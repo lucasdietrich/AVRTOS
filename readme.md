@@ -2,8 +2,17 @@
 
 Index:
 - References to documentation and help
-- Program analysis : in order to understand how `SP`, `REG` and *return address* are handled during function calls
+- Program analysis [tag = test] : in order to understand how `SP`, `REG` and *return address* are handled during function calls
+- Cooperative multithreading [tag = coop] : 
 - Commands list
+
+Themes:
+1. 2 cooperative threads
+2. 2 preemtive threads
+
+Tags:
+- test
+- coop
 
 ---
 
@@ -260,6 +269,61 @@ Datasheet says:
 - `sei` : The instruction following SEI will be executed before any pending interrupts.
     - this explains that restoring the SREG flags is not the last instruction by the `n-1`
 
+#### Stack pointer initialization
+Initialization of the stack pointer is done after reset, here :
+
+```asm
+00000068 <__ctors_end>:
+  68:	11 24       	eor	r1, r1    ; ldi r1, 0 (equivalent)
+  6a:	1f be       	out	0x3f, r1	; SREG = 0
+  6c:	cf ef       	ldi	r28, 0xFF	; prepare SPL value
+  6e:	d8 e0       	ldi	r29, 0x08	; prepare SPH value
+  70:	de bf       	out	0x3e, r29	; write SPH
+  72:	cd bf       	out	0x3d, r28	; write SPL
+```
+
+---
+
+## Cooperative multithreading
+
+
+See :
+- [res/disassembly.coop.s](./res/disassembly.coop.s)
+- [res/ramdump.coop.parsed.txt](.res/ramdump.coop.parsed.txt)
+- [res/ramdump.coop.txt](./res/ramdump.coop.txt)
+
+**Description**
+
+complete cooperative multithreading for 2 threads
+
+Output : 
+```
+============
+thread 2 address : 00A4
+thread 2 stack context : 0100
+thread 2 stack pointer address : 04DC
+thread 2 stack base address : 04FF
+#1 loop : 08FD
+EF
+CD AB 89 #2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+#1 loop : 08FD
+#2 loop SP = 04FF
+```
+
 ---
 
 ## Commands
@@ -272,4 +336,4 @@ Go to project directory
 
 Disassembly
 
-`avr-objdump -S .pio/build/pro16MHzatmega328/firmware.elf > diassembly.s`
+`avr-objdump -S .pio/build/pro16MHzatmega328/firmware.elf > disassembly.s`

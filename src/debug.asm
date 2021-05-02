@@ -26,29 +26,52 @@ read_sp:
 
 /*___________________________________________________________________________*/
 
-.global push_things_in_stack
-.global usart_show_addr
-.global read_return_addr
+.global set_stack_pointer
 
-// return something to tell the compiler to not use r24 (& r25)
-push_things_in_stack:
-    ldi r24, 0xBB
-    ldi r25, 0xBB
-    ret
+// structure address in r24, r25
+set_stack_pointer:
+    cli
 
-read_return_addr:
-    // read addr of "return addr"
     push r26
     push r27
-    ldi r26, SPL
-    ldi r27, SPH
-    // inc 2 times SP
-    ld r24, X+
-    ld r24, X+
 
-    ld r24, X+
-    ld r25, X+
-    call usart_show_addr
+    mov r26, r24
+    mov r27, r25
+
+    lds r24, SPL
+    lds r25, SPH
+
+    st X+, r24
+    st X+, r25
+
     pop r27
     pop r26
+
+    sei
+
+    ret
+
+/*___________________________________________________________________________*/
+
+.global testloop_assembler
+.global testshift_assembler
+
+testloop_assembler:
+    push r16
+
+    ldi r16, 0
+    inc r16
+    dec r24
+    brne .-6
+
+    mov r24, r16
+
+    pop r16
+
+    ret
+
+testshift_assembler:
+    lsr r25 // MSB
+    ror r24 // LSB
+
     ret

@@ -3,6 +3,8 @@
 
 #include "uart.h"
 
+#include "string.h"
+
 /*___________________________________________________________________________*/
 
 #define USART_DUMP_RAM_ALL() (usart_ram_dump(RAMSTART, RAMEND - RAMSTART + 1, SP))
@@ -11,6 +13,10 @@
 #define USART_SP() (usart_hex(SP))
 
 /*___________________________________________________________________________*/
+
+void printf(const char * text);
+
+void usart_dbg_hex16(const char * text, uint16_t addr);
 
 extern "C" void usart_show_addr(uint16_t addr);
 

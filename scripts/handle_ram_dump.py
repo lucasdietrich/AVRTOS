@@ -34,5 +34,7 @@ with open(filepath, "wb+") as fp:
             print(f"Boundary found (state = {state})")
         elif state == 1:
             fp.write(content)
+
+ser.close()
     
 print(f"flash dump complete : {filepath}")
