@@ -6,8 +6,8 @@ import re
 import logging
 from typing import Union
 
-filename = "res/ramdump.txt"
-filename_parsed = "res/ramdump.parsed.txt"
+filename = "../res/ramdump.txt"
+filename_parsed = "../res/ramdump.parsed.txt"
 
 # init config
 logger = logging.getLogger("ramdump.parser")

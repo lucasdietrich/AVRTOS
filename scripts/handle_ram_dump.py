@@ -5,7 +5,7 @@ import os
 
 # todo handle several ramdump in the same run
 
-LOCATION_DIR = "./res"
+LOCATION_DIR = "../res"
 COM_PORT = "COM3"
 BAUDRATE = 115200
 
