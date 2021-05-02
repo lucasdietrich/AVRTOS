@@ -131,6 +131,10 @@ read_ra:
     ret
 ```
 
+The *return address* refers to an instruction and considering that instructions are aligned on paired addresses, the AVR architecture imposes to use addresse shifted by 1bit to the right (i.e. divided by 2). e.g. the *return address* = 0x00A2 will be stored as 0x0051 (0x00A2/2) in stack.
+
+This is also related to harvard architecture that seperate addressing for program and ram, which is not the case for Von Neumann architectures.
+
 ### Disassembly
 
 ***main (not complete)**
