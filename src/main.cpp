@@ -19,10 +19,7 @@
 
 thread_t threads[2];
 
-uint16_t return_sp_c(void)
-{
-  return SP;
-}
+extern void function(uint16_t a, uint16_t b);
 
 /*___________________________________________________________________________*/
 
@@ -32,57 +29,25 @@ extern "C" uint16_t push_things_in_stack(void);
 
 /*___________________________________________________________________________*/
 
+static uint8_t ram[20u] = {0};
+static uint8_t i = 0;
+
 // threadA
 int main(void)
 {
   led_init();
   usart_init();
 
-  /*
-  usart_show_addr(SP);
+  //////////////////////////////////////////////
 
-  usart_show_sp_complete();
+  char buffer[16*8];
+  memset(buffer, 0xAA, sizeof(buffer));
 
-  usart_send("\n", 1);
-  usart_send("struct thread_t size = ", 23);
-  usart_hex(sizeof(thread_t));
-  usart_send("\n", 1);
-  */
+  USART_DUMP_RAM_ALL();
 
-  /*___________________________________________________________________________*/
-
-  // usart_show_addr(SP);
-
-  /*
-  uint16_t ret_addr = read_return_addr();
-
-  usart_hex16(ret_addr);
-
-  usart_transmit('\n');
-  */
-
- USART_DUMP_RAM_ALL();
-
-  /*
-  usart_show_stack(SP - 2, 10);
-
-  uint16_t current_sp = return_sp_assembler();
-
-  usart_show_stack(current_sp - 2, 10);
-  */
-
-  /*
-  uint16_t val = push_things_in_stack();
-  usart_hex16(val);
-  */
-
-  /*
-  uint32_t canary = 0xAAAAAAAA;
-  usart_send_hex((uint8_t*) &canary, 4);
-  */
-
-
-  // thread_switch(&threads[MAIN_THREAD], &threads[SECOND_THREAD]);
+  usart_send_hex((const uint8_t*) buffer, sizeof(buffer));
+ 
+  //////////////////////////////////////////////
 
   while(1)
   {

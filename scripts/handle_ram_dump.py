@@ -31,7 +31,7 @@ with open(filepath, "wb+") as fp:
         
         if content == boundary:
             state += 1
-            print(f"Baudary found (state = {state})")
+            print(f"Boundary found (state = {state})")
         elif state == 1:
             fp.write(content)
     

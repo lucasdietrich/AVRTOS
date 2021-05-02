@@ -5,6 +5,8 @@
 
 #include <avr/io.h>
 
+/*___________________________________________________________________________*/
+
 #define FOSC 16000000 // Clock Speed = F_CPU
 #define BAUD_9600       9600
 #define BAUD_19200      19200
@@ -20,9 +22,13 @@
 #define MH16_115200_UBRR    8
 #define MH16_BAUDRATE_UBRR  MH16_115200_UBRR
 
+/*___________________________________________________________________________*/
+
 void usart_init();
 void usart_transmit(char data);
 void usart_send(const char* buffer, size_t len);
+
+/*___________________________________________________________________________*/
 
 void usart_hex(const uint8_t val);
 void usart_hex16(const uint16_t val);
