@@ -1,5 +1,11 @@
 # Multithreading
 
+Author : Lucas Dietrich (pro@ldietrich.fr)
+
+Description : Multithreading draft on AVR 8 bit microcontroller
+
+Github : https://github.com/Adecy/atmega328p-multithreading
+
 Index:
 - References to documentation and help
 - Program analysis [tag = test] : in order to understand how `SP`, `REG` and *return address* are handled during function calls
@@ -7,8 +13,8 @@ Index:
 - Commands list
 
 Themes:
-1. 2 cooperative threads
-2. 2 preemtive threads
+1. 2 cooperative threads (done)
+2. 2 preemtive threads (todo)
 
 Tags:
 - test
@@ -286,13 +292,12 @@ Initialization of the stack pointer is done after reset, here :
 
 ## Cooperative multithreading
 
-
 See :
 - [res/disassembly.coop.s](./res/disassembly.coop.s)
 - [res/ramdump.coop.parsed.txt](.res/ramdump.coop.parsed.txt)
 - [res/ramdump.coop.txt](./res/ramdump.coop.txt)
 
-**Description**
+### Description
 
 complete cooperative multithreading for 2 threads
 
@@ -323,6 +328,13 @@ CD AB 89 #2 loop SP = 04FF
 #1 loop : 08FD
 #2 loop SP = 04FF
 ```
+
+### Improvements
+
+- `thread_create` could have been written in C++ (but not the case for thread_switch)
+
+- use a more global function that 
+
 
 ---
 
