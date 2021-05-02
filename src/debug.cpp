@@ -1,4 +1,4 @@
-#include "test.h"
+#include "debug.h"
 
 void testfunction()
 {

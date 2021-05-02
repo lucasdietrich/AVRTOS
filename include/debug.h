@@ -1,5 +1,5 @@
-#ifndef _F_H
-#define _F_H
+#ifndef _DEBUG_H
+#define _DEBUG_H
 
 #include <avr/io.h>
 

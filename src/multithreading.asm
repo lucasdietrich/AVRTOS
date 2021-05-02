@@ -12,17 +12,6 @@
 */
 
 thread_switch:
-    // call debug function
-    /*
-    push r24
-    push r25
-    lds r24, SPL
-    lds r25, SPH
-    call usart_show_addr
-    pop r25
-    pop r24
-    */
-    
     // save current thread registers
     // push 32 registers
     push r0
