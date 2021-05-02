@@ -13,9 +13,7 @@
 typedef struct
 {
     void* sp;       // stack pointer (16 bits)
-    uint8_t id;
-
-    // void* data;     // pointer to context (16 bits)
+    uint8_t id;     // thread id
 } thread_t;
 
 // sizeof(thread_t) == 2

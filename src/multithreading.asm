@@ -121,6 +121,7 @@ thread_switch:
     push r0
 
     // disable interrupts
+    // TODO can be done later
     cli
 
     // save stack pointer in structure (thread_t *from)
@@ -146,6 +147,8 @@ thread_switch:
 
     ld r0, X+  ; low byte
     ld r1, X+  ; high byte
+
+    // todo cli here
 
     // set stack pointer
     sts SPL, r0
@@ -200,7 +203,7 @@ thread_switch:
     pop r1
     pop r0
 
-    reti
+    ret
 
 /*___________________________________________________________________________*/
 

@@ -20,6 +20,18 @@ Tags:
 - test
 - coop
 
+Improvements: 
+
+- `thread_create` could have been written in C++ (but not the case for thread_switch)
+
+- don't choose th next thread to be executed from the `thread_switch` caller
+
+- add timer for preemtive threads
+
+- optimize the use of `cli` and `sei`
+
+- semaphore/mutex and synchronisation mechanisms
+
 ---
 
 ## References : 
@@ -328,13 +340,6 @@ CD AB 89 #2 loop SP = 04FF
 #1 loop : 08FD
 #2 loop SP = 04FF
 ```
-
-### Improvements
-
-- `thread_create` could have been written in C++ (but not the case for thread_switch)
-
-- use a more global function that 
-
 
 ---
 
