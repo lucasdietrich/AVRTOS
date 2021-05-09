@@ -12,6 +12,7 @@
 
 #include "multithreading.h"
 #include "mutex.h"
+#include "semaphore.h"
 
 #include "debug.h"
 
@@ -42,6 +43,7 @@ static context_t thread_context;
 //
 
 static mutex_t my_mutex;
+static sem_t my_sem;
 
 /*___________________________________________________________________________*/
 
@@ -54,6 +56,8 @@ int main(void)
   //////////////////////////////////////////////
 
   mutex_define(&my_mutex);
+
+  semaphore_define(&my_sem, 2u);
 
   //////////////////////////////////////////////
 
