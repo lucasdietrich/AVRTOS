@@ -4,27 +4,6 @@
 .global _mutex_lock
 .global mutex_release
 
-
-_mutex_read:
-    push r30
-    push r31
-
-    movw r30, r24
-
-    // neither atmega328P nor atmega2560 supports xch instruction
-    // xch Z, r24
-
-    lds r25, SREG
-    cli
-
-    ld r24, Z
-
-    sts SREG, r25
-
-    pop r31
-    pop r30
-    ret
-
 // mutex struct addr in r24, r25
 // mov addr in r30, r31 (Z register)
 // return value (uint8_t) in r24

@@ -20,8 +20,6 @@ typedef struct {
  */
 void mutex_define(mutex_t *mutex);
 
-extern "C" uint8_t _mutex_read(mutex_t *mutex);
-
 extern "C" uint8_t _mutex_lock(mutex_t *mutex);
 
 /**
