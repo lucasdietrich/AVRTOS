@@ -14,7 +14,7 @@
 
 /*___________________________________________________________________________*/
 
-void printf(const char * text);
+void usart_print(const char * text);
 
 void usart_dbg_hex16(const char * text, uint16_t addr);
 

@@ -15,10 +15,12 @@ Index:
 Themes:
 1. 2 cooperative threads (done)
 2. 2 preemtive threads (todo)
+3. TODO mutex ...
 
 Tags:
 - test
 - coop
+- mutex
 
 Improvements: 
 
@@ -31,6 +33,17 @@ Improvements:
 - optimize the use of `cli` and `sei`
 
 - semaphore/mutex and synchronisation mechanisms
+
+Todos:
+- Semaphore (merge with mutex)
+
+- Scheduler
+
+- Timer
+
+- Mutex/semaphre timeout (0, sec, forever)
+
+- k_cpu_idle()
 
 ---
 

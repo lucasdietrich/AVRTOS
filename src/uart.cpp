@@ -60,7 +60,7 @@ void usart_send_hex(const uint8_t* buffer, size_t len)
 
     if (i != len)
     {
-      if (0 == (i & 0xF))
+      if (0xF == (i & 0xF))
       {
         usart_transmit('\n');
       }

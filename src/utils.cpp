@@ -4,14 +4,14 @@ static const char utils_ram_limit[] = " : ";
 static const char utils_ram_border[] = "============\n";
 static const char utils_ram_here[] = "  <-- here";
 
-void printf(const char * text)
+void usart_print(const char * text)
 {
     usart_send(text, strlen(text));
 }
 
 void usart_dbg_hex16(const char * text, uint16_t addr)
 {
-    printf(text);
+    usart_print(text);
 
     usart_hex16(addr);
     usart_transmit('\n');

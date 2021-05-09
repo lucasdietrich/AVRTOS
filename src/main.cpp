@@ -101,7 +101,11 @@ int main(void)
 
 void thread(void *p)
 {
+  usart_print("Thread 2 start up, context is :\n");
+
   usart_send_hex((const uint8_t*) &((context_t*)p)->context, 4);
+
+  usart_print("\n");
 
   while(1)
   {
@@ -120,7 +124,6 @@ void thread(void *p)
 
       mutex_release(&my_mutex);
     }
-
 
     thread_switch(&threads[SECOND_THREAD], &threads[MAIN_THREAD]);
   }
