@@ -40,6 +40,4 @@ extern "C" void thread_switch(thread_t *from, thread_t *to);
 
 /*___________________________________________________________________________*/
 
-
-
 #endif

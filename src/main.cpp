@@ -8,23 +8,26 @@
 
 #include "uart.h"
 #include "led.h"
-#include "multithreading.h"
 #include "utils.h"
+
+#include "multithreading.h"
+#include "mutex.h"
 
 #include "debug.h"
 
+
 /*___________________________________________________________________________*/
+
+//
+// Multithreading
+//
 
 #define MAIN_THREAD     0
 #define SECOND_THREAD   1
 
-thread_t threads[2];
+static thread_t threads[2];
 
 void thread(void *p);
-
-/*___________________________________________________________________________*/
-
-void(*function_p)(void) = testfunction;
 
 typedef struct {
   uint32_t context = 0x89ABCDEF;
@@ -32,17 +35,31 @@ typedef struct {
 
 static context_t thread_context;
 
+/*___________________________________________________________________________*/
+
+//
+// Mutex
+//
+
+static mutex_t my_mutex;
+
+/*___________________________________________________________________________*/
+
 // threadA
 int main(void)
 {
   led_init();
   usart_init();
-  
+
+  //////////////////////////////////////////////
+
+  mutex_define(&my_mutex);
+
   //////////////////////////////////////////////
 
   thread_create(&threads[SECOND_THREAD], thread, THREAD_2ND_STACK_LOC, (void*) &thread_context);
 
-  usart_ram_dump(RAMSTART, RAMEND - RAMSTART + 1, SP);
+  // usart_ram_dump(RAMSTART, RAMEND - RAMSTART + 1, SP);
 
   //////////////////////////////////////////////
 
@@ -53,18 +70,27 @@ int main(void)
 
   //////////////////////////////////////////////
 
-
   while(1)
   {
-    usart_dbg_hex16("#1 loop : ", SP);
+    usart_dbg_hex16("#1 loop SP = ", SP);
 
     led_on();
 
-    _delay_ms(100.0);
+    _delay_ms(500.0);
 
     led_off();
 
-    _delay_ms(100.0);
+    _delay_ms(500.0);
+
+    // lock the mutex 1 time/2
+    if (mutex_lock(&my_mutex) == 0)
+    {
+      // do nothing
+    }
+    else
+    {
+      mutex_release(&my_mutex);
+    }
 
     thread_switch(&threads[MAIN_THREAD], &threads[SECOND_THREAD]);
   }
@@ -75,19 +101,26 @@ int main(void)
 
 void thread(void *p)
 {
-  usart_send_hex((const char*) (uint8_t*) &((context_t*)p)->context, 4);
+  usart_send_hex((const uint8_t*) &((context_t*)p)->context, 4);
 
   while(1)
   {
-    usart_dbg_hex16("#2 loop SP = ", SP);
+    // do only if mutex is available
+    if (mutex_lock(&my_mutex) == 0)
+    {
+      usart_dbg_hex16("#2 loop SP = ", SP);
 
-    led_on();
+      led_on();
 
-    _delay_ms(500.0);
+      _delay_ms(100.0);
 
-    led_off();
+      led_off();
 
-    _delay_ms(500.0);
+      _delay_ms(100.0);
+
+      mutex_release(&my_mutex);
+    }
+
 
     thread_switch(&threads[SECOND_THREAD], &threads[MAIN_THREAD]);
   }

@@ -9,8 +9,6 @@
 // uint16_t stack_loc   in r20, r21
 // void* p              in r18, r19
 thread_create:
-    cli 
-
     push r26
     push r27
 
@@ -61,9 +59,6 @@ thread_create:
     movw r28, r24
     st Y+, r26
     st Y, r27
-
-    // enable interrupts
-    sei
 
     pop r27
     pop r26
@@ -122,8 +117,7 @@ thread_switch:
 
     // disable interrupts
     // TODO can be done later
-    cli
-
+    
     // save stack pointer in structure (thread_t *from)
     lds r0, SPL
     lds r1, SPH
@@ -151,11 +145,10 @@ thread_switch:
     // todo cli here
 
     // set stack pointer
+    cli
     sts SPL, r0
+    sei // set interrupt mask
     sts SPH, r1
-
-    // set interrupt mask
-    sei
 
     // restore SREG from stack;
     pop r0
