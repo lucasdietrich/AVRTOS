@@ -28,6 +28,9 @@ extern "C" uint8_t _mutex_lock(mutex_t *mutex);
  * @param mutex : success if 0 else mutex already locked
  * @return uint8_t 
  */
+
+// TODO set this inline
+// https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header
 uint8_t mutex_lock(mutex_t *mutex);
 
 /**

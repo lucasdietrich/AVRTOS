@@ -15,7 +15,8 @@ Index:
 Themes:
 1. 2 cooperative threads (done)
 2. 2 preemtive threads (todo)
-3. TODO mutex ...
+3. mutex (nonblocking)
+4. semaphore (draft)
 
 Tags:
 - test
