@@ -1,14 +1,18 @@
 #include <avr/io.h>
 
-.global thread_switch
-.global thread_create
+.global k_thread_switch
+.global k_thread_create
+.global k_yield
+.global k_schedule
+
+.extern k_thread
 
 
 // thread_t *th         in r24, r25
 // thread_entry_t entry in r22, r23
 // uint16_t stack_loc   in r20, r21
 // void* p              in r18, r19
-thread_create:
+k_thread_create:
     push r26
     push r27
 
@@ -63,13 +67,13 @@ thread_create:
     pop r27
     pop r26
 
-    ret
+    ret  // dispath to next thread
 
 /*___________________________________________________________________________*/
 
 // thread_t *from   in r24, r25
 // thread_t *to     in r22, r23
-thread_switch:
+k_thread_switch:
     // save current thread registers
     // push 32 registers
     push r0
@@ -119,25 +123,23 @@ thread_switch:
     // TODO can be done later
     
     // save stack pointer in structure (thread_t *from)
+    cli
     lds r0, SPL
+    sei
     lds r1, SPH
 
     ; set structure pointer to X
-    mov r26, r24  ; low byte
-    mov r27, r25  ; high byte
+    movw r26, r24
 
     st X+, r0    ; write SPL in uint16_t low byte (?)
     st X+, r1    ; write SPH in uint16_t high byte (?)
-
-/*___________________________________________________________________________*/
 
     ; restore the other thread
 
     ; restore stack pointer from  structure (thread_t *from)
 
     ; set structure pointer to X
-    mov r26, r22  ; low byte
-    mov r27, r23  ; high byte
+    movw r26, r22
 
     ld r0, X+  ; low byte
     ld r1, X+  ; high byte
@@ -155,7 +157,6 @@ thread_switch:
     sts SREG, r0
 
     // restore 32 registers
-    // pop SREG
     pop r31
     pop r30
     pop r29
@@ -196,7 +197,110 @@ thread_switch:
     pop r1
     pop r0
 
-    ret
+    ret // 2 following Bytes in stack are return address
 
 /*___________________________________________________________________________*/
 
+// see k_thread_switch (th* a -> th* b)
+k_yield:
+    // save current thread registers
+    // push 32 registers
+    push r0
+    push r1
+    push r2
+    push r3
+    push r4
+    push r5
+    push r6
+    push r7
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+    push r16
+    push r17
+    push r18
+    push r19
+    push r20
+    push r21
+    push r22
+    push r23
+    push r24
+    push r25
+    push r26
+    push r27
+    push r28
+    push r29
+    push r30
+    push r31
+
+    lds r0, SREG    // save flags
+    push r0
+
+    cli
+    lds r0, SPL
+    sei
+    lds r1, SPH
+
+    lds r26, k_thread           // load current thread structure addr in X
+    lds r27, k_thread + 1
+
+    st X+, r0   // save SP
+    st X+, r1
+
+    // determine which is the next thread
+    call k_schedule
+
+    // next thread structure addr is in X
+    movw r26, r24
+
+    ld r0, X+
+    ld r1, X+
+
+    cli
+    sts SPL, r0 // restore stack pointer
+    sei
+    sts SPH, r1
+
+    pop r0  // restore flags
+    sts SREG, r0
+
+    // restore 32 registers
+    pop r31
+    pop r30
+    pop r29
+    pop r28
+    pop r27
+    pop r26
+    pop r25
+    pop r24
+    pop r23
+    pop r22
+    pop r21
+    pop r20
+    pop r19
+    pop r18
+    pop r17
+    pop r16
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop r7
+    pop r6
+    pop r5
+    pop r4
+    pop r3
+    pop r2
+    pop r1
+    pop r0
+
+    ret  // dispath to next thread

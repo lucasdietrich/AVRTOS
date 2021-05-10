@@ -15,6 +15,9 @@
 #include "semaphore.h"
 
 #include "debug.h"
+#include "multithreading_debug.h"
+
+#include <avr/pgmspace.h>
 
 /*___________________________________________________________________________*/
 
@@ -25,39 +28,74 @@
 #define MAIN_THREAD     0
 #define SECOND_THREAD   1
 
-static thread_t threads[2];
+static thread_t mythread1;
+static thread_t mythread2;
 
-void thread(void *p);
+void thread_ledon(void *p);
+void thread_ledoff(void *p);
 
 /*___________________________________________________________________________*/
 
-// threadA
 int main(void)
 {
   led_init();
   usart_init();
 
-  thread_create(&threads[SECOND_THREAD], thread, THREAD_2ND_STACK_LOC, nullptr);
+  // main stack size = 0x300
+
+  k_thread_create(&mythread1, thread_ledon, RAMEND - 0x300, 0x100, K_PRIO_DEFAULT, nullptr);
+  k_thread_create(&mythread2, thread_ledoff, RAMEND - 0x300 - 0x100, 0x100, K_PRIO_DEFAULT, nullptr);
+
+  k_thread_dbg_count();
+
+  k_thread_dump_hex(k_thread.current);
+  k_thread_dump_hex(k_thread.list[k_thread.current_idx]);
+
+  k_thread_dump_all();
+
+  while(1) {
+    k_yield();
+  }
 
   while(1)
   {
+    usart_printl("::main");
 
+    k_thread_dump_all();
 
-    thread_switch(&threads[MAIN_THREAD], &threads[SECOND_THREAD]);
+    k_yield();
   }
 }
 
 /*___________________________________________________________________________*/
 
-void thread(void *p)
+void thread_ledon(void *p)
 {
-
   while(1)
   {
+    usart_printl("::thread_ledon");
 
+    led_on();
 
-    thread_switch(&threads[SECOND_THREAD], &threads[MAIN_THREAD]);
+    _delay_ms(500);
+
+    k_yield();
   }
 }
+
+void thread_ledoff(void *p)
+{
+  while(1)
+  {
+    usart_printl("::thread_ledoff");
+
+    led_off();
+
+    _delay_ms(500);
+
+    k_yield();
+  }
+}
+
 
 /*___________________________________________________________________________*/

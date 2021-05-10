@@ -14,8 +14,6 @@
 
 /*___________________________________________________________________________*/
 
-void usart_print(const char * text);
-
 void usart_dbg_hex16(const char * text, uint16_t addr);
 
 extern "C" void usart_show_addr(uint16_t addr);
