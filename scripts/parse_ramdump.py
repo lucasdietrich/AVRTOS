@@ -111,7 +111,6 @@ class RAM:
         return content
 
 
-
 def parse(filename: str, filename_parsed: str):
     ram = RAM()
 
@@ -146,8 +145,8 @@ def parse(filename: str, filename_parsed: str):
     with open(filename_parsed, "w+") as fp:
         fp.write(display)
 
-    return display
+    return display, ram
+
 
 if __name__ == "__main__":
-
-    print(parse(FILE, FILE_PARSED))
+    print(parse(FILE, FILE_PARSED)[0])
