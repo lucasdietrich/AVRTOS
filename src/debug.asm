@@ -5,7 +5,7 @@
 .global read_sp
 .global read_ra
 
-// return the return address of when ther callee calls it
+; return the return address of when ther callee calls it
 read_ra:
     pop r25
     pop r24
@@ -13,7 +13,7 @@ read_ra:
     push r24
     push r25
 
-    // shift the address (addr_real = addr_cpu << 1)
+    ; shift the address (addr_real = addr_cpu << 1)
     add r24, r24
     adc r25, r25
 
@@ -28,7 +28,7 @@ read_sp:
 
 .global set_stack_pointer
 
-// structure address in r24, r25
+; structure address in r24, r25
 set_stack_pointer:
     cli
 
@@ -71,7 +71,7 @@ testloop_assembler:
     ret
 
 testshift_assembler:
-    lsr r25 // MSB
-    ror r24 // LSB
+    lsr r25 ; MSB
+    ror r24 ; LSB
 
     ret

@@ -4,6 +4,20 @@ static const char utils_ram_limit[] = " : ";
 static const char utils_ram_border[] = "============\n";
 static const char utils_ram_here[] = "  <-- here";
 
+static const char utils_addr_limit[] = " = ";
+
+// always before rampdump
+void usart_dump_addr(const char * name, void* addr)
+{
+    usart_transmit('@');
+
+    usart_send(name, strlen(name));
+    usart_send(utils_addr_limit, strlen(utils_addr_limit));
+    usart_hex16((uint16_t) addr);
+
+    usart_transmit('\n');
+}
+
 void usart_dbg_hex16(const char * text, uint16_t addr)
 {
     usart_print(text);
