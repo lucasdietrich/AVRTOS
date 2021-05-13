@@ -6,8 +6,8 @@ import re
 import logging
 from typing import Union
 
-filename = "../res/ramdump.txt"
-filename_parsed = "../res/ramdump.parsed.txt"
+FILE = "res/ramdump.txt"
+FILE_PARSED = "res/ramdump.parsed.txt"
 
 # init config
 logger = logging.getLogger("ramdump.parser")
@@ -89,21 +89,21 @@ class RAM:
         return content
 
     def display_group(self, group_size: int = 8) -> str:
-        size = len(ram)
+        size = len(self)
 
         content = ""
 
         for i in range(size // group_size):
             i_base = i*group_size
-            base_addr = ram[i_base][0]
+            base_addr = self[i_base][0]
             to_addr = base_addr + group_size + (-1)
 
             str_vals = [
-                str(ram[j][1]) for j in range(i_base, i_base + group_size)
+                str(self[j][1]) for j in range(i_base, i_base + group_size)
             ]
 
             char_vals = [
-                ram[j][1].as_printable() for j in range(i_base, i_base + group_size)
+                self[j][1].as_printable() for j in range(i_base, i_base + group_size)
             ]
 
             content += f"{base_addr} > {to_addr} : " + " ".join(str_vals) + "  " + "".join(char_vals) + "\n"
@@ -112,38 +112,42 @@ class RAM:
 
 
 
-ram = RAM()
+def parse(filename: str, filename_parsed: str):
+    ram = RAM()
 
+    # read file
+    with open(filename, "r") as fp:
+        while True:
+            line = fp.readline()
 
-# read file
-with open(filename, "r") as fp:
-    while True:
-        line = fp.readline()
+            line.rstrip('\n')
 
-        line.rstrip('\n')
+            if line == "":
+                break
 
-        if line == "":
-            break
+            m = line_re.match(line)
 
-        m = line_re.match(line)
+            if m:
+                groups = m.groupdict()
 
-        if m:
-            groups = m.groupdict()
+                addr, val, sp = Addr(groups["addr"]), Hex(groups["val"]), groups["SP"]
 
-            addr, val, sp = Addr(groups["addr"]), Hex(groups["val"]), groups["SP"]
+                ram[addr] = val
 
-            ram[addr] = val
+                if sp is not None:
+                    logger.info(f"SP flag found at addr {groups['addr']}")
+                    ram.SP = addr
+            else:
+                logger.error("invalid ramdump file")
+                break
 
-            if sp is not None:
-                logger.info(f"SP flag found at addr {groups['addr']}")
-                ram.SP = addr
-        else:
-            logger.error("invalid ramdump file")
-            break
+    display = ram.display_group(16)
 
-display = ram.display_group(16)
+    with open(filename_parsed, "w+") as fp:
+        fp.write(display)
 
-print(display)
+    return display
 
-with open(filename_parsed, "w+") as fp:
-    fp.write(display)
+if __name__ == "__main__":
+
+    print(parse(FILE, FILE_PARSED))
