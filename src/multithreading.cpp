@@ -1,22 +1,25 @@
 #include "multithreading.h"
 
+
 /*___________________________________________________________________________*/
 
-thread_t k_thread_main = {
+extern int main(void);
+
+struct thread_t k_thread_main = {
     .sp = nullptr,
-    .tid = 1,
-    .priority = -1, // cooperative
+    .priority = THREAD_MAIN_THREAD_PRIORITY, // cooperative
     .stack = {
-        .end = RAMEND,
-        .size = 0,  // undefined stack size size
+        .end = (void*) RAMEND,
+        .size = THREAD_MAIN_STACK_SIZE,  // undefined stack size size
     },
+    .entry = (thread_entry_t) main,
+    .local_storage = nullptr,
 };
 
 struct k_thread_meta k_thread = {
-    .current = &k_thread_main,
+    &k_thread_main,     // current thread is main
     .list = {
-        &k_thread_main,
-        nullptr
+        &k_thread_main // other to nullptr
     },
     .count = 1u,
     .current_idx = 0u,
@@ -24,27 +27,103 @@ struct k_thread_meta k_thread = {
 
 /*___________________________________________________________________________*/
 
-void k_thread_create(thread_t * th, thread_entry_t entry, uint16_t stack, size_t stack_size, int8_t priority, void *p)
+void k_thread_stack_create_c(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
 {
-    k_thread_create(th, entry, stack, p);
+    // get stack pointer value
+    uint8_t* sp = (uint8_t*) stack_end - 1;
 
-    th->stack.end = stack;
-    th->stack.size = stack_size;
+    // add return addr to stack (with format >> 1)
+    *(uint16_t*)sp = K_SWAP_LITTLE_BIG_ENDIAN((uint16_t) entry);
+    sp -= 1u;
 
-    th->priority = priority;
+    // push r0 > r23 (24 registers)
+    for(uint_fast8_t i = 0u; i < 24u; i++)
+    {
+        *sp-- = 0u;
+    }
 
-    k_thread.list[k_thread.count++] = th;
+    // set context (p)
+    sp -= 1u;
+    *(uint16_t*)sp = (uint16_t) context_p;
+    sp -= 1u;
+
+    // push r26 > r31 (6 registers)
+    for (uint_fast8_t i = 0u; i < 6u; i++)
+    {
+        *sp-- = 0u;
+    }
+
+    // push sreg
+    *sp = (uint8_t) SREG;
+    sp -= 1u;
+
+    // save SP in thread structure
+    th->sp = sp;
 }
 
-thread_t *k_schedule(void)
+void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
 {
-    // eval next thread to be exectued
+    if (k_thread.count >= K_THREAD_MAX_COUNT)
+    {
+        return; // TODO return error
+    }
+
+    if (stack_size < K_THREAD_STACK_MIN_SIZE)
+    {
+        return; // TODO return error
+    }
+
+    k_thread.list[k_thread.count++] = th;
+    th->stack.end = K_STACK_END(stack, stack_size);
+    th->stack.size = stack_size;
+    th->priority = priority;
+    th->entry = entry;
+    th->local_storage = local_storage;
+
+#if THREAD_USE_INIT_STACK_ASM
+    k_thread_stack_create(th, entry, th->stack.end, context_p);
+#else
+    k_thread_stack_create_c(th, entry, th->stack.end, context_p);
+#endif
+}
+
+int k_thread_register(struct thread_t *const th)
+{
+    uint8_t i;
+
+    for(i = 0; i < k_thread.count; i++)
+    {
+        if (th == k_thread.list[i])
+        {
+            return 0; // ok (already registerd)
+        }
+    }
+
+    // thread_t not found
+    if (i < K_THREAD_MAX_COUNT)
+    {
+        k_thread.list[k_thread.count++] = th;  // we add it
+
+        return 0;
+    }
+    else
+    {
+        return -1;  // nok, no more space to register the thread
+    }
+
+}
+
+struct thread_t *k_schedule(void)
+{
+    // eval next thread to be executed
     k_thread.current_idx = (k_thread.current_idx + 1) % k_thread.count;
 
-    // set it as current thread
+    // set current
     k_thread.current = k_thread.list[k_thread.current_idx];
 
     // go back to yield and restore thread context
+    // another solution would be to return anything and let the k_yield asm function
+    // to retrieve the current thread from k_thread.current
     return k_thread.current;
 }
 

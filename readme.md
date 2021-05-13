@@ -35,6 +35,19 @@ Improvements:
 
 - semaphore/mutex and synchronisation mechanisms
 
+- Set code in .init section in order to initialize thread count before main : 
+  - https://stackoverflow.com/questions/949890/how-can-i-perform-pre-main-initialization-in-c-c-with-avr-gcc
+  - https://www.nongnu.org/avr-libc/user-manual/mem_sections.html
+
+  - `initN`, `.finiN`
+  - See `__attribute__((naked))` : https://www.keil.com/support/man/docs/armclang_ref/armclang_ref_jhg1476893564298.htm
+
+- Progmemory : 
+  - https://www.nongnu.org/avr-libc/user-manual/pgmspace.html#:~:text=In%20AVR%20GCC%2C%20there%20is,the%20Program%20Memory%20(Flash).
+  - https://www.nongnu.org/avr-libc/user-manual/group__avr__pgmspace.html
+
+- Assembler in avr-gcc :
+  - https://www.nongnu.org/avr-libc/user-manual/assembler.html#ass_pseudoops
 Todos:
 - Semaphore (merge with mutex)
 
@@ -45,6 +58,10 @@ Todos:
 - Mutex/semaphre timeout (0, sec, forever)
 
 - k_cpu_idle()
+
+- use uint32_t to store priorities of 8 threads over a mutex/sem...
+
+- initialize stacks with buffer[SIZE]
 
 ---
 
@@ -363,8 +380,16 @@ CD AB 89 #2 loop SP = 04FF
 
 Go to project directory
 
-`cd /mnt/c/Users/ldade/Documents/ProjetsRecherche/Embedded/ATmega328p-multithreading`
+```cd /mnt/c/Users/ldade/Documents/ProjetsRecherche/Embedded/ATmega328p-multithreading```
 
 Disassembly
 
-`avr-objdump -S .pio/build/pro16MHzatmega328/firmware.elf > disassembly.s`
+```avr-objdump -S .pio/build/pro16MHzatmega328/firmware.elf > disassembly.s```
+
+Preprocessor on `main.cpp` :
+
+```avr-gcc -mmcu=atmega328p -O2 -Wall -DF_CPU=16000000L -Iinclude -Isrc -c src/main.cpp -E > main.e.c```
+
+Readelf :
+
+```avr-readelf -a .pio/build/pro16MHzatmega328/firmware.elf > readelf.txt```

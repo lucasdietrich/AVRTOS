@@ -1,81 +1,87 @@
 #include <avr/io.h>
 
 .global k_thread_switch
-.global k_thread_create
+.global k_thread_stack_create
 .global k_yield
 .global k_schedule
 
 .extern k_thread
 
-
-// thread_t *th         in r24, r25
-// thread_entry_t entry in r22, r23
-// uint16_t stack_loc   in r20, r21
-// void* p              in r18, r19
-k_thread_create:
+; thread_t *th         in r24, r25
+; thread_entry_t entry in r22, r23
+; uint16_t stack_end   in r20, r21
+; void* context_p      in r18, r19
+k_thread_stack_create:
     push r26
     push r27
+    push r28
+    push r29
 
-    // load stack pointer in X register
-    // mov r22, r23 to X
+    ; load stack pointer in X register
+    ; mov r22, r23 to X
     movw r26, r20
 
-    // add 1 to stack pointer in order
+    ; add 1 to stack pointer in order
     adiw r26, 1
 
-    // addr of function is already shifted
-    // "return addr" 1 bit shift (>>1)
-    // lsr r23
-    // ror r22
+    ; addr of function is already shifted
+    ; "return addr" 1 bit shift (>>1)
+    ; lsr r23
+    ; ror r22
 
-    // add return addr to stack (with format >> 1)
-    st -X, r22 // SPL
-    st -X, r23 // SPH
+    ; add return addr to stack (with format >> 1)
+    st -X, r22 ; SPL
+    st -X, r23 ; SPH
 
-    // push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
-    // r0 > r23 (24 registers)
-    ldi r16, 0x00
-    ldi r17, 24
-    dec r17
-    st -X, r16
+    ; push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
+    ; r0 > r23 (24 registers)
+    ldi r28, 0x00
+    ldi r29, 24
+    dec r29
+    st -X, r28
     brne .-6
 
-    // void * context ~ push r24 > r25
+    ; void * context ~ push r24 > r25
     st -X, r18
     st -X, r19
 
-    // push r26 > r31 (6 registers)
-    ldi r17, 6
-    dec r17
-    st -X, r16
+    ; push r26 > r31 (6 registers)
+    ldi r29, 6
+    dec r29
+    st -X, r28
     brne .-6
     
-    // push sreg default (0)
-    lds r0, SREG
-    st -X, r0
+    ; push sreg default (0)
+    lds r29, SREG
+    st -X, r29
 
-    // copy stack pointer in thread structure
+    ; copy stack pointer in thread structure
 
-    // -1, to first empty stack addr
+    ; -1, to first empty stack addr
     sbiw r26, 1
 
-    // mov r24, r25 (thread_t *th) to Y
+    ; mov r24, r25 (thread_t *th) to Y
     movw r28, r24
+
+    ; save SP in thread structure
     st Y+, r26
     st Y, r27
 
+    pop r29
+    pop r28
     pop r27
     pop r26
 
-    ret  // dispath to next thread
+    ret  ; dispath to next thread
+
 
 /*___________________________________________________________________________*/
 
-// thread_t *from   in r24, r25
-// thread_t *to     in r22, r23
+; thread_t *from   in r24, r25
+; thread_t *to     in r22, r23
 k_thread_switch:
-    // save current thread registers
-    // push 32 registers
+    ; save current thread registers
+    ; push 32 registers
     push r0
     push r1
     push r2
@@ -115,14 +121,14 @@ k_thread_switch:
     push r30
     push r31
 
-    // push SREG onto stack;
+    ; push SREG onto stack;
     lds r0, SREG
     push r0
 
-    // disable interrupts
-    // TODO can be done later
+    ; disable interrupts
+    ; TODO can be done later
     
-    // save stack pointer in structure (thread_t *from)
+    ; save stack pointer in structure (thread_t *from)
     cli
     lds r0, SPL
     sei
@@ -144,19 +150,19 @@ k_thread_switch:
     ld r0, X+  ; low byte
     ld r1, X+  ; high byte
 
-    // todo cli here
+    ; todo cli here
 
-    // set stack pointer
+    ; set stack pointer
     cli
     sts SPL, r0
-    sei // set interrupt mask
+    sei ; set interrupt mask
     sts SPH, r1
 
-    // restore SREG from stack;
+    ; restore SREG from stack;
     pop r0
     sts SREG, r0
 
-    // restore 32 registers
+    ; restore 32 registers
     pop r31
     pop r30
     pop r29
@@ -197,14 +203,14 @@ k_thread_switch:
     pop r1
     pop r0
 
-    ret // 2 following Bytes in stack are return address
+    ret ; 2 following Bytes in stack are return address
 
 /*___________________________________________________________________________*/
 
-// see k_thread_switch (th* a -> th* b)
+; see k_thread_switch (th* a -> th* b)
 k_yield:
-    // save current thread registers
-    // push 32 registers
+    ; save current thread registers
+    ; push 32 registers
     push r0
     push r1
     push r2
@@ -238,7 +244,7 @@ k_yield:
     push r30
     push r31
 
-    lds r0, SREG    // save flags
+    lds r0, SREG    ; save flags
     push r0
 
     cli
@@ -246,30 +252,30 @@ k_yield:
     sei
     lds r1, SPH
 
-    lds r26, k_thread           // load current thread structure addr in X
+    lds r26, k_thread           ; load current thread structure addr in X
     lds r27, k_thread + 1
 
-    st X+, r0   // save SP
+    st X+, r0   ; save SP
     st X+, r1
 
-    // determine which is the next thread
+    ; determine which is the next thread
     call k_schedule
 
-    // next thread structure addr is in X
+    ; next thread structure addr is in X
     movw r26, r24
 
     ld r0, X+
     ld r1, X+
 
     cli
-    sts SPL, r0 // restore stack pointer
+    sts SPL, r0 ; restore stack pointer
     sei
     sts SPH, r1
 
-    pop r0  // restore flags
+    pop r0  ; restore flags
     sts SREG, r0
 
-    // restore 32 registers
+    ; restore 32 registers
     pop r31
     pop r30
     pop r29
@@ -303,4 +309,4 @@ k_yield:
     pop r1
     pop r0
 
-    ret  // dispath to next thread
+    ret  ; dispath to next thread

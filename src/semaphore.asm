@@ -3,9 +3,9 @@
 .global semaphore_take
 .global semaphore_give
 
-// semaphore struct addr in r24, r25
-// mov addr in r30, r31 (Z register)
-// return value (uint8_t) in r24
+; semaphore struct addr in r24, r25
+; mov addr in r30, r31 (Z register)
+; return value (uint8_t) in r24
 semaphore_take:
     push r30
     push r31
@@ -15,11 +15,11 @@ semaphore_take:
     lds r25, SREG
     cli
 
-    ld r24, Z // get semaphore count
-    tst r24   // tst
-    breq .+4    // no semaphore left
-    dec r24     // dec
-    st Z, r24   // mutex free, lock it (set FF)
+    ld r24, Z ; get semaphore count
+    tst r24   ; tst
+    breq .+4    ; no semaphore left
+    dec r24     ; dec
+    st Z, r24   ; mutex free, lock it (set FF)
 
     sts SREG, r25
 
@@ -27,7 +27,7 @@ semaphore_take:
     pop r30
     ret
 
-// mutex struct addr in r24, r25
+; mutex struct addr in r24, r25
 semaphore_give:
     push r26
     push r27
