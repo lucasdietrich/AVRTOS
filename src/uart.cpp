@@ -55,27 +55,29 @@ void usart_u8(const uint8_t val)
   usart_transmit(unit);
 }
 
-void usart_u16(uint16_t val)
+void  usart_u16(uint16_t val)
 {
+  // return usart_hex16(val);
+
   char digits[5];
 
-  uint8_t last_non_zero = 1u;
+  uint8_t first_digit = 4u;
 
   for (uint_fast8_t p = 0; p < 5; p++)
   {
-    char current = usart_alpha16[val % 10];
+    char cur = usart_alpha16[val % 10];
 
     val /= 10;
 
-    digits[5u - p] = current;
+    digits[4u - p] = cur;
 
-    if (current != '0')
+    if (cur != '0')
     {
-      last_non_zero = p + 1;
+      first_digit = 4u - p;
     }
   }
 
-  usart_send(digits + 5 - last_non_zero + 1, last_non_zero);
+  usart_send(&digits[first_digit], 5 - first_digit);
 }
 
 void usart_s8(const int8_t val)
