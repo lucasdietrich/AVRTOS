@@ -151,9 +151,12 @@ extern struct k_thread_meta k_thread;
  * @param stack thread stack start location
  * @param p thread context
  */
-extern "C" void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack, void *const context_p);
 
-void k_thread_stack_create_c(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p);
+#if THREAD_USE_INIT_STACK_ASM
+extern "C" void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack, void *const context_p);
+#else
+void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p);
+#endif
 
 void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
 

@@ -25,7 +25,7 @@ uint8_t off = 0u;
 void thread_led(void *p);
 void thread_monitor(void *p);
 
-#define THREAD_PREPROCESSOR 0
+#define THREAD_PREPROCESSOR 1
 
 #if THREAD_PREPROCESSOR
 K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, nullptr);

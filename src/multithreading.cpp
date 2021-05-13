@@ -27,7 +27,9 @@ struct k_thread_meta k_thread = {
 
 /*___________________________________________________________________________*/
 
-void k_thread_stack_create_c(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
+#if !THREAD_USE_INIT_STACK_ASM
+
+void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
 {
     // get stack pointer value
     uint8_t* sp = (uint8_t*) stack_end - 1;
@@ -60,6 +62,7 @@ void k_thread_stack_create_c(struct thread_t *const th, thread_entry_t entry, vo
     // save SP in thread structure
     th->sp = sp;
 }
+#endif
 
 void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
 {
@@ -80,11 +83,7 @@ void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *cons
     th->entry = entry;
     th->local_storage = local_storage;
 
-#if THREAD_USE_INIT_STACK_ASM
     k_thread_stack_create(th, entry, th->stack.end, context_p);
-#else
-    k_thread_stack_create_c(th, entry, th->stack.end, context_p);
-#endif
 }
 
 int k_thread_register(struct thread_t *const th)

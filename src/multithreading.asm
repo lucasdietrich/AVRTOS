@@ -7,6 +7,8 @@
 
 .extern k_thread
 
+#if THREAD_USE_INIT_STACK_ASM
+
 ; thread_t *th         in r24, r25
 ; thread_entry_t entry in r22, r23
 ; uint16_t stack_end   in r20, r21
@@ -74,6 +76,7 @@ k_thread_stack_create:
 
     ret  ; dispath to next thread
 
+#endif
 
 /*___________________________________________________________________________*/
 
