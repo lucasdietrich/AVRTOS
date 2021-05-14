@@ -130,4 +130,9 @@ struct thread_t *k_scheduler(void)
 // Utils
 //
 
+inline void * k_thread_local_storage(void)
+{
+    return k_thread.current->local_storage;
+}
+
 /*___________________________________________________________________________*/

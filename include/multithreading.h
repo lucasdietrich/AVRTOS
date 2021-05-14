@@ -65,18 +65,31 @@ void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *cons
 
 int k_thread_register(struct thread_t *const th);
 
+/*___________________________________________________________________________*/
+
 /**
- * @brief TODO
- * 
+ * @brief switch from current thrad *from to *to
  */
-void k_thread_switch(struct thread_t *from, struct thread_t *to);
+void _k_thread_switch(struct thread_t *from, struct thread_t *to);
 
 struct thread_t *k_scheduler(void);
 
+/**
+ * @brief Release CPU
+ */
 void k_yield(void);
 
 // TODO
 void cpu_idle(void);
+
+/*___________________________________________________________________________*/
+
+/**
+ * @brief Get current thread local storage pointer
+ * 
+ * @return void* 
+ */
+void * k_thread_local_storage(void);
 
 /*___________________________________________________________________________*/
 

@@ -83,7 +83,7 @@ int main(void)
 // use thread local storage
 void inthread_setled(void)
 {
-  uint8_t state = *(uint8_t *)k_thread.current->local_storage;
+  uint8_t state = *(uint8_t *) k_thread_local_storage();
 
   if (state == 0)
   {

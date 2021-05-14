@@ -10,7 +10,7 @@
 #define CONFIG_THREAD_MAX                   4
 #define CONFIG_THREAD_MAIN_STACK_SIZE       0x200
 #define CONFIG_THREAD_MAIN_THREAD_PRIORITY  K_PRIO_PREEMPT(8)
-#define CONFIG_THREAD_USE_INIT_STACK_ASM    0
+#define CONFIG_THREAD_USE_INIT_STACK_ASM    1
 
 /*___________________________________________________________________________*/
 
@@ -60,13 +60,13 @@
         {0x00},                                                  \
         {K_THREAD_DEFAULT_SREG,                                  \
          {0x00},                                                 \
-         (void *)K_SWAP_LITTLE_BIG_ENDIAN((uint16_t)context_p),  \
+         (void *)context_p,                                      \
          {0x00},                                                 \
          (void *)K_SWAP_LITTLE_BIG_ENDIAN((uint16_t)entry)}}
 
 // in order to remove the K_SWAP_LITTLE_BIG_ENDIAN define here we need to pop and push registers in an inverted way
 
-#define _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p)                   \
+#define _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p)                            \
     {                                                                                             \
         .sp = (void *)K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                \
         .priority = prio,                                                                         \

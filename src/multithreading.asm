@@ -2,7 +2,7 @@
 
 #include <multithreading_defines.h>
 
-.global k_thread_switch
+.global _k_thread_switch
 .global k_thread_stack_create
 .global k_yield
 .global k_scheduler
@@ -85,7 +85,7 @@ k_thread_stack_create:
 
 ; thread_t *from   in r24, r25
 ; thread_t *to     in r22, r23
-k_thread_switch:
+_k_thread_switch:
     ; save current thread registers
     ; push 32 registers
     push r0
@@ -113,13 +113,11 @@ k_thread_switch:
 
     ; as the function has 2 (void* = 16bits) arguments
     ; these 4 registers are already save onto the stack
-
     ; ?
     push r22
     push r23
-    push r24
     push r25
-
+    push r24
     push r26
     push r27
     push r28
@@ -181,11 +179,10 @@ k_thread_switch:
     ; no need to restore them
 
     ; ?
-    pop r25
     pop r24
+    pop r25
     pop r23
     pop r22
-
     pop r21
     pop r20
     pop r19
@@ -213,7 +210,7 @@ k_thread_switch:
 
 /*___________________________________________________________________________*/
 
-; see k_thread_switch (th* a -> th* b)
+; see _k_thread_switch (th* a -> th* b)
 k_yield:
     ; save current thread registers
     ; push 32 registers
@@ -241,8 +238,8 @@ k_yield:
     push r21
     push r22
     push r23
-    push r24
     push r25
+    push r24
     push r26
     push r27
     push r28
@@ -288,8 +285,8 @@ k_yield:
     pop r28
     pop r27
     pop r26
-    pop r25
     pop r24
+    pop r25
     pop r23
     pop r22
     pop r21
