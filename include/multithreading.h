@@ -51,9 +51,9 @@
         struct                                                   \
         {                                                        \
             uint8_t sreg;                                        \
-            uint8_t r0r23[6u];                                   \
+            uint8_t r26r31[6u];                                  \
             void *context;                                       \
-            uint8_t r26r31[24u];                                 \
+            uint8_t r0r23[24u];                                  \
             void *ret_addr;                                      \
         } base;                                                  \
     } _k_stack_buf_##name = {                                    \
@@ -66,18 +66,17 @@
 
 // in order to remove the K_SWAP_LITTLE_BIG_ENDIAN define here we need to pop and push registers in an inverted way
 
-#define _K_THREAD_INITIALIZER(name, entry_p, stack_size, prio, local_storage_p)                   \
+#define _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p)                   \
     {                                                                                             \
         .sp = (void *)K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                \
         .priority = prio,                                                                         \
         .stack = {.end = K_STACK_END(K_THREAD_STACK_NAME(name), stack_size), .size = stack_size}, \
-        .entry = (thread_entry_t)entry_p,                                                         \
         .local_storage = (void *)local_storage_p                                                  \
     }
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio, context_p, local_storage_p)         \
     __attribute__((used)) static _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used)) static thread_t name = _K_THREAD_INITIALIZER(name, entry, stack_size, prio, local_storage_p);
+    __attribute__((used)) static thread_t name = _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p);
 
 // todo remove
 #define THREAD_2ND_STACK_LOC RAMSTART + (RAMEND - RAMSTART) / 2
@@ -113,7 +112,7 @@
 
 typedef void (*thread_entry_t)(void*);
 
-// Size : 11B
+// Size : 9B
 // "thread_t" must be static !!
 struct thread_t
 {
@@ -123,7 +122,6 @@ struct thread_t
         void * end;
         size_t size;
     } stack;
-    thread_entry_t entry;
     void * local_storage;
 };
 
@@ -131,7 +129,7 @@ struct thread_t
 // duplication : current and current_idx does represent the same thing
 // todo remove current and shift in multithreading.asm
 struct k_thread_meta {
-    thread_t *current;                            // used in multithreading.asm
+    thread_t *current;                            // used in multithreading.asm (when saving current thread context)
     struct thread_t * list[K_THREAD_MAX_COUNT];   // main thread is 0
     uint8_t count;
     uint8_t current_idx;                          // current index

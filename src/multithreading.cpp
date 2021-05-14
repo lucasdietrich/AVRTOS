@@ -12,7 +12,6 @@ struct thread_t k_thread_main = {
         .end = (void*) RAMEND,
         .size = THREAD_MAIN_STACK_SIZE,  // undefined stack size size
     },
-    .entry = (thread_entry_t) main,
     .local_storage = nullptr,
 };
 
@@ -80,7 +79,6 @@ void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *cons
     th->stack.end = K_STACK_END(stack, stack_size);
     th->stack.size = stack_size;
     th->priority = priority;
-    th->entry = entry;
     th->local_storage = local_storage;
 
     k_thread_stack_create(th, entry, th->stack.end, context_p);
