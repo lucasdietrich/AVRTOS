@@ -7,9 +7,20 @@
 extern "C" {
 #endif
 
-void led_on(void);
-void led_off(void);
+/**
+ * @brief Init LED on PORTB IO 5
+ */
 void led_init(void);
+
+/**
+ * @brief Set LED on PORTB IO 5 to ON
+ */
+void led_on(void);
+
+/**
+ * @brief Set LED on PORTB IO 5 to OFF
+ */
+void led_off(void);
 
 #ifdef __cplusplus
 }

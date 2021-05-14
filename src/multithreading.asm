@@ -1,13 +1,15 @@
 #include <avr/io.h>
 
+#include <multithreading_defines.h>
+
 .global k_thread_switch
 .global k_thread_stack_create
 .global k_yield
-.global k_schedule
+.global k_scheduler
 
 .extern k_thread
 
-#if THREAD_USE_INIT_STACK_ASM
+#if THREAD_USE_INIT_STACK_ASM == 1
 
 ; thread_t *th         in r24, r25
 ; thread_entry_t entry in r22, r23
@@ -54,7 +56,8 @@ k_thread_stack_create:
     brne .-6
     
     ; push sreg default (0)
-    lds r29, SREG
+    ; lds r29, SREG
+    ldi r29, K_THREAD_DEFAULT_SREG
     st -X, r29
 
     ; copy stack pointer in thread structure
@@ -262,7 +265,7 @@ k_yield:
     st X+, r1
 
     ; determine which is the next thread
-    call k_schedule
+    call k_scheduler
 
     ; next thread structure addr is in X
     movw r26, r24

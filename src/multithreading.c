@@ -1,16 +1,15 @@
 #include "multithreading.h"
 
-
 /*___________________________________________________________________________*/
 
 extern int main(void);
 
 struct thread_t k_thread_main = {
     .sp = NULL,
-    .priority = THREAD_MAIN_THREAD_PRIORITY, // cooperative
+    .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
         .end = (void*) RAMEND,
-        .size = THREAD_MAIN_STACK_SIZE,  // undefined stack size size
+        .size = THREAD_MAIN_STACK_SIZE,
     },
     .local_storage = NULL,
 };
@@ -18,15 +17,15 @@ struct thread_t k_thread_main = {
 struct k_thread_meta k_thread = {
     &k_thread_main,     // current thread is main
     .list = {
-        &k_thread_main
+        &k_thread_main  // only known thread is main
     },
-    .count = 1u,
+    .count = 1u,        // one known thread
     .current_idx = 0u,
 };
 
 /*___________________________________________________________________________*/
 
-#if !THREAD_USE_INIT_STACK_ASM
+#if THREAD_USE_INIT_STACK_ASM == 0
 
 void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
 {
@@ -55,7 +54,7 @@ void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void
     }
 
     // push sreg
-    *sp = (uint8_t) SREG;
+    *sp = (uint8_t) K_THREAD_DEFAULT_SREG;
     sp -= 1u;
 
     // save SP in thread structure
@@ -77,11 +76,12 @@ void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *cons
 
     k_thread.list[k_thread.count++] = th;
     th->stack.end = K_STACK_END(stack, stack_size);
+
+    k_thread_stack_create(th, entry, th->stack.end, context_p);
+
     th->stack.size = stack_size;
     th->priority = priority;
     th->local_storage = local_storage;
-
-    k_thread_stack_create(th, entry, th->stack.end, context_p);
 }
 
 int k_thread_register(struct thread_t *const th)
@@ -110,7 +110,7 @@ int k_thread_register(struct thread_t *const th)
 
 }
 
-struct thread_t *k_schedule(void)
+struct thread_t *k_scheduler(void)
 {
     // eval next thread to be executed
     k_thread.current_idx = (k_thread.current_idx + 1) % k_thread.count;

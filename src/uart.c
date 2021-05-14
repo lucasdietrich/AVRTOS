@@ -1,12 +1,12 @@
 #include "uart.h"
 
-static const char usart_alpha16[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+static const char _usart_alpha16[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
-void usart_init()
+inline void _usart_init(const uint8_t baudrate_ubrr)
 {
   // set baud rate (function of oscillator frequency)
-  UBRR0H = (uint8_t) (MH16_BAUDRATE_UBRR >> 8);
-  UBRR0L = (uint8_t) MH16_BAUDRATE_UBRR;
+  UBRR0H = (uint8_t) (baudrate_ubrr >> 8);
+  UBRR0L = (uint8_t) baudrate_ubrr;
 
   // enable receiver and transmitter
   UCSR0B = (1 << RXEN0) | (1 << TXEN0);
@@ -16,6 +16,11 @@ void usart_init()
   //  - 8 bit format : (3 << UCSZ00)
   //  - configure stop 1 bit : (0<<USBS0)
   UCSR0C = (0<<USBS0) | (3 << UCSZ00);
+}
+
+void usart_init()
+{
+  _usart_init(MH16_DEFAULT_BAUDRATE_UBRR);
 }
 
 void usart_transmit(char data)
@@ -39,9 +44,9 @@ void usart_send(const char* buffer, size_t len)
 
 void usart_u8(const uint8_t val)
 {
-  const char hundred = usart_alpha16[(val / 100)];
-  const char ten = usart_alpha16[(val / 10) % 10];
-  const char unit = usart_alpha16[val % 10];
+  const char hundred = _usart_alpha16[(val / 100)];
+  const char ten = _usart_alpha16[(val / 10) % 10];
+  const char unit = _usart_alpha16[val % 10];
 
   if (val > 100)
   {
@@ -57,15 +62,13 @@ void usart_u8(const uint8_t val)
 
 void  usart_u16(uint16_t val)
 {
-  // return usart_hex16(val);
-
   char digits[5];
 
   uint8_t first_digit = 4u;
 
   for (uint_fast8_t p = 0; p < 5; p++)
   {
-    char cur = usart_alpha16[val % 10];
+    char cur = _usart_alpha16[val % 10];
 
     val /= 10;
 
@@ -104,8 +107,8 @@ void usart_s8(const int8_t val)
 
 void usart_hex(const uint8_t val)
 {
-  const char high = usart_alpha16[val >> 4];
-  const char low = usart_alpha16[val & 0xF];
+  const char high = _usart_alpha16[val >> 4];
+  const char low = _usart_alpha16[val & 0xF];
 
   usart_transmit(high);
   usart_transmit(low);
@@ -114,7 +117,7 @@ void usart_hex(const uint8_t val)
 void usart_hex16(const uint16_t val)
 {
   usart_hex((uint8_t) (val >> 8));
-  usart_hex((uint8_t) (val & 0xFF));
+  usart_hex((uint8_t) val);
 }
 
 void usart_send_hex(const uint8_t* buffer, size_t len)
@@ -123,16 +126,13 @@ void usart_send_hex(const uint8_t* buffer, size_t len)
   {
     usart_hex(buffer[i]);
 
-    if (i != len)
+    if (0xF == (i & 0xF))
     {
-      if (0xF == (i & 0xF))
-      {
-        usart_transmit('\n');
-      }
-      else
-      {
-        usart_transmit(' ');
-      }
+      usart_transmit('\n'); // EOL every 16 chars
+    }
+    else
+    {
+      usart_transmit(' ');
     }
   }
 }

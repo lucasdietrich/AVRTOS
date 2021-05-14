@@ -63,6 +63,18 @@ Todos:
 
 - initialize stacks with buffer[SIZE]
 
+- preprocessor logging macro that stores logging string in Flash (PROGMEM) and print it to usart after reading from flash lpm/pgm (read from flash).
+
+- __ASSEMBLER__ in header files to know if an asembler file called this header
+
+```
+#ifdef __ASSEMBLER__
+#warning __ASSEMBLER__
+#endif
+```
+
+- TODO enable interrupts on startup
+
 ---
 
 ## References : 
