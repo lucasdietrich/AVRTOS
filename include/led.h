@@ -3,12 +3,16 @@
 
 #include <avr/io.h>
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern "C" void led_on(void);
-extern "C" void led_off(void);
-extern "C" void led_init(void);
+void led_on(void);
+void led_off(void);
+void led_init(void);
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+}
+#endif
 
 #endif

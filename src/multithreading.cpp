@@ -6,19 +6,19 @@
 extern int main(void);
 
 struct thread_t k_thread_main = {
-    .sp = nullptr,
+    .sp = NULL,
     .priority = THREAD_MAIN_THREAD_PRIORITY, // cooperative
     .stack = {
         .end = (void*) RAMEND,
         .size = THREAD_MAIN_STACK_SIZE,  // undefined stack size size
     },
-    .local_storage = nullptr,
+    .local_storage = NULL,
 };
 
 struct k_thread_meta k_thread = {
     &k_thread_main,     // current thread is main
     .list = {
-        &k_thread_main // other to nullptr
+        &k_thread_main
     },
     .count = 1u,
     .current_idx = 0u,

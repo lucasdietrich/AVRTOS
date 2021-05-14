@@ -62,7 +62,7 @@ k_thread_stack_create:
     ; -1, to first empty stack addr
     sbiw r26, 1
 
-    ; mov r24, r25 (thread_t *th) to Y
+    ; mov r24, r25 (struct thread_t *th) to Y
     movw r28, r24
 
     ; save SP in thread structure
@@ -131,7 +131,7 @@ k_thread_switch:
     ; disable interrupts
     ; TODO can be done later
     
-    ; save stack pointer in structure (thread_t *from)
+    ; save stack pointer in structure (struct thread_t *from)
     cli
     lds r0, SPL
     sei
@@ -145,7 +145,7 @@ k_thread_switch:
 
     ; restore the other thread
 
-    ; restore stack pointer from  structure (thread_t *from)
+    ; restore stack pointer from  structure (struct thread_t *from)
 
     ; set structure pointer to X
     movw r26, r22

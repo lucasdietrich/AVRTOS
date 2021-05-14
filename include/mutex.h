@@ -4,7 +4,9 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     uint8_t lock;
@@ -20,7 +22,7 @@ typedef struct {
  */
 void mutex_define(mutex_t *mutex);
 
-extern "C" uint8_t _mutex_lock(mutex_t *mutex);
+uint8_t _mutex_lock(mutex_t *mutex);
 
 /**
  * @brief Lock a mutex
@@ -36,8 +38,10 @@ uint8_t mutex_lock(mutex_t *mutex);
 /**
  * @brief Release a mutex
  */
-extern "C" void mutex_release(mutex_t *mutex);
+void mutex_release(mutex_t *mutex);
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+}
+#endif
 
 #endif

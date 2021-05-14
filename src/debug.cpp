@@ -16,7 +16,7 @@ void testfunction()
 
 /*___________________________________________________________________________*/
 
-void show_stack_pointer(thread_t *th)
+void show_stack_pointer(struct thread_t *th)
 {
   usart_hex16((uint16_t) th->sp);
 }

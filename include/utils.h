@@ -1,9 +1,13 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+#include <string.h>
+
 #include "uart.h"
 
-#include "string.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -15,15 +19,14 @@
 /*___________________________________________________________________________*/
 
 void usart_dump_addr(const char * name, void* addr);
-
 void usart_dbg_hex16(const char * text, uint16_t addr);
-
-extern "C" void usart_show_addr(uint16_t addr);
-
-extern "C" void usart_ram_dump(uint16_t start, const size_t len, const uint16_t sp);
-
-extern "C" void usart_dump_as_ram(const uint8_t *ram, const size_t len, const uint16_t start_addr, const uint16_t sp);
-
+void usart_show_addr(uint16_t addr);
+void usart_ram_dump(uint16_t start, const size_t len, const uint16_t sp);
+void usart_dump_as_ram(const uint8_t *ram, const size_t len, const uint16_t start_addr, const uint16_t sp);
 void usart_show_sp_complete(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif 

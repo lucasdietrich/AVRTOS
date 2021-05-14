@@ -2,7 +2,7 @@
 
 uint16_t k_thread_usage(struct thread_t *th)
 {
-    if (nullptr == th->sp)
+    if (NULL == th->sp)
     {
         return 0u;
     }
@@ -62,7 +62,7 @@ void *k_thread_get_return_addr(struct thread_t *th)
 
         return (void *)K_SWAP_LITTLE_BIG_ENDIAN(return_addr_reverted);
     }
-    return nullptr;
+    return NULL;
 }
 
 int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_t size)

@@ -4,7 +4,9 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     uint8_t count;
@@ -26,13 +28,15 @@ void semaphore_define(sem_t *sem, uint8_t init);
  * @param mutex : success if 0 else no semaphore is available
  * @return uint8_t 
  */
-extern "C" uint8_t semaphore_take(sem_t *sem);
+uint8_t semaphore_take(sem_t *sem);
 
 /**
  * @brief Give a semaphore
  */
-extern "C" void semaphore_give(sem_t *sem);
+void semaphore_give(sem_t *sem);
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+}
+#endif
 
 #endif

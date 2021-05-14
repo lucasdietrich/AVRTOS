@@ -7,9 +7,9 @@
 
 #include <avr/pgmspace.h>
 
-// todo remove
-#include <uart.h>
-#include <multithreading_debug.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -129,7 +129,7 @@ struct thread_t
 // duplication : current and current_idx does represent the same thing
 // todo remove current and shift in multithreading.asm
 struct k_thread_meta {
-    thread_t *current;                            // used in multithreading.asm (when saving current thread context)
+    struct thread_t *current;                            // used in multithreading.asm (when saving current thread context)
     struct thread_t * list[K_THREAD_MAX_COUNT];   // main thread is 0
     uint8_t count;
     uint8_t current_idx;                          // current index
@@ -150,13 +150,9 @@ extern struct k_thread_meta k_thread;
  * @param p thread context
  */
 
-#if THREAD_USE_INIT_STACK_ASM
-extern "C" void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack, void *const context_p);
-#else
-void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p);
-#endif
+void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack, void *const context_p);
 
-void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
+void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
 
 int k_thread_register(struct thread_t *const th);
 
@@ -164,18 +160,22 @@ int k_thread_register(struct thread_t *const th);
  * @brief TODO
  * 
  */
-extern "C" void k_thread_switch(struct thread_t *from, struct thread_t *to);
+void k_thread_switch(struct thread_t *from, struct thread_t *to);
 
 // disable name mangling
-extern "C" struct thread_t *k_schedule(void);
+struct thread_t *k_schedule(void);
 
 
 // TODO
 
-extern "C" void k_yield(void);
+void k_yield(void);
 
 void cpu_idle(void);
 
 /*___________________________________________________________________________*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

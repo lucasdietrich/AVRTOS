@@ -6,7 +6,9 @@
 #include <avr/io.h>
 #include <string.h>
 
-/*___________________________________________________________________________*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define FOSC 16000000 // Clock Speed = F_CPU
 #define BAUD_9600       9600
@@ -23,15 +25,11 @@
 #define MH16_115200_UBRR    8
 #define MH16_BAUDRATE_UBRR  MH16_115200_UBRR
 
-/*___________________________________________________________________________*/
-
 void usart_init();
 void usart_transmit(char data);
 void usart_send(const char* buffer, size_t len);
 void usart_print(const char * text);
 void usart_printl(const char * text);
-
-/*___________________________________________________________________________*/
 
 void usart_u8(const uint8_t val);
 void usart_s8(const int8_t val);
@@ -39,5 +37,9 @@ void usart_u16(uint16_t val);
 void usart_hex(const uint8_t val);
 void usart_hex16(const uint16_t val);
 void usart_send_hex(const uint8_t* buffer, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
