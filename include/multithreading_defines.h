@@ -77,15 +77,16 @@
 #define K_THREAD_STACK_VOID_SIZE 35u
 #define K_THREAD_STACK_MIN_SIZE K_THREAD_STACK_VOID_SIZE
 
-// need to differenciate these two preprocessors macros :
-// - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations
+// some of following macros need to be differenciate for c or asm :
+// - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on poointers
 // - in asm files types are not understood by compiler
-#define K_STACK_END(stack_start, size) ((uint16_t) stack_start + size - 1)
-#define _K_STACK_END_ASM(stack_start, size) (stack_start + size - 1)
+#define K_STACK_END(stack_start, size) (stack_start + size - 1)
+#define _K_STACK_END_ASM(stack_start, size) K_STACK_END(stack_start, size)
 
 #define _K_STACK_INIT_SP(stack_end) (stack_end - K_THREAD_STACK_VOID_SIZE)
 
-#define _K_THREAD_STACK_START(name) (&_k_stack_buf_##name)
+// if not casting this symbol address, the stack pointer will not be correctly set
+#define _K_THREAD_STACK_START(name) ((uint16_t) &_k_stack_buf_##name)
 
 #define _K_THREAD_STACK_SIZE(name) (sizeof(_k_stack_buf_##name))
 

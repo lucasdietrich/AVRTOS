@@ -17,8 +17,6 @@ struct thread_t k_thread_main = {
     .local_storage = NULL,
 };
 
-
-
 #else
 struct thread_t k_thread_main = {
     .sp = NULL,

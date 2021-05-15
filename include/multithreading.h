@@ -30,7 +30,7 @@ typedef void (*thread_entry_t)(void*);
 
 /**
  * @brief This structure represents a thread, it defines:
- * - the stack pointer when the thread is suspended
+ * - the value of the stack pointer (valid only when the thread is suspended)
  * - the thread priority (cooperative < 0, preemptive > 0), priority = 0 means the thread is disabled
  * - the stack location (end) and size (size)
  * - the local storage pointer
@@ -58,7 +58,7 @@ struct thread_t
  * - count : current count of threads
  * - current_idx : index of the current thread in the list
  * 
- * This structure is 3B + 2B*THREAD_MAX long
+ * This structure is 4B + 2B*THREAD_MAX long
  */
 struct k_thread_meta
 {
@@ -98,7 +98,7 @@ extern struct k_thread_meta k_thread;
 void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
 
 /**
- * @brief Initialize a thread stack 
+ * @brief Initialize a thread stack at runtime
  * 
  * @param th thread structure pointer
  * @param entry thread entry function
@@ -112,7 +112,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
  * - thread structure must be entirely defined
  * - stack must be entirely defined
  * 
- * This function must be called only if the thread have been defined at compilation time
+ * This function must be called only if the thread have been defined at compilation time using the K_THREAD_DEFINE macro
  * 
  * @param th thread structure pointer
  * 
@@ -125,7 +125,8 @@ int k_thread_register(struct thread_t *const th);
 /**
  * @brief Switch from current thread to {to} thread
  * 
- * {from} must necessary be the current thread
+ * @warning {from} must necessary be the current thread
+ * This function would break the stacks consistency if misused
  * 
  * @param from : current thread
  * @param to : to thread
@@ -144,8 +145,10 @@ struct thread_t *_k_scheduler(void);
 /**
  * @brief Release the CPU
  * 
- * This function must be called from a cooperative thread which is the current thread to tell the kernel that it is releasing the CPU
+ * This function can be called from either a cooperative thread or a premptive thread to tell the kernel that it is releasing the CPU
  * this function will call the scheduler (_k_scheduler) which will determine the next thread to be executed.
+ * 
+ * Cooperative threads must use this function in order to release the CPU
  * 
  * This function will return in the new main thread
  */

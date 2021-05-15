@@ -48,7 +48,7 @@
 //
 // Tells if we should use the C or the Assembler function to define our threads at runtiime
 //
-#define CONFIG_THREAD_USE_INIT_STACK_ASM       1
+#define CONFIG_THREAD_USE_INIT_STACK_ASM       0
 
 /*___________________________________________________________________________*/
 
