@@ -26,7 +26,7 @@ uint8_t off = 0u;
 void thread_led(void *p);
 void thread_monitor(void *p);
 
-#define THREAD_PREPROCESSOR 0
+#define THREAD_PREPROCESSOR 1
 
 #if THREAD_PREPROCESSOR
 K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, nullptr);
@@ -63,7 +63,7 @@ int main(void)
   k_thread_create(&C, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr);
 #endif
 
-  // USART_DUMP_RAM_ALL();
+  USART_DUMP_RAM_ALL();
 
   k_thread_dump_all();
 

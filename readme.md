@@ -18,6 +18,10 @@ Themes:
 3. mutex (nonblocking)
 4. semaphore (draft)
 
+AVR RTOS objectives :
+
+![avr-rtos.png](./pics/avr-rtos.png)
+
 Tags:
 - test
 - coop
@@ -383,6 +387,16 @@ CD AB 89 #2 loop SP = 04FF
 #1 loop : 08FD
 #2 loop SP = 04FF
 ```
+
+---
+
+## PlatformIO
+
+Inspect project with PlatformIO :
+
+![pio_inspect_project.png](./pics/pio_inspect_project.png)
+
+![pio_inspect_project_stats.png](./pics/pio_inspect_project_stats.png)
 
 ---
 

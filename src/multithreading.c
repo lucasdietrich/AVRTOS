@@ -5,24 +5,26 @@
 extern int main(void);
 
 #if THREAD_EXPLICIT_MAIN_STACK == 1
-#warning THREAD_EXPLICIT_MAIN_STACK
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 struct thread_t k_thread_main = {
     .sp = NULL,
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
-        .end = K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE), // todo defined ram start, fix error
+        .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
         .size = THREAD_MAIN_STACK_SIZE,
     },
     .local_storage = NULL,
 };
+
+
+
 #else
 struct thread_t k_thread_main = {
     .sp = NULL,
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
-        .end = RAMEND,
+        .end = (void*) RAMEND,
         .size = 0,
     },
     .local_storage = NULL,
@@ -43,7 +45,7 @@ struct k_thread_meta k_thread = {
 
 #if THREAD_USE_INIT_STACK_ASM == 0
 
-void k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
+void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
 {
     // get stack pointer value
     uint8_t* sp = (uint8_t*) stack_end - 1;
@@ -91,9 +93,9 @@ void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *cons
     }
 
     k_thread.list[k_thread.count++] = th;
-    th->stack.end = K_STACK_END(stack, stack_size);
+    th->stack.end = (void*) K_STACK_END(stack, stack_size);
 
-    k_thread_stack_create(th, entry, th->stack.end, context_p);
+    _k_thread_stack_create(th, entry, th->stack.end, context_p);
 
     th->stack.size = stack_size;
     th->priority = priority;
@@ -126,7 +128,7 @@ int k_thread_register(struct thread_t *const th)
 
 }
 
-struct thread_t *k_scheduler(void)
+struct thread_t *_k_scheduler(void)
 {
     // eval next thread to be executed
     k_thread.current_idx = (k_thread.current_idx + 1) % k_thread.count;

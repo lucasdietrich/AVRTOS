@@ -26,20 +26,33 @@ void k_thread_dump_hex(struct thread_t *th)
     usart_send_hex((const uint8_t *)th, sizeof(struct thread_t));
 }
 
-/*
-    TYP:
-        {idx}[prio] : {usage}/{size}
-        2 [-1] : 15/256
-*/
 void k_thread_dump(struct thread_t *th)
 {
     usart_transmit('[');
-    usart_s8(th->priority);
-    usart_print("] : ");
+
+    if (th->priority == 0)
+    {
+        usart_print("DISABLED");
+    }
+    else
+    {
+        if (th->priority < 0)
+        {
+            usart_print("COOP ");
+        }
+        else
+        {
+            usart_print("PREE  ");
+        }
+
+        usart_s8(th->priority);
+    }
+    usart_print("] \t: SP ");
+
     usart_u16(k_thread_usage(th));
     usart_transmit('/');
     usart_u16(th->stack.size);
-    usart_print(" |");
+    usart_print(" -| END @");
     usart_hex16((uint16_t)th->stack.end);
     usart_transmit('\n');
 }

@@ -2,20 +2,17 @@
 
 #include <multithreading_defines.h>
 
-.global _k_thread_switch
-.global k_thread_stack_create
-.global k_yield
-.global k_scheduler
-
-.extern k_thread
+/*___________________________________________________________________________*/
 
 #if THREAD_USE_INIT_STACK_ASM == 1
+
+.global _k_thread_stack_create
 
 ; thread_t *th         in r24, r25
 ; thread_entry_t entry in r22, r23
 ; uint16_t stack_end   in r20, r21
 ; void* context_p      in r18, r19
-k_thread_stack_create:
+_k_thread_stack_create:
     push r26
     push r27
     push r28
@@ -83,6 +80,8 @@ k_thread_stack_create:
 
 /*___________________________________________________________________________*/
 
+.global _k_thread_switch
+
 ; thread_t *from   in r24, r25
 ; thread_t *to     in r22, r23
 _k_thread_switch:
@@ -111,12 +110,12 @@ _k_thread_switch:
     push r20
     push r21
 
+    ; EVALUATE ??
     ; as the function has 2 (void* = 16bits) arguments
     ; these 4 registers are already save onto the stack
-    ; ?
     push r22
-    push r23
-    push r25
+    push r23    ; r24, r25 inverted
+    push r25    ; r24, r25 inverted
     push r24
     push r26
     push r27
@@ -179,8 +178,8 @@ _k_thread_switch:
     ; no need to restore them
 
     ; ?
-    pop r24
-    pop r25
+    pop r24    ; r24, r25 inverted
+    pop r25    ; r24, r25 inverted
     pop r23
     pop r22
     pop r21
@@ -207,8 +206,12 @@ _k_thread_switch:
     pop r0
 
     ret ; 2 following Bytes in stack are return address
-
+    
 /*___________________________________________________________________________*/
+
+.global k_yield
+.global _k_scheduler
+.extern k_thread
 
 ; see _k_thread_switch (th* a -> th* b)
 k_yield:
@@ -238,8 +241,8 @@ k_yield:
     push r21
     push r22
     push r23
-    push r25
-    push r24
+    push r25    ; r24, r25 inverted
+    push r24    ; r24, r25 inverted
     push r26
     push r27
     push r28
@@ -262,7 +265,7 @@ k_yield:
     st X+, r1
 
     ; determine which is the next thread
-    call k_scheduler
+    call _k_scheduler
 
     ; next thread structure addr is in X
     movw r26, r24
@@ -285,8 +288,8 @@ k_yield:
     pop r28
     pop r27
     pop r26
-    pop r24
-    pop r25
+    pop r24    ; r24, r25 inverted
+    pop r25    ; r24, r25 inverted
     pop r23
     pop r22
     pop r21
