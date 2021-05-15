@@ -5,6 +5,7 @@
 extern int main(void);
 
 #if THREAD_EXPLICIT_MAIN_STACK == 1
+
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 struct thread_t k_thread_main = {
@@ -18,6 +19,7 @@ struct thread_t k_thread_main = {
 };
 
 #else
+
 struct thread_t k_thread_main = {
     .sp = NULL,
     .priority = THREAD_MAIN_THREAD_PRIORITY,
@@ -78,16 +80,16 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
 }
 #endif
 
-void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
+int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
 {
     if (k_thread.count >= K_THREAD_MAX_COUNT)
     {
-        return; // TODO return error
+        return -1;
     }
 
     if (stack_size < K_THREAD_STACK_MIN_SIZE)
     {
-        return; // TODO return error
+        return -1; // TODO return error
     }
 
     k_thread.list[k_thread.count++] = th;
@@ -98,6 +100,8 @@ void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *cons
     th->stack.size = stack_size;
     th->priority = priority;
     th->local_storage = local_storage;
+
+    return 0;
 }
 
 int k_thread_register(struct thread_t *const th)
@@ -152,3 +156,20 @@ inline void * k_thread_local_storage(void)
 }
 
 /*___________________________________________________________________________*/
+
+extern struct thread_t __k_threads_start;
+extern uint8_t __data_end;
+
+// naked remove "ret" instruction, compile as pure instructions
+
+/**
+ * @brief This function is called when system starts up, only first (K_THREAD_MAX_COUNT - 1) threads will be registeres 
+ */
+ __attribute__((used, naked, section(".init5"))) void _k_threads_register(void) 
+{
+    uint8_t i = 0;
+    while ((uint16_t) &(&__k_threads_start)[i] < (uint16_t) &__data_end)
+    {
+        k_thread.list[k_thread.count++] = &(&__k_threads_start)[i++];
+    }
+}

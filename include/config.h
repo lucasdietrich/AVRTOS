@@ -17,7 +17,7 @@
 //
 // This file contains all the main configuration options of the kernel
 //
-// You may need to build directory if you modify this configuration file
+// You may need to reset the build directory if you modify this configuration file
 //
 // Few constants defined here may be used in a asm file, avoid the use of the unsigned flag ("u") at the end of numbers
 // prefer : CONFIG_THREAD_MAIN_STACK_SIZE 0x100 to CONFIG_THREAD_MAIN_STACK_SIZE 0x100u

@@ -42,9 +42,6 @@ static char stack2[0x100u];
 static char stack3[0x100u];
 #endif
 
-extern uint8_t __data_start;
-extern uint8_t __data_end;
-
 /*___________________________________________________________________________*/
 
 int main(void)
@@ -52,19 +49,13 @@ int main(void)
   led_init();
   usart_init();
 
-#if THREAD_PREPROCESSOR
-  // find a way to skip this with custom section .k_threads_section
-  k_thread_register(&ledon);
-  k_thread_register(&ledoff);
-  k_thread_register(&monitor);
-#else
+#if !THREAD_PREPROCESSOR
   k_thread_create(&A, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, nullptr);
   k_thread_create(&B, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr);
   k_thread_create(&C, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr);
 #endif
 
-  USART_DUMP_RAM_ALL();
-
+  // USART_DUMP_RAM_ALL();
   k_thread_dump_all();
 
   while(1)

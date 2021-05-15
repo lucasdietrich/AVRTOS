@@ -95,7 +95,7 @@ extern struct k_thread_meta k_thread;
  * @param context_p thread context passed to entry function
  * @param local_storage thread local_storage
  */
-void k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
+int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
 
 /**
  * @brief Initialize a thread stack at runtime
@@ -167,6 +167,10 @@ void cpu_idle(void);
 void * k_thread_local_storage(void);
 
 /*___________________________________________________________________________*/
+
+ __attribute__((used, naked, section(".init2"))) void _k_threads_register(void);
+
+ /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

@@ -66,6 +66,8 @@
 
 #define K_SWAP_LITTLE_BIG_ENDIAN(u16) (((uint16_t)u16 << 8) | ((uint16_t)u16 >> 8))
 
+#define MIN(a, b) ((a < b) ? (a) : (b))
+
 // From datasheet
 // Bit 7 6 5 4 3 2 1 0
 // 0x3F (0x5F) I T H S V N Z C SREG
@@ -121,7 +123,7 @@
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio, context_p, local_storage_p)         \
     __attribute__((used)) static _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used)) static _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p);
+    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p);
 
 /*___________________________________________________________________________*/
 
