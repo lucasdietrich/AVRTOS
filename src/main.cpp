@@ -67,9 +67,6 @@ int main(void)
 
   k_thread_dump_all();
 
-  usart_hex16((uint16_t) &__data_start);
-  usart_hex16((uint16_t) &__data_end);
-
   while(1)
   {
     usart_printl("::main");

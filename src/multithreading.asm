@@ -313,3 +313,21 @@ k_yield:
     pop r0
 
     ret  ; dispath to next thread
+
+/*___________________________________________________________________________*/
+
+#if THREAD_EXPLICIT_MAIN_STACK == 1
+
+.extern _k_main_stack
+
+; this section override the Stack Pointer defined in section .init2 to the defined Main Buffer
+; https://www.nongnu.org/avr-libc/user-manual/mem_sections.html
+.section .init3,"ax", @progbits
+    ldi r28, lo8(_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE))
+    ldi r29, hi8(_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE))
+    out _SFR_IO_ADDR(SPL), r28
+    out _SFR_IO_ADDR(SPH), r29
+
+#endif
+
+/*___________________________________________________________________________*/

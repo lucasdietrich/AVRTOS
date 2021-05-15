@@ -3,14 +3,57 @@
 
 /*___________________________________________________________________________*/
 
+// Include user configuration
+
+#include "config.h"
+
+/*___________________________________________________________________________*/
+
 //
 // Multithreading Configuration
 //
 
-#define CONFIG_THREAD_MAX                   4
-#define CONFIG_THREAD_MAIN_STACK_SIZE       0x200
-#define CONFIG_THREAD_MAIN_THREAD_PRIORITY  K_PRIO_PREEMPT(8)
-#define CONFIG_THREAD_USE_INIT_STACK_ASM    1
+#define THREAD_DEFAULT_MAX                      4
+#define THREAD_DEFAULT_MAIN_THREAD_PRIORITY     K_PRIO_PREEMPT(8)
+#define THREAD_DEFAULT_EXPLICIT_MAIN_STACK      1
+#define THREAD_DEFAULT_MAIN_STACK_SIZE          0x400
+#define THREAD_DEFAULT_USE_INIT_STACK_ASM       1
+
+/*___________________________________________________________________________*/
+
+#ifdef CONFIG_THREAD_MAX
+#if CONFIG_THREAD_MAX > 1
+#define K_THREAD_MAX_COUNT CONFIG_THREAD_MAX
+#else
+#error Cannot configure this library for less than 2 threads (CONFIG_THREAD_MAX < 2)
+#endif
+#else
+#define K_THREAD_MAX_COUNT THREAD_DEFAULT_MAX
+#endif
+
+#ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
+#define THREAD_MAIN_THREAD_PRIORITY   CONFIG_THREAD_MAIN_THREAD_PRIORITY
+#else
+#define THREAD_MAIN_THREAD_PRIORITY   THREAD_DEFAULT_MAIN_THREAD_PRIORITY
+#endif
+
+#ifdef CONFIG_THREAD_EXPLICIT_MAIN_STACK
+#define THREAD_EXPLICIT_MAIN_STACK CONFIG_THREAD_EXPLICIT_MAIN_STACK
+#else
+#define THREAD_EXPLICIT_MAIN_STACK THREAD_DEFAULT_EXPLICIT_MAIN_STACK
+#endif
+
+#ifdef CONFIG_THREAD_MAIN_STACK_SIZE
+#define THREAD_MAIN_STACK_SIZE  CONFIG_THREAD_MAIN_STACK_SIZE
+#else
+#define THREAD_MAIN_STACK_SIZE  THREAD_DEFAULT_MAIN_STACK_SIZE
+#endif
+
+#ifdef CONFIG_THREAD_USE_INIT_STACK_ASM
+#define THREAD_USE_INIT_STACK_ASM   CONFIG_THREAD_USE_INIT_STACK_ASM
+#else
+#define THREAD_USE_INIT_STACK_ASM   THREAD_DEFAULT_USE_INIT_STACK_ASM
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -31,8 +74,10 @@
 #define K_PRIO_DEFAULT K_PRIO_COOP(1)
 #define K_STOPPED 0
 
-#define K_STACK_END(stack_start, size) ((void *)((uint16_t)stack_start + size - 1u))
-#define K_STACK_START(stack_end, size) ((void *)((uint16_t)stack_end - size + 1u))
+#define _K_STACK_END_ASM(stack_start, size) ((stack_start + size - 1))
+
+#define K_STACK_END(stack_start, size) ((void *)((uint16_t)stack_start + size - 1))
+#define K_STACK_START(stack_end, size) ((void *)((uint16_t)stack_end - size + 1))
 
 #define K_STACK_INIT_SP(stack_end) ((uint16_t)stack_end - K_THREAD_STACK_VOID_SIZE)
 
@@ -78,40 +123,7 @@
     __attribute__((used)) static _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
     __attribute__((used)) static thread_t name = _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p);
 
-// todo remove
-#define THREAD_2ND_STACK_LOC RAMSTART + (RAMEND - RAMSTART) / 2
-
-
 /*___________________________________________________________________________*/
 
-#ifdef CONFIG_THREAD_MAX
-#if CONFIG_THREAD_MAX > 1
-#define K_THREAD_MAX_COUNT CONFIG_THREAD_MAX
-#else
-#error Cannot configure this library for less than 2 threads (CONFIG_THREAD_MAX < 2)
-#endif
-#else
-#define K_THREAD_MAX_COUNT 4
-#endif
-
-#ifdef CONFIG_THREAD_MAIN_STACK_SIZE
-#define THREAD_MAIN_STACK_SIZE  CONFIG_THREAD_MAIN_STACK_SIZE
-#else
-#define THREAD_MAIN_STACK_SIZE  RAMEND - RAMSTART
-#endif 
-
-#ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
-#define THREAD_MAIN_THREAD_PRIORITY   CONFIG_THREAD_MAIN_THREAD_PRIORITY
-#else
-#define THREAD_MAIN_THREAD_PRIORITY   K_PRIO_PREEMPT(8)
-#endif
-
-#ifdef CONFIG_THREAD_USE_INIT_STACK_ASM
-#define THREAD_USE_INIT_STACK_ASM   CONFIG_THREAD_USE_INIT_STACK_ASM
-#else
-#define THREAD_USE_INIT_STACK_ASM   1
-#endif
-
-/*___________________________________________________________________________*/
 
 #endif

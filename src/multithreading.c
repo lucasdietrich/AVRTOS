@@ -4,15 +4,31 @@
 
 extern int main(void);
 
+#if THREAD_EXPLICIT_MAIN_STACK == 1
+#warning THREAD_EXPLICIT_MAIN_STACK
+char _k_main_stack[THREAD_MAIN_STACK_SIZE];
+
 struct thread_t k_thread_main = {
     .sp = NULL,
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
-        .end = (void*) RAMEND,
+        .end = K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE), // todo defined ram start, fix error
         .size = THREAD_MAIN_STACK_SIZE,
     },
     .local_storage = NULL,
 };
+#else
+struct thread_t k_thread_main = {
+    .sp = NULL,
+    .priority = THREAD_MAIN_THREAD_PRIORITY,
+    .stack = {
+        .end = RAMEND,
+        .size = 0,
+    },
+    .local_storage = NULL,
+};
+
+#endif
 
 struct k_thread_meta k_thread = {
     &k_thread_main,     // current thread is main

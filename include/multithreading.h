@@ -96,4 +96,5 @@ void * k_thread_local_storage(void);
 #ifdef __cplusplus
 }
 #endif
+
 #endif

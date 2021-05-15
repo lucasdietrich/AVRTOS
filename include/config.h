@@ -1,0 +1,14 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H
+
+#define CONFIG_THREAD_MAX                      5
+
+#define CONFIG_THREAD_MAIN_THREAD_PRIORITY     K_PRIO_PREEMPT(8)
+
+#define CONFIG_THREAD_EXPLICIT_MAIN_STACK      0
+
+#define CONFIG_THREAD_MAIN_STACK_SIZE          0x100
+
+#define CONFIG_THREAD_USE_INIT_STACK_ASM       1
+
+#endif
