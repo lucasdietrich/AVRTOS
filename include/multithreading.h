@@ -160,6 +160,13 @@ void cpu_idle(void);
 /*___________________________________________________________________________*/
 
 /**
+ * @brief Get current thread
+ * 
+ * @return thread_t* 
+ */
+struct thread_t * k_thread_current(void);
+
+/**
  * @brief Get current thread local storage pointer
  * 
  * @return void* local storage pointer

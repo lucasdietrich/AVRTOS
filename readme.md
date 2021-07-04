@@ -17,6 +17,7 @@ Themes:
 2. 2 preemtive threads (todo)
 3. mutex (nonblocking)
 4. semaphore (draft)
+5. scheduler
 
 AVR RTOS objectives :
 
@@ -387,6 +388,26 @@ CD AB 89 #2 loop SP = 04FF
 #1 loop : 08FD
 #2 loop SP = 04FF
 ```
+
+---
+
+## Interrupts :
+
+From ATmega328p reference :
+
+About interrupt call
+
+```
+During interrupts and subroutine calls, the return address Program Counter (PC) is stored on the Stack.
+```
+
+About Status Register
+```
+The Status Register is not automatically stored when entering an interrupt routine and restored when returning
+from an interrupt. This must be handled by software.
+```
+
+If a `Flag` appears in the `Flag` column of avr5 instruction set, it means that the flag could be modified after the instruction, `None` mean that the instruction doesn't change the `Status Register`
 
 ---
 
