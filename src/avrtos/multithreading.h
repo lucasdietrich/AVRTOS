@@ -10,6 +10,7 @@
 #include <stddef.h>
 
 #include "multithreading_defines.h"
+#include "scheduler.h"
 
 /*___________________________________________________________________________*/
 
@@ -60,6 +61,7 @@ struct thread_t
  * 
  * This structure is 4B + 2B*THREAD_MAX long
  */
+// current must be the first element of the structure (@see multithreading.asm)
 struct k_thread_meta
 {
     struct thread_t *current;                  // used in multithreading.asm (when saving current thread context)
@@ -134,6 +136,16 @@ int k_thread_register(struct thread_t *const th);
 void _k_thread_switch(struct thread_t *from, struct thread_t *to);
 
 /**
+ * @brief Switch from current thread to {to} thread
+ * 
+ * SAFE
+ * 
+ * @param from : current thread
+ * @param to : to thread
+ */
+void k_thread_switch(struct thread_t *to);
+
+/**
  * @brief Choice the next thread to be executed
  * 
  * This function is called in k_yield function
@@ -154,8 +166,12 @@ struct thread_t *_k_scheduler(void);
  */
 void k_yield(void);
 
+void k_sleep(k_timeout_t timeout);
+
 // TODO
 void cpu_idle(void);
+
+
 
 /*___________________________________________________________________________*/
 

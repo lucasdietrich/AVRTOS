@@ -1,3 +1,5 @@
+/*___________________________________________________________________________*/
+
 #include "multithreading.h"
 
 /*___________________________________________________________________________*/
@@ -130,6 +132,17 @@ int k_thread_register(struct thread_t *const th)
 
 }
 
+void k_thread_switch(struct thread_t *to)
+{
+    #warning TODO does not update k_thread.current reference
+
+    if (to != NULL)
+    {
+        _k_thread_switch(k_thread_current(), to);
+    }
+    // exit()
+}
+
 struct thread_t *_k_scheduler(void)
 {
     // TODO find a way to get rid of the `k_thread.count` and `k_thread.current_idx` parameters when threads cannot be create at runtime
@@ -164,6 +177,27 @@ inline struct thread_t * k_thread_current(void)
 inline void * k_thread_local_storage(void)
 {
     return k_thread_current()->local_storage;
+}
+
+/*___________________________________________________________________________*/
+
+void k_sleep(k_timeout_t timeout)
+{
+    if (timeout.delay != 0)
+    {
+        struct k_scheduled_item_t item = {
+            .abs_delay = timeout.delay,
+            .next = NULL,
+            .p = k_thread_current(),
+        };
+
+        _k_schedule_submit(&item);
+
+#warning TODO set curent thread as pending on event
+
+        // return to scheduler thread
+        k_yield();
+    }
 }
 
 /*___________________________________________________________________________*/

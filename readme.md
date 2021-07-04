@@ -80,6 +80,19 @@ Todos:
 
 - TODO enable interrupts on startup
 
+
+- preemtive :
+  - interrupt add SREG and ret address in stack (maybe change stack STACKING/UNSTACKING function to minize work when returning from interrupt)
+  - nested interrupt : need to return to thread after executing the last interrupt
+  - limit code duplication in stack/unstacking functions
+
+- CANARIES,  add canaries before stack to automatically check stack overflow
+- time precision of 1ms, measure
+- disable count/index fields of thread_meta_t structure when all threads are defined at compilation time (CONFIG_DISABLE_THREAD_RUNTIME_DEFINITION) (use of ARRAY_SIZE, or adress for index caculation)
+- k_sleep with uint16_t delay (ms), max is 65seconds, if more return several times to threads and requeue events
+- function to enable/disable cooperative of the current thread
+- function to get stack usage
+
 ---
 
 ## References : 

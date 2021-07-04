@@ -4,9 +4,16 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
+#include "scheduler.h"
+#include "multithreading.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*___________________________________________________________________________*/
+
+// TODO set all mutex at the same RAM location to iter them easily
 
 typedef struct {
     uint8_t lock;
@@ -35,10 +42,14 @@ uint8_t _mutex_lock(mutex_t *mutex);
 // https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header
 uint8_t mutex_lock(mutex_t *mutex);
 
+uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
+
 /**
  * @brief Release a mutex
  */
 void mutex_release(mutex_t *mutex);
+
+/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

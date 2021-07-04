@@ -112,6 +112,12 @@ void set_stack_pointer(struct thread_t *th);
 
 /*___________________________________________________________________________*/
 
+void print_scheduled_item(struct k_scheduled_item_t* const item);
+
+void print_scheduled_items_list();
+
+/*___________________________________________________________________________*/
+
 #ifdef __cplusplus
 }
 #endif

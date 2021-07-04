@@ -1,9 +1,14 @@
 #include "multithreading_debug.h"
 
+#include "scheduler.h"
+
 #include <avr/io.h>
 
 #include <string.h>
 #include <stdio.h>
+
+
+/*___________________________________________________________________________*/
 
 uint16_t k_thread_usage(struct thread_t *th)
 {
@@ -93,3 +98,33 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
     }
     return -1;
 }
+
+
+/*___________________________________________________________________________*/
+
+void print_scheduled_item(struct k_scheduled_item_t* const item)
+{
+    usart_print("-- ");
+    // if not printable
+    // usart_transmit(*(uint8_t*) (item->p));
+    usart_transmit('(');
+    usart_u16(item->delay_shift);
+    usart_transmit(')');
+    usart_transmit(' ');
+}
+
+void print_scheduled_items_list()
+{
+    struct k_scheduled_item_t* item = _k_schedule_get_root();
+
+    usart_print("0 |");
+
+    while (item != NULL)
+    {
+        print_scheduled_item(item);
+        item = item->next;
+    }
+    usart_transmit('\n');
+}
+
+/*___________________________________________________________________________*/
