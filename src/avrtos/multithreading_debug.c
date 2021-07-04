@@ -1,5 +1,10 @@
 #include "multithreading_debug.h"
 
+#include <avr/io.h>
+
+#include <string.h>
+#include <stdio.h>
+
 uint16_t k_thread_usage(struct thread_t *th)
 {
     if (NULL == th->sp)

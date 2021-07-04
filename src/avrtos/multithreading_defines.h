@@ -5,19 +5,15 @@
 
 // Include user configuration
 
-#include "config.h"
+// CONFIG_THREAD_MAX
+// CONFIG_THREAD_MAIN_THREAD_PRIORITY
+// CONFIG_THREAD_EXPLICIT_MAIN_STACK
+// CONFIG_THREAD_MAIN_STACK_SIZE
+// CONFIG_THREAD_USE_INIT_STACK_ASM
 
 /*___________________________________________________________________________*/
 
-//
-// Multithreading Configuration
-//
-
-#define THREAD_DEFAULT_MAX                      4
-#define THREAD_DEFAULT_MAIN_THREAD_PRIORITY     K_PRIO_PREEMPT(8)
-#define THREAD_DEFAULT_EXPLICIT_MAIN_STACK      1
-#define THREAD_DEFAULT_MAIN_STACK_SIZE          0x400
-#define THREAD_DEFAULT_USE_INIT_STACK_ASM       1
+#include "default_config.h"
 
 /*___________________________________________________________________________*/
 
@@ -28,6 +24,7 @@
 
 /*___________________________________________________________________________*/
 
+
 #ifdef CONFIG_THREAD_MAX
 #if CONFIG_THREAD_MAX > 1
 #define K_THREAD_MAX_COUNT CONFIG_THREAD_MAX
@@ -35,31 +32,31 @@
 #error Cannot configure this library for less than 2 threads (CONFIG_THREAD_MAX < 2)
 #endif
 #else
-#define K_THREAD_MAX_COUNT THREAD_DEFAULT_MAX
+#define K_THREAD_MAX_COUNT DEFAULT_THREAD_MAX
 #endif
 
 #ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #define THREAD_MAIN_THREAD_PRIORITY CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #else
-#define THREAD_MAIN_THREAD_PRIORITY THREAD_DEFAULT_MAIN_THREAD_PRIORITY
+#define THREAD_MAIN_THREAD_PRIORITY DEFAULT_THREAD_MAIN_THREAD_PRIORITY
 #endif
 
 #ifdef CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define THREAD_EXPLICIT_MAIN_STACK CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #else
-#define THREAD_EXPLICIT_MAIN_STACK THREAD_DEFAULT_EXPLICIT_MAIN_STACK
+#define THREAD_EXPLICIT_MAIN_STACK DEFAULT_THREAD_EXPLICIT_MAIN_STACK
 #endif
 
 #ifdef CONFIG_THREAD_MAIN_STACK_SIZE
 #define THREAD_MAIN_STACK_SIZE CONFIG_THREAD_MAIN_STACK_SIZE
 #else
-#define THREAD_MAIN_STACK_SIZE THREAD_DEFAULT_MAIN_STACK_SIZE
+#define THREAD_MAIN_STACK_SIZE DEFAULT_THREAD_MAIN_STACK_SIZE
 #endif
 
 #ifdef CONFIG_THREAD_USE_INIT_STACK_ASM
 #define THREAD_USE_INIT_STACK_ASM CONFIG_THREAD_USE_INIT_STACK_ASM
 #else
-#define THREAD_USE_INIT_STACK_ASM THREAD_DEFAULT_USE_INIT_STACK_ASM
+#define THREAD_USE_INIT_STACK_ASM DEFAULT_THREAD_USE_INIT_STACK_ASM
 #endif
 
 /*___________________________________________________________________________*/

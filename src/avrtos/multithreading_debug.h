@@ -1,8 +1,8 @@
 #ifndef _MULTITHREADING_DEBUG_H
 #define _MULTITHREADING_DEBUG_H
 
-#include "uart.h"
-#include "utils.h"
+#include "misc/uart.h"
+#include "misc/utils.h"
 #include "multithreading.h"
 
 #ifdef __cplusplus
@@ -91,8 +91,30 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Return the stack pointer value (after CALL)
+ * 
+ */
+uint16_t read_sp(void);
+
+/**
+ * @brief Return the return addr value of itself (read_ra)
+ * 
+ */
+uint16_t read_ra(void);
+
+/**
+ * @brief Set the stack pointer object
+ * 
+ * @param th 
+ */
+void set_stack_pointer(struct thread_t *th);
+
+/*___________________________________________________________________________*/
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif 
+

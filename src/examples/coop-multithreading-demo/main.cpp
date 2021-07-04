@@ -7,16 +7,15 @@
 
 /*___________________________________________________________________________*/
 
-#include "uart.h"
-#include "led.h"
-#include "utils.h"
+#include "avrtos/misc/uart.h"
+#include "avrtos/misc/led.h"
+#include "avrtos/misc/utils.h"
 
-#include "multithreading.h"
-#include "mutex.h"
-#include "semaphore.h"
+#include "avrtos/multithreading.h"
+#include "avrtos/multithreading_debug.h"
+#include "avrtos/mutex.h"
+#include "avrtos/semaphore.h"
 
-#include "debug.h"
-#include "multithreading_debug.h"
 
 /*___________________________________________________________________________*/
 

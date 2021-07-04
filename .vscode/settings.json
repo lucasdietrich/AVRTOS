@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "multithreading_debug.h": "c",
+        "uart.h": "c"
+    }
+}
