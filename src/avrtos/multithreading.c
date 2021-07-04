@@ -132,11 +132,18 @@ int k_thread_register(struct thread_t *const th)
 
 struct thread_t *_k_scheduler(void)
 {
+    // TODO find a way to get rid of the `k_thread.count` and `k_thread.current_idx` parameters when threads cannot be create at runtime
+    // const uint8_t next_idx = (&k_thread.current - k_thread.list + 1) % ARRAY_SIZE(k_thread.list);
+    // k_thread.current = k_thread.list[next_idx];
+
     // eval next thread to be executed
     k_thread.current_idx = (k_thread.current_idx + 1) % k_thread.count;
 
     // set current
     k_thread.current = k_thread.list[k_thread.current_idx];
+    
+    // go back to yield and restore thread context
+    // another solution would be to return anything and let the k_yield asm function
 
     // go back to yield and restore thread context
     // another solution would be to return anything and let the k_yield asm function

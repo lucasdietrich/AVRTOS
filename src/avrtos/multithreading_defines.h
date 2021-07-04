@@ -64,6 +64,8 @@
 #define K_SWAP_LITTLE_BIG_ENDIAN(u16) (((uint16_t)u16 << 8) | ((uint16_t)u16 >> 8))
 
 #define MIN(a, b) ((a < b) ? (a) : (b))
+#define MAX(a, b) ((a > b) ? (a) : (b))
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 // From datasheet
 // Bit 7 6 5 4 3 2 1 0
