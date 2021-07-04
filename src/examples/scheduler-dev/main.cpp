@@ -39,6 +39,9 @@ int main(void)
       // usart_hex16((uint16_t) k_thread.list[1]);
       // usart_transmit('\n');
 
+
+      // this function should append the thread to the list of pending threads and the scheduler choose which one to execute
+      
       k_yield();
     }
 

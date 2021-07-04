@@ -70,6 +70,8 @@ Todos:
 
 - preprocessor logging macro that stores logging string in Flash (PROGMEM) and print it to usart after reading from flash lpm/pgm (read from flash).
 
+- renamed _schedule function to _timer
+
 - __ASSEMBLER__ in header files to know if an asembler file called this header
 
 ```
