@@ -28,4 +28,5 @@ uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
 
     return _mutex_lock(mutex);
     */
+   return 0;
 }

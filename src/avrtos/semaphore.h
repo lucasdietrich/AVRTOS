@@ -1,5 +1,5 @@
-#ifndef _SEM_H
-#define _SEM_H
+#ifndef _AVRTOS_SEM_H
+#define _AVRTOS_SEM_H
 
 #include <avr/io.h>
 #include <stdbool.h>

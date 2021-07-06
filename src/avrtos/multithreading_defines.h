@@ -1,5 +1,5 @@
-#ifndef _MULTITHREADING_DEFINES_H
-#define _MULTITHREADING_DEFINES_H
+#ifndef _AVRTOS_MULTITHREADING_DEFINES_H
+#define _AVRTOS_MULTITHREADING_DEFINES_H
 
 /*___________________________________________________________________________*/
 

@@ -1,8 +1,9 @@
-#ifndef _MULTITHREADING_DEBUG_H
-#define _MULTITHREADING_DEBUG_H
+#ifndef _AVRTOS_MULTITHREADING_DEBUG_H
+#define _AVRTOS_MULTITHREADING_DEBUG_H
 
 #include "misc/uart.h"
 #include "misc/utils.h"
+
 #include "multithreading.h"
 
 #ifdef __cplusplus
@@ -112,9 +113,9 @@ void set_stack_pointer(struct thread_t *th);
 
 /*___________________________________________________________________________*/
 
-void print_scheduled_item(struct k_scheduled_item_t* const item);
+void print_scheduled_item(struct k_xqueue_item_t* const item);
 
-void print_scheduled_items_list();
+void print_scheduled_items_list(struct k_xqueue_item_t* root);
 
 /*___________________________________________________________________________*/
 

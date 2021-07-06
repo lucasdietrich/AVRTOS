@@ -16,22 +16,22 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 
 /*___________________________________________________________________________*/
 
+
+
 int main(void)
 {
   led_init();
   usart_init();
 
-  print_scheduled_items_list();
+  print_scheduled_items_list(_k_system_xqueue);
 
   k_yield();
 
-  k_scheduled_item_t *item;
-
   while(1)
   {
-    _k_schedule_time_passed(10);
+    k_xqueue_shift(&_k_system_xqueue, 10);
     // print_scheduled_items_list();
-    item = _k_schedule_pop_first_expired();
+    k_xqueue_item_t *item = k_xqueue_pop(&_k_system_xqueue);
     if (item != NULL)
     {
       // usart_hex16((uint16_t) item->p);
@@ -51,6 +51,8 @@ int main(void)
 
 void thread_led(void *p)
 {
+  usart_print("start");
+
   while (1)
   {
     k_sleep(K_MSEC(500));

@@ -1,10 +1,9 @@
-#ifndef _MUTEX_H
-#define _MUTEX_H
+#ifndef _AVRTOS_MUTEX_H
+#define _AVRTOS_MUTEX_H
 
 #include <avr/io.h>
 #include <stdbool.h>
 
-#include "scheduler.h"
 #include "multithreading.h"
 
 #ifdef __cplusplus

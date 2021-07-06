@@ -1,7 +1,7 @@
-#include "scheduler.h"
+#include "xqueue.h"
 
-#include "multithreading.h"
-
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
 // A should be processed in 10 ms
 // B should be processed in 10 + 30 = 40ms
@@ -17,26 +17,18 @@
 
 /*___________________________________________________________________________*/
 
-// is volatile required ?
-static struct k_scheduled_item_t* scheduled_items_root = NULL;
-
-struct k_scheduled_item_t* _k_schedule_get_root(void)
-{
-    return scheduled_items_root;
-}
-
 // scheduled_item_t must have abs_delay set and thread (next = NULL)
-void _k_schedule_submit(struct k_scheduled_item_t *new_item)
+void k_xqueue_schedule(struct k_xqueue_item_t **root, struct k_xqueue_item_t *new_item)
 {
     if (new_item == NULL)
         return;
     new_item->next = NULL;  // safe
 
     cli();
-    struct k_scheduled_item_t ** prev_next_p = &scheduled_items_root;
+    struct k_xqueue_item_t ** prev_next_p = root;
     while (*prev_next_p != NULL)    // if next of previous item is set
     {
-        struct k_scheduled_item_t * p_current = *prev_next_p; // next of previous become current
+        struct k_xqueue_item_t * p_current = *prev_next_p; // next of previous become current
 
         // if current element expires before or at the same time that new_timer, we go to next item
         if (p_current->delay_shift <= new_item->delay_shift)
@@ -58,39 +50,39 @@ void _k_schedule_submit(struct k_scheduled_item_t *new_item)
     sei();
 }
 
-void _k_schedule_time_passed(k_delta_ms_t delta)
+void k_xqueue_shift(struct k_xqueue_item_t **root, k_delta_ms_t time_passed)
 {
-    if (!delta)
+    if (!time_passed)
         return;
 
     cli();
-    struct k_scheduled_item_t ** prev_next_p = &scheduled_items_root;
+    struct k_xqueue_item_t ** prev_next_p = root;
     while (*prev_next_p != NULL) // if next of previous item is set
     {
-        struct k_scheduled_item_t * p_current = *prev_next_p; // next of previous become current
-        if (p_current->delay_shift < delta)
+        struct k_xqueue_item_t * p_current = *prev_next_p; // next of previous become current
+        if (p_current->delay_shift < time_passed)
         {
-            delta -= p_current->delay_shift;
+            time_passed -= p_current->delay_shift;
             p_current->delay_shift = 0;
             prev_next_p = &(p_current->next);
         }
         else
         {
-            p_current->delay_shift -= delta;
+            p_current->delay_shift -= time_passed;
             break;
         }
     }
     sei();
 }
 
-struct k_scheduled_item_t * _k_schedule_pop_first_expired()
+struct k_xqueue_item_t * k_xqueue_pop(struct k_xqueue_item_t **root)
 {
     cli();
-    struct k_scheduled_item_t * item = NULL;
-    if ((scheduled_items_root != NULL) && (scheduled_items_root->delay_shift == 0)) // if next to expire has expired
+    struct k_xqueue_item_t * item = NULL;
+    if ((root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
     {
-        item = scheduled_items_root;    // prepare to return it
-        scheduled_items_root = scheduled_items_root->next;  // set next
+        item = *root;    // prepare to return it
+        *root = (*root)->next;  // set next
     }
     sei();
     return item;

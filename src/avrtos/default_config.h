@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _AVRTOS_DEFAULT_CONFIG_H
+#define _AVRTOS_DEFAULT_CONFIG_H
 
 /*___________________________________________________________________________*/
 

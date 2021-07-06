@@ -1,11 +1,10 @@
-#include "multithreading_debug.h"
-
-#include "scheduler.h"
-
 #include <avr/io.h>
 
 #include <string.h>
 #include <stdio.h>
+
+#include "multithreading_debug.h"
+#include "xqueue.h"
 
 
 /*___________________________________________________________________________*/
@@ -102,7 +101,7 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
 
 /*___________________________________________________________________________*/
 
-void print_scheduled_item(struct k_scheduled_item_t* const item)
+void print_scheduled_item(struct k_xqueue_item_t* const item)
 {
     usart_print("-- ");
     // if not printable
@@ -113,16 +112,14 @@ void print_scheduled_item(struct k_scheduled_item_t* const item)
     usart_transmit(' ');
 }
 
-void print_scheduled_items_list()
+void print_scheduled_items_list(struct k_xqueue_item_t* root)
 {
-    struct k_scheduled_item_t* item = _k_schedule_get_root();
-
     usart_print("0 |");
 
-    while (item != NULL)
+    while (root != NULL)
     {
-        print_scheduled_item(item);
-        item = item->next;
+        print_scheduled_item(root);
+        root = root->next;
     }
     usart_transmit('\n');
 }

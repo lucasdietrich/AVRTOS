@@ -1,7 +1,8 @@
-#ifndef _SCHEDULER_H
-#define _SCHEDULER_H
+#ifndef _AVRTOS_XQUEUE_H
+#define _AVRTOS_XQUEUE_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define SCHEDULER_PRECISION_U32 1
 #define SCHEDULER_PRECISION_U16 0
@@ -28,27 +29,29 @@ typedef struct
 #define K_NO_WAIT(delay) ((k_timeout_t){0})
 #define K_FOREVER(delay) ((k_timeout_t){-1})
 
-struct k_scheduled_item_t
+/*___________________________________________________________________________*/
+
+struct k_xqueue_item_t
 {
     union
     {
         k_delta_ms_t delay_shift;
         k_delta_ms_t abs_delay;
     };
-    struct k_scheduled_item_t* next;
+    struct k_xqueue_item_t* next;
 
     void* p;
 };
 
+#define K_XQUEUE_DEFINE(root) struct k_xqueue_item_t * root = NULL;
+
 /*___________________________________________________________________________*/
 
-struct k_scheduled_item_t* _k_schedule_get_root(void);
+void k_xqueue_schedule(struct k_xqueue_item_t **root, struct k_xqueue_item_t *new_item);
 
-void _k_schedule_submit(struct k_scheduled_item_t *new_item);
+void k_xqueue_shift(struct k_xqueue_item_t **root, k_delta_ms_t delta);
 
-void _k_schedule_time_passed(k_delta_ms_t delta);
-
-struct k_scheduled_item_t * _k_schedule_pop_first_expired();
+struct k_xqueue_item_t *k_xqueue_pop(struct k_xqueue_item_t **root);
 
 /*___________________________________________________________________________*/
 

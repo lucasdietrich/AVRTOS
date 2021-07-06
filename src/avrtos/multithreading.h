@@ -1,5 +1,5 @@
-#ifndef _MULTITHREADING_H
-#define _MULTITHREADING_H
+#ifndef _AVRTOS_MULTITHREADING_H
+#define _AVRTOS_MULTITHREADING_H
 
 /*___________________________________________________________________________*/
 
@@ -10,7 +10,7 @@
 #include <stddef.h>
 
 #include "multithreading_defines.h"
-#include "scheduler.h"
+#include "xqueue.h"
 
 /*___________________________________________________________________________*/
 
@@ -165,6 +165,10 @@ struct thread_t *_k_scheduler(void);
  * This function will return in the new main thread
  */
 void k_yield(void);
+
+/*___________________________________________________________________________*/
+
+extern struct k_xqueue_item_t *_k_system_xqueue;
 
 void k_sleep(k_timeout_t timeout);
 
