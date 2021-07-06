@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "multithreading_debug.h"
+#include "debug.h"
 #include "xqueue.h"
 
 

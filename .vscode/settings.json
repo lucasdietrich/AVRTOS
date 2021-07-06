@@ -1,6 +1,14 @@
 {
     "files.associations": {
         "multithreading_debug.h": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "multithreading.h": "c",
+        "multithreading_defines.h": "c",
+        "schedules_items.h": "c",
+        "xqueue.h": "c",
+        "mutex.h": "c",
+        "pgmspace.h": "c",
+        "io.h": "c",
+        "interrupt.h": "c"
     }
 }

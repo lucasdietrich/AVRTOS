@@ -45,12 +45,17 @@
 // In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option
 // defines the size of the main stack
 //
-#define DEFAULT_THREAD_MAIN_STACK_SIZE          0x400
+#define DEFAULT_THREAD_MAIN_STACK_SIZE          0x200
 
 //
 // Tells if we should use the C or the Assembler function to define our threads at runtiime
 //
 #define DEFAULT_THREAD_USE_INIT_STACK_ASM       1
+
+//
+// Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
+//
+#define DEFAULT_HIGH_RANGE_TIME_OBJECT_U32      1
 
 /*___________________________________________________________________________*/
 

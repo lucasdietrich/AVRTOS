@@ -4,30 +4,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define SCHEDULER_PRECISION_U32 1
-#define SCHEDULER_PRECISION_U16 0
-#define SCHEDULER_PRECISION SCHEDULER_PRECISION_U16
+#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*___________________________________________________________________________*/
-
-#if SCHEDULER_PRECISION == SCHEDULER_PRECISION_U32
-    typedef uint32_t k_delta_ms_t;
-#else
-    typedef uint16_t k_delta_ms_t;
-#endif
-
-typedef struct
-{
-    k_delta_ms_t delay;
-} k_timeout_t;
-
-#define K_MSEC(delay) ((k_timeout_t){delay})
-#define K_NO_WAIT(delay) ((k_timeout_t){0})
-#define K_FOREVER(delay) ((k_timeout_t){-1})
 
 /*___________________________________________________________________________*/
 

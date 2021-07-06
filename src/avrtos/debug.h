@@ -1,5 +1,5 @@
-#ifndef _AVRTOS_MULTITHREADING_DEBUG_H
-#define _AVRTOS_MULTITHREADING_DEBUG_H
+#ifndef _AVRTOS_DEBUG_H
+#define _AVRTOS_DEBUG_H
 
 #include "misc/uart.h"
 #include "misc/utils.h"

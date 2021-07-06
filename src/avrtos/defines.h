@@ -1,5 +1,5 @@
-#ifndef _AVRTOS_MULTITHREADING_DEFINES_H
-#define _AVRTOS_MULTITHREADING_DEFINES_H
+#ifndef _AVRTOS_DEFINES_H
+#define _AVRTOS_DEFINES_H
 
 /*___________________________________________________________________________*/
 
@@ -59,6 +59,11 @@
 #define THREAD_USE_INIT_STACK_ASM DEFAULT_THREAD_USE_INIT_STACK_ASM
 #endif
 
+#ifdef CONFIG_HIGH_RANGE_TIME_OBJECT_U32
+#define HIGH_RANGE_TIME_OBJECT_U32  CONFIG_HIGH_RANGE_TIME_OBJECT_U32
+#else
+#define HIGH_RANGE_TIME_OBJECT_U32  DEFAULT_HIGH_RANGE_TIME_OBJECT_U32
+#endif
 /*___________________________________________________________________________*/
 
 #define K_SWAP_LITTLE_BIG_ENDIAN(u16) (((uint16_t)u16 << 8) | ((uint16_t)u16 >> 8))
@@ -126,5 +131,21 @@
 
 /*___________________________________________________________________________*/
 
+#if HIGH_RANGE_TIME_OBJECT_U32 == 1
+    typedef uint32_t k_delta_ms_t;
+#else
+    typedef uint16_t k_delta_ms_t;
+#endif
+
+typedef struct
+{
+    k_delta_ms_t delay;
+} k_timeout_t;
+
+#define K_MSEC(delay) ((k_timeout_t){delay})
+#define K_NO_WAIT(delay) ((k_timeout_t){0})
+#define K_FOREVER(delay) ((k_timeout_t){-1})
+
+/*___________________________________________________________________________*/
 
 #endif

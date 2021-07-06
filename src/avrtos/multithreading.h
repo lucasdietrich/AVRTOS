@@ -9,8 +9,10 @@
 
 #include <stddef.h>
 
-#include "multithreading_defines.h"
+#include "defines.h"
 #include "xqueue.h"
+#include "mutex.h"
+#include "semaphore.h"
 
 /*___________________________________________________________________________*/
 

@@ -12,7 +12,7 @@
 #include "avrtos/misc/utils.h"
 
 #include "avrtos/multithreading.h"
-#include "avrtos/multithreading_debug.h"
+#include "avrtos/debug.h"
 #include "avrtos/mutex.h"
 #include "avrtos/semaphore.h"
 
