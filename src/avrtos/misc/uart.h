@@ -10,22 +10,26 @@
 extern "C" {
 #endif
 
-// Following constants are calculated for a CPU Clock running at 16MHz
-#ifdef F_CPU
-#define FOSC F_CPU
-#else
-#define FOSC 16000000 
-#endif
+// see datasheet
+// adviced (for 16Mhz): 9600, 38400, 76800, 250k, 500k, 1M
+// not recommended (for 16Mhz) (error rate) : 115200, 230400, 57.6
 
 #define BAUD_9600       9600
 #define BAUD_19200      19200
+#define BAUD_14400      14400
+#define BAUD_19200      19200
+#define BAUD_28800      28800
 #define BAUD_38400      38400
 #define BAUD_57600      57600
+#define BAUD_76800      76800
 #define BAUD_115200     115200
+#define BAUD_230400     230400 
+#define BAUD_250000     250000
+#define BAUD_500000     500000
 #define BAUD_1000000    1000000
-#define BAUDRATE BAUD_1000000
+#define BAUDRATE BAUD_76800
 
-#define UBRR ((FOSC >> 4) / BAUDRATE) - 1
+#define UBRR ((F_CPU >> 4) / BAUDRATE) - 1
 
 /**
  * @brief Initiliaze the USART with the baudrate specified as argument
