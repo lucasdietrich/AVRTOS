@@ -3,6 +3,7 @@
 .global read_sp
 .global read_ra
 .global set_stack_pointer
+.global read_sreg
 
 ; return the return address of when ther callee calls it
 read_ra:
@@ -41,4 +42,8 @@ set_stack_pointer:
     pop r27
     pop r26
 
+    ret
+
+read_sreg:
+    lds r24,SREG
     ret

@@ -72,6 +72,14 @@ Todos:
 
 - renamed _schedule function to _timer
 
+- Canaries & Sentinel & Thread analyser
+
+- what to do when thread returns ? (go to exit)
+
+- safe errno flag in stack
+
+- default SREG value ?
+
 - __ASSEMBLER__ in header files to know if an asembler file called this header
 
 ```

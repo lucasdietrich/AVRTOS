@@ -22,22 +22,17 @@ extern "C" {
 #define BAUD_38400      38400
 #define BAUD_57600      57600
 #define BAUD_115200     115200
+#define BAUD_1000000    1000000
+#define BAUDRATE BAUD_1000000
 
-// FOSC/16/BAUD - 1 = 103.166 -> 103
-#define MH16_9600_UBRR      103
-#define MH16_19200_UBRR     51
-#define MH16_38400_UBRR     25
-#define MH16_57600_UBRR     16
-#define MH16_115200_UBRR    8   // particular case 
-
-#define MH16_DEFAULT_BAUDRATE_UBRR  MH16_115200_UBRR
+#define UBRR ((FOSC >> 4) / BAUDRATE) - 1
 
 /**
  * @brief Initiliaze the USART with the baudrate specified as argument
  * 
  * @param baudrate_ubrr 
  */
-void _usart_init(const uint8_t baudrate_ubrr);
+void _usart_init(const uint16_t baudrate_ubrr);
 
 /**
  * @brief Initialize the USART at 115200 bauds/s

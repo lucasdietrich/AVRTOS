@@ -2,6 +2,8 @@
 
 #include <util/delay.h>
 
+#include <avr/interrupt.h>
+
 #include "avrtos/misc/uart.h"
 #include "avrtos/misc/led.h"
 
@@ -10,56 +12,74 @@
 
 /*___________________________________________________________________________*/
 
-void thread_led(void *p);
+void thread_led_on(void *p);
+void thread_led_off(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
+K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
+K_THREAD_DEFINE(ledoff, thread_led_off, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 
 /*___________________________________________________________________________*/
+
+// ISR(USART_RX_vect)
+// {
+//   usart_transmit(UDR0);
+// }
 
 int main(void)
 {
   led_init();
   usart_init();
 
-  print_scheduled_items_list(_k_system_xqueue);
+  //enable UART interrupt on RX
+  UCSR0B |= 1 << RXCIE0;
 
-  k_yield();
+  usart_printl("main");
+
+  init_sysclock();
+
+  sei();
+
+  while(1) {
+    LOG_SREG_I();
+    usart_u16(_sysclock_counter);
+    usart_transmit('\n');
+    // k_yield();
+
+    _delay_ms(1000);
+  }
 
   while(1)
   {
-    k_xqueue_shift(&_k_system_xqueue, 10);
-    // print_scheduled_items_list();
-    k_xqueue_item_t *item = k_xqueue_pop(&_k_system_xqueue);
-    if (item != NULL)
-    {
-      // usart_hex16((uint16_t) item->p);
-      // usart_print(" expected : ");
-      // usart_hex16((uint16_t) k_thread.list[1]);
-      // usart_transmit('\n');
-
-
-      // this function should append the thread to the list of pending threads and the scheduler choose which one to execute
-      
-      k_yield();
-    }
-
-    _delay_ms(10);
+    k_yield();
   }
 }
 
-void thread_led(void *p)
+void thread_led_on(void *p)
 {
-  usart_print("start");
-
+  sei();  // default SREG is 0 need to set it TODO
   while (1)
   {
-    k_sleep(K_MSEC(500));
-    led_off();
-    usart_printl("OFF");
-
-    k_sleep(K_MSEC(500));
+    LOG_SREG_I();
     led_on();
-    usart_printl("ON");
+    usart_print("ON");
+    _delay_ms(500);
+    
+
+    k_yield();
+  }
+}
+
+void thread_led_off(void *p)
+{
+  sei();  // default SREG is 0 need to set it TODO
+  while (1)
+  {
+    LOG_SREG_I();
+    led_off();
+    usart_print("OFF");
+    _delay_ms(500);
+
+    k_yield();
   }
 }
 

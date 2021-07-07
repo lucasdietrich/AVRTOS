@@ -17,6 +17,7 @@
 
 /*___________________________________________________________________________*/
 
+
 // scheduled_item_t must have abs_delay set and thread (next = NULL)
 void k_xqueue_schedule(struct k_xqueue_item_t **root, struct k_xqueue_item_t *new_item)
 {

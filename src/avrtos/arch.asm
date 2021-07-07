@@ -153,8 +153,6 @@ _k_thread_switch:
     ld r0, X+  ; low byte
     ld r1, X+  ; high byte
 
-    ; todo cli here
-
     ; set stack pointer
     cli
     sts SPL, r0

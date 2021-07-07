@@ -13,6 +13,8 @@
 #include "xqueue.h"
 #include "mutex.h"
 #include "semaphore.h"
+#include "sysclock.h"
+
 
 /*___________________________________________________________________________*/
 
@@ -176,8 +178,6 @@ void k_sleep(k_timeout_t timeout);
 
 // TODO
 void cpu_idle(void);
-
-
 
 /*___________________________________________________________________________*/
 

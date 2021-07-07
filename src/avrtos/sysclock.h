@@ -4,12 +4,6 @@
 
 /*___________________________________________________________________________*/
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-
-#include <stddef.h>
-
 #include "multithreading.h"
 
 #ifdef __cplusplus
@@ -17,6 +11,10 @@ extern "C" {
 #endif
 
 /*___________________________________________________________________________*/
+
+extern volatile uint8_t _sysclock_counter;
+
+void init_sysclock(void);
 
 /*___________________________________________________________________________*/
 

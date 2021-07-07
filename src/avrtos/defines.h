@@ -3,6 +3,10 @@
 
 /*___________________________________________________________________________*/
 
+// This find is include from asm files, make it compatible with ASM or user "#if !__ASSEMBLER__" preprocessor
+
+/*___________________________________________________________________________*/
+
 // Include user configuration
 
 // CONFIG_THREAD_MAX
@@ -131,6 +135,8 @@
 
 /*___________________________________________________________________________*/
 
+#if !__ASSEMBLER__
+
 #if HIGH_RANGE_TIME_OBJECT_U32 == 1
     typedef uint32_t k_delta_ms_t;
 #else
@@ -145,6 +151,8 @@ typedef struct
 #define K_MSEC(delay) ((k_timeout_t){delay})
 #define K_NO_WAIT(delay) ((k_timeout_t){0})
 #define K_FOREVER(delay) ((k_timeout_t){-1})
+
+#endif
 
 /*___________________________________________________________________________*/
 

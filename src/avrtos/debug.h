@@ -111,6 +111,27 @@ uint16_t read_ra(void);
  */
 void set_stack_pointer(struct thread_t *th);
 
+/**
+ * @brief Read SREG register
+ * 
+ * SREG: Status Register
+ * C: Carry Flag
+ * Z: Zero Flag
+ * N: Negative Flag
+ * V: Two's complement overflow indicator
+ * S: N, V, For signed tests
+ * H: Half Carry Flag
+ * T: Transfer bit used by BLD and BST instructions
+ * I: Global Interrupt Enable/Disable Flag
+ * 
+ * @return uint8_t 
+ */
+uint8_t read_sreg(void);
+
+#define LOG_SREG() usart_u8(SREG); usart_transmit(';');
+#define LOG_SREG2() usart_u8(read_sreg()); usart_transmit(';');
+#define LOG_SREG_I() usart_transmit('['); usart_u8(SREG >> 7); usart_transmit(']');
+
 /*___________________________________________________________________________*/
 
 void print_scheduled_item(struct k_xqueue_item_t* const item);
