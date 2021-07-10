@@ -43,8 +43,8 @@ _k_thread_stack_create:
     brne .-6
 
     ; void * context ~ push r24 > r25
-    st -X, r18
     st -X, r19
+    st -X, r18
 
     ; push r26 > r31 (6 registers)
     ldi r29, 6
@@ -109,14 +109,10 @@ _k_thread_switch:
     push r19
     push r20
     push r21
-
-    ; EVALUATE ??
-    ; as the function has 2 (void* = 16bits) arguments
-    ; these 4 registers are already save onto the stack
     push r22
-    push r23    ; r24, r25 inverted
-    push r25    ; r24, r25 inverted
+    push r23
     push r24
+    push r25
     push r26
     push r27
     push r28
@@ -170,14 +166,8 @@ _k_thread_switch:
     pop r28
     pop r27
     pop r26
-
-    ; as the function has 2 (void* = 16bits) arguments
-    ; these 4 registers are already saved
-    ; no need to restore them
-
-    ; ?
-    pop r24    ; r24, r25 inverted
-    pop r25    ; r24, r25 inverted
+    pop r25
+    pop r24
     pop r23
     pop r22
     pop r21
@@ -239,8 +229,8 @@ k_yield:
     push r21
     push r22
     push r23
-    push r25    ; r24, r25 inverted
-    push r24    ; r24, r25 inverted
+    push r24
+    push r25
     push r26
     push r27
     push r28
@@ -286,8 +276,8 @@ k_yield:
     pop r28
     pop r27
     pop r26
-    pop r24    ; r24, r25 inverted
-    pop r25    ; r24, r25 inverted
+    pop r25
+    pop r24
     pop r23
     pop r22
     pop r21

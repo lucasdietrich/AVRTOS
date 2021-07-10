@@ -55,7 +55,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
     uint8_t* sp = (uint8_t*) stack_end - 1;
 
     // add return addr to stack (with format >> 1)
-    *(uint16_t*)sp = K_SWAP_LITTLE_BIG_ENDIAN((uint16_t) entry);
+    *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) entry);
     sp -= 1u;
 
     // push r0 > r23 (24 registers)
@@ -66,7 +66,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
 
     // set context (p)
     sp -= 1u;
-    *(uint16_t*)sp = (uint16_t) context_p;
+    *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) context_p);
     sp -= 1u;
 
     // push r26 > r31 (6 registers)

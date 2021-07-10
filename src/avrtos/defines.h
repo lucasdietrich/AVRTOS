@@ -76,7 +76,7 @@
 #endif
 /*___________________________________________________________________________*/
 
-#define K_SWAP_LITTLE_BIG_ENDIAN(u16) (((uint16_t)u16 << 8) | ((uint16_t)u16 >> 8))
+#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n) & 0xFF)) << 8) | (((uint16_t)(n) & 0xFF00) >> 8))
 
 #define MIN(a, b) ((a < b) ? (a) : (b))
 #define MAX(a, b) ((a > b) ? (a) : (b))
@@ -117,9 +117,9 @@
         {0x00},                                                  \
         {K_THREAD_DEFAULT_SREG,                                  \
          {0x00},                                                 \
-         (void *)context_p,                                      \
+         (void *)K_SWAP_ENDIANNESS(context_p),                                      \
          {0x00},                                                 \
-         (void *)K_SWAP_LITTLE_BIG_ENDIAN((uint16_t)entry)}}
+         (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}}
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p)                                      \
     thread_t name = {                                                                                       \

@@ -82,7 +82,7 @@ void *k_thread_get_return_addr(struct thread_t *th)
     {
         uint16_t return_addr_reverted = *((uint16_t *)((uint16_t)th->stack.end - 2u));
 
-        return (void *)K_SWAP_LITTLE_BIG_ENDIAN(return_addr_reverted);
+        return (void *)K_SWAP_ENDIANNESS(return_addr_reverted);
     }
     return NULL;
 }
