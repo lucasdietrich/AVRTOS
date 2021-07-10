@@ -30,23 +30,21 @@ int main(void)
   led_init();
   usart_init();
 
-  //enable UART interrupt on RX
-  UCSR0B |= 1 << RXCIE0;
+  USART_DUMP_RAM_ALL();
 
-  usart_printl("main");
+  k_thread_dump_all();
 
   init_sysclock();
 
   sei();
 
-  while(1) {
-    LOG_SREG_I();
-    usart_u16(_sysclock_counter);
-    usart_transmit('\n');
-    // k_yield();
+  // while(1) {
+  //   usart_u16(_sysclock_counter);
+  //   usart_transmit('\n');
+  //   // k_yield();
 
-    _delay_ms(1000);
-  }
+  //   _delay_ms(1000);
+  // }
 
   while(1)
   {
@@ -56,14 +54,11 @@ int main(void)
 
 void thread_led_on(void *p)
 {
-  sei();  // default SREG is 0 need to set it TODO
   while (1)
   {
-    LOG_SREG_I();
     led_on();
     usart_print("ON");
     _delay_ms(500);
-    
 
     k_yield();
   }
@@ -71,10 +66,8 @@ void thread_led_on(void *p)
 
 void thread_led_off(void *p)
 {
-  sei();  // default SREG is 0 need to set it TODO
   while (1)
   {
-    LOG_SREG_I();
     led_off();
     usart_print("OFF");
     _delay_ms(500);

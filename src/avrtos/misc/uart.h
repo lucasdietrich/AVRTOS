@@ -27,7 +27,7 @@ extern "C" {
 #define BAUD_250000     250000
 #define BAUD_500000     500000
 #define BAUD_1000000    1000000
-#define BAUDRATE BAUD_76800
+#define BAUDRATE BAUD_500000
 
 #define UBRR ((F_CPU >> 4) / BAUDRATE) - 1
 

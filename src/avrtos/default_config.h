@@ -12,6 +12,8 @@
 #ifndef _AVRTOS_DEFAULT_CONFIG_H
 #define _AVRTOS_DEFAULT_CONFIG_H
 
+#include <avr/io.h>
+
 /*___________________________________________________________________________*/
 
 //
@@ -56,6 +58,19 @@
 // Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
 //
 #define DEFAULT_HIGH_RANGE_TIME_OBJECT_U32      1
+
+//
+// Default SREG value for other thread on stack creation
+//  Main thread default SREG is still 0
+//
+// From datasheet
+//  Bit 7 6 5 4 3 2 1 0
+//  0x3F (0x5F) I T H S V N Z C SREG
+//  Read/Write R/W R/W R/W R/W R/W R/W R/W R/W
+//  Initial Value 0 0 0 0 0 0 0 0
+#define DEFAULT_THREAD_DEFAULT_SREG             1 << SREG_I
+
+
 
 /*___________________________________________________________________________*/
 

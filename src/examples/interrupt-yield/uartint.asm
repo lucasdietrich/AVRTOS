@@ -5,10 +5,22 @@
 .global USART_RX_vect
 .global usart_transmit
 
+; when calling function, you must push all registers covered by the arguments,; even not completely uint8_t require r24 but cover also r25 
+; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
+_USART_RX_vect:
+    push r24
+    push r25
+    lds r24, UDR0
+    lds r24, 0x5A
+    call usart_transmit
+    pop r25
+    pop r24
+    reti
 
 ; USART_RX_vect
 USART_RX_vect:
     push r24
+    push r25
     push r18
     push r17
 
@@ -31,6 +43,7 @@ USART_ReceiveNoError:
 
     pop r17
     pop r18
+    pop r25
     pop r24
     reti
 

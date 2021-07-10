@@ -68,6 +68,12 @@
 #else
 #define HIGH_RANGE_TIME_OBJECT_U32  DEFAULT_HIGH_RANGE_TIME_OBJECT_U32
 #endif
+
+#ifdef CONFIG_THREAD_DEFAULT_SREG
+#define K_THREAD_DEFAULT_SREG  CONFIG_THREAD_DEFAULT_SREG
+#else
+#define K_THREAD_DEFAULT_SREG  DEFAULT_THREAD_DEFAULT_SREG
+#endif
 /*___________________________________________________________________________*/
 
 #define K_SWAP_LITTLE_BIG_ENDIAN(u16) (((uint16_t)u16 << 8) | ((uint16_t)u16 >> 8))
@@ -75,13 +81,6 @@
 #define MIN(a, b) ((a < b) ? (a) : (b))
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-
-// From datasheet
-// Bit 7 6 5 4 3 2 1 0
-// 0x3F (0x5F) I T H S V N Z C SREG
-// Read/Write R/W R/W R/W R/W R/W R/W R/W R/W
-// Initial Value 0 0 0 0 0 0 0 0
-#define K_THREAD_DEFAULT_SREG 0x00
 
 // 32 registers (32) + SREG (1) + return address (2)
 #define K_THREAD_STACK_VOID_SIZE 35u

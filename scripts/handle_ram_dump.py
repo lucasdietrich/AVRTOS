@@ -10,7 +10,7 @@ from parse_ramdump import parse
 
 LOCATION_DIR = "res"
 COM_PORT = "COM3"
-BAUDRATE = 115200
+BAUDRATE = 500000
 
 FILENAME = "ramdump.txt" # set None to have a new file every time
 FILENAME_PARSED = "ramdump.parsed.txt"
@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     addresses = []
 
-    with open(filepath, "wb+") as fp:
+    with open(filepath, "bw") as fp:
         while state < 2:
             content = ser.read_until()
             
