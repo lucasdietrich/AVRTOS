@@ -10,12 +10,14 @@
 volatile uint8_t _sysclock_counter = 0;
 
 // 100Hz timer
-ISR(TIMER2_OVF_vect)
-{
-    TCNT2 = 256 - 156;
+// ISR(TIMER2_OVF_vect)
+// {
+//     TCNT2 = 256 - 156;
 
-    _sysclock_counter++;
-}
+//     usart_transmit('.');
+
+//     // _sysclock_counter++;
+// }
 
 void init_sysclock(void)
 {

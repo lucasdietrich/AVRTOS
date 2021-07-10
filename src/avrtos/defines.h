@@ -70,9 +70,16 @@
 #endif
 
 #ifdef CONFIG_THREAD_DEFAULT_SREG
-#define K_THREAD_DEFAULT_SREG  CONFIG_THREAD_DEFAULT_SREG
+#define THREAD_DEFAULT_SREG  CONFIG_THREAD_DEFAULT_SREG
 #else
-#define K_THREAD_DEFAULT_SREG  DEFAULT_THREAD_DEFAULT_SREG
+#define THREAD_DEFAULT_SREG  DEFAULT_THREAD_DEFAULT_SREG
+#endif
+
+
+#ifdef CONFIG_KERNEL_DEBUG
+#define KERNEL_DEBUG  CONFIG_THREAD_DEFAULT_SREG
+#else
+#define KERNEL_DEBUG  DEFAULT_KERNEL_DEBUG
 #endif
 /*___________________________________________________________________________*/
 
@@ -115,7 +122,7 @@
         } base;                                                  \
     } _k_stack_buf_##name = {                                    \
         {0x00},                                                  \
-        {K_THREAD_DEFAULT_SREG,                                  \
+        {THREAD_DEFAULT_SREG,                                  \
          {0x00},                                                 \
          (void *)K_SWAP_ENDIANNESS(context_p),                                      \
          {0x00},                                                 \

@@ -15,7 +15,7 @@
 void thread_led_on(void *p);
 void thread_led_off(void *p);
 
-// K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
+K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 K_THREAD_DEFINE(ledoff, thread_led_off, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 
 /*___________________________________________________________________________*/
@@ -25,7 +25,7 @@ int main(void)
   led_init();
   usart_init();
 
-  USART_DUMP_RAM_ALL();
+  // USART_DUMP_RAM_ALL();
 
   k_thread_dump_all();
 
@@ -43,8 +43,7 @@ int main(void)
 
   while(1)
   {
-    led_on();
-    usart_print("ON");
+    usart_transmit('_');
     _delay_ms(1000);
 
     // k_yield();
@@ -56,7 +55,7 @@ void thread_led_on(void *p)
   while (1)
   {
     led_on();
-    usart_print("ON");
+    usart_transmit('O');
     _delay_ms(1000);
 
     // k_yield();
@@ -68,7 +67,7 @@ void thread_led_off(void *p)
   while (1)
   {
     led_off();
-    usart_print("OFF");
+    usart_transmit('F');
     _delay_ms(1000);
 
     // k_yield();

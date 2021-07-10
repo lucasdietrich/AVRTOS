@@ -70,6 +70,11 @@
 //  Initial Value 0 0 0 0 0 0 0 0
 #define DEFAULT_THREAD_DEFAULT_SREG             1 << SREG_I
 
+//
+//  Enable Kernel Debug features
+//
+#define DEFAULT_KERNEL_DEBUG                    0
+
 
 
 /*___________________________________________________________________________*/

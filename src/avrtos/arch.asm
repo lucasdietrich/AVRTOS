@@ -54,7 +54,7 @@ _k_thread_stack_create:
     
     ; push sreg default (0)
     ; lds r29, SREG
-    ldi r29, K_THREAD_DEFAULT_SREG
+    ldi r29, THREAD_DEFAULT_SREG
     st -X, r29
 
     ; copy stack pointer in thread structure

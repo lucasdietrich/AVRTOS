@@ -2,8 +2,11 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#include <avrtos/defines.h>
+
 .global USART_RX_vect
 .global usart_transmit
+.global TIMER2_OVF_vect
 
 ;_____________________________________________________________________________;
 
@@ -45,13 +48,31 @@ USART_ReceiveNoError:
 
     out _SFR_IO_ADDR(SREG), r17
 
-
     pop r17
     pop r18
     pop r25
     pop r24
 
-    ; reti  // normal
+    jmp _interrupt_k_yield
+
+; KERNEL_DEBUG
+TIMER2_OVF_vect:
+    push r24
+    ldi r24, 256 - 156
+    sts TCNT2, r24
+
+#if KERNEL_DEBUG
+    push r25
+    in r25, _SFR_IO_ADDR(SREG)
+    ldi r24, 0x2e           ; '.'
+    call usart_transmit
+    out _SFR_IO_ADDR(SREG), r25
+    pop r25
+#endif
+
+    pop r24
+
+    ; jmp _interrupt_k_yield    
 
 ;_____________________________________________________________________________;
 

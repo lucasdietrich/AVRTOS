@@ -76,7 +76,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
     }
 
     // push sreg
-    *sp = (uint8_t) K_THREAD_DEFAULT_SREG;
+    *sp = (uint8_t) THREAD_DEFAULT_SREG;
     sp -= 1u;
 
     // save SP in thread structure
