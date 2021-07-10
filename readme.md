@@ -80,6 +80,8 @@ Todos:
 
 - default SREG value ?
 
+- returning from thread go to error ? : add exit function address at the bottom of the stack (+2B)
+
 - __ASSEMBLER__ in header files to know if an asembler file called this header
 
 ```

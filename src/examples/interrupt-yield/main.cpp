@@ -15,15 +15,10 @@
 void thread_led_on(void *p);
 void thread_led_off(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
+// K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 K_THREAD_DEFINE(ledoff, thread_led_off, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 
 /*___________________________________________________________________________*/
-
-// ISR(USART_RX_vect)
-// {
-//   usart_transmit(UDR0);
-// }
 
 int main(void)
 {
@@ -48,7 +43,11 @@ int main(void)
 
   while(1)
   {
-    k_yield();
+    led_on();
+    usart_print("ON");
+    _delay_ms(1000);
+
+    // k_yield();
   }
 }
 
@@ -58,9 +57,9 @@ void thread_led_on(void *p)
   {
     led_on();
     usart_print("ON");
-    _delay_ms(500);
+    _delay_ms(1000);
 
-    k_yield();
+    // k_yield();
   }
 }
 
@@ -70,9 +69,9 @@ void thread_led_off(void *p)
   {
     led_off();
     usart_print("OFF");
-    _delay_ms(500);
+    _delay_ms(1000);
 
-    k_yield();
+    // k_yield();
   }
 }
 
