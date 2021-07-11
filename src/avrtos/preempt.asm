@@ -103,8 +103,10 @@ _k_interrupt_yield:
     push r30
     push r31
 
-    lds r0, SREG    ; save flags
-    push r0
+    lds r16, SREG
+    ori r16, 1 << SREG_I ; we Interrupt flag is disabled we need to to it manually in SREG
+
+    push r16
 
     lds r0, SPL
     lds r1, SPH
