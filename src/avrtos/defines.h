@@ -23,7 +23,7 @@
 
 #define K_PRIO_PREEMPT(p)                       (p)
 #define K_PRIO_COOP(p)                          (-p)
-#define K_PRIO_DEFAULT                          K_PRIO_COOP(1)
+#define K_PRIO_DEFAULT                          K_PRIO_PREEMPT(8)
 #define K_STOPPED                               0
 
 /*___________________________________________________________________________*/
@@ -76,7 +76,7 @@
 #endif
 
 #ifdef CONFIG_KERNEL_DEBUG
-#define KERNEL_DEBUG  CONFIG_THREAD_DEFAULT_SREG
+#define KERNEL_DEBUG  CONFIG_KERNEL_DEBUG
 #else
 #define KERNEL_DEBUG  DEFAULT_KERNEL_DEBUG
 #endif

@@ -29,10 +29,10 @@ USART_RX_vect:
 
 ; If error, return -1
     andi r18, (1 << FE0) | (1 << DOR0) | (1 << UPE0)
-    breq USART_ReceiveNoError
+    breq USART_Continue
     ldi r24, 0x58 ; X show X if error
     
-USART_ReceiveNoError:
+USART_Continue:
     call usart_transmit     ; return received character
 
     out _SFR_IO_ADDR(SREG), r17
@@ -42,7 +42,7 @@ USART_ReceiveNoError:
     pop r25
     pop r24
 
-    jmp _interrupt_k_yield
+    jmp _k_interrupt_yield
 
 ; KERNEL_DEBUG
 TIMER2_OVF_vect:
@@ -61,15 +61,13 @@ TIMER2_OVF_vect:
 
     pop r24
 
-    reti
+    ; reti
     ; jmp _interrupt_k_yield    
 
 ;_____________________________________________________________________________;
 
 ; switch thread here : stack is +2B (return address)
-
-; see _k_thread_switch (th* a -> th* b)
-_interrupt_k_yield:
+_k_interrupt_yield:
     ; save current thread registers
     ; push 32 registers
     push r0
@@ -96,8 +94,8 @@ _interrupt_k_yield:
     push r21
     push r22
     push r23
-    push r25    ; r24, r25 inverted
-    push r24    ; r24, r25 inverted
+    push r24
+    push r25
     push r26
     push r27
     push r28
@@ -111,10 +109,10 @@ _interrupt_k_yield:
     lds r0, SPL
     lds r1, SPH
 
-    lds r26, k_thread           ; load current thread structure addr in X
+    lds r26, k_thread           ; load current thread addr in X
     lds r27, k_thread + 1
 
-    st X+, r0   ; save SP
+    st X+, r0   ; write SP in structure
     st X+, r1
 
     ; determine which is the next thread
@@ -139,8 +137,8 @@ _interrupt_k_yield:
     pop r28
     pop r27
     pop r26
-    pop r24    ; r24, r25 inverted
-    pop r25    ; r24, r25 inverted
+    pop r25
+    pop r24
     pop r23
     pop r22
     pop r21

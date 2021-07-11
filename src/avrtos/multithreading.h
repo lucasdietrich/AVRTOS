@@ -131,17 +131,6 @@ int k_thread_register(struct thread_t *const th);
 /**
  * @brief Switch from current thread to {to} thread
  * 
- * @warning {from} must necessary be the current thread
- * This function would break the stacks consistency if misused
- * 
- * @param from : current thread
- * @param to : to thread
- */
-void _k_thread_switch(struct thread_t *from, struct thread_t *to);
-
-/**
- * @brief Switch from current thread to {to} thread
- * 
  * SAFE
  * 
  * @param from : current thread

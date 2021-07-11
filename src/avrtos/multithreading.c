@@ -134,17 +134,6 @@ int k_thread_register(struct thread_t *const th)
 
 }
 
-void k_thread_switch(struct thread_t *to)
-{
-// #warning TODO does not update k_thread.current reference
-
-    if (to != NULL)
-    {
-        _k_thread_switch(k_thread_current(), to);
-    }
-    // exit()
-}
-
 struct thread_t *_k_scheduler(void)
 {
     // TODO find a way to get rid of the `k_thread.count` and `k_thread.current_idx` parameters when threads cannot be create at runtime
