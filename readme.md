@@ -21,7 +21,7 @@ Themes:
 
 AVR RTOS objectives :
 
-![avr-rtos.png](./pics/avr-rtos.png)
+![avr-rtos.png](./res/pics/avr-rtos.png)
 
 Tags:
 - test
@@ -84,6 +84,8 @@ Todos:
 
 - __ASSEMBLER__ in header files to know if an asembler file called this header
 
+-  todo do to prepare stack and calling scheduler on cooperative thread on interrupt
+
 ```
 #ifdef __ASSEMBLER__
 #warning __ASSEMBLER__
@@ -110,7 +112,7 @@ Todos:
 ## References : 
 
 ### Return addres:
-![return_address.png](./pics/return_address.png)
+![return_address.png](./res/pics/return_address.png)
 
 ### Data memory map
 
@@ -131,24 +133,24 @@ Todos:
 
 With `#define __SFR_OFFSET 0x20`.
 
-![data_memory_map.png](./pics/data_memory_map.png)
+![data_memory_map.png](./res/pics/data_memory_map.png)
 
 ### Stack pointer 
 
-![stack_pointer.png](./pics/stack_pointer.png)
+![stack_pointer.png](./res/pics/stack_pointer.png)
 
 ### Architecture
 
-![harvard_datasheet.png](./pics/harvard_datasheet.png)
+![harvard_datasheet.png](./res/pics/harvard_datasheet.png)
 
 ---
 
 ## Program analysis
 
 See :
-- [res/disassembly.test.s](./res/disassembly.test.s)
-- [res/ramdump.test.parsed.txt](.res/ramdump.test.parsed.txt)
-- [res/ramdump.test.txt](./res/ramdump.test.txt)
+- [res/dis/disassembly.test.s](./res/dis/disassembly.test.s)
+- [res/dis/ramdump.test.parsed.txt](.res/dis/ramdump.test.parsed.txt)
+- [res/dis/ramdump.test.txt](./res/dis/ramdump.test.txt)
 
 ### Decription
 
@@ -337,7 +339,7 @@ Interesting part is at the end :
 - in violet : *return addr* after the call of the `main` :
     - address is shifted by 1 to the right : to restore it `0x0047 << 1 = 0x008e` which is exactly the line after the `call main` in `__do_copy_data` (function which calls main)
 
-![testfunction_ram.png](./pics/testfunction_ram.png)
+![testfunction_ram.png](./res/pics/testfunction_ram.png)
 
 ### Modifying the stack pointer
 In order to modify manyally the stack pointer the following procedure is proceed :
@@ -378,9 +380,9 @@ Initialization of the stack pointer is done after reset, here :
 ## Cooperative multithreading
 
 See :
-- [res/disassembly.coop.s](./res/disassembly.coop.s)
-- [res/ramdump.coop.parsed.txt](.res/ramdump.coop.parsed.txt)
-- [res/ramdump.coop.txt](./res/ramdump.coop.txt)
+- [res/dis/disassembly.coop.s](./res/dis/disassembly.coop.s)
+- [res/dis/ramdump.coop.parsed.txt](.res/dis/ramdump.coop.parsed.txt)
+- [res/dis/ramdump.coop.txt](./res/dis/ramdump.coop.txt)
 
 ### Description
 
@@ -440,9 +442,9 @@ If a `Flag` appears in the `Flag` column of avr5 instruction set, it means that 
 
 Inspect project with PlatformIO :
 
-![pio_inspect_project.png](./pics/pio_inspect_project.png)
+![pio_inspect_project.png](./res/pics/pio_inspect_project.png)
 
-![pio_inspect_project_stats.png](./pics/pio_inspect_project_stats.png)
+![pio_inspect_project_stats.png](./res/pics/pio_inspect_project_stats.png)
 
 ---
 

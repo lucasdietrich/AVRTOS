@@ -318,7 +318,10 @@ k_yield:
     ldi r29, hi8(_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE))
     out _SFR_IO_ADDR(SPL), r28
     out _SFR_IO_ADDR(SPH), r29
-
 #endif
+
+; Kernel init here
+.section .init3, "ax", @progbits
+    nop
 
 /*___________________________________________________________________________*/

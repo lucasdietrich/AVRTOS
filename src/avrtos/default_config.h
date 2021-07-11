@@ -76,6 +76,11 @@
 #define DEFAULT_KERNEL_DEBUG                    0
 
 
+#define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
+
+#define DEFAULT_KERNEL_TIME_SLICE_MS            10
+
+
 
 /*___________________________________________________________________________*/
 

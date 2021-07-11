@@ -114,10 +114,20 @@ class RAM:
 def parse(filename: str, filename_parsed: str):
     ram = RAM()
 
+    boundary_found = False
+
     # read file
     with open(filename, "r") as fp:
         while True:
+            if fp.readline() == '============\n':
+                boundary_found = True
+                break
+
+        while True:
             line = fp.readline()
+
+            if line == '============\n':
+                break
 
             line.rstrip('\n')
 
@@ -149,4 +159,9 @@ def parse(filename: str, filename_parsed: str):
 
 
 if __name__ == "__main__":
-    print(parse(FILE, FILE_PARSED)[0])
+    import sys
+    if len(sys.argv) == 2:
+
+        parse(sys.argv[1], sys.argv[1] + ".parsed.txt")
+    else:
+        raise Exception("argument problem")

@@ -20,6 +20,7 @@ void usart_dump_addr(const char * name, void* addr)
 
 void usart_ram_dump(uint16_t start, const size_t len, const uint16_t sp)
 {
+    usart_transmit('\n');
     usart_send(utils_ram_border, sizeof(utils_ram_border) - 1);
 
     for(uint16_t i = 0; i < len; i++)

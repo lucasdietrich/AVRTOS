@@ -10,19 +10,8 @@
 
 ;_____________________________________________________________________________;
 
-; when calling function, you must push all registers covered by the arguments,; even not completely uint8_t require r24 but cover also r25 
+; when calling function, you must push all registers covered by the arguments, even not completely uint8_t require r24 but cover also r25 
 ; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
-_USART_RX_vect:
-    push r24
-    push r25
-    lds r24, UDR0
-    lds r24, 0x5A
-    call usart_transmit
-    pop r25
-    pop r24
-    reti
-
-;_____________________________________________________________________________;
 
 ; USART_RX_vect
 USART_RX_vect:
@@ -72,6 +61,7 @@ TIMER2_OVF_vect:
 
     pop r24
 
+    reti
     ; jmp _interrupt_k_yield    
 
 ;_____________________________________________________________________________;
