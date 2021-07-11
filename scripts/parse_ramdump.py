@@ -111,7 +111,7 @@ class RAM:
         return content
 
 
-def parse(filename: str, filename_parsed: str):
+def parse_ram(filename: str, filename_parsed: str):
     ram = RAM()
 
     boundary_found = False
@@ -162,6 +162,6 @@ if __name__ == "__main__":
     import sys
     if len(sys.argv) == 2:
 
-        parse(sys.argv[1], sys.argv[1] + ".parsed.txt")
+        parse_ram(sys.argv[1], sys.argv[1] + ".parsed.txt")
     else:
         raise Exception("argument problem")

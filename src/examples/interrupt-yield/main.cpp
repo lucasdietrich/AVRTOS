@@ -14,6 +14,7 @@
 
 void thread_led_on(void *p);
 void thread_led_off(void *p);
+void exit(uint8_t err);
 
 K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
 K_THREAD_DEFINE(ledoff, thread_led_off, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
@@ -26,6 +27,7 @@ int main(void)
   usart_init();
 
   // USART_DUMP_RAM_ALL();
+  // USART_DUMP_CORE();
 
   k_thread_dump_all();
 
@@ -33,20 +35,16 @@ int main(void)
 
   sei();
 
-  // while(1) {
-  //   usart_u16(_sysclock_counter);
-  //   usart_transmit('\n');
-  //   // k_yield();
+  // uint16_t ra = read_ra();
+  // usart_hex16(ra);
 
-  //   _delay_ms(1000);
-  // }
+  USART_DUMP_CORE();
 
   while(1)
   {
     usart_transmit('_');
-    _delay_ms(1000);
 
-    // k_yield();
+    k_yield();
   }
 }
 
@@ -54,6 +52,7 @@ void thread_led_on(void *p)
 {
   while (1)
   {
+    LOG_SREG_I();
     led_on();
     usart_transmit('O');
     _delay_ms(1000);
@@ -66,12 +65,29 @@ void thread_led_off(void *p)
 {
   while (1)
   {
+    LOG_SREG_I();
+    if ((SREG & (1 << SREG_I)) == 0)
+    {
+      exit(0);
+    }
     led_off();
     usart_transmit('F');
     _delay_ms(1000);
+    
 
     // k_yield();
   }
+}
+
+void exit(uint8_t err)
+{
+  USART_DUMP_CORE();
+
+  k_thread_dump_all();
+
+  usart_printl("stop");
+
+  while(1) { }
 }
 
 /*___________________________________________________________________________*/

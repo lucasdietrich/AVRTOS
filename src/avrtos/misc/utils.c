@@ -1,5 +1,7 @@
 #include "utils.h"
 
+/*___________________________________________________________________________*/
+
 static const char utils_ram_limit[] = " : ";
 static const char utils_ram_border[] = "============\n";
 static const char utils_ram_here[] = "  <-- here";
@@ -70,3 +72,5 @@ void usart_dump_as_ram(const uint8_t *ram, const size_t len, const uint16_t star
 
     usart_send(utils_ram_border, sizeof(utils_ram_border) - 1);
 }
+
+/*___________________________________________________________________________*/

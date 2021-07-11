@@ -4,7 +4,8 @@ import datetime
 import os
 import re
 
-from parse_ramdump import parse
+from parse_ramdump import parse_ram
+from parse_coredump_bin import parse_core
 
 # todo handle several ramdump in the same run
 
@@ -47,6 +48,7 @@ if __name__ == "__main__":
                 print(f"Boundary found (state = {state})")
             elif state == 1:
                 fp.write(content)
+                fp.flush()
 
             if state == 0:
                 m = re_addr.match(content.decode('utf8'))
@@ -65,6 +67,6 @@ if __name__ == "__main__":
 
     print(filepath_parsed)
 
-    parse(filepath, filepath_parsed)
+    parse_ram(filepath, filepath_parsed)
 
     print(f"File parsed to {filepath_parsed}")
