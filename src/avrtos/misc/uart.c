@@ -148,3 +148,22 @@ void usart_printl(const char * text)
   usart_print(text);
   usart_transmit('\n');
 }
+
+void usart_send_p(const char* buffer, size_t len)
+{
+  for(uint_fast16_t i = 0; i < len; i++)
+  {
+    usart_transmit(pgm_read_byte(&buffer[i]));
+  }
+}
+
+void usart_print_p(const char * text)
+{
+  usart_send_p(text, strlen_P(text));
+}
+
+void usart_printl_p(const char * text)
+{
+  usart_print_p(text);
+  usart_transmit('\n');
+}

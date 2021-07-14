@@ -29,9 +29,11 @@ extern "C" {
  * 
  * This function should never end !
  * 
- * TODO handle case if the function ends
+ * TODO handle the case if the function ends
  */
 typedef void (*thread_entry_t)(void*);
+
+enum thread_state_t {STOPPED = 0, READY = 1, WAITING = 2, RUNNING = 3};
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -46,7 +48,8 @@ typedef void (*thread_entry_t)(void*);
  */
 struct thread_t
 {
-    void *sp;
+    void *sp;       // keep it at the beginning of the structure
+    enum thread_state_t state;
     int8_t priority;
     struct
     {

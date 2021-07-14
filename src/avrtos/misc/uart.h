@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+#include <avr/pgmspace.h>
 #include <avr/io.h>
 #include <string.h>
 
@@ -113,6 +114,29 @@ void usart_hex16(const uint16_t val);
  * @param val 
  */
 void usart_send_hex(const uint8_t* buffer, size_t len);
+
+
+/**
+ * @brief Send the buffer stored in PROGMEM of known length over the USART
+ * 
+ * @param buffer 
+ * @param len 
+ */
+void usart_send_p(const char* buffer, size_t len);
+
+/**
+ * @brief Send the string stored in PROGMEM over the USART, length is auto-calculated
+ * 
+ * @param text 
+ */
+void usart_print_p(const char * text);
+
+/**
+ * @brief Send the string stored in PROGMEM over the USART with line return "\n", length is auto-calculated
+ * 
+ * @param text 
+ */
+void usart_printl_p(const char * text);
 
 #ifdef __cplusplus
 }

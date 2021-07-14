@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <avr/pgmspace.h>
+
 #include "debug.h"
 #include "xtqueue.h"
 
@@ -25,7 +27,8 @@ uint16_t k_thread_usage(struct thread_t *th)
 
 void k_thread_dbg_count(void)
 {
-    usart_print("k_thread.count = ");
+    static const char string_1[] PROGMEM = "k_thread.count = ";
+    usart_print_p(string_1);
     usart_u8(k_thread.count);
     usart_transmit('\n');
 }
@@ -41,7 +44,7 @@ void k_thread_dump(struct thread_t *th)
 
     if (th->priority == 0)
     {
-        usart_print("DISABLED");
+        usart_print("None");
     }
     else
     {
@@ -51,12 +54,23 @@ void k_thread_dump(struct thread_t *th)
         }
         else
         {
-            usart_print("PREE  ");
+            usart_print("PREE ");
         }
 
         usart_s8(th->priority);
     }
-    usart_print("] \t: SP ");
+    usart_print("] ");
+
+    static const char strings[4][8] PROGMEM = {
+        "STOPPED",
+        "READY  ",
+        "WAITING",
+        "RUNNING"
+    };
+
+    usart_print_p(strings[th->state]);
+
+    usart_print(" : SP ");
 
     usart_u16(k_thread_usage(th));
     usart_transmit('/');
@@ -68,7 +82,8 @@ void k_thread_dump(struct thread_t *th)
 
 void k_thread_dump_all(void)
 {
-    usart_print("===== k_thread =====\n");
+    static const char string_1[] PROGMEM = "===== k_thread =====\n";
+    usart_print_p(string_1);
 
     for (uint_fast8_t i = 0; i < k_thread.count; i++) // k_thread.count
     {

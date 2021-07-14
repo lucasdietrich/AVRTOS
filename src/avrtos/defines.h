@@ -186,6 +186,7 @@
 #define _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p)                                      \
     thread_t name = {                                                                                       \
         .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                         \
+        .state = READY,                                                                                     \
         .priority = prio,                                                                                   \
         .stack = {.end = (void *)K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p}
