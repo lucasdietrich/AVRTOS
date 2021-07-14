@@ -21,15 +21,15 @@ int main(void)
   led_init();
   usart_init();
 
-  print_scheduled_items_list(_k_system_xqueue);
+  print_scheduled_items_list(_k_system_xtqueue);
 
   k_yield();
 
   while(1)
   {
-    k_xqueue_shift(&_k_system_xqueue, 10);
+    k_xtqueue_shift(&_k_system_xtqueue, 10);
     // print_scheduled_items_list();
-    k_xqueue_item_t *item = k_xqueue_pop(&_k_system_xqueue);
+    k_xtqueue_item_t *item = k_xtqueue_pop(&_k_system_xtqueue);
     if (item != NULL)
     {
       // usart_hex16((uint16_t) item->p);

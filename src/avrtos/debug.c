@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "debug.h"
-#include "xqueue.h"
+#include "xtqueue.h"
 
 
 /*___________________________________________________________________________*/
@@ -101,7 +101,7 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
 
 /*___________________________________________________________________________*/
 
-void print_scheduled_item(struct k_xqueue_item_t* const item)
+void print_scheduled_item(struct k_xtqueue_item_t* const item)
 {
     usart_print("-- ");
     // if not printable
@@ -112,7 +112,7 @@ void print_scheduled_item(struct k_xqueue_item_t* const item)
     usart_transmit(' ');
 }
 
-void print_scheduled_items_list(struct k_xqueue_item_t* root)
+void print_scheduled_items_list(struct k_xtqueue_item_t* root)
 {
     usart_print("0 |");
 

@@ -2,7 +2,7 @@
 
 #include "multithreading.h"
 
-#include "xqueue.h"
+#include "xtqueue.h"
 
 /*___________________________________________________________________________*/
 
@@ -172,19 +172,19 @@ inline void * k_thread_local_storage(void)
 
 /*___________________________________________________________________________*/
 
-struct k_xqueue_item_t *_k_system_xqueue = NULL;
+struct k_xtqueue_item_t *_k_system_xtqueue = NULL;
 
 void k_sleep(k_timeout_t timeout)
 {
     if (timeout.delay != 0)
     {
-        struct k_xqueue_item_t item = {
+        struct k_xtqueue_item_t item = {
             .abs_delay = timeout.delay,
             .next = NULL,
             .p = k_thread_current(),
         };
 
-        k_xqueue_schedule(&_k_system_xqueue, &item);
+        k_xtqueue_schedule(&_k_system_xtqueue, &item);
 
 // #warning TODO set curent thread as pending on event
 

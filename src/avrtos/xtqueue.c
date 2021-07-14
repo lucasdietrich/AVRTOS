@@ -1,4 +1,4 @@
-#include "xqueue.h"
+#include "xtqueue.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -19,17 +19,17 @@
 
 
 // scheduled_item_t must have abs_delay set and thread (next = NULL)
-void k_xqueue_schedule(struct k_xqueue_item_t **root, struct k_xqueue_item_t *new_item)
+void k_xtqueue_schedule(struct k_xtqueue_item_t **root, struct k_xtqueue_item_t *new_item)
 {
     if (new_item == NULL)
         return;
     new_item->next = NULL;  // safe
 
     cli();
-    struct k_xqueue_item_t ** prev_next_p = root;
+    struct k_xtqueue_item_t ** prev_next_p = root;
     while (*prev_next_p != NULL)    // if next of previous item is set
     {
-        struct k_xqueue_item_t * p_current = *prev_next_p; // next of previous become current
+        struct k_xtqueue_item_t * p_current = *prev_next_p; // next of previous become current
 
         // if current element expires before or at the same time that new_timer, we go to next item
         if (p_current->delay_shift <= new_item->delay_shift)
@@ -51,16 +51,16 @@ void k_xqueue_schedule(struct k_xqueue_item_t **root, struct k_xqueue_item_t *ne
     sei();
 }
 
-void k_xqueue_shift(struct k_xqueue_item_t **root, k_delta_ms_t time_passed)
+void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t time_passed)
 {
     if (!time_passed)
         return;
 
     cli();
-    struct k_xqueue_item_t ** prev_next_p = root;
+    struct k_xtqueue_item_t ** prev_next_p = root;
     while (*prev_next_p != NULL) // if next of previous item is set
     {
-        struct k_xqueue_item_t * p_current = *prev_next_p; // next of previous become current
+        struct k_xtqueue_item_t * p_current = *prev_next_p; // next of previous become current
         if (p_current->delay_shift < time_passed)
         {
             time_passed -= p_current->delay_shift;
@@ -76,10 +76,10 @@ void k_xqueue_shift(struct k_xqueue_item_t **root, k_delta_ms_t time_passed)
     sei();
 }
 
-struct k_xqueue_item_t * k_xqueue_pop(struct k_xqueue_item_t **root)
+struct k_xtqueue_item_t * k_xtqueue_pop(struct k_xtqueue_item_t **root)
 {
     cli();
-    struct k_xqueue_item_t * item = NULL;
+    struct k_xtqueue_item_t * item = NULL;
     if ((root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
     {
         item = *root;    // prepare to return it

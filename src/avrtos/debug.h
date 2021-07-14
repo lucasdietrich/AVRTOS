@@ -134,9 +134,9 @@ uint8_t read_sreg(void);
 
 /*___________________________________________________________________________*/
 
-void print_scheduled_item(struct k_xqueue_item_t* const item);
+void print_scheduled_item(struct k_xtqueue_item_t* const item);
 
-void print_scheduled_items_list(struct k_xqueue_item_t* root);
+void print_scheduled_items_list(struct k_xtqueue_item_t* root);
 
 /*___________________________________________________________________________*/
 

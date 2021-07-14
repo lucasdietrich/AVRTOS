@@ -10,7 +10,7 @@
 #include <stddef.h>
 
 #include "defines.h"
-#include "xqueue.h"
+#include "xtqueue.h"
 #include "mutex.h"
 #include "semaphore.h"
 #include "sysclock.h"
@@ -161,7 +161,7 @@ void k_yield(void);
 
 /*___________________________________________________________________________*/
 
-extern struct k_xqueue_item_t *_k_system_xqueue;
+extern struct k_xtqueue_item_t *_k_system_xtqueue;
 
 void k_sleep(k_timeout_t timeout);
 
