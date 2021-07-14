@@ -57,7 +57,7 @@
 //
 // Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
 //
-#define DEFAULT_HIGH_RANGE_TIME_OBJECT_U32      1
+#define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32      1
 
 //
 // Default SREG value for other thread on stack creation
@@ -71,16 +71,35 @@
 #define DEFAULT_THREAD_DEFAULT_SREG             1 << SREG_I
 
 //
+// enable preemtive threads feature
+//
+#define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
+
+//
+// Time slice in milliseconds
+// TODO, use 109µs as base unit
+//
+#define DEFAULT_KERNEL_TIME_SLICE               1
+
+//
+//  auto start scheduler and sysclock
+//
+#define DEFAULT_KERNEL_THREADS_AUTO_START       1
+
+//
 //  Enable Kernel Debug features
 //
 #define DEFAULT_KERNEL_DEBUG                    0
 
+//
+//  Use uart rx interrupt as preempt signal
+//
+#define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0
 
-#define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
-
-#define DEFAULT_KERNEL_TIME_SLICE_MS            10
-
-
+//
+// disable sysclock
+//
+#define DEFAULT_KERNEL_DEBUG_DISABLE_SYSCLOCK   0
 
 /*___________________________________________________________________________*/
 

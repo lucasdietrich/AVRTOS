@@ -21,14 +21,14 @@
 
 /*___________________________________________________________________________*/
 
-#define K_PRIO_PREEMPT(p)                       (p)
-#define K_PRIO_COOP(p)                          (-p)
-#define K_PRIO_DEFAULT                          K_PRIO_PREEMPT(8)
-#define K_STOPPED                               0
+#define K_PRIO_PREEMPT(p)           (p)
+#define K_PRIO_COOP(p)              (-p)
+#define K_PRIO_DEFAULT              K_PRIO_PREEMPT(8)
+#define K_STOPPED                   0
 
 /*___________________________________________________________________________*/
 
-
+// MAX threads
 #ifdef CONFIG_THREAD_MAX
 #if CONFIG_THREAD_MAX > 1
 #define K_THREAD_MAX_COUNT CONFIG_THREAD_MAX
@@ -39,60 +39,106 @@
 #define K_THREAD_MAX_COUNT DEFAULT_THREAD_MAX
 #endif
 
+// main thread priority
 #ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #define THREAD_MAIN_THREAD_PRIORITY CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #else
 #define THREAD_MAIN_THREAD_PRIORITY DEFAULT_THREAD_MAIN_THREAD_PRIORITY
 #endif
 
+// explicit main stack
 #ifdef CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define THREAD_EXPLICIT_MAIN_STACK CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #else
 #define THREAD_EXPLICIT_MAIN_STACK DEFAULT_THREAD_EXPLICIT_MAIN_STACK
 #endif
 
+// main stack size (if explicit)
 #ifdef CONFIG_THREAD_MAIN_STACK_SIZE
 #define THREAD_MAIN_STACK_SIZE CONFIG_THREAD_MAIN_STACK_SIZE
 #else
 #define THREAD_MAIN_STACK_SIZE DEFAULT_THREAD_MAIN_STACK_SIZE
 #endif
 
+// use asm thread stack init function
 #ifdef CONFIG_THREAD_USE_INIT_STACK_ASM
 #define THREAD_USE_INIT_STACK_ASM CONFIG_THREAD_USE_INIT_STACK_ASM
 #else
 #define THREAD_USE_INIT_STACK_ASM DEFAULT_THREAD_USE_INIT_STACK_ASM
 #endif
 
-#ifdef CONFIG_HIGH_RANGE_TIME_OBJECT_U32
-#define HIGH_RANGE_TIME_OBJECT_U32  CONFIG_HIGH_RANGE_TIME_OBJECT_U32
+// use u32 time objects or u16
+#ifdef CONFIG_KERNEL_HIGH_RANGE_TIME_OBJECT_U32
+#define KERNEL_HIGH_RANGE_TIME_OBJECT_U32 CONFIG_KERNEL_HIGH_RANGE_TIME_OBJECT_U32
 #else
-#define HIGH_RANGE_TIME_OBJECT_U32  DEFAULT_HIGH_RANGE_TIME_OBJECT_U32
+#define KERNEL_HIGH_RANGE_TIME_OBJECT_U32 DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32
 #endif
 
+// set default SREG (interrupt flag or not)
 #ifdef CONFIG_THREAD_DEFAULT_SREG
-#define THREAD_DEFAULT_SREG  CONFIG_THREAD_DEFAULT_SREG
+#define THREAD_DEFAULT_SREG CONFIG_THREAD_DEFAULT_SREG
 #else
-#define THREAD_DEFAULT_SREG  DEFAULT_THREAD_DEFAULT_SREG
+#define THREAD_DEFAULT_SREG DEFAULT_THREAD_DEFAULT_SREG
 #endif
 
+// kernel debug mode
 #ifdef CONFIG_KERNEL_DEBUG
-#define KERNEL_DEBUG  CONFIG_KERNEL_DEBUG
+#define KERNEL_DEBUG CONFIG_KERNEL_DEBUG
 #else
-#define KERNEL_DEBUG  DEFAULT_KERNEL_DEBUG
+#define KERNEL_DEBUG DEFAULT_KERNEL_DEBUG
 #endif
 
+// debug preempt via uart
+#ifdef CONFIG_KERNEL_DEBUG_PREEMPT_UART
+#define KERNEL_DEBUG_PREEMPT_UART CONFIG_KERNEL_DEBUG_PREEMPT_UART
+#else
+#define KERNEL_DEBUG_PREEMPT_UART DEFAULT_KERNEL_DEBUG_PREEMPT_UART
+#endif
+
+// debug disable sysclock
+#ifdef CONFIG_KERNEL_DEBUG_DISABLE_SYSCLOCK
+#define KERNEL_DEBUG_DISABLE_SYSCLOCK CONFIG_KERNEL_DEBUG_DISABLE_SYSCLOCK
+#else
+#define KERNEL_DEBUG_DISABLE_SYSCLOCK DEFAULT_KERNEL_DEBUG_DISABLE_SYSCLOCK
+#endif
+
+// preemptive threads
 #ifdef CONFIG_KERNEL_PREEMPTIVE_THREADS
-#define KERNEL_PREEMPTIVE_THREADS   CONFIG_KERNEL_PREEMPTIVE_THREADS
+#define KERNEL_PREEMPTIVE_THREADS CONFIG_KERNEL_PREEMPTIVE_THREADS
 #else
-#define KERNEL_PREEMPTIVE_THREADS   DEFAULT_KERNEL_PREEMPTIVE_THREADS
+#define KERNEL_PREEMPTIVE_THREADS DEFAULT_KERNEL_PREEMPTIVE_THREADS
 #endif
 
-#if KERNEL_PREEMPTIVE_THREADS
-#define KERNEL_TIME_SLICE_HZ            1000 / DEFAULT_KERNEL_TIME_SLICE
+// preemptive threads time_slice
+#ifdef CONFIG_KERNEL_TIME_SLICE
+#define KERNEL_TIME_SLICE CONFIG_KERNEL_TIME_SLICE
+#else
+#define KERNEL_TIME_SLICE DEFAULT_KERNEL_TIME_SLICE
 #endif
+
+#if KERNEL_TIME_SLICE == 1
+#define SYSCLOCK_TIMER0_TCNT0 16
+#elif KERNEL_TIME_SLICE == 2
+#define SYSCLOCK_TIMER0_TCNT0 31
+#elif KERNEL_TIME_SLICE == 3
+#define SYSCLOCK_TIMER0_TCNT0 47
+#elif KERNEL_TIME_SLICE == 4
+#define SYSCLOCK_TIMER0_TCNT0 62
+#elif KERNEL_TIME_SLICE == 5
+#define SYSCLOCK_TIMER0_TCNT0 78
+#elif KERNEL_TIME_SLICE == 10
+#define SYSCLOCK_TIMER0_TCNT0 156
+#elif KERNEL_TIME_SLICE == 15
+#define SYSCLOCK_TIMER0_TCNT0 234
+#elif KERNEL_TIME_SLICE == 16
+#define SYSCLOCK_TIMER0_TCNT0 250
+#else
+#error KERNEL_TIME_SLICE must be among predefined time slices (1, 2, 3, 4, 5, 10, 15, 16)
+#endif
+
 /*___________________________________________________________________________*/
 
-#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n) & 0xFF)) << 8) | (((uint16_t)(n) & 0xFF00) >> 8))
+#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n)&0xFF)) << 8) | (((uint16_t)(n)&0xFF00) >> 8))
 
 #define MIN(a, b) ((a < b) ? (a) : (b))
 #define MAX(a, b) ((a > b) ? (a) : (b))
@@ -111,7 +157,7 @@
 #define _K_STACK_INIT_SP(stack_end) (stack_end - K_THREAD_STACK_VOID_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly set
-#define _K_THREAD_STACK_START(name) ((uint16_t) &_k_stack_buf_##name)
+#define _K_THREAD_STACK_START(name) ((uint16_t)&_k_stack_buf_##name)
 
 #define _K_THREAD_STACK_SIZE(name) (sizeof(_k_stack_buf_##name))
 
@@ -131,9 +177,9 @@
         } base;                                                  \
     } _k_stack_buf_##name = {                                    \
         {0x00},                                                  \
-        {THREAD_DEFAULT_SREG,                                  \
+        {THREAD_DEFAULT_SREG,                                    \
          {0x00},                                                 \
-         (void *)K_SWAP_ENDIANNESS(context_p),                                      \
+         (void *)K_SWAP_ENDIANNESS(context_p),                   \
          {0x00},                                                 \
          (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}}
 
@@ -152,10 +198,10 @@
 
 #if !__ASSEMBLER__
 
-#if HIGH_RANGE_TIME_OBJECT_U32 == 1
-    typedef uint32_t k_delta_ms_t;
+#if KERNEL_HIGH_RANGE_TIME_OBJECT_U32 == 1
+typedef uint32_t k_delta_ms_t;
 #else
-    typedef uint16_t k_delta_ms_t;
+typedef uint16_t k_delta_ms_t;
 #endif
 
 typedef struct
@@ -163,9 +209,9 @@ typedef struct
     k_delta_ms_t delay;
 } k_timeout_t;
 
-#define K_MSEC(delay) ((k_timeout_t){delay})
-#define K_NO_WAIT(delay) ((k_timeout_t){0})
-#define K_FOREVER(delay) ((k_timeout_t){-1})
+#define K_MSEC(delay)       ((k_timeout_t){delay})
+#define K_NO_WAIT(delay)    ((k_timeout_t){0})
+#define K_FOREVER(delay)    ((k_timeout_t){-1})
 
 #endif
 

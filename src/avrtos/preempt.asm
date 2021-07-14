@@ -7,64 +7,19 @@
 .global USART_RX_vect
 .global usart_transmit
 .global TIMER2_OVF_vect
+.global _k_interrupt_yield
+.global _k_preempt_routine
 
 ;_____________________________________________________________________________;
 
-; when calling function, you must push all registers covered by the arguments, even not completely uint8_t require r24 but cover also r25 
-; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
 
-; USART_RX_vect
-USART_RX_vect:
-    push r24
-    push r25
-    push r18
-    push r17
+_k_preempt_routine:
 
-    in r17, _SFR_IO_ADDR(SREG)
+; TODO here
 
-; read received
-    lds r18, UCSR0A    ; UCSR0A =0xC0
-;    lds r17, UCSR0B (if 9 bits)
-    lds r24, UDR0    ; UDR0 =0xC6
-
-; If error, return -1
-    andi r18, (1 << FE0) | (1 << DOR0) | (1 << UPE0)
-    breq USART_Continue
-    ldi r24, 0x58 ; X show X if error
+; add time to xtqueue
+; todo do upstream work in order to determine if another thread is ready
     
-USART_Continue:
-    call usart_transmit     ; return received character
-
-    out _SFR_IO_ADDR(SREG), r17
-
-    pop r17
-    pop r18
-    pop r25
-    pop r24
-
-    jmp _k_interrupt_yield
-
-; KERNEL_DEBUG
-TIMER2_OVF_vect:
-    push r24
-    ldi r24, 256 - 156
-    sts TCNT2, r24
-
-#if KERNEL_DEBUG
-    push r25
-    in r25, _SFR_IO_ADDR(SREG)
-    ldi r24, 0x2e           ; '.'
-    call usart_transmit
-    out _SFR_IO_ADDR(SREG), r25
-    pop r25
-#endif
-
-    pop r24
-
-    ; reti
-    ; jmp _interrupt_k_yield    
-
-;_____________________________________________________________________________;
 
 ; switch thread here : stack is +2B (return address)
 _k_interrupt_yield:
@@ -168,6 +123,5 @@ _k_interrupt_yield:
 
     ; ret/reti
     reti  ; dispath to next thread
-
     
 ;_____________________________________________________________________________;

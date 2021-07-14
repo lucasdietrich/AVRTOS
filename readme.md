@@ -62,6 +62,8 @@ Todos:
 
 - Mutex/semaphre timeout (0, sec, forever)
 
+- to build after having changed configuration (defines or default_config.h), clean the project (even delete the .pio directory) and only after, build the project
+
 - k_cpu_idle()
 
 - use uint32_t to store priorities of 8 threads over a mutex/sem...
@@ -435,6 +437,9 @@ from an interrupt. This must be handled by software.
 ```
 
 If a `Flag` appears in the `Flag` column of avr5 instruction set, it means that the flag could be modified after the instruction, `None` mean that the instruction doesn't change the `Status Register`
+
+Software interrupt:
+![softint.png](./res/pics/softint.png)
 
 ---
 

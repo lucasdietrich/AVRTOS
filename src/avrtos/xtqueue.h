@@ -21,7 +21,7 @@ struct k_xtqueue_item_t
     };
     struct k_xtqueue_item_t* next;
 
-    void* p;
+    void* p_context;
 };
 
 #define K_xtqueue_DEFINE(root) struct k_xtqueue_item_t * root = NULL;

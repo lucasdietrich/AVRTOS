@@ -18,14 +18,13 @@
 /*___________________________________________________________________________*/
 
 
-// scheduled_item_t must have abs_delay set and thread (next = NULL)
+// scheduled_item_t must have abs_delay set and context set
 void k_xtqueue_schedule(struct k_xtqueue_item_t **root, struct k_xtqueue_item_t *new_item)
 {
     if (new_item == NULL)
         return;
     new_item->next = NULL;  // safe
 
-    cli();
     struct k_xtqueue_item_t ** prev_next_p = root;
     while (*prev_next_p != NULL)    // if next of previous item is set
     {
@@ -48,7 +47,6 @@ void k_xtqueue_schedule(struct k_xtqueue_item_t **root, struct k_xtqueue_item_t 
         }
     }
     *prev_next_p = new_item;
-    sei();
 }
 
 void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t time_passed)
@@ -56,15 +54,17 @@ void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t time_passed)
     if (!time_passed)
         return;
 
-    cli();
     struct k_xtqueue_item_t ** prev_next_p = root;
     while (*prev_next_p != NULL) // if next of previous item is set
     {
         struct k_xtqueue_item_t * p_current = *prev_next_p; // next of previous become current
-        if (p_current->delay_shift < time_passed)
+        if (p_current->delay_shift <= time_passed)
         {
-            time_passed -= p_current->delay_shift;
-            p_current->delay_shift = 0;
+            if (p_current->delay_shift != 0)    // if item delay is already 0 
+            {
+                time_passed -= p_current->delay_shift;
+                p_current->delay_shift = 0;
+            }
             prev_next_p = &(p_current->next);
         }
         else
@@ -73,19 +73,16 @@ void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t time_passed)
             break;
         }
     }
-    sei();
 }
 
 struct k_xtqueue_item_t * k_xtqueue_pop(struct k_xtqueue_item_t **root)
 {
-    cli();
     struct k_xtqueue_item_t * item = NULL;
     if ((root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
     {
         item = *root;    // prepare to return it
         *root = (*root)->next;  // set next
     }
-    sei();
     return item;
 }
 

@@ -1,7 +1,7 @@
 /*___________________________________________________________________________*/
 
 #include <util/delay.h>
-
+#include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include "avrtos/misc/uart.h"
@@ -25,13 +25,9 @@ int main(void)
 {
   led_init();
   usart_init();
+  _k_init_sysclock();
 
   k_thread_dump_all();
-
-  USART_DUMP_CORE();
-
-  init_sysclock();
-
   sei();
 
   while(1)
@@ -39,8 +35,6 @@ int main(void)
     usart_transmit('-');
 
     _delay_ms(1000);
-
-    k_yield();
   }
 }
 
@@ -48,8 +42,6 @@ void thread_led_on(void *p)
 {
   while (1)
   {
-    // USART_DUMP_CORE();
-    
     usart_transmit('\\');
 
     _delay_ms(1000);
@@ -60,8 +52,6 @@ void thread_led_off(void *p)
 {
   while (1)
   {
-    // USART_DUMP_CORE();
-
     usart_transmit('/');
 
     _delay_ms(1000);

@@ -181,7 +181,7 @@ void k_sleep(k_timeout_t timeout)
         struct k_xtqueue_item_t item = {
             .abs_delay = timeout.delay,
             .next = NULL,
-            .p = k_thread_current(),
+            .p_context = k_thread_current(),
         };
 
         k_xtqueue_schedule(&_k_system_xtqueue, &item);
