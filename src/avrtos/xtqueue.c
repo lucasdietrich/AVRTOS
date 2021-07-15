@@ -23,6 +23,7 @@ void k_xtqueue_schedule(struct k_xtqueue_item_t **root, struct k_xtqueue_item_t 
 {
     if (new_item == NULL)
         return;
+        
     new_item->next = NULL;  // safe
 
     struct k_xtqueue_item_t ** prev_next_p = root;

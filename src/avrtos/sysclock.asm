@@ -9,12 +9,20 @@
 .global TIMER0_OVF_vect
 .global usart_transmit
 .extern _k_interrupt_yield
+.extern _k_system_shift
 
 TIMER0_OVF_vect:
     push r24
 
     ldi r24, 0x100 - KERNEL_SYSCLOCK_TIMER0_TCNT0
     sts TCNT0, r24
+
+    ; _k_system_shift
+    ; push r25
+    ; ldi r24, lo8(KERNEL_TIME_SLICE)
+    ; ldi r25, hi8(KERNEL_TIME_SLICE)
+    ; call _k_system_shift
+    ; pop r25
 
 #if KERNEL_DEBUG
     push r25
@@ -28,8 +36,6 @@ TIMER0_OVF_vect:
     pop r24
 
     jmp _k_preempt_routine  ; yield current thread and switch to another one
-
-
 
 _k_init_sysclock:
     push r16

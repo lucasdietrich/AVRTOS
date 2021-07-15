@@ -10,11 +10,11 @@
 #include <stddef.h>
 
 #include "defines.h"
+#include "kernel.h"
 #include "xtqueue.h"
 #include "mutex.h"
 #include "semaphore.h"
 #include "sysclock.h"
-
 
 /*___________________________________________________________________________*/
 
@@ -128,48 +128,6 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
  * @return int : 0 if success else (<0) error code
  */
 int k_thread_register(struct thread_t *const th);
-
-/*___________________________________________________________________________*/
-
-/**
- * @brief Switch from current thread to {to} thread
- * 
- * SAFE
- * 
- * @param from : current thread
- * @param to : to thread
- */
-void k_thread_switch(struct thread_t *to);
-
-/**
- * @brief Choice the next thread to be executed
- * 
- * This function is called in k_yield function
- * 
- * @return struct thread_t* : next thread to be executed
- */
-struct thread_t *_k_scheduler(void);
-
-/**
- * @brief Release the CPU
- * 
- * This function can be called from either a cooperative thread or a premptive thread to tell the kernel that it is releasing the CPU
- * this function will call the scheduler (_k_scheduler) which will determine the next thread to be executed.
- * 
- * Cooperative threads must use this function in order to release the CPU
- * 
- * This function will return in the new main thread
- */
-void k_yield(void);
-
-/*___________________________________________________________________________*/
-
-extern struct k_xtqueue_item_t *_k_system_xtqueue;
-
-void k_sleep(k_timeout_t timeout);
-
-// TODO
-void cpu_idle(void);
 
 /*___________________________________________________________________________*/
 

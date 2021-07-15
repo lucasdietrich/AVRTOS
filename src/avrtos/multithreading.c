@@ -137,63 +137,19 @@ int k_thread_register(struct thread_t *const th)
 
 }
 
-struct thread_t *_k_scheduler(void)
-{
-    // TODO find a way to get rid of the `k_thread.count` and `k_thread.current_idx` parameters when threads cannot be create at runtime
-    // const uint8_t next_idx = (&k_thread.current - k_thread.list + 1) % ARRAY_SIZE(k_thread.list);
-    // k_thread.current = k_thread.list[next_idx];
-
-    // eval next thread to be executed
-    k_thread.current_idx = (k_thread.current_idx + 1) % k_thread.count;
-
-    // set current
-    k_thread.current = k_thread.list[k_thread.current_idx];
-    
-    // go back to yield and restore thread context
-    // another solution would be to return anything and let the k_yield asm function
-
-    // go back to yield and restore thread context
-    // another solution would be to return anything and let the k_yield asm function
-    // to retrieve the current thread from k_thread.current
-    return k_thread.current;
-}
-
 /*___________________________________________________________________________*/
 
 inline struct thread_t * k_thread_current(void)
 {
     return k_thread.current;
 }
+
 //
 // Utils
 //
-
 inline void * k_thread_local_storage(void)
 {
     return k_thread_current()->local_storage;
-}
-
-/*___________________________________________________________________________*/
-
-struct k_xtqueue_item_t *_k_system_xtqueue = NULL;
-
-void k_sleep(k_timeout_t timeout)
-{
-    if (timeout.delay != 0)
-    {
-        struct k_xtqueue_item_t item = {
-            .abs_delay = timeout.delay,
-            .next = NULL,
-            .p_context = k_thread_current(),
-        };
-
-        k_xtqueue_schedule(&_k_system_xtqueue, &item);
-
-// #warning TODO set curent thread as pending on event
-
-        // return to scheduler thread
-        k_yield();
-    }
 }
 
 /*___________________________________________________________________________*/

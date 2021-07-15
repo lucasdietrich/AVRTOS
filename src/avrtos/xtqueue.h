@@ -18,6 +18,7 @@ struct k_xtqueue_item_t
     {
         k_delta_ms_t delay_shift;
         k_delta_ms_t abs_delay;
+        k_delta_ms_t timeout;
     };
     struct k_xtqueue_item_t* next;
 
