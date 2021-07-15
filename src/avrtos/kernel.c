@@ -17,10 +17,11 @@ struct thread_t *_k_scheduler(void)
 
 /*___________________________________________________________________________*/
 
+#include "misc/uart.h"
 
-void _k_system_shift(k_delta_ms_t time_passed)
+void _k_system_shift(void)
 {
-    k_xtqueue_shift(&_k_system_xtqueue, time_passed);
+    k_xtqueue_shift(&_k_system_xtqueue, KERNEL_TIME_SLICE);
 }
 
 void k_sleep(k_timeout_t timeout)

@@ -36,7 +36,7 @@ void k_yield(void);
 
 /*___________________________________________________________________________*/
 
-void _k_system_shift(k_delta_ms_t time_passed);
+void _k_system_shift(void);
 
 void k_sleep(k_timeout_t timeout);
 

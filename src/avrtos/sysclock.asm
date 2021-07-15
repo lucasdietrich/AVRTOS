@@ -11,31 +11,63 @@
 .extern _k_interrupt_yield
 .extern _k_system_shift
 
+; https://gcc.gnu.org/wiki/avr-gcc
+; read Call-Used Registers section
 TIMER0_OVF_vect:
     push r24
 
+    ; reset timer as soon as possible
     ldi r24, 0x100 - KERNEL_SYSCLOCK_TIMER0_TCNT0
     sts TCNT0, r24
 
-    ; _k_system_shift
-    ; push r25
-    ; ldi r24, lo8(KERNEL_TIME_SLICE)
-    ; ldi r25, hi8(KERNEL_TIME_SLICE)
-    ; call _k_system_shift
-    ; pop r25
+    ; due to these call-clobbered registers, we need to save them when calling a c function
+    ; TODO write scheduler in assembly in order to gain performance (no need to push all these registers)
+    push r15
+    lds r15, SREG
+
+    push r18
+    push r19
+    push r20
+    push r21
+    push r22
+    push r23
+
+    push r25
+    push r26
+    push r27
+    push r30
+    push r31
+
+    ; shift
+    call _k_system_shift    ; cause _k_system_shift calls usart_transmit which needs a parameter (r24, r25)
 
 #if KERNEL_DEBUG
-    push r25
     in r25, _SFR_IO_ADDR(SREG)
     ldi r24, 0x2e           ; '.'
     call usart_transmit
     out _SFR_IO_ADDR(SREG), r25
-    pop r25
 #endif
+
+    pop r31
+    pop r30
+    pop r27
+    pop r26
+    pop r25
+
+    pop r23
+    pop r22
+    pop r21
+    pop r20
+    pop r19
+    pop r18
+
+    sts SREG, r15
+    pop r15
 
     pop r24
 
     jmp _k_preempt_routine  ; yield current thread and switch to another one
+
 
 _k_init_sysclock:
     push r16

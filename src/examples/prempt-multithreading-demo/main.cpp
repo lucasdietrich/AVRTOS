@@ -10,7 +10,6 @@
 #include "avrtos/multithreading.h"
 #include "avrtos/debug.h"
 
-
 /*___________________________________________________________________________*/
 
 void thread_led_on(void *p);
@@ -31,7 +30,7 @@ int main(void)
 
   while(1)
   {
-    usart_transmit('-');
+    usart_transmit('_');
 
     _delay_ms(1000);
   }
