@@ -32,7 +32,12 @@ struct thread_t *_k_scheduler(void);
  * 
  * This function will return in the new main thread
  */
-void k_yield(void);
+void _k_yield(void);
+
+/**
+ * @brief Wrap the thread with state parametere
+ */
+__attribute__((naked)) void k_yield(void);
 
 /*___________________________________________________________________________*/
 
@@ -40,7 +45,7 @@ void _k_system_shift(void);
 
 void k_sleep(k_timeout_t timeout);
 
-void cpu_idle(void);
+void k_cpu_idle(void);
 
 /*___________________________________________________________________________*/
 

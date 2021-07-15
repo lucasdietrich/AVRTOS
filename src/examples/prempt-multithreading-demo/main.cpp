@@ -30,6 +30,9 @@ int main(void)
 
   while(1)
   {
+    k_thread_dump_all();
+
+    usart_transmit('\n');
     usart_transmit('_');
 
     _delay_ms(1000);
@@ -40,6 +43,9 @@ void thread_led_on(void *p)
 {
   while (1)
   {
+    k_thread_dump_all();
+
+    usart_transmit('\n');
     usart_transmit('\\');
 
     _delay_ms(1000);
@@ -50,6 +56,9 @@ void thread_led_off(void *p)
 {
   while (1)
   {
+    k_thread_dump_all();
+
+    usart_transmit('\n');
     usart_transmit('/');
 
     _delay_ms(1000);

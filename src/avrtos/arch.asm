@@ -80,14 +80,18 @@ _k_thread_stack_create:
 
 /*___________________________________________________________________________*/
 
-.global k_yield
+.global _k_yield
 .global _k_scheduler
 .extern k_thread
 
-k_yield:
+_k_yield:
     ; save current thread registers
     ; push 32 registers
     push r0
+
+    lds r0, SREG    ; save flags
+    cli
+
     push r1
     push r2
     push r3
@@ -120,10 +124,8 @@ k_yield:
     push r30
     push r31
 
-    lds r0, SREG    ; save flags
-    push r0
+    push r0 ; push SREG on stack
 
-    cli
     lds r0, SPL
     lds r1, SPH
 
@@ -145,8 +147,7 @@ k_yield:
     sts SPL, r0 ; restore stack pointer
     sts SPH, r1
 
-    pop r0  ; restore flags
-    sts SREG, r0
+    pop r0  ; load flags from stack
 
     ; restore 32 registers
     pop r31
@@ -180,6 +181,9 @@ k_yield:
     pop r3
     pop r2
     pop r1
+
+    sts SREG, r0 ; restore flasgs
+
     pop r0
 
     ret  ; dispath to next thread

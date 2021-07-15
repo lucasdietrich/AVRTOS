@@ -34,6 +34,7 @@ extern "C" {
 typedef void (*thread_entry_t)(void*);
 
 enum thread_state_t {STOPPED = 0, READY = 1, WAITING = 2, RUNNING = 3};
+// maybe running and ready state can be combined
 
 /**
  * @brief This structure represents a thread, it defines:
