@@ -26,7 +26,7 @@
 #define SYSCLOCK_TIMER0_PRESCALER   SYSCLOCK_PRESCALER_1024
 
 // TEST
-// #define SYSCLOCK_TIMER0_TCNT0       0x100 - KERNEL_TIME_SLICE * ((int) ((F_CPU / 1000.0) / 1024.0 + 0.5))
+// #define KERNEL_SYSCLOCK_TIMER0_TCNT0       0x100 - KERNEL_TIME_SLICE * ((int) ((F_CPU / 1000.0) / 1024.0 + 0.5))
 
 /*___________________________________________________________________________*/
 

@@ -11,7 +11,7 @@
 
 ; prempt debug
 
-#if DEFAULT_KERNEL_DEBUG_PREEMPT_UART
+#if KERNEL_DEBUG_PREEMPT_UART
 
 .extern _k_interrupt_yield
 .global USART_RX_vect

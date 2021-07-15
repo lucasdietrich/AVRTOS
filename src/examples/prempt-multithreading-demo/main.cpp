@@ -25,9 +25,8 @@ int main(void)
 {
   led_init();
   usart_init();
-  _k_init_sysclock();
-
   k_thread_dump_all();
+  
   sei();
 
   while(1)

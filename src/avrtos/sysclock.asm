@@ -3,16 +3,17 @@
 
 #include <avrtos/defines.h>
 
+#if KERNEL_PREEMPTIVE_THREADS
+
 .global _k_init_sysclock
 .global TIMER0_OVF_vect
 .global usart_transmit
 .extern _k_interrupt_yield
 
-; 
 TIMER0_OVF_vect:
     push r24
 
-    ldi r24, 0x100 - SYSCLOCK_TIMER0_TCNT0
+    ldi r24, 0x100 - KERNEL_SYSCLOCK_TIMER0_TCNT0
     sts TCNT0, r24
 
 #if KERNEL_DEBUG
@@ -33,8 +34,8 @@ TIMER0_OVF_vect:
 _k_init_sysclock:
     push r16
 
-; TCNT0 = SYSCLOCK_TIMER0_TCNT0 ;
-    ldi r16, 0x100 - SYSCLOCK_TIMER0_TCNT0 ;
+; TCNT0 = KERNEL_SYSCLOCK_TIMER0_TCNT0 ;
+    ldi r16, 0x100 - KERNEL_SYSCLOCK_TIMER0_TCNT0 ;
     sts TCNT0, r16
 
 ; TCCR0A = (0 << COM0A0) | (0 << COM0A1) | (0 << COM0B0) | (0 << COM0B1) | (0 << WGM01) | (0 << WGM00);
@@ -45,13 +46,11 @@ _k_init_sysclock:
     ldi r16, (0 << WGM02) | (0 << FOC0A) | (0 << FOC0B) | (1 << CS00) | (0 << CS01) |  (1 << CS02)
     sts TCCR0B, r16
     
-; TIMSK0 = (0 << OCIE0B) | (0 << OCIE0A) | (1 << TOIE0);
-#if !KERNEL_DEBUG_DISABLE_SYSCLOCK
+; TIMSK0 = (0 << OCIE0B) | (0 << OCIE0A) | (0 << TOIE0);
     ldi r16, (0 << OCIE0B) | (0 << OCIE0A) | (1 << TOIE0)
-#else
-    ldi r16, (0 << OCIE0B) | (0 << OCIE0A) | (0 << TOIE0)
-#endif
     sts TIMSK0, r16
 
     pop r16
     ret
+
+#endif

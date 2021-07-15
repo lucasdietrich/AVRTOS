@@ -9,7 +9,7 @@ inline void _usart_init(const uint16_t baudrate_ubrr)
   UBRR0L = (uint8_t) baudrate_ubrr;
 
   // enable receiver and transmitter
-  UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+  UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (0 << RXCIE0);
 
   // USART Control and Status Register n C
   //  - set Asynchronous USART : UMSEL01 = UMSEL00 = 0

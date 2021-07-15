@@ -71,35 +71,30 @@
 #define DEFAULT_THREAD_DEFAULT_SREG             1 << SREG_I
 
 //
+//  Enable Kernel Debug features
+//
+#define DEFAULT_KERNEL_DEBUG                    0
+
+//
 // enable preemtive threads feature
 //
 #define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
 
 //
 // Time slice in milliseconds
-// TODO, use 109µs as base unit
+// TODO, use 100µs as base unit
 //
 #define DEFAULT_KERNEL_TIME_SLICE               1
 
 //
-//  auto start scheduler and sysclock
+//  auto start kernel sysclock
 //
-#define DEFAULT_KERNEL_THREADS_AUTO_START       1
-
-//
-//  Enable Kernel Debug features
-//
-#define DEFAULT_KERNEL_DEBUG                    0
+#define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       1
 
 //
 //  Use uart rx interrupt as preempt signal
 //
 #define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0
-
-//
-// disable sysclock
-//
-#define DEFAULT_KERNEL_DEBUG_DISABLE_SYSCLOCK   0
 
 /*___________________________________________________________________________*/
 
