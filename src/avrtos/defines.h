@@ -3,10 +3,6 @@
 
 /*___________________________________________________________________________*/
 
-// This find is include from asm files, make it compatible with ASM or user "#if !__ASSEMBLER__" preprocessor
-
-/*___________________________________________________________________________*/
-
 // Include user configuration
 
 // CONFIG_THREAD_MAX
@@ -18,6 +14,13 @@
 /*___________________________________________________________________________*/
 
 #include "default_config.h"
+
+/*___________________________________________________________________________*/
+
+// This find is include from asm files, make it compatible with ASM or user "#if !__ASSEMBLER__" preprocessor
+// put all c specific definition in the following file
+
+#include "definesc.h"
 
 /*___________________________________________________________________________*/
 
@@ -216,27 +219,6 @@
 #define K_THREAD_DEFINE(name, entry, stack_size, prio, context_p, local_storage_p)         \
     __attribute__((used)) static _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
     __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p);
-
-/*___________________________________________________________________________*/
-
-#if !__ASSEMBLER__
-
-#if KERNEL_HIGH_RANGE_TIME_OBJECT_U32 == 1
-typedef uint32_t k_delta_ms_t;
-#else
-typedef uint16_t k_delta_ms_t;
-#endif
-
-typedef struct
-{
-    k_delta_ms_t delay;
-} k_timeout_t;
-
-#define K_MSEC(delay)       ((k_timeout_t){delay})
-#define K_NO_WAIT(delay)    ((k_timeout_t){0})
-#define K_FOREVER(delay)    ((k_timeout_t){-1})
-
-#endif
 
 /*___________________________________________________________________________*/
 

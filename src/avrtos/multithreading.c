@@ -2,8 +2,6 @@
 
 #include "multithreading.h"
 
-#include "xtqueue.h"
-
 /*___________________________________________________________________________*/
 
 extern int main(void);

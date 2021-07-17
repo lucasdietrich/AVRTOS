@@ -1,10 +1,7 @@
-#ifndef _AVRTOS_xtqueue_H
-#define _AVRTOS_xtqueue_H
+#ifndef _AVRTOS_XTQUEUE_H
+#define _AVRTOS_XTQUEUE_H
 
-#include <stdint.h>
-#include <stddef.h>
-
-#include "defines.h"
+#include "../defines.h"
 
 #ifdef __cplusplus
 extern "C" {

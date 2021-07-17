@@ -2,20 +2,20 @@
 
 /*___________________________________________________________________________*/
 
-void queue(struct item ** const p_root, struct item *const item)
+void queue(struct celem ** const p_root, struct celem *const elem)
 {
-    struct item **p_next = p_root;
+    struct celem **p_next = p_root;
     while (*p_next != NULL)
     {
         p_next = &(*p_next)->next;
     }
-    item->next = NULL;
-    *p_next = item;
+    elem->next = NULL;
+    *p_next = elem;
 }
 
-struct item * dequeue(struct item ** const p_root)
+struct celem * dequeue(struct celem ** const p_root)
 {
-    struct item *dequeued = *p_root;
+    struct celem *dequeued = *p_root;
     if (dequeued != NULL)
     {
         *p_root = (*p_root)->next;

@@ -6,7 +6,7 @@
 #include <avr/pgmspace.h>
 
 #include "debug.h"
-#include "xtqueue.h"
+#include "dstruct/xtqueue.h"
 
 
 /*___________________________________________________________________________*/

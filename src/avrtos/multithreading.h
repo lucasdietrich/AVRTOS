@@ -11,7 +11,9 @@
 
 #include "defines.h"
 #include "kernel.h"
-#include "xtqueue.h"
+#include "dstruct/queue.h"
+#include "dstruct/dlist.h"
+#include "dstruct/xtqueue.h"
 #include "mutex.h"
 #include "semaphore.h"
 #include "sysclock.h"

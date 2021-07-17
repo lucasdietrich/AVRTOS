@@ -1,8 +1,5 @@
 #include "xtqueue.h"
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
 // A should be processed in 10 ms
 // B should be processed in 10 + 30 = 40ms
 // C should be processed in 40 + 0 = 40ms

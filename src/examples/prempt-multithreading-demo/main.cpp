@@ -43,6 +43,8 @@ void thread_led_on(void *p)
 {
   while (1)
   {
+    led_on();
+    
     k_thread_dump_all();
 
     usart_transmit('\n');
@@ -56,6 +58,8 @@ void thread_led_off(void *p)
 {
   while (1)
   {
+    led_off();
+
     k_thread_dump_all();
 
     usart_transmit('\n');
