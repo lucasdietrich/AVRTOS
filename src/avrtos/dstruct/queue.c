@@ -2,9 +2,9 @@
 
 /*___________________________________________________________________________*/
 
-void queue(struct celem ** const p_root, struct celem *const elem)
+void queue(struct qitem ** const p_root, struct qitem *const elem)
 {
-    struct celem **p_next = p_root;
+    struct qitem **p_next = p_root;
     while (*p_next != NULL)
     {
         p_next = &(*p_next)->next;
@@ -13,9 +13,9 @@ void queue(struct celem ** const p_root, struct celem *const elem)
     *p_next = elem;
 }
 
-struct celem * dequeue(struct celem ** const p_root)
+struct qitem * dequeue(struct qitem ** const p_root)
 {
-    struct celem *dequeued = *p_root;
+    struct qitem *dequeued = *p_root;
     if (dequeued != NULL)
     {
         *p_root = (*p_root)->next;

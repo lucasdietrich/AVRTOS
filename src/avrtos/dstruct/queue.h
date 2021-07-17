@@ -1,5 +1,5 @@
-#ifndef _CLIST_H
-#define _CLIST_H
+#ifndef _QUEUE_H
+#define _QUEUE_H
 
 #include <stdio.h>
 
@@ -9,18 +9,18 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-struct celem
+struct qitem
 {
-    struct celem * next;
+    struct qitem * next;
 };
 
-#define CLIST(ref_name) (struct celem ref_name = {NULL})
+#define DEFINE_QUEUE(ref_name) struct qitem *ref_name = {NULL}
 
 /*___________________________________________________________________________*/
 
-void queue(struct celem ** const p_root, struct celem *const item);
+void queue(struct qitem ** const p_root, struct qitem *const qitem);
 
-struct celem * dequeue(struct celem ** const p_root);
+struct qitem * dequeue(struct qitem ** const p_root);
 
 /*___________________________________________________________________________*/
 

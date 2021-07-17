@@ -9,29 +9,29 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-struct delem
+struct ditem
 {
-    struct delem *prev;
-    struct delem *next;
+    struct ditem *prev;
+    struct ditem *next;
 };
 
-#define DLIST_REF(ref_name)  (struct delem ref_name = {ref_name, ref_name })   
+#define DEFINE_DLIST(ref_name)  struct ditem ref_name = {&ref_name, &ref_name}
 
 /*___________________________________________________________________________*/
 
-void push_front(struct delem *ref, struct delem *item);
+void push_front(struct ditem *ref, struct ditem *item);
 
-void push_back(struct delem *ref, struct delem *item);
+void push_back(struct ditem *ref, struct ditem *item);
 
-struct delem * pop_front(struct delem *ref);
+struct ditem * pop_front(struct ditem *ref);
 
-struct delem * pop_back(struct delem *ref);
+struct ditem * pop_back(struct ditem *ref);
 
-void dlist_ref(struct delem *ref);
+void dlist_ref(struct ditem *ref);
 
-void dlist_queue(struct delem *ref, struct delem * item);
+void dlist_queue(struct ditem *ref, struct ditem * item);
 
-struct delem * dlist_dequeue(struct delem *ref);
+struct ditem * dlist_dequeue(struct ditem *ref);
 
 /*___________________________________________________________________________*/
 
