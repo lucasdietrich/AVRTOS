@@ -14,19 +14,23 @@ void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item))
 
 void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
 {
-    ditem_printer(ref);
     uint16_t counter = 0;
 
-    struct ditem *current = ref->next;
-    while (current != ref)
+    if (ref != NULL)
     {
-        usart_print(" > ");
-        ditem_printer(current);
         counter++;
-        current = current->next;
+        ditem_printer(ref);
+
+        struct ditem *current = ref->next;
+        while (current != ref)
+        {
+            usart_print(" > ");
+            ditem_printer(current);
+            counter++;
+            current = current->next;
+        }
     }
-    // usart_print(" > ");
-    // ditem_printer(current);
+
     usart_print(" [");
     usart_u16(counter);
     usart_print("]\n");

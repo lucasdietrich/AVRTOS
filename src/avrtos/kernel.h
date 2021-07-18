@@ -10,6 +10,8 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+void _k_scheduler_init(void);
+
 /**
  * @brief Choice the next thread to be executed
  * 
@@ -18,6 +20,10 @@ extern "C" {
  * @return struct thread_t* : next thread to be executed
  */
 struct thread_t *_k_scheduler(void);
+
+#include "avrtos/dstruct/dlist.h"
+void _thread_symbol(struct ditem * item);
+void print_runqueue(void);
 
 /**
  * @brief Release the CPU

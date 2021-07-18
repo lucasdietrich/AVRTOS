@@ -210,6 +210,8 @@ _k_yield:
 .extern _k_init_sysclock
 #endif
 
+.extern _k_scheduler_init
+
 
 ; Kernel final init here
 .section .init8, "ax", @progbits
@@ -223,6 +225,8 @@ _k_yield:
     ldi r17, 1 << RXCIE0
     sts UCSR0B, r17
 #endif
+
+    call _k_scheduler_init
 
 
 /*___________________________________________________________________________*/

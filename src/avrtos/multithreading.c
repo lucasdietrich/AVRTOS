@@ -13,13 +13,15 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 struct thread_t k_thread_main = {
     .sp = NULL,
     // .state = RUNNING,
-    .pending = {NULL, NULL},
+    .tie = {{&k_thread_main.tie.runqueue, &k_thread_main.tie.runqueue}},
+    .flags = {RUNNING, PREEMPT, 8},
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
         .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
         .size = THREAD_MAIN_STACK_SIZE,
     },
     .local_storage = NULL,
+    .symbol = "M"
 };
 
 #else
@@ -27,13 +29,16 @@ struct thread_t k_thread_main = {
 struct thread_t k_thread_main = {
     .sp = NULL,
     // .state = RUNNING,
-    .pending = {NULL, NULL},
+    .tie = {{&k_thread_main.tie.runqueue, &k_thread_main.tie.runqueue}},
+    .flags = {RUNNING, PREEMPT, 8},
+    .runqueue = {NULL, NULL},
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
         .end = (void*) RAMEND,
         .size = 0,
     },
     .local_storage = NULL,
+    .symbol = "M"
 };
 
 #endif
@@ -129,6 +134,8 @@ int k_thread_register(struct thread_t *const th)
     {
         k_thread.list[k_thread.count++] = th;  // we add it
 
+        // add thread to running queue
+
         return 0;
     }
     else
@@ -170,4 +177,5 @@ extern uint8_t __data_end;
     {
         k_thread.list[k_thread.count++] = &(&__k_threads_start)[i++];
     }
+    
 }

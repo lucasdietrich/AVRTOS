@@ -35,8 +35,15 @@ extern "C" {
  */
 typedef void (*thread_entry_t)(void*);
 
-enum thread_state_t {STOPPED = 0, READY = 1, WAITING = 2, RUNNING = 3};
-// maybe running and ready state can be combined
+struct thread_state
+{
+    uint8_t state: 2;
+    uint8_t coop: 1;
+    uint8_t priority : 5;
+} ;
+
+enum thread_state_t { STOPPED = 0, RUNNING = 1, READY = 2, WAITING = 3 };
+enum thread_type_t { PREEMPT = 0, COOP = 1 };
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -55,8 +62,9 @@ struct thread_t
     // enum thread_state_t state;
     union {
         struct ditem runqueue;
-        struct xtitem xtqueue;
+        struct titem event;
     } tie;
+    struct thread_state flags;
     int8_t priority;
     struct
     {
@@ -64,6 +72,7 @@ struct thread_t
         size_t size;
     } stack;
     void *local_storage;
+    char symbol[3];
 };
 
 /**
