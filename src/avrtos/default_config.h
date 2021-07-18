@@ -73,7 +73,7 @@
 //
 //  Enable Kernel Debug features
 //
-#define DEFAULT_KERNEL_DEBUG                    0
+#define DEFAULT_KERNEL_DEBUG                    1
 
 //
 // enable preemtive threads feature
@@ -84,7 +84,7 @@
 // Time slice in milliseconds
 // TODO, use 100µs as base unit
 //
-#define DEFAULT_KERNEL_TIME_SLICE               1
+#define DEFAULT_KERNEL_TIME_SLICE               16
 
 //
 //  auto start kernel sysclock

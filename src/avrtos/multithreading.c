@@ -12,7 +12,8 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 struct thread_t k_thread_main = {
     .sp = NULL,
-    .state = RUNNING,
+    // .state = RUNNING,
+    .pending = {NULL, NULL},
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
         .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
@@ -25,7 +26,8 @@ struct thread_t k_thread_main = {
 
 struct thread_t k_thread_main = {
     .sp = NULL,
-    .state = RUNNING,
+    // .state = RUNNING,
+    .pending = {NULL, NULL},
     .priority = THREAD_MAIN_THREAD_PRIORITY,
     .stack = {
         .end = (void*) RAMEND,
@@ -104,7 +106,8 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
     th->stack.size = stack_size;
     th->priority = priority;
     th->local_storage = local_storage;
-    th->state = READY;
+    // th->state = READY;
+    // th->pending = {0, 0};
 
     return 0;
 }
