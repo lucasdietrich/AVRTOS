@@ -13,7 +13,7 @@
 #include "kernel.h"
 #include "dstruct/queue.h"
 #include "dstruct/dlist.h"
-#include "dstruct/xtqueue.h"
+#include "dstruct/tqueue.h"
 #include "mutex.h"
 #include "semaphore.h"
 #include "sysclock.h"

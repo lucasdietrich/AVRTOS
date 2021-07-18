@@ -6,7 +6,7 @@
 #include <avr/pgmspace.h>
 
 #include "debug.h"
-#include "dstruct/xtqueue.h"
+#include "dstruct/tqueue.h"
 
 
 /*___________________________________________________________________________*/
@@ -111,32 +111,6 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
         return 0;
     }
     return -1;
-}
-
-
-/*___________________________________________________________________________*/
-
-void print_scheduled_item(struct k_xtqueue_item_t* const item)
-{
-    usart_print("-- ");
-    // if not printable
-    // usart_transmit(*(uint8_t*) (item->p));
-    usart_transmit('(');
-    usart_u16(item->delay_shift);
-    usart_transmit(')');
-    usart_transmit(' ');
-}
-
-void print_scheduled_items_list(struct k_xtqueue_item_t* root)
-{
-    usart_print("0 |");
-
-    while (root != NULL)
-    {
-        print_scheduled_item(root);
-        root = root->next;
-    }
-    usart_transmit('\n');
 }
 
 /*___________________________________________________________________________*/

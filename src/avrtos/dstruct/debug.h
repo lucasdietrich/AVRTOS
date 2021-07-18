@@ -23,12 +23,18 @@ void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item));
 #include "dlist.h"
 
 //
-// Dlist
+// DList
 //
 void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item));
 
 /*___________________________________________________________________________*/
 
+#include "tqueue.h"
+
+//
+// TQueue
+//
+void print_tqueue(struct titem *root, void (*titem_printer)(struct titem *item));
 
 /*___________________________________________________________________________*/
 

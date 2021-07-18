@@ -1,4 +1,4 @@
-#include "xtqueue.h"
+#include "tqueue.h"
 
 // A should be processed in 10 ms
 // B should be processed in 10 + 30 = 40ms
@@ -15,47 +15,41 @@
 /*___________________________________________________________________________*/
 
 
-// scheduled_item_t must have abs_delay set and context set
-void k_xtqueue_schedule(struct k_xtqueue_item_t **root, struct k_xtqueue_item_t *new_item)
+void tqueue_schedule(struct titem **root, struct titem *item)
 {
-    if (new_item == NULL)
+    if (item == NULL)
         return;
-        
-    new_item->next = NULL;  // safe
 
-    struct k_xtqueue_item_t ** prev_next_p = root;
-    while (*prev_next_p != NULL)    // if next of previous item is set
+    struct titem ** prev_next_p = root;
+    while (*prev_next_p != NULL)
     {
-        struct k_xtqueue_item_t * p_current = *prev_next_p; // next of previous become current
+        struct titem * p_current = *prev_next_p; // next of previous become current
 
-        // if current element expires before or at the same time that new_timer, we go to next item
-        if (p_current->delay_shift <= new_item->delay_shift)
+        // if current element expires before or at the same time that item delay, we go to next item
+        if (p_current->delay_shift <= item->delay_shift)
         {
-            new_item->delay_shift -= p_current->delay_shift;
+            item->delay_shift -= p_current->delay_shift;
             prev_next_p = &(p_current->next);
         }
         else    // if current element expire after, we need to insert the new_item before current and linked *prev_next_p
         {
-            new_item->next = p_current;
-            p_current->delay_shift -= new_item->delay_shift;     // adjust delay
+            item->next = p_current;
+            p_current->delay_shift -= item->delay_shift;
             break;
-
-            // if delay_shift = 0 for few items, TODO order depending of priority
-            // if ((*p_item)->next->delay_shift == 0) { }
         }
     }
-    *prev_next_p = new_item;
+    *prev_next_p = item;
 }
 
-void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t time_passed)
+void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)
 {
     if (!time_passed)
         return;
 
-    struct k_xtqueue_item_t ** prev_next_p = root;
+    struct titem ** prev_next_p = root;
     while (*prev_next_p != NULL) // if next of previous item is set
     {
-        struct k_xtqueue_item_t * p_current = *prev_next_p; // next of previous become current
+        struct titem * p_current = *prev_next_p; // next of previous become current
         if (p_current->delay_shift <= time_passed)
         {
             if (p_current->delay_shift != 0)    // if item delay is already 0 
@@ -73,13 +67,13 @@ void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t time_passed)
     }
 }
 
-struct k_xtqueue_item_t * k_xtqueue_pop(struct k_xtqueue_item_t **root)
+struct titem * tqueue_pop(struct titem **root)
 {
-    struct k_xtqueue_item_t * item = NULL;
+    struct titem * item = NULL;
     if ((root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
     {
         item = *root;    // prepare to return it
-        *root = (*root)->next;  // set next
+        *root = (*root)->next;
     }
     return item;
 }

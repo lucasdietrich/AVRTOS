@@ -1,5 +1,5 @@
-#ifndef _AVRTOS_XTQUEUE_H
-#define _AVRTOS_XTQUEUE_H
+#ifndef _AVRTOS_TQUEUE_H
+#define _AVRTOS_TQUEUE_H
 
 #include "../defines.h"
 
@@ -9,7 +9,7 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-struct k_xtqueue_item_t
+struct titem
 {
     union
     {
@@ -17,20 +17,18 @@ struct k_xtqueue_item_t
         k_delta_ms_t abs_delay;
         k_delta_ms_t timeout;
     };
-    struct k_xtqueue_item_t* next;
-
-    void* p_context;
+    struct titem* next;
 };
 
-#define K_xtqueue_DEFINE(root) struct k_xtqueue_item_t * root = NULL;
+#define DEFINE_TQUEUE(ref_name) struct titem *ref_name = NULL
 
 /*___________________________________________________________________________*/
 
-void k_xtqueue_schedule(struct k_xtqueue_item_t **root, struct k_xtqueue_item_t *new_item);
+void tqueue_schedule(struct titem **root, struct titem *item);
 
-void k_xtqueue_shift(struct k_xtqueue_item_t **root, k_delta_ms_t delta);
+void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
 
-struct k_xtqueue_item_t *k_xtqueue_pop(struct k_xtqueue_item_t **root);
+struct titem * tqueue_pop(struct titem **root);
 
 /*___________________________________________________________________________*/
 

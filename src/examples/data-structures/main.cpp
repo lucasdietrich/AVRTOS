@@ -6,6 +6,7 @@
 
 #include "avrtos/dstruct/dlist.h"
 #include "avrtos/dstruct/queue.h"
+#include "avrtos/dstruct/tqueue.h"
 #include "avrtos/dstruct/debug.h"
 
 #include "avrtos/defines.h"
@@ -14,6 +15,7 @@
 
 void test_queue(void);
 void test_dlist(void);
+void test_tqueue(void);
 
 /*___________________________________________________________________________*/
 
@@ -26,6 +28,9 @@ int main(void)
 
   usart_printl("dlist");
   test_dlist();
+
+  usart_printl("tqueue");
+  test_tqueue();
 }
 
 /*___________________________________________________________________________*/
@@ -160,6 +165,70 @@ void test_dlist(void)
   push_front(&dlist.i, &item->i);
 
   print_dlist();
+}
+
+/*___________________________________________________________________________*/
+
+//
+// TQUEUE
+//
+
+struct item3 {
+    const char chr;
+    struct titem tie;
+};
+
+struct item3 titems[] = {
+    {'A', {100}},
+    {'B', {25}},
+    {'C', {35}},
+    {'D', {35}},
+    {'E', {25}}
+};
+
+void print_titem(struct titem *item)
+{
+    struct item3 *i = CONTAINER_OF(item, struct item3, tie);
+    usart_transmit(i->chr);
+    usart_transmit('[');
+    usart_u16(i->tie.delay_shift);
+    usart_transmit(']');
+}
+
+void print_tqueue(struct titem *root)
+{
+  print_tqueue(root, print_titem);
+}
+
+void test_tqueue(void)
+{
+    struct titem *root = NULL;
+
+    for (uint8_t i = 0; i < 5; i++)
+    {
+        tqueue_schedule(&root, &titems[4 - i].tie);
+    }   
+
+    print_tqueue(root);
+
+    tqueue_shift(&root, 20);
+
+    print_tqueue(root);
+
+    tqueue_shift(&root, 20);
+
+    print_tqueue(root);
+
+    struct titem *pop = tqueue_pop(&root);
+    print_titem(pop);
+    usart_transmit('\n');
+    pop = tqueue_pop(&root);
+    print_titem(pop);
+    usart_transmit('\n');
+
+    tqueue_shift(&root, 20);
+
+    print_tqueue(root);
 }
 
 /*___________________________________________________________________________*/

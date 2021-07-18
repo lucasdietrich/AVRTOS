@@ -31,3 +31,19 @@ void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
     usart_u16(counter);
     usart_print("]\n");
 }
+
+//
+// TQueue
+//
+void print_tqueue(struct titem *root, void (*titem_printer)(struct titem *item))
+{
+    usart_print("| ");
+    struct titem *current = root;
+    while (current != NULL)
+    {
+        usart_print("- ");
+        titem_printer(current);
+        current = current->next;
+    }
+    usart_transmit('\n');
+}
