@@ -52,7 +52,11 @@ enum thread_state_t {STOPPED = 0, READY = 1, WAITING = 2, RUNNING = 3};
 struct thread_t
 {
     void *sp;       // keep it at the beginning of the structure
-    enum thread_state_t state;
+    // enum thread_state_t state;
+    union {
+        struct ditem runqueue;
+        struct xtitem xtqueue;
+    } tie;
     int8_t priority;
     struct
     {

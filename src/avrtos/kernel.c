@@ -3,64 +3,61 @@
 
 /*___________________________________________________________________________*/
 
-struct k_xtqueue_item_t *_k_system_xtqueue = NULL;
+static struct k_xtqueue_item_t *scheduled_threads = NULL;
+
+static DEFINE_DLIST(pending_threads);
 
 /*___________________________________________________________________________*/
 
+void k_yield(void)
+{
+    // k_reschedule(); // reschedule self thread
+
+    _k_yield(); // arch kernel yield
+}
+
+void k_scheduler_init(void)
+{
+    cli();
+    for (uint8_t i = 1; i < ARRAY_SIZE(k_thread.list); i++)
+    {
+        dlist_queue(&pending_threads, &k_thread.list[i]->pending);
+    }
+    sei();
+}
+
+// unsafe
+void k_reschedule(void)
+{
+    dlist_queue(&pending_threads, &k_thread.current->pending);
+}
 
 #include "misc/uart.h"
 
 // todo write this function in assembly
 struct thread_t *_k_scheduler(void)
 {
-    // if current thread was still running keeps it's state to ready
-    if (k_thread.current->state == RUNNING)
-    {
-        k_thread.current->state = READY;
-    }
+    k_reschedule(); // reschedule same thread
 
-    struct k_xtqueue_item_t * item = k_xtqueue_pop(&_k_system_xtqueue);
-    if (item == NULL)
+    // need to be donne 
+    struct k_xtqueue_item_t * item = k_xtqueue_pop(&scheduled_threads);
+    if (item != NULL)
     {
-        uint8_t actual_idx;
-        bool found = false;
-        for (uint8_t shift = 0; shift < ARRAY_SIZE(k_thread.list) - 1; shift++)
-        {
-            actual_idx = (k_thread.current_idx + shift + 1) % ARRAY_SIZE(k_thread.list);
-            if (k_thread.list[actual_idx]->state == READY)
-            {
-                found = true;
-                break;
-            }
-        }
-        
-        if (found)
-        {
-            k_thread.current_idx = actual_idx;
-            k_thread.current = k_thread.list[actual_idx];
-        }
-        else // not thread found
-        {
-            usart_transmit('I');
-
-            k_cpu_idle();
-        }
+        usart_transmit('i');
+        k_thread.current = ((struct thread_t*) item->p_context);
     }
     else
     {
-        k_thread.current = ((struct thread_t*) item->p_context);
+        struct ditem* thread_toexec = dlist_dequeue(&pending_threads);
+        if (thread_toexec != &pending_threads)
+        {
+            // usart_transmit('p');
+            k_thread.current = CONTAINER_OF(thread_toexec, struct thread_t, pending);
+        }
     }
 
-    k_thread.current->state = RUNNING;
-    k_thread.current_idx = &k_thread.current - k_thread.list;   // illegal, but it's the idea
+    // k_thread.current->state = RUNNING;
     return k_thread.current;
-}
-
-__attribute__((naked)) void k_yield(void)
-{
-    k_thread.current->state = READY;    // to this in assembler
-    
-    _k_yield();
 }
 
 void k_cpu_idle(void)
@@ -74,24 +71,24 @@ void k_cpu_idle(void)
 
 void _k_system_shift(void)
 {
-    k_xtqueue_shift(&_k_system_xtqueue, KERNEL_TIME_SLICE);
+    k_xtqueue_shift(&scheduled_threads, KERNEL_TIME_SLICE);
 }
 
 void k_sleep(k_timeout_t timeout)
 {
     if (timeout.delay != 0)
     {
-        cli();
-
         struct k_xtqueue_item_t item = {
             .timeout = timeout.delay,
             .next = NULL,
             .p_context = k_thread.current,
         };
 
-        k_thread.current->state = WAITING;
+        cli();
 
-        k_xtqueue_schedule(&_k_system_xtqueue, &item);
+        // k_thread.current->state = WAITING;
+
+        k_xtqueue_schedule(&scheduled_threads, &item);
 
         k_yield();
 

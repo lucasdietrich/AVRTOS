@@ -1,3 +1,6 @@
+// TODO remove this example
+// created for dev
+
 /*___________________________________________________________________________*/
 
 #include <util/delay.h>

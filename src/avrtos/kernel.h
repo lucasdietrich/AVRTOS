@@ -9,7 +9,9 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-extern struct k_xtqueue_item_t *_k_system_xtqueue;
+void k_scheduler_init(void);
+
+void k_reschedule(void);
 
 /*___________________________________________________________________________*/
 
@@ -34,10 +36,7 @@ struct thread_t *_k_scheduler(void);
  */
 void _k_yield(void);
 
-/**
- * @brief Wrap the thread with state parametere
- */
-__attribute__((naked)) void k_yield(void);
+void k_yield(void);
 
 /*___________________________________________________________________________*/
 
