@@ -14,16 +14,9 @@
 
 #define KERNEL_TIME_SLICE_HZ            1000 / KERNEL_TIME_SLICE
 
-#define SYSCLOCK_PRESCALER_1        ((1 << CS00) | (0 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_8        ((0 << CS00) | (1 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_64       ((1 << CS00) | (1 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_256      ((0 << CS00) | (0 << CS01) |  (1 << CS02))
-#define SYSCLOCK_PRESCALER_1024     ((1 << CS00) | (0 << CS01) |  (1 << CS02))
-
 #define SYSCLOCK_PRESCALER_FREQ_MIN(prescaler) ((F_CPU >> 8) / prescaler)
 #define SYSCLOCK_PRESCALER_FREQ_MAX(prescaler) (F_CPU / prescaler)
-
-#define SYSCLOCK_TIMER0_PRESCALER   SYSCLOCK_PRESCALER_1024
+#define SYSCLOCK_TCNT(time_ms, prescaler) (time_ms * (F_CPU / 1000) / prescaler)
 
 // TEST
 // #define KERNEL_SYSCLOCK_TIMER0_TCNT0       0x100 - KERNEL_TIME_SLICE * ((int) ((F_CPU / 1000.0) / 1024.0 + 0.5))

@@ -25,8 +25,8 @@ void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
         counter++;
         current = current->next;
     }
-    usart_print(" > ");
-    ditem_printer(current);
+    // usart_print(" > ");
+    // ditem_printer(current);
     usart_print(" [");
     usart_u16(counter);
     usart_print("]\n");

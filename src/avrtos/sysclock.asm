@@ -81,7 +81,7 @@ _k_init_sysclock:
     sts TCCR0A, r16
 
 ; TCCR0B = (0 << WGM02) | (0 << FOC0A) | (0 << FOC0B) | (1 << CS00) | (0 << CS01) | (1 << CS02);
-    ldi r16, (0 << WGM02) | (0 << FOC0A) | (0 << FOC0B) | (1 << CS00) | (0 << CS01) |  (1 << CS02)
+    ldi r16, (0 << WGM02) | (0 << FOC0A) | (0 << FOC0B) | KERNEL_SYSCLOCK_TIMER0_PRESCALER
     sts TCCR0B, r16
     
 ; TIMSK0 = (0 << OCIE0B) | (0 << OCIE0A) | (0 << TOIE0);

@@ -135,6 +135,8 @@ _k_yield:
     st X+, r0   ; write SP in structure
     st X+, r1
 
+    ; change current thread to pending
+
     ; determine which is the next thread
     call _k_scheduler
 

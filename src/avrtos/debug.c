@@ -68,7 +68,7 @@ void k_thread_dump(struct thread_t *th)
         "RUNNING"
     };
 
-    usart_print_p(strings[th->state]);
+    // usart_print_p(strings[th->state]);
 
     usart_print(" : SP ");
 
