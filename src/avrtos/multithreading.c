@@ -21,7 +21,7 @@ struct thread_t k_thread_main = {
         .size = THREAD_MAIN_STACK_SIZE,
     },
     .local_storage = NULL,
-    .symbol = "M"
+    .symbol = 'M'
 };
 
 #else
@@ -38,7 +38,7 @@ struct thread_t k_thread_main = {
         .size = 0,
     },
     .local_storage = NULL,
-    .symbol = "M"
+    .symbol = 'M'
 };
 
 #endif
@@ -134,7 +134,7 @@ int k_thread_register(struct thread_t *const th)
     {
         k_thread.list[k_thread.count++] = th;  // we add it
 
-        // add thread to running queue
+        // TODO add thread to running queue
 
         return 0;
     }
@@ -177,5 +177,4 @@ extern uint8_t __data_end;
     {
         k_thread.list[k_thread.count++] = &(&__k_threads_start)[i++];
     }
-    
 }

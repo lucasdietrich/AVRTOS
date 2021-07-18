@@ -72,7 +72,7 @@ struct thread_t
         size_t size;
     } stack;
     void *local_storage;
-    char symbol[3];
+    char symbol;
 };
 
 /**

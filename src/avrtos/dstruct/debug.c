@@ -21,13 +21,34 @@ void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
         counter++;
         ditem_printer(ref);
 
-        struct ditem *current = ref->next;
+        struct ditem *current = ref->next; // prev
         while (current != ref)
         {
             usart_print(" > ");
             ditem_printer(current);
             counter++;
-            current = current->next;
+            current = current->next; // prev
+        }
+    }
+
+    counter = 0;
+
+    usart_print(" [");
+    usart_u16(counter);
+    usart_print("] BACKWARDS ");
+
+    if (ref != NULL)
+    {
+        counter++;
+        ditem_printer(ref);
+
+        struct ditem *current = ref->prev; // prev
+        while (current != ref)
+        {
+            usart_print(" > ");
+            ditem_printer(current);
+            counter++;
+            current = current->prev; // prev
         }
     }
 

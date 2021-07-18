@@ -25,16 +25,34 @@ void _k_scheduler_init(void)
 // todo write this function in assembly
 struct thread_t *_k_scheduler(void)
 {
-    return k_thread.current = CONTAINER_OF(ref_requeue_top(&runqueue), struct thread_t, tie.runqueue);
+    void *next = (struct titem*) tqueue_pop(&events_queue);
+    if (next != NULL) // priority to expired timer
+    {
+        CONTAINER_OF(next, struct thread_t, tie.event)->flags.state = READY;
+
+        push_back(runqueue, (struct ditem *) next);
+        // runqueue = next; // change ref position
+
+        usart_transmit('T');
+    }
+    else if (k_thread.current->flags.state == WAITING)
+    {
+        next = (struct ditem *)dlist_dequeue(runqueue);
+        usart_transmit('W');
+    }
+    else
+    {
+        next = (struct ditem *)ref_requeue_top(&runqueue);
+    }
+
+    return k_thread.current = CONTAINER_OF(next, struct thread_t, tie);
 }
 
 #include "avrtos/dstruct/debug.h"
 
 void _thread_symbol(struct ditem * item)
 {
-    struct thread_t *thread = CONTAINER_OF(item, struct thread_t, tie.runqueue);
-    usart_transmit(thread->symbol[0]);
-    usart_transmit(thread->symbol[1]);
+    usart_transmit(CONTAINER_OF(item, struct thread_t, tie.runqueue)->symbol);
 }
 
 void print_runqueue(void)
@@ -63,6 +81,12 @@ void k_sleep(k_timeout_t timeout)
         cli();
 
         k_thread.current->flags.state = WAITING;
+
+        pop_ref(&runqueue);
+
+        k_thread.current->tie.event.timeout = timeout.delay;
+
+        tqueue_schedule(&events_queue, &k_thread.current->tie.event);
      
         k_yield();
 

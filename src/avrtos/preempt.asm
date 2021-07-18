@@ -59,7 +59,7 @@ _k_interrupt_yield:
     push r31
 
     lds r16, SREG
-    ori r16, 1 << SREG_I ; we Interrupt flag is disabled we need to to it manually in SREG
+    ori r16, 1 << SREG_I ; Interrupt flag is disabled we need to to it manually in SREG
 
     push r16
 

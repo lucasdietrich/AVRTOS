@@ -23,9 +23,13 @@ void push_front(struct ditem *ref, struct ditem *item);
 
 void push_back(struct ditem *ref, struct ditem *item);
 
+void push_ref(struct ditem **ref, struct ditem *item);
+
 struct ditem * pop_front(struct ditem *ref);
 
 struct ditem * pop_back(struct ditem *ref);
+
+struct ditem * pop_ref(struct ditem **ref);
 
 void dlist_ref(struct ditem *ref);
 

@@ -34,6 +34,12 @@ struct ditem * pop_back(struct ditem *ref)
     return item;
 }
 
+struct ditem * pop_ref(struct ditem **ref)
+{
+    *ref = (*ref)->next;
+    return pop_back(*ref);
+}
+
 void dlist_ref(struct ditem *ref)
 {
     *ref = (struct ditem)

@@ -14,7 +14,8 @@
 /*___________________________________________________________________________*/
 
 void test_queue(void);
-void test_dlist(void);
+void test_ref_dlist(void);
+void test_unreft_dlist(void);
 void test_tqueue(void);
 
 /*___________________________________________________________________________*/
@@ -26,8 +27,11 @@ int main(void)
   usart_printl("queue");
   test_queue();
 
-  usart_printl("dlist");
-  test_dlist();
+  usart_printl("ref dlist");
+  test_ref_dlist();
+
+  usart_printl("unret dlist");
+  test_unreft_dlist();
 
   usart_printl("tqueue");
   test_tqueue();
@@ -140,7 +144,7 @@ inline struct item2 *dlist_dequeue(void)
   }
 }
 
-void test_dlist(void)
+void test_ref_dlist(void)
 {
   print_dlist();
 
@@ -165,6 +169,29 @@ void test_dlist(void)
   push_front(&dlist.i, &item->i);
 
   print_dlist();
+}
+
+void test_unreft_dlist(void)
+{
+  struct ditem *ref = &ditems[0].i;
+
+  dlist_ref(ref);
+
+  print_dlist(ref, print_dlist_item);
+
+  dlist_queue(ref, &ditems[1].i);
+  dlist_queue(ref, &ditems[2].i);
+  dlist_queue(ref, &ditems[3].i);
+  
+  print_dlist(ref, print_dlist_item);
+  pop_ref(&ref);
+  print_dlist(ref, print_dlist_item);
+  pop_ref(&ref);
+  print_dlist(ref, print_dlist_item);
+  pop_ref(&ref);
+  print_dlist(ref, print_dlist_item);
+  pop_ref(&ref); // cannot have 0 elements in the list
+  print_dlist(ref, print_dlist_item);
 }
 
 /*___________________________________________________________________________*/
