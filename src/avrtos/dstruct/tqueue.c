@@ -14,12 +14,8 @@
 
 /*___________________________________________________________________________*/
 
-
-void tqueue_schedule(struct titem **root, struct titem *item)
+void _tqueue_schedule(struct titem **root, struct titem *item)
 {
-    if (item == NULL)
-        return;
-
     struct titem ** prev_next_p = root;
     while (*prev_next_p != NULL)
     {
@@ -39,6 +35,17 @@ void tqueue_schedule(struct titem **root, struct titem *item)
         }
     }
     *prev_next_p = item;
+}
+
+void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeout)
+{
+    if (item == NULL)
+        return;
+
+    item->next = NULL;
+    item->timeout = timeout;
+
+    _tqueue_schedule(root, item);
 }
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)

@@ -14,9 +14,13 @@ void k_yield(void)
 
 void _k_scheduler_init(void)
 {
+    // main thread is the first running (ready or not)
     for (uint8_t i = 1; i < k_thread.count; i++)
     {
-        dlist_queue(runqueue, &k_thread.list[i]->tie.runqueue);
+        if (k_thread.list[i]->flags.state == READY) // only queue ready threads
+        {
+            dlist_queue(runqueue, &k_thread.list[i]->tie.runqueue);
+        }
     }
 }
 
@@ -30,22 +34,25 @@ struct thread_t *_k_scheduler(void)
     {
         CONTAINER_OF(next, struct thread_t, tie.event)->flags.state = READY;
 
-        push_back(runqueue, (struct ditem *) next);
-        // runqueue = next; // change ref position
-
+        push_ref(&runqueue, next);
         usart_transmit('T');
     }
     else if (k_thread.current->flags.state == WAITING)
     {
-        next = (struct ditem *)dlist_dequeue(runqueue);
+        // next = (struct ditem *)dlist_dequeue(runqueue);
+        // pop_ref(&runqueue);
+        
         usart_transmit('W');
     }
     else
     {
-        next = (struct ditem *)ref_requeue_top(&runqueue);
+        // next = (struct ditem *)ref_requeue_top(&runqueue);
+        ref_requeue_top(&runqueue);
+
+        usart_transmit('N');
     }
 
-    return k_thread.current = CONTAINER_OF(next, struct thread_t, tie);
+    return k_thread.current = CONTAINER_OF(runqueue, struct thread_t, tie);
 }
 
 #include "avrtos/dstruct/debug.h"
@@ -63,6 +70,7 @@ void print_runqueue(void)
 void k_cpu_idle(void)
 {
     // TODO
+    // loop on low power and regularly check scheduler
 }
 
 /*___________________________________________________________________________*/
@@ -76,7 +84,7 @@ void _k_system_shift(void)
 
 void k_sleep(k_timeout_t timeout)
 {
-    if (timeout.delay != 0)
+    if (timeout.value != 0)
     {
         cli();
 
@@ -84,9 +92,7 @@ void k_sleep(k_timeout_t timeout)
 
         pop_ref(&runqueue);
 
-        k_thread.current->tie.event.timeout = timeout.delay;
-
-        tqueue_schedule(&events_queue, &k_thread.current->tie.event);
+        tqueue_schedule(&events_queue, &k_thread.current->tie.event, timeout.value);
      
         k_yield();
 

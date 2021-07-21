@@ -23,7 +23,7 @@ void push_front(struct ditem *ref, struct ditem *item);
 
 void push_back(struct ditem *ref, struct ditem *item);
 
-void push_ref(struct ditem **ref, struct ditem *item);
+struct ditem * push_ref(struct ditem **ref, struct ditem *item);
 
 struct ditem * pop_front(struct ditem *ref);
 

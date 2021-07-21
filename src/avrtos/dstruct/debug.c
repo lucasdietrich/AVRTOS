@@ -30,12 +30,12 @@ void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
             current = current->next; // prev
         }
     }
-
-    counter = 0;
-
+    
     usart_print(" [");
     usart_u16(counter);
     usart_print("] BACKWARDS ");
+
+    counter = 0;
 
     if (ref != NULL)
     {

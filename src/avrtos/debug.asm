@@ -13,8 +13,10 @@
 
 #if KERNEL_DEBUG_PREEMPT_UART
 
+.extern _k_system_shift
 .extern _k_interrupt_yield
 .global USART_RX_vect
+
 
 ; when calling function, you must push all registers covered by the arguments, even not completely uint8_t require r24 but cover also r25 
 ; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
@@ -22,11 +24,22 @@
 ; USART_RX_vect
 USART_RX_vect:
     push r24
-    push r25
-    push r18
-    push r17
 
-    in r17, _SFR_IO_ADDR(SREG)
+    push r15
+    lds r15, SREG
+
+    push r18
+    push r19
+    push r20
+    push r21
+    push r22
+    push r23
+
+    push r25
+    push r26
+    push r27
+    push r30
+    push r31
 
 ; read received
     lds r18, UCSR0A    ; UCSR0A =0xC0
@@ -41,11 +54,24 @@ USART_RX_vect:
 USART_Continue:
     call usart_transmit     ; return received character
 
-    out _SFR_IO_ADDR(SREG), r17
+    call _k_system_shift
 
-    pop r17
-    pop r18
+    pop r31
+    pop r30
+    pop r27
+    pop r26
     pop r25
+
+    pop r23
+    pop r22
+    pop r21
+    pop r20
+    pop r19
+    pop r18
+
+    sts SREG, r15
+    pop r15
+
     pop r24
 
     jmp _k_preempt_routine

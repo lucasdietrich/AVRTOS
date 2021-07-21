@@ -28,36 +28,34 @@ int main(void)
   usart_init();
   
   k_thread_dump_all();
-
-  print_runqueue();
   
   sei();
 
   while(1)
   {
+    usart_print("M : "); 
     print_runqueue();
 
-    usart_transmit('_'); 
-
-    _delay_ms(1000);
+    _delay_ms(5000);
     
-    k_sleep(K_MSEC(1000));
+    k_sleep(K_MSEC(50));
 
     // k_yield();
   }
 }
 
+// still a problem when having preemp interrupt
+
 void thread_led_on(void *p)
 {
   while (1)
   {
+    usart_print("O : "); 
     print_runqueue();
 
     led_on();
 
-    usart_transmit('\\');
-
-    _delay_ms(1000);
+    _delay_ms(5000);
 
     k_yield();
   }
@@ -67,13 +65,12 @@ void thread_led_off(void *p)
 {
   while (1)
   {
+    usart_print("F : "); 
     print_runqueue();
 
     led_off();
 
-    usart_transmit('/');
-
-    _delay_ms(1000);
+    _delay_ms(5000);
 
     k_yield();
   }

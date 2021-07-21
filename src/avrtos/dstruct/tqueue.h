@@ -24,7 +24,9 @@ struct titem
 
 /*___________________________________________________________________________*/
 
-void tqueue_schedule(struct titem **root, struct titem *item);
+void _tqueue_schedule(struct titem **root, struct titem *item);
+
+void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeout);
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
 
