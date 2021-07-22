@@ -61,7 +61,7 @@ void k_thread_dump(struct thread_t *th)
     }
     usart_print("] ");
 
-    static const char strings[4][8] PROGMEM = {
+    __attribute__((used)) static const char strings[4][8] PROGMEM = {
         "STOPPED",
         "READY  ",
         "WAITING",

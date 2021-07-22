@@ -221,9 +221,9 @@
         struct                                                   \
         {                                                        \
             uint8_t sreg;                                        \
-            uint8_t r26r31[6u];                                  \
+            uint8_t r25_r27r30r31r1_r16r28r29[22u];                            \
             void *context;                                       \
-            uint8_t r0r23[24u];                                  \
+            uint8_t r17r0r18_r23[8u];                                  \
             void *ret_addr;                                      \
         } base;                                                  \
     } _k_stack_buf_##name = {                                    \
@@ -238,9 +238,9 @@
     struct                                               \
     {                                                    \
         uint8_t sreg;                                    \
-        uint8_t r26r31[6u];                              \
+        uint8_t r25_r27r30r31r1_r16r28r29[22u];                              \
         void *context;                                   \
-        uint8_t r0r23[24u];                              \
+        uint8_t r17r0r18_r23[8u];                              \
         void *ret_addr;                                  \
     } _k_stack_buf_##name = {                            \
         THREAD_DEFAULT_SREG,                             \

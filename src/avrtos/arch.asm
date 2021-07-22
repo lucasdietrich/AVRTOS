@@ -1,6 +1,241 @@
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
-#include "defines.h"
+#include <avrtos/defines.h>
+
+/*___________________________________________________________________________*/
+
+; prempt debug
+#if KERNEL_DEBUG_PREEMPT_UART
+
+.global USART_RX_vect
+
+; when calling function, you must push all registers covered by the arguments, even not completely uint8_t require r24 but cover also r25 
+; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
+
+USART_RX_vect:
+    push r17
+
+    lds r17, SREG
+
+    push r0
+
+    push r18
+    push r19
+    push r20
+    push r21
+    push r22
+    push r23
+    push r24
+    push r25
+    push r26
+    push r27
+
+    push r30
+    push r31
+
+; read received
+    lds r18, UCSR0A    ; UCSR0A =0xC0
+;    lds r17, UCSR0B (if 9 bits)
+    lds r24, UDR0    ; UDR0 =0xC6
+
+; If error, return -1
+    andi r18, (1 << FE0) | (1 << DOR0) | (1 << UPE0)
+    breq USART_Continue
+    ldi r24, 0x58   ; X show X if error
+    
+USART_Continue:
+    call usart_transmit     ; print received character or X
+
+    jmp system_shift
+
+#endif
+
+/*___________________________________________________________________________*/
+
+.global _k_yield
+.extern _k_scheduler
+.extern k_thread
+
+; push order
+; r17 | r0 r18 > r27 r30 r31 | r1 > r16 r28 r29 | SREG 
+; 1 | 
+
+; SREG is saved in r17 during the whole process, DON'T USE r17 in this part without saving it
+
+TIMER0_OVF_vect:
+    push r17
+
+    ; reset timer counter as soon as possible (to maximize accuracy)
+    ldi r17, 0x100 - KERNEL_SYSCLOCK_TIMER0_TCNT0
+    sts TCNT0, r17
+
+    lds r17, SREG
+
+    push r0
+
+    push r18
+    push r19
+    push r20
+    push r21
+    push r22
+    push r23
+    push r24
+    push r25
+    push r26
+    push r27
+
+    push r30
+    push r31
+
+system_shift:
+    call _k_system_shift
+
+check_coop:
+    ; to use offset of here IF POSSIBLE
+    lds r28, k_thread           ; load current thread addr in X
+    lds r29, k_thread + 1
+
+    ldd r16, Y+6      ; read flag
+
+    sbrc r16, 2       ; if coop thread don't preempt
+    jmp cancel_switch
+    
+
+#if KERNEL_DEBUG
+prempt_debug:
+    ldi r24, 0x2e           ; '.'
+    call usart_transmit
+#endif
+
+yield_from_interrupt:
+    ori r17, 1 << SREG_I ; Interrupt flag is disabled in interrupt handler, we need to set it manually in SREG
+
+    jmp scheduler_entry
+
+_k_yield:
+    push r17
+    lds r17, SREG
+
+save_context1:  ; save call-used registers
+    push r0
+
+    push r18
+    push r19
+    push r20
+    push r21
+    push r22
+    push r23
+    push r24
+    push r25
+    push r26
+    push r27
+
+    push r30
+    push r31
+
+clear_interrupt_flag:
+    ; "brid" I flag pre check would be an oversight
+    cli
+
+prepare_current:
+    lds r28, k_thread          ; load current thread addr in X
+    lds r29, k_thread + 1
+
+scheduler_entry:
+    ; todo
+    ; call scheduler here
+    ; check if current thread changed or not
+    ; goto cancel_switch of no change
+
+save_context2:
+    push r1
+    push r2
+    push r3
+    push r4
+    push r5
+    push r6
+    push r7
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+    push r16
+
+    push r28
+    push r29
+
+    push r17    ; push SREG on stack
+
+save_sp:
+    lds r20, SPL
+    lds r21, SPH
+
+    st Y+, r20       ; write SP in current thread structure
+    st Y+, r21
+
+scheduler:
+    call _k_scheduler 
+
+restore_sp:
+    movw r28, r24   ; new current thread structure address is in (r24, r25)
+
+    ld r20, Y+       ; read sp
+    ld r21, Y+
+
+    sts SPL, r20     ; restore stack pointer
+    sts SPH, r21
+
+restore_context2:
+    pop r17         ; restore SREG from stack
+    sts SREG, r17
+
+    pop r29
+    pop r28
+
+    pop r16
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop r7
+    pop r6
+    pop r5
+    pop r4
+    pop r3
+    pop r2
+    pop r1
+
+cancel_switch:
+restore_context1:
+    pop r31
+    pop r30
+
+    pop r27
+    pop r26
+    pop r25
+    pop r24
+    pop r23
+    pop r22
+    pop r21
+    pop r20
+    pop r19
+    pop r18
+
+    pop r0
+
+    ; sts SREG, r17
+    pop r17
+
+    ret ; SREG contains I flag if returning from interrupt
 
 /*___________________________________________________________________________*/
 
@@ -77,156 +312,5 @@ _k_thread_stack_create:
     ret  ; dispath to next thread
 
 #endif
-
-/*___________________________________________________________________________*/
-
-.global _k_yield
-.global _k_scheduler
-.extern k_thread
-
-_k_yield:
-    ; save current thread registers
-    ; push 32 registers
-    push r0
-
-    lds r0, SREG    ; save flags
-    cli
-
-    push r1
-    push r2
-    push r3
-    push r4
-    push r5
-    push r6
-    push r7
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r13
-    push r14
-    push r15
-    push r16
-    push r17
-    push r18
-    push r19
-    push r20
-    push r21
-    push r22
-    push r23
-    push r24
-    push r25
-    push r26
-    push r27
-    push r28
-    push r29
-    push r30
-    push r31
-
-    push r0 ; push SREG on stack
-
-    lds r0, SPL
-    lds r1, SPH
-
-    lds r26, k_thread            ; load current thread addr in X
-    lds r27, k_thread + 1
-
-    st X+, r0   ; write SP in structure
-    st X+, r1
-
-    ; change current thread to pending
-
-    ; determine which is the next thread
-    call _k_scheduler
-
-    ; next thread structure addr is in X
-    movw r26, r24
-
-    ld r0, X+
-    ld r1, X+
-
-    sts SPL, r0 ; restore stack pointer
-    sts SPH, r1
-
-    pop r0  ; load flags from stack
-
-    ; restore 32 registers
-    pop r31
-    pop r30
-    pop r29
-    pop r28
-    pop r27
-    pop r26
-    pop r25
-    pop r24
-    pop r23
-    pop r22
-    pop r21
-    pop r20
-    pop r19
-    pop r18
-    pop r17
-    pop r16
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop r7
-    pop r6
-    pop r5
-    pop r4
-    pop r3
-    pop r2
-    pop r1
-
-    sts SREG, r0 ; restore flasgs
-
-    pop r0
-
-    ret  ; dispath to next thread
-
-/*___________________________________________________________________________*/
-
-#if THREAD_EXPLICIT_MAIN_STACK == 1
-
-.extern _k_main_stack
-
-; this section override the Stack Pointer defined in section .init2 to the defined Main Buffer
-; https://www.nongnu.org/avr-libc/user-manual/mem_sections.html
-.section .init3, "ax", @progbits
-    ldi r28, lo8(_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE))
-    ldi r29, hi8(_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE))
-    out _SFR_IO_ADDR(SPL), r28
-    out _SFR_IO_ADDR(SPH), r29
-#endif
-
-
-#if KERNEL_SYSCLOCK_AUTO_INIT
-.extern _k_init_sysclock
-#endif
-
-.extern _k_scheduler_init
-
-
-; Kernel final init here
-.section .init8, "ax", @progbits
-
-#if KERNEL_SYSCLOCK_AUTO_INIT
-    call _k_init_sysclock
-#endif
-
-#if KERNEL_DEBUG_PREEMPT_UART
-; enable uart RX interrupt
-    ldi r17, 1 << RXCIE0
-    sts UCSR0B, r17
-#endif
-
-    call _k_scheduler_init
-
 
 /*___________________________________________________________________________*/

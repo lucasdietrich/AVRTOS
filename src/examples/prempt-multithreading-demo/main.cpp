@@ -33,7 +33,7 @@ int main(void)
 
   while(1)
   {
-    usart_print("M : "); 
+    usart_print("[M] "); 
     print_runqueue();
 
     _delay_ms(5000);
@@ -50,7 +50,7 @@ void thread_led_on(void *p)
 {
   while (1)
   {
-    usart_print("O : "); 
+    usart_print("[O] "); 
     print_runqueue();
 
     led_on();
@@ -65,14 +65,14 @@ void thread_led_off(void *p)
 {
   while (1)
   {
-    usart_print("F : "); 
+    usart_print("[F] "); 
     print_runqueue();
 
     led_off();
 
     _delay_ms(5000);
 
-    k_yield();
+    // k_yield();
   }
 }
 
