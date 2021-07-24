@@ -5,11 +5,10 @@
 
 static struct ditem *runqueue = &k_thread_main.tie.runqueue; 
 
-static struct titem *events_queue;
+static struct titem *events_queue = NULL;
 
 void k_yield(void)
 {
-    _k_yield(); // arch kernel yield
 }
 
 void _k_scheduler_init(void)
@@ -26,31 +25,48 @@ void _k_scheduler_init(void)
 
 #include "misc/uart.h"
 
+#define KERNEL_SCHEDULER_DEBUG      0
+
 // todo write this function in assembly
+// ! mean tqueue item
+// ~ thread set to waiting
+// > default next thread
 struct thread_t *_k_scheduler(void)
 {
+    // print_tqueue(events_queue, _thread_symbol);
     void *next = (struct titem*) tqueue_pop(&events_queue);
     if (next != NULL) // priority to expired timer
     {
         CONTAINER_OF(next, struct thread_t, tie.event)->flags.state = READY;
 
         push_ref(&runqueue, next);
-        usart_transmit('T');
+
+#if KERNEL_SCHEDULER_DEBUG
+        usart_transmit('!');
+#endif
+
     }
     else if (k_thread.current->flags.state == WAITING)
     {
-        // next = (struct ditem *)dlist_dequeue(runqueue);
-        // pop_ref(&runqueue);
-        
-        usart_transmit('W');
+
+#if KERNEL_SCHEDULER_DEBUG
+        usart_transmit('~');
+#endif
     }
     else
     {
+ 
         // next = (struct ditem *)ref_requeue_top(&runqueue);
         ref_requeue_top(&runqueue);
 
-        usart_transmit('N');
+#if KERNEL_SCHEDULER_DEBUG
+        usart_transmit('>');
+#endif
     }
+
+#if KERNEL_SCHEDULER_DEBUG
+    _thread_symbol(runqueue);
+#endif
 
     return k_thread.current = CONTAINER_OF(runqueue, struct thread_t, tie);
 }
@@ -82,6 +98,7 @@ void _k_system_shift(void)
     tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }
 
+// todo k_sleep(FOREVER) -> remov thread from queue only
 void k_sleep(k_timeout_t timeout)
 {
     if (timeout.value != 0)
@@ -89,9 +106,9 @@ void k_sleep(k_timeout_t timeout)
         cli();
 
         k_thread.current->flags.state = WAITING;
-
+        
         pop_ref(&runqueue);
-
+        
         tqueue_schedule(&events_queue, &k_thread.current->tie.event, timeout.value);
      
         k_yield();

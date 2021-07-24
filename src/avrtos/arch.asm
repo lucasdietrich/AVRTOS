@@ -45,7 +45,7 @@ USART_RX_vect:
     ldi r24, 0x58   ; X show X if error
     
 USART_Continue:
-    call usart_transmit     ; print received character or X
+    ; call usart_transmit     ; print received character or X
 
     jmp system_shift
 
@@ -58,10 +58,13 @@ USART_Continue:
 .extern k_thread
 
 ; push order
-; r17 | r0 r18 > r27 r30 r31 | r1 > r16 r28 r29 | SREG 
-; 1 | 
+; r17 | r0 r18 > r27 r30 r31 | r1 > r16 r28 r29 | SREG
 
 ; SREG is saved in r17 during the whole process, DON'T USE r17 in this part without saving it
+
+#if KERNEL_PREEMPTIVE_THREADS
+
+.global TIMER0_OVF_vect
 
 TIMER0_OVF_vect:
     push r17
@@ -88,30 +91,31 @@ TIMER0_OVF_vect:
     push r30
     push r31
 
-system_shift:
-    call _k_system_shift
-
-check_coop:
-    ; to use offset of here IF POSSIBLE
-    lds r28, k_thread           ; load current thread addr in X
-    lds r29, k_thread + 1
-
-    ldd r16, Y+6      ; read flag
-
-    sbrc r16, 2       ; if coop thread don't preempt
-    jmp cancel_switch
-    
-
 #if KERNEL_DEBUG
 prempt_debug:
     ldi r24, 0x2e           ; '.'
     call usart_transmit
 #endif
 
+system_shift:
+    call _k_system_shift
+
+check_coop:
+    ; to use offset of here IF POSSIBLE
+    lds r30, k_thread           ; load current thread addr in X
+    lds r31, k_thread + 1
+
+    ldd r18, Z+6      ; read flag
+
+    sbrc r18, 2       ; if coop thread don't preempt
+    jmp restore_context1
+
+
 yield_from_interrupt:
     ori r17, 1 << SREG_I ; Interrupt flag is disabled in interrupt handler, we need to set it manually in SREG
 
     jmp scheduler_entry
+#endif
 
 _k_yield:
     push r17
@@ -138,15 +142,11 @@ clear_interrupt_flag:
     ; "brid" I flag pre check would be an oversight
     cli
 
-prepare_current:
-    lds r28, k_thread          ; load current thread addr in X
-    lds r29, k_thread + 1
-
 scheduler_entry:
     ; todo
     ; call scheduler here
     ; check if current thread changed or not
-    ; goto cancel_switch of no change
+    ; goto cancel_sched of no change
 
 save_context2:
     push r1
@@ -172,27 +172,50 @@ save_context2:
     push r17    ; push SREG on stack
 
 save_sp:
-    lds r20, SPL
-    lds r21, SPH
+    ; lds r20, SPL
+    ; lds r21, SPH
 
-    st Y+, r20       ; write SP in current thread structure
-    st Y+, r21
+    ; lds r28, k_thread          ; load current thread addr in X
+    ; lds r29, k_thread + 1
+
+    ; st Y+, r20       ; write SP in current thread structure
+    ; st Y+, r21
+
+    lds r0, SPL
+    lds r1, SPH
+
+    lds r26, k_thread            ; load current thread addr in X
+    lds r27, k_thread + 1
+
+    st X+, r0   ; write SP in structure
+    st X+, r1
 
 scheduler:
     call _k_scheduler 
 
 restore_sp:
-    movw r28, r24   ; new current thread structure address is in (r24, r25)
+    ; movw r28, r24   ; new current thread structure address is in (r24, r25)
 
-    ld r20, Y+       ; read sp
-    ld r21, Y+
+    ; ld r20, Y+       ; read sp
+    ; ld r21, Y+
 
-    sts SPL, r20     ; restore stack pointer
-    sts SPH, r21
+    ; sts SPL, r20     ; restore stack pointer
+    ; sts SPH, r21
+
+    movw r26, r24
+
+    ld r0, X+
+    ld r1, X+
+
+    sts SPL, r0 ; restore stack pointer
+    sts SPH, r1
 
 restore_context2:
-    pop r17         ; restore SREG from stack
-    sts SREG, r17
+    pop r17         
+    
+    ; TODO restore SREG here if k_yield (not interrupt)
+    ; we need to know if the call switch happened from an interrupt or not
+    ; if not interrupt, set SREG (and I flag potentially) is not a problem here
 
     pop r29
     pop r28
@@ -214,7 +237,6 @@ restore_context2:
     pop r2
     pop r1
 
-cancel_switch:
 restore_context1:
     pop r31
     pop r30
@@ -232,10 +254,23 @@ restore_context1:
 
     pop r0
 
-    ; sts SREG, r17
+    ; if I flag is set : we need to make sure to set interrupt back at the very last intruction)
+    ; else : no problem
+    sbrs r17, SREG_I
+    jmp no_interrupt_ret
+
+    cbr r17, 1 << SREG_I
+
+    sts SREG, r17
     pop r17
 
-    ret ; SREG contains I flag if returning from interrupt
+    reti
+
+no_interrupt_ret:
+    sts SREG, r17
+    pop r17
+
+    ret
 
 /*___________________________________________________________________________*/
 

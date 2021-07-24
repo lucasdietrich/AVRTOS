@@ -89,7 +89,7 @@
 // Time slice in milliseconds
 // TODO, use 100µs as base unit
 //
-#define DEFAULT_KERNEL_TIME_SLICE               1
+#define DEFAULT_KERNEL_TIME_SLICE               15
 
 //
 //  auto start kernel sysclock
