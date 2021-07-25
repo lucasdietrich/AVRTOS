@@ -9,6 +9,7 @@ static struct titem *events_queue = NULL;
 
 void k_yield(void)
 {
+    _k_yield();
 }
 
 void _k_scheduler_init(void)
@@ -16,7 +17,7 @@ void _k_scheduler_init(void)
     // main thread is the first running (ready or not)
     for (uint8_t i = 1; i < k_thread.count; i++)
     {
-        if (k_thread.list[i]->flags.state == READY) // only queue ready threads
+        if (k_thread.list[i]->state == READY) // only queue ready threads
         {
             dlist_queue(runqueue, &k_thread.list[i]->tie.runqueue);
         }
@@ -35,9 +36,9 @@ struct thread_t *_k_scheduler(void)
 {
     // print_tqueue(events_queue, _thread_symbol);
     void *next = (struct titem*) tqueue_pop(&events_queue);
-    if (next != NULL) // priority to expired timer
+    if (next != NULL)
     {
-        CONTAINER_OF(next, struct thread_t, tie.event)->flags.state = READY;
+        CONTAINER_OF(next, struct thread_t, tie.event)->state = READY;
 
         push_ref(&runqueue, next);
 
@@ -46,7 +47,7 @@ struct thread_t *_k_scheduler(void)
 #endif
 
     }
-    else if (k_thread.current->flags.state == WAITING)
+    else if (k_thread.current->state == WAITING)
     {
 
 #if KERNEL_SCHEDULER_DEBUG
@@ -101,15 +102,18 @@ void _k_system_shift(void)
 // todo k_sleep(FOREVER) -> remov thread from queue only
 void k_sleep(k_timeout_t timeout)
 {
-    if (timeout.value != 0)
-    {
+    if (timeout.value != K_NO_WAIT.value)
+    {        
         cli();
 
-        k_thread.current->flags.state = WAITING;
+        k_thread.current->state = WAITING;
         
         pop_ref(&runqueue);
-        
-        tqueue_schedule(&events_queue, &k_thread.current->tie.event, timeout.value);
+
+        if(timeout.value != K_FOREVER.value)
+        {
+            tqueue_schedule(&events_queue, &k_thread.current->tie.event, timeout.value);
+        }
      
         k_yield();
 

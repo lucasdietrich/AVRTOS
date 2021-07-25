@@ -35,15 +35,7 @@ extern "C" {
  */
 typedef void (*thread_entry_t)(void*);
 
-struct thread_state
-{
-    uint8_t state: 2;
-    uint8_t coop: 1;
-    uint8_t priority : 5;
-} ;
-
 enum thread_state_t { STOPPED = 0, RUNNING = 1, READY = 2, WAITING = 3 };
-enum thread_type_t { PREEMPT = 0, COOP = 1 };
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -64,8 +56,15 @@ struct thread_t
         struct ditem runqueue;
         struct titem event;
     } tie;
-    struct thread_state flags;
-    int8_t priority;
+    union {
+        struct
+        {
+            uint8_t state : 2;
+            uint8_t coop : 1;
+            uint8_t priority : 2;
+        };
+        uint8_t flags;
+    };
     struct
     {
         void *end;
@@ -80,7 +79,6 @@ struct thread_t
  * - current : this pointer refers to the current thread at any time
  * - list : gather all the pointers to all the threads structures
  * - count : current count of threads
- * - current_idx : index of the current thread in the list
  * 
  * This structure is 4B + 2B*THREAD_MAX long
  */
@@ -90,7 +88,6 @@ struct k_thread_meta
     struct thread_t *current;                  // used in multithreading.asm (when saving current thread context)
     struct thread_t *list[K_THREAD_MAX_COUNT]; // the first thread defined in the structure is the "main" thread
     uint8_t count;
-    uint8_t current_idx;
 };
 
 /**

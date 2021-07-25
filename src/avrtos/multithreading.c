@@ -12,10 +12,10 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 struct thread_t k_thread_main = {
     .sp = NULL,
-    // .state = RUNNING,
-    .tie = {{&k_thread_main.tie.runqueue, &k_thread_main.tie.runqueue}},
-    .flags = {RUNNING, PREEMPT, 8},
-    .priority = THREAD_MAIN_THREAD_PRIORITY,
+    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next  = &k_thread_main.tie.runqueue}},
+    {
+        .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
+    },
     .stack = {
         .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
         .size = THREAD_MAIN_STACK_SIZE,
@@ -28,11 +28,10 @@ struct thread_t k_thread_main = {
 
 struct thread_t k_thread_main = {
     .sp = NULL,
-    // .state = RUNNING,
-    .tie = {{&k_thread_main.tie.runqueue, &k_thread_main.tie.runqueue}},
-    .flags = {RUNNING, PREEMPT, 8},
-    .runqueue = {NULL, NULL},
-    .priority = THREAD_MAIN_THREAD_PRIORITY,
+    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next = &k_thread_main.tie.runqueue}},
+    {
+        .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
+    },
     .stack = {
         .end = (void*) RAMEND,
         .size = 0,
@@ -45,11 +44,10 @@ struct thread_t k_thread_main = {
 
 struct k_thread_meta k_thread = {
     &k_thread_main,     // current thread is main
-    .list = {
+    .list = {           // TODO remove this list, and stack all thread in the same ld section (compilation/runtime declaration)
         &k_thread_main  // only known thread is main
     },
     .count = 1u,        // one known thread
-    .current_idx = 0u,
 };
 
 /*___________________________________________________________________________*/
@@ -66,7 +64,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
     sp -= 1u;
 
     // push r0 > r23 (24 registers)
-    for(uint_fast8_t i = 0u; i < 24u; i++)
+    for(uint_fast8_t i = 0u; i < 8u; i++)
     {
         *sp-- = 0u;
     }
@@ -77,7 +75,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
     sp -= 1u;
 
     // push r26 > r31 (6 registers)
-    for (uint_fast8_t i = 0u; i < 6u; i++)
+    for (uint_fast8_t i = 0u; i < 22u; i++)
     {
         *sp-- = 0u;
     }
@@ -109,10 +107,9 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
     _k_thread_stack_create(th, entry, th->stack.end, context_p);
 
     th->stack.size = stack_size;
-    th->priority = priority;
     th->local_storage = local_storage;
-    // th->state = READY;
-    // th->pending = {0, 0};
+    th->state = READY;
+    th->priority = priority;
 
     return 0;
 }

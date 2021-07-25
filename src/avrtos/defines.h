@@ -20,14 +20,8 @@
 // This find is include from asm files, make it compatible with ASM or user "#if !__ASSEMBLER__" preprocessor
 // put all c specific definition in the following file
 
+#include "common.h"
 #include "definesc.h"
-
-/*___________________________________________________________________________*/
-
-#define K_PRIO_PREEMPT(p)           (p)
-#define K_PRIO_COOP(p)              (-p)
-#define K_PRIO_DEFAULT              K_PRIO_PREEMPT(8)
-#define K_STOPPED                   0
 
 /*___________________________________________________________________________*/
 
@@ -132,12 +126,6 @@
 #define KERNEL_TIME_SLICE DEFAULT_KERNEL_TIME_SLICE
 #endif
 
-#define SYSCLOCK_PRESCALER_1        ((1 << CS00) | (0 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_8        ((0 << CS00) | (1 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_64       ((1 << CS00) | (1 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_256      ((0 << CS00) | (0 << CS01) |  (1 << CS02))
-#define SYSCLOCK_PRESCALER_1024     ((1 << CS00) | (0 << CS01) |  (1 << CS02))
-
 #if KERNEL_TIME_SLICE == 1
 // 62.5
 #define KERNEL_SYSCLOCK_TIMER0_TCNT0 63 
@@ -189,12 +177,6 @@
 
 /*___________________________________________________________________________*/
 
-#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n)&0xFF)) << 8) | (((uint16_t)(n)&0xFF00) >> 8))
-
-#define MIN(a, b) ((a < b) ? (a) : (b))
-#define MAX(a, b) ((a > b) ? (a) : (b))
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-
 // 32 registers (32) + SREG (1) + return address (2)
 #define K_THREAD_STACK_VOID_SIZE 35
 #define K_THREAD_STACK_MIN_SIZE K_THREAD_STACK_VOID_SIZE
@@ -221,9 +203,9 @@
         struct                                                   \
         {                                                        \
             uint8_t sreg;                                        \
-            uint8_t r25_r27r30r31r1_r16r28r29[22u];                            \
+            uint8_t r25_r27r30r31r1_r16r28r29[22u];              \
             void *context;                                       \
-            uint8_t r17r0r18_r23[8u];                                  \
+            uint8_t r17r0r18_r23[8u];                            \
             void *ret_addr;                                      \
         } base;                                                  \
     } _k_stack_buf_##name = {                                    \
@@ -238,9 +220,9 @@
     struct                                               \
     {                                                    \
         uint8_t sreg;                                    \
-        uint8_t r25_r27r30r31r1_r16r28r29[22u];                              \
+        uint8_t r25_r27r30r31r1_r16r28r29[22u];          \
         void *context;                                   \
-        uint8_t r17r0r18_r23[8u];                              \
+        uint8_t r17r0r18_r23[8u];                        \
         void *ret_addr;                                  \
     } _k_stack_buf_##name = {                            \
         THREAD_DEFAULT_SREG,                             \
@@ -249,23 +231,24 @@
         {0x00},                                          \
         (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}
 
-#define _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p, sym)                                   \
+#define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, sym)                           \
     thread_t name = {                                                                                       \
         .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                         \
-        .tie = {{NULL, NULL}},                                                                              \
-        .flags = {READY, PREEMPT, 8},                                                                       \
-        .priority = prio,                                                                                   \
+        .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                  \
+        {                                                                                                   \
+            .flags = K_FLAG_READY | prio_flags,                                                                            \
+        },                                                                                                  \
         .stack = {.end = (void *)K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                           \
         .symbol = sym}
 
-#define K_THREAD_DEFINE(name, entry, stack_size, prio, context_p, local_storage_p, symbol)         \
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, local_storage_p, symbol)         \
     __attribute__((used)) static _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, stack_size, prio, local_storage_p, symbol);
+    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, symbol);
 
-#define K_THREAD_MINSTACK_DEFINE(name, entry, prio, context_p, local_storage_p, symbol)    \
+#define K_THREAD_MINSTACK_DEFINE(name, entry, prio_flags, context_p, local_storage_p, symbol)    \
     __attribute__((used)) static _K_STACK_MIN_INITIALIZER(name, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, K_THREAD_STACK_VOID_SIZE, prio, local_storage_p, symbol);
+    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, K_THREAD_STACK_VOID_SIZE, prio_flags, local_storage_p, symbol);
 
 /*___________________________________________________________________________*/
 

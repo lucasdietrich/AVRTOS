@@ -42,23 +42,17 @@ void k_thread_dump(struct thread_t *th)
 {
     usart_transmit('[');
 
-    if (th->priority == 0)
+    if (th->coop)
     {
-        usart_print("None");
+        usart_print("COOP ");
     }
     else
     {
-        if (th->priority < 0)
-        {
-            usart_print("COOP ");
-        }
-        else
-        {
-            usart_print("PREE ");
-        }
-
-        usart_s8(th->priority);
+        usart_print("PREE ");
     }
+
+    usart_s8(th->priority);
+
     usart_print("] ");
 
     __attribute__((used)) static const char strings[4][8] PROGMEM = {
@@ -68,7 +62,7 @@ void k_thread_dump(struct thread_t *th)
         "RUNNING"
     };
 
-    // usart_print_p(strings[th->state]);
+    usart_print_p(strings[th->state]);
 
     usart_print(" : SP ");
 
