@@ -16,14 +16,19 @@ void k_yield(void)
     _k_yield();
 }
 
-void _k_scheduler_init(void)
+extern struct thread_t __k_threads_start;
+extern struct thread_t __data_end;
+
+void _k_kernel_init(void)
 {
+    k_thread.count = &__data_end - &__k_threads_start;
+
     // main thread is the first running (ready or not)
     for (uint8_t i = 1; i < k_thread.count; i++)
     {
-        if (k_thread.list[i]->state == READY) // only queue ready threads
+        if (k_thread.list[i].state == READY) // only queue ready threads
         {
-            dlist_queue(runqueue, &k_thread.list[i]->tie.runqueue);
+            dlist_queue(runqueue, &k_thread.list[i].tie.runqueue);
         }
     }
 }

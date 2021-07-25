@@ -81,9 +81,10 @@ void k_thread_dump_all(void)
 
     for (uint_fast8_t i = 0; i < k_thread.count; i++) // k_thread.count
     {
-        k_thread_dump(k_thread.list[i]);
+        k_thread_dump(&k_thread.list[i]);
     }
 }
+
 
 void *k_thread_get_return_addr(struct thread_t *th)
 {

@@ -26,8 +26,6 @@ int main(void)
 {
   led_init();
   usart_init();
-
-  usart_printl("strart");
   
   k_thread_dump_all();
 

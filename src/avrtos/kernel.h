@@ -10,7 +10,7 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-void _k_scheduler_init(void);
+void _k_kernel_init(void);
 
 void k_queue(struct thread_t *th);
 

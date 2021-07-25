@@ -34,13 +34,13 @@
 #include "avrtos/misc/uart.h"
 #include "avrtos/misc/led.h"
 
-#include "avrtos/multithreading.h"
+#include "avrtos/kernel.h"
 
 /*___________________________________________________________________________*/
 
 void thread_led(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, nullptr, nullptr);
+K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, nullptr, nullptr, 'O');
 
 /*___________________________________________________________________________*/
 

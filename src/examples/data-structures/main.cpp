@@ -25,17 +25,17 @@ int main(void)
 {
   usart_init();
   
-  // usart_printl("queue");
-  // test_queue();
+  usart_printl("queue");
+  test_queue();
 
-  // usart_printl("ref dlist");
-  // test_ref_dlist();
+  usart_printl("ref dlist");
+  test_ref_dlist();
 
-  // usart_printl("unret dlist");
-  // test_unreft_dlist();
+  usart_printl("unret dlist");
+  test_unreft_dlist();
 
-  // usart_printl("tqueue");
-  // test_tqueue();
+  usart_printl("tqueue");
+  test_tqueue();
 
   usart_printl("scheduler");
   test_scheduler();

@@ -84,8 +84,8 @@ struct thread_t
 // current must be the first element of the structure (@see multithreading.asm)
 struct k_thread_meta
 {
-    struct thread_t *current;                  // used in multithreading.asm (when saving current thread context)
-    struct thread_t *list[K_THREAD_MAX_COUNT]; // the first thread defined in the structure is the "main" thread
+    struct thread_t *current;
+    struct thread_t *list;
     uint8_t count;
 };
 
@@ -128,19 +128,6 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
  */
 void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack, void *const context_p);
 
-/**
- * @brief Register a thread that has been defined at compilation time
- * - thread structure must be entirely defined
- * - stack must be entirely defined
- * 
- * This function must be called only if the thread have been defined at compilation time using the K_THREAD_DEFINE macro
- * 
- * @param th thread structure pointer
- * 
- * @return int : 0 if success else (<0) error code
- */
-int k_thread_register(struct thread_t *const th);
-
 /*___________________________________________________________________________*/
 
 /**
@@ -158,10 +145,6 @@ struct thread_t * k_thread_current(void);
 void * k_thread_local_storage(void);
 
 /*___________________________________________________________________________*/
-
- __attribute__((used, naked, section(".init2"))) void _k_threads_register(void);
-
- /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

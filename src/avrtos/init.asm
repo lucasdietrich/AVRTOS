@@ -37,6 +37,7 @@
     ldi r17, 1 << RXCIE0
     sts UCSR0B, r17
 #endif
-    call _k_scheduler_init
+
+    call _k_kernel_init
 
 /*___________________________________________________________________________*/

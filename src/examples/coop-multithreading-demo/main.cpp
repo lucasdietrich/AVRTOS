@@ -22,17 +22,16 @@ uint8_t off = 0u;
 void thread_led(void *p);
 void thread_monitor(void *p);
 
-#define THREAD_PREPROCESSOR 1
+#define THREAD_PREPROCESSOR 0
 
 #if THREAD_PREPROCESSOR
 K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, nullptr, 'O');
 K_THREAD_DEFINE(ledoff, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&off, nullptr, 'F');
 K_THREAD_DEFINE(monitor, thread_monitor, 0x100, K_PRIO_DEFAULT, nullptr, nullptr, 'R');
 #else
-
-static thread_t O;
-static thread_t F;
-static thread_t R;
+K_THREAD static thread_t O;
+K_THREAD static thread_t F;
+K_THREAD static thread_t R;
 
 static char stack1[0x100u];
 static char stack2[0x100u];
@@ -45,8 +44,7 @@ int main(void)
 {
   led_init();
   usart_init();
-
-  print_runqueue();
+ 
 
 #if !THREAD_PREPROCESSOR
   O.symbol = 'O';
@@ -57,6 +55,8 @@ int main(void)
   k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr);
   k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr);
 #endif
+
+  print_runqueue();
 
   // USART_DUMP_RAM_ALL();
   k_thread_dump_all();

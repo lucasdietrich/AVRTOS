@@ -12,7 +12,7 @@ extern int main(void);
 
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
-struct thread_t k_thread_main = {
+K_THREAD struct thread_t k_thread_main = {
     .sp = NULL,
     .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next  = &k_thread_main.tie.runqueue}},
     {
@@ -28,7 +28,7 @@ struct thread_t k_thread_main = {
 
 #else
 
-struct thread_t k_thread_main = {
+K_THREAD struct thread_t k_thread_main = {
     .sp = NULL,
     .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next = &k_thread_main.tie.runqueue}},
     {
@@ -44,12 +44,13 @@ struct thread_t k_thread_main = {
 
 #endif
 
+extern struct thread_t __k_threads_start;
+
+// remove this structure, only keep current variable
 struct k_thread_meta k_thread = {
-    &k_thread_main,     // current thread is main
-    .list = {           // TODO remove this list, and stack all thread in the same ld section (compilation/runtime declaration)
-        &k_thread_main  // only known thread is main
-    },
-    .count = 1u,        // one known thread
+    .current = &k_thread_main,
+    .list = &__k_threads_start,
+    .count = 1
 };
 
 /*___________________________________________________________________________*/
@@ -93,17 +94,11 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
 
 int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
 {
-    if (k_thread.count >= K_THREAD_MAX_COUNT)
-    {
-        return -1;
-    }
-
     if (stack_size < K_THREAD_STACK_MIN_SIZE)
     {
         return -1; // TODO return error
     }
 
-    k_thread.list[k_thread.count++] = th;
     th->stack.end = (void*) K_STACK_END(stack, stack_size);
 
     _k_thread_stack_create(th, entry, th->stack.end, context_p);
@@ -116,34 +111,6 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
     k_queue(th);
 
     return 0;
-}
-
-int k_thread_register(struct thread_t *const th)
-{
-    uint8_t i;
-
-    for(i = 0; i < k_thread.count; i++)
-    {
-        if (th == k_thread.list[i])
-        {
-            return 0; // ok (already registerd)
-        }
-    }
-
-    // thread_t not found
-    if (i < K_THREAD_MAX_COUNT)
-    {
-        k_thread.list[k_thread.count++] = th;  // we add it
-
-        k_queue(th);
-
-        return 0;
-    }
-    else
-    {
-        return -1;  // nok, no more space to register the thread
-    }
-
 }
 
 /*___________________________________________________________________________*/
@@ -159,23 +126,4 @@ inline struct thread_t * k_thread_current(void)
 inline void * k_thread_local_storage(void)
 {
     return k_thread_current()->local_storage;
-}
-
-/*___________________________________________________________________________*/
-
-extern struct thread_t __k_threads_start;
-extern uint8_t __data_end;
-
-// naked remove "ret" instruction, compile as pure instructions
-
-/**
- * @brief This function is called when system starts up, only first (K_THREAD_MAX_COUNT - 1) threads will be registeres 
- */
- __attribute__((used, naked, section(".init5"))) void _k_threads_register(void) 
-{
-    uint8_t i = 0;
-    while ((uint16_t) &(&__k_threads_start)[i] < (uint16_t) &__data_end)
-    {
-        k_thread.list[k_thread.count++] = &(&__k_threads_start)[i++];
-    }
 }
