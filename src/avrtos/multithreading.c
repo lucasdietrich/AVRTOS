@@ -2,6 +2,8 @@
 
 #include "multithreading.h"
 
+#include "kernel.h"
+
 /*___________________________________________________________________________*/
 
 extern int main(void);
@@ -111,6 +113,8 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
     th->state = READY;
     th->priority = priority;
 
+    k_queue(th);
+
     return 0;
 }
 
@@ -131,7 +135,7 @@ int k_thread_register(struct thread_t *const th)
     {
         k_thread.list[k_thread.count++] = th;  // we add it
 
-        // TODO add thread to running queue
+        k_queue(th);
 
         return 0;
     }

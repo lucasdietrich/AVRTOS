@@ -7,7 +7,7 @@
 #include "avrtos/misc/uart.h"
 #include "avrtos/misc/led.h"
 
-#include "avrtos/multithreading.h"
+#include "avrtos/kernel.h"
 #include "avrtos/debug.h"
 
 /*___________________________________________________________________________*/

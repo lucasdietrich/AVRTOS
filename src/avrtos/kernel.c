@@ -1,11 +1,15 @@
 #include "kernel.h"
-#include "multithreading.h"
 
 /*___________________________________________________________________________*/
 
 static struct ditem *runqueue = &k_thread_main.tie.runqueue; 
 
 static struct titem *events_queue = NULL;
+
+void k_queue(struct thread_t *th)
+{
+    push_back(runqueue, &th->tie.runqueue);
+}
 
 void k_yield(void)
 {

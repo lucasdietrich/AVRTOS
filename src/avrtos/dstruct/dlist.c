@@ -101,12 +101,12 @@ struct ditem * ref_forward_tail(struct ditem **ref)
 
 void dlist_queue(struct ditem *ref, struct ditem * item)
 {
-    return push_front(ref, item);
+    return push_back(ref, item);
 }
 
 struct ditem * dlist_dequeue(struct ditem *ref)
 {
-    return pop_back(ref);
+    return pop_front(ref);
 }
 
 /*___________________________________________________________________________*/

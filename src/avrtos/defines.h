@@ -196,6 +196,8 @@
 
 #define _K_STACK_INIT_SP_FROM_NAME(name, stack_size) _K_STACK_INIT_SP(K_STACK_END(_K_THREAD_STACK_START(name), stack_size))
 
+#define K_THREAD        __attribute__((used, section(".k_threads"))) static
+
 #define _K_STACK_INITIALIZER(name, stack_size, entry, context_p) \
     struct                                                       \
     {                                                            \

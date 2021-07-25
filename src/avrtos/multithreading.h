@@ -10,7 +10,6 @@
 #include <stddef.h>
 
 #include "defines.h"
-#include "kernel.h"
 #include "dstruct/queue.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"

@@ -305,19 +305,17 @@ _k_thread_stack_create:
     st -X, r23 ; SPH
 
     ; push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
-    ; r0 > r23 (24 registers)
     ldi r28, 0x00
-    ldi r29, 24
+    ldi r29, 8
     dec r29
     st -X, r28
     brne .-6
 
     ; void * context ~ push r24 > r25
-    st -X, r19
     st -X, r18
+    st -X, r19
 
-    ; push r26 > r31 (6 registers)
-    ldi r29, 6
+    ldi r29, 22
     dec r29
     st -X, r28
     brne .-6

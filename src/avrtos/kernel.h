@@ -12,6 +12,8 @@ extern "C" {
 
 void _k_scheduler_init(void);
 
+void k_queue(struct thread_t *th);
+
 /**
  * @brief Choice the next thread to be executed
  * 
@@ -20,8 +22,6 @@ void _k_scheduler_init(void);
  * @return struct thread_t* : next thread to be executed
  */
 struct thread_t *_k_scheduler(void);
-
-#include "avrtos/dstruct/dlist.h"
 
 void _thread_symbol(struct ditem * item);
 

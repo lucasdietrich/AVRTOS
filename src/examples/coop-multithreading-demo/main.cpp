@@ -11,11 +11,8 @@
 #include "avrtos/misc/led.h"
 #include "avrtos/misc/utils.h"
 
-#include "avrtos/multithreading.h"
+#include "avrtos/kernel.h"
 #include "avrtos/debug.h"
-#include "avrtos/mutex.h"
-#include "avrtos/semaphore.h"
-
 
 /*___________________________________________________________________________*/
 
@@ -32,9 +29,10 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, nullptr, 
 K_THREAD_DEFINE(ledoff, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&off, nullptr, 'F');
 K_THREAD_DEFINE(monitor, thread_monitor, 0x100, K_PRIO_DEFAULT, nullptr, nullptr, 'R');
 #else
-static thread_t A;
-static thread_t B;
-static thread_t C;
+
+static thread_t O;
+static thread_t F;
+static thread_t R;
 
 static char stack1[0x100u];
 static char stack2[0x100u];
@@ -48,10 +46,16 @@ int main(void)
   led_init();
   usart_init();
 
+  print_runqueue();
+
 #if !THREAD_PREPROCESSOR
-  k_thread_create(&A, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, nullptr);
-  k_thread_create(&B, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr);
-  k_thread_create(&C, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr);
+  O.symbol = 'O';
+  F.symbol = 'F';
+  R.symbol = 'R';
+  
+  k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, nullptr);
+  k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr);
+  k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr);
 #endif
 
   // USART_DUMP_RAM_ALL();
