@@ -25,6 +25,10 @@ struct thread_t *_k_scheduler(void);
 
 void _thread_symbol(struct ditem * item);
 
+void _thread_symbol_e(struct titem * item);
+
+void print_events_queue(void);
+
 void print_runqueue(void);
 
 /**
@@ -48,6 +52,10 @@ void _k_system_shift(void);
 void k_sleep(k_timeout_t timeout);
 
 void k_cpu_idle(void);
+
+/*___________________________________________________________________________*/
+
+uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
 
 /*___________________________________________________________________________*/
 

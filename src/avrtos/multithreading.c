@@ -14,10 +14,11 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 K_THREAD struct thread_t k_thread_main = {
     .sp = NULL,
-    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next  = &k_thread_main.tie.runqueue}},
     {
         .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
     },
+    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next  = &k_thread_main.tie.runqueue}},
+    .wmutex = {NULL},
     .stack = {
         .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
         .size = THREAD_MAIN_STACK_SIZE,
@@ -30,10 +31,11 @@ K_THREAD struct thread_t k_thread_main = {
 
 K_THREAD struct thread_t k_thread_main = {
     .sp = NULL,
-    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next = &k_thread_main.tie.runqueue}},
     {
         .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
     },
+    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next = &k_thread_main.tie.runqueue}},
+    .wmutex = {NULL},
     .stack = {
         .end = (void*) RAMEND,
         .size = 0,

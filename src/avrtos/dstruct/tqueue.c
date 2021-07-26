@@ -85,4 +85,19 @@ struct titem * tqueue_pop(struct titem **root)
     return item;
 }
 
+void tqueue_remove(struct titem **root, struct titem *item)
+{
+    struct titem **prev_next_p = root;
+    while (*prev_next_p != NULL)
+    {
+        struct titem * p_current = *prev_next_p;
+        if (p_current == item)
+        {
+            *prev_next_p = p_current->next;
+            break;
+        }
+        prev_next_p = &(p_current->next);
+    }
+}
+
 /*___________________________________________________________________________*/

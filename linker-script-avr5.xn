@@ -175,9 +175,14 @@ SECTIONS
     *(.gnu.linkonce.r*)
     . = ALIGN(2);
      _edata = . ;
-     PROVIDE (__k_threads_start = .);
+    PROVIDE (__k_threads_start = .);
     *(.k_threads)
     KEEP(SORT(*)(.k_threads))
+    PROVIDE (__k_threads_end = .);
+    PROVIDE (__k_mutexes_start = .);
+    *(.k_mutexes)
+    KEEP(SORT(*)(.k_mutexes))
+    PROVIDE (__k_mutexes_end = .);
      PROVIDE (__data_end = .) ;
   }  > data AT> text
   .bss  ADDR(.data) + SIZEOF (.data)   : AT (ADDR (.bss))

@@ -197,6 +197,11 @@
 #define _K_STACK_INIT_SP_FROM_NAME(name, stack_size) _K_STACK_INIT_SP(K_STACK_END(_K_THREAD_STACK_START(name), stack_size))
 
 #define K_THREAD        __attribute__((used, section(".k_threads")))
+#define K_MUTEX         __attribute__((used, section(".k_mutexes")))
+
+#define THREAD_OF_DITEM(item) CONTAINER_OF(item, struct thread_t, tie.runqueue)
+#define THREAD_OF_QITEM(item) CONTAINER_OF(item, struct thread_t, wmutex)
+#define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct thread_t, tie.event)
 
 #define _K_STACK_INITIALIZER(name, stack_size, entry, context_p) \
     struct                                                       \
@@ -236,10 +241,11 @@
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, sym)                           \
     thread_t name = {                                                                                       \
         .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                         \
-        .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                  \
         {                                                                                                   \
-            .flags = K_FLAG_READY | prio_flags,                                                                            \
+            .flags = K_FLAG_READY | prio_flags,                                                             \
         },                                                                                                  \
+        .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                  \
+        .wmutex = {NULL},                                                                                   \
         .stack = {.end = (void *)K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                           \
         .symbol = sym}

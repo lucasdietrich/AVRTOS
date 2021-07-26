@@ -12,13 +12,15 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+#define K_MUTEX_DEFINE(mutex_name) __attribute__((used, section(".k_mutexes"))) static mutex_t mutex_name = { .lock = 0xFFu, .waitqueue = NULL }
+
+/*___________________________________________________________________________*/
+
 // TODO set all mutex at the same RAM location to iter them easily
 
 typedef struct {
     uint8_t lock;
-
-    // TODO, check if the mutex_define caller is the owner of the mutex (for release)
-    // thread_t * ower_id
+    struct qitem *waitqueue;
 } mutex_t;
 
 /**
@@ -41,12 +43,12 @@ uint8_t _mutex_lock(mutex_t *mutex);
 // https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header
 uint8_t mutex_lock(mutex_t *mutex);
 
-uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
-
 /**
  * @brief Release a mutex
  */
 void mutex_release(mutex_t *mutex);
+
+void _mutex_release(mutex_t *mutex);
 
 /*___________________________________________________________________________*/
 

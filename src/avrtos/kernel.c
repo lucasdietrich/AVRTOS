@@ -17,14 +17,16 @@ void k_yield(void)
 }
 
 extern struct thread_t __k_threads_start;
-extern struct thread_t __data_end;
+extern struct thread_t __k_threads_end;
+extern struct mutex_t __k_mutexes_start;
+extern struct mutex_t __k_mutexes_end;
 
 void _k_kernel_init(void)
 {
-    k_thread.count = &__data_end - &__k_threads_start;
+    k_thread.count = &__k_threads_end - &__k_threads_start;
 
     // main thread is the first running (ready or not)
-    for (uint8_t i = 1; i < k_thread.count; i++)
+    for (uint8_t i = 0; i < k_thread.count; i++)
     {
         if (k_thread.list[i].state == READY) // only queue ready threads
         {
@@ -35,7 +37,7 @@ void _k_kernel_init(void)
 
 #include "misc/uart.h"
 
-#define KERNEL_SCHEDULER_DEBUG      0
+#define KERNEL_SCHEDULER_DEBUG      1
 
 // todo write this function in assembly
 // ! mean tqueue item
@@ -47,8 +49,6 @@ struct thread_t *_k_scheduler(void)
     void *next = (struct titem*) tqueue_pop(&events_queue);
     if (next != NULL)
     {
-        CONTAINER_OF(next, struct thread_t, tie.event)->state = READY;
-
         push_ref(&runqueue, next);
 
 #if KERNEL_SCHEDULER_DEBUG
@@ -78,6 +78,8 @@ struct thread_t *_k_scheduler(void)
     _thread_symbol(runqueue);
 #endif
 
+    THREAD_OF_TITEM(runqueue)->state = READY;
+
     return k_thread.current = CONTAINER_OF(runqueue, struct thread_t, tie);
 }
 
@@ -88,15 +90,24 @@ void _thread_symbol(struct ditem * item)
     usart_transmit(CONTAINER_OF(item, struct thread_t, tie.runqueue)->symbol);
 }
 
+void _thread_symbol_e(struct titem * item)
+{
+    usart_transmit(CONTAINER_OF(item, struct thread_t, tie.event)->symbol);
+}
+
 void print_runqueue(void)
 {
     print_dlist(runqueue, _thread_symbol);
 }
 
+void print_events_queue(void)
+{
+    print_tqueue(events_queue, _thread_symbol_e);
+}
+
 void k_cpu_idle(void)
 {
-    // TODO
-    // loop on low power and regularly check scheduler
+    // TODO loop on low power and regularly check scheduler
 }
 
 /*___________________________________________________________________________*/
@@ -112,7 +123,7 @@ void _k_system_shift(void)
 void k_sleep(k_timeout_t timeout)
 {
     if (timeout.value != K_NO_WAIT.value)
-    {        
+    {
         cli();
 
         k_thread.current->state = WAITING;
@@ -131,3 +142,50 @@ void k_sleep(k_timeout_t timeout)
 }
 
 /*___________________________________________________________________________*/
+
+uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
+{
+    uint8_t lock = _mutex_lock(mutex);
+    if ((lock != 0) && (timeout.value != K_NO_WAIT.value))
+    {
+        cli();
+
+        k_thread.current->state = WAITING;
+
+        pop_ref(&runqueue);
+
+        queue(&mutex->waitqueue, &k_thread.current->wmutex);
+
+        if(timeout.value != K_FOREVER.value)
+        {
+            tqueue_schedule(&events_queue, &k_thread.current->tie.event, timeout.value);
+        }
+
+        k_yield();
+
+        lock = _mutex_lock(mutex);
+        sei();
+    }
+    return lock;
+}
+
+void mutex_release(mutex_t *mutex)
+{
+    cli();
+    struct qitem* first_waiting_thread = dequeue(&mutex->waitqueue);
+    if (first_waiting_thread != NULL)
+    {
+        struct thread_t *th = THREAD_OF_QITEM(first_waiting_thread);
+
+        // remove from queue
+        tqueue_remove(&events_queue, &th->tie.event);
+
+        th->wmutex.next = NULL;
+
+        push_front(runqueue, &th->tie.runqueue);
+
+        _thread_symbol(runqueue);
+    }
+    _mutex_release(mutex);
+    sei();
+}

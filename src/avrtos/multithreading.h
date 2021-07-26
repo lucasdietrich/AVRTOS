@@ -52,10 +52,6 @@ struct thread_t
     void *sp;       // keep it at the beginning of the structure
     // enum thread_state_t state;
     union {
-        struct ditem runqueue;
-        struct titem event;
-    } tie;
-    union {
         struct
         {
             uint8_t state : 2;
@@ -64,6 +60,12 @@ struct thread_t
         };
         uint8_t flags;
     };
+    union
+    {
+        struct ditem runqueue;
+        struct titem event;
+    } tie;
+    struct qitem wmutex;
     struct
     {
         void *end;

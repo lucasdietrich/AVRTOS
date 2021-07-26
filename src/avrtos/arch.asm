@@ -105,7 +105,7 @@ check_coop:
     lds r30, k_thread           ; load current thread addr in X
     lds r31, k_thread + 1
 
-    ldd r18, Z+6      ; read flag
+    ldd r18, Z+2      ; read flag
 
     sbrc r18, 2       ; if coop thread don't preempt
     jmp restore_context1

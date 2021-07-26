@@ -32,6 +32,8 @@ void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
 
 struct titem * tqueue_pop(struct titem **root);
 
+void tqueue_remove(struct titem **root, struct titem *item);
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
