@@ -32,8 +32,6 @@ int main(void)
   k_sleep(K_FOREVER);
 }
 
-// still a problem when having preemp interrupt
-
 void thread_led_on(void *p)
 {
   while (1)

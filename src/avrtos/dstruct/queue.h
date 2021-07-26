@@ -18,9 +18,9 @@ struct qitem
 
 /*___________________________________________________________________________*/
 
-void queue(struct qitem ** const p_root, struct qitem *const qitem);
+void queue(struct qitem ** p_root, struct qitem * qitem);
 
-struct qitem * dequeue(struct qitem ** const p_root);
+struct qitem * dequeue(struct qitem ** p_root);
 
 /*___________________________________________________________________________*/
 

@@ -18,6 +18,7 @@ void test_ref_dlist(void);
 void test_unreft_dlist(void);
 void test_tqueue(void);
 void test_scheduler(void);
+void test_mutex(void);
 
 /*___________________________________________________________________________*/
 
@@ -39,6 +40,9 @@ int main(void)
 
   usart_printl("scheduler");
   test_scheduler();
+
+  usart_printl("mutex");
+  test_mutex();
 }
 
 /*___________________________________________________________________________*/
@@ -260,6 +264,22 @@ void test_tqueue(void)
     tqueue_shift(&root, 20);
 
     print_tqueue(root);
+
+    tqueue_remove(&root, &titems[2].tie);
+
+    print_tqueue(root);
+
+    tqueue_remove(&root, &titems[2].tie);
+
+    print_tqueue(root);
+
+    tqueue_remove(&root, &titems[0].tie);
+
+    print_tqueue(root);
+
+    tqueue_remove(&root, &titems[3].tie);
+
+    print_tqueue(root);
 }
 
 /*___________________________________________________________________________*/
@@ -322,6 +342,21 @@ void test_scheduler(void)
   usart_transmit('\n');
 
   print_dlist(runqueue, print_dlist_item);
+}
+
+/*___________________________________________________________________________*/
+
+struct qitem *mutex_ref = NULL;
+
+struct item wthreads[] = {
+  ITEM('M'), ITEM('A'), ITEM('B'), 
+};
+
+void test_mutex(void)
+{
+  queue(&mutex_ref, &wthreads[0].i);
+
+  print_queue(mutex_ref, print_queue_item);  
 }
 
 /*___________________________________________________________________________*/

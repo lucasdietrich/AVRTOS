@@ -2,7 +2,7 @@
 
 /*___________________________________________________________________________*/
 
-void queue(struct qitem ** const p_root, struct qitem *const elem)
+void queue(struct qitem ** p_root, struct qitem * elem)
 {
     struct qitem **p_next = p_root;
     while (*p_next != NULL)
@@ -13,7 +13,7 @@ void queue(struct qitem ** const p_root, struct qitem *const elem)
     *p_next = elem;
 }
 
-struct qitem * dequeue(struct qitem ** const p_root)
+struct qitem * dequeue(struct qitem ** p_root)
 {
     struct qitem *dequeued = *p_root;
     if (dequeued != NULL)
