@@ -34,50 +34,21 @@ int main(void)
   k_thread_dump_all();
 
   print_runqueue();
-  print_events_queue();
-
-  mutex_lock(&mymutex);
 
   sei();
-
-  k_sleep(K_MSEC(5000));
-
-  print_runqueue();
-  print_events_queue();
-
-  mutex_release(&mymutex);
-
-  usart_printl("get back");
-
-  print_runqueue();
 
   k_sleep(K_FOREVER);
 }
 
 void thread_led_on(void *p)
 {
-  while (1)
+  while(1)
   {
-    print_runqueue();
+    mutex_lock_wait(&mymutex, K_FOREVER);
 
-    while (mutex_lock_wait(&mymutex, K_NO_WAIT) != 0)
-    {
-      print_runqueue();
-
-      k_sleep(K_MSEC(3000));
-
-      usart_print("[OWM]");
-
-      _delay_ms(1000);
-    }
-
-    usart_print("[OGM]");
-    
     led_on();
 
-    k_sleep(K_MSEC(2000));
-
-    usart_print("[ORM]");
+    k_sleep(K_MSEC(1000));
 
     mutex_release(&mymutex);
   }
@@ -85,58 +56,22 @@ void thread_led_on(void *p)
 
 void thread_led_off(void *p)
 {
-  if (mutex_lock_wait(&mymutex, K_MSEC(10000)) == 0)
-  {
-    usart_print("[FGM]");
-  }
-  else
-  {
-    usart_print("[FDM]");
-  }
-
   while (1)
   {
-    // if (mutex_lock_wait(&mymutex, K_NO_WAIT) == 0)
-    // {
-    //   usart_print("[F : got mutex]");
+    mutex_lock_wait(&mymutex, K_FOREVER);
 
-    //   k_sleep(K_MSEC(1000));
+    led_off();
 
-    //   mutex_release(&mymutex);
-    // }
-    // else
-    // {
-    //   usart_print("[F : didn't get mutex]");
+    k_sleep(K_MSEC(1000));
 
-    //   k_sleep(K_MSEC(1000));
-    // }
-
-    // while (mutex_lock_wait(&mymutex, K_NO_WAIT) != 0)
-    // {
-    //   k_sleep(K_MSEC(1000));
-
-    //   usart_print("F : WAITING MUTEX");
-    // }
-
-    // usart_print("F : GOT MUTEX");
-    
-    // led_off();
-
-    // k_sleep(K_MSEC(2000));
-
-    // usart_print("F : RELEASE MUTEX");
-
-    // mutex_release(&mymutex);
+    mutex_release(&mymutex);
   }
 }
 
 void thread_idle(void *p)
 {
   while(1) {
-    // print_runqueue();
-    // print_eventqueue();
-
-    usart_print(";");
+    usart_print("S");
     _delay_ms(1000);
   }
 }

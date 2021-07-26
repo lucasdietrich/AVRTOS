@@ -4,12 +4,12 @@
 
 void queue(struct qitem ** p_root, struct qitem * elem)
 {
+    elem->next = NULL;
     struct qitem **p_next = p_root;
     while (*p_next != NULL)
     {
         p_next = &(*p_next)->next;
     }
-    elem->next = NULL;
     *p_next = elem;
 }
 

@@ -57,9 +57,9 @@ void k_thread_dump(struct thread_t *th)
 
     __attribute__((used)) static const char strings[4][8] PROGMEM = {
         "STOPPED",
+        "RUNNING",
         "READY  ",
         "WAITING",
-        "RUNNING"
     };
 
     usart_print_p(strings[th->state]);

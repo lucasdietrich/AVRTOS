@@ -81,6 +81,11 @@
 #define DEFAULT_KERNEL_DEBUG                    0
 
 //
+// Enable Kernel Debug in scheduler
+//
+#define DEFAULT_KERNEL_SCHEDULER_DEBUG          0
+
+//
 // enable preemtive threads feature
 //
 #define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
@@ -89,7 +94,7 @@
 // Time slice in milliseconds
 // TODO, use 100µs as base unit
 //
-#define DEFAULT_KERNEL_TIME_SLICE               15
+#define DEFAULT_KERNEL_TIME_SLICE               1
 
 //
 //  auto start kernel sysclock
@@ -100,6 +105,8 @@
 //  Use uart rx interrupt as preempt signal
 //
 #define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0
+
+
 
 /*___________________________________________________________________________*/
 

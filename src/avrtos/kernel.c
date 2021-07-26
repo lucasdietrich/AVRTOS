@@ -37,7 +37,7 @@ void _k_kernel_init(void)
 
 #include "misc/uart.h"
 
-#define KERNEL_SCHEDULER_DEBUG      1
+#if KERNEL_SCHEDULER_DEBUG
 
 // todo write this function in assembly
 // ! mean tqueue item
@@ -51,17 +51,11 @@ struct thread_t *_k_scheduler(void)
     {
         push_ref(&runqueue, next);
 
-#if KERNEL_SCHEDULER_DEBUG
         usart_transmit('!');
-#endif
-
     }
     else if (k_thread.current->state == WAITING)
     {
-
-#if KERNEL_SCHEDULER_DEBUG
         usart_transmit('~');
-#endif
     }
     else
     {
@@ -69,19 +63,33 @@ struct thread_t *_k_scheduler(void)
         // next = (struct ditem *)ref_requeue_top(&runqueue);
         ref_requeue_top(&runqueue);
 
-#if KERNEL_SCHEDULER_DEBUG
         usart_transmit('>');
-#endif
     }
 
-#if KERNEL_SCHEDULER_DEBUG
     _thread_symbol(runqueue);
-#endif
 
     THREAD_OF_TITEM(runqueue)->state = READY;
 
     return k_thread.current = CONTAINER_OF(runqueue, struct thread_t, tie);
 }
+#else
+struct thread_t *_k_scheduler(void)
+{
+    // print_tqueue(events_queue, _thread_symbol);
+    void *next = (struct titem*) tqueue_pop(&events_queue);
+    if (next != NULL)
+    {
+        push_ref(&runqueue, next);
+    }
+    else if(k_thread.current->state != WAITING)
+    {
+        ref_requeue_top(&runqueue);
+    }
+    THREAD_OF_TITEM(runqueue)->state = READY;
+
+    return k_thread.current = CONTAINER_OF(runqueue, struct thread_t, tie);
+}
+#endif
 
 #include "avrtos/dstruct/debug.h"
 
@@ -163,9 +171,16 @@ uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
 
         k_yield();
 
+#if KERNEL_SCHEDULER_DEBUG
+        usart_transmit('{');
+        _thread_symbol(runqueue);
+#endif
         lock = _mutex_lock(mutex);
         sei();
     }
+#if KERNEL_SCHEDULER_DEBUG
+    usart_transmit('#');
+#endif
     return lock;
 }
 
@@ -173,19 +188,31 @@ void mutex_release(mutex_t *mutex)
 {
     cli();
     struct qitem* first_waiting_thread = dequeue(&mutex->waitqueue);
+    if (first_waiting_thread == NULL)
+    {
+        _mutex_release(mutex);
+    }
     if (first_waiting_thread != NULL)
     {
         struct thread_t *th = THREAD_OF_QITEM(first_waiting_thread);
-
+        
         // remove from queue
         tqueue_remove(&events_queue, &th->tie.event);
+
+        th->state = READY;
 
         th->wmutex.next = NULL;
 
         push_front(runqueue, &th->tie.runqueue);
-
+        
+#if KERNEL_SCHEDULER_DEBUG
+        usart_transmit('{');
         _thread_symbol(runqueue);
+        usart_transmit('*');
+#endif
+        _mutex_release(mutex);
+
+        k_yield();
     }
-    _mutex_release(mutex);
     sei();
 }

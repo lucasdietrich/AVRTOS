@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.asm": "avr",
         "multithreading_debug.h": "c",
         "uart.h": "c",
         "multithreading.h": "c",
@@ -9,6 +10,7 @@
         "mutex.h": "c",
         "pgmspace.h": "c",
         "io.h": "c",
-        "interrupt.h": "c"
+        "interrupt.h": "c",
+        "kernel.h": "c"
     }
 }
