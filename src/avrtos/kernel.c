@@ -2,7 +2,7 @@
 
 /*___________________________________________________________________________*/
 
-struct ditem *runqueue = &k_thread_main.tie.runqueue; 
+struct ditem *runqueue = &_k_thread_main.tie.runqueue; 
 
 struct titem *events_queue = NULL;
 
@@ -21,10 +21,14 @@ void k_yield(void)
 extern struct thread_t __k_threads_start;
 extern struct thread_t __k_threads_end;
 
+uint8_t _k_thread_count;
+
 void _k_kernel_init(void)
 {
+    _k_thread_count = &__k_threads_end - &__k_threads_start;
+
     // main thread is the first running (ready or not)
-    for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++)
+    for (uint8_t i = 0; i < _k_thread_count; i++)
     {
         if ((&__k_threads_start)[i].state == READY) // only queue ready threads
         {

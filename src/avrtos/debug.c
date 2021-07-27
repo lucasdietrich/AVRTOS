@@ -36,9 +36,9 @@ extern struct thread_t __k_threads_end;
 
 void k_thread_dbg_count(void)
 {
-    static const char string_1[] PROGMEM = "THREADS COUNT : &__k_threads_end - &__k_threads_start = ";
+    static const char string_1[] PROGMEM = "THREADS COUNT : _k_thread_count = ";
     usart_print_p(string_1);
-    usart_u8(&__k_threads_end - &__k_threads_start);
+    usart_u8(_k_thread_count);
     usart_transmit('\n');
 }
 
@@ -88,7 +88,7 @@ void k_thread_dump_all(void)
     static const char string_1[] PROGMEM = "===== k_thread =====\n";
     usart_print_p(string_1);
 
-    for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++)
+    for (uint_fast8_t i = 0; i < _k_thread_count; i++)
     {
         k_thread_dump(&(&__k_threads_start)[i]);
     }

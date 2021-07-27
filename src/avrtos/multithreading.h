@@ -81,10 +81,11 @@ struct thread_t
  * 
  * @see struct thread_t
  */
-extern struct thread_t k_thread_main;
-
+extern struct thread_t _k_thread_main;
 
 extern struct thread_t * k_current;
+
+extern uint8_t _k_thread_count;
 
 /*___________________________________________________________________________*/
 

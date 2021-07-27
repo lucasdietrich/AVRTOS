@@ -12,12 +12,12 @@ extern int main(void);
 
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
-K_THREAD struct thread_t k_thread_main = {
+K_THREAD struct thread_t _k_thread_main = {
     .sp = NULL,
     {
         .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
     },
-    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next  = &k_thread_main.tie.runqueue}},
+    .tie = {.runqueue = {.prev = &_k_thread_main.tie.runqueue, .next  = &_k_thread_main.tie.runqueue}},
     .wmutex = {NULL},
     .stack = {
         .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
@@ -29,12 +29,12 @@ K_THREAD struct thread_t k_thread_main = {
 
 #else
 
-K_THREAD struct thread_t k_thread_main = {
+K_THREAD struct thread_t _k_thread_main = {
     .sp = NULL,
     {
         .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
     },
-    .tie = {.runqueue = {.prev = &k_thread_main.tie.runqueue, .next = &k_thread_main.tie.runqueue}},
+    .tie = {.runqueue = {.prev = &_k_thread_main.tie.runqueue, .next = &_k_thread_main.tie.runqueue}},
     .wmutex = {NULL},
     .stack = {
         .end = (void*) RAMEND,
@@ -46,7 +46,7 @@ K_THREAD struct thread_t k_thread_main = {
 
 #endif
 
-struct thread_t * k_current = &k_thread_main;
+struct thread_t * k_current = &_k_thread_main;
 
 
 /*___________________________________________________________________________*/

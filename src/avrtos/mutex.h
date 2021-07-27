@@ -43,6 +43,10 @@ uint8_t _mutex_lock(mutex_t *mutex);
 // https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header
 uint8_t mutex_lock(mutex_t *mutex);
 
+/*___________________________________________________________________________*/
+
+uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
+
 /**
  * @brief Release a mutex
  */
