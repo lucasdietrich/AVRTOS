@@ -75,21 +75,6 @@ struct thread_t
     char symbol;
 };
 
-/**
- * @brief This structure gathers the current threads informations
- * - current : this pointer refers to the current thread at any time
- * - list : gather all the pointers to all the threads structures
- * - count : current count of threads
- * 
- * This structure is 4B + 2B*THREAD_MAX long
- */
-// current must be the first element of the structure (@see multithreading.asm)
-struct k_thread_meta
-{
-    struct thread_t *current;
-    struct thread_t *list;
-    uint8_t count;
-};
 
 /**
  * @brief This is the thread structure representing the main thread
@@ -98,12 +83,8 @@ struct k_thread_meta
  */
 extern struct thread_t k_thread_main;
 
-/**
- * @brief This global variable contains all meta informations about current threads
- * 
- * @see struct k_thread_meta
- */
-extern struct k_thread_meta k_thread;
+
+extern struct thread_t * k_current;
 
 /*___________________________________________________________________________*/
 

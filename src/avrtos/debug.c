@@ -8,6 +8,12 @@
 #include "debug.h"
 #include "dstruct/tqueue.h"
 
+#include "kernel.h"
+
+/*___________________________________________________________________________*/
+
+extern struct ditem *runqueue; 
+extern struct titem *events_queue;
 
 /*___________________________________________________________________________*/
 
@@ -25,11 +31,14 @@ uint16_t k_thread_usage(struct thread_t *th)
     }
 }
 
+extern struct thread_t __k_threads_start;
+extern struct thread_t __k_threads_end;
+
 void k_thread_dbg_count(void)
 {
-    static const char string_1[] PROGMEM = "k_thread.count = ";
+    static const char string_1[] PROGMEM = "THREADS COUNT : &__k_threads_end - &__k_threads_start = ";
     usart_print_p(string_1);
-    usart_u8(k_thread.count);
+    usart_u8(&__k_threads_end - &__k_threads_start);
     usart_transmit('\n');
 }
 
@@ -79,16 +88,16 @@ void k_thread_dump_all(void)
     static const char string_1[] PROGMEM = "===== k_thread =====\n";
     usart_print_p(string_1);
 
-    for (uint_fast8_t i = 0; i < k_thread.count; i++) // k_thread.count
+    for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++)
     {
-        k_thread_dump(&k_thread.list[i]);
+        k_thread_dump(&(&__k_threads_start)[i]);
     }
 }
 
 
 void *k_thread_get_return_addr(struct thread_t *th)
 {
-    if (th == k_thread.current)
+    if (th == k_current)
     {
         uint16_t return_addr_reverted = *((uint16_t *)((uint16_t)th->stack.end - 2u));
 
@@ -99,13 +108,41 @@ void *k_thread_get_return_addr(struct thread_t *th)
 
 int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_t size)
 {
-    if ((th == k_thread.current) && (size >= 16))
+    if ((th == k_current) && (size >= 16))
     {
         memcpy(buffer, (void *)((uint16_t)th->stack.end - 34u), 32u); // -32 (registers) - 2 (return address)
 
         return 0;
     }
     return -1;
+}
+
+
+
+/*___________________________________________________________________________*/
+
+#include "dstruct/dlist.h"
+#include "dstruct/queue.h"
+#include "dstruct/debug.h"
+
+void _thread_symbol_runqueue(struct ditem * item)
+{
+    usart_transmit(CONTAINER_OF(item, struct thread_t, tie.runqueue)->symbol);
+}
+
+void _thread_symbol_events_queue(struct titem * item)
+{
+    usart_transmit(CONTAINER_OF(item, struct thread_t, tie.event)->symbol);
+}
+
+void print_runqueue(void)
+{
+    print_dlist(runqueue, _thread_symbol_runqueue);
+}
+
+void print_events_queue(void)
+{
+    print_tqueue(events_queue, _thread_symbol_e);
 }
 
 /*___________________________________________________________________________*/

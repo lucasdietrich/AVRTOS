@@ -91,7 +91,7 @@ void inthread_setled(void)
 void thread_led(void *p)
 {
   // store context in thread local storage
-  k_thread.current->local_storage = p;
+  k_current->local_storage = p;
 
   while (1)
   {

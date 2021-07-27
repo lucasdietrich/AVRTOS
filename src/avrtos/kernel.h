@@ -23,14 +23,6 @@ void k_queue(struct thread_t *th);
  */
 struct thread_t *_k_scheduler(void);
 
-void _thread_symbol(struct ditem * item);
-
-void _thread_symbol_e(struct titem * item);
-
-void print_events_queue(void);
-
-void print_runqueue(void);
-
 /**
  * @brief Release the CPU
  * 

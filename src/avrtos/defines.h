@@ -3,16 +3,6 @@
 
 /*___________________________________________________________________________*/
 
-// Include user configuration
-
-// CONFIG_THREAD_MAX
-// CONFIG_THREAD_MAIN_THREAD_PRIORITY
-// CONFIG_THREAD_EXPLICIT_MAIN_STACK
-// CONFIG_THREAD_MAIN_STACK_SIZE
-// CONFIG_THREAD_USE_INIT_STACK_ASM
-
-/*___________________________________________________________________________*/
-
 #include "default_config.h"
 
 /*___________________________________________________________________________*/
@@ -21,7 +11,6 @@
 // put all c specific definition in the following file
 
 #include "common.h"
-#include "definesc.h"
 
 /*___________________________________________________________________________*/
 
@@ -184,6 +173,10 @@
 
 /*___________________________________________________________________________*/
 
+#include "definesc.h"
+
+/*___________________________________________________________________________*/
+
 // 32 registers (32) + SREG (1) + return address (2)
 #define K_THREAD_STACK_VOID_SIZE 35
 #define K_THREAD_STACK_MIN_SIZE K_THREAD_STACK_VOID_SIZE
@@ -204,7 +197,6 @@
 #define _K_STACK_INIT_SP_FROM_NAME(name, stack_size) _K_STACK_INIT_SP(K_STACK_END(_K_THREAD_STACK_START(name), stack_size))
 
 #define K_THREAD        __attribute__((used, section(".k_threads")))
-#define K_MUTEX         __attribute__((used, section(".k_mutexes")))
 
 #define THREAD_OF_DITEM(item) CONTAINER_OF(item, struct thread_t, tie.runqueue)
 #define THREAD_OF_QITEM(item) CONTAINER_OF(item, struct thread_t, wmutex)

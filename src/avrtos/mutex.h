@@ -12,7 +12,7 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-#define K_MUTEX_DEFINE(mutex_name) __attribute__((used, section(".k_mutexes"))) static mutex_t mutex_name = { .lock = 0xFFu, .waitqueue = NULL }
+#define K_MUTEX_DEFINE(mutex_name) static mutex_t mutex_name = { .lock = 0xFFu, .waitqueue = NULL }
 
 /*___________________________________________________________________________*/
 

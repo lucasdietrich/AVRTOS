@@ -46,14 +46,8 @@ K_THREAD struct thread_t k_thread_main = {
 
 #endif
 
-extern struct thread_t __k_threads_start;
+struct thread_t * k_current = &k_thread_main;
 
-// remove this structure, only keep current variable
-struct k_thread_meta k_thread = {
-    .current = &k_thread_main,
-    .list = &__k_threads_start,
-    .count = 1
-};
 
 /*___________________________________________________________________________*/
 
@@ -119,7 +113,7 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
 
 inline struct thread_t * k_thread_current(void)
 {
-    return k_thread.current;
+    return k_current;
 }
 
 //
@@ -127,5 +121,5 @@ inline struct thread_t * k_thread_current(void)
 //
 inline void * k_thread_local_storage(void)
 {
-    return k_thread_current()->local_storage;
+    return k_current->local_storage;
 }

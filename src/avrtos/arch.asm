@@ -55,7 +55,7 @@ USART_Continue:
 
 .global _k_yield
 .extern _k_scheduler
-.extern k_thread
+.extern k_current
 
 ; push order
 ; r17 | r0 r18 > r27 r30 r31 | r1 > r16 r28 r29 | SREG
@@ -102,8 +102,8 @@ system_shift:
 
 check_coop:
     ; to use offset of here IF POSSIBLE
-    lds r30, k_thread           ; load current thread addr in X
-    lds r31, k_thread + 1
+    lds ZL, k_current           ; load current thread addr in X
+    lds ZH, k_current + 1
 
     ldd r18, Z+2      ; read flag
 
@@ -172,43 +172,26 @@ save_context2:
     push r17    ; push SREG on stack
 
 save_sp:
-    ; lds r20, SPL
-    ; lds r21, SPH
+    lds r20, SPL
+    lds r21, SPH
 
-    ; lds r28, k_thread          ; load current thread addr in X
-    ; lds r29, k_thread + 1
+    lds r28, k_current          ; load current thread addr in X
+    lds r29, k_current + 1
 
-    ; st Y+, r20       ; write SP in current thread structure
-    ; st Y+, r21
-
-    lds r0, SPL
-    lds r1, SPH
-
-    lds r26, k_thread            ; load current thread addr in X
-    lds r27, k_thread + 1
-
-    st X+, r0   ; write SP in structure
-    st X+, r1
+    st Y+, r20       ; write SP in current thread structure
+    st Y+, r21
 
 scheduler:
     call _k_scheduler 
 
 restore_sp:
-    ; movw r28, r24   ; new current thread structure address is in (r24, r25)
+    movw r28, r24   ; new current thread structure address is in (r24, r25)
 
-    ; ld r20, Y+       ; read sp
-    ; ld r21, Y+
+    ld r20, Y+       ; read sp
+    ld r21, Y+
 
-    ; sts SPL, r20     ; restore stack pointer
-    ; sts SPH, r21
-
-    movw r26, r24
-
-    ld r0, X+
-    ld r1, X+
-
-    sts SPL, r0 ; restore stack pointer
-    sts SPH, r1
+    sts SPL, r20     ; restore stack pointer
+    sts SPH, r21
 
 restore_context2:
     pop r17         

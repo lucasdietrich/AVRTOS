@@ -179,11 +179,7 @@ SECTIONS
     *(.k_threads)
     KEEP(SORT(*)(.k_threads))
     PROVIDE (__k_threads_end = .);
-    PROVIDE (__k_mutexes_start = .);
-    *(.k_mutexes)
-    KEEP(SORT(*)(.k_mutexes))
-    PROVIDE (__k_mutexes_end = .);
-     PROVIDE (__data_end = .) ;
+    PROVIDE (__data_end = .) ;
   }  > data AT> text
   .bss  ADDR(.data) + SIZEOF (.data)   : AT (ADDR (.bss))
   {
