@@ -37,13 +37,15 @@ void _k_yield(void);
 
 void k_yield(void);
 
+void _k_reschedule(k_timeout_t timeout);
+
+void _k_wake_up(struct thread_t *th);
+
 /*___________________________________________________________________________*/
 
 void _k_system_shift(void);
 
 void k_sleep(k_timeout_t timeout);
-
-void k_cpu_idle(void);
 
 /*___________________________________________________________________________*/
 

@@ -3,6 +3,8 @@
 #include "kernel.h"
 #include "debug.h"
 
+#include "debug.h"
+
 extern struct ditem *runqueue; 
 
 extern struct titem *events_queue;
@@ -24,16 +26,9 @@ uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
     {
         cli();
 
-        k_current->state = WAITING;
-
-        pop_ref(&runqueue);
-
         queue(&mutex->waitqueue, &k_current->wmutex);
 
-        if(timeout.value != K_FOREVER.value)
-        {
-            tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
-        }
+        _k_reschedule(timeout);
 
         k_yield();
 

@@ -18,21 +18,49 @@ void k_yield(void)
     _k_yield();
 }
 
+void _k_unschedule()
+{
+    pop_ref(&runqueue);
+}
+
+void _k_reschedule(k_timeout_t timeout)
+{
+    k_current->state = WAITING;
+
+    pop_ref(&runqueue);
+
+    if (timeout.value != K_FOREVER.value)
+    {
+        tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
+    }
+}
+
+// assumptions : thread not in runqueue and if tqueue
+void _k_wake_up(struct thread_t *th)
+{
+    tqueue_remove(&events_queue, &th->tie.event);
+
+    th->state = READY;
+    th->wmutex.next = NULL;
+
+    push_front(runqueue, &th->tie.runqueue);
+}
+
 extern struct thread_t __k_threads_start;
 extern struct thread_t __k_threads_end;
 
-uint8_t _k_thread_count;
+uint8_t _k_thread_count = 1;
 
 void _k_kernel_init(void)
 {
     _k_thread_count = &__k_threads_end - &__k_threads_start;
 
-    // main thread is the first running (ready or not)
+    // main thread is the first running (ready or not), already in queue
     for (uint8_t i = 0; i < _k_thread_count; i++)
     {
         if ((&__k_threads_start)[i].state == READY) // only queue ready threads
         {
-            dlist_queue(runqueue, &(&__k_threads_start)[i].tie.runqueue);
+            k_queue(&(&__k_threads_start)[i]);
         }
     }
 }
@@ -52,9 +80,15 @@ struct thread_t *_k_scheduler(void)
     {
         ref_requeue(&runqueue);
     }
+    // if next thread is idle, we skip it
+    // if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
+    // {
+    //     ref_requeue(&runqueue);
+    // }
+
     THREAD_OF_DITEM(runqueue)->state = READY;
 
-    return k_current = CONTAINER_OF(runqueue, struct thread_t, tie);
+    return k_current = CONTAINER_OF(runqueue, struct thread_t, tie.runqueue);
 }
 
 #else
@@ -89,15 +123,10 @@ struct thread_t *_k_scheduler(void)
 
     THREAD_OF_DITEM(runqueue)->state = READY;
 
-    return k_current = CONTAINER_OF(runqueue, struct thread_t, tie);
+    return k_current = CONTAINER_OF(runqueue, struct thread_t, tie.runqueue);
 }
 #endif
 
-
-void k_cpu_idle(void)
-{
-    // TODO loop on low power and regularly check scheduler
-}
 
 /*___________________________________________________________________________*/
 
@@ -108,23 +137,15 @@ void _k_system_shift(void)
     tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }
 
-// todo k_sleep(FOREVER) -> remov thread from queue only
 void k_sleep(k_timeout_t timeout)
 {
     if (timeout.value != K_NO_WAIT.value)
     {
         cli();
 
-        k_current->state = WAITING;
-        
-        pop_ref(&runqueue);
-
-        if(timeout.value != K_FOREVER.value)
-        {
-            tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
-        }
+        _k_reschedule(timeout);
      
-        k_yield();
+        _k_yield();
 
         sei();
     }
