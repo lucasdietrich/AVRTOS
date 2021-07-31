@@ -77,7 +77,7 @@ void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)
 struct titem * tqueue_pop(struct titem **root)
 {
     struct titem * item = NULL;
-    if ((root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
+    if ((*root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
     {
         item = *root;    // prepare to return it
         *root = (*root)->next;
