@@ -1,6 +1,7 @@
 #include "mutex.h"
 
 #include "kernel.h"
+#include "debug.h"
 
 extern struct ditem *runqueue; 
 
@@ -38,7 +39,7 @@ uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
 
 #if KERNEL_SCHEDULER_DEBUG
         usart_transmit('{');
-        _thread_symbol(runqueue);
+        _thread_symbol_runqueue(runqueue);
 #endif
         lock = _mutex_lock(mutex);
         sei();
@@ -72,7 +73,7 @@ void mutex_release(mutex_t *mutex)
         
 #if KERNEL_SCHEDULER_DEBUG
         usart_transmit('{');
-        _thread_symbol(runqueue);
+        _thread_symbol_runqueue(runqueue);
         usart_transmit('*');
 #endif
         _mutex_release(mutex);

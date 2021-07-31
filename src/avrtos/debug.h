@@ -134,9 +134,9 @@ uint8_t read_sreg(void);
 
 /*___________________________________________________________________________*/
 
-void _thread_symbol(struct ditem * item);
+void _thread_symbol_runqueue(struct ditem * item);
 
-void _thread_symbol_e(struct titem * item);
+void _thread_symbol_events_queue(struct titem * item);
 
 void print_events_queue(void);
 

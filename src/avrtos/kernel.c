@@ -39,7 +39,7 @@ void _k_kernel_init(void)
 
 
 
-#if !KERNEL_SCHEDULER_DEBUG
+#if KERNEL_SCHEDULER_DEBUG == 0
 
 struct thread_t *_k_scheduler(void)
 {
@@ -52,7 +52,7 @@ struct thread_t *_k_scheduler(void)
     {
         ref_requeue_top(&runqueue);
     }
-    THREAD_OF_TITEM(runqueue)->state = READY;
+    THREAD_OF_DITEM(runqueue)->state = READY;
 
     return k_current = CONTAINER_OF(runqueue, struct thread_t, tie);
 }
@@ -60,6 +60,7 @@ struct thread_t *_k_scheduler(void)
 #else
 
 #include "misc/uart.h"
+#include "debug.h"
 
 // todo write this function in assembly
 // ! mean tqueue item
@@ -88,9 +89,9 @@ struct thread_t *_k_scheduler(void)
         usart_transmit('>');
     }
 
-    _thread_symbol(runqueue);
+    _thread_symbol_runqueue(runqueue);
 
-    THREAD_OF_TITEM(runqueue)->state = READY;
+    THREAD_OF_DITEM(runqueue)->state = READY;
 
     return k_current = CONTAINER_OF(runqueue, struct thread_t, tie);
 }

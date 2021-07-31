@@ -171,6 +171,15 @@
 
 #endif
 
+// idle thread
+// only if preemptive
+#ifdef CONFIG_KERNEL_THREAD_IDLE
+#define KERNEL_THREAD_IDLE CONFIG_KERNEL_THREAD_IDLE
+#else
+#define KERNEL_THREAD_IDLE DEFAULT_KERNEL_THREAD_IDLE
+#endif
+
+
 /*___________________________________________________________________________*/
 
 #include "definesc.h"
@@ -238,24 +247,24 @@
         (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, sym)                           \
-    thread_t name = {                                                                                       \
+    struct thread_t name = {                                                                                       \
         .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                         \
         {                                                                                                   \
             .flags = K_FLAG_READY | prio_flags,                                                             \
         },                                                                                                  \
         .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                  \
-        .wmutex = {NULL},                                                                                   \
+        .wmutex = {.next = NULL},                                                                                   \
         .stack = {.end = (void *)K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                           \
         .symbol = sym}
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, local_storage_p, symbol)         \
-    __attribute__((used)) static _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, symbol);
+    __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, symbol);
 
 #define K_THREAD_MINSTACK_DEFINE(name, entry, prio_flags, context_p, local_storage_p, symbol)    \
-    __attribute__((used)) static _K_STACK_MIN_INITIALIZER(name, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) static _K_THREAD_INITIALIZER(name, K_THREAD_STACK_VOID_SIZE, prio_flags, local_storage_p, symbol);
+    __attribute__((used)) _K_STACK_MIN_INITIALIZER(name, entry, context_p); \
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, K_THREAD_STACK_VOID_SIZE, prio_flags, local_storage_p, symbol);
 
 /*___________________________________________________________________________*/
 

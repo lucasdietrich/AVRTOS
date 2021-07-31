@@ -142,7 +142,7 @@ void print_runqueue(void)
 
 void print_events_queue(void)
 {
-    print_tqueue(events_queue, _thread_symbol_e);
+    print_tqueue(events_queue, _thread_symbol_events_queue);
 }
 
 /*___________________________________________________________________________*/

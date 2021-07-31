@@ -30,7 +30,7 @@
 //
 // Define the maximum number of threads supported
 //
-#define DEFAULT_THREAD_MAX                      4
+#define DEFAULT_THREAD_MAX                      5
 
 //
 // Define the main thread type (coop/prempt) and priority
@@ -106,7 +106,10 @@
 //
 #define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0
 
-
+//
+// Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting status
+//
+#define DEFAULT_KERNEL_THREAD_IDLE              1
 
 /*___________________________________________________________________________*/
 
