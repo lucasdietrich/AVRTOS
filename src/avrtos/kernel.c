@@ -50,7 +50,7 @@ struct thread_t *_k_scheduler(void)
     }
     else if(k_current->state != WAITING)
     {
-        ref_requeue_top(&runqueue);
+        ref_requeue(&runqueue);
     }
     THREAD_OF_DITEM(runqueue)->state = READY;
 
@@ -73,7 +73,6 @@ struct thread_t *_k_scheduler(void)
     if (next != NULL)
     {
         push_ref(&runqueue, next);
-
         usart_transmit('!');
     }
     else if (k_current->state == WAITING)
@@ -82,10 +81,7 @@ struct thread_t *_k_scheduler(void)
     }
     else
     {
- 
-        // next = (struct ditem *)ref_requeue_top(&runqueue);
-        ref_requeue_top(&runqueue);
-
+        ref_requeue(&runqueue);
         usart_transmit('>');
     }
 

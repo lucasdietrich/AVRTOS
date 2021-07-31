@@ -335,9 +335,9 @@ void test_scheduler(void)
 
   usart_printl("==== REFREQUEUETOP ====");
 
-  next = ref_requeue_top(&runqueue);
+  next = ref_requeue(&runqueue);
 
-  usart_print("ref_requeue_top(&runqueue) = ");
+  usart_print("ref_requeue(&runqueue) = ");
   print_dlist_item(next);
   usart_transmit('\n');
 

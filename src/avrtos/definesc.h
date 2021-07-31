@@ -21,7 +21,7 @@ typedef struct
 #define K_NO_WAIT    ((k_timeout_t){0})
 #define K_FOREVER    ((k_timeout_t){(k_delta_ms_t) -1})
 
-#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n)&0xFF)) << 8) | (((uint16_t)(n)&0xFF00) >> 8))
+#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n) & 0xFF)) << 8) | (((uint16_t)(n) & 0xFF00) >> 8))
 
 #define MIN(a, b) ((a < b) ? (a) : (b))
 #define MAX(a, b) ((a > b) ? (a) : (b))

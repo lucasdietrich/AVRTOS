@@ -25,11 +25,15 @@ void push_back(struct ditem *ref, struct ditem *item);
 
 struct ditem * push_ref(struct ditem **ref, struct ditem *item);
 
+struct ditem * safe_push_ref(struct ditem **ref, struct ditem *item);
+
 struct ditem * pop_front(struct ditem *ref);
 
 struct ditem * pop_back(struct ditem *ref);
 
 struct ditem * pop_ref(struct ditem **ref);
+
+struct ditem * safe_pop_ref(struct ditem **ref);
 
 void dlist_ref(struct ditem *ref);
 
@@ -37,7 +41,7 @@ struct ditem * requeue_top(struct ditem *ref);
 
 struct ditem * forward_tail(struct ditem *ref);
 
-struct ditem * ref_requeue_top(struct ditem **ref);
+struct ditem * ref_requeue(struct ditem **ref);
 
 struct ditem * ref_forward_tail(struct ditem **ref);
 

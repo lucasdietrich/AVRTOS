@@ -49,15 +49,15 @@ void k_thread_dump_hex(struct thread_t *th)
 
 void k_thread_dump(struct thread_t *th)
 {
-    usart_transmit('[');
+    usart_transmit(th->symbol);
 
     if (th->coop)
     {
-        usart_print("COOP ");
+        usart_print(" [COOP ");
     }
     else
     {
-        usart_print("PREE ");
+        usart_print(" [PREE ");
     }
 
     usart_s8(th->priority);

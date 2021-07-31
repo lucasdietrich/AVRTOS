@@ -34,11 +34,29 @@ struct ditem * pop_back(struct ditem *ref)
     return item;
 }
 
-// output ref
 struct ditem * pop_ref(struct ditem **ref)
 {
     *ref = (*ref)->next;
     return pop_back(*ref);
+}
+
+// output ref
+struct ditem * safe_pop_ref(struct ditem **ref)
+{
+    struct ditem *ret = NULL;
+    if (*ref != NULL)
+    {
+        if ((*ref)->next == *ref)
+        {
+            ret = *ref;
+            *ref = NULL;
+        }
+        else
+        {
+            ret = pop_back(*ref);
+        }
+    }
+    return ret;
 }
 
 // ref become item
@@ -46,6 +64,20 @@ struct ditem * push_ref(struct ditem **ref, struct ditem *item)
 {
     push_front(*ref, item);
     return *ref = (*ref)->next;
+}
+
+struct ditem * safe_push_ref(struct ditem **ref, struct ditem *item)
+{
+    if (*ref == NULL)
+    {
+        *ref = item;
+    }
+    else
+    {
+        push_front(*ref, item);
+        *ref = (*ref)->next;
+    }
+    return *ref;
 }
 
 void dlist_ref(struct ditem *ref)
@@ -90,10 +122,12 @@ struct ditem * forward_tail(struct ditem *ref)
     return item;
 }
 
-struct ditem * ref_requeue_top(struct ditem **ref)
+struct ditem * ref_requeue(struct ditem **ref)
 {
     return *ref = (*ref)->next;
 }
+
+
 struct ditem * ref_forward_tail(struct ditem **ref)
 {
     return *ref = (*ref)->prev;
