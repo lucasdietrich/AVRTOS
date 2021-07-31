@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+#include "idle.h"
+
 /*___________________________________________________________________________*/
 
 struct ditem *runqueue = &_k_thread_main.tie.runqueue; 
@@ -80,11 +82,12 @@ struct thread_t *_k_scheduler(void)
     {
         ref_requeue(&runqueue);
     }
-    // if next thread is idle, we skip it
-    // if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
-    // {
-    //     ref_requeue(&runqueue);
-    // }
+
+    // if next thread is idle and there are others threads to be executed, we skip it
+    if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
+    {
+        ref_requeue(&runqueue);
+    }
 
     THREAD_OF_DITEM(runqueue)->state = READY;
 
@@ -117,6 +120,13 @@ struct thread_t *_k_scheduler(void)
     {
         ref_requeue(&runqueue);
         usart_transmit('>');
+    }
+
+    // if next thread is idle and there are others threads to be executed, we skip it
+    if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
+    {
+        usart_print("p");
+        ref_requeue(&runqueue);
     }
 
     _thread_symbol_runqueue(runqueue);

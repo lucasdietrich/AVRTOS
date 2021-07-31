@@ -147,6 +147,7 @@ scheduler_entry:
     ; call scheduler here
     ; check if current thread changed or not
     ; goto cancel_sched of no change
+    ; calling the scheduler here helps to not use too much stack of the current thread when calling the scheduler function
 
 save_context2:
     push r1
