@@ -14,11 +14,9 @@
 
 void thread_led_on(void *p);
 void thread_led_off(void *p);
-void thread_idle(void *p);
 
 K_THREAD_DEFINE(ledon, thread_led_on, 0x120, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'O');
 K_THREAD_DEFINE(ledoff, thread_led_off, 0x140, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'F');
-K_THREAD_DEFINE(idle, thread_idle, 0x160, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'I');
 
 /*___________________________________________________________________________*/
 
@@ -65,14 +63,6 @@ void thread_led_off(void *p)
     k_sleep(K_MSEC(1000));
 
     mutex_release(&mymutex);
-  }
-}
-
-void thread_idle(void *p)
-{
-  while(1) {
-    usart_print("S");
-    _delay_ms(1000);
   }
 }
 

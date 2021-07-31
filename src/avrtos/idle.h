@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+// todo, no keep the idle thread in the runqueue (add it/remove it) when runqueue changes, use runqueue control functions
+
 /*___________________________________________________________________________*/
 
 
