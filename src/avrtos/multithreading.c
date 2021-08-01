@@ -20,7 +20,7 @@ K_THREAD struct thread_t _k_thread_main = {
     .tie = {.runqueue = {.prev = &_k_thread_main.tie.runqueue, .next  = &_k_thread_main.tie.runqueue}},
     .wmutex = {NULL},
     .stack = {
-        .end = (void*) K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
+        .end = (void*) _K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
         .size = THREAD_MAIN_STACK_SIZE,
     },
     .local_storage = NULL,
@@ -97,7 +97,7 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
         return -1; // TODO return error
     }
     
-    th->stack.end = (void*) K_STACK_END(stack, stack_size);
+    th->stack.end = (void*) _K_STACK_END(stack, stack_size);
 
     _k_thread_stack_create(th, entry, th->stack.end, context_p);
 

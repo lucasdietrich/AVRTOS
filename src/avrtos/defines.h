@@ -180,6 +180,18 @@
 #endif
 
 
+#ifdef CONFIG_THREAD_CANARIES
+#define THREAD_CANARIES CONFIG_THREAD_CANARIES
+#else
+#define THREAD_CANARIES DEFAULT_THREAD_CANARIES
+#endif
+
+#ifdef CONFIG_THREAD_CANARIES_SYMBOL
+#define THREAD_CANARIES_SYMBOL CONFIG_THREAD_CANARIES_SYMBOL
+#else
+#define THREAD_CANARIES_SYMBOL DEFAULT_THREAD_CANARIES_SYMBOL
+#endif
+
 /*___________________________________________________________________________*/
 
 #include "definesc.h"
@@ -193,8 +205,14 @@
 // some of following macros need to be differenciate for c or asm :
 // - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on poointers
 // - in asm files types are not understood by compiler
-#define K_STACK_END(stack_start, size) (stack_start + size - 1)
-#define _K_STACK_END_ASM(stack_start, size) K_STACK_END(stack_start, size)
+#define K_STACK_END(stack_start, size) (void*) ((uint8_t*) stack_start + size - 1)
+#define K_STACK_START(stack_end, size) (void*) ((uint8_t*) stack_end - size + 1)
+#define K_THREAD_STACK_START(th) K_STACK_START(th->stack.end, th->stack.size)
+#define K_THREAD_STACK_END(th) (th->stack.end)
+
+#define _K_STACK_END(stack_start, size) (stack_start + size - 1)
+
+#define _K_STACK_END_ASM(stack_start, size) _K_STACK_END(stack_start, size)
 
 #define _K_STACK_INIT_SP(stack_end) (stack_end - K_THREAD_STACK_VOID_SIZE)
 
@@ -203,7 +221,7 @@
 
 #define _K_THREAD_STACK_SIZE(name) (sizeof(_k_stack_buf_##name))
 
-#define _K_STACK_INIT_SP_FROM_NAME(name, stack_size) _K_STACK_INIT_SP(K_STACK_END(_K_THREAD_STACK_START(name), stack_size))
+#define _K_STACK_INIT_SP_FROM_NAME(name, stack_size) _K_STACK_INIT_SP(_K_STACK_END(_K_THREAD_STACK_START(name), stack_size))
 
 #define K_THREAD        __attribute__((used, section(".k_threads")))
 
@@ -254,7 +272,7 @@
         },                                                                                                  \
         .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                  \
         .wmutex = {.next = NULL},                                                                                   \
-        .stack = {.end = (void *)K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
+        .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                           \
         .symbol = sym}
 
