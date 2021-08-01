@@ -12,13 +12,12 @@
 
 /*___________________________________________________________________________*/
 
-void thread_led_on(void *p);
-void thread_led_off(void *p);
-void thread_idle(void *p);
+void thread_led_toggle(void *p);
+void thread_processing(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led_on, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'O');
-K_THREAD_DEFINE(ledoff, thread_led_off, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'F');
-K_THREAD_DEFINE(idle, thread_idle, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'I');
+K_THREAD_DEFINE(led, thread_led_toggle, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'L');
+K_THREAD_DEFINE(task1, thread_processing, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, '1');
+K_THREAD_DEFINE(task2, thread_processing, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, '2');
 
 /*___________________________________________________________________________*/
 
@@ -32,7 +31,7 @@ int main(void)
   k_sleep(K_FOREVER);
 }
 
-void thread_led_on(void *p)
+void thread_led_toggle(void *p)
 {
   while (1)
   {
@@ -41,14 +40,6 @@ void thread_led_on(void *p)
     led_on();
 
     k_sleep(K_MSEC(1000));
-  }
-}
-
-void thread_led_off(void *p)
-{
-  while (1)
-  {
-    print_runqueue();
 
     led_off();
 
@@ -56,11 +47,18 @@ void thread_led_off(void *p)
   }
 }
 
-void thread_idle(void *p)
+void thread_processing(void *p)
 {
-  while(1) {
-    // usart_printl("IDLE");
-    // _delay_ms(1000);
+  uint32_t counter = 0;
+  while (1)
+  {
+    counter++;
+
+    if ((counter & 0xFFFFF) == 0)
+    {
+      usart_hex16(counter >> 16);
+      usart_print("0000\n");
+    }
   }
 }
 
