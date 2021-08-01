@@ -23,14 +23,14 @@
 .extern _k_init_sysclock
 #endif
 
+#if THREAD_CANARIES
+.extern _k_init_thread_canaries
+#endif
+
 .extern _k_scheduler_init
 
 ; Kernel final init here
 .section .init8, "ax", @progbits
-
-#if KERNEL_SYSCLOCK_AUTO_INIT
-    call _k_init_sysclock
-#endif
 
 #if KERNEL_DEBUG_PREEMPT_UART
 ; enable uart RX interrupt
@@ -39,5 +39,13 @@
 #endif
 
     call _k_kernel_init
+
+#if THREAD_CANARIES
+    call _k_init_thread_canaries
+#endif
+
+#if KERNEL_SYSCLOCK_AUTO_INIT
+    call _k_init_sysclock
+#endif
 
 /*___________________________________________________________________________*/

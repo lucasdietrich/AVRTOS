@@ -66,7 +66,7 @@
 
 //
 // Default SREG value for other thread on stack creation
-//  Main thread default SREG is still 0
+//  Main thread default SREG is always 0
 //
 // From datasheet
 //  Bit 7 6 5 4 3 2 1 0
@@ -94,7 +94,7 @@
 // Time slice in milliseconds
 // TODO, use 100µs as base unit
 //
-#define DEFAULT_KERNEL_TIME_SLICE               1
+#define DEFAULT_KERNEL_TIME_SLICE               4
 
 //
 //  auto start kernel sysclock
@@ -110,6 +110,16 @@
 // Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting status
 //
 #define DEFAULT_KERNEL_THREAD_IDLE              1
+
+//
+// Enable thread canaries
+//
+#define DEFAULT_THREAD_CANARIES                 0
+
+//
+// thread canaries symbol
+//
+#define DEFAULT_THREAD_CANARIES_SYMBOL          0xAA
 
 /*___________________________________________________________________________*/
 

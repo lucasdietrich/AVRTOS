@@ -10,3 +10,6 @@ avr-readelf -a .pio/build/MutexMultithreadingDemo/firmware.elf > res/tmp/MutexMu
 avr-objdump -S .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.s
 avr-readelf -a .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.readelf.txt
 avr-nm .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.nm.txt
+
+avr-objdump -S .pio/build/Canaries/firmware.elf > res/tmp/Canaries.s
+avr-readelf -a .pio/build/Canaries/firmware.elf > res/tmp/Canaries.readelf.txt

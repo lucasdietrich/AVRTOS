@@ -16,6 +16,8 @@
 #include "mutex.h"
 #include "semaphore.h"
 #include "sysclock.h"
+#include "idle.h"
+#include "canaries.h"
 
 /*___________________________________________________________________________*/
 
