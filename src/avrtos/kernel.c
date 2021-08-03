@@ -20,6 +20,20 @@ void k_yield(void)
     _k_yield();
 }
 
+void k_sched_lock(void)
+{
+    cli();
+    SET_BIT(k_current->flags, K_FLAG_COOP);
+    sei();
+}
+
+void k_sched_unlock(void)
+{
+    cli();
+    CLR_BIT(k_current->flags, K_FLAG_COOP);
+    sei();
+}
+
 void _k_unschedule()
 {
     pop_ref(&runqueue);
