@@ -318,7 +318,7 @@ _k_thread_stack_create:
 
     ; push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
     ldi r28, 0x00
-    ldi r29, 8
+    ldi r29, 8 + _K_ARCH_STACK_SIZE_FIXUP
     dec r29
     st -X, r28
     brne .-6

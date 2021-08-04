@@ -13,12 +13,20 @@
 read_ra:
     pop r25
     pop r24
-
+#if __AVR_3_BYTE_PC__
+    pop r23
+    push r23
+#endif
     push r24
     push r25
 
     ; shift the address (addr_real = addr_cpu << 1)
+#if __AVR_3_BYTE_PC__
+    add r23, r23
+    adc r24, r24
+#else
     add r24, r24
+#endif
     adc r25, r25
 
     ret

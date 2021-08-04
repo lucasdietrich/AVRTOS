@@ -102,7 +102,11 @@ uint16_t read_sp(void);
  * @brief Return the return addr value of itself (read_ra)
  * 
  */
+#if __AVR_3_BYTE_PC__
+uint32_t read_ra(void);
+#else
 uint16_t read_ra(void);
+#endif
 
 /**
  * @brief Set the stack pointer object
