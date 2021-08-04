@@ -7,7 +7,13 @@
 extern "C" {
 #endif
 
-// todo, no keep the idle thread in the runqueue (add it/remove it) when runqueue changes, use runqueue control functions
+/*___________________________________________________________________________*/
+
+#if KERNEL_ALLOW_INTERRUPT_YIELD
+#define K_TRHEAD_IDLE_STACK_SIZE 2*K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
+#else
+#define K_TRHEAD_IDLE_STACK_SIZE 1*K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
+#endif
 
 /*___________________________________________________________________________*/
 

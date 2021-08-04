@@ -117,6 +117,13 @@
 #define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    0
 
 //
+// allow interrupt yield, this forces to add more stack to idle thread, 
+// since it is possible to save the current interrupt context while being in idle thread 
+// this happens often
+//
+#define DEFAULT_KERNEL_ALLOW_INTERRUPT_YIELD    1
+
+//
 // Enable thread canaries
 //
 #define DEFAULT_THREAD_CANARIES                 0
@@ -125,6 +132,7 @@
 // thread canaries symbol
 //
 #define DEFAULT_THREAD_CANARIES_SYMBOL          0xAA
+
 
 /*___________________________________________________________________________*/
 
