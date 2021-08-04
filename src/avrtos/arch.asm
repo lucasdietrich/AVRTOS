@@ -100,6 +100,9 @@ prempt_debug:
 system_shift:
     call _k_system_shift
 
+yield_from_interrupt:
+    ori r17, 1 << SREG_I ; Interrupt flag is disabled in interrupt handler, we need to set it manually in SREG
+
 check_coop:
     ; to use offset of here IF POSSIBLE
     lds ZL, k_current           ; load current thread addr in X
@@ -109,10 +112,6 @@ check_coop:
 
     sbrc r18, 2       ; if coop thread don't preempt
     jmp restore_context1
-
-
-yield_from_interrupt:
-    ori r17, 1 << SREG_I ; Interrupt flag is disabled in interrupt handler, we need to set it manually in SREG
 
     jmp scheduler_entry
 #endif
