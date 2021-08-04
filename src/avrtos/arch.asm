@@ -58,7 +58,7 @@ USART_Continue:
 .extern k_current
 
 ; push order
-; r17 | r0 r18 > r27 r30 r31 | r1 > r16 r28 r29 | SREG
+; r17 | r0 r18 > r27 r30 r31 | r28 r19 r1 > r16 | SREG
 
 ; SREG is saved in r17 during the whole process, DON'T USE r17 in this part without saving it
 
@@ -149,6 +149,25 @@ scheduler_entry:
     ; goto cancel_sched of no change
     ; calling the scheduler here helps to not use too much stack of the current thread when calling the scheduler function
 
+    ; push these two registers now as we need them to store current k_current thread locations
+    push r28
+    push r29
+
+    lds r28, k_current          ; load current thread addr in Y
+    lds r29, k_current + 1
+
+    call _k_scheduler 
+
+    ; r24, r25 contains new k_current thread address
+    cp r24, r28
+    brne save_context2
+    cp r25, r29
+    brne save_context2
+
+    pop r29
+    pop r28
+    jmp restore_context1
+
 save_context2:
     push r1
     push r2
@@ -167,23 +186,14 @@ save_context2:
     push r15
     push r16
 
-    push r28
-    push r29
-
     push r17    ; push SREG on stack
 
 save_sp:
     lds r20, SPL
     lds r21, SPH
 
-    lds r28, k_current          ; load current thread addr in X
-    lds r29, k_current + 1
-
     st Y+, r20       ; write SP in current thread structure
     st Y+, r21
-
-scheduler:
-    call _k_scheduler 
 
 restore_sp:
     movw r28, r24   ; new current thread structure address is in (r24, r25)
@@ -201,9 +211,6 @@ restore_context2:
     ; we need to know if the call switch happened from an interrupt or not
     ; if not interrupt, set SREG (and I flag potentially) is not a problem here
 
-    pop r29
-    pop r28
-
     pop r16
     pop r15
     pop r14
@@ -220,6 +227,9 @@ restore_context2:
     pop r3
     pop r2
     pop r1
+
+    pop r29
+    pop r28
 
 restore_context1:
     pop r31

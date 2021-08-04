@@ -29,7 +29,7 @@ void _k_reschedule(k_timeout_t timeout)
 {
     k_current->state = WAITING;
 
-    pop_ref(&runqueue);
+    _k_unschedule();
 
     if (timeout.value != K_FOREVER.value)
     {
