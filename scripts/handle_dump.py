@@ -9,8 +9,8 @@ from parse_coredump_bin import parse_core
 
 # todo handle several ramdump in the same run
 
-LOCATION_DIR = "res"
-COM_PORT = "COM3"
+LOCATION_DIR = "../res"
+COM_PORT = "COM5"
 BAUDRATE = 500000
 
 FILENAME = "ramdump.txt" # set None to have a new file every time
@@ -50,6 +50,8 @@ if __name__ == "__main__":
                 fp.write(content)
                 fp.flush()
 
+            print(content)
+
             if state == 0:
                 m = re_addr.match(content.decode('utf8'))
                 if m:
@@ -67,6 +69,6 @@ if __name__ == "__main__":
 
     print(filepath_parsed)
 
-    parse_ram(filepath, filepath_parsed)
+    parse_ram(filepath, filepath_parsed, no_boundary=True)
 
     print(f"File parsed to {filepath_parsed}")

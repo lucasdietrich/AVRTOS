@@ -6,6 +6,7 @@ avr-readelf -a .pio/build/CoopMultithreadingDemo/firmware.elf > res/tmp/CoopMult
 
 avr-objdump -S .pio/build/MutexMultithreadingDemo/firmware.elf > res/tmp/MutexMultithreadingDemo.s
 avr-readelf -a .pio/build/MutexMultithreadingDemo/firmware.elf > res/tmp/MutexMultithreadingDemo.readelf.txt
+avr-nm .pio/build/MutexMultithreadingDemo/firmware.elf > res/tmp/MutexMultithreadingDemo.nm.txt
 
 avr-objdump -S .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.s
 avr-readelf -a .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.readelf.txt

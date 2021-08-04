@@ -111,14 +111,14 @@ class RAM:
         return content
 
 
-def parse_ram(filename: str, filename_parsed: str):
+def parse_ram(filename: str, filename_parsed: str, no_boundary: bool = False):
     ram = RAM()
 
     boundary_found = False
 
     # read file
     with open(filename, "r") as fp:
-        while True:
+        while not no_boundary and True:
             if fp.readline() == '============\n':
                 boundary_found = True
                 break

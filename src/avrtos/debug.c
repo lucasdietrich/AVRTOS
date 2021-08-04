@@ -23,6 +23,12 @@ uint16_t k_thread_usage(struct thread_t *th)
     {
         return 0u;
     }
+    else if(th == k_current)
+    {
+        // stack pointer refers to the first empty addr (from end)
+        // empty stack : th->stack.end == th->sp
+        return ((uint16_t)th->stack.end) - ((uint16_t)th->sp) - K_THREAD_STACK_VOID_SIZE;
+    }
     else
     {
         // stack pointer refers to the first empty addr (from end)
@@ -50,6 +56,10 @@ void k_thread_dump_hex(struct thread_t *th)
 void k_thread_dump(struct thread_t *th)
 {
     usart_transmit(th->symbol);
+
+    usart_transmit(' ');
+
+    usart_hex16((const uint16_t) th);
 
     if (th->coop)
     {

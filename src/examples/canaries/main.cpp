@@ -29,6 +29,8 @@ int main(void)
   
   k_thread_dump_all();
 
+  dump_threads_canaries();
+
   k_sleep(K_FOREVER);
 }
 
