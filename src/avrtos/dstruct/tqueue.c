@@ -94,6 +94,7 @@ void tqueue_remove(struct titem **root, struct titem *item)
         if (p_current == item)
         {
             *prev_next_p = p_current->next;
+            item->next = NULL;
             break;
         }
         prev_next_p = &(p_current->next);

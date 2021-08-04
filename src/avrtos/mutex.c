@@ -75,5 +75,5 @@ void mutex_release(mutex_t *mutex)
 
         k_yield();
     }
-    sei();
+    sei(); // todo only enable interrupt if interrupt flag was set previously
 }
