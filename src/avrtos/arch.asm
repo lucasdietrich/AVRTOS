@@ -163,6 +163,7 @@ scheduler_entry:
     push r28
     push r29
 
+    ; r28, r29 must be caller saved
     lds r28, k_current          ; load current thread addr in Y
     lds r29, k_current + 1
 
@@ -173,6 +174,13 @@ scheduler_entry:
     brne save_context2
     cp r25, r29
     brne save_context2
+
+#if KERNEL_SCHEDULER_DEBUG == 1
+    push r24
+    ldi r24, 0x73
+    call usart_transmit
+    pop r24
+#endif
 
     pop r29
     pop r28
