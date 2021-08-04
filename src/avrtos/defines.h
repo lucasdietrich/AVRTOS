@@ -236,7 +236,7 @@
         struct                                                   \
         {                                                        \
             uint8_t sreg;                                        \
-            uint8_t r25_r27r30r31r1_r16r28r29[22u];              \
+            uint8_t r26_r27r30r31r28r29r1_r16[22u];              \
             void *context;                                       \
             uint8_t r17r0r18_r23[8u];                            \
             void *ret_addr;                                      \
@@ -253,7 +253,7 @@
     struct                                               \
     {                                                    \
         uint8_t sreg;                                    \
-        uint8_t r25_r27r30r31r1_r16r28r29[22u];          \
+        uint8_t r26_r27r30r31r28r29r1_r16[22u];          \
         void *context;                                   \
         uint8_t r17r0r18_r23[8u];                        \
         void *ret_addr;                                  \

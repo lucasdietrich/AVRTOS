@@ -143,11 +143,21 @@ clear_interrupt_flag:
     cli
 
 scheduler_entry:
-    ; todo
-    ; call scheduler here
-    ; check if current thread changed or not
-    ; goto cancel_sched of no change
-    ; calling the scheduler here helps to not use too much stack of the current thread when calling the scheduler function
+    ; calling the scheduler here helps to :
+    ; - no wasting time to push every register to restore the context of the same thread
+    ; - not use too much stack of the current thread when calling the scheduler function
+
+    ; [M] CANARIES until @07BC [found 468], MAX usage = 44 / 512
+    ; [2] CANARIES until @010B [found 6], MAX usage = 506 / 512
+    ; [1] CANARIES until @03D2 [found 205], MAX usage = 51 / 256
+    ; [L] CANARIES until @04DE [found 217], MAX usage = 39 / 256
+    ; [K] CANARIES until @050E [found 9], MAX usage = 36 / 45
+
+    ; [M] CANARIES until @07B8 [found 464], MAX usage = 48 / 512
+    ; [2] CANARIES until @010A [found 5], MAX usage = 507 / 512
+    ; [1] CANARIES until @03CE [found 201], MAX usage = 55 / 256
+    ; [L] CANARIES until @04DA [found 213], MAX usage = 43 / 256
+    ; [K] CANARIES until @050B [found 6], MAX usage = 39 / 45
 
     ; push these two registers now as we need them to store current k_current thread locations
     push r28
