@@ -1,13 +1,13 @@
 #include <avr/io.h>
 
 .global _mutex_read
-.global _mutex_lock
-.global _mutex_release
+.global _k_mutex_lock
+.global _k_mutex_release
 
 ; mutex struct addr in r24, r25
 ; mov addr in r30, r31 (Z register)
 ; return value (uint8_t) in r24
-_mutex_lock:
+_k_mutex_lock:
     movw r30, r24
 
     ; neither atmega328P nor atmega2560 supports xch instruction
@@ -25,7 +25,7 @@ _mutex_lock:
     ret
 
 ; mutex struct addr in r24, r25
-_mutex_release:
+_k_mutex_release:
     movw r26, r24
     ldi r24, 0xFF
     st X, r24

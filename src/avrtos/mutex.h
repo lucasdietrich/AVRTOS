@@ -28,9 +28,9 @@ typedef struct {
  * 
  * @param mutex : structure representing the mutex
  */
-void mutex_define(mutex_t *mutex);
+void k_mutex_define(mutex_t *mutex);
 
-uint8_t _mutex_lock(mutex_t *mutex);
+uint8_t _k_mutex_lock(mutex_t *mutex);
 
 /**
  * @brief Lock a mutex
@@ -41,18 +41,18 @@ uint8_t _mutex_lock(mutex_t *mutex);
 
 // TODO set this inline
 // https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header
-uint8_t mutex_lock(mutex_t *mutex);
+uint8_t k_mutex_lock(mutex_t *mutex);
 
 /*___________________________________________________________________________*/
 
-uint8_t mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
+uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
 
 /**
  * @brief Release a mutex
  */
-void mutex_release(mutex_t *mutex);
+void k_mutex_release(mutex_t *mutex);
 
-void _mutex_release(mutex_t *mutex);
+void _k_mutex_release(mutex_t *mutex);
 
 /*___________________________________________________________________________*/
 

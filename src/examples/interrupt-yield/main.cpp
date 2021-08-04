@@ -52,7 +52,7 @@ ISR(USART_RX_vect)
   // UART0 RX buffer must be read before enabling interrupts again
   recv = usart_read_rx();
 
-  mutex_release(&mymutex);
+  k_mutex_release(&mymutex);
 }
 
 int main(void)
@@ -62,7 +62,7 @@ int main(void)
   
   k_thread_dump_all();
 
-  mutex_lock(&mymutex);
+  k_mutex_lock(&mymutex);
 
   // set UART RX interrupt
   UCSR0B |= 1 << RXCIE0;
@@ -82,7 +82,7 @@ void waiting_thread(void *p)
   // cli();
   while (1)
   {
-    if (0 == mutex_lock_wait(&mymutex, K_FOREVER))
+    if (0 == k_mutex_lock_wait(&mymutex, K_FOREVER))
     {
       usart_print("get the mutex, thread woke up from interrupt : ");
       usart_transmit(recv);
@@ -90,7 +90,7 @@ void waiting_thread(void *p)
 
       k_sleep(K_MSEC(1000));
 
-      mutex_lock(&mymutex);
+      k_mutex_lock(&mymutex);
     }
     else
     {

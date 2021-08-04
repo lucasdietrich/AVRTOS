@@ -42,13 +42,13 @@ void thread_led_on(void *p)
 {
   while(1)
   {
-    mutex_lock_wait(&mymutex, K_FOREVER);
+    k_mutex_lock_wait(&mymutex, K_FOREVER);
 
     led_on();
 
     k_sleep(K_MSEC(1000));
 
-    mutex_release(&mymutex);
+    k_mutex_release(&mymutex);
   }
 }
 
@@ -56,13 +56,13 @@ void thread_led_off(void *p)
 {
   while (1)
   {
-    mutex_lock_wait(&mymutex, K_FOREVER);
+    k_mutex_lock_wait(&mymutex, K_FOREVER);
 
     led_off();
 
     k_sleep(K_MSEC(1000));
 
-    mutex_release(&mymutex);
+    k_mutex_release(&mymutex);
   }
 }
 
