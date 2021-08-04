@@ -13,7 +13,7 @@
 //
 
 // K_THREAD_MINSTACK_DEFINE(_k_idle, _k_idle_entry, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, NULL, 'K');
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 100, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, NULL, 'K');
+K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, NULL, 'K');
 
 void _k_idle_entry(void* context)
 {

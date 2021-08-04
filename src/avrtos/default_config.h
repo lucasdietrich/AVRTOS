@@ -112,6 +112,11 @@
 #define DEFAULT_KERNEL_THREAD_IDLE              1
 
 //
+// Kernel thread stack size
+//
+#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    0x100
+
+//
 // Enable thread canaries
 //
 #define DEFAULT_THREAD_CANARIES                 0
