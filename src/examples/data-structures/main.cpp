@@ -288,60 +288,60 @@ struct item2 threads[] = {
   DITEM('M'), DITEM('A'), DITEM('B'), 
 };
 
-struct ditem *runqueue;
+struct ditem *runqueue2;
 
 void test_scheduler(void)
 {
-  runqueue = &threads[0].i;
-  dlist_ref(runqueue);
+  runqueue2 = &threads[0].i;
+  dlist_ref(runqueue2);
 
-  dlist_queue(runqueue, &threads[1].i);
-  dlist_queue(runqueue, &threads[2].i);
+  dlist_queue(runqueue2, &threads[1].i);
+  dlist_queue(runqueue2, &threads[2].i);
 
-  print_dlist(runqueue, print_dlist_item);
+  print_dlist(runqueue2, print_dlist_item);
 
   usart_printl("==== POPREF ====");
 
-  struct ditem * ref = pop_ref(&runqueue);
+  struct ditem * ref = pop_ref(&runqueue2);
 
-  usart_print("pop_ref(&runqueue) = ");
+  usart_print("pop_ref(&runqueue2) = ");
   print_dlist_item(ref);
   usart_transmit('\n');
 
-  print_dlist(runqueue, print_dlist_item);
+  print_dlist(runqueue2, print_dlist_item);
 
 /*
   usart_printl("==== PUSHBACK ====");
 
-  push_back(runqueue, ref);
+  push_back(runqueue2, ref);
 
-  struct ditem * next = runqueue;
+  struct ditem * next = runqueue2;
 
-  usart_print("next = runqueue ");
+  usart_print("next = runqueue2 ");
   print_dlist_item(next);
   usart_transmit('\n');
 
-  print_dlist(runqueue, print_dlist_item);
+  print_dlist(runqueue2, print_dlist_item);
 */
   usart_printl("==== PUSHREF ====");
 
-  struct ditem * next = push_ref(&runqueue, ref);
+  struct ditem * next = push_ref(&runqueue2, ref);
 
-  usart_print("push_ref(&runqueue, ref) = ");
+  usart_print("push_ref(&runqueue2, ref) = ");
   print_dlist_item(next);
   usart_transmit('\n');
 
-  print_dlist(runqueue, print_dlist_item);
+  print_dlist(runqueue2, print_dlist_item);
 
   usart_printl("==== REFREQUEUETOP ====");
 
-  next = ref_requeue(&runqueue);
+  next = ref_requeue(&runqueue2);
 
-  usart_print("ref_requeue(&runqueue) = ");
+  usart_print("ref_requeue(&runqueue2) = ");
   print_dlist_item(next);
   usart_transmit('\n');
 
-  print_dlist(runqueue, print_dlist_item);
+  print_dlist(runqueue2, print_dlist_item);
 }
 
 /*___________________________________________________________________________*/

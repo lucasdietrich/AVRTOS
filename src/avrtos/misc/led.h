@@ -3,6 +3,8 @@
 
 #include <avr/io.h>
 
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

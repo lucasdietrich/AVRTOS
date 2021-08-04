@@ -28,3 +28,7 @@ when remving event from tqueue, set .next to NULL
 having next = NULL mean not in tqueue (and not in runqueue)
 
 renamed project to AVRTOS
+
+Test this : https://docs.platformio.org/en/latest/plus/debug-tools/simavr.html#debugging-tool-simavr
+
+asm "sleep" (waiting for interrupt)

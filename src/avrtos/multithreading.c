@@ -63,7 +63,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
     sp -= 1u;
 
     // push r0 > r23 (24 registers)
-    for(uint_fast8_t i = 0u; i < 8u; i++)
+    for(uint_fast8_t i = 0u; i < 8u + _K_ARCH_STACK_SIZE_FIXUP; i++)
     {
         *sp-- = 0u;
     }
