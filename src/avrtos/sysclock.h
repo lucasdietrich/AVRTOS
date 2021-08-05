@@ -7,6 +7,7 @@
 
 /*___________________________________________________________________________*/
 
+// TODO :  update
 // as thread context switch is 26µs and it is not advice to do context switch more than 10% of the time
 // maximum time slice must be 26µs*9 = 234µs ~ 4273 Hz
 
@@ -18,9 +19,6 @@
 #define SYSCLOCK_PRESCALER_FREQ_MAX(prescaler) (F_CPU / prescaler)
 #define SYSCLOCK_TCNT(time_ms, prescaler) (time_ms * (F_CPU / 1000) / prescaler)
 
-// TEST
-// #define KERNEL_SYSCLOCK_TIMER0_TCNT0       0x100 - KERNEL_TIME_SLICE * ((int) ((F_CPU / 1000.0) / 1024.0 + 0.5))
-
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
@@ -29,6 +27,9 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Initialize and enable timer0 overflow vector used for preemptive threads 
+ */
 void _k_init_sysclock(void);
 
 /*___________________________________________________________________________*/

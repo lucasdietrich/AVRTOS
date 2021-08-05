@@ -10,10 +10,9 @@ struct titem *events_queue = NULL;
 
 /*___________________________________________________________________________*/
 
-void k_queue(struct thread_t *th)
-{
-    push_back(runqueue, &th->tie.runqueue);
-}
+//
+// Kernel Public API
+//
 
 void k_yield(void)
 {
@@ -34,33 +33,57 @@ void k_sched_unlock(void)
     sei();
 }
 
-void _k_unschedule()
+void k_sleep(k_timeout_t timeout)
 {
-    pop_ref(&runqueue);
-}
-
-void _k_reschedule(k_timeout_t timeout)
-{
-    k_current->state = WAITING;
-
-    _k_unschedule();
-
-    if (timeout.value != K_FOREVER.value)
+    if (timeout.value != K_NO_WAIT.value)
     {
-        tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
+        cli();
+
+        _k_reschedule(timeout);
+     
+        _k_yield();
+
+        sei();
     }
 }
 
-// assumptions : thread not in runqueue and if tqueue
-void _k_wake_up(struct thread_t *th)
+/*___________________________________________________________________________*/
+
+//
+// Not tested
+//
+
+void k_suspend(void)
 {
-    tqueue_remove(&events_queue, &th->tie.event);
-
-    th->state = READY;
-    th->wmutex.next = NULL;
-
-    push_front(runqueue, &th->tie.runqueue);
+    cli();
+    _k_suspend();
+    sei();
 }
+
+void k_resume(struct thread_t *th)
+{
+    k_start(th);
+}
+
+void k_start(struct thread_t *th)
+{
+    if (th->state == STOPPED)
+    {
+        cli();
+        _k_queue(th);
+        sei();
+    }
+    else // thread waiting, ready of running and then already started
+    {
+
+    }
+}
+
+/*___________________________________________________________________________*/
+
+//
+// Kernel Private API
+//
 
 extern struct thread_t __k_threads_start;
 extern struct thread_t __k_threads_end;
@@ -76,12 +99,31 @@ void _k_kernel_init(void)
     {
         if ((&__k_threads_start)[i].state == READY) // only queue ready threads
         {
-            k_queue(&(&__k_threads_start)[i]);
+            _k_queue(&(&__k_threads_start)[i]);
         }
     }
 }
 
+void _k_queue(struct thread_t *th)
+{
+    push_back(runqueue, &th->tie.runqueue);
+}
 
+void _k_catch()
+{
+    pop_ref(&runqueue);
+}
+
+void _k_suspend(void)
+{
+    pop_ref(&runqueue);
+    k_current->flags = STOPPED;
+}
+
+void _k_unschedule(struct thread_t *th)
+{
+    tqueue_remove(&events_queue, &th->tie.event);
+}
 
 #if KERNEL_SCHEDULER_DEBUG == 0
 
@@ -152,28 +194,34 @@ struct thread_t *_k_scheduler(void)
 #endif
 
 
-/*___________________________________________________________________________*/
+void _k_reschedule(k_timeout_t timeout)
+{
+    _k_suspend();
 
-#include "misc/uart.h"
+    k_current->state = WAITING;
+
+    if (timeout.value != K_FOREVER.value)
+    {
+        tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
+    }
+}
+
+// assumptions : thread not in runqueue and if tqueue
+void _k_wake_up(struct thread_t *th)
+{
+    _k_unschedule(th);
+
+    th->state = READY;
+    th->wmutex.next = NULL;
+
+    push_front(runqueue, &th->tie.runqueue);
+}
 
 void _k_system_shift(void)
 {
     tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }
 
-void k_sleep(k_timeout_t timeout)
-{
-    if (timeout.value != K_NO_WAIT.value)
-    {
-        cli();
-
-        _k_reschedule(timeout);
-     
-        _k_yield();
-
-        sei();
-    }
-}
 
 /*___________________________________________________________________________*/
 

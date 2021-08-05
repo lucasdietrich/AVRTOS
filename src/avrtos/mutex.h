@@ -16,8 +16,10 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-// TODO set all mutex at the same RAM location to iter them easily
-
+/**
+ * @brief Structure describing a mutex, "lock" parameter tells if the current is locked or not (0 if lock, 0xFF otherwise)
+ * waitqueue list contains all threads waiting for the mutex, first thread to wake up when mutex is release is at the first element of the queue
+ */
 typedef struct {
     uint8_t lock;
     struct qitem *waitqueue;
@@ -26,32 +28,55 @@ typedef struct {
 /**
  * @brief Define a mutex
  * 
- * @param mutex : structure representing the mutex
+ * @param mutex address of the mutex structure
  */
 void k_mutex_define(mutex_t *mutex);
 
-uint8_t _k_mutex_lock(mutex_t *mutex);
-
 /**
- * @brief Lock a mutex
+ * @brief Lock a mutex, return immediately (nonblocking @see k_mutex_lock_wait)
  * 
- * @param mutex : success if 0 else mutex already locked
- * @return uint8_t 
+ * @param mutex address of the mutex structure
+ * @return uint8_t 0 if mutex locked any other value otherwise
  */
-
-// TODO set this inline
-// https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header
 uint8_t k_mutex_lock(mutex_t *mutex);
 
-/*___________________________________________________________________________*/
-
+/**
+ * @brief Wait on a mutex, return immediately if mutex is available, otherwise wait for given timeout.
+ * If the mutex is available, the scheduler is not called. If the scheduler is already locked.
+ * The current thread is unscheduled and added to the waiting queue ("waitqueue") of the mutex, 
+ * it will be woke up when the thread reach the top of this waitqueue and the mutex is available again.
+ * If timeout is different from K_FOREVER, the thread will be woke up when the timeout expires, in this case
+ * the function will returns that the mutex is still locked. (current thread is removed from the waiting queue).
+ * 
+ * @param mutex address of the mutex structure
+ * @param timeout time waiting the mutex (e.g. K_NO_WAIT, K_MSEC(1000), K_FOREVER)
+ * @return uint8_t 0 if mutex locked any other value otherwise
+ */
 uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
 
 /**
- * @brief Release a mutex
+ * @brief Release a mutex, wake up the first waiting thread if the waiting queue is not empty, do k_yield
+ * this function doesn't check if the current thread actually own the mutex. This function sets interrupt flag when returning.
+ * 
+ * @param mutex : address of the mutex structure
  */
 void k_mutex_release(mutex_t *mutex);
 
+/*___________________________________________________________________________*/
+
+/**
+ * @brief Arch lock a mutex, clear the interrupt flag and set it to its original state when finished
+ * 
+ * @param mutex address of the mutex structure
+ * @return uint8_t 0 if mutex locked any other value otherwise
+ */
+uint8_t _k_mutex_lock(mutex_t *mutex);
+
+/**
+ * @brief Arch unlock a mutex, don't need the interrupt flag to be disabled
+ * 
+ * @param mutex 
+ */
 void _k_mutex_release(mutex_t *mutex);
 
 /*___________________________________________________________________________*/

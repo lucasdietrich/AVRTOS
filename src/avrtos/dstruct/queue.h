@@ -22,6 +22,8 @@ void queue(struct qitem ** p_root, struct qitem * qitem);
 
 struct qitem * dequeue(struct qitem ** p_root);
 
+// unqueue
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus

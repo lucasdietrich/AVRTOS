@@ -34,3 +34,5 @@ Test this : https://docs.platformio.org/en/latest/plus/debug-tools/simavr.html#d
 asm "sleep" (waiting for interrupt)
 
  don't keep the idle thread in the runqueue (add it/remove it) when runqueue changes, use runqueue control functions
+
+ if the sysclock interrupt want to switch a thread that got the cpu very little time ago, maybe don't preempt him ?

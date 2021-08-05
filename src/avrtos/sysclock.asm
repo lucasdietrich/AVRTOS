@@ -4,7 +4,6 @@
 #include <avrtos/defines.h>
 
 #if KERNEL_PREEMPTIVE_THREADS
-
 .global _k_init_sysclock
 
 _k_init_sysclock:

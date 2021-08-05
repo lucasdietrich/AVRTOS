@@ -106,7 +106,7 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
     th->state = READY;
     th->priority = priority;
 
-    k_queue(th);
+    _k_queue(th);
 
     return 0;
 }
