@@ -185,10 +185,10 @@
 
 #else
 
-#define KERNEL_SYSCLOCK_AUTO_INIT           0
-#define CONFIG_KERNEL_DEBUG_PREEMPT_UART    0
-#define KERNEL_TIME_SLICE                   0
-#define KERNEL_SYSCLOCK_TIMER0_TCNT0               0
+#define KERNEL_SYSCLOCK_AUTO_INIT                   0
+#define CONFIG_KERNEL_DEBUG_PREEMPT_UART            0
+#define KERNEL_TIME_SLICE                           0
+#define KERNEL_SYSCLOCK_TIMER0_TCNT0                0
 
 #endif
 

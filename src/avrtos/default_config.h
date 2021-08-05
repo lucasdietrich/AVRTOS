@@ -16,6 +16,10 @@
 
 /*___________________________________________________________________________*/
 
+#include "common.h"
+
+/*___________________________________________________________________________*/
+
 //
 // This file contains all the default configuration options of the kernel
 //
@@ -35,7 +39,7 @@
 //
 // Define the main thread type (coop/prempt) and priority
 //
-#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY     K_PRIO_PREEMPT(8)
+#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY     K_PRIO_PREEMPT(K_PRIO_HIGH)
 
 //
 // Tells if the main stack location and size must be defined at compilation time (1)
@@ -50,7 +54,7 @@
 #define DEFAULT_THREAD_MAIN_STACK_SIZE          0x200
 
 //
-// Tells if we should use the C or the Assembler function to define our threads at runtiime
+// Tells if we should use the C or the Assembler function to define our threads at runtime
 //
 #define DEFAULT_THREAD_USE_INIT_STACK_ASM              1
 
@@ -65,8 +69,8 @@
 #define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32      0
 
 //
-// Default SREG value for other thread on stack creation
-//  Main thread default SREG is always 0
+// Default SREG value for other thread on stack creation.
+// Main thread default SREG is always 0
 //
 // From datasheet
 //  Bit 7 6 5 4 3 2 1 0
@@ -86,7 +90,7 @@
 #define DEFAULT_KERNEL_SCHEDULER_DEBUG          0
 
 //
-// enable preemtive threads feature
+// Enable preemtive threads feature
 //
 #define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
 
@@ -97,7 +101,7 @@
 #define DEFAULT_KERNEL_TIME_SLICE               4
 
 //
-//  auto start kernel sysclock
+//  Auto start kernel sysclock
 //
 #define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       1
 
@@ -112,12 +116,12 @@
 #define DEFAULT_KERNEL_THREAD_IDLE              1
 
 //
-// Kernel thread stack size
+// Kernel thread idle stack size
 //
 #define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    0
 
 //
-// allow interrupt yield, this forces to add more stack to idle thread, 
+// Allow interrupt yield, this forces to add more stack to idle thread, 
 // since it is possible to save the current interrupt context while being in idle thread 
 // this happens often
 //
@@ -129,7 +133,7 @@
 #define DEFAULT_THREAD_CANARIES                 0
 
 //
-// thread canaries symbol
+// Define thread canaries symbol
 //
 #define DEFAULT_THREAD_CANARIES_SYMBOL          0xAA
 

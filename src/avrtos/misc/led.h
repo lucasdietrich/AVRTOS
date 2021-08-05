@@ -24,6 +24,11 @@ void led_on(void);
  */
 void led_off(void);
 
+/**
+ * @brief Set LED on PORTB IO 5 to state
+ */
+void led_set(uint8_t state);
+
 #ifdef __cplusplus
 }
 #endif

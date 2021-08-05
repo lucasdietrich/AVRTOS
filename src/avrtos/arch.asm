@@ -110,10 +110,16 @@ check_coop:
 
     ldd r18, Z+2      ; read flag
 
-    sbrc r18, 2       ; if coop thread don't preempt
-    jmp restore_context1
-
+    sbrs r18, 2
     jmp scheduler_entry
+
+    ; if coop thread don't preempt
+#if KERNEL_SCHEDULER_DEBUG == 1
+    ldi r24, 0x63 ; 'c'
+    call usart_transmit
+#endif
+    jmp restore_context1
+    
 #endif
 
 _k_yield:
@@ -176,7 +182,7 @@ scheduler_entry:
 
 #if KERNEL_SCHEDULER_DEBUG == 1
     push r24
-    ldi r24, 0x73
+    ldi r24, 0x73 ; 's'
     call usart_transmit
     pop r24
 #endif
