@@ -9,7 +9,7 @@
 
 .extern _k_main_stack
 
-; this section override the Stack Pointer defined in section .init2 to the defined Main Buffer
+; this section "overwrite" the Stack Pointer defined in section .init2 to the defined Main Buffer
 ; https://www.nongnu.org/avr-libc/user-manual/mem_sections.html
 .section .init3, "ax", @progbits
     ldi r28, lo8(_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE))
@@ -18,18 +18,14 @@
     out _SFR_IO_ADDR(SPH), r29
 #endif
 
-
+; initialize system clock (timer0) in order to preempt preemptive threads
 #if KERNEL_SYSCLOCK_AUTO_INIT
 .extern _k_init_sysclock
 #endif
 
-#if THREAD_CANARIES
-.extern _k_init_thread_canaries
-#endif
-
 .extern _k_scheduler_init
 
-; Kernel final init here
+; kernel final init here
 .section .init8, "ax", @progbits
 
 #if KERNEL_DEBUG_PREEMPT_UART
@@ -38,8 +34,10 @@
     sts UCSR0B, r17
 #endif
 
+; add READY threads to the runqueue
     call _k_kernel_init
 
+; initialize canaries in threads stacks
 #if THREAD_CANARIES
     call _k_init_thread_canaries
 #endif

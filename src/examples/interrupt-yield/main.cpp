@@ -16,7 +16,7 @@ void waiting_thread(void *p);
 void monitoring_thread(void *p);
 
 K_THREAD_DEFINE(waiting, waiting_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'W');
-K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'M');
+K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'R');
 
 /*___________________________________________________________________________*/
 
@@ -107,6 +107,7 @@ void monitoring_thread(void *p)
 
     print_runqueue();
     print_events_queue();
+    dump_threads_canaries();
   }
 }
 

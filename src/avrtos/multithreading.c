@@ -12,39 +12,34 @@ extern int main(void);
 
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
+#endif
+
 K_THREAD struct thread_t _k_thread_main = {
-    .sp = NULL,
+    .sp = NULL, // main thread is running, context already "restored"
     {
         .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
     },
-    .tie = {.runqueue = {.prev = &_k_thread_main.tie.runqueue, .next  = &_k_thread_main.tie.runqueue}},
-    .wmutex = {NULL},
+    .tie = {
+        .runqueue = {   // thread in before initialisation at the top of the runqueue (is actually the reference element)
+            .prev = &_k_thread_main.tie.runqueue,
+            .next = &_k_thread_main.tie.runqueue
+        }
+    },
+    .wmutex = {NULL},   // the thread isn't waiting of an y events
+#if THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
     .stack = {
-        .end = (void*) _K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
+        .end = (void *)_K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
         .size = THREAD_MAIN_STACK_SIZE,
     },
-    .local_storage = NULL,
-    .symbol = 'M'
-};
-
 #else
-
-K_THREAD struct thread_t _k_thread_main = {
-    .sp = NULL,
-    {
-        .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
-    },
-    .tie = {.runqueue = {.prev = &_k_thread_main.tie.runqueue, .next = &_k_thread_main.tie.runqueue}},
-    .wmutex = {NULL},
-    .stack = {
+    .stack = {          // implicit stack, we set the main thread stack end at the end of the RAM
         .end = (void*) RAMEND,
         .size = 0,
     },
-    .local_storage = NULL,
-    .symbol = 'M'
-};
-
 #endif
+    .local_storage = NULL,  // can be set later
+    .symbol = 'M'           // default main thread sumbol
+};
 
 struct thread_t * k_current = &_k_thread_main;
 
@@ -118,9 +113,6 @@ inline struct thread_t * k_thread_current(void)
     return k_current;
 }
 
-//
-// Utils
-//
 inline void * k_thread_local_storage(void)
 {
     return k_current->local_storage;

@@ -206,8 +206,6 @@
 #define KERNEL_THREAD_IDLE_ADD_STACK DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK
 #endif
 
-
-
 #ifdef CONFIG_KERNEL_ALLOW_INTERRUPT_YIELD
 #define KERNEL_ALLOW_INTERRUPT_YIELD CONFIG_KERNEL_ALLOW_INTERRUPT_YIELD
 #else
@@ -224,6 +222,10 @@
 #define THREAD_CANARIES_SYMBOL CONFIG_THREAD_CANARIES_SYMBOL
 #else
 #define THREAD_CANARIES_SYMBOL DEFAULT_THREAD_CANARIES_SYMBOL
+#endif
+
+#if THREAD_EXPLICIT_MAIN_STACK == 0 && THREAD_CANARIES == 1
+#warning unable to monitor main thread stack canaries as the main stack is defined as explicit (see THREAD_EXPLICIT_MAIN_STACK)
 #endif
 
 /*___________________________________________________________________________*/

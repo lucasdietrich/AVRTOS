@@ -40,10 +40,7 @@ void k_thread_dump_hex(struct thread_t *th);
  * [priority] : stack usage/stack size | stack end address
  * 
  * e.g:
- *      [-1] : 35/256 |037D
- * 
- * If CONFIG_THREAD_EXPLICIT_MAIN_STACK is not set, dumping main thread structure will give :
- *      [8] : 0/0 |08FF
+ * M 0614 [PREE 0] RUNNING : SP 0/512 -| END @0856 
  * 
  * @param th 
  */
@@ -52,11 +49,10 @@ void k_thread_dump(struct thread_t *th);
 /**
  * @brief Pretty print all threads contains
  * 
- * ===== k_thread =====
- * [8] : 0/256 |0273
- * [-1] : 35/256 |0586
- * [-1] : 35/256 |047D
- * [-1] : 35/256 |0373
+ * M 0614 [PREE 0] RUNNING : SP 0/512 -| END @0856 
+ * R 0624 [PREE 1] READY   : SP 35/512 -| END @0307
+ * W 0634 [PREE 1] READY   : SP 35/512 -| END @0507
+ * K 0644 [PREE 3] READY   : SP 35/62 -| END @0545
  */
 void k_thread_dump_all(void);
 
@@ -99,8 +95,9 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
 uint16_t read_sp(void);
 
 /**
- * @brief Return the return addr value of itself (read_ra)
+ * @brief Return the return addr value of itself (read_ra), helps to determine current running thread
  * 
+ * Depends on arch (PC can be 2 or 3 bytes)
  */
 #if __AVR_3_BYTE_PC__
 uint32_t read_ra(void);
