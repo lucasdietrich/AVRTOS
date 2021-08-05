@@ -65,11 +65,11 @@ void thread_coop(void *p)
 {
   while(1)
   {
-    k_sleep(K_MSEC(10000));
+    k_sleep(K_MSEC(5000));
 
     usart_printl("full cooperative thread");
 
-    _delay_ms(500);
+    _delay_ms(1000);
   }
 }
 

@@ -196,7 +196,7 @@ struct thread_t *_k_scheduler(void)
 
 void _k_reschedule(k_timeout_t timeout)
 {
-    _k_suspend();
+    _k_catch();
 
     k_current->state = WAITING;
 
