@@ -50,9 +50,6 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeo
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)
 {
-    if (!time_passed)
-        return;
-
     struct titem ** prev_next_p = root;
     while (*prev_next_p != NULL) // if next of previous item is set
     {

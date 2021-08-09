@@ -4,12 +4,14 @@
 
 ### Description
 
-In this example, we spawn two threads (+ main thread) :
-- One thread set the led on for 500ms and ther other off for the same time
-- A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting
+In this example, we spawn three threads (+ main thread + idle thread) :
+- Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same time
+    - A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting for 100ms.
+    - both threads use the same reentrant function
+- One cooperative threads that blocks the execution of all threads for 500ms every 2 seconds.
 - The main thread release the CPU forever when initialization finished
 
-On an Arduino Pro (ATmega328p, avr5) the led should be blinking at the frequency of 1Hz.
+On an Arduino Pro (ATmega328p, avr5) the led should be blinking at the frequency of 10Hz and then block for 500ms every 2 seconds.
 
 Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
 
@@ -17,6 +19,7 @@ Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
 
 ```cpp
 #include <avr/io.h>
+#include <util/delay.h>
 #include "avrtos/misc/uart.h"
 #include "avrtos/misc/led.h"
 #include "avrtos/kernel.h"
@@ -31,6 +34,7 @@ uint8_t off = 0u;
 K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
 K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, nullptr, 'O');
 K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, nullptr, 'F');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, nullptr, 'C');
 
 int main(void)
 {
@@ -49,8 +53,18 @@ void thread_led(void *context)
     k_mutex_lock_wait(&mymutex, K_FOREVER);
     led_set(thread_led_state);
     usart_transmit(thread_led_state ? 'o' : 'f');
-    k_sleep(K_MSEC(500));
+    k_sleep(K_MSEC(100));
     k_mutex_release(&mymutex);
+  }
+}
+
+void thread_coop(void*)
+{
+  while(1)
+  {
+    k_sleep(K_MSEC(2000));
+    usart_transmit('_');
+    _delay_ms(500); // blocking all threads for 500ms
   }
 }
 ```
@@ -59,11 +73,12 @@ void thread_led(void *context)
 
 ```
 ===== k_thread =====
-M 021C [PREE 0] RUNNING : SP 0/512 -| END @045E
-F 022C [PREE 1] READY   : SP 35/80 -| END @0157
-O 023C [PREE 1] READY   : SP 35/80 -| END @01A7
-K 024C [PREE 3] READY   : SP 35/62 -| END @01E6
-fofofofofofofofofofofofofofofofofofofofofofofofofofofo
+M 031C [PREE 0] RUNNING : SP 0/512 -| END @056E
+C 032C [COOP 1] READY   : SP 35/256 -| END @0207
+F 033C [PREE 1] READY   : SP 35/80 -| END @0257
+O 034C [PREE 1] READY   : SP 35/80 -| END @02A7
+K 035C [PREE 3] READY   : SP 35/62 -| END @02E6
+fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 ```
 
 ## Introduction
@@ -98,6 +113,8 @@ What paradigms are not supported:
 - Nested interrupts
 
 What features will be implemented :
+- System time
+- Statistics CPU use per thread
 - Prioritization
 - Semaphores
 - Signals
@@ -110,8 +127,9 @@ What enhancements are planned :
 - removing CPU idle thread
 - don't keep the idle thread in the runqueue if others threads are in
 - using makefile to build the project for a target
+- Stack for interrupts handlers
 
-Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr) projects 
+Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
 
 ## PlatformIO
@@ -168,6 +186,12 @@ monitor_speed = 500000
 | KERNEL\_DEBUG                          | Enable Kernel Debug features                                                                                                                                  | 0                               | 0   | 1     |
 | KERNEL\_SCHEDULER\_DEBUG               | Enable Kernel Debug in scheduler                                                                                                                              | 0                               | 0   | 1     |
 
+
+## Known issues
+
+- It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_release, ... from it.
+  - k_sched lock/cooperative thread only prevent thread switching with the sysclock interrupt handler (used to preempt threads)
+
 ## Debugging
 
 Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
@@ -193,11 +217,12 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 
 ```
 ===== k_thread =====
-M 021E [PREE 0] RUNNING : SP 0/512 -| END @0460
-F 022E [PREE 1] READY   : SP 35/80 -| END @0157
-O 023E [PREE 1] READY   : SP 35/80 -| END @01A7
-K 024E [PREE 3] READY   : SP 35/62 -| END @01E6
-~F#f~O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks
+M 031E [PREE 0] RUNNING : SP 0/512 -| END @0570
+C 032E [COOP 1] READY   : SP 35/256 -| END @0207
+F 033E [PREE 1] READY   : SP 35/80 -| END @0257
+O 034E [PREE 1] READY   : SP 35/80 -| END @02A7
+K 035E [PREE 3] READY   : SP 35/62 -| END @02E6
+~C~F#f~O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!C_.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.
 ```
 
 ## Things ...

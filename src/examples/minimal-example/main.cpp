@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <util/delay.h>
 #include "avrtos/misc/uart.h"
 #include "avrtos/misc/led.h"
 #include "avrtos/kernel.h"
@@ -13,6 +14,7 @@ uint8_t off = 0u;
 K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
 K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, nullptr, 'O');
 K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, nullptr, 'F');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, nullptr, 'C');
 
 int main(void)
 {
@@ -31,7 +33,17 @@ void thread_led(void *context)
     k_mutex_lock_wait(&mymutex, K_FOREVER);
     led_set(thread_led_state);
     usart_transmit(thread_led_state ? 'o' : 'f');
-    k_sleep(K_MSEC(500));
+    k_sleep(K_MSEC(100));
     k_mutex_release(&mymutex);
+  }
+}
+
+void thread_coop(void*)
+{
+  while(1)
+  {
+    k_sleep(K_MSEC(2000));
+    usart_transmit('_');
+    _delay_ms(500); // blocking all threads for 500ms
   }
 }

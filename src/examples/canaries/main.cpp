@@ -1,3 +1,27 @@
+/**
+ * @file main.cpp
+ * @author Dietrich Lucas (ld.adecy@gmail.com)
+ * @brief Use of canaries to determine precise stacks needs for different threads
+ * @version 0.1
+ * @date 2021-08-06
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ * Configuration options
+ *  - CONFIG_THREAD_CANARIES=1
+ *  - CONFIG_THREAD_EXPLICIT_MAIN_STACK=1
+ * 
+ * Logs :
+ * 
+ * ...
+ *  
+ * [M] CANARIES until @07CE [found 468], MAX usage = 44 / 512
+ * [2] CANARIES until @0113 [found 14], MAX usage = 498 / 512
+ * [1] CANARIES until @03C7 [found 194], MAX usage = 62 / 256
+ * [L] CANARIES until @04DE [found 217], MAX usage = 39 / 256
+ * [K] CANARIES until @051F [found 26], MAX usage = 36 / 62
+ */
+
 /*___________________________________________________________________________*/
 
 #include <util/delay.h>

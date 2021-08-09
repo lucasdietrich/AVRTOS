@@ -30,8 +30,10 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeo
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
 
+// doesn't set popped item->next to NULL
 struct titem * tqueue_pop(struct titem **root);
 
+// set item->next to NULL
 void tqueue_remove(struct titem **root, struct titem *item);
 
 /*___________________________________________________________________________*/
