@@ -22,12 +22,16 @@ void _k_workqueue_entry(struct k_workqueue * context)
         k_sched_unlock();
         if (item != nullptr)
         {
+            CLR_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
+
             struct k_work * work = CONTAINER_OF(item, struct k_work, tie);
 
             work->handler(work);    // call the task
         }
         else
         {
+            SET_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
+
             k_sleep(K_FOREVER); // sleep until a new work item is added to the queue
         }
     }
@@ -37,10 +41,15 @@ void _k_workqueue_entry(struct k_workqueue * context)
 void k_work_submit(struct k_workqueue * workqueue, struct k_work * work)
 {
     cli();
-    if (workqueue->thread->state == WAITING)
+    
+    // we need to check if the workqueue is processing an item (workqueue should be idle), 
+    // because we shouldn't wake up it if there if the item is waiting for an event while beiing processed
+    if (TEST_BIT(workqueue->flags, K_WORKQUEUE_IDLE) &&
+        workqueue->thread->state == WAITING)
     {
         _k_wake_up(workqueue->thread);
     }
+
     tqueue_schedule(&workqueue->root, &work->tie, K_NO_WAIT.value);
     sei();
 }

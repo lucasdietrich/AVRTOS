@@ -34,7 +34,7 @@ void task_handler(struct k_work* self)
 {
   struct task_t * const task = CONTAINER_OF(self, struct task_t, work);
 
-  k_sleep(K_MSEC((k_delta_ms_t) task->input));
+  k_sleep(K_MSEC((k_delta_ms_t) task->input)); // doesn't work because we cannot differentiate workqueue sleep and item sleep
 
   k_sched_lock();
   usart_hex16((uint16_t) self);
@@ -56,14 +56,14 @@ int main(void)
   
   k_thread_dump_all();
 
-  sei();
-
   for (uint_fast8_t i = 0; i < ARRAY_SIZE(tasks); i++)
   {
     k_mutex_init(&tasks[i].mutex);
     k_work_init(&tasks[i].work, task_handler);
     tasks[i].input = 100;
   }
+
+  sei();
 
   k_sleep(K_FOREVER);
 }
