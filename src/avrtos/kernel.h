@@ -24,8 +24,8 @@ void k_yield(void);
 
 /**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
- * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and shift still
- * shift the timed threads in th etime queue.
+ * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and it stills
+ * shift the timed threads in the time queue.
  * As cooperative threads, executing should no last very long, since it could delay other threads execution and break time sensitive (RT) threads.
  */
 void k_sched_lock(void);
@@ -146,6 +146,11 @@ void _k_reschedule(k_timeout_t timeout);
 
 /**
  * @brief Wake up a thread that is waiting for an event.
+ * 
+ * Assumptions:
+ *  - thread is in waiting mode
+ *  - thread is not in the runqueue
+ *  - thread may be in the events queue
  * 
  * @param th 
  */

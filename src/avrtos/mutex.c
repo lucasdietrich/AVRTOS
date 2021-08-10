@@ -8,7 +8,7 @@
 extern struct ditem *runqueue; 
 extern struct titem *events_queue;
 
-void k_mutex_define(mutex_t *mutex)
+void k_mutex_init(mutex_t *mutex)
 {
     mutex->lock = 0xFFu;
 }

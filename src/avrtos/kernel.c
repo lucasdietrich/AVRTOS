@@ -120,6 +120,7 @@ void _k_suspend(void)
     k_current->flags = STOPPED;
 }
 
+// TODO : use double linked list in order to remove the event with 1 call (without loop)
 void _k_unschedule(struct thread_t *th)
 {
     tqueue_remove(&events_queue, &th->tie.event);
@@ -206,7 +207,7 @@ void _k_reschedule(k_timeout_t timeout)
     }
 }
 
-// assumptions : thread not in runqueue and if tqueue
+// assumptions : thread not in runqueue and (potentially) in tqueue
 void _k_wake_up(struct thread_t *th)
 {
     _k_unschedule(th);

@@ -122,6 +122,8 @@ What features will be implemented :
 - Delayed start, suspending/resuming threads
 - Stack sentinels
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
+- Memslabs
+- Task scheduler
 
 What enhancements are planned :
 - Removing CPU idle thread
@@ -129,6 +131,9 @@ What enhancements are planned :
 - Using makefile to build the project for a target
 - Stack for interrupts handlers
 - Propose this project as a library
+- Delay the submission of a work in a workqueue
+- Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
+- Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
@@ -230,6 +235,10 @@ K 035E [PREE 3] READY   : SP 35/62 -| END @02E6
 
 - didn't use any debugger to develop this project
 - AVRTOS stands for AVR and RTOS
+
+# Immediate todo
+
+- change "mutex_t" to "struct k_mutex"
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list

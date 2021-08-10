@@ -12,6 +12,7 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+#define K_MUTEX_INIT() { .lock = 0xFFu, .waitqueue = NULL }
 #define K_MUTEX_DEFINE(mutex_name) static mutex_t mutex_name = { .lock = 0xFFu, .waitqueue = NULL }
 
 /*___________________________________________________________________________*/
@@ -30,7 +31,7 @@ typedef struct {
  * 
  * @param mutex address of the mutex structure
  */
-void k_mutex_define(mutex_t *mutex);
+void k_mutex_init(mutex_t *mutex);
 
 /**
  * @brief Lock a mutex, return immediately (nonblocking @see k_mutex_lock_wait)

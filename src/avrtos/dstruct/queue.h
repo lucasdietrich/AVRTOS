@@ -14,7 +14,12 @@ struct qitem
     struct qitem * next;
 };
 
-#define DEFINE_QUEUE(ref_name) struct qitem *ref_name = {NULL}
+#define DEFINE_QUEUE(ref_name) struct qitem *ref_name = NULL
+#define INIT_QITEM() \
+    {                \
+        .next = NULL \
+    }
+#define DEFINE_QITEM(name) struct qitem ref_name = INIT_QITEM()
 
 /*___________________________________________________________________________*/
 

@@ -20,12 +20,27 @@ struct titem
     struct titem* next;
 };
 
-#define DEFINE_TQUEUE(ref_name) struct titem *ref_name = NULL
+#define DEFINE_TQUEUE(name) struct titem *name = NULL
+#define INIT_TITEM(timeout_ms)       \
+    {                                \
+        {                            \
+            .timeout = timeout_ms,   \
+        },                           \
+        .next = NULL                 \
+    }
+#define DEFINE_TITEM(name) struct titem name = INIT_TITEM(name, timeout_ms)
 
 /*___________________________________________________________________________*/
 
 void _tqueue_schedule(struct titem **root, struct titem *item);
 
+/**
+ * @brief If the new event has the same timeout as another event already in the list, it will be added after it
+ * 
+ * @param root 
+ * @param item 
+ * @param timeout 
+ */
 void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeout);
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);

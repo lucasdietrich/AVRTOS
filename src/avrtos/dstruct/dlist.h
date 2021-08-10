@@ -15,7 +15,14 @@ struct ditem
     struct ditem *next;
 };
 
-#define DEFINE_DLIST(ref_name)  struct ditem ref_name = {&ref_name, &ref_name}
+
+#define INIT_DITEM(self)           \
+    {                              \
+        .prev = &self              \
+        .next = &self              \
+    }
+#define INIT_DITEM_NULL()   INIT_DITEM(NULL)
+#define DEFINE_DLIST(ref_name) struct dlist ref_name = INIT_DITEM(ref_name)
 
 /*___________________________________________________________________________*/
 

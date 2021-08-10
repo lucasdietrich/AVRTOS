@@ -45,7 +45,7 @@ typedef void (*thread_entry_t)(void*);
  * READY : the thread is ready to be executed and it somewhere is in the runqueue but is not at the top
  * 
  * WAITING : the thread is waiting for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
- * It can be woke up with function _k_wake_up()
+ * It can be wake up with function _k_wake_up()
  * 
  */
 enum thread_state_t { STOPPED = 0, RUNNING = 1, READY = 2, WAITING = 3 };
