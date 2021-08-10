@@ -13,6 +13,8 @@ extern "C" {
 // a ditem is already in the list if next != null and prev != null
 // a ditem is not in the list if next == null && prev == null
 
+// poping the last element of the runqueue doesn't have no any effect
+
 /*___________________________________________________________________________*/
 
 struct ditem
@@ -21,14 +23,14 @@ struct ditem
     struct ditem *next;
 };
 
-
 #define INIT_DITEM(self)           \
     {                              \
-        .prev = &self              \
-        .next = &self              \
+        .prev = self,              \
+        .next = self               \
     }
-#define INIT_DITEM_NULL()   INIT_DITEM(NULL)
-#define DEFINE_DLIST(ref_name) struct dlist ref_name = INIT_DITEM(ref_name)
+#define INIT_DITEM_NULL()           INIT_DITEM(NULL)
+
+#define DEFINE_DLIST(ref_name) struct dlist ref_name = INIT_DITEM(&ref_name)
 
 /*___________________________________________________________________________*/
 
@@ -58,9 +60,13 @@ struct ditem * ref_requeue(struct ditem **ref);
 
 struct ditem * ref_forward_tail(struct ditem **ref);
 
-void dlist_queue(struct ditem *ref, struct ditem * item);
+/*___________________________________________________________________________*/
 
-struct ditem * dlist_dequeue(struct ditem *ref);
+// Queue, starting at ref, different from push_back and pop_front
+
+void dlist_queue(struct ditem **ref, struct ditem * item);
+
+struct ditem * dlist_dequeue(struct ditem **ref);
 
 /*___________________________________________________________________________*/
 

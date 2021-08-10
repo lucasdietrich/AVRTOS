@@ -133,14 +133,37 @@ struct ditem * ref_forward_tail(struct ditem **ref)
     return *ref = (*ref)->prev;
 }
 
-void dlist_queue(struct ditem *ref, struct ditem * item)
+/*___________________________________________________________________________*/
+
+void dlist_queue(struct ditem **ref, struct ditem * item)
 {
-    return push_back(ref, item);
+    if (*ref == NULL)
+    {
+        *ref = item;
+        dlist_ref(*ref);
+    }
+    else
+    {
+        push_back(*ref, item);
+    }
 }
 
-struct ditem * dlist_dequeue(struct ditem *ref)
+struct ditem * dlist_dequeue(struct ditem **ref)
 {
-    return pop_front(ref);
+    struct ditem * pop = NULL;
+    if (*ref != NULL)
+    {
+        if ((*ref)->next == *ref) // == (*ref)->prev
+        {
+            pop = *ref;
+            *ref = NULL;
+        }
+        else
+        {
+            pop = pop_ref(ref);
+        }
+    }
+    return pop;
 }
 
 /*___________________________________________________________________________*/
