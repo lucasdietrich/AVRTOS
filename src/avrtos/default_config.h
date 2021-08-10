@@ -34,7 +34,7 @@
 //
 // Define the maximum number of threads supported
 //
-#define DEFAULT_THREAD_MAX                      5
+#define DEFAULT_THREAD_MAX                      7
 
 //
 // Define the main thread type (coop/prempt) and priority
@@ -136,6 +136,21 @@
 // Define thread canaries symbol
 //
 #define DEFAULT_THREAD_CANARIES_SYMBOL          0xAA
+
+//
+// Enable system workqueue
+//
+#define DEFAULT_SYSTEM_WORKQUEUE_ENABLE         0
+
+//
+// Define system workqueue stack size
+//
+#define DEFAULT_SYSTEM_WORKQUEUE_STACK_SIZE     0x200
+
+//
+// Define system workqueue thread priority
+//
+#define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       K_PRIO_PREEMPT(K_PRIO_HIGH)
 
 
 /*___________________________________________________________________________*/

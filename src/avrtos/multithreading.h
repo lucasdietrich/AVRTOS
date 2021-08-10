@@ -14,6 +14,7 @@
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
 #include "mutex.h"
+#include "workqueue.h"
 #include "semaphore.h"
 #include "sysclock.h"
 #include "idle.h"

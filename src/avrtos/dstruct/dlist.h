@@ -7,6 +7,12 @@
 extern "C" {
 #endif
 
+
+/*___________________________________________________________________________*/
+
+// a ditem is already in the list if next != null and prev != null
+// a ditem is not in the list if next == null && prev == null
+
 /*___________________________________________________________________________*/
 
 struct ditem
