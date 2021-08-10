@@ -31,6 +31,7 @@ typedef struct
 
 #define SET_BIT(x, b)  ((x) |= b)
 #define CLR_BIT(x, b)  ((x) &= (~(b)))
+#define TEST_BIT(x, b) ((bool) ((x) & b))
 
 
 #endif

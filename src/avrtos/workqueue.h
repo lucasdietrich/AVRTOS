@@ -25,19 +25,21 @@ struct k_work
 
 /*___________________________________________________________________________*/
 
+#define K_WORKQUEUE_IDLE  (1 << 0)
+
 struct k_workqueue
 {
     struct ditem *queue;
     struct thread_t* thread;
-    // stats
+    uint8_t flags;
 };
 
 #define _K_WORKQUEUE_THREAD_NAME(name) workq_##name
 
 #define K_WORKQUEUE_DEFINE(name, stack_size, prio_flags)                                                             \
     extern struct k_workqueue name;                                                                                  \
-    K_THREAD_DEFINE(_K_WORKQUEUE_THREAD_NAME(name), _k_workqueue_entry, stack_size, prio_flags, &name, nullptr, 'W') \
-    struct k_workqueue name = {.queue = NULL, .thread = &_K_WORKQUEUE_THREAD_NAME(name)};
+    K_THREAD_DEFINE(_K_WORKQUEUE_THREAD_NAME(name), _k_workqueue_entry, stack_size, prio_flags, &name, &name, 'W') \
+    struct k_workqueue name = {.queue = NULL, .thread = &_K_WORKQUEUE_THREAD_NAME(name), .flags = 0u};
 
 /*___________________________________________________________________________*/
 
