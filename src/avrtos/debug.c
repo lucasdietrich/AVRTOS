@@ -1,14 +1,11 @@
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 
 #include <string.h>
 #include <stdio.h>
 
-#include <avr/pgmspace.h>
-
 #include "debug.h"
 #include "dstruct/tqueue.h"
-
-#include "kernel.h"
 
 /*___________________________________________________________________________*/
 

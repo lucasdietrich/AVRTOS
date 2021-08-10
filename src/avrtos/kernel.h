@@ -98,7 +98,7 @@ void _k_kernel_init(void);
  * 
  * @param th : ready thread to queue 
  */
-void _k_queue(struct thread_t *th);
+void _k_queue(struct thread_t * const th);
 
 /**
  * @brief Remove the current thread from the runqueue. Keep it's flag unchanged.

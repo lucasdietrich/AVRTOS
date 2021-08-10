@@ -42,7 +42,7 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeo
     if (item == NULL)
         return;
 
-    item->next = NULL;
+    item->next = NULL;  // necessary if the item is put at the very end of the list
     item->timeout = timeout;
 
     _tqueue_schedule(root, item);

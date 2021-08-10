@@ -104,7 +104,7 @@ void _k_kernel_init(void)
     }
 }
 
-void _k_queue(struct thread_t *th)
+void _k_queue(struct thread_t *const th)
 {
     push_back(runqueue, &th->tie.runqueue);
 }

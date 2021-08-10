@@ -8,10 +8,10 @@ In this example, we spawn three threads (+ main thread + idle thread) :
 - Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same time
     - A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting for 100ms.
     - both threads use the same reentrant function
-- One cooperative threads that blocks the execution of all threads for 500ms every 2 seconds.
-- The main thread release the CPU forever when initialization finished
+- One cooperative threads blocks the execution of all threads for 500ms every 2 seconds.
+- The main thread releases the CPU forever when initialization finished
 
-On an Arduino Pro (ATmega328p, avr5) the led should be blinking at the frequency of 10Hz and then block for 500ms every 2 seconds.
+On an Arduino Pro (or Arduino Pro Mini), based on an ATmega328p (avr5) the led should be blinking at the frequency of 5Hz and then block for 500ms every 2 seconds.
 
 Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
 
@@ -83,7 +83,7 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 
 ## Introduction
 
-This project is an attempt to create a real time operating system for AVR 8 bits microcontrollers.
+This project is an attempt to create a real time operating system (RTOS) for AVR 8 bits microcontrollers.
 
 Following avr architectures are supported/tested :
 - avr5, especially ATmega328p : tested with an Arduino PRO
@@ -91,7 +91,7 @@ Following avr architectures are supported/tested :
 
 Following features are supported:
 - Cooperative threads
-- Preemptive threads with time slice between 1ms and 16ms
+- Preemptive threads with time slice between 1ms and 16ms (based on timer 2)
 - Mutex
 - Thread sleeping up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
@@ -124,17 +124,18 @@ What features will be implemented :
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
 
 What enhancements are planned :
-- removing CPU idle thread
-- don't keep the idle thread in the runqueue if others threads are in
-- using makefile to build the project for a target
+- Removing CPU idle thread
+- Don't keep the idle thread in the runqueue if others threads are in
+- Using makefile to build the project for a target
 - Stack for interrupts handlers
+- Propose this project as a library
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
 
 ## PlatformIO
 
-- This project was developp using PlatformIO environnement in Visual Studio Code IDE.
+- This project was developed using PlatformIO environnement in Visual Studio Code IDE.
 - Each example can be easily built using the *pio* configuration file :
     - Board, e.g. : pro16MHzatmega328, megaatmega2560
     - Choose the linker script depending on the AVR architecture

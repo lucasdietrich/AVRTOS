@@ -11,6 +11,9 @@
         "pgmspace.h": "c",
         "io.h": "c",
         "interrupt.h": "c",
-        "kernel.h": "c"
+        "kernel.h": "c",
+        "defines.h": "c",
+        "common.h": "c",
+        "debug.h": "c"
     }
 }
