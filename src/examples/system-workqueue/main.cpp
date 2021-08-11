@@ -14,6 +14,8 @@
 
 void task_handler(struct k_work* self)
 {
+  k_sleep(K_SECONDS(1));
+
   usart_printl("Hello");
 }
 
@@ -33,10 +35,9 @@ int main(void)
   while(true)
   {
     k_system_workqueue_submit(&work);
+    k_system_workqueue_submit(&work);
 
     k_sleep(K_SECONDS(2));
-
-    print_runqueue();
   }
 }
 

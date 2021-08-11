@@ -43,7 +43,7 @@ struct k_workqueue
 
 /*___________________________________________________________________________*/
 
-void _k_workqueue_entry(struct k_workqueue * context);
+void _k_workqueue_entry(struct k_workqueue *const workqueue);
 
 /*___________________________________________________________________________*/
 

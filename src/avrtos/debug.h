@@ -15,7 +15,7 @@ extern "C" {
 /**
  * @brief Current thread stack usage
  * 
- * Getting the stack usage of the main thread if CONFIG_THREAD_EXPLICIT_MAIN_STACK is not set will return 0 by default :
+ * Getting the stack usage of the main thread if THREAD_EXPLICIT_MAIN_STACK is not set will return 0 by default :
  *  
  * @param th
  * @return uint16_t 

@@ -56,7 +56,9 @@ void k_mutex_release(mutex_t *mutex)
     else
     {
         struct thread_t *th = THREAD_OF_QITEM(first_waiting_thread);
-        
+
+        th->wmutex.next = NULL;
+
         _k_wake_up(th);
         
 #if KERNEL_SCHEDULER_DEBUG

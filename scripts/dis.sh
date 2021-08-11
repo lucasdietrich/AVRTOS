@@ -12,5 +12,9 @@ avr-objdump -S .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.s
 avr-readelf -a .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.readelf.txt
 avr-nm .pio/build/KernelTest/firmware.elf > res/tmp/KernelTest.nm.txt
 
+avr-objdump -S .pio/build/WorkQueue/firmware.elf > res/tmp/WorkQueue.s
+avr-readelf -a .pio/build/WorkQueue/firmware.elf > res/tmp/WorkQueue.readelf.txt
+avr-nm .pio/build/WorkQueue/firmware.elf > res/tmp/WorkQueue.nm.txt
+
 avr-objdump -S .pio/build/Canaries/firmware.elf > res/tmp/Canaries.s
 avr-readelf -a .pio/build/Canaries/firmware.elf > res/tmp/Canaries.readelf.txt

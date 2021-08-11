@@ -4,9 +4,8 @@
 
 /*___________________________________________________________________________*/
 
-void _k_workqueue_entry(struct k_workqueue * context)
+void _k_workqueue_entry(struct k_workqueue *const workqueue)
 {
-    struct k_workqueue * const workqueue = (struct k_workqueue *) context;
     for(;;)
     {
         k_sched_lock();
@@ -39,16 +38,15 @@ void k_work_init(struct k_work * work, k_work_handler_t handler)
     work->handler = handler;
 }
 
-// TODO : don't submit if it's already queued
 void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
     cli(); // maybe optimize, can be only k_sched_lock arround dlist_queue
 
     if (work->tie.prev == NULL) // if item is not already in queue
     {
-
-        // we need to check if the workqueue is processing an item (workqueue should be idle),
+        // we need to check if the workqueue is processing an item,
         // because we shouldn't wake up it if there if the item is waiting for an event while beiing processed
+        // workqueue should be idle to wake it up
         if (TEST_BIT(workqueue->flags, K_WORKQUEUE_IDLE) &&
             workqueue->thread->state == WAITING)
         {
@@ -64,7 +62,7 @@ void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 
 #if SYSTEM_WORKQUEUE_ENABLE
 
-K_WORKQUEUE_DEFINE(_k_system_workqueue, SYSTEM_WORKQUEUE_STACK_SIZE, DEFAULT_SYSTEM_WORKQUEUE_PRIORITY);
+K_WORKQUEUE_DEFINE(_k_system_workqueue, SYSTEM_WORKQUEUE_STACK_SIZE, SYSTEM_WORKQUEUE_PRIORITY);
 
 void k_system_workqueue_submit(struct k_work * work)
 {

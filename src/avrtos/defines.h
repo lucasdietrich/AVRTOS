@@ -38,12 +38,12 @@
 // MAX threads
 #ifdef CONFIG_THREAD_MAX
 #if CONFIG_THREAD_MAX > 1
-#define K_THREAD_MAX_COUNT CONFIG_THREAD_MAX
+#define THREAD_MAX CONFIG_THREAD_MAX
 #else
 #error Cannot configure this library for less than 2 threads (CONFIG_THREAD_MAX < 2)
 #endif
 #else
-#define K_THREAD_MAX_COUNT DEFAULT_THREAD_MAX
+#define THREAD_MAX DEFAULT_THREAD_MAX
 #endif
 
 // main thread priority

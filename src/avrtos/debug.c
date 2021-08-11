@@ -53,11 +53,8 @@ void k_thread_dump_hex(struct thread_t *th)
 void k_thread_dump(struct thread_t *th)
 {
     usart_transmit(th->symbol);
-
     usart_transmit(' ');
-
     usart_hex16((const uint16_t) th);
-
     if (th->coop)
     {
         usart_print(" [COOP ");
@@ -71,7 +68,7 @@ void k_thread_dump(struct thread_t *th)
 
     usart_print("] ");
 
-    __attribute__((used)) static const char strings[4][8] PROGMEM = {
+   static const char strings[4][8] PROGMEM = {
         "STOPPED",
         "RUNNING",
         "READY  ",
@@ -92,8 +89,8 @@ void k_thread_dump(struct thread_t *th)
 
 void k_thread_dump_all(void)
 {
-    static const char string_1[] PROGMEM = "===== k_thread =====\n";
-    usart_print_p(string_1);
+    static const char string[] PROGMEM = "===== k_thread =====\n";
+    usart_print_p(string);
 
     for (uint_fast8_t i = 0; i < _k_thread_count; i++)
     {

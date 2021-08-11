@@ -62,7 +62,7 @@ usart_core_dump:
     ldi r24, 32 ; "space"
     call usart_transmit
 
-    adiw r26, 35 + 1    ; 35 for return address + registers + sreg
+    adiw r26, K_THREAD_STACK_VOID_SIZE + 1    ; for return address + registers + sreg
 
     ; show return address
     ld r24, -X

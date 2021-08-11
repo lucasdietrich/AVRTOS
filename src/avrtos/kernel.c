@@ -116,7 +116,8 @@ void _k_catch()
 
 void _k_suspend(void)
 {
-    pop_ref(&runqueue);
+    _k_catch();
+
     k_current->flags = STOPPED;
 }
 
@@ -213,7 +214,6 @@ void _k_wake_up(struct thread_t *th)
     _k_unschedule(th);
 
     th->state = READY;
-    th->wmutex.next = NULL;
 
     push_front(runqueue, &th->tie.runqueue);
 }
