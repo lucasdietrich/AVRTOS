@@ -130,7 +130,7 @@ void _k_unschedule(struct thread_t *th);
  * 
  * @return struct thread_t* : next thread to be executed
  */
-struct thread_t *_k_scheduler(void);
+/* __attribute__((noinline)) */ struct thread_t *_k_scheduler(void);
 
 /**
  * @brief @see k_yield

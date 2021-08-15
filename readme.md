@@ -124,6 +124,7 @@ What features will be implemented :
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
 - Memslabs
 - Task scheduler
+- Saving thread errno
 
 What enhancements are planned :
 - Removing CPU idle thread
@@ -239,6 +240,10 @@ K 035E [PREE 3] READY   : SP 35/62 -| END @02E6
 # Immediate todo
 
 - change "mutex_t" to "struct k_mutex"
+
+# Ideas: 
+- Malloc : https://www.nongnu.org/avr-libc/user-manual/malloc.html
+- Exceptions
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
