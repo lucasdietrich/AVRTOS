@@ -5,7 +5,7 @@
 ### Description
 
 In this example, we spawn three threads (+ main thread + idle thread) :
-- Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same time
+- Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same duration
     - A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting for 100ms.
     - both threads use the same reentrant function
 - One cooperative threads blocks the execution of all threads for 500ms every 2 seconds.
@@ -100,6 +100,7 @@ Following features are supported:
 - Canaries
 - Runtime stack/thread creation
 - avr5 and avr6 architectures
+- Workqueues and system workqueue 
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -118,7 +119,6 @@ What features will be implemented :
 - Prioritization
 - Semaphores
 - Signals
-- System workqueue and work items
 - Delayed start, suspending/resuming threads
 - Stack sentinels
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
@@ -236,10 +236,6 @@ K 035E [PREE 3] READY   : SP 35/62 -| END @02E6
 
 - didn't use any debugger to develop this project
 - AVRTOS stands for AVR and RTOS
-
-# Immediate todo
-
-- change "mutex_t" to "struct k_mutex"
 
 # Ideas: 
 - Malloc : https://www.nongnu.org/avr-libc/user-manual/malloc.html

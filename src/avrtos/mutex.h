@@ -13,7 +13,7 @@ extern "C" {
 /*___________________________________________________________________________*/
 
 #define K_MUTEX_INIT() { .lock = 0xFFu, .waitqueue = NULL }
-#define K_MUTEX_DEFINE(mutex_name) static mutex_t mutex_name = { .lock = 0xFFu, .waitqueue = NULL }
+#define K_MUTEX_DEFINE(mutex_name) static struct k_mutex mutex_name = { .lock = 0xFFu, .waitqueue = NULL }
 
 /*___________________________________________________________________________*/
 
@@ -21,17 +21,17 @@ extern "C" {
  * @brief Structure describing a mutex, "lock" parameter tells if the current is locked or not (0 if lock, 0xFF otherwise)
  * waitqueue list contains all threads waiting for the mutex, first thread to wake up when mutex is release is at the first element of the queue
  */
-typedef struct {
+struct k_mutex {
     uint8_t lock;
     struct qitem *waitqueue;
-} mutex_t;
+};
 
 /**
  * @brief Define a mutex
  * 
  * @param mutex address of the mutex structure
  */
-void k_mutex_init(mutex_t *mutex);
+void k_mutex_init(struct k_mutex *mutex);
 
 /**
  * @brief Lock a mutex, return immediately (nonblocking @see k_mutex_lock_wait)
@@ -39,7 +39,7 @@ void k_mutex_init(mutex_t *mutex);
  * @param mutex address of the mutex structure
  * @return uint8_t 0 if mutex locked any other value otherwise
  */
-uint8_t k_mutex_lock(mutex_t *mutex);
+uint8_t k_mutex_lock(struct k_mutex *mutex);
 
 /**
  * @brief Wait on a mutex, return immediately if mutex is available, otherwise wait for given timeout.
@@ -53,7 +53,7 @@ uint8_t k_mutex_lock(mutex_t *mutex);
  * @param timeout time waiting the mutex (e.g. K_NO_WAIT, K_MSEC(1000), K_FOREVER)
  * @return uint8_t 0 if mutex locked any other value otherwise
  */
-uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
+uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout);
 
 /**
  * @brief Release a mutex, wake up the first waiting thread if the waiting queue is not empty, do k_yield
@@ -61,7 +61,7 @@ uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout);
  * 
  * @param mutex : address of the mutex structure
  */
-void k_mutex_release(mutex_t *mutex);
+void k_mutex_release(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 
@@ -71,14 +71,14 @@ void k_mutex_release(mutex_t *mutex);
  * @param mutex address of the mutex structure
  * @return uint8_t 0 if mutex locked any other value otherwise
  */
-uint8_t _k_mutex_lock(mutex_t *mutex);
+uint8_t _k_mutex_lock(struct k_mutex *mutex);
 
 /**
  * @brief Arch unlock a mutex, don't need the interrupt flag to be disabled
  * 
  * @param mutex 
  */
-void _k_mutex_release(mutex_t *mutex);
+void _k_mutex_release(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 

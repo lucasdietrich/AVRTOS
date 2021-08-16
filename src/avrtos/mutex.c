@@ -8,17 +8,17 @@
 extern struct ditem *runqueue; 
 extern struct titem *events_queue;
 
-void k_mutex_init(mutex_t *mutex)
+void k_mutex_init(struct k_mutex *mutex)
 {
     mutex->lock = 0xFFu;
 }
 
-uint8_t k_mutex_lock(mutex_t *mutex)
+uint8_t k_mutex_lock(struct k_mutex *mutex)
 {
     return _k_mutex_lock(mutex);
 }
 
-uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
+uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout)
 {
     uint8_t lock = _k_mutex_lock(mutex);
     if ((lock != 0) && (timeout.value != K_NO_WAIT.value))
@@ -28,7 +28,7 @@ uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
 
         _k_reschedule(timeout);
 
-        k_yield();
+        _k_yield();
 
 #if KERNEL_SCHEDULER_DEBUG
         usart_transmit('{');
@@ -45,7 +45,7 @@ uint8_t k_mutex_lock_wait(mutex_t *mutex, k_timeout_t timeout)
     return lock;
 }
 
-void k_mutex_release(mutex_t *mutex)
+void k_mutex_release(struct k_mutex *mutex)
 {
     cli();
     struct qitem* first_waiting_thread = dequeue(&mutex->waitqueue);

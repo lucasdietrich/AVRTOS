@@ -25,7 +25,7 @@ K_WORKQUEUE_DEFINE(workqueue, 0x200, K_PRIO_COOP(K_PRIO_LOW));
 struct task_t
 {
   struct k_work work;
-  mutex_t mutex;
+  struct k_mutex mutex;
 
   uint32_t input;
 };

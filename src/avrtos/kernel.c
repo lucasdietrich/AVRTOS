@@ -134,7 +134,7 @@ struct thread_t *_k_scheduler(void)
     void *next = (struct titem*) tqueue_pop(&events_queue);
     if (next != NULL)
     {
-        push_ref(&runqueue, next);
+        push_ref(&runqueue, (struct ditem*) next);
     }
     else if(k_current->state != WAITING)
     {

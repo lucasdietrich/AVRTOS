@@ -152,6 +152,7 @@ void _k_reschedule(k_timeout_t timeout);
  *  - thread is not in the runqueue
  *  - thread may be in the events queue
  * 
+ * 
  * @param th 
  */
 void _k_wake_up(struct thread_t *th);
