@@ -26,47 +26,47 @@
 // You may need to reset the build directory if you modify this configuration file
 //
 // Few constants defined here may be used in a asm file, avoid the use of the unsigned flag ("u") at the end of numbers
-// prefer : CONFIG_THREAD_MAIN_STACK_SIZE 0x100 to CONFIG_THREAD_MAIN_STACK_SIZE 0x100u
+// i.e. prefer : CONFIG_THREAD_MAIN_STACK_SIZE 0x100 to CONFIG_THREAD_MAIN_STACK_SIZE 0x100u
 //
 
 /*___________________________________________________________________________*/
 
 //
-// Define the maximum number of threads supported
+// Define the maximum number of threads supported.
 //
-#define DEFAULT_THREAD_MAX                      7
+#define DEFAULT_THREAD_MAX                          7
 
 //
 // Define the main thread type (coop/prempt) and priority
 //
-#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY     K_PRIO_PREEMPT(K_PRIO_HIGH)
+#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY         K_PRIO_PREEMPT(K_PRIO_HIGH)
 
 //
 // Tells if the main stack location and size must be defined at compilation time (1)
 // or if the default main stack behaviour (stack at RAMEND) should be kept (0)
 //
-#define DEFAULT_THREAD_EXPLICIT_MAIN_STACK      1
+#define DEFAULT_THREAD_EXPLICIT_MAIN_STACK          1
 
 //
 // In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option
 // defines the size of the main stack
 //
-#define DEFAULT_THREAD_MAIN_STACK_SIZE          0x200
+#define DEFAULT_THREAD_MAIN_STACK_SIZE              0x200
 
 //
 // Tells if we should use the C or the Assembler function to define our threads at runtime
 //
-#define DEFAULT_THREAD_USE_INIT_STACK_ASM              1
+#define DEFAULT_THREAD_USE_INIT_STACK_ASM           1
 
 //
-// Tell if we can name threads using a 2 letters symbol (e.g. M, T1, T2, ...)
+// Tell if we can name threads using a 1 letter symbol (e.g. M, T1, T2, ...)
 //
-#define DEFAULT_THREAD_SYMBOL                          1
+#define DEFAULT_THREAD_SYMBOL                       1
 
 //
 // Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
 //
-#define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32      0
+#define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32   0
 
 //
 // Default SREG value for other thread on stack creation.

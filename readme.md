@@ -92,7 +92,7 @@ Following avr architectures are supported/tested :
 Following features are supported:
 - Cooperative threads
 - Preemptive threads with time slice between 1ms and 16ms (based on timer 2)
-- Mutex
+- Mutex and Semaphores
 - Thread sleeping up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
 - Waking up threads waiting on events (mutex release)
@@ -117,7 +117,6 @@ What features will be implemented :
 - System time
 - Statistics CPU use per thread
 - Prioritization
-- Semaphores
 - Signals
 - Delayed start, suspending/resuming threads
 - Stack sentinels
@@ -136,6 +135,7 @@ What enhancements are planned :
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
 - Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
+- Reworking the Git history to remove big files (screenshots, logs) : [stackoverflow.com : How to remove/delete a large file from commit history in Git repository?](https://stackoverflow.com/questions/2100907/how-to-remove-delete-a-large-file-from-commit-history-in-git-repository)
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
