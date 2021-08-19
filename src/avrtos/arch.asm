@@ -53,7 +53,7 @@ USART_Continue:
 
 /*___________________________________________________________________________*/
 
-.global _k_yield
+.global k_yield
 .extern _k_scheduler
 .extern k_current
 
@@ -122,7 +122,7 @@ check_coop:
     
 #endif
 
-_k_yield:
+k_yield:
     push r17
     lds r17, SREG
 

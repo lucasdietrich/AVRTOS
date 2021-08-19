@@ -135,6 +135,7 @@ What enhancements are planned :
 - Delay the submission of a work in a workqueue
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
 - Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
+- Check that the thread own the mutex/semaphore when releasing it
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).

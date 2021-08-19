@@ -51,7 +51,6 @@ void _tqueue_schedule(struct titem **root, struct titem *item);
  *  - root is not null
  *  - item is not null
  * 
- * 
  * @param root 
  * @param item 
  * @param timeout 

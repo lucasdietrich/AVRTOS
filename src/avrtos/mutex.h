@@ -26,15 +26,17 @@ struct k_mutex {
     struct qitem *waitqueue;
 };
 
+/*___________________________________________________________________________*/
+
 /**
- * @brief Define a mutex
+ * @brief Initialize a mutex
  * 
  * @param mutex address of the mutex structure
  */
 void k_mutex_init(struct k_mutex *mutex);
 
 /**
- * @brief Lock a mutex, return immediately (nonblocking @see k_mutex_lock_wait)
+ * @brief Lock a mutex, return immediately (nonblocking @see k_mutex_lock_wait).
  * 
  * @param mutex address of the mutex structure
  * @return uint8_t 0 if mutex locked any other value otherwise
@@ -42,12 +44,13 @@ void k_mutex_init(struct k_mutex *mutex);
 uint8_t k_mutex_lock(struct k_mutex *mutex);
 
 /**
- * @brief Wait on a mutex, return immediately if mutex is available, otherwise wait for given timeout.
- * If the mutex is available, the scheduler is not called. If the scheduler is already locked.
- * The current thread is unscheduled and added to the waiting queue ("waitqueue") of the mutex, 
+ * @brief Wait on a mutex, return immediately if mutex is available, otherwise wait until timeout.
+ * If the mutex is available, the scheduler is not called. If the mutex ic locked,
+ * the current thread is unscheduled and added to the waiting queue ("waitqueue") of the mutex, 
  * it will be woke up when the thread reach the top of this waitqueue and the mutex is available again.
  * If timeout is different from K_FOREVER, the thread will be woke up when the timeout expires, in this case
- * the function will returns that the mutex is still locked. (current thread is removed from the waiting queue).
+ * the function will check again for the mutex availability. (current thread is removed from the waiting queue).
+ * Don't lock a mutex from an interrupt routine !
  * 
  * @param mutex address of the mutex structure
  * @param timeout time waiting the mutex (e.g. K_NO_WAIT, K_MSEC(1000), K_FOREVER)
@@ -66,7 +69,7 @@ void k_mutex_release(struct k_mutex *mutex);
 /*___________________________________________________________________________*/
 
 /**
- * @brief Arch lock a mutex, clear the interrupt flag and set it to its original state when finished
+ * @brief Arch lock a mutex, clear the interrupt flag (if set) and set it to its original state when finished
  * 
  * @param mutex address of the mutex structure
  * @return uint8_t 0 if mutex locked any other value otherwise

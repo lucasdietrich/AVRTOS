@@ -14,11 +14,6 @@ struct titem *events_queue = NULL;
 // Kernel Public API
 //
 
-void k_yield(void)
-{
-    _k_yield();
-}
-
 void k_sched_lock(void)
 {
     cli();
@@ -41,7 +36,7 @@ void k_sleep(k_timeout_t timeout)
 
         _k_reschedule(timeout);
      
-        _k_yield();
+        k_yield();
 
         sei();
     }

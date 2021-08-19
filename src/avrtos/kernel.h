@@ -17,8 +17,8 @@ extern "C" {
  * @brief Release the CPU: Stop the execution of the current thread and set it at the end of the runqueue 
  * (if it's still ready) in order to execute it one "cycle" later.
  * This function call the scheduler that determine which thread is the next on to be executing.
- * This functing restore the context of the current thread when returning.
- * This function can be called from either a cooperative thread or a premptive thread
+ * This function restore the context of the current thread when returning.
+ * This function can be called from either a cooperative thread or a premptive thread.
  */
 void k_yield(void);
 
@@ -131,11 +131,6 @@ void _k_unschedule(struct thread_t *th);
  * @return struct thread_t* : next thread to be executed
  */
 /* __attribute__((noinline)) */ struct thread_t *_k_scheduler(void);
-
-/**
- * @brief @see k_yield
- */
-void _k_yield(void);
 
 /**
  * @brief Remove the current thread from the runqueue and schedule it's execution later.

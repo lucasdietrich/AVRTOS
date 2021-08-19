@@ -150,3 +150,19 @@ void print_events_queue(void)
 }
 
 /*___________________________________________________________________________*/
+
+void k_sem_debug(struct k_sem *sem)
+{
+    cli();
+    const uint8_t count = sem->count;
+    const uint8_t limit = sem->limit;
+    sei();
+
+    usart_print("K_SEM ");
+    usart_u8(count);
+    usart_transmit('/');
+    usart_u8(limit);
+    usart_transmit('\n');
+}
+
+/*___________________________________________________________________________*/
