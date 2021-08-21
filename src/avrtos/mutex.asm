@@ -2,7 +2,7 @@
 
 .global _mutex_read
 .global _k_mutex_lock
-.global _k_mutex_release
+.global _k_mutex_unlock
 
 ; mutex struct addr in r24, r25
 ; mov addr in r30, r31 (Z register)
@@ -25,7 +25,7 @@ _k_mutex_lock:
     ret
 
 ; mutex struct addr in r24, r25
-_k_mutex_release:
+_k_mutex_unlock:
     movw r26, r24
     ldi r24, 0xFF
     st X, r24

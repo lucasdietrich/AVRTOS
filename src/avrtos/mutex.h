@@ -19,7 +19,7 @@ extern "C" {
 
 /**
  * @brief Structure describing a mutex, "lock" parameter tells if the current is locked or not (0 if lock, 0xFF otherwise)
- * waitqueue list contains all threads waiting for the mutex, first thread to wake up when mutex is release is at the first element of the queue
+ * waitqueue list contains all threads waiting for the mutex, first thread to wake up when mutex is unlocked is first in the queue.
  */
 struct k_mutex {
     uint8_t lock;
@@ -44,7 +44,7 @@ void k_mutex_init(struct k_mutex *mutex);
 uint8_t k_mutex_lock(struct k_mutex *mutex);
 
 /**
- * @brief Lock a mutex, return immediately if mutex is available, otherwise wait until the mutex is released or timeout.
+ * @brief Lock a mutex, return immediately if mutex is available, otherwise wait until the mutex is unlocked or timeout.
  * If the mutex is available, the scheduler is not called. If the mutex ic locked,
  * the current thread is unscheduled and added to the waiting queue ("waitqueue") of the mutex, 
  * it will be woke up when the thread reach the top of this waitqueue and the mutex is available again.
@@ -59,13 +59,13 @@ uint8_t k_mutex_lock(struct k_mutex *mutex);
 uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout);
 
 /**
- * @brief Release a mutex, wake up the first waiting thread if the waiting queue is not empty, do k_yield
+ * @brief Unlock a mutex, wake up the first waiting thread if the waiting queue is not empty, do k_yield
  * this function doesn't check if the current thread actually own the mutex. This function sets interrupt flag when returning.
  * Can be called from an interrupt.
  * 
  * @param mutex : address of the mutex structure
  */
-void k_mutex_release(struct k_mutex *mutex);
+void k_mutex_unlock(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 
@@ -82,7 +82,7 @@ uint8_t _k_mutex_lock(struct k_mutex *mutex);
  * 
  * @param mutex 
  */
-void _k_mutex_release(struct k_mutex *mutex);
+void _k_mutex_unlock(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 

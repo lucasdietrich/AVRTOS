@@ -14,7 +14,7 @@ extern struct titem *events_queue;
 
 /*___________________________________________________________________________*/
 
-uint16_t k_thread_usage(struct thread_t *th)
+uint16_t k_thread_usage(struct k_thread *th)
 {
     if (NULL == th->sp)
     {
@@ -34,8 +34,8 @@ uint16_t k_thread_usage(struct thread_t *th)
     }
 }
 
-extern struct thread_t __k_threads_start;
-extern struct thread_t __k_threads_end;
+extern struct k_thread __k_threads_start;
+extern struct k_thread __k_threads_end;
 
 void k_thread_dbg_count(void)
 {
@@ -45,12 +45,12 @@ void k_thread_dbg_count(void)
     usart_transmit('\n');
 }
 
-void k_thread_dump_hex(struct thread_t *th)
+void k_thread_dump_hex(struct k_thread *th)
 {
-    usart_send_hex((const uint8_t *)th, sizeof(struct thread_t));
+    usart_send_hex((const uint8_t *)th, sizeof(struct k_thread));
 }
 
-void k_thread_dump(struct thread_t *th)
+void k_thread_dump(struct k_thread *th)
 {
     usart_transmit(th->symbol);
     usart_transmit(' ');
@@ -99,7 +99,7 @@ void k_thread_dump_all(void)
 }
 
 
-void *k_thread_get_return_addr(struct thread_t *th)
+void *k_thread_get_return_addr(struct k_thread *th)
 {
     if (th == k_current)
     {
@@ -110,7 +110,7 @@ void *k_thread_get_return_addr(struct thread_t *th)
     return NULL;
 }
 
-int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_t size)
+int k_thread_copy_registers(struct k_thread *th, char *const buffer, const size_t size)
 {
     if ((th == k_current) && (size >= 16))
     {
@@ -131,12 +131,12 @@ int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_
 
 void _thread_symbol_runqueue(struct ditem * item)
 {
-    usart_transmit(CONTAINER_OF(item, struct thread_t, tie.runqueue)->symbol);
+    usart_transmit(CONTAINER_OF(item, struct k_thread, tie.runqueue)->symbol);
 }
 
 void _thread_symbol_events_queue(struct titem * item)
 {
-    usart_transmit(CONTAINER_OF(item, struct thread_t, tie.event)->symbol);
+    usart_transmit(CONTAINER_OF(item, struct k_thread, tie.event)->symbol);
 }
 
 void print_runqueue(void)

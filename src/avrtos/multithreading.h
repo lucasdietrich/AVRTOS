@@ -60,9 +60,9 @@ enum thread_state_t { STOPPED = 0, RUNNING = 1, READY = 2, WAITING = 3 };
  * 
  * This structure is 16B long
  * 
- * Warning : Every definition of a "struct thread_t" variable must be stack
+ * Warning : Every definition of a "struct k_thread" variable must be stack
  */
-struct thread_t
+struct k_thread
 {
     void *sp;       // stack point, keep it at the beginning of the structure
     union {
@@ -99,12 +99,12 @@ struct thread_t
 /**
  * @brief Main thread structure, defined in _k_threads section
  */
-extern struct thread_t _k_thread_main;
+extern struct k_thread _k_thread_main;
 
 /**
  * @brief Get the address of the thread currently running.
  */
-extern struct thread_t * k_current;
+extern struct k_thread * k_current;
 
 /**
  * @brief Get the number of threads defined.
@@ -137,7 +137,7 @@ extern uint8_t _k_thread_count;
  * @param local_storage thread local_storage
  * @return int 0 on success
  */
-int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
+int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
 
 /**
  * @brief Initialize a thread stack at runtime
@@ -147,18 +147,18 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
  * @param stack thread stack start location
  * @param context_p thread context
  */
-void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack, void *const context_p);
+void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, void *const stack, void *const context_p);
 
 /*___________________________________________________________________________*/
 
 /**
  * @brief Get current thread
  * 
- * @see struct thread_t * k_current
+ * @see struct k_thread * k_current
  * 
  * @return thread_t* 
  */
-struct thread_t * k_thread_current(void);
+struct k_thread * k_thread_current(void);
 
 /**
  * @brief Get current thread local storage pointer

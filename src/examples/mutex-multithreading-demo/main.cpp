@@ -48,7 +48,7 @@ void thread_led_on(void *p)
 
     k_sleep(K_MSEC(1000));
 
-    k_mutex_release(&mymutex);
+    k_mutex_unlock(&mymutex);
   }
 }
 
@@ -62,7 +62,7 @@ void thread_led_off(void *p)
 
     k_sleep(K_MSEC(1000));
 
-    k_mutex_release(&mymutex);
+    k_mutex_unlock(&mymutex);
   }
 }
 

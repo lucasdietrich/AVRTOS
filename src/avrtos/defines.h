@@ -299,9 +299,9 @@
 
 #define K_THREAD        __attribute__((used, section(".k_threads")))
 
-#define THREAD_OF_DITEM(item) CONTAINER_OF(item, struct thread_t, tie.runqueue)
-#define THREAD_OF_QITEM(item) CONTAINER_OF(item, struct thread_t, wmutex)
-#define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct thread_t, tie.event)
+#define THREAD_OF_DITEM(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
+#define THREAD_OF_QITEM(item) CONTAINER_OF(item, struct k_thread, wmutex)
+#define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
 #define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
     struct                                                                 \
@@ -339,7 +339,7 @@
         (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, local_storage_p, sym)                            \
-    struct thread_t name = {                                                                                 \
+    struct k_thread name = {                                                                                 \
         .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                          \
         {                                                                                                    \
             .flags = K_FLAG_READY | prio_flags,                                                              \

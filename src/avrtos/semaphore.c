@@ -60,7 +60,7 @@ NOINLINE void k_sem_give(struct k_sem *sem)
         struct qitem *const first_waiting_thread = dequeue(&sem->waitqueue);
         if (first_waiting_thread != NULL)
         {
-            struct thread_t *const th = THREAD_OF_QITEM(first_waiting_thread);
+            struct k_thread *const th = THREAD_OF_QITEM(first_waiting_thread);
             th->wmutex.next = NULL;
 
             /* immediate: the first thread in the queue must be the first to get the semaphore */

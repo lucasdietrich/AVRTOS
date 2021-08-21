@@ -20,7 +20,7 @@ extern "C" {
  * @param th
  * @return uint16_t 
  */
-uint16_t k_thread_usage(struct thread_t *th);
+uint16_t k_thread_usage(struct k_thread *th);
 
 /**
  * @brief Print the current number of threads
@@ -32,7 +32,7 @@ void k_thread_dbg_count(void);
  * 
  * @param th 
  */
-void k_thread_dump_hex(struct thread_t *th);
+void k_thread_dump_hex(struct k_thread *th);
 
 /**
  * @brief Pretty print the thread structure content :
@@ -44,7 +44,7 @@ void k_thread_dump_hex(struct thread_t *th);
  * 
  * @param th 
  */
-void k_thread_dump(struct thread_t *th);
+void k_thread_dump(struct k_thread *th);
 
 /**
  * @brief Pretty print all threads contains
@@ -64,7 +64,7 @@ void k_thread_dump_all(void);
  * @param th 
  * @return void* 
  */
-void *k_thread_get_return_addr(struct thread_t *th);
+void *k_thread_get_return_addr(struct k_thread *th);
 
 /**
  * @brief Copy in buffer the 32 registers (stored in stack) of a suspended thread
@@ -84,7 +84,7 @@ void *k_thread_get_return_addr(struct thread_t *th);
  * @param size 
  * @return int 
  */
-int k_thread_copy_registers(struct thread_t *th, char *const buffer, const size_t size);
+int k_thread_copy_registers(struct k_thread *th, char *const buffer, const size_t size);
 
 /*___________________________________________________________________________*/
 
@@ -110,7 +110,7 @@ uint16_t read_ra(void);
  * 
  * @param th 
  */
-void set_stack_pointer(struct thread_t *th);
+void set_stack_pointer(struct k_thread *th);
 
 /**
  * @brief Read SREG register

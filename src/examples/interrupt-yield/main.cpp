@@ -52,7 +52,7 @@ ISR(USART_RX_vect)
   // UART0 RX buffer must be read before enabling interrupts again
   recv = usart_read_rx();
 
-  k_mutex_release(&mymutex);
+  k_mutex_unlock(&mymutex);
 }
 
 int main(void)

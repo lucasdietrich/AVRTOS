@@ -347,7 +347,7 @@ _k_thread_stack_create:
     ; -1, to first empty stack addr
     sbiw r26, 1
 
-    ; mov r24, r25 (struct thread_t *th) to Y
+    ; mov r24, r25 (struct k_thread *th) to Y
     movw r28, r24
 
     ; save SP in thread structure

@@ -54,7 +54,7 @@ void thread_led(void *context)
     led_set(thread_led_state);
     usart_transmit(thread_led_state ? 'o' : 'f');
     k_sleep(K_MSEC(100));
-    k_mutex_release(&mymutex);
+    k_mutex_unlock(&mymutex);
   }
 }
 
@@ -91,7 +91,7 @@ Following avr architectures are supported/tested :
 
 Following features are supported:
 - Cooperative threads
-- Preemptive threads with time slice between 1ms and 16ms (based on timer 2)
+- Preemptive threads with time slice between 1ms and 16ms (based on timer 0).
 - Mutex and Semaphores
 - Thread sleeping up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
@@ -110,7 +110,7 @@ Minor features:
 - data structures : dlist (doubly linked list), queue (singly linked list), time queue (singly linked list with delay parameter)
 - I/O : leds, uart
 
-What paradigms are not supported:
+What paradigms/concepts are not supported:
 - Nested interrupts
 
 What features will be implemented :
@@ -139,7 +139,6 @@ What enhancements are planned :
 - Cancel submitted item
 - Custom errors code: e.g. : EAGAIN, EINVAL
 - Use <util/atomic.h> library to enhanced SREG flag restore or force on
-- Rename `struct thread_t` to `struct k_thread`
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
@@ -152,7 +151,9 @@ Mutexes may not be unlocked in ISRs, as mutexes must only be manipulated
 in thread context due to ownership and priority inheritance semantics.
 ```
 
-Moreover, some paradigms appear in  the code but re actually not imlplemented for now, e.g. prioritization
+Moreover, some paradigms appear in  the code but re actually not implemented for now, e.g. prioritization
+
+- This library is not compatible with the Arduino framework for now: the kernel clock is based on the timer0 which is used for `millis()` in the arduino framework. This should be the only limitation.
 
 ## PlatformIO
 
@@ -211,7 +212,7 @@ monitor_speed = 500000
 
 ## Known issues
 
-- It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_release, ... from it.
+- It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_unlock, ... from it.
   - k_sched lock/cooperative thread only prevent thread switching with the sysclock interrupt handler (used to preempt threads)
 
 ## Debugging

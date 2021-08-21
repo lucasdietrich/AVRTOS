@@ -29,7 +29,7 @@ extern "C" {
     /**
  * @brief idle thread structure location
  */
-    extern struct thread_t _k_idle;
+    extern struct k_thread _k_idle;
 
     /**
  * @brief Idle thread entry function

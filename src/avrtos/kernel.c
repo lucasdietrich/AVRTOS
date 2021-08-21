@@ -84,12 +84,12 @@ void k_suspend(void)
     }
 }
 
-void k_resume(struct thread_t *th)
+void k_resume(struct k_thread *th)
 {
     k_start(th);
 }
 
-void k_start(struct thread_t *th)
+void k_start(struct k_thread *th)
 {
     if (th->state == STOPPED)
     {
@@ -110,8 +110,8 @@ void k_start(struct thread_t *th)
 // Kernel Private API
 //
 
-extern struct thread_t __k_threads_start;
-extern struct thread_t __k_threads_end;
+extern struct k_thread __k_threads_start;
+extern struct k_thread __k_threads_end;
 
 uint8_t _k_thread_count = 1;
 
@@ -129,7 +129,7 @@ void _k_kernel_init(void)
     }
 }
 
-void _k_queue(struct thread_t *const th)
+void _k_queue(struct k_thread *const th)
 {
     push_back(runqueue, &th->tie.runqueue);
 }
@@ -147,14 +147,14 @@ void _k_suspend(void)
 }
 
 // TODO : use double linked list in order to remove the event with 1 call (without loop)
-void _k_unschedule(struct thread_t *th)
+void _k_unschedule(struct k_thread *th)
 {
     tqueue_remove(&events_queue, &th->tie.event);
 }
 
 #if KERNEL_SCHEDULER_DEBUG == 0
 
-struct thread_t *_k_scheduler(void)
+struct k_thread *_k_scheduler(void)
 {
     void *ready = (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
@@ -185,7 +185,7 @@ struct thread_t *_k_scheduler(void)
 
     THREAD_OF_DITEM(runqueue)->state = READY;
 
-    return k_current = CONTAINER_OF(runqueue, struct thread_t, tie.runqueue);
+    return k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
 }
 
 #else
@@ -197,7 +197,7 @@ struct thread_t *_k_scheduler(void)
 // ! mean tqueue item
 // ~ thread set to waiting
 // > default next thread
-struct thread_t *_k_scheduler(void)
+struct k_thread *_k_scheduler(void)
 {
     void *ready = (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
@@ -239,7 +239,7 @@ struct thread_t *_k_scheduler(void)
 
     _thread_symbol_runqueue(runqueue);
     THREAD_OF_DITEM(runqueue)->state = READY;
-    return k_current = CONTAINER_OF(runqueue, struct thread_t, tie.runqueue);
+    return k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
 }
 #endif
 
@@ -257,7 +257,7 @@ void _k_reschedule(k_timeout_t timeout)
 }
 
 // assumptions : thread not in runqueue and (potentially) in tqueue
-void _k_wake_up(struct thread_t *th)
+void _k_wake_up(struct k_thread *th)
 {
 #if KERNEL_SCHEDULER_DEBUG
     usart_transmit('@');
@@ -269,7 +269,7 @@ void _k_wake_up(struct thread_t *th)
     push_front(runqueue, &th->tie.runqueue);
 }
 
-void _k_immediate_wake_up(struct thread_t *th)
+void _k_immediate_wake_up(struct k_thread *th)
 {
     SET_BIT(th->flags, K_FLAG_IMMEDIATE);
     _k_wake_up(th);

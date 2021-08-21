@@ -34,7 +34,7 @@ void thread_led(void *context)
     led_set(thread_led_state);
     usart_transmit(thread_led_state ? 'o' : 'f');
     k_sleep(K_MSEC(100));
-    k_mutex_release(&mymutex);
+    k_mutex_unlock(&mymutex);
   }
 }
 

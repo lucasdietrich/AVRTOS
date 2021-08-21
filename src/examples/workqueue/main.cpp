@@ -41,7 +41,7 @@ void task_handler(struct k_work* self)
   usart_printl(" finished");
   k_sched_unlock();
 
-  k_mutex_release(&task->mutex);
+  k_mutex_unlock(&task->mutex);
 }
 
 #define TASKS_COUNT   15

@@ -14,7 +14,7 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 #endif
 
-K_THREAD struct thread_t _k_thread_main = {
+K_THREAD struct k_thread _k_thread_main = {
     .sp = NULL, // main thread is running, context already "restored"
     {
         .flags = RUNNING | K_PRIO_PREEMPT(K_PRIO_MAX),
@@ -41,14 +41,14 @@ K_THREAD struct thread_t _k_thread_main = {
     .symbol = 'M'           // default main thread sumbol
 };
 
-struct thread_t * k_current = &_k_thread_main;
+struct k_thread * k_current = &_k_thread_main;
 
 
 /*___________________________________________________________________________*/
 
 #if THREAD_USE_INIT_STACK_ASM == 0
 
-void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
+void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
 {
     // get stack pointer value
     uint8_t* sp = (uint8_t*) stack_end - 1;
@@ -85,7 +85,7 @@ void _k_thread_stack_create(struct thread_t *const th, thread_entry_t entry, voi
 
 #include "misc/uart.h"
 
-int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
+int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
 {
     if (stack_size < K_THREAD_STACK_MIN_SIZE)
     {
@@ -108,7 +108,7 @@ int k_thread_create(struct thread_t *const th, thread_entry_t entry, void *const
 
 /*___________________________________________________________________________*/
 
-inline struct thread_t * k_thread_current(void)
+inline struct k_thread * k_thread_current(void)
 {
     return k_current;
 }

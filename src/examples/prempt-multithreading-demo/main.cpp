@@ -1,3 +1,16 @@
+/**
+ * @file main.cpp
+ * @author Dietrich Lucas (ld.adecy@gmail.com)
+ * @brief Two thread increment two counters. Threads are preempted by the system clock.
+ * If configuration option CONFIG_KERNEL_DEBUG_PREEMPT_UART=1 is enabled :
+ * send a character over the UART to preempt the thread currently running and switch to the other.
+ * @version 0.1
+ * @date 2021-08-21
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 /*___________________________________________________________________________*/
 
 #include <util/delay.h>
@@ -56,8 +69,12 @@ void thread_processing(void *p)
 
     if ((counter & 0xFFFFF) == 0)
     {
+      k_sched_lock();
+      usart_transmit(k_current->symbol);
+      usart_print(": ");
       usart_hex16(counter >> 16);
       usart_print("0000\n");
+      k_sched_unlock();
     }
   }
 }

@@ -83,14 +83,14 @@ void k_suspend(void);
  * 
  * @param th : suspended thread to resume.
  */
-void k_resume(struct thread_t *th);
+void k_resume(struct k_thread *th);
 
 /**
  * @brief Start the thread
  * 
  * @param th : stopped thread to start.
  */
-void k_start(struct thread_t *th);
+void k_start(struct k_thread *th);
 
 /*___________________________________________________________________________*/
 
@@ -113,7 +113,7 @@ void _k_kernel_init(void);
  * 
  * @param th : ready thread to queue 
  */
-void _k_queue(struct thread_t * const th);
+void _k_queue(struct k_thread * const th);
 
 /**
  * @brief Remove the current thread from the runqueue. Keep it's flag unchanged.
@@ -134,7 +134,7 @@ void _k_suspend(void);
  * 
  * @param th 
  */
-void _k_unschedule(struct thread_t *th);
+void _k_unschedule(struct k_thread *th);
 
 /**
  * @brief Choice the next thread to be executed. 
@@ -143,9 +143,9 @@ void _k_unschedule(struct thread_t *th);
  * 
  * This function is called in k_yield function
  * 
- * @return struct thread_t* : next thread to be executed
+ * @return struct k_thread* : next thread to be executed
  */
-K_NOINLINE struct thread_t *_k_scheduler(void);
+K_NOINLINE struct k_thread *_k_scheduler(void);
 
 /**
  * @brief Remove the current thread from the runqueue and schedule it's execution later.
@@ -165,7 +165,7 @@ void _k_reschedule(k_timeout_t timeout);
  * 
  * @param th thread to wake up
  */
-K_NOINLINE void _k_wake_up(struct thread_t *th);
+K_NOINLINE void _k_wake_up(struct k_thread *th);
 
 /**
  * @brief Wake up a thread that is waiting for an event.
@@ -174,7 +174,7 @@ K_NOINLINE void _k_wake_up(struct thread_t *th);
  * 
  * @param th thread to wake up in immediate mode
  */
-void _k_immediate_wake_up(struct thread_t *th);
+void _k_immediate_wake_up(struct k_thread *th);
 
 /**
  * @brief Shift time in kernel time queue list (events_queue) 

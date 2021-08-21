@@ -46,7 +46,7 @@ NOINLINE uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout)
     return lock;
 }
 
-NOINLINE void k_mutex_release(struct k_mutex *mutex)
+NOINLINE void k_mutex_unlock(struct k_mutex *mutex)
 {
     // must be executed without interruption
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -57,12 +57,12 @@ NOINLINE void k_mutex_release(struct k_mutex *mutex)
         usart_transmit('*');
 #endif
 
-        _k_mutex_release(mutex);
+        _k_mutex_unlock(mutex);
 
         struct qitem* first_waiting_thread = dequeue(&mutex->waitqueue);
         if (first_waiting_thread != NULL)
         {
-            struct thread_t *th = THREAD_OF_QITEM(first_waiting_thread);
+            struct k_thread *th = THREAD_OF_QITEM(first_waiting_thread);
             th->wmutex.next = NULL;
 
             /* immediate: the first thread in the queue must be the first to get the semaphore */

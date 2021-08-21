@@ -22,7 +22,7 @@ void _k_init_thread_canaries(void);
  * @param th 
  * @return void* Address of byte following the last found canary. (Address of the furthest stack location used by the thread.)
  */
-void* _k_thread_canaries(struct thread_t *th);
+void* _k_thread_canaries(struct k_thread *th);
 
 /*___________________________________________________________________________*/
 
@@ -31,7 +31,7 @@ void* _k_thread_canaries(struct thread_t *th);
  * 
  * @param th thread to check
  */
-void print_thread_canaries(struct thread_t *th);
+void print_thread_canaries(struct k_thread *th);
 
 /**
  * @brief Pretty print found canaries in the current thread

@@ -30,7 +30,7 @@ struct k_work
 struct k_workqueue
 {
     struct ditem *queue;
-    struct thread_t* thread;
+    struct k_thread* thread;
     uint8_t flags;
 };
 
