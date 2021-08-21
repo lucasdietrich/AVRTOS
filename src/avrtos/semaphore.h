@@ -25,7 +25,7 @@ extern "C" {
 /**
  * @brief Structure describing a semaphore, "count" parameter tells the number of available semaphore
  * "limit" describe the maximum number of semaphores.
- * waitqueue list contains all threads waiting for the mutex, first thread to wake up when mutex is release is at the first element of the queue
+ * waitqueue list contains all threads waiting for the semaphore, first thread to wake up when a semaphore is available is at the first element of the queue
  */
 struct k_sem {
     uint8_t count;
@@ -38,18 +38,12 @@ struct k_sem {
 /**
  * @brief Initialize a semaphore
  * 
- * @param mutex : structure representing the semaphore
+ * @param sem : structure representing the semaphore
  */
 void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
 
 /**
- * @brief Take a semaphore
- * 
- * @param mutex : success if 0, any other value is no semaphore is available
- * @return uint8_t 
- */
-/**
- * @brief Wait on a semaphore, return immediately if a semaphore is available, otherwise wait until timeout.
+ * @brief Take a semaphore, return immediately if a semaphore is available, otherwise wait until a semaphore is given or timeout.
  * If a semaphore is available, the scheduler is not called. If no semaphore is available,
  * the current thread is unscheduled and added to the waiting queue ("waitqueue") of the semaphore, 
  * it will be woke up when the thread reach the top of this waitqueue and a semaphore is available.
@@ -64,8 +58,8 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
 uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
- * @brief Give a semaphore, wake up the first waiting thread if the waiting queue is not empty, do k_yield
- * this function doesn't check if the current thread actually own the mutex. This function sets interrupt flag when returning.
+ * @brief Give a semaphore, wake up the first waiting thread if the waiting queue is not empty, do k_yield.
+ * This function sets interrupt flag when returning.
  * Giving a semaphore if the "limit" is reached will have no effect.
  * 
  * @param sem : address of the semaphore structure
@@ -85,8 +79,9 @@ uint8_t _k_sem_take(struct k_sem *sem);
 /**
  * @brief Arch give a semaphore, clear the interrupt flag (if set) and set it to its original state when finished
  * Giving a semaphore if the "limit" is reached will have no effect.
+ * Can be called from an interrupt.
  * 
- * @param mutex 
+ * @param sem 
  */
 void _k_sem_give(struct k_sem *sem);
 

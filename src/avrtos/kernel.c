@@ -2,6 +2,8 @@
 
 #include "idle.h"
 
+#include <util/atomic.h>
+
 /*___________________________________________________________________________*/
 
 struct ditem *runqueue = &_k_thread_main.tie.runqueue; 
@@ -16,16 +18,42 @@ struct titem *events_queue = NULL;
 
 void k_sched_lock(void)
 {
-    cli();
-    SET_BIT(k_current->flags, K_FLAG_COOP);
-    sei();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        SET_BIT(k_current->flags, K_FLAG_COOP);
+    }
 }
 
 void k_sched_unlock(void)
 {
-    cli();
-    CLR_BIT(k_current->flags, K_FLAG_COOP);
-    sei();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        CLR_BIT(k_current->flags, K_FLAG_COOP);
+    }
+}
+
+bool k_sched_locked(void)
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        return (bool) TEST_BIT(k_current->flags, K_FLAG_COOP);
+    }
+
+    __builtin_unreachable();
+}
+
+void k_soft_yield(void)
+{
+    bool yield = 0;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        yield = !TEST_BIT(k_current->flags, K_FLAG_COOP);
+    }
+
+    if(yield)
+    {
+        k_yield();
+    }
 }
 
 void k_sleep(k_timeout_t timeout)
@@ -50,9 +78,10 @@ void k_sleep(k_timeout_t timeout)
 
 void k_suspend(void)
 {
-    cli();
-    _k_suspend();
-    sei();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        _k_suspend();
+    }
 }
 
 void k_resume(struct thread_t *th)
@@ -64,9 +93,10 @@ void k_start(struct thread_t *th)
 {
     if (th->state == STOPPED)
     {
-        cli();
-        _k_queue(th);
-        sei();
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+            _k_queue(th);
+        }
     }
     else // thread waiting, ready of running and then already started
     {
@@ -126,10 +156,21 @@ void _k_unschedule(struct thread_t *th)
 
 struct thread_t *_k_scheduler(void)
 {
-    void *next = (struct titem*) tqueue_pop(&events_queue);
-    if (next != NULL)
+    void *ready = (struct titem*) tqueue_pop(&events_queue);
+    if (ready != NULL)
     {
-        push_ref(&runqueue, (struct ditem*) next);
+        // next thread is in immediate mode and should be executed first (no reorder)
+        if(TEST_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE))
+        {
+            CLR_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE);
+            push_front(runqueue->next, ready);
+        }
+        else
+        {
+            push_front(runqueue, ready);
+        }
+
+        ref_requeue(&runqueue);
     }
     else if(k_current->state != WAITING)
     {
@@ -158,12 +199,26 @@ struct thread_t *_k_scheduler(void)
 // > default next thread
 struct thread_t *_k_scheduler(void)
 {
-    // print_tqueue(events_queue, _thread_symbol);
-    void *next = (struct titem*) tqueue_pop(&events_queue);
-    if (next != NULL)
+    void *ready = (struct titem*) tqueue_pop(&events_queue);
+    if (ready != NULL)
     {
-        push_ref(&runqueue, next);
         usart_transmit('!');
+        
+        // next thread is in immediate mode and should be executed first (no reorder)
+        if(TEST_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE))
+        {
+            CLR_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE);
+            push_front(runqueue->next, ready);
+            
+            usart_transmit(THREAD_OF_DITEM(ready)->symbol);
+            usart_transmit('\'');
+        }
+        else
+        {
+            push_front(runqueue, ready);
+        }
+
+        ref_requeue(&runqueue);
     }
     else if (k_current->state == WAITING)
     {
@@ -183,9 +238,7 @@ struct thread_t *_k_scheduler(void)
     }
 
     _thread_symbol_runqueue(runqueue);
-
     THREAD_OF_DITEM(runqueue)->state = READY;
-
     return k_current = CONTAINER_OF(runqueue, struct thread_t, tie.runqueue);
 }
 #endif
@@ -206,11 +259,20 @@ void _k_reschedule(k_timeout_t timeout)
 // assumptions : thread not in runqueue and (potentially) in tqueue
 void _k_wake_up(struct thread_t *th)
 {
+#if KERNEL_SCHEDULER_DEBUG
+    usart_transmit('@');
+    usart_transmit(th->symbol);
+#endif
+
     _k_unschedule(th);
-
     th->state = READY;
-
     push_front(runqueue, &th->tie.runqueue);
+}
+
+void _k_immediate_wake_up(struct thread_t *th)
+{
+    SET_BIT(th->flags, K_FLAG_IMMEDIATE);
+    _k_wake_up(th);
 }
 
 void _k_system_shift(void)

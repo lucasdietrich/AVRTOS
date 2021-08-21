@@ -136,9 +136,23 @@ What enhancements are planned :
 - Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
 - Reworking the Git history to remove big files (screenshots, logs) : [stackoverflow.com : How to remove/delete a large file from commit history in Git repository?](https://stackoverflow.com/questions/2100907/how-to-remove-delete-a-large-file-from-commit-history-in-git-repository)
+- Cancel submitted item
+- Custom errors code: e.g. : EAGAIN, EINVAL
+- Use <util/atomic.h> library to enhanced SREG flag restore or force on
+- Rename `struct thread_t` to `struct k_thread`
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
+However be carefull, many behavior are different from the ones from Zephyr RTOS ! For example, regarding mutexes, AVRTOS kernel doesn't check if the thread releasing a mutex actually owns it, moreover it's possible to release a mutex from an interrupt routine routine while this is not the case in Zephyr.
+
+From Zephyr RTOS documentation `k_mutex_unlock` : 
+
+```
+Mutexes may not be unlocked in ISRs, as mutexes must only be manipulated
+in thread context due to ownership and priority inheritance semantics.
+```
+
+Moreover, some paradigms appear in  the code but re actually not imlplemented for now, e.g. prioritization
 
 ## PlatformIO
 

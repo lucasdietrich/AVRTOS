@@ -12,8 +12,15 @@
 
 /*___________________________________________________________________________*/
 
-#define PERIOD_SEM_GIVE   100
+#define CRASH_TEST  1
+
+#if CRASH_TEST
+#define PERIOD_SEM_GIVE 1000
+#define PERIOD_SEM_TAKE PERIOD_SEM_GIVE
+#else
+#define PERIOD_SEM_GIVE   1000
 #define PERIOD_SEM_TAKE   1000
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -46,8 +53,9 @@ int main(void)
     k_sched_lock();
     usart_print("M: giving a semaphore");
     k_sem_debug(&mysem);
-    k_sem_give(&mysem);
     k_sched_unlock();
+
+    k_sem_give(&mysem);
   }
 }
 
@@ -55,14 +63,21 @@ void waiter_entry(void*)
 {
   while(1)
   {
-    k_sem_take(&mysem, K_FOREVER);
+    uint8_t dbg_sem = k_sem_take(&mysem, K_FOREVER);
 
-    k_sched_lock();
-    usart_transmit(k_current->symbol);
-    usart_printl(": got a semaphore !");
-    k_sched_unlock();
+    if(dbg_sem == 0)
+    {
+      k_sched_lock();
+      usart_transmit(k_current->symbol);
+      usart_printl(": got a semaphore !");
+      k_sched_unlock();
 
-    k_sleep(K_MSEC(PERIOD_SEM_TAKE));
+      k_sleep(K_MSEC(PERIOD_SEM_TAKE));
+    }
+    else
+    {
+      usart_printl("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM");
+    }
   }
 }
 

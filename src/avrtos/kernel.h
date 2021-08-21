@@ -23,12 +23,18 @@ extern "C" {
 void k_yield(void);
 
 /**
+ * @brief Release the CPU if the current thread is in preemptive mode.
+ * @see k_yield
+ */
+K_NOINLINE void k_soft_yield(void);
+
+/**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
  * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and it stills
  * shift the timed threads in the time queue.
  * As cooperative threads, executing should no last very long, since it could delay other threads execution and break time sensitive (RT) threads.
  */
-void k_sched_lock(void);
+K_NOINLINE void k_sched_lock(void);
 
 /**
  * @brief Unlock the CPU for the current thread being executed @see k_sched_lock. Set it as preemptive.
@@ -38,7 +44,16 @@ void k_sched_lock(void);
  * - for a preemptive thread, set it as a preemptive thread again
  * - add a new flag that tells if the thread is defined as a preemptive thread but locked the scheduler or is a real cooperative thread
  */
-void k_sched_unlock(void);
+K_NOINLINE void k_sched_unlock(void);
+
+/**
+ * @brief Tells if the scheduler is locked by the current thread or not.
+ * @see k_sched_lock/k_sched_unlock.
+ * 
+ * @return true     if scheduler is locked for the current thread or is thread is cooperative
+ * @return false    if not 
+ */
+K_NOINLINE bool k_sched_locked(void);
 
 /**
  * @brief Stop the execution of the current thread for the specified amount of time. This function schedule the execution of
@@ -50,7 +65,7 @@ void k_sched_unlock(void);
  * 
  * @param timeout waiting delay
  */
-void k_sleep(k_timeout_t timeout);
+K_NOINLINE void k_sleep(k_timeout_t timeout);
 
 /*___________________________________________________________________________*/
 
@@ -130,7 +145,7 @@ void _k_unschedule(struct thread_t *th);
  * 
  * @return struct thread_t* : next thread to be executed
  */
-/* __attribute__((noinline)) */ struct thread_t *_k_scheduler(void);
+K_NOINLINE struct thread_t *_k_scheduler(void);
 
 /**
  * @brief Remove the current thread from the runqueue and schedule it's execution later.
@@ -148,9 +163,18 @@ void _k_reschedule(k_timeout_t timeout);
  *  - thread may be in the events queue
  * 
  * 
- * @param th 
+ * @param th thread to wake up
  */
-void _k_wake_up(struct thread_t *th);
+K_NOINLINE void _k_wake_up(struct thread_t *th);
+
+/**
+ * @brief Wake up a thread that is waiting for an event.
+ * This thread is the very first to be executed.
+ * The scheduler should not reorder it before beeing executed.
+ * 
+ * @param th thread to wake up in immediate mode
+ */
+void _k_immediate_wake_up(struct thread_t *th);
 
 /**
  * @brief Shift time in kernel time queue list (events_queue) 

@@ -8,7 +8,6 @@
 /*___________________________________________________________________________*/
 
 // This find is include from asm files, make it compatible with ASM or user "#if !__ASSEMBLER__" preprocessor
-// put all c specific definition in the following file
 
 #include "common.h"
 
@@ -33,6 +32,9 @@
 # endif
 #endif
 
+#define NOINLINE            __attribute__((noinline))
+#define FUNC_NORETURN       __attribute__((__noreturn__))
+#define CODE_UNREACHABLE    __builtin_unreachable();
 /*___________________________________________________________________________*/
 
 // MAX threads
@@ -93,6 +95,19 @@
 #define KERNEL_DEBUG CONFIG_KERNEL_DEBUG
 #else
 #define KERNEL_DEBUG DEFAULT_KERNEL_DEBUG
+#endif
+
+// kernel debug function mode
+#ifdef CONFIG_KERNEL_API_NOINLINE
+#define KERNEL_API_NOINLINE CONFIG_KERNEL_API_NOINLINE
+#else
+#define KERNEL_API_NOINLINE DEFAULT_KERNEL_API_NOINLINE
+#endif
+
+#if KERNEL_API_NOINLINE
+#define K_NOINLINE NOINLINE
+#else
+#define K_NOINLINE 
 #endif
 
 // kernel scheduler debug mode
@@ -252,6 +267,7 @@
 
 /*___________________________________________________________________________*/
 
+// put all c specific definition in the following file
 #include "definesc.h"
 
 /*___________________________________________________________________________*/
