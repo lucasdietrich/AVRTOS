@@ -140,6 +140,10 @@ What enhancements are planned :
 - Custom errors code: e.g. : EAGAIN, EINVAL
 - Use <util/atomic.h> library to enhanced SREG flag restore or force on
 
+### Note
+
+#### Zephyr RTOS
+
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
 However be carefull, many behavior are different from the ones from Zephyr RTOS ! For example, regarding mutexes, AVRTOS kernel doesn't check if the thread releasing a mutex actually owns it, moreover it's possible to release a mutex from an interrupt routine routine while this is not the case in Zephyr.
@@ -151,9 +155,15 @@ Mutexes may not be unlocked in ISRs, as mutexes must only be manipulated
 in thread context due to ownership and priority inheritance semantics.
 ```
 
+#### Features
+
 Moreover, some paradigms appear in  the code but re actually not implemented for now, e.g. prioritization
 
-- This library is not compatible with the Arduino framework for now: the kernel clock is based on the timer0 which is used for `millis()` in the arduino framework. This should be the only limitation.
+This library is not compatible with the Arduino framework for now: the kernel clock is based on the timer0 which is used for `millis()` in the arduino framework. This should be the only limitation.
+
+#### Git
+
+Git history of the project has been reworked in order to remove big files (as screenshots or disassembly files). Some links can be invalid when working on an old commit.
 
 ## PlatformIO
 
@@ -183,36 +193,36 @@ monitor_speed = 500000
 ```
 
 ## Configuration options
-
-| Configuration option                   | Description                                                                                                                                                   | default                         | min | max   |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | --- | ----- |
-| THREAD\_MAX                            | Define the maximum number of threads supported                                                                                                                | 5                               | 2   | ?     |
-| THREAD\_MAIN\_THREAD\_PRIORITY         | Define the main thread type (coop/prempt) and priority                                                                                                        | K\_PRIO\_PREEMPT(K\_PRIO\_HIGH) | 0   | 0b111 |
-| THREAD\_EXPLICIT\_MAIN\_STACK          | Tells if the main stack location and size must be defined at compilation time (1) or if the default main stack behaviour (stack at RAMEND) should be kept (0) | 1                               | 0   | 1     |
-| THREAD\_MAIN\_STACK\_SIZE              | In the case we defined (EXPLICIT\_MAIN\_STACK == 1), this configuration option defines the size of the main stack                                             | 0x200                           | 0   | ?     |
-| THREAD\_USE\_INIT\_STACK\_ASM          | Tells if we should use the C or the Assembler function to define our threads at runtime                                                                       | 1                               | 0   | 1     |
-| THREAD\_DEFAULT\_SREG                  | Default SREG value for other thread on stack creation. Main thread default SREG is always 0.                                                                  | 1<< SREG\_I                     | 0   | 0xFF  |
-| THREAD\_CANARIES                       | Enable thread canaries                                                                                                                                        | 0                               | 0   | 1     |
-| THREAD\_CANARIES\_SYMBOL               | Define thread canaries symbol                                                                                                                                 | 0xAA                            | 0   | 0xFF  |
-| THREAD\_SYMBOL                         | Tell if we can name threads using a 2 letters symbol (e.g. M, T1, T2, ...)                                                                                    | 1                               | 1   | 1     |
-|                                        |                                                                                                                                                               |                                 |     |       |
-| KERNEL\_HIGH\_RANGE\_TIME\_OBJECT\_U32 | Configure to use uint32\_t as k\_delta\_ms\_t ~= 50 days or keep (uint16\_t) ~= 65seconds                                                                     | 0                               | 0   | 1     |
-| KERNEL\_PREEMPTIVE\_THREADS            | Enable preemtive threads feature                                                                                                                              | 1                               | 0   | 1     |
-| KERNEL\_TIME\_SLICE                    | Time slice in milliseconds                                                                                                                                    | 4                               | 1   | 16    |
-| KERNEL\_SYSCLOCK\_AUTO\_INIT           | Auto start kernel sysclock                                                                                                                                    | 1                               | 0   | 1     |
-| KERNEL\_THREAD\_IDLE                   | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting status                                                    | 1                               | 0   | 1     |
-| KERNEL\_THREAD\_IDLE\_ADD\_STACK       | Kernel thread idle stack size                                                                                                                                 | 0                               | 0   | ?     |
-| KERNEL\_ALLOW\_INTERRUPT\_YIELD        | Allow interrupt yield, this forces to add more stack to idle thread                                                                                           | 1                               | 0   | 1     |
-|                                        |                                                                                                                                                               |                                 |     |       |
-| KERNEL\_DEBUG\_PREEMPT\_UART           | Use uart rx interrupt as preempt signal                                                                                                                       | 0                               | 0   | 1     |
-| KERNEL\_DEBUG                          | Enable Kernel Debug features                                                                                                                                  | 0                               | 0   | 1     |
-| KERNEL\_SCHEDULER\_DEBUG               | Enable Kernel Debug in scheduler                                                                                                                              | 0                               | 0   | 1     |
-
+| Configuration option | Description |
+| --- | --- |
+| THREAD_MAX                    | Define the maximum number of threads supported |
+| THREAD_MAIN_THREAD_PRIORITY   | Define the main thread type (coop/prempt) and priority |
+| THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
+| THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
+| THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
+| THREAD_SYMBOL | Tell if we can name threads using a 1 letter symbol (e.g. M, K, 1, 2, ...) |
+| KERNEL_HIGH_RANGE_TIME_OBJECT_U32 | Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds |
+| THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
+| KERNEL_DEBUG | Enable Kernel Debug features |
+| KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
+| KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
+| KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
+| KERNEL_TIME_SLICE | Time slice in milliseconds |
+| KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
+| KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
+| KERNEL_THREAD_IDLE | KERNEL_DEBUG_PREEMPT_UART |
+| KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
+| KERNEL_ALLOW_INTERRUPT_YIELD |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
+| THREAD_CANARIES | Enable thread canaries |
+| THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
+| SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
+| SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
+| SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 
 ## Known issues
 
 - It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_unlock, ... from it.
-  - k_sched lock/cooperative thread only prevent thread switching with the sysclock interrupt handler (used to preempt threads)
+  - it's dangerous to use some kernel function that trigger a thread switch, as we cannot predict which will be the current thread when an interrupt occures.
 
 ## Debugging
 

@@ -59,7 +59,7 @@
 #define DEFAULT_THREAD_USE_INIT_STACK_ASM           1
 
 //
-// Tell if we can name threads using a 1 letter symbol (e.g. M, T1, T2, ...)
+// Tell if we can name threads using a 1 letter symbol (e.g. M, K, 1, 2, ...)
 //
 #define DEFAULT_THREAD_SYMBOL                       1
 
@@ -101,7 +101,6 @@
 
 //
 // Time slice in milliseconds
-// TODO, use 100µs as base unit
 //
 #define DEFAULT_KERNEL_TIME_SLICE               4
 
