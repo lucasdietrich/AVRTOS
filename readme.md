@@ -168,7 +168,6 @@ Moreover, some paradigms appear in  the code but re actually not implemented for
 platform = atmelavr
 board = pro16MHzatmega328
 ; board = megaatmega2560
-framework = arduino
 
 src_filter =
     +<avrtos/>
