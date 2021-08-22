@@ -161,15 +161,26 @@ struct k_thread *_k_scheduler(void)
     k_current->timer_expired = 0;
     k_current->immediate = 0;
 
+    if (k_current->state == WAITING)
+    {
+        // runqueue is positionned to the normally next thread to be executed
+        __K_DBG_SCHED_WAITING();
+    }
+    else
+    {
+        // next thread is positionned at the top of the runqueue
+        ref_requeue(&runqueue);
+
+        __K_DBG_SCHED_REQUEUE();
+    }
+
     void *ready = (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
     {
         __K_DBG_SCHED_EVENT();
-        
-        // next thread is in immediate mode and should be executed first (no reorder)
-        struct k_thread * const default_next_th = THREAD_OF_DITEM(runqueue->next);
-        if(TEST_BIT(default_next_th->flags, K_FLAG_IMMEDIATE))
-        {            
+
+        if (THREAD_OF_DITEM(runqueue)->immediate)
+        {
             __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));
 
             push_front(runqueue->next, ready);
@@ -178,20 +189,6 @@ struct k_thread *_k_scheduler(void)
         {
             push_front(runqueue, ready);
         }
-
-        SET_BIT(THREAD_OF_DITEM(ready)->flags, K_FLAG_TIMER_EXPIRED);
-
-        ref_requeue(&runqueue);
-    }
-    else if (k_current->state == WAITING)
-    {
-        __K_DBG_SCHED_WAITING();
-    }
-    else
-    {
-        ref_requeue(&runqueue);
-        
-        __K_DBG_SCHED_REQUEUE();
     }
 
     // if next thread is idle and there are others threads to be executed, we skip it
