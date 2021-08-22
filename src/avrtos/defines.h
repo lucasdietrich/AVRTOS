@@ -48,6 +48,7 @@
 #define THREAD_MAX DEFAULT_THREAD_MAX
 #endif
 
+
 // main thread priority
 #ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #define THREAD_MAIN_THREAD_PRIORITY CONFIG_THREAD_MAIN_THREAD_PRIORITY
@@ -345,7 +346,7 @@
             .flags = K_FLAG_READY | prio_flags,                                                              \
         },                                                                                                   \
         .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                   \
-        .wmutex = {.next = NULL},                                                                            \
+        {.wmutex = {.prev = NULL, .next = NULL}},                                                            \
         .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                            \
         .symbol = sym}

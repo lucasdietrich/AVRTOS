@@ -23,9 +23,10 @@ NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
             // must be executed without interruption
-            queue(&mutex->waitqueue, &k_current->wmutex);
+            dlist_queue(&mutex->waitqueue, &k_current->wmutex);
             _k_reschedule(timeout);
-            k_yield();
+            k_yield();            
+            dlist_remove(&mutex->waitqueue, &k_current->wmutex);
 
             lock = _k_mutex_lock(mutex);
         }
@@ -47,11 +48,10 @@ NOINLINE void k_mutex_unlock(struct k_mutex *mutex)
 
         __K_DBG_MUTEX_UNLOCKED(k_current);
 
-        struct qitem* first_waiting_thread = dequeue(&mutex->waitqueue);
+        struct ditem* first_waiting_thread = dlist_dequeue(&mutex->waitqueue);
         if (first_waiting_thread != NULL)
         {
             struct k_thread *th = THREAD_OF_QITEM(first_waiting_thread);
-            th->wmutex.next = NULL;
 
             /* immediate: the first thread in the queue must be the first to get the semaphore */
             _k_immediate_wake_up(th);

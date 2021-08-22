@@ -25,7 +25,7 @@ K_THREAD struct k_thread _k_thread_main = {
             .next = &_k_thread_main.tie.runqueue
         }
     },
-    .wmutex = {NULL},   // the thread isn't waiting of an y events
+    .wmutex = {NULL, NULL},   // the thread isn't waiting of an y events
 #if THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
     .stack = {
         .end = (void *)_K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),

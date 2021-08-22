@@ -24,10 +24,12 @@ NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-            queue(&sem->waitqueue, &k_current->wmutex);
+            dlist_queue(&sem->waitqueue, &k_current->wsem);
 
             _k_reschedule(timeout);
             k_yield();
+            
+            dlist_remove(&sem->waitqueue, &k_current->wsem);
 
             get = _k_sem_take(sem);
         }
@@ -49,11 +51,10 @@ NOINLINE void k_sem_give(struct k_sem *sem)
 
         __K_DBG_SEM_GIVE(k_current);
 
-        struct qitem *const first_waiting_thread = dequeue(&sem->waitqueue);
+        struct ditem *const first_waiting_thread = dlist_dequeue(&sem->waitqueue);
         if (first_waiting_thread != NULL)
         {
             struct k_thread *const th = THREAD_OF_QITEM(first_waiting_thread);
-            th->wmutex.next = NULL;
 
             /* immediate: the first thread in the queue must be the first to get the semaphore */
             _k_immediate_wake_up(th);

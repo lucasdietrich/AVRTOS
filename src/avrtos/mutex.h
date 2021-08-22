@@ -23,7 +23,7 @@ extern "C" {
  */
 struct k_mutex {
     uint8_t lock;
-    struct qitem *waitqueue;
+    struct ditem *waitqueue;
 };
 
 /*___________________________________________________________________________*/

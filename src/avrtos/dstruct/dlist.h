@@ -42,6 +42,8 @@ struct ditem * push_ref(struct ditem **ref, struct ditem *item);
 
 struct ditem * safe_push_ref(struct ditem **ref, struct ditem *item);
 
+void pop(struct ditem *item);
+
 struct ditem * pop_front(struct ditem *ref);
 
 struct ditem * pop_back(struct ditem *ref);
@@ -62,11 +64,17 @@ struct ditem * ref_forward_tail(struct ditem **ref);
 
 /*___________________________________________________________________________*/
 
-// Queue, starting at ref, different from push_back and pop_front
+//
+// Queue
+// - first item is ref
+// - (different from push_back and pop_front)
+//
 
 void dlist_queue(struct ditem **ref, struct ditem * item);
 
 struct ditem * dlist_dequeue(struct ditem **ref);
+
+void dlist_remove(struct ditem **ref, struct ditem * item);
 
 /*___________________________________________________________________________*/
 

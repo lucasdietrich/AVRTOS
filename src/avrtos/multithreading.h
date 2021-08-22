@@ -10,15 +10,17 @@
 #include <stddef.h>
 
 #include "defines.h"
-#include "dstruct/queue.h"
-#include "dstruct/dlist.h"
-#include "dstruct/tqueue.h"
-#include "mutex.h"
-#include "workqueue.h"
-#include "semaphore.h"
 #include "sysclock.h"
 #include "idle.h"
 #include "canaries.h"
+
+#include "dstruct/queue.h"
+#include "dstruct/dlist.h"
+#include "dstruct/tqueue.h"
+
+#include "workqueue.h"
+#include "mutex.h"
+#include "semaphore.h"
 
 /*___________________________________________________________________________*/
 
@@ -83,8 +85,13 @@ struct k_thread
         struct ditem runqueue;          // represent the thread in the runqueue     (4B)
         struct titem event;             // represent the thread in the events queue (4B)
     } tie;                              // the thread cannot be in the events_queue and the runqueue at the same time
-                                        
-    struct qitem wmutex;                // represent the thread waiting on an object (mutex, signal, ...)
+            
+    union
+    {
+        struct ditem wmutex;            // represent the thread waiting on an mutex
+        struct ditem wsem;              // represent the thread waiting on an semaphore
+        struct ditem wsig;              // represent the thread waiting on an signal
+    };
     struct
     {
         void *end;                      // stack end

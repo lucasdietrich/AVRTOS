@@ -18,6 +18,12 @@ void push_back(struct ditem *ref, struct ditem *item)
     item->next = ref;
 }
 
+void pop(struct ditem *item)
+{
+    item->next->prev = item->prev;
+    item->prev->next = item->next;
+}
+
 struct ditem * pop_front(struct ditem *ref)
 {
     struct ditem * item = ref->next;
@@ -164,6 +170,18 @@ struct ditem * dlist_dequeue(struct ditem **ref)
         }
     }
     return pop;
+}
+
+void dlist_remove(struct ditem **ref, struct ditem *item)
+{
+    if (*ref == item)
+    {
+        *ref = NULL;
+    }
+    else
+    {
+        pop(item);
+    }
 }
 
 /*___________________________________________________________________________*/

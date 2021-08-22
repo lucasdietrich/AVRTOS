@@ -222,6 +222,14 @@ void test_queue_dlist(void)
   dlist_queue(&ref, &ditems[4].i);
   print_dlist(ref, print_dlist_item);
 
+  usart_printl("dlist_remove : ");
+  
+  dlist_remove(&ref, &ditems[3].i);
+  print_dlist(ref, print_dlist_item);
+
+  dlist_queue(&ref, &ditems[3].i);
+  print_dlist(ref, print_dlist_item);
+
   struct ditem *pop = NULL;
 
   for (uint8_t i = 0; i < 6; i++)
