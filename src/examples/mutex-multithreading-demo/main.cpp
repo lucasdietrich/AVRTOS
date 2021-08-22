@@ -42,7 +42,7 @@ void thread_led_on(void *p)
 {
   while(1)
   {
-    k_mutex_lock_wait(&mymutex, K_FOREVER);
+    k_mutex_lock(&mymutex, K_FOREVER);
 
     led_on();
 
@@ -56,7 +56,7 @@ void thread_led_off(void *p)
 {
   while (1)
   {
-    k_mutex_lock_wait(&mymutex, K_FOREVER);
+    k_mutex_lock(&mymutex, K_FOREVER);
 
     led_off();
 

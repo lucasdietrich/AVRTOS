@@ -62,7 +62,7 @@ int main(void)
   
   k_thread_dump_all();
 
-  k_mutex_lock(&mymutex);
+  k_mutex_lock(&mymutex, K_NO_WAIT);
 
   // set UART RX interrupt
   UCSR0B |= 1 << RXCIE0;
@@ -82,7 +82,7 @@ void waiting_thread(void *p)
   // cli();
   while (1)
   {
-    if (0 == k_mutex_lock_wait(&mymutex, K_FOREVER))
+    if (0 == k_mutex_lock(&mymutex, K_FOREVER))
     {
       usart_print("get the mutex, thread woke up from interrupt : ");
       usart_transmit(recv);
@@ -90,7 +90,7 @@ void waiting_thread(void *p)
 
       k_sleep(K_MSEC(1000));
 
-      k_mutex_lock(&mymutex);
+      k_mutex_lock(&mymutex, K_NO_WAIT);
     }
     else
     {

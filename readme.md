@@ -1,86 +1,5 @@
 # AVRTOS : RTOS attempt for 8bits AVR microcontrollers
 
-## Getting started example :
-
-### Description
-
-In this example, we spawn three threads (+ main thread + idle thread) :
-- Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same duration
-    - A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting for 100ms.
-    - both threads use the same reentrant function
-- One cooperative threads blocks the execution of all threads for 500ms every 2 seconds.
-- The main thread releases the CPU forever when initialization finished
-
-On an Arduino Pro (or Arduino Pro Mini), based on an ATmega328p (avr5) the led should be blinking at the frequency of 5Hz and then block for 500ms every 2 seconds.
-
-Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
-
-### Code
-
-```cpp
-#include <avr/io.h>
-#include <util/delay.h>
-#include "avrtos/misc/uart.h"
-#include "avrtos/misc/led.h"
-#include "avrtos/kernel.h"
-#include "avrtos/debug.h"
-
-void thread_led(void *context);
-void thread_coop(void *context);
-
-uint8_t on = 1u;
-uint8_t off = 0u;
-
-K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
-K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, nullptr, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, nullptr, 'F');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, nullptr, 'C');
-
-int main(void)
-{
-  led_init();
-  usart_init();
-  k_thread_dump_all();
-  sei();
-  k_sleep(K_FOREVER);
-}
-
-void thread_led(void *context)
-{
-  const uint8_t thread_led_state = *(uint8_t*)context;
-  while(1)
-  {
-    k_mutex_lock_wait(&mymutex, K_FOREVER);
-    led_set(thread_led_state);
-    usart_transmit(thread_led_state ? 'o' : 'f');
-    k_sleep(K_MSEC(100));
-    k_mutex_unlock(&mymutex);
-  }
-}
-
-void thread_coop(void*)
-{
-  while(1)
-  {
-    k_sleep(K_MSEC(2000));
-    usart_transmit('_');
-    _delay_ms(500); // blocking all threads for 500ms
-  }
-}
-```
-
-### Logs
-
-```
-===== k_thread =====
-M 031C [PREE 0] RUNNING : SP 0/512 -| END @056E
-C 032C [COOP 1] READY   : SP 35/256 -| END @0207
-F 033C [PREE 1] READY   : SP 35/80 -| END @0257
-O 034C [PREE 1] READY   : SP 35/80 -| END @02A7
-K 035C [PREE 3] READY   : SP 35/62 -| END @02E6
-fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
-```
-
 ## Introduction
 
 This project is an attempt to create a real time operating system (RTOS) for AVR 8 bits microcontrollers.
@@ -135,14 +54,95 @@ What enhancements are planned :
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
 - Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
-- Reworking the Git history to remove big files (screenshots, logs) : [stackoverflow.com : How to remove/delete a large file from commit history in Git repository?](https://stackoverflow.com/questions/2100907/how-to-remove-delete-a-large-file-from-commit-history-in-git-repository)
 - Cancel submitted item
 - Custom errors code: e.g. : EAGAIN, EINVAL
 - Use <util/atomic.h> library to enhanced SREG flag restore or force on
+- Make the library fully C compliant.
 
-### Note
+## Getting started example :
 
-#### Zephyr RTOS
+### Description
+
+In this example, we spawn three threads (+ main thread + idle thread) :
+- Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same duration
+    - A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting for 100ms.
+    - both threads use the same reentrant function
+- One cooperative threads blocks the execution of all threads for 500ms every 2 seconds.
+- The main thread releases the CPU forever when initialization finished
+
+On an Arduino Pro (or Arduino Pro Mini), based on an ATmega328p (avr5) the led should be blinking at the frequency of 5Hz and then block for 500ms every 2 seconds.
+
+Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
+
+### Code
+
+```cpp
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avrtos/misc/uart.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/kernel.h>
+#include <avrtos/debug.h>
+
+void thread_led(void *context);
+void thread_coop(void *context);
+
+uint8_t on = 1u;
+uint8_t off = 0u;
+
+K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
+K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, nullptr, 'O');
+K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, nullptr, 'F');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, nullptr, 'C');
+
+int main(void)
+{
+  led_init();
+  usart_init();
+  k_thread_dump_all();
+  sei();
+  k_sleep(K_FOREVER);
+}
+
+void thread_led(void *context)
+{
+  const uint8_t thread_led_state = *(uint8_t*)context;
+  while(1)
+  {
+    k_mutex_lock(&mymutex, K_FOREVER);
+    led_set(thread_led_state);
+    usart_transmit(thread_led_state ? 'o' : 'f');
+    k_sleep(K_MSEC(100));
+    k_mutex_unlock(&mymutex);
+  }
+}
+
+void thread_coop(void*)
+{
+  while(1)
+  {
+    k_sleep(K_MSEC(2000));
+    usart_transmit('_');
+    _delay_ms(500); // blocking all threads for 500ms
+  }
+}
+```
+
+### Logs
+
+```
+===== k_thread =====
+M 031C [PREE 0] RUNNING : SP 0/512 -| END @056E
+C 032C [COOP 1] READY   : SP 35/256 -| END @0207
+F 033C [PREE 1] READY   : SP 35/80 -| END @0257
+O 034C [PREE 1] READY   : SP 35/80 -| END @02A7
+K 035C [PREE 3] READY   : SP 35/62 -| END @02E6
+fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
+```
+
+## Note
+
+### Zephyr RTOS
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
@@ -155,13 +155,13 @@ Mutexes may not be unlocked in ISRs, as mutexes must only be manipulated
 in thread context due to ownership and priority inheritance semantics.
 ```
 
-#### Features
+### Features
 
 Moreover, some paradigms appear in  the code but re actually not implemented for now, e.g. prioritization
 
 This library is not compatible with the Arduino framework for now: the kernel clock is based on the timer0 which is used for `millis()` in the arduino framework. This should be the only limitation.
 
-#### Git
+### Git
 
 Git history of the project has been reworked in order to remove big files (as screenshots or disassembly files). Some links can be invalid when working on an old commit.
 
@@ -223,6 +223,9 @@ monitor_speed = 500000
 
 - It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_unlock, ... from it.
   - it's dangerous to use some kernel function that trigger a thread switch, as we cannot predict which will be the current thread when an interrupt occures.
+  - Nothing is yet planned to prevent the developper from doing this.
+- This library is not full c compliant, this enhancement is planned. For example, the macro defining a thread canot be compiled as a c file.
+  - For now it is adviced to use threads macros from C++ files : e.g. `main.cpp` 
 
 ## Debugging
 
@@ -255,12 +258,12 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 
 ```
 ===== k_thread =====
-M 031E [PREE 0] RUNNING : SP 0/512 -| END @0570
-C 032E [COOP 1] READY   : SP 35/256 -| END @0207
-F 033E [PREE 1] READY   : SP 35/80 -| END @0257
-O 034E [PREE 1] READY   : SP 35/80 -| END @02A7
-K 035E [PREE 3] READY   : SP 35/62 -| END @02E6
-~C~F#f~O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!F{F*>O{O#o~pF~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!C_.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c!O{O*>F{F#f~pO~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.
+M 030E [PREE 0] RUNNING : SP 0/512 -| END @0560
+C 031E [COOP 1] READY   : SP 35/256 -| END @0207
+F 032E [PREE 1] READY   : SP 35/80 -| END @0257
+O 033E [PREE 1] READY   : SP 35/80 -| END @02A7
+K 034E [PREE 3] READY   : SP 35/62 -| END @02E6
+~C~F}Ff~O#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!C_.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>K
 ```
 
 ## Things ...

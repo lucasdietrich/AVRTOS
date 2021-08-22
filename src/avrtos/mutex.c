@@ -13,12 +13,7 @@ void k_mutex_init(struct k_mutex *mutex)
     mutex->lock = 0xFFu;
 }
 
-uint8_t k_mutex_lock(struct k_mutex *mutex)
-{
-    return _k_mutex_lock(mutex);
-}
-
-NOINLINE uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout)
+NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 {
     uint8_t lock = _k_mutex_lock(mutex);
     if ((lock != 0) && (timeout.value != K_NO_WAIT.value))
