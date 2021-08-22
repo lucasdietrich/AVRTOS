@@ -64,13 +64,12 @@ void k_sleep(k_timeout_t timeout)
 {
     if (timeout.value != K_NO_WAIT.value)
     {
-        cli();
-
-        _k_reschedule(timeout);
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+            _k_reschedule(timeout);
      
-        k_yield();
-
-        sei();
+            k_yield();
+        }
     }
 }
 
