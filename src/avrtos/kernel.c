@@ -4,6 +4,9 @@
 
 #include <util/atomic.h>
 
+// debug
+#include "debug.h"
+
 /*___________________________________________________________________________*/
 
 struct ditem *runqueue = &_k_thread_main.tie.runqueue; 
@@ -22,10 +25,14 @@ void k_sched_lock(void)
     {
         SET_BIT(k_current->flags, K_FLAG_COOP);
     }
+
+    __K_DBG_SCHED_LOCK(k_current);
 }
 
 void k_sched_unlock(void)
 {
+    __K_DBG_SCHED_UNLOCK();
+
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
         CLR_BIT(k_current->flags, K_FLAG_COOP);
@@ -44,15 +51,12 @@ bool k_sched_locked(void)
 
 void k_soft_yield(void)
 {
-    bool yield = 0;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        yield = !TEST_BIT(k_current->flags, K_FLAG_COOP);
-    }
-
-    if(yield)
-    {
-        k_yield();
+        if (!TEST_BIT(k_current->flags, K_FLAG_COOP))
+        {   
+            k_yield();
+        }
     }
 }
 
@@ -152,66 +156,21 @@ void _k_unschedule(struct k_thread *th)
     tqueue_remove(&events_queue, &th->tie.event);
 }
 
-#if KERNEL_SCHEDULER_DEBUG == 0
-
 struct k_thread *_k_scheduler(void)
 {
     void *ready = (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
     {
-        // next thread is in immediate mode and should be executed first (no reorder)
-        if(TEST_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE))
-        {
-            CLR_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE);
-            push_front(runqueue->next, ready);
-        }
-        else
-        {
-            push_front(runqueue, ready);
-        }
-
-        ref_requeue(&runqueue);
-    }
-    else if(k_current->state != WAITING)
-    {
-        ref_requeue(&runqueue);
-    }
-
-    // if next thread is idle and there are others threads to be executed, we skip it
-    if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
-    {
-        ref_requeue(&runqueue);
-    }
-
-    THREAD_OF_DITEM(runqueue)->state = READY;
-
-    return k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
-}
-
-#else
-
-#include "misc/uart.h"
-#include "debug.h"
-
-// todo write this function in assembly
-// ! mean tqueue item
-// ~ thread set to waiting
-// > default next thread
-struct k_thread *_k_scheduler(void)
-{
-    void *ready = (struct titem*) tqueue_pop(&events_queue);
-    if (ready != NULL)
-    {
-        usart_transmit('!');
+        __K_DBG_SCHED_EVENT();
         
         // next thread is in immediate mode and should be executed first (no reorder)
-        if(TEST_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE))
+        struct k_thread * const default_next_th = THREAD_OF_DITEM(runqueue->next);
+        if(TEST_BIT(default_next_th->flags, K_FLAG_IMMEDIATE))
         {
-            CLR_BIT(THREAD_OF_DITEM(runqueue->next)->flags, K_FLAG_IMMEDIATE);
+            CLR_BIT(default_next_th->flags, K_FLAG_IMMEDIATE);
             push_front(runqueue->next, ready);
             
-            usart_transmit(THREAD_OF_DITEM(ready)->symbol);
-            usart_transmit('\'');
+            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));
         }
         else
         {
@@ -222,26 +181,30 @@ struct k_thread *_k_scheduler(void)
     }
     else if (k_current->state == WAITING)
     {
-        usart_transmit('~');
+        __K_DBG_SCHED_WAITING();
     }
     else
     {
         ref_requeue(&runqueue);
-        usart_transmit('>');
+        
+        __K_DBG_SCHED_REQUEUE();
     }
 
     // if next thread is idle and there are others threads to be executed, we skip it
     if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
     {
-        usart_print("p");
         ref_requeue(&runqueue);
+
+        __K_DBG_SCHED_SKIP_IDLE();
     }
 
-    _thread_symbol_runqueue(runqueue);
-    THREAD_OF_DITEM(runqueue)->state = READY;
-    return k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
+    k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
+    k_current->state = READY;
+
+    __K_DBG_SCHED_NEXT(k_current);
+
+    return k_current;
 }
-#endif
 
 
 void _k_reschedule(k_timeout_t timeout)
@@ -259,10 +222,7 @@ void _k_reschedule(k_timeout_t timeout)
 // assumptions : thread not in runqueue and (potentially) in tqueue
 void _k_wake_up(struct k_thread *th)
 {
-#if KERNEL_SCHEDULER_DEBUG
-    usart_transmit('@');
-    usart_transmit(th->symbol);
-#endif
+    __K_DBG_WAKEUP(th);
 
     _k_unschedule(th);
     th->state = READY;
@@ -272,6 +232,7 @@ void _k_wake_up(struct k_thread *th)
 void _k_immediate_wake_up(struct k_thread *th)
 {
     SET_BIT(th->flags, K_FLAG_IMMEDIATE);
+
     _k_wake_up(th);
 }
 

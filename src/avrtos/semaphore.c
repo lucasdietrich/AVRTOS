@@ -20,14 +20,12 @@ NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
     int8_t get = _k_sem_take(sem);
     if ((get != 0) && (timeout.value != K_NO_WAIT.value))
     {
-#if KERNEL_SCHEDULER_DEBUG
-        usart_print("($");
-        _thread_symbol_runqueue(runqueue);
-#endif
+        __K_DBG_SEM_WAIT(k_current);
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
             queue(&sem->waitqueue, &k_current->wmutex);
+
             _k_reschedule(timeout);
             k_yield();
 
@@ -35,13 +33,10 @@ NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
         }
     }
 
-#if KERNEL_SCHEDULER_DEBUG
     if (get == 0)
     {
-        usart_print("-$");
-        _thread_symbol_runqueue(runqueue);
+        __K_DBG_SEM_TAKE(k_current);
     }
-#endif
 
     return get;
 }
@@ -50,12 +45,9 @@ NOINLINE void k_sem_give(struct k_sem *sem)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-#if KERNEL_SCHEDULER_DEBUG
-        usart_print("+$");
-        _thread_symbol_runqueue(runqueue);
-        usart_transmit('*');
-#endif
         _k_sem_give(sem);
+
+        __K_DBG_SEM_GIVE(k_current);
 
         struct qitem *const first_waiting_thread = dequeue(&sem->waitqueue);
         if (first_waiting_thread != NULL)

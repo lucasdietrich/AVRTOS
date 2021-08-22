@@ -230,16 +230,22 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 - Before scheduler call :
     - `c` : Meaning that an interrupt planned to call the scheduler but the current thread is in cooperative mode. We restore the current thread same context that was only partially saved.
     - `s` : Afther the scheduler get called, there is still only one thread that is ready to be executed, and we restore the context that was partially saved.
+    - `@T` : thread `T` was awakened
 - During scheduler call :
     - `!` : The timer of a waiting thread expired and the scheduler poped it off in order to execute it.
+    - `'T` : The thread `T` should be executed immediately, before the thread awakened by the timer expiration `!`
     - `~` : Current thread has just been set in WAITING mode and has been removed from the runqueue. The scheduler get the next thread to be executed.
     - `>` : The scheduler simply requeue the current thread and get the next thread to be executed.
     - `p` : Next thread to be executed is the IDLE thread, since there are other threads to be executed we skip the IDLE thread.
     - `M`, `K`, `A`, *Any* : After one of the symbols described above, the next thread symbol is printed in the console.
 - On mutex handling:
-    - `#` : mutex is available and the current thread get it without waiting
-    - `{X#`: mutex is already locked and the current thread `X` needed to wait `{` before getting it `#`
-    - `{X*`: the current thread is locking the mutex, the thread `X` is waiting on it, we release it and we wake up this thread `*`
+    - `#T` : current thread `T` is waiting on a mutex
+    - `}T`: current thread `T` locked a mutex and is now the owner of it
+    - `T{`: current thread `T` unlocked a mutex
+- On sempahore handling:
+    - `$T` : current thread `T` is waiting on a semaphore
+    - `)T` : current thread `T` took a semaphore
+    - `T(` : current thread `T` gave a semaphore
 
 Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 - `.` : Each time the syslock timer expires, we check if the current thread can be preempted and then the scheduler is called in.

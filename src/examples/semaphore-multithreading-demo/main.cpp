@@ -51,8 +51,10 @@ int main(void)
     k_sleep(K_MSEC(PERIOD_SEM_GIVE));
 
     k_sched_lock();
-    usart_print("M: giving a semaphore");
-    k_sem_debug(&mysem);
+#if !KERNEL_SCHEDULER_DEBUG
+    usart_print("M: giving a semaphore ");
+#endif
+    // k_sem_debug(&mysem);
     k_sched_unlock();
 
     k_sem_give(&mysem);
@@ -68,8 +70,10 @@ void waiter_entry(void*)
     if(dbg_sem == 0)
     {
       k_sched_lock();
+#if !KERNEL_SCHEDULER_DEBUG
       usart_transmit(k_current->symbol);
       usart_printl(": got a semaphore !");
+#endif
       k_sched_unlock();
 
       k_sleep(K_MSEC(PERIOD_SEM_TAKE));

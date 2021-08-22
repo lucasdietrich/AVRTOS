@@ -10,6 +10,64 @@
 extern "C" {
 #endif
 
+
+/*___________________________________________________________________________*/
+
+//
+// Kernel Debug Macros
+//
+
+#define __K_DBG_HELPER_TH(th, chr) \
+    usart_transmit(chr);           \
+    usart_transmit(th->symbol)
+
+#define __K_DBG_HELPER_TH_R(th, chr) \
+    usart_transmit(th->symbol);      \
+    usart_transmit(chr)
+
+#if KERNEL_DEBUG || KERNEL_SCHEDULER_DEBUG
+
+#define __K_DBG_SCHED_LOCK(th)      __K_DBG_HELPER_TH(th, '[')
+#define __K_DBG_SCHED_UNLOCK()      usart_transmit(']')
+#define __K_DBG_SCHED_EVENT()       usart_transmit('!')
+#define __K_DBG_SCHED_EVENT_ON_IMMEDIATE(th) __K_DBG_HELPER_TH(th, '\'')
+#define __K_DBG_SCHED_WAITING()     usart_transmit('~')
+#define __K_DBG_SCHED_REQUEUE()     usart_transmit('>')
+#define __K_DBG_SCHED_SKIP_IDLE()   usart_print("p")
+#define __K_DBG_SCHED_NEXT(th)      usart_transmit(th->symbol)
+#define __K_DBG_WAKEUP(th)          __K_DBG_HELPER_TH(th, '@')
+
+#define __K_DBG_MUTEX_LOCKED(th)    __K_DBG_HELPER_TH(th, '}')
+#define __K_DBG_MUTEX_UNLOCKED(th)  __K_DBG_HELPER_TH_R(th, '{')
+#define __K_DBG_MUTEX_WAIT(th)      __K_DBG_HELPER_TH(th, '#')
+
+#define __K_DBG_SEM_TAKE(th)        __K_DBG_HELPER_TH(th, ')')
+#define __K_DBG_SEM_GIVE(th)        __K_DBG_HELPER_TH_R(th, '(')
+#define __K_DBG_SEM_WAIT(th)        __K_DBG_HELPER_TH(th, '$')
+
+#else
+
+#define __K_DBG_SCHED_LOCK(th)
+#define __K_DBG_SCHED_UNLOCK()
+#define __K_DBG_SCHED_EVENT()
+#define __K_DBG_SCHED_EVENT_ON_IMMEDIATE(th)
+#define __K_DBG_SCHED_WAITING()
+#define __K_DBG_SCHED_REQUEUE()
+#define __K_DBG_SCHED_SKIP_IDLE()
+#define __K_DBG_SCHED_NEXT(th)
+#define __K_DBG_WAKEUP(th)
+
+#define __K_DBG_MUTEX_LOCKED(th)
+#define __K_DBG_MUTEX_UNLOCKED(th)
+#define __K_DBG_MUTEX_WAIT(th)
+
+#define __K_DBG_SEM_TAKE(th)
+#define __K_DBG_SEM_GIVE(th)
+#define __K_DBG_SEM_WAIT(th)
+
+#endif
+
+
 /*___________________________________________________________________________*/
 
 /**

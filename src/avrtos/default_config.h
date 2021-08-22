@@ -120,7 +120,7 @@
 #define DEFAULT_KERNEL_THREAD_IDLE              1
 
 //
-// Kernel thread idle stack size
+// Kernel thread idle addtionnal stack
 //
 #define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    0
 

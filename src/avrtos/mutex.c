@@ -23,10 +23,7 @@ NOINLINE uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout)
     uint8_t lock = _k_mutex_lock(mutex);
     if ((lock != 0) && (timeout.value != K_NO_WAIT.value))
     {
-#if KERNEL_SCHEDULER_DEBUG
-        usart_transmit('{');
-        _thread_symbol_runqueue(runqueue);
-#endif
+        __K_DBG_MUTEX_WAIT(k_current);
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
@@ -39,25 +36,21 @@ NOINLINE uint8_t k_mutex_lock_wait(struct k_mutex *mutex, k_timeout_t timeout)
         }
     }
 
-#if KERNEL_SCHEDULER_DEBUG
-    usart_transmit('#');
-#endif
+    if (lock == 0)
+    {
+        __K_DBG_MUTEX_LOCKED(k_current);
+    }
 
     return lock;
 }
 
 NOINLINE void k_mutex_unlock(struct k_mutex *mutex)
 {
-    // must be executed without interruption
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-#if KERNEL_SCHEDULER_DEBUG
-        usart_transmit('{');
-        _thread_symbol_runqueue(runqueue);
-        usart_transmit('*');
-#endif
-
         _k_mutex_unlock(mutex);
+
+        __K_DBG_MUTEX_UNLOCKED(k_current);
 
         struct qitem* first_waiting_thread = dequeue(&mutex->waitqueue);
         if (first_waiting_thread != NULL)
