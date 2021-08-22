@@ -60,7 +60,7 @@ int main(void)
   {
     k_mutex_init(&tasks[i].mutex);
     k_work_init(&tasks[i].work, task_handler);
-    tasks[i].input = 100;
+    tasks[i].input = 200;
   }
 
   sei();
@@ -73,7 +73,7 @@ void tasks_generator(void *p)
   uint8_t i = 0;
   while(1)
   {
-    if (k_mutex_lock(&tasks[i].mutex) == 0)
+    if (k_mutex_lock(&tasks[i].mutex, K_NO_WAIT) == 0)
     {
       usart_hex16((uint16_t)&tasks[i]);
       usart_printl(" submitted");

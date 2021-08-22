@@ -58,6 +58,7 @@ What enhancements are planned :
 - Custom errors code: e.g. : EAGAIN, EINVAL
 - Use <util/atomic.h> library to enhanced SREG flag restore or force on
 - Make the library fully C compliant.
+- Allow thread termination
 
 ## Getting started example :
 

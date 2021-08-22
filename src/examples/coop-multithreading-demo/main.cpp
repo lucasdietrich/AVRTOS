@@ -29,9 +29,9 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, nullptr, 
 K_THREAD_DEFINE(ledoff, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&off, nullptr, 'F');
 K_THREAD_DEFINE(monitor, thread_monitor, 0x100, K_PRIO_DEFAULT, nullptr, nullptr, 'R');
 #else
-K_THREAD static thread_t O;
-K_THREAD static thread_t F;
-K_THREAD static thread_t R;
+K_THREAD static struct k_thread O;
+K_THREAD static struct k_thread F;
+K_THREAD static struct k_thread R;
 
 static char stack1[0x100u];
 static char stack2[0x100u];

@@ -91,6 +91,11 @@ void tqueue_remove(struct titem **root, struct titem *item)
         if (p_current == item)
         {
             *prev_next_p = p_current->next;
+            if (p_current->next != NULL)
+            {
+                p_current->next->delay_shift += item->delay_shift;    // add removed item remaining time to the next item if exists
+            }
+            
             item->next = NULL;
             break;
         }

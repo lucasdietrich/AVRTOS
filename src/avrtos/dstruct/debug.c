@@ -68,6 +68,10 @@ void print_tqueue(struct titem *root, void (*titem_printer)(struct titem *item))
     {
         usart_print("- ");
         titem_printer(current);
+        usart_transmit('(');
+        usart_u16(current->delay_shift);
+        usart_transmit(')');
+
         current = current->next;
     }
     usart_transmit('\n');

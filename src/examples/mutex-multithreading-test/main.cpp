@@ -10,7 +10,9 @@
 
 void thread(void *p);
 
-K_THREAD_DEFINE(ledon, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'T');
+K_THREAD_DEFINE(thread1, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, '1');
+K_THREAD_DEFINE(thread2, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, '2');
+K_THREAD_DEFINE(thread3, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, '3');
 
 /*___________________________________________________________________________*/
 
@@ -31,7 +33,7 @@ int main(void)
 
   sei();
 
-  k_sleep(K_SECONDS(4));
+  k_sleep(K_SECONDS(3));
 
   k_mutex_unlock(&mymutex);
 
@@ -40,7 +42,7 @@ int main(void)
 
 void thread(void *p)
 {
-  uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(3));
+  uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(10));
 
   if (lock)
   {
@@ -50,6 +52,10 @@ void thread(void *p)
   {
     usart_printl("Got the mutex !");
   }
+
+  k_sleep(K_SECONDS(1));
+
+  k_mutex_unlock(&mymutex);
   
   k_sleep(K_FOREVER);
 }
