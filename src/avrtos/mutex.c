@@ -25,8 +25,12 @@ NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
             // must be executed without interruption
             dlist_queue(&mutex->waitqueue, &k_current->wmutex);
             _k_reschedule(timeout);
-            k_yield();            
-            dlist_remove(&mutex->waitqueue, &k_current->wmutex);
+            k_yield();
+
+            if (TEST_BIT(k_current->flags, K_FLAG_TIMER_EXPIRED))
+            {
+                dlist_remove(&mutex->waitqueue, &k_current->wmutex);
+            }
 
             lock = _k_mutex_lock(mutex);
         }

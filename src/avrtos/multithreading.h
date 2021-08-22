@@ -77,6 +77,7 @@ struct k_thread
                                         // and should not be reordered (by the scheduler for example)
                                         // this flag is not persistent and will be cleared when the thread is executed
                                         // TODO, maybe remove this immediate flag and push event ready thread after the normally next thread
+            uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
         };
         uint8_t flags;
     };

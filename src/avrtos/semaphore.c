@@ -29,7 +29,10 @@ NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
             _k_reschedule(timeout);
             k_yield();
             
-            dlist_remove(&sem->waitqueue, &k_current->wsem);
+            if (TEST_BIT(k_current->flags, K_FLAG_TIMER_EXPIRED))
+            {
+                dlist_remove(&sem->waitqueue, &k_current->wsem);
+            }
 
             get = _k_sem_take(sem);
         }

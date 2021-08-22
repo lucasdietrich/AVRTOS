@@ -158,6 +158,9 @@ void _k_unschedule(struct k_thread *th)
 
 struct k_thread *_k_scheduler(void)
 {
+    k_current->timer_expired = 0;
+    k_current->immediate = 0;
+
     void *ready = (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
     {
@@ -166,16 +169,17 @@ struct k_thread *_k_scheduler(void)
         // next thread is in immediate mode and should be executed first (no reorder)
         struct k_thread * const default_next_th = THREAD_OF_DITEM(runqueue->next);
         if(TEST_BIT(default_next_th->flags, K_FLAG_IMMEDIATE))
-        {
-            CLR_BIT(default_next_th->flags, K_FLAG_IMMEDIATE);
-            push_front(runqueue->next, ready);
-            
+        {            
             __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));
+
+            push_front(runqueue->next, ready);
         }
         else
         {
             push_front(runqueue, ready);
         }
+
+        SET_BIT(THREAD_OF_DITEM(ready)->flags, K_FLAG_TIMER_EXPIRED);
 
         ref_requeue(&runqueue);
     }
