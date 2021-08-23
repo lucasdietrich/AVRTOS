@@ -79,7 +79,6 @@ int main(void)
 
 void waiting_thread(void *p)
 {
-  // cli();
   while (1)
   {
     if (0 == k_mutex_lock(&mymutex, K_FOREVER))

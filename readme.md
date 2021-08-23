@@ -12,9 +12,9 @@ Following features are supported:
 - Cooperative threads
 - Preemptive threads with time slice between 1ms and 16ms (based on timer 0).
 - Mutex and Semaphores
-- Thread sleeping up to 65 seconds (or more if using high precision time objects)
+- Thread sleep up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
-- Waking up threads waiting on events (mutex release)
+- Waking up threads waiting on events (mutex release, semaphore give)
 - Scheduler calls (thread switching) from interrupt handler
 - Canaries
 - Runtime stack/thread creation

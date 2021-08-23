@@ -60,7 +60,7 @@ NOINLINE void k_mutex_unlock(struct k_mutex *mutex)
             /* immediate: the first thread in the queue must be the first to get the semaphore */
             _k_immediate_wake_up(th);
 
-            k_soft_yield();
+            k_yield();
         }
     }
 }

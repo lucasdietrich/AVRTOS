@@ -1,5 +1,7 @@
 #include "workqueue.h"
 
+#include <util/atomic.h>
+
 #include "kernel.h"
 
 /*___________________________________________________________________________*/
@@ -40,21 +42,22 @@ void k_work_init(struct k_work * work, k_work_handler_t handler)
 
 void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
-    cli(); // maybe optimize, can be only k_sched_lock arround dlist_queue
-    if (work->tie.prev == NULL) // if item is not already in queue
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        // we need to check if the workqueue is processing an item,
-        // because we shouldn't wake up it if there if the item is waiting for an event while beiing processed
-        // workqueue should be idle to wake it up
-        if (TEST_BIT(workqueue->flags, K_WORKQUEUE_IDLE) &&
-            workqueue->thread->state == WAITING)
+        if (work->tie.prev == NULL) // if item is not already in queue
         {
-            _k_wake_up(workqueue->thread);
-        }
+            // we need to check if the workqueue is processing an item,
+            // because we shouldn't wake up it if there if the item is waiting for an event while beiing processed
+            // workqueue should be idle to wake it up
+            if (TEST_BIT(workqueue->flags, K_WORKQUEUE_IDLE) &&
+                workqueue->thread->state == WAITING)
+            {
+                _k_wake_up(workqueue->thread);
+            }
 
-        dlist_queue(&workqueue->queue, &work->tie);
+            dlist_queue(&workqueue->queue, &work->tie);
+        }
     }
-    sei();
 }
 
 /*___________________________________________________________________________*/

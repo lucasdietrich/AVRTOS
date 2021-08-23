@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <util/atomic.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -153,10 +154,14 @@ void print_events_queue(void)
 
 void k_sem_debug(struct k_sem *sem)
 {
-    cli();
-    const uint8_t count = sem->count;
-    const uint8_t limit = sem->limit;
-    sei();
+    uint8_t count = sem->count;
+    uint8_t limit = sem->limit;
+
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        count = sem->count;
+        limit = sem->limit;
+    }
 
     usart_print("K_SEM ");
     usart_u8(count);
