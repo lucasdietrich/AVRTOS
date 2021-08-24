@@ -14,6 +14,10 @@ avr-objdump -S .pio/build/SemaphoreMultithreadingDemo/firmware.elf > tmp/Semapho
 avr-readelf -a .pio/build/SemaphoreMultithreadingDemo/firmware.elf > tmp/SemaphoreMultithreadingDemo.readelf.txt
 avr-nm .pio/build/SemaphoreMultithreadingDemo/firmware.elf > tmp/SemaphoreMultithreadingDemo.nm.txt
 
+avr-objdump -S .pio/build/InterruptYield/firmware.elf > tmp/InterruptYield.asm
+avr-readelf -a .pio/build/InterruptYield/firmware.elf > tmp/InterruptYield.readelf.txt
+avr-nm .pio/build/InterruptYield/firmware.elf > tmp/InterruptYield.nm.txt
+
 avr-objdump -S .pio/build/KernelTest/firmware.elf > tmp/KernelTest.asm
 avr-readelf -a .pio/build/KernelTest/firmware.elf > tmp/KernelTest.readelf.txt
 avr-nm .pio/build/KernelTest/firmware.elf > tmp/KernelTest.nm.txt

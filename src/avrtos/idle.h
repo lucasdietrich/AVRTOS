@@ -3,6 +3,9 @@
 
 #include "multithreading.h"
 
+#include <stddef.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,21 +27,29 @@ extern "C" {
 #define K_TRHEAD_IDLE_STACK_SIZE K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
 #endif
 
-    /*___________________________________________________________________________*/
+/*___________________________________________________________________________*/
 
-    /**
+/**
  * @brief idle thread structure location
  */
-    extern struct k_thread _k_idle;
+extern struct k_thread _k_idle;
 
-    /**
+/**
  * @brief Idle thread entry function
  * 
  * @param context : ignored for now
  */
-    void _k_idle_entry(void *context);
+void _k_idle_entry(void *context);
 
-    /*___________________________________________________________________________*/
+/**
+ * @brief Tells if the runqueue contains the thread IDLE
+ * 
+ * @return true 
+ * @return false 
+ */
+bool _k_runqueue_idle(void);
+
+/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

@@ -9,9 +9,18 @@
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Runqueue containing the queue of all ready threads.
+ * Should never be NULL.
+ */
 struct ditem *runqueue = &_k_thread_main.tie.runqueue; 
 
 struct titem *events_queue = NULL;
+
+static inline bool _k_runqueue_single(void)
+{
+    return runqueue->next == runqueue;
+}
 
 /*___________________________________________________________________________*/
 
@@ -49,17 +58,6 @@ bool k_sched_locked(void)
     __builtin_unreachable();
 }
 
-void k_soft_yield(void)
-{
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        if (!TEST_BIT(k_current->flags, K_FLAG_COOP))
-        {   
-            k_yield();
-        }
-    }
-}
-
 void k_sleep(k_timeout_t timeout)
 {
     if (timeout.value != K_NO_WAIT.value)
@@ -67,7 +65,7 @@ void k_sleep(k_timeout_t timeout)
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
             _k_reschedule(timeout);
-     
+
             k_yield();
         }
     }
@@ -89,7 +87,18 @@ void k_suspend(void)
 
 void k_resume(struct k_thread *th)
 {
-    k_start(th);
+    if (th->state == WAITING)
+    {
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+            th->state = READY;
+            _k_schedule(&th->tie.runqueue);
+        }
+    }
+    else // thread waiting, ready of running and then already started
+    {
+
+    }
 }
 
 void k_start(struct k_thread *th)
@@ -100,10 +109,6 @@ void k_start(struct k_thread *th)
         {
             _k_queue(th);
         }
-    }
-    else // thread waiting, ready of running and then already started
-    {
-
     }
 }
 
@@ -125,9 +130,10 @@ void _k_kernel_init(void)
     // main thread is the first running (ready or not), already in queue
     for (uint8_t i = 0; i < _k_thread_count; i++)
     {
-        if ((&__k_threads_start)[i].state == READY) // only queue ready threads
+        struct k_thread *const thread = &(&__k_threads_start)[i];
+        if ((thread != &_k_idle) && (thread->state == READY)) // only queue ready threads
         {
-            _k_queue(&(&__k_threads_start)[i]);
+            push_front(runqueue, &thread->tie.runqueue);
         }
     }
 }
@@ -137,19 +143,43 @@ void _k_queue(struct k_thread *const th)
     push_back(runqueue, &th->tie.runqueue);
 }
 
-void _k_catch()
+void _k_schedule(struct ditem * const thread_tie)
 {
-    pop_ref(&runqueue);
+    if (KERNEL_THREAD_IDLE && _k_runqueue_idle())
+    {
+        dlist_ref(thread_tie);
+        runqueue = thread_tie;
+    }
+    else
+    {
+        push_front(runqueue, thread_tie);
+    }
+}
+
+void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
+{
+    if (timeout.value != K_FOREVER.value)
+    {
+        tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
+    }
 }
 
 void _k_suspend(void)
 {
-    _k_catch();
+    if (KERNEL_THREAD_IDLE && _k_runqueue_single())
+    {
+        struct ditem *const tie = &_k_idle.tie.runqueue;
+        dlist_ref(tie);
+        runqueue = tie;
+    }
+    else
+    {
+        pop_ref(&runqueue);
+    }
 
-    k_current->flags = STOPPED;
+    k_current->state = WAITING;
 }
 
-// TODO : use double linked list in order to remove the event with 1 call (without loop)
 void _k_unschedule(struct k_thread *th)
 {
     tqueue_remove(&events_queue, &th->tie.event);
@@ -173,11 +203,12 @@ struct k_thread *_k_scheduler(void)
         __K_DBG_SCHED_REQUEUE();
     }
 
-    void *ready = (struct titem*) tqueue_pop(&events_queue);
+    struct ditem* ready = (struct ditem*) (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
     {
         __K_DBG_SCHED_EVENT();
 
+        // idle thread cannot be immediate
         if (THREAD_OF_DITEM(runqueue)->immediate)
         {
             __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));
@@ -186,16 +217,8 @@ struct k_thread *_k_scheduler(void)
         }
         else
         {
-            push_front(runqueue, ready);
+            _k_schedule(ready);
         }
-    }
-
-    // if next thread is idle and there are others threads to be executed, we skip it
-    if (KERNEL_THREAD_IDLE && (runqueue == &_k_idle.tie.runqueue) && (runqueue->next != &_k_idle.tie.runqueue))
-    {
-        ref_requeue(&runqueue);
-
-        __K_DBG_SCHED_SKIP_IDLE();
     }
 
     k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
@@ -206,27 +229,15 @@ struct k_thread *_k_scheduler(void)
     return k_current;
 }
 
-
-void _k_reschedule(k_timeout_t timeout)
-{
-    _k_catch();
-
-    k_current->state = WAITING;
-
-    if (timeout.value != K_FOREVER.value)
-    {
-        tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
-    }
-}
-
-// assumptions : thread not in runqueue and (potentially) in tqueue
 void _k_wake_up(struct k_thread *th)
 {
     __K_DBG_WAKEUP(th);
 
-    _k_unschedule(th);
     th->state = READY;
-    push_front(runqueue, &th->tie.runqueue);
+
+    _k_unschedule(th);
+
+    _k_schedule(&th->tie.runqueue);     // schedule in runqueue
 }
 
 void _k_immediate_wake_up(struct k_thread *th)
@@ -236,11 +247,18 @@ void _k_immediate_wake_up(struct k_thread *th)
     _k_wake_up(th);
 }
 
+void _k_reschedule(k_timeout_t timeout)
+{
+    _k_suspend();
+    _k_schedule_wake_up(k_current, timeout);
+}
+
+/*___________________________________________________________________________*/
+
 void _k_system_shift(void)
 {
     tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }
-
 
 /*___________________________________________________________________________*/
 

@@ -23,12 +23,6 @@ extern "C" {
 void k_yield(void);
 
 /**
- * @brief Release the CPU if the current thread is in preemptive mode.
- * @see k_yield
- */
-K_NOINLINE void k_soft_yield(void);
-
-/**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
  * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and it stills
  * shift the timed threads in the time queue.
@@ -76,21 +70,21 @@ K_NOINLINE void k_sleep(k_timeout_t timeout);
 /**
  * @brief Stop the execution of the current thread until it is resumed with function k_resume.
  */
-void k_suspend(void);
+K_NOINLINE void k_suspend(void);
 
 /**
  * @brief Resume suspended thread.
  * 
  * @param th : suspended thread to resume.
  */
-void k_resume(struct k_thread *th);
+K_NOINLINE void k_resume(struct k_thread *th);
 
 /**
  * @brief Start the thread
  * 
  * @param th : stopped thread to start.
  */
-void k_start(struct k_thread *th);
+K_NOINLINE void k_start(struct k_thread *th);
 
 /*___________________________________________________________________________*/
 
@@ -110,35 +104,62 @@ void _k_kernel_init(void);
  * @brief Queue the thread in the runqueue. We assume that the thread {th} is READY. 
  * The thread must not be added to the runqueue already. Keep it's flag unchanged.
  * Assume that the interrupt flag is cleared when called.
+ * Assume that the runqueue doesn't contain the IDLE thread
  * 
  * @param th : ready thread to queue 
  */
 void _k_queue(struct k_thread * const th);
 
 /**
- * @brief Remove the current thread from the runqueue. Keep it's flag unchanged.
- * Assume that the interrupt flag is cleared when called.
+ * @brief Schedule the thread to be executed.
+ * If the IDLE thread is in the runqueue (it is removed), the scheduled thread become the only thread in the runqueue.
+ * If other threads are in the runqueue, the thread is only appended.
+ * - Assume that the thread is READY
+ * - Assume that the thread is not in the runqueue
+ * 
+ * @param thread_tie thread.tie.runqueue item
+ * @return __attribute__((noinline)) 
  */
-void _k_catch(void);
+K_NOINLINE void _k_schedule(struct ditem * const thread_tie);
 
 /**
- * @brief Stop the execution of the current thread until it is resumed with function k_resume.
- * State flag is changed to STOPPED.
- * Assume that the interrupt flag is cleared when called.
+ * @brief Schedule the thread wake up.
+ * 
+ * Assumptions:
+ * - thread is suspended (WAITING)
+ * - thread is not in the runqueue
+ * 
+ * @param thread 
+ * @param timeout 
+ * @return K_NOINLINE 
  */
-void _k_suspend(void);
+K_NOINLINE void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout);
 
 /**
- * @brief Remove the thread from the 
- * Assume that the interrupt flag is cleared when called.
+ * @brief Remove the current thread from the runqueue.
+ * Stop the execution of the current thread (until it is scheduled again with function _k_schedule or _k_schedule_wake_up)
+ * State flag is changed to WAITING.
+ * 
+ * Assumptions:
+ * - interrupt flag is cleared when called.
+ * - thread is in the runqueue
+ */
+K_NOINLINE void _k_suspend(void);
+
+/**
+ * @brief Remove the thread from the events queue
+ * 
+ * Assumptions:
+ * - interrupt flag is cleared when called.
+ * - thread is in the time_queue
  * 
  * @param th 
  */
-void _k_unschedule(struct k_thread *th);
+K_NOINLINE void _k_unschedule(struct k_thread *th);
 
 /**
- * @brief Choice the next thread to be executed. 
- * This function is called be any thread switch in order to determine which 
+ * @brief Choose the next thread to be executed. 
+ * This function is called during any thread switch in order to determine which 
  * one is the following thread to be executed. 
  * 
  * This function is called in k_yield function
@@ -148,20 +169,14 @@ void _k_unschedule(struct k_thread *th);
 K_NOINLINE struct k_thread *_k_scheduler(void);
 
 /**
- * @brief Remove the current thread from the runqueue and schedule it's execution later.
- * 
- * @param timeout 
- */
-void _k_reschedule(k_timeout_t timeout);
-
-/**
  * @brief Wake up a thread that is waiting for an event.
  * 
  * Assumptions:
  *  - thread is in waiting mode
  *  - thread is not in the runqueue
  *  - thread may be in the events queue
- * 
+ *  - interrupt flag is cleared when called.
+ *
  * 
  * @param th thread to wake up
  */
@@ -172,14 +187,29 @@ K_NOINLINE void _k_wake_up(struct k_thread *th);
  * This thread is the very first to be executed.
  * The scheduler should not reorder it before beeing executed.
  * 
+* Assumptions:
+ *  - thread is in waiting mode
+ *  - thread is not in the runqueue
+ *  - thread may be in the events queue
+ *  - interrupt flag is cleared when called.
+ * 
  * @param th thread to wake up in immediate mode
  */
-void _k_immediate_wake_up(struct k_thread *th);
+K_NOINLINE void _k_immediate_wake_up(struct k_thread *th);
+
+/**
+ * @brief Suspend the current thread and schedule its awakening for later
+ * 
+ * @param timeout 
+ */
+K_NOINLINE void _k_reschedule(k_timeout_t timeout);
+
+/*___________________________________________________________________________*/
 
 /**
  * @brief Shift time in kernel time queue list (events_queue) 
  */
-void _k_system_shift(void);
+K_NOINLINE void _k_system_shift(void);
 
 /*___________________________________________________________________________*/
 

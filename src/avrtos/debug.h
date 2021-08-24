@@ -25,7 +25,7 @@ extern "C" {
     usart_transmit(th->symbol);      \
     usart_transmit(chr)
 
-#if KERNEL_DEBUG || KERNEL_SCHEDULER_DEBUG
+#if KERNEL_SCHEDULER_DEBUG
 
 #define __K_DBG_SCHED_LOCK(th)      __K_DBG_HELPER_TH(th, '[')
 #define __K_DBG_SCHED_UNLOCK()      usart_transmit(']')

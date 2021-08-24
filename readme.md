@@ -46,7 +46,6 @@ What features will be implemented :
 
 What enhancements are planned :
 - Removing CPU idle thread
-- Don't keep the idle thread in the runqueue if others threads are in
 - Using makefile to build the project for a target
 - Stack for interrupts handlers
 - Propose this project as a library
@@ -282,3 +281,4 @@ K 034E [PREE 3] READY   : SP 35/62 -| END @02E6
 - avr-gcc : https://gcc.gnu.org/wiki/avr-gcc
 - Pseudo-ops and operators : https://www.nongnu.org/avr-libc/user-manual/assembler.html#ass_pseudoop
 - AVR Instruction Set Manual : http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
+- cross-referencer example : https://elixir.bootlin.com/zephyr/v2.6.1-rc1/source/kernel/sched.c

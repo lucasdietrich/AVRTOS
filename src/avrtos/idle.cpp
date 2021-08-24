@@ -26,6 +26,13 @@ void _k_idle_entry(void* context)
     }
 }
 
+extern struct ditem *runqueue;
+
+bool _k_runqueue_idle(void)
+{
+    return runqueue == &_k_idle.tie.runqueue;
+}
+
 #endif
 
 /*___________________________________________________________________________*/

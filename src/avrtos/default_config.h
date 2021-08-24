@@ -87,7 +87,7 @@
 //
 //  Enable Kernel debug for function, that set some of them noinline 
 //
-#define DEFAULT_KERNEL_API_NOINLINE             1
+#define DEFAULT_KERNEL_API_NOINLINE             0
 
 //
 // Enable Kernel Debug in scheduler

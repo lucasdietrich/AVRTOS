@@ -35,6 +35,16 @@
 #define NOINLINE            __attribute__((noinline))
 #define FUNC_NORETURN       __attribute__((__noreturn__))
 #define CODE_UNREACHABLE    __builtin_unreachable();
+
+/*___________________________________________________________________________*/
+
+// todo
+#if 0
+#define __ASSERT(assertion) k_assert(assertion)
+#else
+#define __ASSERT(assertion) 
+#endif
+
 /*___________________________________________________________________________*/
 
 // MAX threads
@@ -141,6 +151,16 @@
 #if KERNEL_DEBUG_PREEMPT_UART
 
 #define KERNEL_SYSCLOCK_AUTO_INIT   0
+
+// refactor this
+#if defined(__AVR_ATmega328P__)
+#define _K_USART_RX_vect  USART_RX_vect
+#elif defined(__AVR_ATmega2560__)
+#define _K_USART_RX_vect  USART0_RX_vect
+#else
+#warning   KERNEL_DEBUG_PREEMPT_UART enaabled, USART RX vector no configured, default = "USART_RX_vect"
+#define _K_USART_RX_vect  USART_RX_vect
+#endif
 
 #else
 
@@ -345,8 +365,8 @@
         {                                                                                                    \
             .flags = K_FLAG_READY | prio_flags,                                                              \
         },                                                                                                   \
-        .tie = {.runqueue = {.prev = NULL, .next = NULL}},                                                   \
-        {.wmutex = {.prev = NULL, .next = NULL}},                                                            \
+        .tie = {.runqueue = INIT_DITEM(NULL)},                                                 \
+        {.wmutex = INIT_DITEM(NULL)},                                                                        \
         .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                            \
         .symbol = sym}

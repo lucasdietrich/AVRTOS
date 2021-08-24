@@ -47,7 +47,12 @@ static uint8_t usart_read_rx(void)
 
 static volatile uint8_t recv;
 
+// atmega2560
+#if defined(__AVR_ATmega328P__)
 ISR(USART_RX_vect)
+#elif defined(__AVR_ATmega2560__)
+ISR(USART0_RX_vect)
+#endif
 {
   // UART0 RX buffer must be read before enabling interrupts again
   recv = usart_read_rx();

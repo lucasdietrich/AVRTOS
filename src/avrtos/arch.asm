@@ -8,12 +8,12 @@
 ; prempt debug
 #if KERNEL_DEBUG_PREEMPT_UART
 
-.global USART_RX_vect
+.global _K_USART_RX_vect
 
 ; when calling function, you must push all registers covered by the arguments, even not completely uint8_t require r24 but cover also r25 
 ; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
 
-USART_RX_vect:
+_K_USART_RX_vect:
     push r17
 
     lds r17, SREG
