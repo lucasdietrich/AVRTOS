@@ -31,6 +31,7 @@ Minor features:
 
 What paradigms/concepts are not supported:
 - Nested interrupts
+- Dedicated stack for interrupt handlers
 
 What features will be implemented :
 - System time
@@ -58,6 +59,7 @@ What enhancements are planned :
 - Use <util/atomic.h> library to enhanced SREG flag restore or force on
 - Make the library fully C compliant.
 - Allow thread termination
+- Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
 
 ## Getting started example :
 
@@ -142,6 +144,26 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 
 ## Note
 
+### Peripherals
+
+- This library only needs the timer0 peripheral and the usart0 (+ RX interrupt vector) in case of debugging
+
+### Overhead
+- In term of flash, the overhead is approximately 3KB
+- In term of RAM :
+  - kernel objects
+    - runqueue : 2B
+    - events queue : 2B
+    - thread idle stack is at least 34/36 byte + 16B thread structure (should be removed in the future)
+  - a thread structure is 16B + stack size which is at least 35/36byte
+  - a mutex is 5B
+  - a semaphore is 5B
+  - a workqueue is 5B
+    - a k_work item is 6B
+- In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
+
+- Plan additionnal stack for every thread that have their interrupt flag set, and whose the stack could be used during interrupt handlers calls.
+  
 ### Zephyr RTOS
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
