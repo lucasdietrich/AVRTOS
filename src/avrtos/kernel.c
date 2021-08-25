@@ -131,7 +131,7 @@ void _k_kernel_init(void)
     for (uint8_t i = 0; i < _k_thread_count; i++)
     {
         struct k_thread *const thread = &(&__k_threads_start)[i];
-        if ((thread != &_k_idle) && (thread->state == READY)) // only queue ready threads
+        if (!IS_THREAD_IDLE(thread) && (thread->state == READY))
         {
             push_front(runqueue, &thread->tie.runqueue);
         }
@@ -145,6 +145,7 @@ void _k_queue(struct k_thread *const th)
 
 void _k_schedule(struct ditem * const thread_tie)
 {
+#if KERNEL_THREAD_IDLE
     if (KERNEL_THREAD_IDLE && _k_runqueue_idle())
     {
         dlist_ref(thread_tie);
@@ -154,6 +155,9 @@ void _k_schedule(struct ditem * const thread_tie)
     {
         push_front(runqueue, thread_tie);
     }
+#else
+    push_front(runqueue, thread_tie);
+#endif
 }
 
 void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
@@ -166,7 +170,8 @@ void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 
 void _k_suspend(void)
 {
-    if (KERNEL_THREAD_IDLE && _k_runqueue_single())
+#if KERNEL_THREAD_IDLE
+    if (_k_runqueue_single())
     {
         struct ditem *const tie = &_k_idle.tie.runqueue;
         dlist_ref(tie);
@@ -176,6 +181,9 @@ void _k_suspend(void)
     {
         pop_ref(&runqueue);
     }
+#else
+    pop_ref(&runqueue);
+#endif
 
     k_current->state = WAITING;
 }

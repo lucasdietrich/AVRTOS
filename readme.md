@@ -44,6 +44,7 @@ What features will be implemented :
 - Memslabs
 - Task scheduler
 - Saving thread errno
+- Kernel fault and __ASSERT
 
 What enhancements are planned :
 - Removing CPU idle thread
@@ -161,8 +162,7 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
   - a workqueue is 5B
     - a k_work item is 6B
 - In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
-
-- Plan additionnal stack for every thread that have their interrupt flag set, and whose the stack could be used during interrupt handlers calls.
+- Plan additionnal stack for every thread that have their interrupt flag set, whose the stack could be used during interrupt handlers calls.
   
 ### Zephyr RTOS
 
@@ -222,7 +222,6 @@ monitor_speed = 500000
 | THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
 | THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
 | THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
-| THREAD_SYMBOL | Tell if we can name threads using a 1 letter symbol (e.g. M, K, 1, 2, ...) |
 | KERNEL_HIGH_RANGE_TIME_OBJECT_U32 | Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds |
 | THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
 | KERNEL_DEBUG | Enable Kernel Debug features |

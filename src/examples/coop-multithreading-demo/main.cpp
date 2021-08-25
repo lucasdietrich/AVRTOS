@@ -46,14 +46,10 @@ int main(void)
   usart_init();
  
 
-#if !THREAD_PREPROCESSOR
-  O.symbol = 'O';
-  F.symbol = 'F';
-  R.symbol = 'R';
-  
-  k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, nullptr);
-  k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr);
-  k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr);
+#if !THREAD_PREPROCESSOR  
+  k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, nullptr, 'O');
+  k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr, 'F');
+  k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr, 'R');
 #endif
 
   print_runqueue();

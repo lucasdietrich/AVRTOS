@@ -59,11 +59,6 @@
 #define DEFAULT_THREAD_USE_INIT_STACK_ASM           1
 
 //
-// Tell if we can name threads using a 1 letter symbol (e.g. M, K, 1, 2, ...)
-//
-#define DEFAULT_THREAD_SYMBOL                       1
-
-//
 // Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
 //
 #define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32   0

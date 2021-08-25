@@ -27,6 +27,12 @@ extern "C" {
 #define K_TRHEAD_IDLE_STACK_SIZE K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
 #endif
 
+#if KERNEL_THREAD_IDLE
+#define IS_THREAD_IDLE(thread)  (thread != &_k_idle)
+#else
+#define IS_THREAD_IDLE(thread)  0
+#endif
+
 /*___________________________________________________________________________*/
 
 /**

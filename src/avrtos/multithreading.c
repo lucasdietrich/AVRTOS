@@ -85,11 +85,11 @@ void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, voi
 
 #include "misc/uart.h"
 
-int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage)
+int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage, const char symbol)
 {
     if (stack_size < K_THREAD_STACK_MIN_SIZE)
     {
-        return -1; // TODO return error
+        return -1;
     }
     
     th->stack.end = (void*) _K_STACK_END(stack, stack_size);
@@ -100,6 +100,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const
     th->local_storage = local_storage;
     th->state = READY;
     th->priority = priority;
+    th->symbol = symbol;
 
     _k_queue(th);
 

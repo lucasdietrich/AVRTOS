@@ -62,8 +62,6 @@ USART_Continue:
 
 ; SREG is saved in r17 during the whole process, DON'T USE r17 in this part without saving it
 
-#if KERNEL_PREEMPTIVE_THREADS
-
 .global TIMER0_OVF_vect
 
 TIMER0_OVF_vect:
@@ -103,6 +101,7 @@ system_shift:
 yield_from_interrupt:
     ori r17, 1 << SREG_I ; Interrupt flag is disabled in interrupt handler, we need to set it manually in SREG
 
+#if KERNEL_PREEMPTIVE_THREADS
 check_coop:
     ; to use offset of here IF POSSIBLE
     lds ZL, k_current           ; load current thread addr in X
@@ -118,9 +117,10 @@ check_coop:
     ldi r24, 0x63 ; 'c'
     call usart_transmit
 #endif
-    jmp restore_context1
-    
 #endif
+
+    jmp restore_context1
+
 
 k_yield:
     push r17

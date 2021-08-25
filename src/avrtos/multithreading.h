@@ -101,7 +101,8 @@ struct k_thread
     void *local_storage;                // pointer to a custom user object, local storage of the thread
                                         // we cannot use CONTAINER_OF(thread, struct mystruct, thread_struct), 
                                         // because all threads structures are stack at the same address location in RAM
-    char symbol;                        // symbol association to the thread, already used main : M, idle : K, ...
+    char symbol;                        // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
+    
 };
 
 /**
@@ -145,7 +146,7 @@ extern uint8_t _k_thread_count;
  * @param local_storage thread local_storage
  * @return int 0 on success
  */
-int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack_end, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage);
+int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage, const char symbol);
 
 /**
  * @brief Initialize a thread stack at runtime
