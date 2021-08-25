@@ -51,11 +51,11 @@ void usart_u8(const uint8_t val)
   const char ten = pgm_read_byte(&_usart_alpha16[(val / 10) % 10]);
   const char unit = pgm_read_byte(&_usart_alpha16[val % 10]);
 
-  if (val > 100)
+  if (val >= 100)
   {
     usart_transmit(hundred);
   }
-  if (val > 10)
+  if (val >= 10)
   {
     usart_transmit(ten);
   }
