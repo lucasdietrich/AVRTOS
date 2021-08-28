@@ -15,16 +15,17 @@ void k_mutex_init(struct k_mutex *mutex)
 
 NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 {
-    uint8_t lock = _k_mutex_lock(mutex);
-    if ((lock != 0) && (timeout.value != K_NO_WAIT.value))
+    uint8_t lock;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        __K_DBG_MUTEX_WAIT(k_current);
-
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        lock = _k_mutex_lock(mutex);
+        if ((lock != 0) && (timeout.value != K_NO_WAIT.value))
         {
+            __K_DBG_MUTEX_WAIT(k_current);
+
             // must be executed without interruption
             dlist_queue(&mutex->waitqueue, &k_current->wmutex);
-            _k_reschedule(timeout);            
+            _k_reschedule(timeout);
             k_yield();
 
             if (TEST_BIT(k_current->flags, K_FLAG_TIMER_EXPIRED))

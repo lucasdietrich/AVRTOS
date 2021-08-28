@@ -17,18 +17,19 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 
 NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 {
-    int8_t get = _k_sem_take(sem);
-    if ((get != 0) && (timeout.value != K_NO_WAIT.value))
+    int8_t get;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        __K_DBG_SEM_WAIT(k_current);
-
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        get = _k_sem_take(sem);
+        if ((get != 0) && (timeout.value != K_NO_WAIT.value))
         {
+            __K_DBG_SEM_WAIT(k_current);
+
             dlist_queue(&sem->waitqueue, &k_current->wsem);
 
             _k_reschedule(timeout);
             k_yield();
-            
+
             if (TEST_BIT(k_current->flags, K_FLAG_TIMER_EXPIRED))
             {
                 dlist_remove(&sem->waitqueue, &k_current->wsem);

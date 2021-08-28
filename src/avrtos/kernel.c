@@ -22,6 +22,8 @@ static inline bool _k_runqueue_single(void)
     return runqueue->next == runqueue;
 }
 
+extern bool __k_interrupts(void);
+
 /*___________________________________________________________________________*/
 
 //
@@ -140,28 +142,31 @@ void _k_kernel_init(void)
 
 void _k_queue(struct k_thread *const th)
 {
+    __ASSERT_NOINTERRUPT(0x00);
+
     push_back(runqueue, &th->tie.runqueue);
 }
 
-void _k_schedule(struct ditem * const thread_tie)
+void _k_schedule(struct ditem *const thread_tie)
 {
+    __ASSERT_NOINTERRUPT(0x01);
+
 #if KERNEL_THREAD_IDLE
     if (KERNEL_THREAD_IDLE && _k_runqueue_idle())
     {
         dlist_ref(thread_tie);
         runqueue = thread_tie;
+        return;
     }
-    else
-    {
-        push_front(runqueue, thread_tie);
-    }
-#else
-    push_front(runqueue, thread_tie);
 #endif
+
+    push_front(runqueue, thread_tie);
 }
 
 void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 {
+    __ASSERT_NOINTERRUPT(0x02);
+
     if (timeout.value != K_FOREVER.value)
     {
         tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
@@ -170,31 +175,36 @@ void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 
 void _k_suspend(void)
 {
+    __ASSERT_NOINTERRUPT(0x02);
+
 #if KERNEL_THREAD_IDLE
     if (_k_runqueue_single())
     {
         struct ditem *const tie = &_k_idle.tie.runqueue;
         dlist_ref(tie);
         runqueue = tie;
+        return;
     }
-    else
-    {
-        pop_ref(&runqueue);
-    }
-#else
-    pop_ref(&runqueue);
 #endif
+
+    __ASSERT_LEASTONE_RUNNING(0x00);
+
+    pop_ref(&runqueue);
 
     k_current->state = WAITING;
 }
 
 void _k_unschedule(struct k_thread *th)
 {
+    __ASSERT_NOINTERRUPT(0x03);
+
     tqueue_remove(&events_queue, &th->tie.event);
 }
 
 struct k_thread *_k_scheduler(void)
 {
+    __ASSERT_NOINTERRUPT(0x04);
+
     k_current->timer_expired = 0;
     k_current->immediate = 0;
 
@@ -239,6 +249,8 @@ struct k_thread *_k_scheduler(void)
 
 void _k_wake_up(struct k_thread *th)
 {
+    __ASSERT_NOINTERRUPT(0x05);
+
     __K_DBG_WAKEUP(th);
 
     th->state = READY;
@@ -250,6 +262,8 @@ void _k_wake_up(struct k_thread *th)
 
 void _k_immediate_wake_up(struct k_thread *th)
 {
+    __ASSERT_NOINTERRUPT(0x06);
+
     SET_BIT(th->flags, K_FLAG_IMMEDIATE);
 
     _k_wake_up(th);
@@ -257,7 +271,10 @@ void _k_immediate_wake_up(struct k_thread *th)
 
 void _k_reschedule(k_timeout_t timeout)
 {
+    __ASSERT_NOINTERRUPT(0x07);
+
     _k_suspend();
+    
     _k_schedule_wake_up(k_current, timeout);
 }
 
@@ -265,6 +282,8 @@ void _k_reschedule(k_timeout_t timeout)
 
 void _k_system_shift(void)
 {
+    __ASSERT_NOINTERRUPT(0x08);
+    
     tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }
 

@@ -10,6 +10,8 @@
 #include <stddef.h>
 
 #include "defines.h"
+#include "assert.h"
+
 #include "sysclock.h"
 #include "idle.h"
 #include "canaries.h"

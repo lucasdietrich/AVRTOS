@@ -38,15 +38,6 @@
 
 /*___________________________________________________________________________*/
 
-// todo
-#if 0
-#   define __ASSERT(assertion) k_assert(assertion)
-#else
-#   define __ASSERT(assertion) 
-#endif
-
-/*___________________________________________________________________________*/
-
 // MAX threads
 #ifdef CONFIG_THREAD_MAX
 #   if CONFIG_THREAD_MAX > 1
@@ -287,6 +278,12 @@
 #   else
 #       define SYSTEM_WORKQUEUE_PRIORITY DEFAULT_SYSTEM_WORKQUEUE_PRIORITY
 #   endif
+#endif
+
+#ifdef CONFIG_KERNEL_ASSERT
+#   define KERNEL_ASSERT CONFIG_KERNEL_ASSERT
+#else
+#   define KERNEL_ASSERT DEFAULT_KERNEL_ASSERT
 #endif
 
 /*___________________________________________________________________________*/

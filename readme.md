@@ -14,7 +14,7 @@ Following features are supported:
 - Mutex and Semaphores
 - Thread sleep up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
-- Waking up threads waiting on events (mutex release, semaphore give)
+- Waking up threads waiting on events (mutex unlock, semaphore give)
 - Scheduler calls (thread switching) from interrupt handler
 - Canaries
 - Runtime stack/thread creation
@@ -28,6 +28,7 @@ Minor features:
 - debug/utils functions : RAM_DUMP, CORE_DUMP, read_ra (read return address)
 - data structures : dlist (doubly linked list), queue (singly linked list), time queue (singly linked list with delay parameter)
 - I/O : leds, uart
+- Kernel Assertions (__ASSERT)
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -44,7 +45,7 @@ What features will be implemented :
 - Memslabs
 - Task scheduler
 - Saving thread errno
-- Kernel fault and __ASSERT
+- Kernel fault
 
 What enhancements are planned :
 - Removing CPU idle thread
@@ -61,6 +62,7 @@ What enhancements are planned :
 - Make the library fully C compliant.
 - Allow thread termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
+- don't allow mutex unlock from interrupt, then change cli to k_shed_lock when handling mutex lock/unlock
 
 ## Getting started example :
 
@@ -168,7 +170,7 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
-However be carefull, many behavior are different from the ones from Zephyr RTOS ! For example, regarding mutexes, AVRTOS kernel doesn't check if the thread releasing a mutex actually owns it, moreover it's possible to release a mutex from an interrupt routine routine while this is not the case in Zephyr.
+However be carefull, many behavior are different from the ones from Zephyr RTOS ! For example, regarding mutexes, AVRTOS kernel doesn't check if the thread releasing a mutex actually owns it, moreover it's possible to unlock a mutex from an interrupt routine routine while this is not the case in Zephyr.
 
 From Zephyr RTOS documentation `k_mutex_unlock` : 
 

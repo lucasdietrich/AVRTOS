@@ -151,6 +151,11 @@
 //
 #define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       K_PRIO_PREEMPT(K_PRIO_HIGH)
 
+//
+// Enable kernel assertion test
+//
+#define DEFAULT_KERNEL_ASSERT                   0
+
 
 /*___________________________________________________________________________*/
 

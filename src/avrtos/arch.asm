@@ -5,6 +5,17 @@
 
 /*___________________________________________________________________________*/
 
+.global __k_interrupts
+
+__k_interrupts:
+    ldi r24, 0x00
+    lds r25, SREG
+    sbrc r25, SREG_I
+    ldi r24, 0x01
+    ret
+
+/*___________________________________________________________________________*/
+
 ; prempt debug
 #if KERNEL_DEBUG_PREEMPT_UART
 
