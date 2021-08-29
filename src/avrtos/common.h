@@ -8,15 +8,20 @@
 #define K_PRIO_LOW                  0b10
 #define K_PRIO_MIN                  0b11
 
-#define K_FLAG_COOP                 (1 << 2)
-#define K_FLAG_PREEMPT              (0 << 2)
+#define K_FLAG_SCHED_LOCKED_SHIFT   2
+#define K_FLAG_SCHED_LOCKED         (1 << K_FLAG_SCHED_LOCKED_SHIFT)
+
+#define K_FLAG_PREEMPT_SHIFT        3
+
+#define K_FLAG_COOP                 (1 << K_FLAG_PREEMPT_SHIFT)
+#define K_FLAG_PREEMPT              (0 << K_FLAG_PREEMPT_SHIFT)
 
 #define K_FLAG_STOPPED              (0b00 << 0)
 #define K_FLAG_RUNNING              (0b01 << 0)
 #define K_FLAG_READY                (0b10 << 0)
 #define K_FLAG_WAITING              (0b11 << 0)
 
-#define K_FLAG_PRIO_SHIFT           3
+#define K_FLAG_PRIO_SHIFT           4
 
 #define K_FLAG_PRIO_MAX             (K_PRIO_MAX << K_FLAG_PRIO_SHIFT)
 #define K_FLAG_PRIO_HIGH            (K_PRIO_HIGH << K_FLAG_PRIO_SHIFT)
@@ -32,14 +37,11 @@
 #define K_PRIO_DEFAULT              K_PRIO_PREEMPT(K_PRIO_HIGH)
 #define K_STOPPED                   K_FLAG_STOPPED
 
-#define K_FLAG_IMMEDIATE_SHIFT       5
+#define K_FLAG_IMMEDIATE_SHIFT       6
 #define K_FLAG_IMMEDIATE             (1 << K_FLAG_IMMEDIATE_SHIFT)
 
-#define K_FLAG_TIMER_EXPIRED_SHIFT   6
+#define K_FLAG_TIMER_EXPIRED_SHIFT   7
 #define K_FLAG_TIMER_EXPIRED         (1 << K_FLAG_TIMER_EXPIRED_SHIFT)
-
-// #define K_FLAG_IMMINENT_SHIFT       6
-// #define K_FLAG_IMMINENT             1 << K_FLAG_IMMINENT_SHIFT
 
 #define SYSCLOCK_PRESCALER_1        ((1 << CS00) | (0 << CS01) |  (0 << CS02))
 #define SYSCLOCK_PRESCALER_8        ((0 << CS00) | (1 << CS01) |  (0 << CS02))

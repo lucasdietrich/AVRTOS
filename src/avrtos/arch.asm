@@ -119,9 +119,8 @@ check_coop:
     lds ZH, k_current + 1
 
     ldd r18, Z+2      ; read flag
-
-    sbrs r18, 2
-    jmp scheduler_entry
+    andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
+    breq scheduler_entry
 
     ; if coop thread don't preempt
 #if KERNEL_SCHEDULER_DEBUG == 1

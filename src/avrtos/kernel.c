@@ -34,7 +34,7 @@ void k_sched_lock(void)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        SET_BIT(k_current->flags, K_FLAG_COOP);
+        SET_BIT(k_current->flags, K_FLAG_SCHED_LOCKED);
     }
 
     __K_DBG_SCHED_LOCK(k_current);
@@ -46,7 +46,7 @@ void k_sched_unlock(void)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        CLR_BIT(k_current->flags, K_FLAG_COOP);
+        CLR_BIT(k_current->flags, K_FLAG_SCHED_LOCKED);
     }
 }
 
@@ -54,7 +54,7 @@ bool k_sched_locked(void)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        return (bool) TEST_BIT(k_current->flags, K_FLAG_COOP);
+        return (bool) TEST_BIT(k_current->flags, K_FLAG_SCHED_LOCKED);
     }
 
     __builtin_unreachable();
@@ -152,7 +152,7 @@ void _k_schedule(struct ditem *const thread_tie)
     __ASSERT_NOINTERRUPT(0x01);
 
 #if KERNEL_THREAD_IDLE
-    if (KERNEL_THREAD_IDLE && _k_runqueue_idle())
+    if (_k_runqueue_idle())
     {
         dlist_ref(thread_tie);
         runqueue = thread_tie;
@@ -177,6 +177,8 @@ void _k_suspend(void)
 {
     __ASSERT_NOINTERRUPT(0x02);
 
+    k_current->state = WAITING;
+
 #if KERNEL_THREAD_IDLE
     if (_k_runqueue_single())
     {
@@ -185,13 +187,11 @@ void _k_suspend(void)
         runqueue = tie;
         return;
     }
+#else
+    __ASSERT_LEASTONE_RUNNING(0x00);
 #endif
 
-    __ASSERT_LEASTONE_RUNNING(0x00);
-
     pop_ref(&runqueue);
-
-    k_current->state = WAITING;
 }
 
 void _k_unschedule(struct k_thread *th)
@@ -211,25 +211,25 @@ struct k_thread *_k_scheduler(void)
     if (k_current->state == WAITING)
     {
         // runqueue is positionned to the normally next thread to be executed
-        __K_DBG_SCHED_WAITING();
+        __K_DBG_SCHED_WAITING();        // ~
     }
     else
     {
         // next thread is positionned at the top of the runqueue
         ref_requeue(&runqueue);
 
-        __K_DBG_SCHED_REQUEUE();
+        __K_DBG_SCHED_REQUEUE();        // >
     }
 
     struct ditem* ready = (struct ditem*) (struct titem*) tqueue_pop(&events_queue);
     if (ready != NULL)
     {
-        __K_DBG_SCHED_EVENT();
+        __K_DBG_SCHED_EVENT();  // !
 
         // idle thread cannot be immediate
         if (THREAD_OF_DITEM(runqueue)->immediate)
         {
-            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));
+            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));   // '
 
             push_front(runqueue->next, ready);
         }
@@ -242,7 +242,7 @@ struct k_thread *_k_scheduler(void)
     k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
     k_current->state = READY;
 
-    __K_DBG_SCHED_NEXT(k_current);
+    __K_DBG_SCHED_NEXT(k_current);  // thread symbol
 
     return k_current;
 }

@@ -86,10 +86,10 @@ void thread_task1(void *p)
 
 void thread_task2(void *p)
 {
-  uint16_t blocks = 460;
+  uint16_t blocks = 0;
 
   while(1) {
-    blocks = (blocks + 1) % (0x200 - 40);
+    blocks = (blocks + 1) % (0x200 - 30);
 
     if (blocks != 0)
     {
@@ -106,7 +106,7 @@ void thread_task2(void *p)
       sei();
     }
 
-    k_sleep(K_MSEC(500));
+    k_sleep(K_MSEC(50));
   }
 }
 

@@ -8,19 +8,27 @@
 
 void _k_workqueue_entry(struct k_workqueue *const workqueue)
 {
+    sei();
+
     for(;;)
     {
         k_sched_lock();
+        const bool yield = (bool) TEST_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
         struct ditem * const item = dlist_dequeue(&workqueue->queue);
         k_sched_unlock();
 
         if (item != nullptr)
         {
-            item->prev = NULL; // reset item prev in order to know that the work item can be pushed again
+            item->next = NULL; // reset item prev in order to know that the work item can be pushed again
             
             struct k_work * work = CONTAINER_OF(item, struct k_work, tie);
 
             work->handler(work);    // call the task
+
+            if (yield)
+            {
+                k_yield();
+            }
         }
         else
         {
@@ -30,6 +38,8 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue)
 
             CLR_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
         }
+
+        
     }
 }
 
@@ -44,7 +54,7 @@ void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        if (work->tie.prev == NULL) // if item is not already in queue
+        if (work->tie.next == NULL) // if item is not already in queue
         {
             // we need to check if the workqueue is processing an item,
             // because we shouldn't wake up it if there if the item is waiting for an event while beiing processed
@@ -58,6 +68,20 @@ void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
             dlist_queue(&workqueue->queue, &work->tie);
         }
     }
+}
+
+void k_workqueue_set_yieldeach(struct k_workqueue * workqueue)
+{
+    k_sched_lock();
+    SET_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
+    k_sched_unlock();
+}
+
+void k_workqueue_clr_yieldeach(struct k_workqueue * workqueue)
+{
+    k_sched_lock();
+    CLR_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
+    k_sched_unlock();
 }
 
 /*___________________________________________________________________________*/

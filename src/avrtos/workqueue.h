@@ -25,7 +25,10 @@ struct k_work
 
 /*___________________________________________________________________________*/
 
-#define K_WORKQUEUE_IDLE  (1 << 0)
+#define K_WORKQUEUE_IDLE        (1 << 0)
+
+// todo
+#define K_WORKQUEUE_YIELDEACH   (2 << 0)
 
 struct k_workqueue
 {
@@ -50,6 +53,10 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue);
 void k_work_init(struct k_work * work, k_work_handler_t handler);
 
 void k_work_submit(struct k_workqueue * workqueue, struct k_work * work);
+
+void k_workqueue_set_yieldeach(struct k_workqueue * workqueue);
+
+void k_workqueue_clr_yieldeach(struct k_workqueue * workqueue);
 
 /*___________________________________________________________________________*/
 

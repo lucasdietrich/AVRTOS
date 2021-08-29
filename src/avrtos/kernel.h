@@ -27,16 +27,18 @@ void k_yield(void);
  * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and it stills
  * shift the timed threads in the time queue.
  * As cooperative threads, executing should no last very long, since it could delay other threads execution and break time sensitive (RT) threads.
+ * In cooperative threads locking/unlocking the scheduler doesn't have no effect.
  */
 K_NOINLINE void k_sched_lock(void);
 
 /**
  * @brief Unlock the CPU for the current thread being executed @see k_sched_lock. Set it as preemptive.
- * 
+ * In cooperative threads locking/unlocking the scheduler doesn't have no effect.
  * TODO :
  * - for a cooperative thread : yield it
  * - for a preemptive thread, set it as a preemptive thread again
  * - add a new flag that tells if the thread is defined as a preemptive thread but locked the scheduler or is a real cooperative thread
+ * 
  */
 K_NOINLINE void k_sched_unlock(void);
 
