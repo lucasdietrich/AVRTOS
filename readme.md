@@ -38,22 +38,17 @@ What paradigms/concepts are not supported:
 What features will be implemented :
 - System time
 - Statistics CPU use per thread
-- Prioritization
 - Signals
 - Delayed start, suspending/resuming threads
 - Stack sentinels
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
 - Memslabs
-- Task scheduler
-- Saving thread errno
+- Task scheduling
 - Kernel fault
 
 What enhancements are planned :
-- Removing CPU idle thread
 - Using makefile to build the project for a target
-- Stack for interrupts handlers
 - Propose this project as a library
-- Delay the submission of a work in a workqueue
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
 - Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
@@ -61,9 +56,16 @@ What enhancements are planned :
 - Custom errors code: e.g. : EAGAIN, EINVAL
 - Use <util/atomic.h> library to enhanced SREG flag restore or force on
 - Make the library fully C compliant.
-- Allow thread termination
+- Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
-- don't allow mutex unlock from interrupt, then change cli to k_shed_lock when handling mutex lock/unlock
+- Don't allow mutex unlock from interrupt, then change cli to k_shed_lock when handling mutex lock/unlock
+
+What enhancements/features are not planned :
+- Prioritization
+- Totally removing CPU idle thread
+- Stack for interrupts handlers
+- Delay the submission of a work in a workqueue
+- Saving thread errno
 
 ## Getting started example :
 
@@ -190,7 +192,7 @@ in thread context due to ownership and priority inheritance semantics.
 
 ### Features
 
-Some paradigms appear in  the code but re actually not implemented for now, e.g. prioritization
+Some paradigms appear in the code but are actually not implemented for now, e.g. prioritization
 
 ### Arduino
 
@@ -243,7 +245,7 @@ monitor_speed = 500000
 | KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
 | KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
 | KERNEL_TIME_SLICE | Time slice in milliseconds |
-| DEFAULT_KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
+| KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
 | KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
 | KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | KERNEL_DEBUG_PREEMPT_UART |
@@ -254,7 +256,7 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
-| DEFAULT_KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
+| KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
 
 ## Known issues
 
