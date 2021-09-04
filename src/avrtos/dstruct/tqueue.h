@@ -28,7 +28,7 @@ struct titem
         },                           \
         .next = NULL                 \
     }
-#define DEFINE_TITEM(name) struct titem name = INIT_TITEM(name, timeout_ms)
+#define DEFINE_TITEM(name) struct titem name = INIT_TITEM(timeout_ms)
 
 /*___________________________________________________________________________*/
 
