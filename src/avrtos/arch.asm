@@ -73,14 +73,28 @@ USART_Continue:
 
 ; SREG is saved in r17 during the whole process, DON'T USE r17 in this part without saving it
 
-.global TIMER0_OVF_vect
+#if KERNEL_DEBUG_PREEMPT_UART == 0
 
-TIMER0_OVF_vect:
+#include <avrtos/sysclock_config.h>
+
+.global SYSCLOCK_TIMERX_OVF_vect
+
+SYSCLOCK_TIMERX_OVF_vect:
     push r17
 
+#if KERNEL_SYSLOCK_HW_TIMER == 1
+    ; from ATmega328p documentation :
+    ; > To do a 16-bit write, the high byte must be written before the low byte. 
+    ; > For a 16-bit read, the low byte must be read before the high byte.
+
+    ldi r17, SYSCLOCK_TIMER_TCNTH
+    sts SYSCLOCK_HW_REG_TCNTXH, r17
+#endif
+
+    ldi r17, SYSCLOCK_TIMER_TCNTL
+    sts SYSCLOCK_HW_REG_TCNTXL, r17
+
     ; reset timer counter as soon as possible (to maximize accuracy)
-    ldi r17, 0x100 - KERNEL_SYSCLOCK_TIMER0_TCNT0
-    sts TCNT0, r17
 
     lds r17, SREG
 
@@ -100,13 +114,14 @@ TIMER0_OVF_vect:
     push r30
     push r31
 
+#endif
+; KERNEL_DEBUG_PREEMPT_UART
+
+system_shift:
 #if KERNEL_DEBUG
-prempt_debug:
     ldi r24, 0x2e           ; '.'
     call usart_transmit
 #endif
-
-system_shift:
     call _k_system_shift
 
 yield_from_interrupt:

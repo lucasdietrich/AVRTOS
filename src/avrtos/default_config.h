@@ -100,6 +100,11 @@
 #define DEFAULT_KERNEL_TIME_SLICE               4
 
 //
+// Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
+//
+#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         0
+
+//
 //  Auto start kernel sysclock
 //
 #define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       1
@@ -152,7 +157,7 @@
 #define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       K_PRIO_PREEMPT(K_PRIO_HIGH)
 
 //
-// Enable kernel assertion test
+// Enable kernel assertion test for debug purpose
 //
 #define DEFAULT_KERNEL_ASSERT                   0
 

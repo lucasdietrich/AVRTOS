@@ -43,15 +43,6 @@
 #define K_FLAG_TIMER_EXPIRED_SHIFT   7
 #define K_FLAG_TIMER_EXPIRED         (1 << K_FLAG_TIMER_EXPIRED_SHIFT)
 
-#define SYSCLOCK_PRESCALER_1        ((1 << CS00) | (0 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_8        ((0 << CS00) | (1 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_64       ((1 << CS00) | (1 << CS01) |  (0 << CS02))
-#define SYSCLOCK_PRESCALER_256      ((0 << CS00) | (0 << CS01) |  (1 << CS02))
-#define SYSCLOCK_PRESCALER_1024     ((1 << CS00) | (0 << CS01) |  (1 << CS02))
-
-
-
-
 /*___________________________________________________________________________*/
 
 #endif

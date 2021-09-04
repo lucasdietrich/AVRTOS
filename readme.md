@@ -10,7 +10,8 @@ Following avr architectures are supported/tested :
 
 Following features are supported:
 - Cooperative threads
-- Preemptive threads with time slice between 1ms and 16ms (based on timer 0).
+- Preemptive threads with time slice between 1 ms and 16 ms (timer 0 and timer 2) up to 4 seconds (timer 1)
+- Configurable sysclock timer among hardware timers : timer0 (8bits), timer1 (16 bits), timer2 (8 bits)
 - Mutex and Semaphores
 - Thread sleep up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
@@ -149,7 +150,15 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 
 ### Peripherals
 
-- This library only needs the timer0 peripheral and the usart0 (+ RX interrupt vector) in case of debugging
+- This library only needs one timer among following hardware timers :
+  - timer0 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds
+  - timer1 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds and 20ms, 25ms, 50ms, 100ms, 200ms, 250ms, 500ms, 1s, 2s, 2500ms, 3s, 4s
+  - timer2 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds
+
+The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER configuration option.
+
+- If configuration option KERNEL_DEBUG_PREEMPT_UART is enabled, the usart0 peripheral is used (+ RX interrupt vector)
+
 
 ### Overhead
 - In term of flash, the overhead is approximately 3KB
@@ -181,9 +190,12 @@ in thread context due to ownership and priority inheritance semantics.
 
 ### Features
 
-Moreover, some paradigms appear in  the code but re actually not implemented for now, e.g. prioritization
+Some paradigms appear in  the code but re actually not implemented for now, e.g. prioritization
 
-This library is not compatible with the Arduino framework for now: the kernel clock is based on the timer0 which is used for `millis()` in the arduino framework. This should be the only limitation.
+### Arduino
+
+This library should be compatible with the Arduino framework but was not tested on it:
+- As the `millis()` function from arduino uses timer0 you need to configure the kernel sysclock to use another hardware timer among timer1 (16 bits) and timer2 (8 bits). This should be the only limitation.
 
 ### Git
 
@@ -231,6 +243,7 @@ monitor_speed = 500000
 | KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
 | KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
 | KERNEL_TIME_SLICE | Time slice in milliseconds |
+| DEFAULT_KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
 | KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
 | KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | KERNEL_DEBUG_PREEMPT_UART |
@@ -241,6 +254,7 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
+| DEFAULT_KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
 
 ## Known issues
 
