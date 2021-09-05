@@ -42,7 +42,11 @@ extern "C" {
 #define K_ASSERT_LEASTONE_RUNNING   3
 #define __ASSERT_LEASTONE_RUNNING(loc)   __ASSERT(!_k_runqueue_single(), K_ASSERT_USER(loc) | K_ASSERT_LEASTONE_RUNNING)
 
-#define K_ASSERT_WORKQUEUE          4
+// runqueue has more than 1 thread running
+#define K_ASSERT_THREAD_STATE       4
+#define __ASSERT_THREAD_STATE(th, state, loc)   __ASSERT(th->state == state, K_ASSERT_USER(loc) | K_ASSERT_THREAD_STATE)
+
+#define K_ASSERT_WORKQUEUE          10
 
 /*___________________________________________________________________________*/
 

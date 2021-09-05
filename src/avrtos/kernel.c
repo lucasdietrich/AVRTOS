@@ -252,6 +252,8 @@ void _k_wake_up(struct k_thread *th)
 {
     __ASSERT_NOINTERRUPT(0x05);
 
+    __ASSERT_THREAD_STATE(th, WAITING, 0x01);
+
     __K_DBG_WAKEUP(th);
 
     th->state = READY;
