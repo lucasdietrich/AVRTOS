@@ -216,7 +216,7 @@ Git history of the project has been reworked in order to remove big files (as sc
     - Choose the linker script depending on the AVR architecture
     - Choose *upload* and *monitor* ports
 
-```
+```ini
 [env]
 platform = atmelavr
 board = pro16MHzatmega328
