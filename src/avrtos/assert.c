@@ -11,6 +11,7 @@ void __assert(bool expression, uint16_t acode)
     if (expression == 0)
     {
         cli();
+        
         usart_print_p(assert_msg);
         usart_u8(acode >> 8);
         usart_transmit(':');

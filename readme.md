@@ -161,6 +161,20 @@ The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER co
 
 - If configuration option KERNEL_DEBUG_PREEMPT_UART is enabled, the usart0 peripheral is used (+ RX interrupt vector)
 
+### qemu
+
+As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://github.com/qemu/qemu/tree/master/target/avr), any program built using this RTOS can be emulated in qemu and debugged using GDB.
+
+Note that only few peripherals are supported on avr architecture (https://qemu-project.gitlab.io/qemu/system/target-avr.html) :
+  - `timer1` : 
+    - https://github.com/qemu/qemu/blob/master/hw/timer/avr_timer16.c
+    - https://github.com/qemu/qemu/blob/master/include/hw/timer/avr_timer16.h
+  - `usart0` :
+    - https://github.com/qemu/qemu/blob/master/hw/char/avr_usart.c
+    - https://github.com/qemu/qemu/blob/master/include/hw/char/avr_usart.h
+
+But these two peripherals are enough to fully run/debug the kernel with output in console.
+
 
 ### Overhead
 - In term of flash, the overhead is approximately 3KB
@@ -198,6 +212,8 @@ Some paradigms appear in the code but are actually not implemented for now, e.g.
 
 This library should be compatible with the Arduino framework but was not tested on it:
 - As the `millis()` function from arduino uses timer0 you need to configure the kernel sysclock to use another hardware timer among timer1 (16 bits) and timer2 (8 bits). This should be the only limitation.
+
+- https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c#L65-L77
 
 ### Git
 

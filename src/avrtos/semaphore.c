@@ -15,7 +15,7 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
     sem->waitqueue = NULL;
 }
 
-NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
+uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 {
     int8_t get;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -28,6 +28,7 @@ NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
             dlist_queue(&sem->waitqueue, &k_current->wsem);
 
             _k_reschedule(timeout);
+
             k_yield();
 
             if (TEST_BIT(k_current->flags, K_FLAG_TIMER_EXPIRED))
@@ -47,7 +48,7 @@ NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
     return get;
 }
 
-NOINLINE void k_sem_give(struct k_sem *sem)
+void k_sem_give(struct k_sem *sem)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
@@ -55,12 +56,13 @@ NOINLINE void k_sem_give(struct k_sem *sem)
 
         __K_DBG_SEM_GIVE(k_current);
 
-        struct ditem *const first_waiting_thread = dlist_dequeue(&sem->waitqueue);
-        if (first_waiting_thread != NULL)
+        struct ditem *const first_thread = dlist_dequeue(&sem->waitqueue);
+        if (first_thread != NULL)
         {
-            struct k_thread *const th = THREAD_OF_QITEM(first_waiting_thread);
+            struct k_thread *const th = THREAD_OF_QITEM(first_thread);
 
-            /* immediate: the first thread in the queue must be the first to get the semaphore */
+            /* immediate: the first thread in the queue 
+             * must be the first to get the semaphore */
             _k_immediate_wake_up(th);
 
             k_yield();

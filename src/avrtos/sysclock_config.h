@@ -9,13 +9,24 @@
 
 /*___________________________________________________________________________*/
 
-// TODO :  update
-// as thread context switch is 26µs and it is not advice to do context switch more than 10% of the time
-// maximum time slice must be 26µs*9 = 234µs ~ 4273 Hz
+// TODO :  
+//  - automatically calculate timer parameter in preprocessor for an 
+//      input time slice
+//  - make it compatible with 8MHz clock
 
-// TODO automatically calculate timer parameter in preprocessor for an input time slice
-
-// TODO make it compatible with 8MHz clock
+// NOTE : 
+//  - as thread context switch is 26µs and it is not advice to do context 
+//      switch more than 10% of the time.
+//
+//  - maximum time slice must be 26µs*9 = 234µs ~ 4273 Hz
+//
+//  - If using Arduino Framework, as timer0 is used by the `millis()` function:
+//      Timer1 or 2 should be used for the syslock timer.
+//      https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c#L65-L77
+//      
+//  - If using qemu for avr, only timer1 is supported at the time :
+//      https://qemu-project.gitlab.io/qemu/system/target-avr.html
+//      https://github.com/qemu/qemu/blob/master/hw/timer/avr_timer16.c
 
 /*___________________________________________________________________________*/
 

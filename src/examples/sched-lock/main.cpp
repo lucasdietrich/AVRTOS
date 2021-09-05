@@ -10,6 +10,8 @@
 #include "avrtos/kernel.h"
 #include "avrtos/debug.h"
 
+#define USE_SCHED_LOCK_TRICK 0
+
 /*___________________________________________________________________________*/
 
 void thread_blink(void *p);
@@ -31,15 +33,26 @@ int main(void)
 
   sei();
 
-  while(1)
+  while (1)
   {
-    k_sched_lock();
-    usart_printl("k_sched_lock()");
+  
+#if USE_SCHED_LOCK_TRICK
+    K_SCHED_LOCK_CONTEXT
+    {
+#else
+      k_sched_lock();
+#endif
+      usart_printl("k_sched_lock()");
 
-    _delay_ms(500);
+      _delay_ms(500);
 
-    usart_printl("k_sched_unlock()");
-    k_sched_unlock();
+      usart_printl("k_sched_unlock()");
+
+#if USE_SCHED_LOCK_TRICK == 0
+      k_sched_unlock();
+#else
+    }
+#endif
 
     _delay_ms(2000);
   }
@@ -47,7 +60,7 @@ int main(void)
 
 void thread_blink(void *p)
 {
-  while(1)
+  while (1)
   {
     usart_transmit('o');
     led_on();
@@ -63,7 +76,7 @@ void thread_blink(void *p)
 
 void thread_coop(void *p)
 {
-  while(1)
+  while (1)
   {
     k_sleep(K_MSEC(5000));
 

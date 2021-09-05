@@ -52,6 +52,48 @@ K_NOINLINE void k_sched_unlock(void);
 K_NOINLINE bool k_sched_locked(void);
 
 /**
+ * @brief used in K_SCHED_LOCK_CONTEXT macro
+ * 
+ * @see k_sched_unlock
+ * 
+ * @param __s 
+ * @return __inline__ 
+ */
+static __inline__ void __k_sched_restore(const uint8_t *__s)
+{
+   k_sched_unlock();
+   __asm__ volatile ("" ::: "memory");
+   ARG_UNUSED(__s);
+}
+
+/**
+ * @brief used in K_SCHED_LOCK_CONTEXT macro
+ * 
+ * @return __inline__ 
+ */
+static __inline__ uint8_t __k_sched_lock_ret(void)
+{
+    k_sched_lock();
+
+    return 1;
+}
+
+/**
+ * @brief This macro lock the scheduler for the duration of the inner scope.
+ * 
+ * This code in the block is equivalent to the code between k_sched_lock(); 
+ *    and k_sched_unlock();
+ * 
+ * Inspiration for this MACRO come greatly from 
+ *    ATOMIC_BLOCK(ATOMIC_FORCEON) { } macro from <avr/atomic.h> 
+ */
+#define K_SCHED_LOCK_CONTEXT                                                       \
+   for (uint8_t __k_schedl_x __attribute__((__cleanup__(__k_sched_restore))) = 0u, \
+                             __k_todo = __k_sched_lock_ret();                      \
+        __k_todo;                                                                  \
+        __k_todo = 0)
+ 
+/**
  * @brief Stop the execution of the current thread for the specified amount of time. This function schedule the execution of
  * the current thread when the timer expires. Returning of this function is equivalent that returning from k_yield.
  * 

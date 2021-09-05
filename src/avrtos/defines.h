@@ -288,6 +288,8 @@ typedef struct
 #define CLR_BIT(x, b)  ((x) &= (~(b)))
 #define TEST_BIT(x, b) ((bool) ((x) & b))
 
+#define ARG_UNUSED(arg) ((void) arg)
+
 
 #endif
 

@@ -13,15 +13,11 @@ _k_mutex_lock:
     ; neither atmega328P nor atmega2560 supports xch instruction
     ; xch Z, r24
 
-    lds r25, SREG
-    cli
-
     ld r24, Z
     com r24     ; if mutex locked (00), com should set flag Z=0
-    brne .+2    ; mutex locked
+    brne .+2    ; mutex already locked locked
     st Z, r24   ; mutex free, lock it (set FF)
 
-    sts SREG, r25
     ret
 
 ; mutex struct addr in r24, r25

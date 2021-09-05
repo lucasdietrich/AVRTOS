@@ -7,9 +7,6 @@
 _k_sem_take:
     movw r30, r24
 
-    lds r25, SREG
-    cli
-
     ld r24, Z           ; get semaphore count
     tst r24             ; test
     breq nosem          ; no semaphore left
@@ -21,15 +18,11 @@ oksem:
 nosem:
     ldi r24, 0xFF
 retsemtake:
-    sts SREG, r25
     ret
 
 ; mutex struct addr in r24, r25
 _k_sem_give:
     movw r30, r24
-
-    lds r25, SREG
-    cli
 
     ld r24, Z           ; get semaphore count
     ldd r23, Z+1         ; get semaphore limit
@@ -41,5 +34,4 @@ semgive:
     inc r24
     st Z, r24
 retsemgive:
-    sts SREG, r25
     ret
