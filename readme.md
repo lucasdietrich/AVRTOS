@@ -165,17 +165,6 @@ The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER co
 
 As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://github.com/qemu/qemu/tree/master/target/avr), any program built using this RTOS can be emulated in qemu and debugged using GDB.
 
-Note that only few peripherals are supported on avr architecture (https://qemu-project.gitlab.io/qemu/system/target-avr.html) :
-  - `timer1` : 
-    - https://github.com/qemu/qemu/blob/master/hw/timer/avr_timer16.c
-    - https://github.com/qemu/qemu/blob/master/include/hw/timer/avr_timer16.h
-  - `usart0` :
-    - https://github.com/qemu/qemu/blob/master/hw/char/avr_usart.c
-    - https://github.com/qemu/qemu/blob/master/include/hw/char/avr_usart.h
-
-But these two peripherals are enough to fully run/debug the kernel with output in console.
-
-
 ### Overhead
 - In term of flash, the overhead is approximately 3KB
 - In term of RAM :
@@ -284,6 +273,94 @@ monitor_speed = 500000
 
 ## Debugging
 
+### Emulate with QEMU and debug
+
+[qemu](https://www.qemu.org/) implements an emulator for AVR architectures.
+
+My install :
+- Environnement : Windows 10
+- Ubuntu 20.04 (WSL)
+- [qemu v6.1.0](https://github.com/qemu/qemu/tree/v6.1.0)
+
+Steps : 
+1. Building project in debug mode : 
+  - `build_type = debug`
+  - Make sure to use timer1 as syslock !
+  
+2. Emulate on qemu : Run command from WSL :
+  `~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off`
+
+3. Attach serial :
+  - From WSL : `telnet localhost 5678`
+  - From Visual Studio Code IDE : Serial Monitor : `Ctrl + Alt + S`
+
+4. Attach debugger in VSC environnement :
+  - `Ctrl + F5`
+
+Note that only few peripherals are supported on avr architecture (https://qemu-project.gitlab.io/qemu/system/target-avr.html) :
+  - `timer1` : 
+    - https://github.com/qemu/qemu/blob/master/hw/timer/avr_timer16.c
+    - https://github.com/qemu/qemu/blob/master/include/hw/timer/avr_timer16.h
+  - `usart0` :
+    - https://github.com/qemu/qemu/blob/master/hw/char/avr_usart.c
+    - https://github.com/qemu/qemu/blob/master/include/hw/char/avr_usart.h
+
+But these two peripherals are enough to fully run/debug the kernel with output in console.
+
+Debugging in QEMU : `Sysclock-qemu-ATmega328p` : [sysclock/main.cpp](./src/examples/sysclock/main.cpp) :
+![avrtos_qemu1.png](./pics/avrtos_qemu1.png)
+
+Debugging in QEMU : `MutexMultithreadingDemo-qemu-ATmega328p` : [mutex-multithreading-demo/main.cpp](./src/examples/mutex-multithreading-demo/main.cpp) :
+![avrtos_qemu2.png](./pics/avrtos_qemu2.png)
+
+If you want to create your own application I advice to define two environnements in `platformio.ini` :
+
+Release env for real board Arduino Pro (ATmega328p): 
+```ini
+[env:MutexMultithreadingDemo]
+src_filter =
+    ${env.src_filter}
+    +<examples/mutex-multithreading-demo/>
+
+build_flags = 
+    ${env.build_flags}
+    -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
+    -DCONFIG_KERNEL_TIME_SLICE=16
+    -DCONFIG_KERNEL_DEBUG=0
+    -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
+    -DCONFIG_KERNEL_THREAD_IDLE=1
+```
+
+Debug mode for QEMU (ATmega328p)
+
+```ini
+[env:MutexMultithreadingDemo-qemu-ATmega328p]
+build_type = debug
+
+src_filter =
+    ${env.src_filter}
+    +<examples/mutex-multithreading-demo/>
+
+build_flags = 
+    ${env.build_flags}
+    -DCONFIG_KERNEL_SYSLOCK_HW_TIMER=1
+    -DCONFIG_KERNEL_TIME_SLICE=4
+    -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
+    -DCONFIG_KERNEL_DEBUG=0
+    -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
+    -DCONFIG_KERNEL_THREAD_IDLE=1
+
+debug_tool = custom
+debug_port = :1234
+debug_load_mode = manual
+monitor_port = socket://localhost:5678
+debug_extra_cmds =
+    tbreak main
+```
+
+
+### Console debug
+
 Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 - Before scheduler call :
     - `c` : Meaning that an interrupt planned to call the scheduler but the current thread is in cooperative mode. We restore the current thread same context that was only partially saved.
@@ -309,7 +386,7 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 - `.` : Each time the syslock timer expires, we check if the current thread can be preempted and then the scheduler is called in.
     - If configuration option `KERNEL_DEBUG_PREEMPT_UART` is set, syslock timer overflow handler is replaced by the uart rx interrupt handler.
 
-### Example with the getting-started example 
+#### Example with the getting-started example 
 
 ```
 ===== k_thread =====

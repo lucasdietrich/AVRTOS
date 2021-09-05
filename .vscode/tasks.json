@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU WSL Ubuntu - Sysclock-qemu-ATmega2560"
+		},
+		{
+			"type": "shell",
+			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/Sysclock-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU WSL Ubuntu - Sysclock-qemu-ATmega328p"
+		},
+		{
+			"type": "shell",
+			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/MutexMultithreadingDemo-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU WSL Ubuntu - MutexMultithreadingDemo-qemu-ATmega328p"
+		},
+	]
+}
