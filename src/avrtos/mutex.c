@@ -5,12 +5,10 @@
 
 #include <util/atomic.h>
 
-extern struct ditem *runqueue; 
-extern struct titem *events_queue;
-
 void k_mutex_init(struct k_mutex *mutex)
 {
     mutex->lock = 0xFFu;
+    mutex->waitqueue = NULL;
 }
 
 uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
@@ -29,6 +27,7 @@ uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 
             k_yield();
 
+            // TODO use a dlist in order to remove it without condition
             if (TEST_BIT(k_current->flags, K_FLAG_TIMER_EXPIRED))
             {
                 dlist_remove(&mutex->waitqueue, &k_current->wmutex);

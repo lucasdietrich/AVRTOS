@@ -174,9 +174,13 @@ struct ditem * dlist_dequeue(struct ditem **ref)
 
 void dlist_remove(struct ditem **ref, struct ditem *item)
 {
-    if (*ref == item)
+    if ((*ref == item) && (item->next == item))
     {
         *ref = NULL;
+    }
+    else if (*ref == item)
+    {
+        pop_ref(ref);
     }
     else
     {

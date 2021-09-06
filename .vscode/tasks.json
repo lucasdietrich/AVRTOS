@@ -25,5 +25,13 @@
 			],
 			"label": "QEMU WSL Ubuntu - MutexMultithreadingDemo-qemu-ATmega328p"
 		},
+		{
+			"type": "shell",
+			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/FifoQemuMega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU WSL Ubuntu - FifoQemuMega328p"
+		},
 	]
 }

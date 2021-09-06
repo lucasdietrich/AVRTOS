@@ -238,6 +238,8 @@ struct k_thread *_k_scheduler(void)
         {
             _k_schedule(ready);
         }
+
+        SET_BIT(THREAD_OF_DITEM(ready)->flags, K_FLAG_TIMER_EXPIRED);
     }
 
     k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);

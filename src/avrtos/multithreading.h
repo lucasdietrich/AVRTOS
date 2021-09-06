@@ -24,6 +24,8 @@
 #include "mutex.h"
 #include "semaphore.h"
 
+#include "fifo.h"
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
@@ -94,6 +96,7 @@ struct k_thread
         struct ditem wmutex;            // represent the thread waiting on an mutex
         struct ditem wsem;              // represent the thread waiting on an semaphore
         struct ditem wsig;              // represent the thread waiting on an signal
+        struct ditem wfifo;             // represent the thread waiting on a fifo item
     };
     struct
     {

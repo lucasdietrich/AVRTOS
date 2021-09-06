@@ -14,6 +14,15 @@
         "kernel.h": "c",
         "defines.h": "c",
         "common.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "fifo.h": "c",
+        "assert.h": "c",
+        "sysclock.h": "c",
+        "idle.h": "c",
+        "canaries.h": "c",
+        "queue.h": "c",
+        "workqueue.h": "c",
+        "dlist.h": "c",
+        "stddef.h": "c"
     }
 }

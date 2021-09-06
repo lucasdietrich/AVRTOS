@@ -11,6 +11,23 @@
 
 #include "common.h"
 
+#define K_MODULE_KERNEL         1
+#define K_MODULE_ARCH           2
+#define K_MODULE_SYSCLOCK       3
+#define K_MODULE_THREAD         4
+#define K_MODULE_IDLE           5
+
+#define K_MODULE_MUTEX          10
+#define K_MODULE_SEMAPHORE      11
+#define K_MODULE_SIGNAL         12
+#define K_MODULE_WORKQUEUE      13
+#define K_MODULE_FIFO           14
+#define K_MODULE_MEMSLAB        15
+
+
+
+
+
 /*___________________________________________________________________________*/
 
 // arch specific fixups
@@ -33,7 +50,7 @@
 #endif
 
 #define NOINLINE            __attribute__((noinline))
-#define FUNC_NORETURN       __attribute__((__noreturn__))
+#define NORETURN            __attribute__((__noreturn__))
 #define CODE_UNREACHABLE    __builtin_unreachable();
 
 /*___________________________________________________________________________*/

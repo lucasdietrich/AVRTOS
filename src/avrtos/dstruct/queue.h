@@ -14,7 +14,10 @@ struct qitem
     struct qitem * next;
 };
 
+// #define INIT_QUEUE()    NULL
+
 #define DEFINE_QUEUE(ref_name) struct qitem *ref_name = NULL
+
 #define INIT_QITEM() \
     {                \
         .next = NULL \
@@ -26,8 +29,6 @@ struct qitem
 void queue(struct qitem ** p_root, struct qitem * qitem);
 
 struct qitem * dequeue(struct qitem ** p_root);
-
-// unqueue
 
 /*___________________________________________________________________________*/
 
