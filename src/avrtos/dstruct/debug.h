@@ -25,7 +25,12 @@ void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item));
 //
 // DList
 //
-void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item));
+void print_dlist(struct ditem *dlist, void (*ditem_printer)(struct ditem *item));
+
+//
+// ref DList
+//
+void print_ref_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item));
 
 /*___________________________________________________________________________*/
 

@@ -17,7 +17,7 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue)
         struct ditem * const item = dlist_dequeue(&workqueue->queue);
         k_sched_unlock();
 
-        if (item != nullptr)
+        if (DITEM_VALID(&workqueue->queue, item))
         {
             item->next = NULL; // set the work item submittable again
             

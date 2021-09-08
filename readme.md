@@ -21,6 +21,7 @@ Following features are supported:
 - Runtime stack/thread creation
 - avr5 and avr6 architectures
 - Workqueues and system workqueue 
+- Fifo
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -30,6 +31,7 @@ Minor features:
 - data structures : dlist (doubly linked list), queue (singly linked list), time queue (singly linked list with delay parameter)
 - I/O : leds, uart
 - Kernel Assertions (__ASSERT)
+- Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEOUT
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -53,8 +55,6 @@ What enhancements are planned :
 - Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
 - Cancel submitted item
-- Custom errors code: e.g. : EAGAIN, EINVAL
-- Use <util/atomic.h> library to enhanced SREG flag restore or force on
 - Make the library fully C compliant.
 - Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
@@ -171,7 +171,7 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
   - kernel objects
     - runqueue : 2B
     - events queue : 2B
-    - thread idle stack is at least 34/36 byte + 16B thread structure (should be removed in the future)
+    - thread idle stack is at least 34/36 byte + 18B thread structure (should be removed in the future)
   - a thread structure is 16B + stack size which is at least 35/36byte
   - a mutex is 5B
   - a semaphore is 5B
@@ -397,11 +397,6 @@ O 033E [PREE 1] READY   : SP 35/80 -| END @02A7
 K 034E [PREE 3] READY   : SP 35/62 -| END @02E6
 ~C~F}Ff~O#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!C_.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>K
 ```
-
-## Things ...
-
-- didn't use any debugger to develop this project
-- AVRTOS stands for AVR and RTOS
 
 # Ideas: 
 - Malloc : https://www.nongnu.org/avr-libc/user-manual/malloc.html

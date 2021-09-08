@@ -12,18 +12,6 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-#define K_SEM_INIT(initial_count, count_limit)    \
-    {                                             \
-        .count = MIN(initial_count, count_limit), \
-        .limit = count_limit,                     \
-        .waitqueue = NULL                         \
-    }
-
-#define K_SEM_DEFINE(sem_name, initial_count, count_limit) \
-    static struct k_sem sem_name = K_SEM_INIT(initial_count, count_limit)
-
-/*___________________________________________________________________________*/
-
 /**
  * @brief Structure describing a semaphore, "count" parameter tells the number 
  * of available semaphore, "limit" describe the maximum number of semaphores.
@@ -36,8 +24,20 @@ struct k_sem
 {
     uint8_t count;
     uint8_t limit;
-    struct ditem *waitqueue;
+    struct ditem waitqueue;
 };
+
+/*___________________________________________________________________________*/
+
+#define K_SEM_INIT(sem, initial_count, count_limit) \
+    {                                               \
+        .count = MIN(initial_count, count_limit),   \
+        .limit = count_limit,                       \
+        .waitqueue = DLIST_INIT(sem.waitqueue)      \
+    }
+
+#define K_SEM_DEFINE(sem_name, initial_count, count_limit) \
+    static struct k_sem sem_name = K_SEM_INIT(sem_name, initial_count, count_limit)
 
 /*___________________________________________________________________________*/
 

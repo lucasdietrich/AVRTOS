@@ -8,17 +8,19 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <avr/io.h>
 #include <util/atomic.h>
 
 #include "multithreading.h"
-#include "misc/uart.h"
+
+
 
 
 /*___________________________________________________________________________*/
 
 // move to assert.h
 #if KERNEL_ASSERT
-#   define __ASSERT(assertion, code) __assert((bool) (assertion), code)
+#   define __ASSERT(assertion, code) __assert((uint8_t) (assertion), code)
 #else
 #   define __ASSERT(assertion, code) 
 #endif
@@ -36,7 +38,7 @@ extern "C" {
 
 // interrupts enabled
 #define K_ASSERT_INTERRUPT          1
-#define __ASSERT_INTERRUPT(loc)     __ASSERT(SREG & (1 << SREG_I), K_ASSERT_USER(loc) | K_ASSERT_INTERRUPT)
+#define __ASSERT_INTERRUPT(loc)     __ASSERT(__k_interrupts() != 0, K_ASSERT_USER(loc) | K_ASSERT_INTERRUPT)
 
 #define K_ASSSERT_NOTNULL               15
 #define __ASSERT_NOTNULL(var, module)   __ASSERT(var != NULL, K_ASSERT_MODULE(module) | K_ASSSERT_NOTNULL)
@@ -46,7 +48,7 @@ extern "C" {
 
 // interrupt disabled
 #define K_ASSERT_NOINTERRUPT        2
-#define __ASSERT_NOINTERRUPT(loc)   __ASSERT((SREG & (1 << SREG_I)) == 0, K_ASSERT_USER(loc) | K_ASSERT_NOINTERRUPT)
+#define __ASSERT_NOINTERRUPT(loc)   __ASSERT(__k_interrupts() == 0, K_ASSERT_USER(loc) | K_ASSERT_NOINTERRUPT)
 
 // runqueue has more than 1 thread running
 #define K_ASSERT_LEASTONE_RUNNING   3
@@ -54,13 +56,13 @@ extern "C" {
 
 // runqueue has more than 1 thread running
 #define K_ASSERT_THREAD_STATE       4
-#define __ASSERT_THREAD_STATE(th, state, loc)   __ASSERT(th->state == state, K_ASSERT_USER(loc) | K_ASSERT_THREAD_STATE)
+#define __ASSERT_THREAD_STATE(th, th_state, loc)   __ASSERT(th->state == th_state, K_ASSERT_USER(loc) | K_ASSERT_THREAD_STATE)
 
 #define K_ASSERT_WORKQUEUE          10
 
 /*___________________________________________________________________________*/
 
-void __assert(bool expression, uint16_t acode);
+void __assert(uint8_t expression, uint16_t acode);
 
 /*___________________________________________________________________________*/
 

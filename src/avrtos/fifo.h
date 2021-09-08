@@ -15,17 +15,19 @@ extern "C" {
 struct k_fifo
 {
     struct qitem *queue;         // fifo reference to head item
-    struct ditem *waitqueue;    // waitqueue of thread waiting to get an item
+    struct ditem waitqueue;    // waitqueue of thread waiting to get an item
 };
 
-#define K_FIFO_INIT()      \
-    {                      \
-        .queue = NULL,     \
-        .waitqueue = NULL, \
+/*___________________________________________________________________________*/
+
+#define K_FIFO_INIT(fifo)                       \
+    {                                           \
+        .queue = NULL,                          \
+        .waitqueue = DLIST_INIT(fifo.waitqueue) \
     }
 
 #define K_FIFO_DEFINE(fifo_name) \
-    static struct k_fifo fifo_name = K_FIFO_INIT()
+    static struct k_fifo fifo_name = K_FIFO_INIT(fifo_name)
 
 /*___________________________________________________________________________*/
 

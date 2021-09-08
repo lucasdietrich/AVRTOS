@@ -202,44 +202,42 @@ void _k_unschedule(struct k_thread *th)
     tqueue_remove(&events_queue, &th->tie.event);
 }
 
-struct k_thread *_k_scheduler(void)
+struct k_thread* _k_scheduler(void)
 {
     __ASSERT_NOINTERRUPT(0x04);
 
     k_current->timer_expired = 0;
     k_current->immediate = 0;
 
-    if (k_current->state == WAITING)
-    {
-        // runqueue is positionned to the normally next thread to be executed
+    if (k_current->state == WAITING) {
+        /* runqueue is positionned to the normally next thread to be executed */
         __K_DBG_SCHED_WAITING();        // ~
     }
-    else
-    {
-        // next thread is positionned at the top of the runqueue
+    else {
+        /* next thread is positionned at the top of the runqueue */
         ref_requeue(&runqueue);
 
         __K_DBG_SCHED_REQUEUE();        // >
     }
 
-    struct ditem* ready = (struct ditem*) tqueue_pop(&events_queue);
-    if (ready != NULL)
-    {
+    struct ditem* ready = (struct ditem*)tqueue_pop(&events_queue);
+    if (ready != NULL) {
         __K_DBG_SCHED_EVENT();  // !
 
-        // idle thread cannot be immediate
-        if (THREAD_OF_DITEM(runqueue)->immediate)
-        {
-            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_OF_DITEM(ready));   // '
+        /* set ready thread expired flag */
+        THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
+
+        /* if a thread has been woken up with the immediate flag set,
+         * the expired thread will be push just after it */
+        /* as idle thread cannot be immediate, it will never be prioritized */
+        if (THREAD_FROM_EVENTQUEUE(runqueue)->immediate) {
+            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_FROM_EVENTQUEUE(ready));   // '
 
             push_front(runqueue->next, ready);
         }
-        else
-        {
+        else {
             _k_schedule(ready);
         }
-
-        SET_BIT(THREAD_OF_DITEM(ready)->flags, K_FLAG_TIMER_EXPIRED);
     }
 
     k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
@@ -256,7 +254,7 @@ void _k_wake_up(struct k_thread *th)
 
     __ASSERT_THREAD_STATE(th, WAITING, 0x01);
 
-    __K_DBG_WAKEUP(th);
+    __K_DBG_WAKEUP(th); // @
 
     th->state = READY;
 
@@ -269,7 +267,7 @@ void _k_immediate_wake_up(struct k_thread *th)
 {
     __ASSERT_NOINTERRUPT(0x06);
 
-    SET_BIT(th->flags, K_FLAG_IMMEDIATE);
+    th->immediate = 1u;
 
     _k_wake_up(th);
 }
@@ -294,3 +292,37 @@ void _k_system_shift(void)
 
 /*___________________________________________________________________________*/
 
+int8_t _k_waiting_object(struct ditem *waitqueue, k_timeout_t timeout)
+{
+    int8_t err = -1;
+    if (timeout.value != 0) {
+        dlist_queue(waitqueue, &k_current->wany);
+
+        _k_reschedule(timeout);
+        k_yield();
+
+        if (k_current->timer_expired) {
+            dlist_remove(&k_current->wany);
+            err = -ETIMEOUT;
+        } else {
+            err = 0;
+        }
+    }
+    return err;
+}
+
+void _k_wakeup_notify_object(struct ditem* waitqueue)
+{
+    struct ditem* waiting_thread = dlist_dequeue(waitqueue);
+    if (DITEM_VALID(waitqueue, waiting_thread)) {
+        struct k_thread* th = THREAD_FROM_WAITQUEUE(waiting_thread);
+
+        /* immediate: the first thread in the queue
+         * must be the first to get the object */
+        _k_immediate_wake_up(th);
+
+        k_yield();
+    }
+}
+
+/*___________________________________________________________________________*/

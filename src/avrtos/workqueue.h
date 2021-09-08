@@ -21,7 +21,7 @@ struct k_work
 
 #define K_WORK_INIT(work_handler) \
     {                             \
-        .tie = INIT_DITEM_NULL(), \
+        .tie = DITEM_INIT_NULL(), \
         .handler = work_handler,  \
     }
 
@@ -36,7 +36,7 @@ struct k_work
 
 struct k_workqueue
 {
-    struct ditem *queue;
+    struct ditem queue;
     struct k_thread* thread;
     uint8_t flags;
 };
@@ -56,7 +56,7 @@ struct k_workqueue
         symbol)                                                  \
     struct k_workqueue name =                                    \
         {                                                        \
-            .queue = NULL,                                       \
+            .queue = DLIST_INIT(name.queue),                     \
             .thread = &_K_WORKQUEUE_THREAD_NAME(name),           \
             .flags = 0u,                                         \
     };

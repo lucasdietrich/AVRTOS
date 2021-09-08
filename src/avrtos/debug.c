@@ -142,7 +142,7 @@ void _thread_symbol_events_queue(struct titem * item)
 
 void print_runqueue(void)
 {
-    print_dlist(runqueue, _thread_symbol_runqueue);
+    print_ref_dlist(runqueue, _thread_symbol_runqueue);
 }
 
 void print_events_queue(void)

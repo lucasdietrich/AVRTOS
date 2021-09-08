@@ -4,7 +4,7 @@
 
 #include "misc/uart.h"
 
-void __assert(bool expression, uint16_t acode)
+void __assert(uint8_t expression, uint16_t acode)
 {
     static const char assert_msg[] PROGMEM = "***** Kernel Assertion failed *****\n  assert code = ";
 
@@ -18,7 +18,7 @@ void __assert(bool expression, uint16_t acode)
         usart_u8(acode);
 
         asm("jmp _exit");
-    }
 
-    __builtin_unreachable();
+        __builtin_unreachable();
+    }
 }

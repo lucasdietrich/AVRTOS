@@ -2,6 +2,7 @@
 #define _CLIST_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,62 +20,83 @@ extern "C" {
 
 struct ditem
 {
-    struct ditem *prev;
-    struct ditem *next;
+    union
+    {
+        struct ditem *next;
+        struct ditem *head;
+    };
+    union
+    {
+        struct ditem *prev;
+        struct ditem *tail;
+    };
 };
 
-#define INIT_DITEM(self)           \
-    {                              \
-        .prev = self,              \
-        .next = self               \
+#define DITEM_INIT(self)  \
+    {                     \
+        {                 \
+            .next = self, \
+        },                \
+        {                 \
+            .prev = self, \
+        }                 \
     }
-#define INIT_DITEM_NULL()           INIT_DITEM(NULL)
 
-#define DEFINE_DLIST(ref_name) struct dlist ref_name = INIT_DITEM(&ref_name)
+#define DLIST_INIT(dlist)   \
+    {                       \
+        {                   \
+            .head = &dlist, \
+        },                  \
+        {                   \
+            .tail = &dlist, \
+        }                   \
+    }
+
+#define DITEM_INIT_NULL() DITEM_INIT(NULL)
+
+#define DEFINE_DLIST(list_name) struct ditem list_name = DLIST_INIT(list_name)
+
+#define DITEM_VALID(dlist, item) (dlist != item)
 
 /*___________________________________________________________________________*/
 
-void push_front(struct ditem *ref, struct ditem *item);
+void push_front(struct ditem *dlist, struct ditem *item);
 
-void push_back(struct ditem *ref, struct ditem *item);
+void push_back(struct ditem *dlist, struct ditem *item);
 
-struct ditem * push_ref(struct ditem **ref, struct ditem *item);
+struct ditem * pop_front(struct ditem *dlist);
 
-struct ditem * safe_push_ref(struct ditem **ref, struct ditem *item);
+struct ditem * pop_back(struct ditem *dlist);
 
 void pop(struct ditem *item);
 
-struct ditem * pop_front(struct ditem *ref);
+/*___________________________________________________________________________*/
 
-struct ditem * pop_back(struct ditem *ref);
+void dlist_init(struct ditem *dlist);
+
+void dlist_queue(struct ditem *dlist, struct ditem *item);
+
+struct ditem * dlist_dequeue(struct ditem *dlist);
+
+void dlist_remove(struct ditem *item);
+
+bool dlist_is_empty(struct ditem *dlist);
+
+void dlist_empty(struct ditem *dlist);
+
+void dlist_ref(struct ditem *dlist);
+
+uint8_t dlist_count(struct ditem *dlist);
+
+/*___________________________________________________________________________*/
+
+struct ditem * push_ref(struct ditem **ref, struct ditem *item);
 
 struct ditem * pop_ref(struct ditem **ref);
-
-struct ditem * safe_pop_ref(struct ditem **ref);
-
-void dlist_ref(struct ditem *ref);
-
-struct ditem * requeue_top(struct ditem *ref);
-
-struct ditem * forward_tail(struct ditem *ref);
 
 struct ditem * ref_requeue(struct ditem **ref);
 
 struct ditem * ref_forward_tail(struct ditem **ref);
-
-/*___________________________________________________________________________*/
-
-//
-// Queue
-// - first item is ref
-// - (different from push_back and pop_front)
-//
-
-void dlist_queue(struct ditem **ref, struct ditem * item);
-
-struct ditem * dlist_dequeue(struct ditem **ref);
-
-void dlist_remove(struct ditem **ref, struct ditem * item);
 
 /*___________________________________________________________________________*/
 

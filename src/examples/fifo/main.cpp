@@ -13,8 +13,8 @@
 /*___________________________________________________________________________*/
 
 k_timeout_t timeouts[2] = {
-  K_MSEC(10000),
-  K_MSEC(1000)
+  K_FOREVER, // K_MSEC(10000),
+  K_FOREVER, // K_MSEC(1000)
 };
 
 void consumer_thread(k_timeout_t *p_timeout);

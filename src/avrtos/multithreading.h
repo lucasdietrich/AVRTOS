@@ -93,6 +93,7 @@ struct k_thread
             
     union
     {
+        struct ditem wany;                // represent the thread waiting on a generic object
         struct ditem wmutex;            // represent the thread waiting on an mutex
         struct ditem wsem;              // represent the thread waiting on an semaphore
         struct ditem wsig;              // represent the thread waiting on an signal

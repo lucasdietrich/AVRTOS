@@ -22,17 +22,20 @@ extern "C" {
 struct k_mutex
 {
     uint8_t lock;
-    struct ditem *waitqueue;
+    struct ditem waitqueue;
 };
 
-#define K_MUTEX_INIT()    \
-    {                     \
-        .lock = 0xFFu,    \
-        .waitqueue = NULL \
+/*___________________________________________________________________________*/
+
+
+#define K_MUTEX_INIT(mutex)                      \
+    {                                            \
+        .lock = 0xFFu,                           \
+        .waitqueue = DLIST_INIT(mutex.waitqueue) \
     }
 
 #define K_MUTEX_DEFINE(mutex_name) \
-    static struct k_mutex mutex_name = K_MUTEX_INIT()
+    static struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)
 
 /*___________________________________________________________________________*/
 

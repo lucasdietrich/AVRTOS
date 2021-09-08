@@ -254,6 +254,9 @@ K_NOINLINE void _k_immediate_wake_up(struct k_thread *th);
 /**
  * @brief Suspend the current thread and schedule its awakening for later
  * 
+ * Assumptions :
+ *  - interrupt flag is cleared when called.
+ * 
  * @param timeout 
  */
 K_NOINLINE void _k_reschedule(k_timeout_t timeout);
@@ -261,9 +264,47 @@ K_NOINLINE void _k_reschedule(k_timeout_t timeout);
 /*___________________________________________________________________________*/
 
 /**
- * @brief Shift time in kernel time queue list (events_queue) 
+ * @brief Shift time in kernel time queue list (events_queue).
+ * 
+ * Assumptions :
+ *  - interrupt flag is cleared when called.
  */
 K_NOINLINE void _k_system_shift(void);
+
+/*___________________________________________________________________________*/
+
+/**
+ * @brief Make the thread waiting for an object being available.
+ * 
+ * Suspend the thread and add it to the waitqueue.
+ * The function will return if the thread is awakaned or on timeout.
+ * 
+ * If timeout is K_FOREVER, the thread should we awakaned.
+ * If timeout is K_NO_WAIT, the thread returns immediately
+ * 
+ * Assumptions :
+ *  - interrupt flag is cleared when called.
+ * 
+ * @param waitqueue 
+ * @param timeout 
+ * @return 0 on success (object available), ETIMEOUT on timeout, negative error
+ *  in other cases.
+ */
+K_NOINLINE int8_t _k_waiting_object(struct ditem *waitqueue, k_timeout_t timeout);
+
+/**
+ * @brief Wake up the first thread waiting for the object.
+ * Switch thread before returning.
+ * 
+ * Assumptions :
+ * - interrupt flag is cleared when called
+ * - waitqueue is not null
+ * - Thread in the runqueue is suspended
+ * 
+ * @param waitqueue 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE void _k_wakeup_notify_object(struct ditem *waitqueue);
 
 /*___________________________________________________________________________*/
 

@@ -12,7 +12,39 @@ void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item))
     usart_transmit('\n');
 }
 
-void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
+void print_dlist(struct ditem *dlist, void (*ditem_printer)(struct ditem *item))
+{
+    uint16_t counter = 0;
+
+    if (dlist != NULL)
+    {
+        usart_print("[H]");
+        struct ditem *current = dlist->head;
+        while (current != dlist)
+        {
+            usart_print(" > ");
+            ditem_printer(current);
+            counter++;
+            current = current->next;
+        }
+        usart_print(" > [T]");
+
+        current = dlist->tail;
+        while (current != dlist)
+        {
+            usart_print(" > ");
+            ditem_printer(current);
+            current = current->prev;
+        }
+        usart_print(" > [H]");
+    }
+
+    usart_print(" (");
+    usart_u16(counter);
+    usart_print(")\n");
+}
+
+void print_ref_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
 {
     uint16_t counter = 0;
 
@@ -30,16 +62,11 @@ void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
             current = current->next; // prev
         }
     }
-    
-    usart_print(" [");
-    usart_u16(counter);
-    usart_print("] BACKWARDS ");
 
-    counter = 0;
+    usart_print(" BACKWARD ");
 
     if (ref != NULL)
     {
-        counter++;
         ditem_printer(ref);
 
         struct ditem *current = ref->prev; // prev
@@ -47,14 +74,13 @@ void print_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item))
         {
             usart_print(" > ");
             ditem_printer(current);
-            counter++;
             current = current->prev; // prev
         }
     }
 
-    usart_print(" [");
+    usart_print(" (");
     usart_u16(counter);
-    usart_print("]\n");
+    usart_print(")\n");
 }
 
 //

@@ -2,20 +2,40 @@
 
 /*___________________________________________________________________________*/
 
-void push_front(struct ditem *ref, struct ditem *item)
+//
+// Raw API
+//
+
+void push_front(struct ditem *dlist, struct ditem *item)
 {
-    ref->next->prev = item;
-    item->next = ref->next;
-    ref->next = item;
-    item->prev = ref;
+    dlist->head->prev = item;
+    item->next = dlist->head;
+    dlist->head = item;
+    item->prev = dlist;
 }
 
-void push_back(struct ditem *ref, struct ditem *item)
+void push_back(struct ditem *dlist, struct ditem *item)
 {
-    ref->prev->next = item;
-    item->prev = ref->prev;
-    ref->prev = item;
-    item->next = ref;
+    dlist->tail->next = item;
+    item->prev = dlist->tail;
+    dlist->tail = item;
+    item->next = dlist;
+}
+
+struct ditem * pop_front(struct ditem *dlist)
+{
+    struct ditem * item = dlist->head;
+    dlist->head = item->next;
+    item->next->prev = dlist;
+    return item;
+}
+
+struct ditem * pop_back(struct ditem *dlist)
+{
+    struct ditem * item = dlist->tail;
+    dlist->tail = item->prev;
+    item->prev->next = dlist;
+    return item;
 }
 
 void pop(struct ditem *item)
@@ -24,108 +44,78 @@ void pop(struct ditem *item)
     item->prev->next = item->next;
 }
 
-struct ditem * pop_front(struct ditem *ref)
+/*___________________________________________________________________________*/
+
+//
+// Public dlist API
+//
+// dlist references to the head and the tail of the doubly-linky-list
+
+void dlist_init(struct ditem *dlist)
 {
-    struct ditem * item = ref->next;
-    ref->next = item->next;
-    item->next->prev = ref;
-    return item;
+    dlist->head = dlist;
+    dlist->tail = dlist;
 }
 
-struct ditem * pop_back(struct ditem *ref)
+void dlist_queue(struct ditem *dlist, struct ditem *item)
 {
-    struct ditem * item = ref->prev;
-    ref->prev = item->prev;
-    item->prev->next = ref;
-    return item;
+    push_front(dlist, item);
 }
 
-struct ditem * pop_ref(struct ditem **ref)
+struct ditem * dlist_dequeue(struct ditem *dlist)
 {
-    *ref = (*ref)->next;
-    return pop_back(*ref);
+    return pop_back(dlist);
 }
 
-// output ref
-struct ditem * safe_pop_ref(struct ditem **ref)
+void dlist_remove(struct ditem *item)
 {
-    struct ditem *ret = NULL;
-    if (*ref != NULL)
+    pop(item);
+}
+
+bool dlist_is_empty(struct ditem *dlist)
+{
+    return dlist->head == dlist;
+}
+
+void dlist_empty(struct ditem *dlist)
+{
+    dlist_init(dlist);
+}
+
+void dlist_ref(struct ditem *dlist)
+{
+    dlist_init(dlist);
+}
+
+uint8_t dlist_count(struct ditem *dlist)
+{
+    uint8_t count = 0u;
+    struct ditem *cur = dlist->head;
+    while(cur != dlist)
     {
-        if ((*ref)->next == *ref)
-        {
-            ret = *ref;
-            *ref = NULL;
-        }
-        else
-        {
-            ret = pop_back(*ref);
-        }
+        count++;
+        cur = cur->next;
     }
-    return ret;
+    return count;
 }
 
-// ref become item
+/*___________________________________________________________________________*/
+
+//
+// Public cdlist API
+//
+
+// circular dlist, ref is a pointer to the reference of the circular doubly-linky list
+
 struct ditem * push_ref(struct ditem **ref, struct ditem *item)
 {
     push_front(*ref, item);
     return *ref = (*ref)->next;
 }
-
-struct ditem * safe_push_ref(struct ditem **ref, struct ditem *item)
+struct ditem * pop_ref(struct ditem **ref)
 {
-    if (*ref == NULL)
-    {
-        *ref = item;
-    }
-    else
-    {
-        push_front(*ref, item);
-        *ref = (*ref)->next;
-    }
-    return *ref;
-}
-
-void dlist_ref(struct ditem *ref)
-{
-    *ref = (struct ditem)
-    {
-        ref,
-        ref
-    };
-}
-
-// move top item to tail
-struct ditem * requeue_top(struct ditem *ref)
-{
-    struct ditem * item = ref->prev;
-
-    ref->prev = item->prev;
-    item->prev->next = ref;
-
-    ref->next->prev = item;
-    item->next = ref->next;
-
-    ref->next = item;
-    item->prev = ref;
-
-    return item;
-}
-
-struct ditem * forward_tail(struct ditem *ref)
-{
-    struct ditem * item = ref->next;
-
-    ref->next = item->next;
-    item->next->prev = ref;
-
-    ref->prev->next = item;
-    item->prev = ref->prev;
-    
-    ref->prev = item;
-    item->next = ref;
-
-    return item;
+    *ref = (*ref)->next;
+    return pop_back(*ref);
 }
 
 struct ditem * ref_requeue(struct ditem **ref)
@@ -133,59 +123,9 @@ struct ditem * ref_requeue(struct ditem **ref)
     return *ref = (*ref)->next;
 }
 
-
 struct ditem * ref_forward_tail(struct ditem **ref)
 {
     return *ref = (*ref)->prev;
-}
-
-/*___________________________________________________________________________*/
-
-void dlist_queue(struct ditem **ref, struct ditem * item)
-{
-    if (*ref == NULL)
-    {
-        *ref = item;
-        dlist_ref(*ref);
-    }
-    else
-    {
-        push_back(*ref, item);
-    }
-}
-
-struct ditem * dlist_dequeue(struct ditem **ref)
-{
-    struct ditem * pop = NULL;
-    if (*ref != NULL)
-    {
-        if ((*ref)->next == *ref) // == (*ref)->prev
-        {
-            pop = *ref;
-            *ref = NULL;
-        }
-        else
-        {
-            pop = pop_ref(ref);
-        }
-    }
-    return pop;
-}
-
-void dlist_remove(struct ditem **ref, struct ditem *item)
-{
-    if ((*ref == item) && (item->next == item))
-    {
-        *ref = NULL;
-    }
-    else if (*ref == item)
-    {
-        pop_ref(ref);
-    }
-    else
-    {
-        pop(item);
-    }
 }
 
 /*___________________________________________________________________________*/

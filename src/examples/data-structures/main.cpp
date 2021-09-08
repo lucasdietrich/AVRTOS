@@ -14,8 +14,6 @@
 /*___________________________________________________________________________*/
 
 void test_queue(void);
-void test_ref_dlist(void);
-void test_unreft_dlist(void);
 void test_queue_dlist(void);
 void test_tqueue(void);
 void test_scheduler(void);
@@ -30,20 +28,15 @@ int main(void)
   usart_printl("queue");
   test_queue();
 
-  usart_printl("ref dlist");
-  test_ref_dlist();
-
-  usart_printl("unref dlist");
-  test_unreft_dlist();
-
   usart_printl("queue/dequeue dlist");
   test_queue_dlist();
 
+  // todo raw api
+
+  // todo cdlist
+
   usart_printl("tqueue");
   test_tqueue();
-
-  usart_printl("scheduler");
-  test_scheduler();
 
   usart_printl("mutex");
   test_mutex();
@@ -138,114 +131,36 @@ struct item2 ditems[] = {
   DITEM('A'), DITEM('B'), DITEM('C'), DITEM('D'), DITEM('E')
 };
 
-DEFINE_DLIST_ITEM(dlist);
+DEFINE_DLIST(dlist);
 
 void print_dlist_item(struct ditem *item) { usart_transmit(DNAME_OF(item)); }
-inline void print_dlist(void) { print_dlist(&dlist.i, print_dlist_item); }
-inline void push_back(struct item2 *item) { return push_back(&dlist.i, &item->i); }
-inline struct item2 *pop_front(void)
+inline void print_dlist(void) { print_dlist(&dlist, print_dlist_item); }
+
+static void test_dlist_dequeue(struct ditem *dlist)
 {
-  struct ditem *item = pop_front(&dlist.i);
-  if (item == &dlist.i)
-  {
-    return NULL;
-  }
-  else
-  {
-    return DITEM_OF(item);
-  }
-}
-
-void test_ref_dlist(void)
-{
-  print_dlist();
-
-  push_back(&ditems[0]);
-  push_back(&ditems[1]);
-  push_back(&ditems[2]);
-  
-  print_dlist();
-
-  push_back(&dlist.i, &ditems[3].i);
-  
-  print_dlist();
-
-  struct item2 * item = pop_front();
-
-  print_dlist();
-
-  item = pop_front();
-
-  print_dlist();
-
-  push_front(&dlist.i, &item->i);
-
-  print_dlist();
-}
-
-void test_unreft_dlist(void)
-{
-  struct ditem *ref = &ditems[0].i;
-
-  dlist_ref(ref);
-
-  print_dlist(ref, print_dlist_item);
-
-  push_back(ref, &ditems[1].i);
-  push_back(ref, &ditems[2].i);
-  push_back(ref, &ditems[3].i);
-  
-  print_dlist(ref, print_dlist_item);
-  pop_ref(&ref);
-  print_dlist(ref, print_dlist_item);
-  pop_ref(&ref);
-  print_dlist(ref, print_dlist_item);
-  pop_ref(&ref);
-  print_dlist(ref, print_dlist_item);
-  pop_ref(&ref); // cannot have 0 elements in the list
-  print_dlist(ref, print_dlist_item);
+  struct ditem *out = dlist_dequeue(dlist);
+  if (DITEM_VALID(dlist, out)) {
+    print_dlist_item(out);
+    usart_transmit('\n');
+    print_dlist(dlist, print_dlist_item);
+  } else { usart_print("dlist empty="); usart_u8(dlist_is_empty(dlist)); }
 }
 
 
 void test_queue_dlist(void)
 {
-  struct ditem *ref = NULL;
-  print_dlist(ref, print_dlist_item);
-  dlist_queue(&ref, &ditems[0].i);
-  print_dlist(ref, print_dlist_item);
-  dlist_queue(&ref, &ditems[1].i);
-  print_dlist(ref, print_dlist_item);
-  dlist_queue(&ref, &ditems[2].i);
-  print_dlist(ref, print_dlist_item);
-  dlist_queue(&ref, &ditems[3].i);
-  print_dlist(ref, print_dlist_item);
-  dlist_queue(&ref, &ditems[4].i);
-  print_dlist(ref, print_dlist_item);
+  print_dlist(&dlist, print_dlist_item);
+  dlist_queue(&dlist, &ditems[0].i);
+  print_dlist(&dlist, print_dlist_item);
+  dlist_queue(&dlist, &ditems[1].i);
+  print_dlist(&dlist, print_dlist_item);
+  dlist_queue(&dlist, &ditems[2].i);
+  print_dlist(&dlist, print_dlist_item);
 
-  usart_printl("dlist_remove : ");
-  
-  dlist_remove(&ref, &ditems[3].i);
-  print_dlist(ref, print_dlist_item);
-
-  dlist_queue(&ref, &ditems[3].i);
-  print_dlist(ref, print_dlist_item);
-
-  struct ditem *pop = NULL;
-
-  for (uint8_t i = 0; i < 6; i++)
-  {
-    pop = dlist_dequeue(&ref);
-    if (pop != NULL)
-    {
-      print_dlist_item(pop);
-      usart_print("]]]");
-    }
-    else
-    {
-      usart_printl("NULL");
-    }      
-    print_dlist(ref, print_dlist_item);
-  }
+  test_dlist_dequeue(&dlist);
+  test_dlist_dequeue(&dlist);
+  test_dlist_dequeue(&dlist);
+  test_dlist_dequeue(&dlist);
 }
 
 /*___________________________________________________________________________*/
@@ -326,68 +241,6 @@ void test_tqueue(void)
     tqueue_remove(&root, &titems[3].tie);
 
     print_tqueue(root);
-}
-
-/*___________________________________________________________________________*/
-
-struct item2 threads[] = {
-  DITEM('M'), DITEM('A'), DITEM('B'), 
-};
-
-struct ditem *runqueue2;
-
-void test_scheduler(void)
-{
-  runqueue2 = &threads[0].i;
-  dlist_ref(runqueue2);
-
-  push_back(runqueue2, &threads[1].i);
-  push_back(runqueue2, &threads[2].i);
-
-  print_dlist(runqueue2, print_dlist_item);
-
-  usart_printl("==== POPREF ====");
-
-  struct ditem * ref = pop_ref(&runqueue2);
-
-  usart_print("pop_ref(&runqueue2) = ");
-  print_dlist_item(ref);
-  usart_transmit('\n');
-
-  print_dlist(runqueue2, print_dlist_item);
-
-/*
-  usart_printl("==== PUSHBACK ====");
-
-  push_back(runqueue2, ref);
-
-  struct ditem * next = runqueue2;
-
-  usart_print("next = runqueue2 ");
-  print_dlist_item(next);
-  usart_transmit('\n');
-
-  print_dlist(runqueue2, print_dlist_item);
-*/
-  usart_printl("==== PUSHREF ====");
-
-  struct ditem * next = push_ref(&runqueue2, ref);
-
-  usart_print("push_ref(&runqueue2, ref) = ");
-  print_dlist_item(next);
-  usart_transmit('\n');
-
-  print_dlist(runqueue2, print_dlist_item);
-
-  usart_printl("==== REFREQUEUETOP ====");
-
-  next = ref_requeue(&runqueue2);
-
-  usart_print("ref_requeue(&runqueue2) = ");
-  print_dlist_item(next);
-  usart_transmit('\n');
-
-  print_dlist(runqueue2, print_dlist_item);
 }
 
 /*___________________________________________________________________________*/

@@ -24,8 +24,24 @@
 #define K_MODULE_FIFO           14
 #define K_MODULE_MEMSLAB        15
 
+/*___________________________________________________________________________*/
 
+/* non standart */
+#define ENOERROR        0
+#define EERROR          1
+#define ETIMEOUT        2
 
+/* standart */
+#define EINTR 4
+#define EIO 5
+#define EAGAIN 11
+#define ENOMEM 12
+#define EACCES 13
+#define EFAULT 14
+#define EBUSY 16
+#define EINVAL 22
+
+#define EWOULDBLOCK EAGAIN
 
 
 /*___________________________________________________________________________*/
@@ -339,8 +355,8 @@ typedef struct
 
 #define K_THREAD        __attribute__((used, section(".k_threads")))
 
-#define THREAD_OF_DITEM(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
-#define THREAD_OF_QITEM(item) CONTAINER_OF(item, struct k_thread, wmutex)
+#define THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
+#define THREAD_FROM_WAITQUEUE(item) CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
 #define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
@@ -384,8 +400,8 @@ typedef struct
         {                                                                                                    \
             .flags = K_FLAG_READY | prio_flags,                                                              \
         },                                                                                                   \
-        .tie = {.runqueue = INIT_DITEM(NULL)},                                                 \
-        {.wmutex = INIT_DITEM(NULL)},                                                                        \
+        .tie = {.runqueue = DITEM_INIT(NULL)},                                                 \
+        {.wmutex = DITEM_INIT(NULL)},                                                                        \
         .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                            \
         .symbol = sym}
