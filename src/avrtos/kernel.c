@@ -4,8 +4,11 @@
 
 #include <util/atomic.h>
 
-// debug
 #include "debug.h"
+
+/*___________________________________________________________________________*/
+
+#define K_MODULE    K_MODULE_KERNEL
 
 /*___________________________________________________________________________*/
 
@@ -143,14 +146,14 @@ void _k_kernel_init(void)
 
 void _k_queue(struct k_thread *const th)
 {
-    __ASSERT_NOINTERRUPT(0x00);
+    __ASSERT_NOINTERRUPT();
 
     push_back(runqueue, &th->tie.runqueue);
 }
 
 void _k_schedule(struct ditem *const thread_tie)
 {
-    __ASSERT_NOINTERRUPT(0x01);
+    __ASSERT_NOINTERRUPT();
 
 #if KERNEL_THREAD_IDLE
     if (_k_runqueue_idle())
@@ -166,7 +169,7 @@ void _k_schedule(struct ditem *const thread_tie)
 
 void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 {
-    __ASSERT_NOINTERRUPT(0x02);
+    __ASSERT_NOINTERRUPT();
 
     if (timeout.value != K_FOREVER.value)
     {
@@ -176,7 +179,7 @@ void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 
 void _k_suspend(void)
 {
-    __ASSERT_NOINTERRUPT(0x02);
+    __ASSERT_NOINTERRUPT();
 
     k_current->state = WAITING;
 
@@ -189,7 +192,7 @@ void _k_suspend(void)
         return;
     }
 #else
-    __ASSERT_LEASTONE_RUNNING(0x00);
+    __ASSERT_LEASTONE_RUNNING();
 #endif
 
     pop_ref(&runqueue);
@@ -197,14 +200,14 @@ void _k_suspend(void)
 
 void _k_unschedule(struct k_thread *th)
 {
-    __ASSERT_NOINTERRUPT(0x03);
+    __ASSERT_NOINTERRUPT();
 
     tqueue_remove(&events_queue, &th->tie.event);
 }
 
 struct k_thread* _k_scheduler(void)
 {
-    __ASSERT_NOINTERRUPT(0x04);
+    __ASSERT_NOINTERRUPT();
 
     k_current->timer_expired = 0;
     k_current->immediate = 0;
@@ -250,9 +253,8 @@ struct k_thread* _k_scheduler(void)
 
 void _k_wake_up(struct k_thread *th)
 {
-    __ASSERT_NOINTERRUPT(0x05);
-
-    __ASSERT_THREAD_STATE(th, WAITING, 0x01);
+    __ASSERT_NOINTERRUPT();
+    __ASSERT_THREAD_STATE(th, WAITING);
 
     __K_DBG_WAKEUP(th); // @
 
@@ -265,7 +267,7 @@ void _k_wake_up(struct k_thread *th)
 
 void _k_immediate_wake_up(struct k_thread *th)
 {
-    __ASSERT_NOINTERRUPT(0x06);
+    __ASSERT_NOINTERRUPT();
 
     th->immediate = 1u;
 
@@ -274,7 +276,7 @@ void _k_immediate_wake_up(struct k_thread *th)
 
 void _k_reschedule(k_timeout_t timeout)
 {
-    __ASSERT_NOINTERRUPT(0x07);
+    __ASSERT_NOINTERRUPT();
 
     _k_suspend();
     
@@ -285,7 +287,7 @@ void _k_reschedule(k_timeout_t timeout)
 
 void _k_system_shift(void)
 {
-    __ASSERT_NOINTERRUPT(0x08);
+    __ASSERT_NOINTERRUPT();
     
     tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }

@@ -3,6 +3,8 @@
 #include <avrtos/kernel.h>
 #include <avrtos/dstruct/queue.h>
 
+#define K_MODULE    K_MODULE_FIFO
+
 void k_fifo_init(struct k_fifo* fifo)
 {
     fifo->queue = NULL;
@@ -11,8 +13,8 @@ void k_fifo_init(struct k_fifo* fifo)
 
 void k_fifo_put(struct k_fifo* fifo, struct qitem* item)
 {
-    __ASSERT_NOTNULL(fifo, K_MODULE_FIFO);
-    __ASSERT_NOTNULL(item, K_MODULE_FIFO);
+    __ASSERT_NOTNULL(fifo);
+    __ASSERT_NOTNULL(item);
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
@@ -24,7 +26,7 @@ void k_fifo_put(struct k_fifo* fifo, struct qitem* item)
 
 struct qitem* k_fifo_get(struct k_fifo* fifo, k_timeout_t timeout)
 {
-    __ASSERT_NOTNULL(fifo, K_MODULE_FIFO);
+    __ASSERT_NOTNULL(fifo);
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {

@@ -13,56 +13,59 @@ extern "C" {
 
 #include "multithreading.h"
 
+/*___________________________________________________________________________*/
 
+#define K_MODULE_KERNEL         1
+#define K_MODULE_ARCH           2
+#define K_MODULE_SYSCLOCK       3
+#define K_MODULE_THREAD         4
+#define K_MODULE_IDLE           5
 
+#define K_MODULE_MUTEX          10
+#define K_MODULE_SEMAPHORE      11
+#define K_MODULE_SIGNAL         12
+#define K_MODULE_WORKQUEUE      13
+#define K_MODULE_FIFO           14
+#define K_MODULE_MEMSLAB        15
+
+/*___________________________________________________________________________*/
+
+#define K_ASSERT_UNDEFINED              0
+
+#define K_ASSERT_INTERRUPT              1
+#define K_ASSERT_NOINTERRUPT            2
+
+#define K_ASSERT_LEASTONE_RUNNING       3
+#define K_ASSERT_THREAD_STATE           4
+
+#define K_ASSERT_WORKQUEUE              10
+
+#define K_ASSSERT_NOTNULL               15
+#define K_ASSSERT_NULL                  16
 
 /*___________________________________________________________________________*/
 
 // move to assert.h
 #if KERNEL_ASSERT
-#   define __ASSERT(assertion, code) __assert((uint8_t) (assertion), code)
+#   define __ASSERT(acode, assertion) __assert((uint8_t) (assertion), K_MODULE, acode, __LINE__)
 #else
-#   define __ASSERT(assertion, code) 
+#   define __ASSERT(acode, assertion) 
 #endif
 
 /*___________________________________________________________________________*/
 
-// todo change `user` to `module`
-// change `loc` to automatic line number
+#define __ASSERT_INTERRUPT()                __ASSERT(K_ASSERT_INTERRUPT, __k_interrupts() != 0)
+#define __ASSERT_NOINTERRUPT()              __ASSERT(K_ASSERT_NOINTERRUPT, __k_interrupts() == 0)
 
-// code between 1 and 127 are internal assert codes
-// code between 128 and 255 are user assert codes
+#define __ASSERT_NOTNULL(var)               __ASSERT(K_ASSSERT_NOTNULL, var != NULL)
+#define __ASSERT_NULL(var)                  __ASSERT(K_ASSSERT_NULL, var == NULL)
 
-#define K_ASSERT_USER(n)      ((n & 0xFF) << 8)
-#define K_ASSERT_MODULE(n)    ((n & 0xFF) << 8)
-
-// interrupts enabled
-#define K_ASSERT_INTERRUPT          1
-#define __ASSERT_INTERRUPT(loc)     __ASSERT(__k_interrupts() != 0, K_ASSERT_USER(loc) | K_ASSERT_INTERRUPT)
-
-#define K_ASSSERT_NOTNULL               15
-#define __ASSERT_NOTNULL(var, module)   __ASSERT(var != NULL, K_ASSERT_MODULE(module) | K_ASSSERT_NOTNULL)
-
-#define K_ASSSERT_NULL                  16
-#define __ASSERT_NULL(var, module)   __ASSERT(var == NULL, K_ASSERT_MODULE(module) | K_ASSSERT_NULL)
-
-// interrupt disabled
-#define K_ASSERT_NOINTERRUPT        2
-#define __ASSERT_NOINTERRUPT(loc)   __ASSERT(__k_interrupts() == 0, K_ASSERT_USER(loc) | K_ASSERT_NOINTERRUPT)
-
-// runqueue has more than 1 thread running
-#define K_ASSERT_LEASTONE_RUNNING   3
-#define __ASSERT_LEASTONE_RUNNING(loc)   __ASSERT(!_k_runqueue_single(), K_ASSERT_USER(loc) | K_ASSERT_LEASTONE_RUNNING)
-
-// runqueue has more than 1 thread running
-#define K_ASSERT_THREAD_STATE       4
-#define __ASSERT_THREAD_STATE(th, th_state, loc)   __ASSERT(th->state == th_state, K_ASSERT_USER(loc) | K_ASSERT_THREAD_STATE)
-
-#define K_ASSERT_WORKQUEUE          10
+#define __ASSERT_LEASTONE_RUNNING()         __ASSERT(K_ASSERT_LEASTONE_RUNNING, !_k_runqueue_single())
+#define __ASSERT_THREAD_STATE(th, th_state) __ASSERT(K_ASSERT_THREAD_STATE, th->state == th_state)
 
 /*___________________________________________________________________________*/
 
-void __assert(uint8_t expression, uint16_t acode);
+void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line);
 
 /*___________________________________________________________________________*/
 
