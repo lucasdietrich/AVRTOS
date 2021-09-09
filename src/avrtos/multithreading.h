@@ -47,7 +47,7 @@ typedef void (*thread_entry_t)(void*);
  * 
  * STOPPED : the thread is not running and is not in the runqueue, it can be resumed/started with k_resume/k_start functions.
  * 
- * RUNNING : the thread is currently running and can be retrieved with via `k_current`, 
+ * RUNNING : the thread is currently running and can be retrieved with via `_current`, 
  * moreover the thread is at the top of the 'runqueue'.
  * 
  * READY : the thread is ready to be executed and it somewhere is in the runqueue but is not at the top
@@ -120,7 +120,7 @@ extern struct k_thread _k_thread_main;
 /**
  * @brief Get the address of the thread currently running.
  */
-extern struct k_thread * k_current;
+extern struct k_thread * _current;
 
 /**
  * @brief Get the number of threads defined.
@@ -170,7 +170,7 @@ void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, voi
 /**
  * @brief Get current thread
  * 
- * @see struct k_thread * k_current
+ * @see struct k_thread * _current
  * 
  * @return thread_t* 
  */

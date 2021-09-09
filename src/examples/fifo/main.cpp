@@ -49,7 +49,7 @@ int main(void)
   uint8_t pos = 0u;
   while(1)
   {
-    usart_transmit(k_current->symbol);
+    usart_transmit(_current->symbol);
     usart_print(" : Send = ");
     usart_transmit(letters[pos].chr);
     usart_transmit('\n');
@@ -67,7 +67,7 @@ void consumer_thread(k_timeout_t *p_timeout)
   while(1)
   {
     struct qitem* tie = k_fifo_get(&fifo, *p_timeout);
-    usart_transmit(k_current->symbol);
+    usart_transmit(_current->symbol);
     if (tie != NULL)
     {
       usart_print(" : Received = ");

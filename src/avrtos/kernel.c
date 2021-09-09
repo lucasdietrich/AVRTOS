@@ -37,10 +37,10 @@ void k_sched_lock(void)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        SET_BIT(k_current->flags, K_FLAG_SCHED_LOCKED);
+        SET_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
     }
 
-    __K_DBG_SCHED_LOCK(k_current);
+    __K_DBG_SCHED_LOCK(_current);
 }
 
 void k_sched_unlock(void)
@@ -49,7 +49,7 @@ void k_sched_unlock(void)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        CLR_BIT(k_current->flags, K_FLAG_SCHED_LOCKED);
+        CLR_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
     }
 }
 
@@ -57,7 +57,7 @@ bool k_sched_locked(void)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        return (bool) TEST_BIT(k_current->flags, K_FLAG_SCHED_LOCKED);
+        return (bool) TEST_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
     }
 
     __builtin_unreachable();
@@ -173,7 +173,7 @@ void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 
     if (timeout.value != K_FOREVER.value)
     {
-        tqueue_schedule(&events_queue, &k_current->tie.event, timeout.value);
+        tqueue_schedule(&events_queue, &_current->tie.event, timeout.value);
     }
 }
 
@@ -181,7 +181,7 @@ void _k_suspend(void)
 {
     __ASSERT_NOINTERRUPT();
 
-    k_current->state = WAITING;
+    _current->state = WAITING;
 
 #if KERNEL_THREAD_IDLE
     if (_k_runqueue_single())
@@ -209,10 +209,10 @@ struct k_thread* _k_scheduler(void)
 {
     __ASSERT_NOINTERRUPT();
 
-    k_current->timer_expired = 0;
-    k_current->immediate = 0;
+    _current->timer_expired = 0;
+    _current->immediate = 0;
 
-    if (k_current->state == WAITING) {
+    if (_current->state == WAITING) {
         /* runqueue is positionned to the normally next thread to be executed */
         __K_DBG_SCHED_WAITING();        // ~
     }
@@ -243,12 +243,12 @@ struct k_thread* _k_scheduler(void)
         }
     }
 
-    k_current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
-    k_current->state = READY;
+    _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
+    _current->state = READY;
 
-    __K_DBG_SCHED_NEXT(k_current);  // thread symbol
+    __K_DBG_SCHED_NEXT(_current);  // thread symbol
 
-    return k_current;
+    return _current;
 }
 
 void _k_wake_up(struct k_thread *th)
@@ -280,7 +280,7 @@ void _k_reschedule(k_timeout_t timeout)
 
     _k_suspend();
     
-    _k_schedule_wake_up(k_current, timeout);
+    _k_schedule_wake_up(_current, timeout);
 }
 
 /*___________________________________________________________________________*/
@@ -298,13 +298,13 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
     int8_t err = -1;
     if (timeout.value != 0) {
-        dlist_queue(waitqueue, &k_current->wany);
+        dlist_queue(waitqueue, &_current->wany);
 
         _k_reschedule(timeout);
         k_yield();
 
-        if (k_current->timer_expired) {
-            dlist_remove(&k_current->wany);
+        if (_current->timer_expired) {
+            dlist_remove(&_current->wany);
             err = -ETIMEOUT;
         } else {
             err = 0;

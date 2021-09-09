@@ -50,7 +50,7 @@ void print_thread_canaries(struct k_thread *th)
 
 void print_current_canaries(void)
 {
-    print_thread_canaries(k_current);
+    print_thread_canaries(_current);
 }
 
 void dump_threads_canaries(void)

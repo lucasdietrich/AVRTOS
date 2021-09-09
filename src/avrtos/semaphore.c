@@ -29,7 +29,7 @@ uint8_t k_sem_take(struct k_sem* sem, k_timeout_t timeout)
     }
 
     if (get == 0) {
-        __K_DBG_SEM_TAKE(k_current);
+        __K_DBG_SEM_TAKE(_current);
     }
 
     return get;
@@ -39,7 +39,7 @@ void k_sem_give(struct k_sem* sem)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        __K_DBG_SEM_GIVE(k_current);
+        __K_DBG_SEM_GIVE(_current);
 
         _k_sem_give(sem);
 

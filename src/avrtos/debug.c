@@ -21,7 +21,7 @@ uint16_t k_thread_usage(struct k_thread *th)
     {
         return 0u;
     }
-    else if(th == k_current)
+    else if(th == _current)
     {
         // stack pointer refers to the first empty addr (from end)
         // empty stack : th->stack.end == th->sp
@@ -102,7 +102,7 @@ void k_thread_dump_all(void)
 
 void *k_thread_get_return_addr(struct k_thread *th)
 {
-    if (th == k_current)
+    if (th == _current)
     {
         uint16_t return_addr_reverted = *((uint16_t *)((uint16_t)th->stack.end - 2u));
 
@@ -113,7 +113,7 @@ void *k_thread_get_return_addr(struct k_thread *th)
 
 int k_thread_copy_registers(struct k_thread *th, char *const buffer, const size_t size)
 {
-    if ((th == k_current) && (size >= 16))
+    if ((th == _current) && (size >= 16))
     {
         memcpy(buffer, (void *)((uint16_t)th->stack.end - 34u), 32u); // -32 (registers) - 2 (return address)
 

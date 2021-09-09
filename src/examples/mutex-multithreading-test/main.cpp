@@ -48,7 +48,7 @@ void thread(void *p)
 {
   uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5));  // change this timeout
 
-  usart_transmit(k_current->symbol);
+  usart_transmit(_current->symbol);
 
   if (lock)
   {
@@ -70,7 +70,7 @@ void threadp(void *p)
 {
   uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9));  // change this timeout
 
-  usart_transmit(k_current->symbol);
+  usart_transmit(_current->symbol);
 
   if (lock)
   {

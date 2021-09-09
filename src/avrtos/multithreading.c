@@ -41,7 +41,7 @@ K_THREAD struct k_thread _k_thread_main = {
     .symbol = 'M'           // default main thread sumbol
 };
 
-struct k_thread * k_current = &_k_thread_main;
+struct k_thread * _current = &_k_thread_main;
 
 
 /*___________________________________________________________________________*/
@@ -111,10 +111,10 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const
 
 inline struct k_thread * k_thread_current(void)
 {
-    return k_current;
+    return _current;
 }
 
 inline void * k_thread_local_storage(void)
 {
-    return k_current->local_storage;
+    return _current->local_storage;
 }

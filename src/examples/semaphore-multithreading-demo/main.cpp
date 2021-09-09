@@ -71,7 +71,7 @@ void waiter_entry(void*)
     {
       k_sched_lock();
 #if !KERNEL_SCHEDULER_DEBUG
-      usart_transmit(k_current->symbol);
+      usart_transmit(_current->symbol);
       usart_printl(": got a semaphore !");
 #endif
       k_sched_unlock();

@@ -77,7 +77,7 @@ void thread_processing(void *p)
     if ((counter & 0xFFFFF) == 0)
     {
       k_sched_lock();
-      usart_transmit(k_current->symbol);
+      usart_transmit(_current->symbol);
       usart_print(": ");
       usart_hex16(counter >> 16);
       usart_print("0000\n");

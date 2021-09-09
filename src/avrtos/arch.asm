@@ -66,7 +66,7 @@ USART_Continue:
 
 .global k_yield
 .extern _k_scheduler
-.extern k_current
+.extern _current
 
 ; push order
 ; r17 | r0 r18 > r27 r30 r31 | r28 r19 r1 > r16 | SREG
@@ -130,8 +130,8 @@ yield_from_interrupt:
 #if KERNEL_PREEMPTIVE_THREADS
 check_coop:
     ; to use offset of here IF POSSIBLE
-    lds ZL, k_current           ; load current thread addr in X
-    lds ZH, k_current + 1
+    lds ZL, _current           ; load current thread addr in X
+    lds ZH, _current + 1
 
     ldd r18, Z+2      ; read flag
     andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
@@ -189,17 +189,17 @@ scheduler_entry:
     ; [L] CANARIES until @04DA [found 213], MAX usage = 43 / 256
     ; [K] CANARIES until @050B [found 6], MAX usage = 39 / 45
 
-    ; push these two registers now as we need them to store current k_current thread locations
+    ; push these two registers now as we need them to store current _current thread locations
     push r28
     push r29
 
     ; r28, r29 must be caller saved
-    lds r28, k_current          ; load current thread addr in Y
-    lds r29, k_current + 1
+    lds r28, _current          ; load current thread addr in Y
+    lds r29, _current + 1
 
     call _k_scheduler 
 
-    ; r24, r25 contains new k_current thread address
+    ; r24, r25 contains new _current thread address
     cp r24, r28
     brne save_context2
     cp r25, r29
