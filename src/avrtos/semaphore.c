@@ -22,7 +22,7 @@ uint8_t k_sem_take(struct k_sem* sem, k_timeout_t timeout)
     {
         get = _k_sem_take(sem);
         if (get != 0) {
-            if (0 == _k_waiting_object(&sem->waitqueue, timeout)) {
+            if (0 == _k_pend_current(&sem->waitqueue, timeout)) {
                 get = _k_sem_take(sem);
             }
         }
@@ -43,6 +43,6 @@ void k_sem_give(struct k_sem* sem)
 
         _k_sem_give(sem);
 
-        _k_wakeup_notify_object(&sem->waitqueue);
+        _k_unpend_first_thread(&sem->waitqueue);
     }
 }

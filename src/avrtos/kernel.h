@@ -274,7 +274,7 @@ K_NOINLINE void _k_system_shift(void);
 /*___________________________________________________________________________*/
 
 /**
- * @brief Make the thread waiting for an object being available.
+ * @brief Make the current thread waiting/pending for an object being available.
  * 
  * Suspend the thread and add it to the waitqueue.
  * The function will return if the thread is awakaned or on timeout.
@@ -290,7 +290,7 @@ K_NOINLINE void _k_system_shift(void);
  * @return 0 on success (object available), ETIMEOUT on timeout, negative error
  *  in other cases.
  */
-K_NOINLINE int8_t _k_waiting_object(struct ditem *waitqueue, k_timeout_t timeout);
+K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
 
 /**
  * @brief Wake up the first thread waiting for the object.
@@ -304,7 +304,7 @@ K_NOINLINE int8_t _k_waiting_object(struct ditem *waitqueue, k_timeout_t timeout
  * @param waitqueue 
  * @return K_NOINLINE 
  */
-K_NOINLINE void _k_wakeup_notify_object(struct ditem *waitqueue);
+K_NOINLINE void _k_unpend_first_thread(struct ditem *waitqueue);
 
 /*___________________________________________________________________________*/
 

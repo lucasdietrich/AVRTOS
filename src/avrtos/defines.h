@@ -292,6 +292,8 @@ typedef struct
     k_delta_ms_t value;
 } k_timeout_t;
 
+#define K_TIMEOUT_EQ(t1, t2)    (t1.value == t2.value)
+
 #define K_SECONDS(delay_s)      ((k_timeout_t){(k_delta_ms_t) (delay_s * 1000)})
 #define K_MSEC(delay_ms)        ((k_timeout_t){(k_delta_ms_t) (delay_ms)})
 #define K_NO_WAIT               ((k_timeout_t){(k_delta_ms_t) (0)})

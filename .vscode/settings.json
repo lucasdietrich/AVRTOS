@@ -23,6 +23,7 @@
         "queue.h": "c",
         "workqueue.h": "c",
         "dlist.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "mem_slab.h": "c"
     }
 }

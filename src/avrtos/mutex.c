@@ -18,7 +18,7 @@ uint8_t k_mutex_lock(struct k_mutex* mutex, k_timeout_t timeout)
     {
         lock = _k_mutex_lock(mutex);
         if (lock != 0) {
-            if (0 == _k_waiting_object(&mutex->waitqueue, timeout)) {
+            if (0 == _k_pend_current(&mutex->waitqueue, timeout)) {
                 lock = _k_mutex_lock(mutex);
             }
         }
@@ -39,6 +39,6 @@ void k_mutex_unlock(struct k_mutex* mutex)
 
         _k_mutex_unlock(mutex);
 
-        _k_wakeup_notify_object(&mutex->waitqueue);
+        _k_unpend_first_thread(&mutex->waitqueue);
     }
 }

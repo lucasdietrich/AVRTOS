@@ -49,6 +49,9 @@ What features will be implemented :
 - Kernel fault
 
 What enhancements are planned :
+- Add `swap_data` address in thread in order to pass data when an expected object is available, e.g. on `mutex_unlock`.
+  - This prevent to release and lock the mutex again, the mutex owner is just passed to the first pending thread.
+  - The same with other objects : semaphores, fifo, slabs
 - Using makefile to build the project for a target
 - Propose this project as a library
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)

@@ -294,7 +294,7 @@ void _k_system_shift(void)
 
 /*___________________________________________________________________________*/
 
-int8_t _k_waiting_object(struct ditem *waitqueue, k_timeout_t timeout)
+int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
     int8_t err = -1;
     if (timeout.value != 0) {
@@ -313,11 +313,11 @@ int8_t _k_waiting_object(struct ditem *waitqueue, k_timeout_t timeout)
     return err;
 }
 
-void _k_wakeup_notify_object(struct ditem* waitqueue)
+void _k_unpend_first_thread(struct ditem* waitqueue)
 {
-    struct ditem* waiting_thread = dlist_dequeue(waitqueue);
-    if (DITEM_VALID(waitqueue, waiting_thread)) {
-        struct k_thread* th = THREAD_FROM_WAITQUEUE(waiting_thread);
+    struct ditem* pending_thread = dlist_dequeue(waitqueue);
+    if (DITEM_VALID(waitqueue, pending_thread)) {
+        struct k_thread* th = THREAD_FROM_WAITQUEUE(pending_thread);
 
         /* immediate: the first thread in the queue
          * must be the first to get the object */
