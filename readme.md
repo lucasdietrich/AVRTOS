@@ -22,6 +22,7 @@ Following features are supported:
 - avr5 and avr6 architectures
 - Workqueues and system workqueue 
 - Fifo
+- Memory slabs
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
