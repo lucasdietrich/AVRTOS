@@ -14,6 +14,10 @@
 
 /*___________________________________________________________________________*/
 
+#define MEM_SLAB_COMPILATION_TIME   1
+
+/*___________________________________________________________________________*/
+
 struct block
 {
   struct qitem tie;
@@ -46,8 +50,12 @@ void consumer_thread(void *);
 K_FIFO_DEFINE(fifo);
 K_THREAD_DEFINE(consumer, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), nullptr, nullptr, 'A');
 
+#if MEM_SLAB_COMPILATION_TIME
+K_MEM_SLAB_DEFINE(myslab, BLOCK_SIZE, BLOCK_COUNT);
+#else
 uint8_t buffer[BLOCK_SIZE * BLOCK_COUNT];
 struct k_mem_slab myslab;
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -56,7 +64,9 @@ int main(void)
   led_init();
   usart_init();
 
+  #if !MEM_SLAB_COMPILATION_TIME
   k_mem_slab_init(&myslab, buffer, BLOCK_SIZE, BLOCK_COUNT);
+  #endif
 
   k_thread_dump_all();
 

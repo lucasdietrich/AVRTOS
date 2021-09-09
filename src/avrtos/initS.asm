@@ -18,12 +18,15 @@
     out _SFR_IO_ADDR(SPH), r29
 #endif
 
+/*___________________________________________________________________________*/
+
 ; initialize system clock (timer0) in order to preempt preemptive threads
 #if KERNEL_SYSCLOCK_AUTO_INIT
 .extern _k_init_sysclock
 #endif
 
-.extern _k_scheduler_init
+.extern _k_kernel_init
+.extern _k_mem_slab_init_module
 
 ; kernel final init here
 .section .init8, "ax", @progbits
@@ -36,6 +39,9 @@
 
 ; add READY threads to the runqueue
     call _k_kernel_init
+
+; initialize mem slabs defined at compilation
+    call _k_mem_slab_init_module
 
 ; initialize canaries in threads stacks
 #if THREAD_CANARIES

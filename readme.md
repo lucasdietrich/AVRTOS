@@ -180,6 +180,8 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
   - a semaphore is 5B
   - a workqueue is 5B
     - a k_work item is 6B
+  - a fifo is 6B
+  - a memory slab is 11B
 - In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
 - Plan additionnal stack for every thread that have their interrupt flag set, whose the stack could be used during interrupt handlers calls.
   

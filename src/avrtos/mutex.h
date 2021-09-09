@@ -13,7 +13,7 @@ extern "C" {
 /*___________________________________________________________________________*/
 
 /**
- * @brief Structure describing a mutex, "lock" parameter tells 
+ * @brief Structure representing a mutex, "lock" parameter tells 
  * if the current is locked or not (0 if lock, 0xFF otherwise).
  * 
  * Waitqueue list contains all threads waiting for the mutex, 
@@ -26,7 +26,6 @@ struct k_mutex
 };
 
 /*___________________________________________________________________________*/
-
 
 #define K_MUTEX_INIT(mutex)                      \
     {                                            \

@@ -19,9 +19,16 @@ static void create_free_list(struct k_mem_slab* slab)
     }
 }
 
+extern struct k_mem_slab __k_mem_slabs_start;
+extern struct k_mem_slab __k_mem_slabs_end;
+
 void _k_mem_slab_init_module(void)
 {
-    /* __attribute__((used, section(".k_mem_slabs"))) */
+    const uint8_t mem_slabs_count = &__k_mem_slabs_end - &__k_mem_slabs_start;
+    for (uint8_t i = 0; i < mem_slabs_count; i++)
+    {
+        create_free_list(&(&__k_mem_slabs_start)[i]);
+    }
 }
 
 int8_t k_mem_slab_init(struct k_mem_slab* slab, void* buffer,
