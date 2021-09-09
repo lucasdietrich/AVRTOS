@@ -31,10 +31,10 @@
 
 #include <util/delay.h>
 
-#include "avrtos/misc/uart.h"
-#include "avrtos/misc/led.h"
+#include <avrtos/misc/uart.h>
+#include <avrtos/misc/led.h>
 
-#include "avrtos/kernel.h"
+#include <avrtos/kernel.h>
 
 /*___________________________________________________________________________*/
 

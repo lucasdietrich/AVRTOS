@@ -4,11 +4,11 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "avrtos/misc/uart.h"
-#include "avrtos/misc/led.h"
+#include <avrtos/misc/uart.h>
+#include <avrtos/misc/led.h>
 
-#include "avrtos/kernel.h"
-#include "avrtos/debug.h"
+#include <avrtos/kernel.h>
+#include <avrtos/debug.h>
 
 /*___________________________________________________________________________*/
 

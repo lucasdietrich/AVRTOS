@@ -2,14 +2,14 @@
 
 #include <avr/io.h>
 
-#include "avrtos/misc/uart.h"
+#include <avrtos/misc/uart.h>
 
-#include "avrtos/dstruct/dlist.h"
-#include "avrtos/dstruct/queue.h"
-#include "avrtos/dstruct/tqueue.h"
-#include "avrtos/dstruct/debug.h"
+#include <avrtos/dstruct/dlist.h>
+#include <avrtos/dstruct/queue.h>
+#include <avrtos/dstruct/tqueue.h>
+#include <avrtos/dstruct/debug.h>
 
-#include "avrtos/defines.h"
+#include <avrtos/defines.h>
 
 /*___________________________________________________________________________*/
 
