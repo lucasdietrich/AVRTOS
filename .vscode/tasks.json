@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"type": "shell",
-			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
 			"problemMatcher": [
 				"$platformio"
 			],
@@ -11,7 +11,7 @@
 		},
 		{
 			"type": "shell",
-			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/Sysclock-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/Sysclock-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
 			"problemMatcher": [
 				"$platformio"
 			],
@@ -19,7 +19,7 @@
 		},
 		{
 			"type": "shell",
-			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/MutexMultithreadingDemo-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/MutexMultithreadingDemo-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
 			"problemMatcher": [
 				"$platformio"
 			],
@@ -27,7 +27,7 @@
 		},
 		{
 			"type": "shell",
-			"command": "wsl ~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/FifoQemuMega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/FifoQemuMega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
 			"problemMatcher": [
 				"$platformio"
 			],
