@@ -29,11 +29,11 @@ void waiter_entry(void*);
 /*___________________________________________________________________________*/
 
 K_SEM_DEFINE(mysem, 5, 5);
-K_THREAD_DEFINE(waiter1, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, NULL, 'A');
-K_THREAD_DEFINE(waiter2, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, NULL, 'B');
-K_THREAD_DEFINE(waiter3, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, NULL, 'C');
-K_THREAD_DEFINE(waiter4, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, NULL, 'D');
-K_THREAD_DEFINE(waiter5, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, NULL, 'E');
+K_THREAD_DEFINE(waiter1, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, 'A');
+K_THREAD_DEFINE(waiter2, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, 'B');
+K_THREAD_DEFINE(waiter3, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, 'C');
+K_THREAD_DEFINE(waiter4, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, 'D');
+K_THREAD_DEFINE(waiter5, waiter_entry, 0x50, K_PRIO_PREEMPT(K_PRIO_LOW), NULL, 'E');
 
 /*___________________________________________________________________________*/
 

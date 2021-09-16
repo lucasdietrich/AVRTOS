@@ -25,9 +25,9 @@ void thread_monitor(void *p);
 #define THREAD_PREPROCESSOR 0
 
 #if THREAD_PREPROCESSOR
-K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, nullptr, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&off, nullptr, 'F');
-K_THREAD_DEFINE(monitor, thread_monitor, 0x100, K_PRIO_DEFAULT, nullptr, nullptr, 'R');
+K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&on, 'O');
+K_THREAD_DEFINE(ledoff, thread_led, 0x100, K_PRIO_DEFAULT, (void *)&off, 'F');
+K_THREAD_DEFINE(monitor, thread_monitor, 0x100, K_PRIO_DEFAULT, nullptr, 'R');
 #else
 K_THREAD static struct k_thread O;
 K_THREAD static struct k_thread F;
@@ -47,9 +47,9 @@ int main(void)
  
 
 #if !THREAD_PREPROCESSOR  
-  k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, nullptr, 'O');
-  k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, nullptr, 'F');
-  k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, nullptr, 'R');
+  k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, 'O');
+  k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, 'F');
+  k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, nullptr, 'R');
 #endif
 
   print_runqueue();
@@ -68,10 +68,8 @@ int main(void)
 /*___________________________________________________________________________*/
 
 // use thread local storage
-void inthread_setled(void)
+void inthread_setled(uint8_t state)
 {
-  uint8_t state = *(uint8_t *) k_thread_local_storage();
-
   if (state == 0)
   {
     led_off();
@@ -86,12 +84,9 @@ void inthread_setled(void)
 
 void thread_led(void *p)
 {
-  // store context in thread local storage
-  _current->local_storage = p;
-
   while (1)
   {
-    inthread_setled();
+    inthread_setled(*(uint8_t*) p);
 
     _delay_ms(500);
 

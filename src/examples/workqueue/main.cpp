@@ -17,7 +17,7 @@ void tasks_handler(void *p);
 
 
 
-K_THREAD_DEFINE(generator, tasks_generator, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'G');
+K_THREAD_DEFINE(generator, tasks_generator, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'G');
 K_WORKQUEUE_DEFINE(workqueue, 0x200, K_PRIO_COOP(K_PRIO_LOW), 'W');
 
 /*___________________________________________________________________________*/

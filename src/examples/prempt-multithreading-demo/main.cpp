@@ -31,9 +31,9 @@
 void thread_led_toggle(void *p);
 void thread_processing(void *p);
 
-K_THREAD_DEFINE(led, thread_led_toggle, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'L');
-K_THREAD_DEFINE(task1, thread_processing, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'A');
-K_THREAD_DEFINE(task2, thread_processing, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'B');
+K_THREAD_DEFINE(led, thread_led_toggle, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'L');
+K_THREAD_DEFINE(task1, thread_processing, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'A');
+K_THREAD_DEFINE(task2, thread_processing, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'B');
 
 /*___________________________________________________________________________*/
 

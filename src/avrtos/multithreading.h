@@ -105,9 +105,6 @@ struct k_thread
         void *end;                      // stack end
         size_t size;                    // stack size
     } stack;                            // thread stack definition
-    void *local_storage;                // pointer to a custom user object, local storage of the thread
-                                        // we cannot use CONTAINER_OF(thread, struct mystruct, thread_struct), 
-                                        // because all threads structures are stack at the same address location in RAM
     char symbol;                        // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
     
 };
@@ -138,7 +135,6 @@ extern uint8_t _k_thread_count;
  * @param stack_size thread stack size
  * @param priority thread priority
  * @param context_p thread context passed to entry function
- * @param local_storage thread local_storage
  */
 
 /**
@@ -150,10 +146,11 @@ extern uint8_t _k_thread_count;
  * @param stack_size thread stack size
  * @param priority thread priority
  * @param context_p thread context passed to entry function
- * @param local_storage thread local_storage
  * @return int 0 on success
  */
-int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage, const char symbol);
+int k_thread_create(struct k_thread* const th, thread_entry_t entry,
+    void* const stack, const size_t stack_size, const int8_t priority,
+    void* const context_p, const char symbol);
 
 /**
  * @brief Initialize a thread stack at runtime
@@ -163,7 +160,8 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const
  * @param stack thread stack start location
  * @param context_p thread context
  */
-void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, void *const stack, void *const context_p);
+void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
+    void* const stack, void* const context_p);
 
 /*___________________________________________________________________________*/
 
@@ -175,13 +173,6 @@ void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, voi
  * @return thread_t* 
  */
 struct k_thread * k_thread_current(void);
-
-/**
- * @brief Get current thread local storage pointer
- * 
- * @return void* local storage pointer
- */
-void * k_thread_local_storage(void);
 
 /*___________________________________________________________________________*/
 

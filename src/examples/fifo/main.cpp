@@ -20,8 +20,8 @@ k_timeout_t timeouts[2] = {
 void consumer_thread(k_timeout_t *p_timeout);
 
 K_FIFO_DEFINE(fifo);
-K_THREAD_DEFINE(consumer1, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), &timeouts[0], nullptr, 'A');
-K_THREAD_DEFINE(consumer2, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), &timeouts[1], nullptr, 'B');
+K_THREAD_DEFINE(consumer1, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), &timeouts[0], 'A');
+K_THREAD_DEFINE(consumer2, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), &timeouts[1], 'B');
 
 /*___________________________________________________________________________*/
 

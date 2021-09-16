@@ -14,7 +14,7 @@
 // - or use this idle thread to do kernel works (as k_works/workqueue, etc...), call it "system thread/kernel thread"
 //
 
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, NULL, 'I');
+K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, 'I');
 
 void _k_idle_entry(void* context)
 {
