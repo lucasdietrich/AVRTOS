@@ -14,21 +14,23 @@
 
 /*___________________________________________________________________________*/
 
-void _tqueue_schedule(struct titem **root, struct titem *item)
+void _tqueue_schedule(struct titem** root, struct titem* item)
 {
-    struct titem ** prev_next_p = root;
-    while (*prev_next_p != NULL)
-    {
-        struct titem * p_current = *prev_next_p; // next of previous become current
+    struct titem** prev_next_p = root;
+    while (*prev_next_p != NULL) {
+        /* next of previous become current */
+        struct titem* p_current = *prev_next_p;
 
-        // if current element expires before or at the same time that item delay, we go to next item
-        if (p_current->delay_shift <= item->delay_shift)
-        {
+        /* if current element expires before or at the same time
+         * that the input item, we go to next item.
+         */
+        if (p_current->delay_shift <= item->delay_shift) {
             item->delay_shift -= p_current->delay_shift;
             prev_next_p = &(p_current->next);
-        }
-        else    // if current element expire after, we need to insert the new_item before current and linked *prev_next_p
-        {
+        } else {
+            /* if current element expire after, we need to insert
+             * the new_item before current and linked *prev_next_p
+             */
             item->next = p_current;
             p_current->delay_shift -= item->delay_shift;
             break;
@@ -37,12 +39,14 @@ void _tqueue_schedule(struct titem **root, struct titem *item)
     *prev_next_p = item;
 }
 
-void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeout)
+void tqueue_schedule(struct titem** root,
+    struct titem* item, k_delta_ms_t timeout)
 {
     if (item == NULL)
         return;
 
-    item->next = NULL;  // necessary if the item is put at the very end of the list
+    /* last item doesn't have a "next" item */
+    item->next = NULL;
     item->timeout = timeout;
 
     _tqueue_schedule(root, item);
@@ -50,21 +54,19 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeo
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)
 {
-    struct titem ** prev_next_p = root;
-    while (*prev_next_p != NULL) // if next of previous item is set
-    {
-        struct titem * p_current = *prev_next_p; // next of previous become current
-        if (p_current->delay_shift <= time_passed)
-        {
-            if (p_current->delay_shift != 0)    // if item delay is already 0 
-            {
+    struct titem** prev_next_p = root;
+    while (*prev_next_p != NULL) {
+        /* next of previous become current */
+        struct titem* p_current = *prev_next_p;
+
+        if (p_current->delay_shift <= time_passed) {
+            /* if item delay_shift is different from 0 */
+            if (p_current->delay_shift != 0) {
                 time_passed -= p_current->delay_shift;
                 p_current->delay_shift = 0;
             }
             prev_next_p = &(p_current->next);
-        }
-        else
-        {
+        } else {
             p_current->delay_shift -= time_passed;
             break;
         }
@@ -73,10 +75,11 @@ void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)
 
 struct titem * tqueue_pop(struct titem **root)
 {
-    struct titem * item = NULL;
-    if ((*root != NULL) && ((*root)->delay_shift == 0)) // if next to expire has expired
+    struct titem* item = NULL;
+    /* pop the first item if expired */
+    if ((*root != NULL) && ((*root)->delay_shift == 0))
     {
-        item = *root;    // prepare to return it
+        item = *root;
         *root = (*root)->next;
     }
     return item;
@@ -84,18 +87,17 @@ struct titem * tqueue_pop(struct titem **root)
 
 void tqueue_remove(struct titem **root, struct titem *item)
 {
-    struct titem **prev_next_p = root;
-    while (*prev_next_p != NULL)
-    {
-        struct titem * p_current = *prev_next_p;
-        if (p_current == item)
-        {
+    struct titem** prev_next_p = root;
+    while (*prev_next_p != NULL) {
+        struct titem* p_current = *prev_next_p;
+        if (p_current == item) {
             *prev_next_p = p_current->next;
-            if (p_current->next != NULL)
-            {
-                p_current->next->delay_shift += item->delay_shift;    // add removed item remaining time to the next item if exists
+
+            /* add removed item remaining time to the next item if exists */
+            if (p_current->next != NULL) {
+                p_current->next->delay_shift += item->delay_shift;
             }
-            
+
             item->next = NULL;
             break;
         }

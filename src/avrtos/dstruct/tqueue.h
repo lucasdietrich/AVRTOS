@@ -34,28 +34,32 @@ struct titem
 
 /**
  * @brief Schedule an event by adding it to the list.
- * If the new event has the same timeout as another event already in the list, it will be added after it
+ * If the new event has the same timeout as another event 
+ * already in the list, it will be added after i.
  * 
  * Assumptions :
- *  - root is not null
+ * - root is not null
+ * - item is not null
+ * - item->next is null
+ * - item->timeout is set
  * 
  * @param root 
  * @param item 
  */
-void _tqueue_schedule(struct titem **root, struct titem *item);
+void _tqueue_schedule(struct titem** root, struct titem* item);
 
 /**
  * @see _tqueue_schedule
  * 
  * Assumptions :
  *  - root is not null
- *  - item is not null
  * 
  * @param root 
  * @param item 
  * @param timeout 
  */
-void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeout);
+void tqueue_schedule(struct titem** root,
+    struct titem* item, k_delta_ms_t timeout);
 
 /**
  * @brief Shift the queue time of {time_passe}
@@ -67,7 +71,7 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_ms_t timeo
  * @param root 
  * @param time_passed 
  */
-void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
+void tqueue_shift(struct titem** root, k_delta_ms_t time_passed);
 
 /**
  * @brief Pop an item from the time queue.
@@ -80,21 +84,24 @@ void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
  * @param root 
  * @return struct titem* 
  */
-struct titem * tqueue_pop(struct titem **root);
+struct titem* tqueue_pop(struct titem** root);
 
-// set item->next to NULL
 /**
  * @brief Remove an item from the time queue.
  * Item->next attribute is set to null if found.
  * 
+ * Note: this function is very expensive in term of time if there are a 
+ *  lot of items in the titem queue.
+ * 
  * Assumptions :
  *  - root is not null
  *  - item is not null
+ *  - item is in root tqueue
  * 
  * @param root 
  * @param item Item to remove if exists in the time queue.
  */
-void tqueue_remove(struct titem **root, struct titem *item);
+void tqueue_remove(struct titem** root, struct titem* item);
 
 /*___________________________________________________________________________*/
 
