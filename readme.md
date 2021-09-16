@@ -33,6 +33,8 @@ Minor features:
 - I/O : leds, uart
 - Kernel Assertions (__ASSERT)
 - Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEOUT
+- Efficient pending feature, allowing to pass directly an object (mutex, semaphore, mem slab bloc, fifo item) to a pending thread. No need to do the whole process : unlock/lock for a mutex or free/allocate for a memory block if a thread is pending for the object being available.
+- Mutex thread owner
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -50,9 +52,6 @@ What features will be implemented :
 - Kernel fault
 
 What enhancements are planned :
-- Add `swap_data` address in thread in order to pass data when an expected object is available, e.g. on `mutex_unlock`.
-  - This prevent to release and lock the mutex again, the mutex owner is just passed to the first pending thread.
-  - The same with other objects : semaphores, fifo, slabs
 - Using makefile to build the project for a target
 - Propose this project as a library
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
@@ -62,7 +61,7 @@ What enhancements are planned :
 - Make the library fully C compliant.
 - Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
-- Don't allow mutex unlock from interrupt, then change cli to k_shed_lock when handling mutex lock/unlock
+- Remove thread local storage pointer
 
 What enhancements/features are not planned :
 - Prioritization
@@ -177,7 +176,7 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
     - events queue : 2B
     - thread idle stack is at least 34/36 byte + 18B thread structure (should be removed in the future)
   - a thread structure is 16B + stack size which is at least 35/36byte
-  - a mutex is 5B
+  - a mutex is 7B
   - a semaphore is 5B
   - a workqueue is 5B
     - a k_work item is 6B
@@ -190,14 +189,7 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
 
 Inspiration in the naming comes greatly from the project [Zephyr RTOS](https://github.com/zephyrproject-rtos/zephyr), 
 as well as some paradigms and concepts regarding multithreading : [Zephyr : Threads](https://docs.zephyrproject.org/latest/reference/kernel/threads/index.html).
-However be carefull, many behavior are different from the ones from Zephyr RTOS ! For example, regarding mutexes, AVRTOS kernel doesn't check if the thread releasing a mutex actually owns it, moreover it's possible to unlock a mutex from an interrupt routine routine while this is not the case in Zephyr.
-
-From Zephyr RTOS documentation `k_mutex_unlock` : 
-
-```
-Mutexes may not be unlocked in ISRs, as mutexes must only be manipulated
-in thread context due to ownership and priority inheritance semantics.
-```
+However be carefull, many behavior are different from the ones from Zephyr RTOS ! 
 
 ### Features
 

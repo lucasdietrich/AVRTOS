@@ -25,7 +25,11 @@ K_WORKQUEUE_DEFINE(workqueue, 0x200, K_PRIO_COOP(K_PRIO_LOW), 'W');
 struct task_t
 {
   struct k_work work;
-  struct k_mutex mutex;
+  struct k_sem sem; /* we need a signal here ! semaphores are inefficient */
+
+  /* mutex would not work because the mutex owner is the main thread and 
+   * the thread which would want to unlock is the workqueue thread.
+   */
 
   uint32_t input;
 };
@@ -41,7 +45,7 @@ void task_handler(struct k_work* self)
   usart_printl(" finished");
   k_sched_unlock();
 
-  k_mutex_unlock(&task->mutex);
+  k_sem_give(&task->sem);
 }
 
 #define TASKS_COUNT   15
@@ -58,7 +62,7 @@ int main(void)
 
   for (uint_fast8_t i = 0; i < ARRAY_SIZE(tasks); i++)
   {
-    k_mutex_init(&tasks[i].mutex);
+    k_sem_init(&tasks[i].sem, 1, 1);
     k_work_init(&tasks[i].work, task_handler);
     tasks[i].input = 200;
   }
@@ -73,7 +77,7 @@ void tasks_generator(void *p)
   uint8_t i = 0;
   while(1)
   {
-    if (k_mutex_lock(&tasks[i].mutex, K_NO_WAIT) == 0)
+    if (k_sem_take(&tasks[i].sem, K_NO_WAIT) == 0)
     {
       usart_hex16((uint16_t)&tasks[i]);
       usart_printl(" submitted");
