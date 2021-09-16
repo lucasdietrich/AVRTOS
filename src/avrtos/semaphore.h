@@ -63,7 +63,7 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
  * again for a semaphore availability. 
  * (current thread is removed from the waiting queue).
  * 
- * Don't take a semaphore from an interrupt routine !
+ * Don't take a semaphore from an interrupt routine if timeout is not K_NO_WAIT.
  * 
  * @param sem address of the semaphore structure
  * @param timeout time waiting the semaphore (e.g. K_NO_WAIT, K_MSEC(1000), K_FOREVER)
@@ -78,6 +78,8 @@ K_NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
  * This function sets interrupt flag when returning.
  * 
  * Give a semaphore if the "limit" is reached will have no effect.
+ * 
+ * Can be called from an interrupt routine.
  * 
  * @param sem : address of the semaphore structure
  */

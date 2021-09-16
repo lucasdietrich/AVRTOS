@@ -24,6 +24,9 @@ extern struct k_mem_slab __k_mem_slabs_end;
 
 void _k_mem_slab_init_module(void)
 {
+    /* must be called during MCU initialization, in order to initialize
+     * known memory slabs using the linker section defined
+     */
     const uint8_t mem_slabs_count = &__k_mem_slabs_end - &__k_mem_slabs_start;
     for (uint8_t i = 0; i < mem_slabs_count; i++)
     {
@@ -76,13 +79,18 @@ int8_t k_mem_slab_alloc(struct k_mem_slab* slab, void** mem, k_timeout_t timeout
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
         if (slab->free_list != NULL) {
+            /* there are fre memory blocks, so we allocate one directly */
             ret = _k_mem_slab_alloc(slab, mem);
         } else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+            /* we don't wait for a block to available and there no
+             * one left, we return an error */
             ret = -ENOMEM;
         } else {
+            /* we wait for a block being available */
             ret = _k_pend_current(&slab->waitqueue, timeout);
             if (ret == 0) {
-                ret = _k_mem_slab_alloc(slab, mem);
+                /* we retrieve the memory block available */
+                *mem = _current->swap_data;
             }
         }
     }
@@ -109,10 +117,12 @@ void k_mem_slab_free(struct k_mem_slab* slab, void** mem)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        if (slab->free_list == NULL) {
+        /* if a thread is waiting on a memory slab we give the block
+         * directly to the thread (using thread->swap_data)
+         */
+        if (_k_unpend_first_thread(&slab->waitqueue, *mem) != 0) {
+            /* otherwise we free the block */
             _k_mem_slab_free(slab, mem);
-
-            _k_unpend_first_thread(&slab->waitqueue);
         }
     }
 }

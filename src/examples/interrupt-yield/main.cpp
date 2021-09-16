@@ -20,7 +20,7 @@ K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH
 
 /*___________________________________________________________________________*/
 
-K_MUTEX_DEFINE(mymutex);
+K_SEM_DEFINE(mysem, 0, 1);
 
 /*___________________________________________________________________________*/
 
@@ -57,7 +57,7 @@ ISR(USART0_RX_vect)
   // UART0 RX buffer must be read before enabling interrupts again
   recv = usart_read_rx();
 
-  k_mutex_unlock(&mymutex);
+  k_sem_give(&mysem);
 }
 
 int main(void)
@@ -66,8 +66,6 @@ int main(void)
   usart_init();
   
   k_thread_dump_all();
-
-  k_mutex_lock(&mymutex, K_NO_WAIT);
 
   // set UART RX interrupt
   UCSR0B |= 1 << RXCIE0;
@@ -86,19 +84,17 @@ void waiting_thread(void *p)
 {
   while (1)
   {
-    if (0 == k_mutex_lock(&mymutex, K_FOREVER))
+    if (0 == k_sem_take(&mysem, K_SECONDS(5)))
     {
-      usart_print("get the mutex, thread woke up from interrupt : ");
+      usart_print("get a semaphore, thread woke up from interrupt : ");
       usart_transmit(recv);
       usart_transmit('\n');
 
       k_sleep(K_MSEC(1000));
-
-      k_mutex_lock(&mymutex, K_NO_WAIT);
     }
     else
     {
-      usart_printl("didn't get the mutex");
+      usart_printl("didn't get a semaphore in time");
     }
   }
 }

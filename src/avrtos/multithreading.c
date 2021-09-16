@@ -26,6 +26,7 @@ K_THREAD struct k_thread _k_thread_main = {
         }
     },
     .wmutex = DITEM_INIT_NULL(),   // the thread isn't waiting of an y events
+    .swap_data = NULL,
 #if THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
     .stack = {
         .end = (void *)_K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
@@ -101,6 +102,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const
     th->state = READY;
     th->priority = priority;
     th->symbol = symbol;
+    th->swap_data = NULL;
 
     _k_queue(th);
 

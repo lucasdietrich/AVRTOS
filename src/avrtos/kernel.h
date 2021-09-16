@@ -293,7 +293,8 @@ K_NOINLINE void _k_system_shift(void);
 K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
 
 /**
- * @brief Wake up the first thread waiting for the object.
+ * @brief Wake up the first thread waiting for an object.
+ * Set the first pending thread swap_data parameter before switching.
  * Switch thread before returning.
  * 
  * Assumptions :
@@ -302,9 +303,10 @@ K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
  * - Thread in the runqueue is suspended
  * 
  * @param waitqueue 
- * @return K_NOINLINE 
+ * @param swap_data : available object information
+ * @return uint8_t return 0 if a thread got the object, any other value otherwise
  */
-K_NOINLINE void _k_unpend_first_thread(struct ditem *waitqueue);
+K_NOINLINE uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void * swap_data);
 
 /*___________________________________________________________________________*/
 

@@ -18,9 +18,14 @@ void k_fifo_put(struct k_fifo* fifo, struct qitem* item)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        queue(&fifo->queue, item);
-
-        _k_unpend_first_thread(&fifo->waitqueue);
+        /* If there is a thread waiting on a fifo item, 
+         * we to give the item directly to the thread
+         * (using thread->swap_data)
+         */
+        if (_k_unpend_first_thread(&fifo->waitqueue, (void*) item) != 0) {
+            /* otherwise we queue the item to the fifo */
+            queue(&fifo->queue, item);
+        }
     }
 }
 
@@ -32,8 +37,8 @@ struct qitem* k_fifo_get(struct k_fifo* fifo, k_timeout_t timeout)
     {
         struct qitem* item = dequeue(&fifo->queue);
         if (item == NULL) {
-            if (0 == _k_pend_current(&fifo->waitqueue, timeout)) {
-                item = dequeue(&fifo->queue);
+            if (_k_pend_current(&fifo->waitqueue, timeout) == 0) {
+                item = (struct qitem*) _current->swap_data;
             }
         }
         return item;

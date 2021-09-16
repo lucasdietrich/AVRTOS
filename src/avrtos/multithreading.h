@@ -94,12 +94,13 @@ struct k_thread
             
     union
     {
-        struct ditem wany;                // represent the thread waiting on a generic object
+        struct ditem wany;              // represent the thread waiting on a generic object
         struct ditem wmutex;            // represent the thread waiting on an mutex
         struct ditem wsem;              // represent the thread waiting on an semaphore
         struct ditem wsig;              // represent the thread waiting on an signal
         struct ditem wfifo;             // represent the thread waiting on a fifo item
     };
+    void * swap_data;                   // data returned by kernel API's when calling _k_unpend_first_thread
     struct
     {
         void *end;                      // stack end

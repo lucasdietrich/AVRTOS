@@ -312,19 +312,28 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
     }
     return err;
 }
-
-void _k_unpend_first_thread(struct ditem* waitqueue)
+    
+uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
 {
     struct ditem* pending_thread = dlist_dequeue(waitqueue);
     if (DITEM_VALID(waitqueue, pending_thread)) {
         struct k_thread* th = THREAD_FROM_WAITQUEUE(pending_thread);
 
-        /* immediate: the first thread in the queue
-         * must be the first to get the object */
+        /* the first thread in the queue must be the first to get the object,
+         * so we set the immediate flag */
         _k_immediate_wake_up(th);
 
+        /* set the available object address */
+        th->swap_data = swap_data;
+
+        /* yield to this thread */
         k_yield();
+
+        /* we return 0 if a pending thread got the object*/
+        return 0;
     }
+    /* if no thread is pending on the object, we simply return */
+    return -1;
 }
 
 /*___________________________________________________________________________*/

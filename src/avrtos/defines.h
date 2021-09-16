@@ -389,8 +389,9 @@ typedef struct
         {                                                                                                    \
             .flags = K_FLAG_READY | prio_flags,                                                              \
         },                                                                                                   \
-        .tie = {.runqueue = DITEM_INIT(NULL)},                                                 \
+        .tie = {.runqueue = DITEM_INIT(NULL)},                                                               \
         {.wmutex = DITEM_INIT(NULL)},                                                                        \
+        .swap_data = NULL,                                                                                   \
         .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
         .local_storage = (void *)local_storage_p,                                                            \
         .symbol = sym}

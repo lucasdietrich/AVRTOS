@@ -23,14 +23,16 @@ struct k_mutex
 {
     uint8_t lock;
     struct ditem waitqueue;
+    struct k_thread *owner;
 };
 
 /*___________________________________________________________________________*/
 
-#define K_MUTEX_INIT(mutex)                      \
-    {                                            \
-        .lock = 0xFFu,                           \
-        .waitqueue = DLIST_INIT(mutex.waitqueue) \
+#define K_MUTEX_INIT(mutex)                       \
+    {                                             \
+        .lock = 0xFFu,                            \
+        .waitqueue = DLIST_INIT(mutex.waitqueue), \
+        .owner = NULL                             \
     }
 
 #define K_MUTEX_DEFINE(mutex_name) \
@@ -76,7 +78,7 @@ K_NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
  * is not empty, do k_yield this function doesn't check if the current thread 
  * actually own the mutex. This function sets interrupt flag when returning.
  * 
- * Can be called from an interrupt.
+ *  * Don't unlock a mutex from an interrupt routine !
  * 
  * @param mutex : address of the mutex structure
  */
