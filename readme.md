@@ -61,7 +61,6 @@ What enhancements are planned :
 - Make the library fully C compliant.
 - Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
-- Remove thread local storage pointer
 
 What enhancements/features are not planned :
 - Prioritization
