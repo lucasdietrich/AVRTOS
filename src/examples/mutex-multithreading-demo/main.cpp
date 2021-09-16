@@ -15,8 +15,8 @@
 void thread_led_on(void *p);
 void thread_led_off(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led_on, 0x120, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'O');
-K_THREAD_DEFINE(ledoff, thread_led_off, 0x140, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, nullptr, 'F');
+K_THREAD_DEFINE(ledon, thread_led_on, 0x120, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'O');
+K_THREAD_DEFINE(ledoff, thread_led_off, 0x140, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'F');
 
 /*___________________________________________________________________________*/
 

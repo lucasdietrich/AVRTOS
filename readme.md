@@ -26,7 +26,6 @@ Following features are supported:
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
-- thread local storage
 - thread context passing
 - debug/utils functions : RAM_DUMP, CORE_DUMP, read_ra (read return address)
 - data structures : dlist (doubly linked list), queue (singly linked list), time queue (singly linked list with delay parameter)
@@ -39,6 +38,7 @@ Minor features:
 What paradigms/concepts are not supported:
 - Nested interrupts
 - Dedicated stack for interrupt handlers
+- Thread local storage (removed)
 
 What features will be implemented :
 - System time
@@ -102,9 +102,9 @@ uint8_t on = 1u;
 uint8_t off = 0u;
 
 K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
-K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, nullptr, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, nullptr, 'F');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, nullptr, 'C');
+K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, 'O');
+K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, 'F');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, 'C');
 
 int main(void)
 {

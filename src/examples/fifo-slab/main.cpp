@@ -48,7 +48,7 @@ void block_write(uint8_t *buffer, uint16_t size, uint8_t symb)
 void consumer_thread(void *);
 
 K_FIFO_DEFINE(fifo);
-K_THREAD_DEFINE(consumer, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), nullptr, nullptr, 'A');
+K_THREAD_DEFINE(consumer, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), nullptr, 'A');
 
 #if MEM_SLAB_COMPILATION_TIME
 K_MEM_SLAB_DEFINE(myslab, BLOCK_SIZE, BLOCK_COUNT);

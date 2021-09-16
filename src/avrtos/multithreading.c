@@ -38,7 +38,6 @@ K_THREAD struct k_thread _k_thread_main = {
         .size = 0,
     },
 #endif
-    .local_storage = NULL,  // can be set later
     .symbol = 'M'           // default main thread sumbol
 };
 
@@ -49,7 +48,8 @@ struct k_thread * _current = &_k_thread_main;
 
 #if THREAD_USE_INIT_STACK_ASM == 0
 
-void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, void *const stack_end, void *const context_p)
+void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
+    void* const stack_end, void* const context_p)
 {
     // get stack pointer value
     uint8_t* sp = (uint8_t*) stack_end - 1;
@@ -86,7 +86,9 @@ void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry, voi
 
 #include "misc/uart.h"
 
-int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const stack, const size_t stack_size, const int8_t priority, void *const context_p, void *const local_storage, const char symbol)
+int k_thread_create(struct k_thread* const th, thread_entry_t entry,
+    void* const stack, const size_t stack_size,
+    const int8_t priority, void* const context_p, const char symbol)
 {
     if (stack_size < K_THREAD_STACK_MIN_SIZE)
     {
@@ -98,7 +100,6 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const
     _k_thread_stack_create(th, entry, th->stack.end, context_p);
 
     th->stack.size = stack_size;
-    th->local_storage = local_storage;
     th->state = READY;
     th->priority = priority;
     th->symbol = symbol;
@@ -114,9 +115,4 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry, void *const
 inline struct k_thread * k_thread_current(void)
 {
     return _current;
-}
-
-inline void * k_thread_local_storage(void)
-{
-    return _current->local_storage;
 }

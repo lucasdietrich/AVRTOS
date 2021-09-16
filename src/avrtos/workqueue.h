@@ -52,7 +52,6 @@ struct k_workqueue
         _k_workqueue_entry, stack_size,                          \
         prio_flags,                                              \
         &name,                                                   \
-        &name,                                                   \
         symbol)                                                  \
     struct k_workqueue name =                                    \
         {                                                        \
