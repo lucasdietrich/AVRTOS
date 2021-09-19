@@ -65,10 +65,6 @@ struct k_thread
             uint8_t state : 2;          // @see thread_state_t
             uint8_t coop : 1;           // cooperative/preemptive thread
             uint8_t priority : 2;       // thread priority : not supported for now
-            uint8_t immediate : 1;      // tell that the thread is the next to be executed 
-                                        // and should not be reordered (by the scheduler for example)
-                                        // this flag is not persistent and will be cleared when the thread is executed
-                                        // TODO, maybe remove this immediate flag and push event ready thread after the normally next thread
             uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
         };
         uint8_t flags;

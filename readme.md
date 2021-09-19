@@ -363,7 +363,6 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
     - `@T` : thread `T` was awakened
 - During scheduler call :
     - `!` : The timer of a waiting thread expired and the scheduler poped it off in order to execute it.
-    - `'T` : The thread `T` should be executed immediately, before the thread awakened by the timer expiration `!`
     - `~` : Current thread has just been set in WAITING mode and has been removed from the runqueue. The scheduler get the next thread to be executed.
     - `>` : The scheduler simply requeue the current thread and get the next thread to be executed.
     - `p` : Next thread to be executed is the IDLE thread, since there are other threads to be executed we skip the IDLE thread.

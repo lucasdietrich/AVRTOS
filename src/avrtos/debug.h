@@ -29,8 +29,7 @@ extern "C" {
 
 #define __K_DBG_SCHED_LOCK(th)      __K_DBG_HELPER_TH(th, '[')
 #define __K_DBG_SCHED_UNLOCK()      usart_transmit(']')
-#define __K_DBG_SCHED_EVENT()       usart_transmit('!')
-#define __K_DBG_SCHED_EVENT_ON_IMMEDIATE(th) __K_DBG_HELPER_TH(th, '\'')
+#define __K_DBG_SCHED_EVENT(th)     __K_DBG_HELPER_TH(th, '!')
 #define __K_DBG_SCHED_WAITING()     usart_transmit('~')
 #define __K_DBG_SCHED_REQUEUE()     usart_transmit('>')
 #define __K_DBG_SCHED_SKIP_IDLE()   usart_print("p")
@@ -49,8 +48,7 @@ extern "C" {
 
 #define __K_DBG_SCHED_LOCK(th)
 #define __K_DBG_SCHED_UNLOCK()
-#define __K_DBG_SCHED_EVENT()
-#define __K_DBG_SCHED_EVENT_ON_IMMEDIATE(th)
+#define __K_DBG_SCHED_EVENT(th)
 #define __K_DBG_SCHED_WAITING()
 #define __K_DBG_SCHED_REQUEUE()
 #define __K_DBG_SCHED_SKIP_IDLE()

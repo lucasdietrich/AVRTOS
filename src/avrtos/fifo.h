@@ -51,6 +51,8 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  * 
  * Wake up the first thread pending on a fifo item.
  * 
+ * Switch thread before returning if a thread is waiting on the item.
+ * 
  * Actually it's not the item itself which is added to the fifo but its "tie"
  * member `item_tie`. As for workqueue we're using the CONTAINER_OF paragigm.
  * For each item added to the fifo, you must define a structure containing 

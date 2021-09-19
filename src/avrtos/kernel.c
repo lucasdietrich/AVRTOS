@@ -147,7 +147,7 @@ void _k_kernel_init(void)
          * runqueue as the main thread is running */
         if (!IS_THREAD_IDLE(thread) && (thread->state == READY))
         {
-            push_front(runqueue, &thread->tie.runqueue);
+            push_back(runqueue, &thread->tie.runqueue);
         }
 
         /* Swap endianness of addresses in compilation-time built stacks.
@@ -232,7 +232,6 @@ struct k_thread* _k_scheduler(void)
     __ASSERT_NOINTERRUPT();
 
     _current->timer_expired = 0;
-    _current->immediate = 0;
 
     if (_current->state == WAITING) {
         /* runqueue is positionned to the normally next thread to be executed */
@@ -247,22 +246,12 @@ struct k_thread* _k_scheduler(void)
 
     struct ditem* ready = (struct ditem*)tqueue_pop(&events_queue);
     if (ready != NULL) {
-        __K_DBG_SCHED_EVENT();  // !
+        __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
 
         /* set ready thread expired flag */
         THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
 
-        /* if a thread has been woken up with the immediate flag set,
-         * the expired thread will be push just after it */
-        /* as idle thread cannot be immediate, it will never be prioritized */
-        if (THREAD_FROM_EVENTQUEUE(runqueue)->immediate) {
-            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_FROM_EVENTQUEUE(ready));   // '
-
-            push_front(runqueue->next, ready);
-        }
-        else {
-            _k_schedule(ready);
-        }
+        _k_schedule(ready);
     }
 
     _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
@@ -285,15 +274,6 @@ void _k_wake_up(struct k_thread *th)
     _k_unschedule(th);
 
     _k_schedule(&th->tie.runqueue);     // schedule in runqueue
-}
-
-void _k_immediate_wake_up(struct k_thread *th)
-{
-    __ASSERT_NOINTERRUPT();
-
-    th->immediate = 1u;
-
-    _k_wake_up(th);
 }
 
 void _k_reschedule(k_timeout_t timeout)
@@ -347,9 +327,11 @@ uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
     if (DITEM_VALID(waitqueue, pending_thread)) {
         struct k_thread* th = THREAD_FROM_WAITQUEUE(pending_thread);
 
-        /* the first thread in the queue must be the first to get the object,
-         * so we set the immediate flag */
-        _k_immediate_wake_up(th);
+        /* immediate wake up is not more required because 
+         * with the swap model, the object is already reserved for the 
+         * first waiting thread
+         */
+        _k_wake_up(th);
 
         /* set the available object address */
         th->swap_data = swap_data;

@@ -73,7 +73,9 @@ K_NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
  * @brief Give a semaphore, wake up the first waiting thread if the waiting 
- * queue is not empty, do k_yield.
+ * queue is not empty.
+ * 
+ * Switch thread before returning if a thread is waiting on a semaphores.
  * 
  * This function sets interrupt flag when returning.
  * 

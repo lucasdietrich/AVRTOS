@@ -237,21 +237,6 @@ K_NOINLINE struct k_thread *_k_scheduler(void);
 K_NOINLINE void _k_wake_up(struct k_thread *th);
 
 /**
- * @brief Wake up a thread that is waiting for an event.
- * This thread is the very first to be executed.
- * The scheduler should not reorder it before beeing executed.
- * 
-* Assumptions:
- *  - thread is in waiting mode
- *  - thread is not in the runqueue
- *  - thread may be in the events queue
- *  - interrupt flag is cleared when called.
- * 
- * @param th thread to wake up in immediate mode
- */
-K_NOINLINE void _k_immediate_wake_up(struct k_thread *th);
-
-/**
  * @brief Suspend the current thread and schedule its awakening for later
  * 
  * Assumptions :

@@ -37,10 +37,7 @@
 #define K_PRIO_DEFAULT              K_PRIO_PREEMPT(K_PRIO_HIGH)
 #define K_STOPPED                   K_FLAG_STOPPED
 
-#define K_FLAG_IMMEDIATE_SHIFT       6
-#define K_FLAG_IMMEDIATE             (1 << K_FLAG_IMMEDIATE_SHIFT)
-
-#define K_FLAG_TIMER_EXPIRED_SHIFT   7
+#define K_FLAG_TIMER_EXPIRED_SHIFT   6
 #define K_FLAG_TIMER_EXPIRED         (1 << K_FLAG_TIMER_EXPIRED_SHIFT)
 
 /*___________________________________________________________________________*/
