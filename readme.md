@@ -23,6 +23,7 @@ Following features are supported:
 - Workqueues and system workqueue 
 - Fifo
 - Memory slabs
+- Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -34,6 +35,7 @@ Minor features:
 - Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEOUT
 - Efficient pending feature, allowing to pass directly an object (mutex, semaphore, mem slab bloc, fifo item) to a pending thread. No need to do the whole process : unlock/lock for a mutex or free/allocate for a memory block if a thread is pending for the object being available.
 - Mutex thread owner
+- Fully C/C++ compliant
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -46,8 +48,6 @@ What features will be implemented :
 - Signals
 - Delayed start, suspending/resuming threads
 - Stack sentinels
-- Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
-- Memslabs
 - Task scheduling
 - Kernel fault
 
@@ -55,10 +55,7 @@ What enhancements are planned :
 - Using makefile to build the project for a target
 - Propose this project as a library
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
-- Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
-- Cancel submitted item
-- Make the library fully C compliant.
 - Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
 
@@ -68,6 +65,7 @@ What enhancements/features are not planned :
 - Stack for interrupts handlers
 - Delay the submission of a work in a workqueue
 - Saving thread errno
+- Cancel submitted item
 
 ## Getting started example :
 
@@ -261,10 +259,8 @@ monitor_speed = 500000
 ## Known issues
 
 - It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_unlock, ... from it.
-  - it's dangerous to use some kernel function that trigger a thread switch, as we cannot predict which will be the current thread when an interrupt occures.
+  - it's dangerous to use some kernel function that trigger a thread switch, as we cannot predict which will be the current thread when an interrupt occurs.
   - Nothing is yet planned to prevent the developper from doing this.
-- This library is not full c compliant, this enhancement is planned. For example, the macro defining a thread canot be compiled as a c file.
-  - For now it is adviced to use threads macros from C++ files : e.g. `main.cpp` 
 
 ## Debugging
 
