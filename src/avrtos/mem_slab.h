@@ -64,7 +64,7 @@ struct k_mem_slab
 #define _K_MEM_SLAB_BUF_NAME(slab_name) _k_mem_slab_buf_##slab_name
 
 #define K_MEM_SLAB_DEFINE(slab_name, size, num_blocks)                                  \
-    uint8_t _k_mem_slab_buf_##slab_name[(size) * (num_blocks)];                             \
+    uint8_t _k_mem_slab_buf_##slab_name[(size)*(num_blocks)];                           \
     __attribute__((used, section(".k_mem_slabs"))) static struct k_mem_slab slab_name = \
         K_MEM_SLAB_INIT(slab_name, _k_mem_slab_buf_##slab_name, size, num_blocks)
 

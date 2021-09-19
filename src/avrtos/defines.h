@@ -272,6 +272,14 @@
 #   define KERNEL_ASSERT DEFAULT_KERNEL_ASSERT
 #endif
 
+#ifdef CONFIG_KERNEL_YIELD_ON_UNPEND
+#   define KERNEL_YIELD_ON_UNPEND CONFIG_KERNEL_YIELD_ON_UNPEND
+#else
+#   define KERNEL_YIELD_ON_UNPEND DEFAULT_KERNEL_YIELD_ON_UNPEND
+#endif
+
+
+
 /*___________________________________________________________________________*/
 
 // put all c specific definition  here

@@ -37,7 +37,7 @@
     sts UCSR0B, r17
 #endif
 
-; add READY threads to the runqueue
+; add READY threads to the runqueue, and adjust addresses endianness in stacks
     call _k_kernel_init
 
 ; initialize mem slabs defined at compilation

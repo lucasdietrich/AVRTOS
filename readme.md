@@ -255,13 +255,18 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
+| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. |
 
 ## Known issues
 
-- It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_unlock, ... from it.
-  - it's dangerous to use some kernel function that trigger a thread switch, as we cannot predict which will be the current thread when an interrupt occurs.
-  - Nothing is yet planned to prevent the developper from doing this.
+- For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc automatically switch to the first thread waiting on the object (this will probably be changed). If the function is called from an interrupt, it could preempt a cooperative thread if the function is called from an interrupt handler. And this is an unwished behavior.
+  - There is not mechanisms to prevent the switch for now.
+  - As we cannot predict the current thread beeing processed when an interrupt occurs and we cannot know if we 
+  are actually in an interrupt handler (when calling k_fifo_put for example), I decided the default behavior as described above.
+  - First, I wanted to automatically switch to the thread waiting on an object when it became available, but this should probably be changed ...
+  - Nothing is yet planned to prevent the developper from doing weird things from interrupt handlers.
 
+See `KERNEL_YIELD_ON_UNPEND` configuration option.
 ## Debugging
 
 ### Emulate with QEMU and debug
@@ -276,7 +281,7 @@ My install :
 Steps : 
 1. Building project in debug mode : 
   - `build_type = debug`
-  - Make sure to use timer1 as syslock !
+  - Make sure to use timer1 as syslock as it's the only hardware timer supported for now !
   
 2. Emulate on qemu : Run command from WSL :
   `~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off`
