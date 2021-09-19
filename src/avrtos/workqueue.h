@@ -3,9 +3,11 @@
 
 #include <stddef.h>
 
-#include "multithreading.h"
-#include "dstruct/tqueue.h"
+#include "avrtos.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -137,5 +139,9 @@ void k_system_workqueue_submit(struct k_work * work);
 
 /*___________________________________________________________________________*/
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

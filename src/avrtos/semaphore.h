@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-#include "multithreading.h"
+#include "avrtos.h"
 
 #ifdef __cplusplus
 extern "C" {

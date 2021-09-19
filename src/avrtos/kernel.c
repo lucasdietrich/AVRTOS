@@ -128,6 +128,11 @@ extern struct k_thread __k_threads_end;
 
 uint8_t _k_thread_count = 1;
 
+inline static void swap_endianness(uint16_t * const addr)
+{
+    *addr = HTONS(*addr);
+}
+
 void _k_kernel_init(void)
 {
     _k_thread_count = &__k_threads_end - &__k_threads_start;
@@ -137,10 +142,27 @@ void _k_kernel_init(void)
     for (uint8_t i = 0; i < _k_thread_count; i++)
     {
         struct k_thread *const thread = &(&__k_threads_start)[i];
+
+        /* idle thread must not be added to the 
+         * runqueue as the main thread is running */
         if (!IS_THREAD_IDLE(thread) && (thread->state == READY))
         {
             push_front(runqueue, &thread->tie.runqueue);
         }
+
+        /* Swap endianness of addresses in compilation-time built stacks.
+         * We cannot change the endianness of addresses determined by the
+         * linker at compilation time. So we need to do it on system start up
+         */
+        if (_current != thread)
+        {
+            /* thread entry function address */
+            swap_endianness(thread->stack.end - 1u);
+
+            /* thread context address */
+            swap_endianness(thread->stack.end - 1u -
+                (8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+        }        
     }
 }
 
@@ -298,11 +320,17 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
     int8_t err = -1;
     if (timeout.value != 0) {
+        /* queue thread to waiting queue of the object */
         dlist_queue(waitqueue, &_current->wany);
 
+        /* schedule thread wake up if timeout is set */
         _k_reschedule(timeout);
+
         k_yield();
 
+        /* if timer expired, we nned to manually remove the thread from 
+         * the waiting queue
+         */
         if (_current->timer_expired) {
             dlist_remove(&_current->wany);
             err = -ETIMEOUT;

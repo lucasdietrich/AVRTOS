@@ -11,7 +11,7 @@ extern "C" {
 #include <avr/io.h>
 #include <util/atomic.h>
 
-#include "multithreading.h"
+#include "avrtos.h"
 
 /*___________________________________________________________________________*/
 

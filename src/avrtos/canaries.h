@@ -1,8 +1,8 @@
 #ifndef _AVRTOS_CANARIES_H_
 #define _AVRTOS_CANARIES_H_
 
-#include "multithreading.h"
-
+#include "avrtos.h"
+    
 #ifdef __cplusplus
 extern "C" {
 #endif

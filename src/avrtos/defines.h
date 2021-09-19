@@ -299,6 +299,14 @@ typedef struct
 #define K_NO_WAIT               ((k_timeout_t){(k_delta_ms_t) (0)})
 #define K_FOREVER               ((k_timeout_t){(k_delta_ms_t) (-1)})
 
+#define HTONL(n) ((((((uint32_t)(n) & 0xFF)) << 24) |      \
+               ((((uint32_t)(n) & 0xFF00)) << 8) |         \
+               ((((uint32_t)(n) & 0xFF0000)) >> 8) |       \
+               ((((uint32_t)(n) & 0xFF000000)) >> 24)))
+
+#define HTONS(n) (((((uint16_t)(n) & 0xFF)) << 8) |       \
+               ((((uint16_t)(n) & 0xFF00)) >> 8))
+
 #define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n) & 0xFF)) << 8) | (((uint16_t)(n) & 0xFF00) >> 8))
 
 #define MIN(a, b) ((a < b) ? (a) : (b))
@@ -336,7 +344,7 @@ typedef struct
 #define _K_STACK_INIT_SP(stack_end) (stack_end - K_THREAD_STACK_VOID_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly set
-#define _K_THREAD_STACK_START(name) ((uint16_t)&_k_stack_buf_##name)
+#define _K_THREAD_STACK_START(name) ((uint8_t*)(&_k_stack_buf_##name))
 
 #define _K_THREAD_STACK_SIZE(name) (sizeof(_k_stack_buf_##name))
 
@@ -364,9 +372,9 @@ typedef struct
         {0x00},                                                            \
         {THREAD_DEFAULT_SREG,                                              \
          {0x00},                                                           \
-         (void *)K_SWAP_ENDIANNESS(context_p),                             \
+         (void*) context_p,                                                \
          {0x00},                                                           \
-         (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}}
+         (void*) entry}}
 
 #define _K_STACK_MIN_INITIALIZER(name, entry, context_p)     \
     struct                                                   \
@@ -379,9 +387,9 @@ typedef struct
     } _k_stack_buf_##name = {                                \
         THREAD_DEFAULT_SREG,                                 \
         {0x00},                                              \
-        (void *)K_SWAP_ENDIANNESS(context_p),                \
+        (void*) context_p,                                   \
         {0x00},                                              \
-        (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}
+        (void*) entry}
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \

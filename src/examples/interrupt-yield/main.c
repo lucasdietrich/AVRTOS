@@ -15,8 +15,8 @@
 void waiting_thread(void *p);
 void monitoring_thread(void *p);
 
-K_THREAD_DEFINE(waiting, waiting_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'W');
-K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'R');
+K_THREAD_DEFINE(waiting, waiting_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, 'W');
+K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, 'R');
 
 /*___________________________________________________________________________*/
 

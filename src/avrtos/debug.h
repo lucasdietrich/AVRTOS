@@ -4,7 +4,7 @@
 #include "misc/uart.h"
 #include "misc/utils.h"
 
-#include "multithreading.h"
+#include "avrtos.h"
 
 #ifdef __cplusplus
 extern "C" {

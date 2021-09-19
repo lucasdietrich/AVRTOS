@@ -9,23 +9,10 @@
 
 #include <stddef.h>
 
-#include "defines.h"
-#include "assert.h"
-
-#include "sysclock.h"
-#include "idle.h"
-#include "canaries.h"
-
-#include "dstruct/queue.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
 
-#include "workqueue.h"
-#include "mutex.h"
-#include "semaphore.h"
-
-#include "fifo.h"
-#include "mem_slab.h"
+#include "multithreading.h"
 
 /*___________________________________________________________________________*/
 
@@ -107,7 +94,6 @@ struct k_thread
         size_t size;                    // stack size
     } stack;                            // thread stack definition
     char symbol;                        // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
-    
 };
 
 /**

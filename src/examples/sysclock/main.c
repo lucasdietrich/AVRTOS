@@ -18,7 +18,7 @@
 
 void thread_led(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, nullptr, 'L');
+K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'L');
 
 /*___________________________________________________________________________*/
 
