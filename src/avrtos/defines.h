@@ -298,6 +298,7 @@ typedef struct
 #define K_MSEC(delay_ms)        ((k_timeout_t){(k_delta_ms_t) (delay_ms)})
 #define K_NO_WAIT               ((k_timeout_t){(k_delta_ms_t) (0)})
 #define K_FOREVER               ((k_timeout_t){(k_delta_ms_t) (-1)})
+#define K_UNTIL_WAKEUP          K_FOREVER
 
 #define HTONL(n) ((((((uint32_t)(n) & 0xFF)) << 24) |      \
                ((((uint32_t)(n) & 0xFF00)) << 8) |         \

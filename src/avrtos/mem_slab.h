@@ -64,7 +64,7 @@ struct k_mem_slab
 #define _K_MEM_SLAB_BUF_NAME(slab_name) _k_mem_slab_buf_##slab_name
 
 #define K_MEM_SLAB_DEFINE(slab_name, size, num_blocks)                                  \
-    uint8_t _k_mem_slab_buf_##slab_name[size * num_blocks];                             \
+    uint8_t _k_mem_slab_buf_##slab_name[(size) * (num_blocks)];                             \
     __attribute__((used, section(".k_mem_slabs"))) static struct k_mem_slab slab_name = \
         K_MEM_SLAB_INIT(slab_name, _k_mem_slab_buf_##slab_name, size, num_blocks)
 
@@ -115,13 +115,15 @@ K_NOINLINE int8_t _k_mem_slab_alloc(struct k_mem_slab* slab, void** mem);
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE int8_t _k_mem_slab_free(struct k_mem_slab* slab, void** mem);
+K_NOINLINE int8_t _k_mem_slab_free(struct k_mem_slab* slab, void* mem);
 
 /**
  * @brief Allocate a memory block. 
  * 
  * If there is no block available timeout is different from K_NO_WAIT,
  * the function is blocking until a block is freed or timeout.
+ * 
+ * Can be called from an interrupt routine.
  * 
  * Assumptions :
  * - slab not null
@@ -141,6 +143,9 @@ K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab* slab, void** mem,
  * 
  * Switch thread before returning if a thread is waiting on a block.
  * 
+ * Cannot be called from an interrupt routine 
+ * if timeout is different from K_NO_WAIT.
+ * 
  * Assumptions :
  * - slab not null
  * - mem not null
@@ -150,7 +155,7 @@ K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab* slab, void** mem,
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_mem_slab_free(struct k_mem_slab* slab, void** mem);
+K_NOINLINE void k_mem_slab_free(struct k_mem_slab* slab, void* mem);
 
 /*___________________________________________________________________________*/
 

@@ -10,35 +10,35 @@
 
 /*___________________________________________________________________________*/
 
-void _k_workqueue_entry(struct k_workqueue *const workqueue)
+void _k_workqueue_entry(struct k_workqueue* const workqueue)
 {
     sei();
 
-    for(;;)
-    {
+    for (;;) {
         k_sched_lock();
-        const bool yield = (bool) TEST_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
-        struct ditem * const item = dlist_dequeue(&workqueue->queue);
+        const bool yield = (bool)TEST_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
+        struct ditem* const item = dlist_dequeue(&workqueue->queue);
         k_sched_unlock();
 
-        if (DITEM_VALID(&workqueue->queue, item))
-        {
-            item->next = NULL; // set the work item submittable again
-            
-            struct k_work * work = CONTAINER_OF(item, struct k_work, tie);
+        if (DITEM_VALID(&workqueue->queue, item)) {
+            /* set the work as "submittable" */
+            item->next = NULL;
+
+            struct k_work* work = CONTAINER_OF(item, struct k_work, tie);
 
             work->handler(work);
 
-            if (yield)
-            {
+            /* yield if "yieldeach" option is enabled */
+            if (yield) {
                 k_yield();
             }
-        }
-        else
-        {
+        } else {
+            /* K_WORKQUEUE_IDLE help to differentiate a work sleep
+             * from the workqueue sleeping */
             SET_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
 
-            k_sleep(K_FOREVER); // sleep until a new work item is added to the queue
+            /* sleep until a new work item is added to the queue */
+            k_sleep(K_UNTIL_WAKEUP);
 
             CLR_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
         }
@@ -64,8 +64,13 @@ void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
         {
             /* we need to check if the workqueue is processing an item,
              * because we shouldn't wake it up if a work item being processed
-             * is waiting for an event while beiing processed
-             * workqueue should be idle to wake it up
+             * is waiting for an event while beiing processed.
+             * 
+             * The workqueue should be idle to wake it up.
+             * 
+             * If a work item is rescheduling another work item while 
+             * beiing processed, there is no need to wake up the workqueue
+             * thread.
              */
             if (
                 TEST_BIT(workqueue->flags, K_WORKQUEUE_IDLE) &&

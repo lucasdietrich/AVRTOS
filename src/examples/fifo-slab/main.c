@@ -101,7 +101,7 @@ void consumer_thread(void* context)
       block_read(mem->data, sizeof(mem->data));
       k_sched_unlock();
 
-      k_mem_slab_free(&myslab, (void**)&mem);
+      k_mem_slab_free(&myslab, (void*)mem);
     }
 
     k_sleep(K_SECONDS(1));

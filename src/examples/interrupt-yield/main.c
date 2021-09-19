@@ -20,7 +20,8 @@ K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH
 
 /*___________________________________________________________________________*/
 
-K_SEM_DEFINE(mysem, 0, 1);
+K_FIFO_DEFINE(myfifo);
+K_MEM_SLAB_DEFINE(myslab, 2u + 1u, 10u);
 
 /*___________________________________________________________________________*/
 
@@ -29,23 +30,14 @@ static uint8_t usart_read_rx(void)
   uint8_t status = UCSR0A;
   // uint8_t resh = UCSR0B;
   uint8_t resl = UDR0;
-  
-  if (status & ((1 << FE0) | (1 << DOR0) | (1 << UPE0)))
-  {
+
+  if (status & ((1 << FE0) | (1 << DOR0) | (1 << UPE0))) {
     usart_transmit('x');
-    resl = 0;
-  }
-  else
-  {
-    // resh = (resh >> 1) & 0x01;
-    // return ((resh << 8) | resl);
-    usart_transmit(resl);
+    resl = 0; 
   }
 
   return resl;
 }
-
-static volatile uint8_t recv;
 
 // atmega2560
 #if defined(__AVR_ATmega328P__)
@@ -55,9 +47,18 @@ ISR(USART0_RX_vect)
 #endif
 {
   // UART0 RX buffer must be read before enabling interrupts again
-  recv = usart_read_rx();
+  char recv = usart_read_rx();
 
-  k_sem_give(&mysem);
+  void* mem;
+  if (k_mem_slab_alloc(&myslab, &mem, K_NO_WAIT) == 0) {
+
+    /* first two bytes are use by the fifo */
+    *(char*)(mem + 2u) = recv;
+    k_fifo_put(&myfifo, mem);
+  } else {
+    /* no memory slab available */
+    usart_transmit('X');
+  }
 }
 
 int main(void)
@@ -67,34 +68,35 @@ int main(void)
   
   k_thread_dump_all();
 
-  // set UART RX interrupt
+  /* set UART RX interrupt */
   UCSR0B |= 1 << RXCIE0;
 
-  sei();
+  irq_enable();
 
-  while(1)
-  {
-    k_sleep(K_MSEC(1000));
-
-    usart_printl("::main");
-  }
+  k_sleep(K_FOREVER);
 }
 
 void waiting_thread(void *p)
 {
   while (1)
   {
-    if (0 == k_sem_take(&mysem, K_SECONDS(5)))
+    void* mem = k_fifo_get(&myfifo, K_SECONDS(5));
+    if (mem != NULL)
     {
-      usart_print("get a semaphore, thread woke up from interrupt : ");
-      usart_transmit(recv);
+      usart_print("Got a letter from the UART : ");
+      usart_transmit(*(char*)(mem + 2u));
       usart_transmit('\n');
 
-      k_sleep(K_MSEC(1000));
+      /* This delay emulates a delay in the process of the input letter.
+       * If you send letters faster than you process them, there will be
+       * not enough memory blocks and 'X' will appear in the UART.*/
+      k_sleep(K_MSEC(200));
+
+      k_mem_slab_free(&myslab, mem);
     }
     else
     {
-      usart_printl("didn't get a semaphore in time");
+      usart_printl("Didn't get a letter from the UART in time.");
     }
   }
 }
@@ -103,7 +105,7 @@ void monitoring_thread(void *p)
 {
   while (1)
   {
-    k_sleep(K_MSEC(1000));
+    k_sleep(K_MSEC(30000));
 
     print_runqueue();
     print_events_queue();
