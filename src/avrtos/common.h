@@ -17,9 +17,8 @@
 #define K_FLAG_PREEMPT              (0 << K_FLAG_PREEMPT_SHIFT)
 
 #define K_FLAG_STOPPED              (0b00 << 0)
-#define K_FLAG_RUNNING              (0b01 << 0)
-#define K_FLAG_READY                (0b10 << 0)
-#define K_FLAG_WAITING              (0b11 << 0)
+#define K_FLAG_READY                (0b01 << 0)
+#define K_FLAG_WAITING              (0b10 << 0)
 
 #define K_FLAG_PRIO_SHIFT           4
 

@@ -321,12 +321,14 @@ no_interrupt_ret:
 #if THREAD_USE_INIT_STACK_ASM == 1
 
 .global _k_thread_stack_create
+.extern _k_thread_entry
 
 ; thread_t *th         in r24, r25
 ; thread_entry_t entry in r22, r23
 ; uint16_t stack_end   in r20, r21
 ; void* context_p      in r18, r19
 _k_thread_stack_create:
+; TODO can be optimized a lot
     push r26
     push r27
     push r28
@@ -345,15 +347,23 @@ _k_thread_stack_create:
     ; ror r22
 
     ; add return addr to stack (with format >> 1)
-    st -X, r22 ; SPL
-    st -X, r23 ; SPH
+    ldi r20, lo8(_k_thread_entry)
+    ldi r21, hi8(_k_thread_entry)
+    lsr r21
+    ror r20
+    st -X, r20 ; SPL
+    st -X, r21 ; SPH
 
     ; push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
     ldi r28, 0x00
-    ldi r29, 8 + _K_ARCH_STACK_SIZE_FIXUP
+    ldi r29, 6 + _K_ARCH_STACK_SIZE_FIXUP
     dec r29
     st -X, r28
     brne .-6
+
+    ; entry ~ push r22 > r23
+    st -X, r22
+    st -X, r23
 
     ; void * context ~ push r24 > r25
     st -X, r18
@@ -368,8 +378,6 @@ _k_thread_stack_create:
     ; lds r29, SREG
     ldi r29, THREAD_DEFAULT_SREG
     st -X, r29
-
-    ; copy stack pointer in thread structure
 
     ; -1, to first empty stack addr
     sbiw r26, 1

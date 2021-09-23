@@ -43,7 +43,7 @@ typedef void (*thread_entry_t)(void*);
  * It can be wake up with function _k_wake_up()
  * 
  */
-enum thread_state_t { STOPPED = 0, READY = 1, WAITING = 2, TERMINATED = 3};
+enum thread_state_t { STOPPED = 0, READY = 1, WAITING = 2, _UNDEFINED = 3};
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -145,6 +145,10 @@ int k_thread_create(struct k_thread* const th, thread_entry_t entry,
  */
 void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
     void* const stack, void* const context_p);
+
+/*___________________________________________________________________________*/
+
+void _k_thread_entry(void* context, thread_entry_t entry);
 
 /*___________________________________________________________________________*/
 

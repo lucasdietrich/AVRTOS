@@ -382,16 +382,18 @@ typedef struct
             uint8_t sreg;                                                  \
             uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
             void *context;                                                 \
-            uint8_t r17r0r18_r23_3Baddrmsb[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
-            void *entry_addr;                                              \
+            thread_entry_t *entry;                                         \
+            uint8_t r17r0r18_r21_3Baddrmsb[6u + _K_ARCH_STACK_SIZE_FIXUP]; \
+            void *k_thread_entry;                                          \
         } base;                                                            \
     } _k_stack_buf_##name = {                                              \
         {0x00},                                                            \
         {THREAD_DEFAULT_SREG,                                              \
          {0x00},                                                           \
          (void*) context_p,                                                \
+         (thread_entry_t*) entry,                                          \
          {0x00},                                                           \
-         (void*) entry}}
+         (void*) _k_thread_entry}}
 
 #define _K_STACK_MIN_INITIALIZER(name, entry, context_p)     \
     struct                                                   \
@@ -399,14 +401,16 @@ typedef struct
         uint8_t sreg;                                        \
         uint8_t r26_r27r30r31r28r29r1_r16[22u];              \
         void *context;                                       \
-        uint8_t r17r0r18_r23[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
-        void *entry_addr;                                    \
+        thread_entry_t *entry;                               \
+        uint8_t r17r0r18_r21[6u + _K_ARCH_STACK_SIZE_FIXUP]; \
+        void *k_thread_entry;                                \
     } _k_stack_buf_##name = {                                \
         THREAD_DEFAULT_SREG,                                 \
         {0x00},                                              \
         (void*) context_p,                                   \
+        (thread_entry_t*) entry,                             \
         {0x00},                                              \
-        (void*) entry}
+        (void*) _k_thread_entry}
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \

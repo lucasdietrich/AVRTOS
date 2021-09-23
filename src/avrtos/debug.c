@@ -69,9 +69,8 @@ void k_thread_dump(struct k_thread *th)
 
     usart_print("] ");
 
-   static const char strings[4][8] PROGMEM = {
+   static const char strings[4][11] PROGMEM = {
         "STOPPED",
-        "RUNNING",
         "READY  ",
         "WAITING",
     };
@@ -111,13 +110,14 @@ void *k_thread_get_return_addr(struct k_thread *th)
     return NULL;
 }
 
-int k_thread_copy_registers(struct k_thread *th, char *const buffer, const size_t size)
+int k_thread_copy_registers(struct k_thread *th, uint8_t * buffer, const size_t size)
 {
-    if ((th == _current) && (size >= 16))
+    const uint16_t context_size = 35u + _K_ARCH_STACK_SIZE_FIXUP;
+    if ((th != _current) && (size >= context_size))
     {
-        memcpy(buffer, (void *)((uint16_t)th->stack.end - 34u), 32u); // -32 (registers) - 2 (return address)
+        memcpy(buffer, K_STACK_START(th->stack.end, context_size), context_size);
 
-        return 0;
+        return context_size;
     }
     return -1;
 }

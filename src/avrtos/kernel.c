@@ -157,8 +157,12 @@ void _k_kernel_init(void)
          */
         if (_current != thread)
         {
-            /* thread entry function address */
+            /* thread kernel entry function address */
             swap_endianness(thread->stack.end - 1u);
+
+            /* thread kernel entry function address */
+            swap_endianness(thread->stack.end - 1u -
+                (6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
 
             /* thread context address */
             swap_endianness(thread->stack.end - 1u -

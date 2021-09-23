@@ -55,23 +55,24 @@ void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
     uint8_t* sp = (uint8_t*) stack_end - 1;
 
     // add return addr to stack (with format >> 1)
-    *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) entry);
+    *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) _k_thread_entry);
     sp -= 1u;
 
-    // push r0 > r23 (24 registers)
-    for(uint_fast8_t i = 0u; i < 8u + _K_ARCH_STACK_SIZE_FIXUP; i++)
-    {
+    for (uint_fast8_t i = 0u; i < 6u + _K_ARCH_STACK_SIZE_FIXUP; i++) {
         *sp-- = 0u;
     }
+
+    // set entry (p)
+    sp -= 1u;
+    *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) entry);
+    sp -= 1u;
 
     // set context (p)
     sp -= 1u;
     *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) context_p);
     sp -= 1u;
 
-    // push r26 > r31 (6 registers)
-    for (uint_fast8_t i = 0u; i < 22u; i++)
-    {
+    for (uint_fast8_t i = 0u; i < 22u; i++) {
         *sp-- = 0u;
     }
 
@@ -90,8 +91,7 @@ int k_thread_create(struct k_thread* const th, thread_entry_t entry,
     void* const stack, const size_t stack_size,
     const int8_t priority, void* const context_p, const char symbol)
 {
-    if (stack_size < K_THREAD_STACK_MIN_SIZE)
-    {
+    if (stack_size < K_THREAD_STACK_MIN_SIZE) {
         return -1;
     }
     
@@ -99,15 +99,35 @@ int k_thread_create(struct k_thread* const th, thread_entry_t entry,
 
     _k_thread_stack_create(th, entry, th->stack.end, context_p);
 
+    /* clear internal flags */
+    th->flags = 0;
+
     th->stack.size = stack_size;
     th->state = READY;
     th->priority = priority;
     th->symbol = symbol;
     th->swap_data = NULL;
 
-    _k_queue(th);
-
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        _k_queue(th);
+    }
+    
     return 0;
+}
+
+/*___________________________________________________________________________*/
+
+void _k_thread_entry(void* context, thread_entry_t entry)
+{    
+    entry(context);
+
+    irq_disable();
+
+    _k_suspend();
+
+    _current->state = STOPPED;
+
+    k_yield();
 }
 
 /*___________________________________________________________________________*/
@@ -116,3 +136,5 @@ inline struct k_thread * k_thread_current(void)
 {
     return _current;
 }
+
+/*___________________________________________________________________________*/

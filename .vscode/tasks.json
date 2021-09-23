@@ -33,5 +33,13 @@
 			],
 			"label": "QEMU WSL Ubuntu - FifoQemuMega328p"
 		},
+		{
+			"type": "shell",
+			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/ThreadTermination-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU WSL Ubuntu - ThreadTermination-qemu-ATmega2560"
+		},
 	]
 }

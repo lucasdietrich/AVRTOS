@@ -165,8 +165,11 @@
 // Tells if function _k_unpend_first_thread should immediately switch to 
 //   the first waiting thread when the object become  available.
 //
-#define DEFAULT_KERNEL_YIELD_ON_UNPEND          1
+#define DEFAULT_KERNEL_YIELD_ON_UNPEND          0
 
+//
+// Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks)
+//
 #define DEFAULT_ALLOW_THREAD_RETURN             1
 
 /*___________________________________________________________________________*/

@@ -140,7 +140,7 @@ void *k_thread_get_return_addr(struct k_thread *th);
  * @param size 
  * @return int 
  */
-int k_thread_copy_registers(struct k_thread *th, char *const buffer, const size_t size);
+int k_thread_copy_registers(struct k_thread *th, uint8_t * buffer, const size_t size);
 
 /*___________________________________________________________________________*/
 
