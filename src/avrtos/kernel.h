@@ -295,6 +295,10 @@ K_NOINLINE uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void * swap_d
 
 /*___________________________________________________________________________*/
 
+K_NOINLINE void _k_on_thread_return(void);
+
+/*___________________________________________________________________________*/
+
 #ifdef __cplusplus
 }
 #endif

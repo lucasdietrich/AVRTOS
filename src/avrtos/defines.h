@@ -278,6 +278,14 @@
 #   define KERNEL_YIELD_ON_UNPEND DEFAULT_KERNEL_YIELD_ON_UNPEND
 #endif
 
+#ifdef CONFIG_ALLOW_THREAD_RETURN
+#   define ALLOW_THREAD_RETURN CONFIG_ALLOW_THREAD_RETURN
+#else
+#   define ALLOW_THREAD_RETURN DEFAULT_ALLOW_THREAD_RETURN
+#endif
+
+
+
 
 
 /*___________________________________________________________________________*/
@@ -375,7 +383,7 @@ typedef struct
             uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
             void *context;                                                 \
             uint8_t r17r0r18_r23_3Baddrmsb[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
-            void *ret_addr;                                                \
+            void *entry_addr;                                              \
         } base;                                                            \
     } _k_stack_buf_##name = {                                              \
         {0x00},                                                            \
@@ -392,7 +400,7 @@ typedef struct
         uint8_t r26_r27r30r31r28r29r1_r16[22u];              \
         void *context;                                       \
         uint8_t r17r0r18_r23[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
-        void *ret_addr;                                      \
+        void *entry_addr;                                    \
     } _k_stack_buf_##name = {                                \
         THREAD_DEFAULT_SREG,                                 \
         {0x00},                                              \

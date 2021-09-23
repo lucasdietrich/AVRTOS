@@ -58,6 +58,9 @@ What enhancements are planned :
 - Check that the thread own the mutex/semaphore when releasing it
 - Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
+- Remove RUNNING state which is implicitely represented by the position of the current thread in the runqueue.
+  - A thread is running if it is at the top on the runqueue
+  - Also optimize the use of READY
 
 What enhancements/features are not planned :
 - Prioritization
@@ -260,7 +263,7 @@ monitor_speed = 500000
 ## Known issues
 
 - For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc automatically switch to the first thread waiting on the object (this will probably be changed). If the function is called from an interrupt, it could preempt a cooperative thread if the function is called from an interrupt handler. And this is an unwished behavior.
-  - There is not mechanisms to prevent the switch for now.
+  - There is no mechanism to prevent the switch for now.
   - As we cannot predict the current thread beeing processed when an interrupt occurs and we cannot know if we 
   are actually in an interrupt handler (when calling k_fifo_put for example), I decided the default behavior as described above.
   - First, I wanted to automatically switch to the thread waiting on an object when it became available, but this should probably be changed ...

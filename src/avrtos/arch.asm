@@ -16,13 +16,9 @@ __k_interrupts:
 
 /*___________________________________________________________________________*/
 
-; prempt debug
 #if KERNEL_DEBUG_PREEMPT_UART
 
 .global _K_USART_RX_vect
-
-; when calling function, you must push all registers covered by the arguments, even not completely uint8_t require r24 but cover also r25 
-; the function will use r25 without pushing on the stack, admitting that it as been saved by ther caller
 
 _K_USART_RX_vect:
     push r17
@@ -53,11 +49,9 @@ _K_USART_RX_vect:
 ; If error, return -1
     andi r18, (1 << FE0) | (1 << DOR0) | (1 << UPE0)
     breq USART_Continue
-    ldi r24, 0x58   ; X show X if error
+    ldi r24, 0x58   ; show X if error
     
 USART_Continue:
-    ; call usart_transmit     ; print received character or X
-
     jmp system_shift
 
 #endif
@@ -71,7 +65,8 @@ USART_Continue:
 ; push order
 ; r17 | r0 r18 > r27 r30 r31 | r28 r19 r1 > r16 | SREG
 
-; SREG is saved in r17 during the whole process, DON'T USE r17 in this part without saving it
+; SREG is saved in r17 during the whole process, 
+; DON'T USE r17 in this part without saving it
 
 #if KERNEL_DEBUG_PREEMPT_UART == 0
 
@@ -83,7 +78,7 @@ SYSCLOCK_TIMERX_OVF_vect:
     push r17
 
 #if KERNEL_SYSLOCK_HW_TIMER == 1
-    ; from ATmega328p documentation :
+    ; from ATmega328p documentation : timer1 (16 bits)
     ; > To do a 16-bit write, the high byte must be written before the low byte. 
     ; > For a 16-bit read, the low byte must be read before the high byte.
 
@@ -93,7 +88,6 @@ SYSCLOCK_TIMERX_OVF_vect:
 
     ldi r17, SYSCLOCK_TIMER_TCNTL
     sts SYSCLOCK_HW_REG_TCNTXL, r17
-
     ; reset timer counter as soon as possible (to maximize accuracy)
 
     lds r17, SREG
@@ -125,7 +119,9 @@ system_shift:
     call _k_system_shift
 
 yield_from_interrupt:
-    ori r17, 1 << SREG_I ; Interrupt flag is disabled in interrupt handler, we need to set it manually in SREG
+    ; Interrupt flag is disabled in interrupt handler, 
+    ; we need to set it manually in SREG
+    ori r17, 1 << SREG_I 
 
 #if KERNEL_PREEMPTIVE_THREADS
 check_coop:
@@ -174,8 +170,16 @@ clear_interrupt_flag:
 
 scheduler_entry:
     ; calling the scheduler here helps to :
-    ; - no wasting time to push every register to restore the context of the same thread
-    ; - not use too much stack of the current thread when calling the scheduler function
+    ; - no wasting time to push every registers in the case the same thread 
+    ;   will be executed next. That would lead to restore the same whole context
+    ; - limit stack need when calling _k_scheduler
+
+    ; Before partial context save/restore
+    ; [M] CANARIES until @07B8 [found 464], MAX usage = 48 / 512
+    ; [2] CANARIES until @010A [found 5], MAX usage = 507 / 512
+    ; [1] CANARIES until @03CE [found 201], MAX usage = 55 / 256
+    ; [L] CANARIES until @04DA [found 213], MAX usage = 43 / 256
+    ; [K] CANARIES until @050B [found 6], MAX usage = 39 / 45
 
     ; [M] CANARIES until @07BC [found 468], MAX usage = 44 / 512
     ; [2] CANARIES until @010B [found 6], MAX usage = 506 / 512
@@ -183,23 +187,22 @@ scheduler_entry:
     ; [L] CANARIES until @04DE [found 217], MAX usage = 39 / 256
     ; [K] CANARIES until @050E [found 9], MAX usage = 36 / 45
 
-    ; [M] CANARIES until @07B8 [found 464], MAX usage = 48 / 512
-    ; [2] CANARIES until @010A [found 5], MAX usage = 507 / 512
-    ; [1] CANARIES until @03CE [found 201], MAX usage = 55 / 256
-    ; [L] CANARIES until @04DA [found 213], MAX usage = 43 / 256
-    ; [K] CANARIES until @050B [found 6], MAX usage = 39 / 45
+    ; After partial context save/restore
 
-    ; push these two registers now as we need them to store current _current thread locations
+    ; push Y address registers, as we need it to store _current
     push r28
     push r29
 
-    ; r28, r29 must be caller saved
-    lds r28, _current          ; load current thread addr in Y
+    ; r28, r29 shouldn't be destroyed when calling _k_scheduler
+    ; and then must be caller saved registers
+    lds r28, _current          ; load current thread address in Y
     lds r29, _current + 1
 
     call _k_scheduler 
 
-    ; r24, r25 contains new _current thread address
+    ; r24, r25 contains the address of the next thread to be executed
+
+    ; save the remaining context on thread switch
     cp r24, r28
     brne save_context2
     cp r25, r29
@@ -214,6 +217,7 @@ scheduler_entry:
 
     pop r29
     pop r28
+    ; restore the partial context saved if there is no thread switch
     jmp restore_context1
 
 save_context2:
@@ -244,7 +248,7 @@ save_sp:
     st Y+, r21
 
 restore_sp:
-    movw r28, r24   ; new current thread structure address is in (r24, r25)
+    movw r28, r24   ; new thread structure address is in (r24, r25)
 
     ld r20, Y+       ; read sp
     ld r21, Y+
@@ -253,11 +257,7 @@ restore_sp:
     sts SPH, r21
 
 restore_context2:
-    pop r17         
-    
-    ; TODO restore SREG here if k_yield (not interrupt)
-    ; we need to know if the call switch happened from an interrupt or not
-    ; if not interrupt, set SREG (and I flag potentially) is not a problem here
+    pop r17     ; load SREG in r17
 
     pop r16
     pop r15
@@ -296,16 +296,18 @@ restore_context1:
 
     pop r0
 
-    ; if I flag is set : we need to make sure to set interrupt back at the very last intruction)
-    ; else : no problem
+    ; if I flag is set : we need to make sure to set interrupt back 
+    ;   at the very last intruction
     sbrs r17, SREG_I
     jmp no_interrupt_ret
 
     cbr r17, 1 << SREG_I
-
     sts SREG, r17
+
+    ; we pop the last register
     pop r17
 
+    ; and we set enable interrupt again while returning
     reti
 
 no_interrupt_ret:
@@ -384,7 +386,7 @@ _k_thread_stack_create:
     pop r27
     pop r26
 
-    ret  ; dispath to next thread
+    ret  ; dispatch to next thread
 
 #endif
 

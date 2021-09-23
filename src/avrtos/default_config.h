@@ -167,6 +167,8 @@
 //
 #define DEFAULT_KERNEL_YIELD_ON_UNPEND          1
 
+#define DEFAULT_ALLOW_THREAD_RETURN             1
+
 /*___________________________________________________________________________*/
 
 #endif

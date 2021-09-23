@@ -145,8 +145,9 @@ void _k_kernel_init(void)
 
         /* idle thread must not be added to the 
          * runqueue as the main thread is running */
-        if (!IS_THREAD_IDLE(thread) && (thread->state == READY))
-        {
+        if (!IS_THREAD_IDLE(thread) &&
+            (thread->state == READY) &&
+            (thread != _current)) {
             push_back(runqueue, &thread->tie.runqueue);
         }
 
@@ -255,7 +256,6 @@ struct k_thread* _k_scheduler(void)
     }
 
     _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
-    _current->state = READY;
 
     __K_DBG_SCHED_NEXT(_current);  // thread symbol
 
@@ -344,7 +344,7 @@ uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
          *    if the function is called from an interrupt handler. And this
          *    is an unwished behavior.
          * 
-         * - There is not mechanisms to prevent the switch for now.
+         * - There is no mechanism to prevent the switch for now.
          * 
          * - As we cannot predict the current thread beeing processed 
          *    when an interrupt occurs and we cannot know if we 
@@ -370,6 +370,13 @@ uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
     }
     /* if no thread is pending on the object, we simply return */
     return -1;
+}
+
+/*___________________________________________________________________________*/
+
+void _k_on_thread_return(void)
+{
+    k_suspend();
 }
 
 /*___________________________________________________________________________*/

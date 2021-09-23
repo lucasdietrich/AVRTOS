@@ -43,7 +43,7 @@ typedef void (*thread_entry_t)(void*);
  * It can be wake up with function _k_wake_up()
  * 
  */
-enum thread_state_t { STOPPED = 0, RUNNING = 1, READY = 2, WAITING = 3 };
+enum thread_state_t { STOPPED = 0, READY = 1, WAITING = 2, TERMINATED = 3};
 
 /**
  * @brief This structure represents a thread, it defines:
