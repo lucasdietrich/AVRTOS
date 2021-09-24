@@ -26,6 +26,7 @@
         "stddef.h": "c",
         "mem_slab.h": "c",
         "avrtos.h": "c",
-        "tqueue.h": "c"
+        "tqueue.h": "c",
+        "oqueue.h": "c"
     }
 }

@@ -118,16 +118,20 @@ int k_thread_create(struct k_thread* const th, thread_entry_t entry,
 /*___________________________________________________________________________*/
 
 void _k_thread_entry(void* context, thread_entry_t entry)
-{    
+{
+    /* execute thread entry */
     entry(context);
 
     irq_disable();
 
+    /* terminate thread execution */
     _k_suspend();
-
     _current->state = STOPPED;
 
+    /* release CPU */
     k_yield();
+
+    __builtin_unreachable();
 }
 
 /*___________________________________________________________________________*/

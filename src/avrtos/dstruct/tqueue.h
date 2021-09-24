@@ -9,6 +9,20 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Scheduling queue data structure
+ * 
+ * - n : number of items in the list
+ * 
+ * tqueue_schedule/tqueue_pop are O(1)
+ * tqueue_remove is O(n)
+ * tqueue_shift is O(n)
+ * 
+ * TODO tqueue_remove could be optimized to O(1), using a doubly linked list
+ */
+
+/*___________________________________________________________________________*/
+
 struct titem
 {
     union

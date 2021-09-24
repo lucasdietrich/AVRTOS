@@ -20,6 +20,15 @@ void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item));
 
 /*___________________________________________________________________________*/
 
+#include "oqueue.h"
+
+//
+// OQueue
+//
+void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item));
+
+/*___________________________________________________________________________*/
+
 #include "dlist.h"
 
 //

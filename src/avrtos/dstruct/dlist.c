@@ -49,7 +49,7 @@ void pop(struct ditem *item)
 //
 // Public dlist API
 //
-// dlist references to the head and the tail of the doubly-linky-list
+// dlist references to the head and the tail of the doubly-linked-list
 
 void dlist_init(struct ditem *dlist)
 {
@@ -105,7 +105,7 @@ uint8_t dlist_count(struct ditem *dlist)
 // Public cdlist API
 //
 
-// circular dlist, ref is a pointer to the reference of the circular doubly-linky list
+// circular dlist, ref is a pointer to the reference of the circular doubly-linked list
 
 struct ditem * push_ref(struct ditem **ref, struct ditem *item)
 {

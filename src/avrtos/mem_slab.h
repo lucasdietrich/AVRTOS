@@ -24,6 +24,10 @@ extern "C" {
  * - when a block is allocated, the item is removed from the free_list
  * - when a block is freed, the item is queue to the free_list
  * 
+ * Complexity :
+ * - Initialization is O(n)
+ * - Allocation/free is O(1)
+ * 
  * Maximum number of blocks is 255
  * Maximum block size is 65535 (but technically impossible on AVR architectures)
  */

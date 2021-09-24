@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <avrtos/dstruct/oqueue.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,15 +23,16 @@ extern "C" {
  */
 struct k_fifo
 {
-    struct qitem *queue;       // fifo reference to head item
+    struct oqref queue;        // fifo reference to head item
     struct ditem waitqueue;    // waitqueue of thread waiting to get an item
 };
 
 /*___________________________________________________________________________*/
 
+
 #define K_FIFO_INIT(fifo)                       \
     {                                           \
-        .queue = NULL,                          \
+        .queue = INIT_OQREF(),                  \
         .waitqueue = DLIST_INIT(fifo.waitqueue) \
     }
 

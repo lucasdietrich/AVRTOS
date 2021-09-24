@@ -9,12 +9,22 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Simple queue data structure
+ * 
+ * - n : number of items in the list
+ * 
+ * queue action is O(n)
+ * dequeue action is O(1)
+ * 
+ */
+
+/*___________________________________________________________________________*/
+
 struct qitem
 {
-    struct qitem * next;
+    struct qitem* next;
 };
-
-// #define INIT_QUEUE()    NULL
 
 #define DEFINE_QUEUE(ref_name) struct qitem *ref_name = NULL
 
@@ -26,7 +36,12 @@ struct qitem
 
 /*___________________________________________________________________________*/
 
-void queue(struct qitem ** p_root, struct qitem * qitem);
+inline void queue_init(struct qitem ** p_root)
+{
+    *p_root = NULL;
+}
+
+void queue(struct qitem ** p_root, struct qitem * item);
 
 struct qitem * dequeue(struct qitem ** p_root);
 

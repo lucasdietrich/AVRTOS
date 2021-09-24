@@ -29,7 +29,14 @@ Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
 - thread context passing
 - debug/utils functions : RAM_DUMP, CORE_DUMP, read_ra (read return address)
-- data structures : dlist (doubly linked list), queue (singly linked list), time queue (singly linked list with delay parameter)
+- data structures : 
+  - dlist : doubly linked list
+    - raw API
+    - dlist API : queue
+    - cdlist API : circular dlist
+  - queue : singly linked list
+  - oqueue : optimized singly linked list
+  - tqueue : scheduling singly linked list for time-sorted items
 - I/O : leds, uart
 - Kernel Assertions (__ASSERT)
 - Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEOUT
@@ -61,6 +68,7 @@ What enhancements are planned :
 - Remove RUNNING state which is implicitely represented by the position of the current thread in the runqueue.
   - A thread is running if it is at the top on the runqueue
   - Also optimize the use of READY
+- Optimizing `tqueue_remove` function from O(n) to O(1) where `n` is the number of items in the time queue
 
 What enhancements/features are not planned :
 - Prioritization

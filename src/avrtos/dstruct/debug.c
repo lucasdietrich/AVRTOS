@@ -12,6 +12,18 @@ void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item))
     usart_transmit('\n');
 }
 
+void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item))
+{
+    struct qitem *item = oref->head;
+    usart_print("[H]");
+    while (item != NULL) {
+        usart_print(" > ");
+        qitem_printer(item);
+        item = item->next;
+    }
+    usart_printl(" > [T]");
+}
+
 void print_dlist(struct ditem *dlist, void (*ditem_printer)(struct ditem *item))
 {
     uint16_t counter = 0;

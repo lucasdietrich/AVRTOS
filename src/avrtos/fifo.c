@@ -1,13 +1,13 @@
 #include "fifo.h"
 
 #include <avrtos/kernel.h>
-#include <avrtos/dstruct/queue.h>
+#include <avrtos/dstruct/oqueue.h>
 
 #define K_MODULE    K_MODULE_FIFO
 
 void k_fifo_init(struct k_fifo* fifo)
 {
-    fifo->queue = NULL;
+    oqref_init(&fifo->queue);
     dlist_init(&fifo->waitqueue);
 }
 
@@ -24,7 +24,7 @@ void k_fifo_put(struct k_fifo* fifo, struct qitem* item)
          */
         if (_k_unpend_first_thread(&fifo->waitqueue, (void*) item) != 0) {
             /* otherwise we queue the item to the fifo */
-            queue(&fifo->queue, item);
+            oqueue(&fifo->queue, item);
         }
     }
 }
@@ -35,7 +35,7 @@ struct qitem* k_fifo_get(struct k_fifo* fifo, k_timeout_t timeout)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        struct qitem* item = dequeue(&fifo->queue);
+        struct qitem* item = odequeue(&fifo->queue);
         if (item == NULL) {
             if (_k_pend_current(&fifo->waitqueue, timeout) == 0) {
                 item = (struct qitem*) _current->swap_data;
@@ -56,7 +56,7 @@ struct qitem* k_fifo_peek_head(struct k_fifo* fifo)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        return fifo->queue;
+        return opeek_head(&fifo->queue);
     }
 
     __builtin_unreachable();
@@ -66,13 +66,7 @@ struct qitem* k_fifo_peek_tail(struct k_fifo* fifo)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        struct qitem* item = fifo->queue;
-        if (item != NULL) {
-            while (item->next != NULL) {
-                item = item->next;
-            }
-        }
-        return item;
+        return opeek_tail(&fifo->queue);
     }
 
     __builtin_unreachable();

@@ -11,6 +11,7 @@
 #include "multithreading.h"
 
 #include "dstruct/queue.h"
+#include "dstruct/oqueue.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
 #include "dstruct/debug.h"
