@@ -266,18 +266,38 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
-| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. |
+| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread 
+| THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
+when the object become  available. |
 
 ## Known issues
 
 - For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc automatically switch to the first thread waiting on the object (this will probably be changed). If the function is called from an interrupt, it could preempt a cooperative thread if the function is called from an interrupt handler. And this is an unwished behavior.
-  - There is no mechanism to prevent the switch for now.
   - As we cannot predict the current thread beeing processed when an interrupt occurs and we cannot know if we 
   are actually in an interrupt handler (when calling k_fifo_put for example), I decided the default behavior as described above.
   - First, I wanted to automatically switch to the thread waiting on an object when it became available, but this should probably be changed ...
-  - Nothing is yet planned to prevent the developper from doing weird things from interrupt handlers.
+  - For now, setting configuration option `KERNEL_YIELD_ON_UNPEND` to `0` prevent the switch.
+  - Moreover nothing is yet planned to prevent the developper from doing weird things from interrupt handlers.
 
-See `KERNEL_YIELD_ON_UNPEND` configuration option.
+
+- Set stack pointer only one time, remove instructions `b4` to `ba` (.init2):
+  - See linker script
+```s
+000000b0 <__ctors_end>:
+  b0:	11 24       	eor	r1, r1    ; clear r1
+  b2:	1f be       	out	0x3f, r1	; clear SREG
+
+  b4:	cf ef       	ldi	r28, 0xFF	; SPL
+  b6:	d8 e0       	ldi	r29, 0x08	; SPH
+  b8:	de bf       	out	0x3e, r29	; set SPH
+  ba:	cd bf       	out	0x3d, r28	; set SPL
+
+  bc:	ce ea       	ldi	r28, 0xAE	; SPL
+  be:	d7 e0       	ldi	r29, 0x07	; SPH
+  c0:	cd bf       	out	0x3d, r28	; set SPL
+  c2:	de bf       	out	0x3e, r29	; set SPH
+```
+
 ## Debugging
 
 ### Emulate with QEMU and debug

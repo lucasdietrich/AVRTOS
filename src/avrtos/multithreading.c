@@ -55,17 +55,28 @@ void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
     uint8_t* sp = (uint8_t*) stack_end - 1;
 
     // add return addr to stack (with format >> 1)
+#if THREAD_ALLOW_RETURN == 1
     *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) _k_thread_entry);
+#else
+    *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) entry);    
+#endif
     sp -= 1u;
 
-    for (uint_fast8_t i = 0u; i < 6u + _K_ARCH_STACK_SIZE_FIXUP; i++) {
+#if THREAD_ALLOW_RETURN == 1
+    const uint8_t ilimit = 6u + _K_ARCH_STACK_SIZE_FIXUP;
+#else
+    const uint8_t ilimit = 8u + _K_ARCH_STACK_SIZE_FIXUP;
+#endif
+    for (uint_fast8_t i = 0u; i < ilimit; i++) {
         *sp-- = 0u;
     }
 
+#if THREAD_ALLOW_RETURN == 1
     // set entry (p)
     sp -= 1u;
     *(uint16_t*)sp = K_SWAP_ENDIANNESS((uint16_t) entry);
     sp -= 1u;
+#endif
 
     // set context (p)
     sp -= 1u;

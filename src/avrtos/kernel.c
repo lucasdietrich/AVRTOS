@@ -160,9 +160,11 @@ void _k_kernel_init(void)
             /* thread kernel entry function address */
             swap_endianness(thread->stack.end - 1u);
 
+#if THREAD_ALLOW_RETURN == 1
             /* thread kernel entry function address */
             swap_endianness(thread->stack.end - 1u -
                 (6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+#endif
 
             /* thread context address */
             swap_endianness(thread->stack.end - 1u -

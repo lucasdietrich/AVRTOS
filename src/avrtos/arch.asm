@@ -347,23 +347,34 @@ _k_thread_stack_create:
     ; ror r22
 
     ; add return addr to stack (with format >> 1)
+#if THREAD_ALLOW_RETURN == 1
     ldi r20, lo8(_k_thread_entry)
     ldi r21, hi8(_k_thread_entry)
     lsr r21
     ror r20
     st -X, r20 ; SPL
     st -X, r21 ; SPH
+#else
+    st -X, r22 ; SPL
+    st -X, r23 ; SPH
+#endif
 
     ; push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
     ldi r28, 0x00
+#if THREAD_ALLOW_RETURN == 1
     ldi r29, 6 + _K_ARCH_STACK_SIZE_FIXUP
+#else
+    ldi r29, 8 + _K_ARCH_STACK_SIZE_FIXUP
+#endif
     dec r29
     st -X, r28
     brne .-6
 
+#if THREAD_ALLOW_RETURN == 1
     ; entry ~ push r22 > r23
     st -X, r22
     st -X, r23
+#endif
 
     ; void * context ~ push r24 > r25
     st -X, r18

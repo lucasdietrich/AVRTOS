@@ -170,7 +170,7 @@
 //
 // Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks)
 //
-#define DEFAULT_ALLOW_THREAD_RETURN             1
+#define DEFAULT_THREAD_ALLOW_RETURN             0
 
 /*___________________________________________________________________________*/
 

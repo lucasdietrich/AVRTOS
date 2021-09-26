@@ -278,10 +278,10 @@
 #   define KERNEL_YIELD_ON_UNPEND DEFAULT_KERNEL_YIELD_ON_UNPEND
 #endif
 
-#ifdef CONFIG_ALLOW_THREAD_RETURN
-#   define ALLOW_THREAD_RETURN CONFIG_ALLOW_THREAD_RETURN
+#ifdef CONFIG_THREAD_ALLOW_RETURN
+#   define THREAD_ALLOW_RETURN CONFIG_THREAD_ALLOW_RETURN
 #else
-#   define ALLOW_THREAD_RETURN DEFAULT_ALLOW_THREAD_RETURN
+#   define THREAD_ALLOW_RETURN DEFAULT_THREAD_ALLOW_RETURN
 #endif
 
 
@@ -373,11 +373,9 @@ typedef struct
 #define THREAD_FROM_WAITQUEUE(item) CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
-#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
-    struct                                                                 \
-    {                                                                      \
-        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE];              \
-        struct                                                             \
+#if THREAD_ALLOW_RETURN == 1
+
+#define _K_CORE_CONTEXT_STRUCT() struct                                    \
         {                                                                  \
             uint8_t sreg;                                                  \
             uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
@@ -385,32 +383,48 @@ typedef struct
             thread_entry_t *entry;                                         \
             uint8_t r17r0r18_r21_3Baddrmsb[6u + _K_ARCH_STACK_SIZE_FIXUP]; \
             void *k_thread_entry;                                          \
-        } base;                                                            \
-    } _k_stack_buf_##name = {                                              \
-        {0x00},                                                            \
+        }
+
+#define _K_CORE_CONTEXT(entry, context_p)                                  \
         {THREAD_DEFAULT_SREG,                                              \
          {0x00},                                                           \
          (void*) context_p,                                                \
          (thread_entry_t*) entry,                                          \
          {0x00},                                                           \
-         (void*) _k_thread_entry}}
+         (void*) _k_thread_entry}
+
+#else
+
+#define _K_CORE_CONTEXT_STRUCT() struct                                    \
+        {                                                                  \
+            uint8_t sreg;                                                  \
+            uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
+            void *context;                                                 \
+            uint8_t r17r0r18_r21_3Baddrmsb[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
+            thread_entry_t *entry;                                         \
+        }
+
+#define _K_CORE_CONTEXT(entry, context_p)                                  \
+        {THREAD_DEFAULT_SREG,                                              \
+         {0x00},                                                           \
+         (void*) context_p,                                                \
+         {0x00},                                                           \
+         (thread_entry_t*) entry}
+
+#endif
+
+#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
+    struct                                                                 \
+    {                                                                      \
+        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE];              \
+        _K_CORE_CONTEXT_STRUCT() base;                                     \
+    } _k_stack_buf_##name = {                                              \
+        {0x00},                                                            \
+       _K_CORE_CONTEXT(entry, context_p)}
 
 #define _K_STACK_MIN_INITIALIZER(name, entry, context_p)     \
-    struct                                                   \
-    {                                                        \
-        uint8_t sreg;                                        \
-        uint8_t r26_r27r30r31r28r29r1_r16[22u];              \
-        void *context;                                       \
-        thread_entry_t *entry;                               \
-        uint8_t r17r0r18_r21[6u + _K_ARCH_STACK_SIZE_FIXUP]; \
-        void *k_thread_entry;                                \
-    } _k_stack_buf_##name = {                                \
-        THREAD_DEFAULT_SREG,                                 \
-        {0x00},                                              \
-        (void*) context_p,                                   \
-        (thread_entry_t*) entry,                             \
-        {0x00},                                              \
-        (void*) _k_thread_entry}
+    _K_CORE_CONTEXT_STRUCT() _k_stack_buf_##name =           \
+    _K_CORE_CONTEXT(entry, context_p)
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \
