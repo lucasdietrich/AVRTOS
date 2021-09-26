@@ -113,7 +113,10 @@ int8_t _k_mem_slab_free(struct k_mem_slab* slab, void* mem)
 void k_mem_slab_free(struct k_mem_slab* slab, void* mem)
 {
     __ASSERT_NOTNULL(slab);
-    __ASSERT_NOTNULL(mem);
+    
+    if (mem == NULL) {
+        return;
+    }
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
