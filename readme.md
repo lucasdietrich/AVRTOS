@@ -266,9 +266,9 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
-| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread 
+| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
 | THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
-when the object become  available. |
+
 
 ## Known issues
 
