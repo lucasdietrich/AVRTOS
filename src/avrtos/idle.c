@@ -8,10 +8,8 @@
 // few problems:
 // - _k_scheduler function is using current thread stack, when all registers are pushed (35-36) : 
 //  minimal stacks may be full already when calling the scheduler
-// - saving thread context in interrupts can create problem when preempting idle thread
-// - solution is to move scheduler before having pushed all the registers
 // - using a stack for idle is not a good idea to me
-// - or use this idle thread to do kernel works (as k_works/workqueue, etc...), call it "system thread/kernel thread"
+// - use this idle thread to do kernel works, like IDK ??
 //
 
 K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, 'I');

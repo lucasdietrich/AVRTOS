@@ -366,7 +366,8 @@ uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
          *   things from interrupt handlers.
          * 
          * IDEA but impossible : yield to this thread if the current thread 
-         *   isn't cooperative and we are in an interrupt */
+         *   isn't cooperative and we are in an interrupt 
+         */
 #if KERNEL_YIELD_ON_UNPEND
         k_yield();
 #endif
