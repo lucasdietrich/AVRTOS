@@ -27,6 +27,8 @@
         "mem_slab.h": "c",
         "avrtos.h": "c",
         "tqueue.h": "c",
-        "oqueue.h": "c"
+        "oqueue.h": "c",
+        "led.h": "c",
+        "delay.h": "c"
     }
 }

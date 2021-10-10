@@ -27,6 +27,7 @@ extern "C" {
 #define K_MODULE_WORKQUEUE      13
 #define K_MODULE_FIFO           14
 #define K_MODULE_MEMSLAB        15
+#define K_MODULE_TIMER          16
 
 /*___________________________________________________________________________*/
 

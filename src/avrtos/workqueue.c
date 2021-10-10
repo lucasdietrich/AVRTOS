@@ -12,13 +12,12 @@
 
 void _k_workqueue_entry(struct k_workqueue* const workqueue)
 {
-    sei();
+    struct ditem* item;
 
     for (;;) {
-        k_sched_lock();
-        const bool yield = (bool)TEST_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
-        struct ditem* const item = dlist_dequeue(&workqueue->queue);
-        k_sched_unlock();
+        ATOMIC_BLOCK(ATOMIC_FORCEON) {
+            item = dlist_dequeue(&workqueue->queue);
+        }
 
         if (DITEM_VALID(&workqueue->queue, item)) {
             /* set the work as "submittable" */
@@ -29,7 +28,7 @@ void _k_workqueue_entry(struct k_workqueue* const workqueue)
             work->handler(work);
 
             /* yield if "yieldeach" option is enabled */
-            if (yield) {
+            if (TEST_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH)) {
                 k_yield();
             }
         } else {

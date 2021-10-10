@@ -43,6 +43,8 @@
 ; initialize mem slabs defined at compilation
     call _k_mem_slab_init_module
 
+    call _k_timer_init_module
+
 ; initialize canaries in threads stacks
 #if THREAD_CANARIES
     call _k_init_thread_canaries

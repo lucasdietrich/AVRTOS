@@ -3,6 +3,8 @@
 
 #include <avrtos/defines.h>
 
+.extern _k_timers_process
+
 /*___________________________________________________________________________*/
 
 .global __k_interrupts
@@ -117,6 +119,9 @@ system_shift:
     call usart_transmit
 #endif
     call _k_system_shift
+
+timers_handlers_exec:
+    call _k_timers_process
 
 yield_from_interrupt:
     ; Interrupt flag is disabled in interrupt handler, 

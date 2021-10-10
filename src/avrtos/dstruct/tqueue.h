@@ -88,6 +88,14 @@ void tqueue_schedule(struct titem** root,
 void tqueue_shift(struct titem** root, k_delta_ms_t time_passed);
 
 /**
+ * @brief 
+ * 
+ * @param root 
+ * @return struct titem* 
+ */
+struct titem* tqueue_pop_reschedule(struct titem** root, k_delta_ms_t timeout);
+
+/**
  * @brief Pop an item from the time queue.
  * 
  * Note: this function doesn't set the poped item->next parameter to null.

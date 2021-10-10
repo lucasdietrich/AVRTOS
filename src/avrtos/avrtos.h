@@ -27,6 +27,7 @@
 #include "workqueue.h"
 #include "mutex.h"
 #include "semaphore.h"
+#include "timer.h"
 
 #include "fifo.h"
 #include "mem_slab.h"

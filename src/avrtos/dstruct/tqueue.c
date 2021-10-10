@@ -85,6 +85,15 @@ struct titem * tqueue_pop(struct titem **root)
     return item;
 }
 
+struct titem* tqueue_pop_reschedule(struct titem** root, k_delta_ms_t timeout)
+{
+    struct titem* item = tqueue_pop(root);
+    if (item != NULL) {
+        tqueue_schedule(root, item, timeout);
+    }
+    return item;
+}
+
 void tqueue_remove(struct titem **root, struct titem *item)
 {
     struct titem** prev_next_p = root;

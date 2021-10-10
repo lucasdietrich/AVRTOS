@@ -25,8 +25,6 @@ static inline bool _k_runqueue_single(void)
     return runqueue->next == runqueue;
 }
 
-extern bool __k_interrupts(void);
-
 /*___________________________________________________________________________*/
 
 //
@@ -202,7 +200,9 @@ void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 
     if (timeout.value != K_FOREVER.value)
     {
-        tqueue_schedule(&events_queue, &_current->tie.event, timeout.value);
+        _current->tie.event.timeout = timeout.value;
+        _current->tie.event.next = NULL;
+        _tqueue_schedule(&events_queue, &_current->tie.event);
     }
 }
 
@@ -304,6 +304,8 @@ void _k_system_shift(void)
 
 int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
+    __ASSERT_NOINTERRUPT();
+
     int8_t err = -1;
     if (timeout.value != 0) {
         /* queue thread to waiting queue of the object */
@@ -329,6 +331,8 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
     
 uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
 {
+    __ASSERT_NOINTERRUPT();
+    
     struct ditem* pending_thread = dlist_dequeue(waitqueue);
     if (DITEM_VALID(waitqueue, pending_thread)) {
         struct k_thread* th = THREAD_FROM_WAITQUEUE(pending_thread);

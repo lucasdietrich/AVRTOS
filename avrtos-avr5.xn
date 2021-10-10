@@ -183,6 +183,10 @@ SECTIONS
     *(.k_mem_slabs)
     KEEP(SORT(*)(.k_mem_slabs))
     PROVIDE (__k_mem_slabs_end = .);
+    PROVIDE (__k_timers_start = .);
+    *(.k_timers)
+    KEEP(SORT(*)(.k_timers))
+    PROVIDE (__k_timers_end = .);
     PROVIDE (__data_end = .) ;
   }  > data AT> text
   .bss  ADDR(.data) + SIZEOF (.data)   : AT (ADDR (.bss))

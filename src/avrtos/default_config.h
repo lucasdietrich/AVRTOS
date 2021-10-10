@@ -172,6 +172,11 @@
 //
 #define DEFAULT_THREAD_ALLOW_RETURN             0
 
+//
+// Enable timers support
+//
+#define DEFAULT_KERNEL_TIMERS                   1
+
 /*___________________________________________________________________________*/
 
 #endif

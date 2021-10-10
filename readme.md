@@ -24,6 +24,7 @@ Following features are supported:
 - Fifo
 - Memory slabs
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
+- Timers
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -69,6 +70,9 @@ What enhancements are planned :
   - A thread is running if it is at the top on the runqueue
   - Also optimize the use of READY
 - Optimizing `tqueue_remove` function from O(n) to O(1) where `n` is the number of items in the time queue
+  - Optimizing corresponding code in the kernel
+- Optimizing timers code
+- Unifying `k_timeout_t` and `k_delay_ms_t` types
 
 What enhancements/features are not planned :
 - Prioritization
