@@ -15,7 +15,7 @@ void _k_workqueue_entry(struct k_workqueue* const workqueue)
     struct ditem* item;
 
     for (;;) {
-        ATOMIC_BLOCK(ATOMIC_FORCEON) {
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
             item = dlist_dequeue(&workqueue->queue);
         }
 

@@ -23,7 +23,7 @@ void _k_timer_init_module(void)
     for (uint8_t i = 0; i < timers_count; i++)
     {
         struct k_timer *timer = &(&__k_timers_start)[i];
-        if (!K_TIMEOUT_EQ(timer->timeout, K_FOREVER)) {
+        if (timer->tie.timeout != K_TIMER_STOPPED) {
             _k_timer_start(timer, K_MSEC(timer->tie.timeout));
         }
     }
@@ -33,7 +33,7 @@ void _k_timer_start(struct k_timer* timer, k_timeout_t starting_delay)
 {
     __ASSERT_NOTNULL(timer);
 
-    ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         tqueue_schedule(&_k_timers_runqueue, &timer->tie, starting_delay.value);
     }
 }
@@ -80,7 +80,11 @@ bool k_timer_started(struct k_timer* timer)
 {
     __ASSERT_NOTNULL(timer);
 
-    return !K_TIMEOUT_EQ(K_MSEC(timer->tie.timeout), K_FOREVER);
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        return timer->tie.timeout != K_TIMER_STOPPED;
+    }
+    
+    __builtin_unreachable();
 }
 
 int8_t k_timer_stop(struct k_timer* timer)
@@ -91,7 +95,7 @@ int8_t k_timer_stop(struct k_timer* timer)
         return -1;
     }
     
-    ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         tqueue_remove(&_k_timers_runqueue, &timer->tie);
     }
     timer->timeout = K_FOREVER;

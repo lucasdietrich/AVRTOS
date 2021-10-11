@@ -30,7 +30,6 @@
 
 #define EWOULDBLOCK EAGAIN
 
-
 /*___________________________________________________________________________*/
 
 // arch specific fixups
@@ -284,10 +283,6 @@
 #   define THREAD_ALLOW_RETURN DEFAULT_THREAD_ALLOW_RETURN
 #endif
 
-
-
-
-
 /*___________________________________________________________________________*/
 
 // put all c specific definition  here
@@ -310,10 +305,10 @@ typedef struct
 
 #define K_TIMEOUT_EQ(t1, t2)    (t1.value == t2.value)
 
-#define K_SECONDS(delay_s)      ((k_timeout_t){(k_delta_ms_t) (delay_s * 1000)})
-#define K_MSEC(delay_ms)        ((k_timeout_t){(k_delta_ms_t) (delay_ms)})
-#define K_NO_WAIT               ((k_timeout_t){(k_delta_ms_t) (0)})
-#define K_FOREVER               ((k_timeout_t){(k_delta_ms_t) (-1)})
+#define K_SECONDS(delay_s)      ((k_timeout_t){.value = 1000*delay_s})
+#define K_MSEC(delay_ms)        ((k_timeout_t){.value = delay_ms})
+#define K_NO_WAIT               ((k_timeout_t){.value = 0})
+#define K_FOREVER               ((k_timeout_t){.value = -1})
 #define K_UNTIL_WAKEUP          K_FOREVER
 
 #define HTONL(n) ((((((uint32_t)(n) & 0xFF)) << 24) |      \
