@@ -9,6 +9,7 @@
 
 #include "defines.h"
 #include "multithreading.h"
+#include "init.h"
 
 #include "dstruct/queue.h"
 #include "dstruct/oqueue.h"
