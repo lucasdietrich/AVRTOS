@@ -17,7 +17,7 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 K_THREAD struct k_thread _k_thread_main = {
     .sp = NULL, // main thread is running, context already "restored"
     {
-        .flags = READY | K_PRIO_PREEMPT(K_PRIO_MAX),
+        .flags = READY | K_PREEMPTIVE,
     },
     .tie = {
         .runqueue = {   // thread in before initialisation at the top of the runqueue (is actually the reference element)

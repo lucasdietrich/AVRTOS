@@ -25,7 +25,7 @@ K_WORK_DEFINE(mywork, work_handler);
 K_TIMER_DEFINE(mytimer1, handler1, K_MSEC(100), 0);
 K_TIMER_DEFINE(mytimer2, handler2, K_MSEC(100), K_TIMER_STOPPED);
 
-K_THREAD_DEFINE(th2, thread2, 0x100, K_PRIO_PREEMPT(K_PRIO_MAX), NULL, 'A');
+K_THREAD_DEFINE(th2, thread2, 0x100, K_PREEMPTIVE, NULL, 'A');
 
 int main(void)
 {

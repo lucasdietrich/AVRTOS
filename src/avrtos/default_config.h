@@ -39,7 +39,7 @@
 //
 // Define the main thread type (coop/prempt) and priority
 //
-#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY         K_PRIO_PREEMPT(K_PRIO_HIGH)
+#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY         K_PREEMPTIVE
 
 //
 // Tells if the main stack location and size must be defined at compilation time (1)
@@ -154,7 +154,7 @@
 //
 // Define system workqueue thread priority
 //
-#define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       K_PRIO_PREEMPT(K_PRIO_HIGH)
+#define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       K_PREEMPTIVE
 
 //
 // Enable kernel assertion test for debug purpose

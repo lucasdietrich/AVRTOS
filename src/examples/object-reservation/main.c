@@ -20,9 +20,9 @@ k_timeout_t timeouts[3] = {
   K_SECONDS(1)
 };
 
-K_THREAD_DEFINE(waiter1, waiting_thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), &timeouts[0], 'A');
-K_THREAD_DEFINE(waiter2, waiting_thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), &timeouts[1], 'B');
-K_THREAD_DEFINE(waiter3, waiting_thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), &timeouts[2], 'C');
+K_THREAD_DEFINE(waiter1, waiting_thread, 0x100, K_PREEMPTIVE, &timeouts[0], 'A');
+K_THREAD_DEFINE(waiter2, waiting_thread, 0x100, K_PREEMPTIVE, &timeouts[1], 'B');
+K_THREAD_DEFINE(waiter3, waiting_thread, 0x100, K_PREEMPTIVE, &timeouts[2], 'C');
 K_MUTEX_DEFINE(mymutex);
 
 int main(void)

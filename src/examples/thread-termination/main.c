@@ -16,10 +16,10 @@ void thread_canaries_entry(void* _c);
 #endif
 
 K_THREAD_DEFINE(thread, thread_entry, 0x100,
-    K_PRIO_PREEMPT(K_PRIO_LOW), &s_thread, 'T');
+    K_PREEMPTIVE, &s_thread, 'T');
 
 // K_THREAD_DEFINE(thread_canaries, thread_canaries_entry, 0x100,
-//     K_PRIO_PREEMPT(K_PRIO_LOW), &s_thread, 'C');
+//     K_PREEMPTIVE, &s_thread, 'C');
 
 K_SEM_DEFINE(mysem, 0, 1);
 
@@ -45,7 +45,7 @@ int main(void)
             K_STACK_START(s_thread->stack.end,
                 s_thread->stack.size),
             s_thread->stack.size,
-            K_PRIO_PREEMPT(K_PRIO_MAX), NULL, 'T');
+            K_PREEMPTIVE, NULL, 'T');
 
         usart_printl("Thread started again");
         k_start(s_thread);

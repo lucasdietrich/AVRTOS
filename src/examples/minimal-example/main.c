@@ -12,9 +12,9 @@ uint8_t on = 1u;
 uint8_t off = 0u;
 
 K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
-K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void*)&on, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void*)&off, 'F');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), NULL, 'C');
+K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PREEMPTIVE, (void*)&on, 'O');
+K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PREEMPTIVE, (void*)&off, 'F');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PREEMPTIVE, NULL, 'C');
 
 int main(void)
 {

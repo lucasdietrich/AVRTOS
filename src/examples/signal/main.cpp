@@ -10,7 +10,7 @@
 
 void waiter(void *context);
 
-K_THREAD_DEFINE(w1, waiter, 0x100, K_PRIO_PREEMPT(K_PRIO_MIN), NULL, 'W');
+K_THREAD_DEFINE(w1, waiter, 0x100, K_PREEMPTIVE, NULL, 'W');
 K_SIGNAL_DEFINE(sig);
 
 /*___________________________________________________________________________*/

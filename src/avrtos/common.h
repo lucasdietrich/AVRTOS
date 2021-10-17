@@ -33,7 +33,10 @@
 // (K_FLAG_READY | K_FLAG_PREEMPT | ((p & 0b11) << 3))
 #define K_PRIO_COOP(p)              (K_FLAG_COOP | ((p & 0b11) << K_FLAG_PRIO_SHIFT))
 
-#define K_PRIO_DEFAULT              K_PRIO_PREEMPT(K_PRIO_HIGH)
+#define K_COOPERATIVE               K_PRIO_COOP(K_PRIO_HIGH)
+#define K_PREEMPTIVE                K_PRIO_PREEMPT(K_PRIO_HIGH)
+
+#define K_PRIO_DEFAULT              K_PREEMPTIVE
 #define K_STOPPED                   K_FLAG_STOPPED
 
 #define K_FLAG_TIMER_EXPIRED_SHIFT   6
