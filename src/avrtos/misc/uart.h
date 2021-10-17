@@ -28,9 +28,10 @@ extern "C" {
 #define BAUD_250000     250000
 #define BAUD_500000     500000
 #define BAUD_1000000    1000000
-#define BAUDRATE BAUD_500000
 
-#define UBRR ((F_CPU >> 4) / BAUDRATE) - 1
+#define UBRR_BAUDRATE(baudrate) (((F_CPU >> 4) / baudrate) - 1)
+
+#define UBRR UBRR_BAUDRATE(BAUD_500000)
 
 /**
  * @brief Initiliaze the USART with the baudrate specified as argument
