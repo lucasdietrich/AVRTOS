@@ -305,7 +305,7 @@ typedef struct
 
 #define K_TIMEOUT_EQ(t1, t2)    (t1.value == t2.value)
 
-#define K_SECONDS(delay_s)      ((k_timeout_t){.value = 1000*delay_s})
+#define K_SECONDS(delay_s)      ((k_timeout_t){.value = 1000u*delay_s})
 #define K_MSEC(delay_ms)        ((k_timeout_t){.value = delay_ms})
 #define K_NO_WAIT               ((k_timeout_t){.value = (k_delta_ms_t) 0})
 #define K_FOREVER               ((k_timeout_t){.value = (k_delta_ms_t) -1})
