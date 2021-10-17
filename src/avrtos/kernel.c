@@ -124,7 +124,7 @@ void k_start(struct k_thread *th)
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
-uint8_t _k_thread_count = 1;
+uint8_t _k_thread_count = 0;
 
 inline static void swap_endianness(uint16_t * const addr)
 {
