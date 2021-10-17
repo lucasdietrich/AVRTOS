@@ -72,6 +72,7 @@ What enhancements are planned :
   - Optimizing corresponding code in the kernel
 - Optimizing timers code
 - Unifying `k_timeout_t` and `k_delta_ms_t` types
+- Move the examples from a directory above
 
 What enhancements/features are not planned :
 - Prioritization
