@@ -27,6 +27,8 @@ extern "C" {
 #define K_SIGNAL_DEFINE(signal_name) \
     static struct k_signal signal_name = K_SIGNAL_INIT(signal_name)
 
+#define K_SIGNAL_SET_UNREADY(signal) (signal)->flags = K_POLL_STATE_NOT_READY
+
 /*___________________________________________________________________________*/
 
 struct k_signal
