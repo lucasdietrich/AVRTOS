@@ -1,8 +1,8 @@
 #ifndef _AVRTOS_CANARIES_H_
 #define _AVRTOS_CANARIES_H_
 
-#include "multithreading.h"
-
+#include "avrtos.h"
+    
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -10,8 +10,12 @@ extern "C" {
 /*___________________________________________________________________________*/
 
 /**
- * @brief Automatically initialize thread canaries in stack if configuration option THREAD_CANARIES is enabled.
- * Stack is filled with symbol THREAD_CANARIES_SYMBOL (default 0xAA = 0b10101010)
+ * @brief Automatically initialize thread canaries in stack 
+ * if configuration option THREAD_CANARIES is enabled.
+ * 
+ * Stack is filled with symbol THREAD_CANARIES_SYMBOL 
+ * 
+ * Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010
  */
 void _k_init_thread_canaries(void);
 
@@ -20,7 +24,8 @@ void _k_init_thread_canaries(void);
  * i.e. We loop until we found canaries for the thread {th}.
  * 
  * @param th 
- * @return void* Address of byte following the last found canary. (Address of the furthest stack location used by the thread.)
+ * @return void* Address of byte following the last found canary. 
+ * (Address of the furthest stack location used by the thread.)
  */
 void* _k_thread_canaries(struct k_thread *th);
 

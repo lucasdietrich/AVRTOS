@@ -12,14 +12,13 @@
 
 /*___________________________________________________________________________*/
 
-void task_handler(struct k_work* self)
-{
-  k_sleep(K_SECONDS(1));
+#define PERIOD  1000
 
-  usart_printl("Hello");
-}
+/*___________________________________________________________________________*/
 
-K_WORK_DEFINE(work, task_handler);
+void thread_led(void *p);
+
+K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'L');
 
 /*___________________________________________________________________________*/
 
@@ -30,14 +29,19 @@ int main(void)
   
   k_thread_dump_all();
 
-  sei();
+  k_sleep(K_FOREVER);
+}
 
-  while(true)
+void thread_led(void *p)
+{
+  while (1)
   {
-    k_system_workqueue_submit(&work);
-    k_system_workqueue_submit(&work);
+    k_thread_dump(_current);
 
-    k_sleep(K_SECONDS(2));
+    led_on();
+    k_sleep(K_MSEC(PERIOD));
+    led_off();
+    k_sleep(K_MSEC(PERIOD));
   }
 }
 

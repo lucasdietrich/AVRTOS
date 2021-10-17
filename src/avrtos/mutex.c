@@ -21,14 +21,12 @@ uint8_t k_mutex_lock(struct k_mutex* mutex, k_timeout_t timeout)
         if (lock != 0) {
             lock = _k_pend_current(&mutex->waitqueue, timeout);
         }
+
+        if (lock == 0) {
+            __K_DBG_MUTEX_LOCKED(_current);    // }
+            mutex->owner = _current;
+        }
     }
-
-    if (lock == 0) {
-        __K_DBG_MUTEX_LOCKED(_current);    // }
-
-        mutex->owner = _current;
-    }
-
     return lock;
 }
 

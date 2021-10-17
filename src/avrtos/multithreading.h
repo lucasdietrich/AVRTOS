@@ -9,23 +9,10 @@
 
 #include <stddef.h>
 
-#include "defines.h"
-#include "assert.h"
-
-#include "sysclock.h"
-#include "idle.h"
-#include "canaries.h"
-
-#include "dstruct/queue.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
 
-#include "workqueue.h"
-#include "mutex.h"
-#include "semaphore.h"
-
-#include "fifo.h"
-#include "mem_slab.h"
+#include "multithreading.h"
 
 /*___________________________________________________________________________*/
 
@@ -56,7 +43,7 @@ typedef void (*thread_entry_t)(void*);
  * It can be wake up with function _k_wake_up()
  * 
  */
-enum thread_state_t { STOPPED = 0, RUNNING = 1, READY = 2, WAITING = 3 };
+enum thread_state_t { STOPPED = 0, READY = 1, WAITING = 2, _UNDEFINED = 3};
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -78,10 +65,6 @@ struct k_thread
             uint8_t state : 2;          // @see thread_state_t
             uint8_t coop : 1;           // cooperative/preemptive thread
             uint8_t priority : 2;       // thread priority : not supported for now
-            uint8_t immediate : 1;      // tell that the thread is the next to be executed 
-                                        // and should not be reordered (by the scheduler for example)
-                                        // this flag is not persistent and will be cleared when the thread is executed
-                                        // TODO, maybe remove this immediate flag and push event ready thread after the normally next thread
             uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
         };
         uint8_t flags;
@@ -107,7 +90,6 @@ struct k_thread
         size_t size;                    // stack size
     } stack;                            // thread stack definition
     char symbol;                        // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
-    
 };
 
 /**
@@ -163,6 +145,10 @@ int k_thread_create(struct k_thread* const th, thread_entry_t entry,
  */
 void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
     void* const stack, void* const context_p);
+
+/*___________________________________________________________________________*/
+
+void _k_thread_entry(void* context, thread_entry_t entry);
 
 /*___________________________________________________________________________*/
 

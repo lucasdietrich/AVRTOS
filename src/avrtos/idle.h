@@ -1,10 +1,10 @@
 #ifndef _IDLE_H_
 #define _IDLE_H_
 
-#include "multithreading.h"
-
 #include <stddef.h>
 #include <stdbool.h>
+
+#include "avrtos.h"
 
 #ifdef __cplusplus
 extern "C" {

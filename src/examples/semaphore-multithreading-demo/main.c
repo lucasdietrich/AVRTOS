@@ -61,7 +61,7 @@ int main(void)
   }
 }
 
-void waiter_entry(void*)
+void waiter_entry(void* context)
 {
   while(1)
   {

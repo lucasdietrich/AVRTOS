@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-#include "multithreading.h"
+#include "avrtos.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +63,8 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
  * again for a semaphore availability. 
  * (current thread is removed from the waiting queue).
  * 
- * Don't take a semaphore from an interrupt routine if timeout is not K_NO_WAIT.
+ * Cannot be called from an interrupt routine 
+ * if timeout is different from K_NO_WAIT.
  * 
  * @param sem address of the semaphore structure
  * @param timeout time waiting the semaphore (e.g. K_NO_WAIT, K_MSEC(1000), K_FOREVER)
@@ -73,7 +74,9 @@ K_NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
  * @brief Give a semaphore, wake up the first waiting thread if the waiting 
- * queue is not empty, do k_yield.
+ * queue is not empty.
+ * 
+ * Switch thread before returning if a thread is waiting on a semaphores.
  * 
  * This function sets interrupt flag when returning.
  * 

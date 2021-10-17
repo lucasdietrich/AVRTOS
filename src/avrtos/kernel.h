@@ -1,11 +1,13 @@
 #ifndef _AVRTOS_KERNEL_H
 #define _AVRTOS_KERNEL_H
 
-#include "multithreading.h"
+#include "avrtos.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern bool __k_interrupts(void);
 
 /*___________________________________________________________________________*/
 
@@ -237,21 +239,6 @@ K_NOINLINE struct k_thread *_k_scheduler(void);
 K_NOINLINE void _k_wake_up(struct k_thread *th);
 
 /**
- * @brief Wake up a thread that is waiting for an event.
- * This thread is the very first to be executed.
- * The scheduler should not reorder it before beeing executed.
- * 
-* Assumptions:
- *  - thread is in waiting mode
- *  - thread is not in the runqueue
- *  - thread may be in the events queue
- *  - interrupt flag is cleared when called.
- * 
- * @param th thread to wake up in immediate mode
- */
-K_NOINLINE void _k_immediate_wake_up(struct k_thread *th);
-
-/**
  * @brief Suspend the current thread and schedule its awakening for later
  * 
  * Assumptions :
@@ -307,6 +294,10 @@ K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
  * @return uint8_t return 0 if a thread got the object, any other value otherwise
  */
 K_NOINLINE uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void * swap_data);
+
+/*___________________________________________________________________________*/
+
+K_NOINLINE void _k_on_thread_return(void);
 
 /*___________________________________________________________________________*/
 

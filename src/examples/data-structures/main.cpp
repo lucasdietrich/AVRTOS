@@ -13,33 +13,47 @@
 
 /*___________________________________________________________________________*/
 
+#define FLAG_QUEUE        1
+#define FLAG_OQUEUE       2
+#define FLAG_DLIST        4
+#define FLAG_TQUEUE       8
+
+#define TESTS             FLAG_OQUEUE
+
 void test_queue(void);
+void test_oqueue(void);
 void test_queue_dlist(void);
 void test_tqueue(void);
-void test_scheduler(void);
-void test_mutex(void);
 
 /*___________________________________________________________________________*/
 
 int main(void)
 {
   usart_init();
-  
+
+#if TESTS & FLAG_QUEUE
   usart_printl("queue");
   test_queue();
+#endif
 
+#if TESTS & FLAG_OQUEUE
+  usart_printl("oqueue");
+  test_oqueue();
+#endif
+
+#if TESTS & FLAG_DLIST
   usart_printl("queue/dequeue dlist");
   test_queue_dlist();
+#endif
 
   // todo raw api
 
   // todo cdlist
 
+#if TESTS & FLAG_TQUEUE
   usart_printl("tqueue");
   test_tqueue();
-
-  usart_printl("mutex");
-  test_mutex();
+#endif
 }
 
 /*___________________________________________________________________________*/
@@ -108,6 +122,43 @@ void test_queue(void)
   print_queue();
   dequeued = dequeue();
   print_queue();
+}
+
+/*___________________________________________________________________________*/
+
+DEFINE_OQREF(oref);
+
+inline void print_oqueue(void) { print_oqueue(&oref, print_queue_item); }
+
+void print_odequeue(void)
+{
+  struct qitem* dequeued = odequeue(&oref);
+  if (dequeued != NULL) {
+    usart_print("dequeued : ");
+    print_queue_item(dequeued);
+    usart_transmit('\n');
+  } else {
+    usart_printl("dequeued NULL");
+  }
+  print_oqueue();
+}
+
+//
+// OQUEUE
+//
+void test_oqueue(void)
+{
+  print_oqueue();
+  oqueue(&oref, &items[0].i);
+  print_oqueue();
+  oqueue(&oref, &items[1].i);
+  oqueue(&oref, &items[2].i);
+  print_oqueue();
+
+  print_odequeue();
+  print_odequeue();
+  print_odequeue();
+  print_odequeue();
 }
 
 /*___________________________________________________________________________*/
@@ -241,21 +292,6 @@ void test_tqueue(void)
     tqueue_remove(&root, &titems[3].tie);
 
     print_tqueue(root);
-}
-
-/*___________________________________________________________________________*/
-
-struct qitem *mutex_ref = NULL;
-
-struct item wthreads[] = {
-  ITEM('M'), ITEM('A'), ITEM('B'), 
-};
-
-void test_mutex(void)
-{
-  queue(&mutex_ref, &wthreads[0].i);
-
-  print_queue(mutex_ref, print_queue_item);  
 }
 
 /*___________________________________________________________________________*/

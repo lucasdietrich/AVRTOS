@@ -23,17 +23,27 @@ Following features are supported:
 - Workqueues and system workqueue 
 - Fifo
 - Memory slabs
+- Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
+- Timers
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
 - thread context passing
 - debug/utils functions : RAM_DUMP, CORE_DUMP, read_ra (read return address)
-- data structures : dlist (doubly linked list), queue (singly linked list), time queue (singly linked list with delay parameter)
+- data structures : 
+  - dlist : doubly linked list
+    - raw API
+    - dlist API : queue
+    - cdlist API : circular dlist
+  - queue : singly linked list
+  - oqueue : optimized singly linked list
+  - tqueue : scheduling singly linked list for time-sorted items
 - I/O : leds, uart
 - Kernel Assertions (__ASSERT)
 - Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEOUT
 - Efficient pending feature, allowing to pass directly an object (mutex, semaphore, mem slab bloc, fifo item) to a pending thread. No need to do the whole process : unlock/lock for a mutex or free/allocate for a memory block if a thread is pending for the object being available.
 - Mutex thread owner
+- Fully C/C++ compliant
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -46,8 +56,6 @@ What features will be implemented :
 - Signals
 - Delayed start, suspending/resuming threads
 - Stack sentinels
-- Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
-- Memslabs
 - Task scheduling
 - Kernel fault
 
@@ -55,12 +63,16 @@ What enhancements are planned :
 - Using makefile to build the project for a target
 - Propose this project as a library
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
-- Wrong : Using double linked lists would also help to remove the idle thread from the runqueue in one function call, without finding it
 - Check that the thread own the mutex/semaphore when releasing it
-- Cancel submitted item
-- Make the library fully C compliant.
 - Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
+- Remove RUNNING state which is implicitely represented by the position of the current thread in the runqueue.
+  - A thread is running if it is at the top on the runqueue
+  - Also optimize the use of READY
+- Optimizing `tqueue_remove` function from O(n) to O(1) where `n` is the number of items in the time queue
+  - Optimizing corresponding code in the kernel
+- Optimizing timers code
+- Unifying `k_timeout_t` and `k_delta_ms_t` types
 
 What enhancements/features are not planned :
 - Prioritization
@@ -68,6 +80,7 @@ What enhancements/features are not planned :
 - Stack for interrupts handlers
 - Delay the submission of a work in a workqueue
 - Saving thread errno
+- Cancel submitted item
 
 ## Getting started example :
 
@@ -94,16 +107,16 @@ Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
-void thread_led(void *context);
-void thread_coop(void *context);
+void thread_led(void* context);
+void thread_coop(void* context);
 
 uint8_t on = 1u;
 uint8_t off = 0u;
 
 K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
-K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&on, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void *)&off, 'F');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, 'C');
+K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void*)&on, 'O');
+K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PRIO_PREEMPT(K_PRIO_HIGH), (void*)&off, 'F');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), NULL, 'C');
 
 int main(void)
 {
@@ -114,11 +127,10 @@ int main(void)
   k_sleep(K_FOREVER);
 }
 
-void thread_led(void *context)
+void thread_led(void* context)
 {
   const uint8_t thread_led_state = *(uint8_t*)context;
-  while(1)
-  {
+  while (1)   {
     k_mutex_lock(&mymutex, K_FOREVER);
     led_set(thread_led_state);
     usart_transmit(thread_led_state ? 'o' : 'f');
@@ -127,10 +139,9 @@ void thread_led(void *context)
   }
 }
 
-void thread_coop(void*)
+void thread_coop(void* context)
 {
-  while(1)
-  {
+  while (1)   {
     k_sleep(K_MSEC(2000));
     usart_transmit('_');
     _delay_ms(500); // blocking all threads for 500ms
@@ -173,14 +184,16 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
   - kernel objects
     - runqueue : 2B
     - events queue : 2B
-    - thread idle stack is at least 34/36 byte + 18B thread structure (should be removed in the future)
-  - a thread structure is 16B + stack size which is at least 35/36byte
+    - thread idle stack is at least 35/36 byte + 18B thread structure (configurable)
+  - a thread structure is 18B + stack size which is at least 35/36byte
   - a mutex is 7B
-  - a semaphore is 5B
-  - a workqueue is 5B
+  - a semaphore is 6B
+  - a workqueue is 7B
     - a k_work item is 6B
-  - a fifo is 6B
+  - a fifo is 8B
+    - a fifo item is at least 2B
   - a memory slab is 11B
+  - a timer is 8B (or 12B with high precision)
 - In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
 - Plan additionnal stack for every thread that have their interrupt flag set, whose the stack could be used during interrupt handlers calls.
   
@@ -259,14 +272,37 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
+| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
+| THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
+
 
 ## Known issues
 
-- It's possible to preempt a cooperative thread from an interrupt when called k_yield, k_mutex_unlock, ... from it.
-  - it's dangerous to use some kernel function that trigger a thread switch, as we cannot predict which will be the current thread when an interrupt occures.
-  - Nothing is yet planned to prevent the developper from doing this.
-- This library is not full c compliant, this enhancement is planned. For example, the macro defining a thread canot be compiled as a c file.
-  - For now it is adviced to use threads macros from C++ files : e.g. `main.cpp` 
+- For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc automatically switch to the first thread waiting on the object (this will probably be changed). If the function is called from an interrupt, it could preempt a cooperative thread if the function is called from an interrupt handler. And this is an unwished behavior.
+  - As we cannot predict the current thread beeing processed when an interrupt occurs and we cannot know if we 
+  are actually in an interrupt handler (when calling k_fifo_put for example), I decided the default behavior as described above.
+  - First, I wanted to automatically switch to the thread waiting on an object when it became available, but this should probably be changed ...
+  - For now, setting configuration option `KERNEL_YIELD_ON_UNPEND` to `0` prevent the switch.
+  - Moreover nothing is yet planned to prevent the developper from doing weird things from interrupt handlers.
+
+
+- Set stack pointer only one time, remove instructions `b4` to `ba` (.init2):
+  - See linker script
+```s
+000000b0 <__ctors_end>:
+  b0:	11 24       	eor	r1, r1    ; clear r1
+  b2:	1f be       	out	0x3f, r1	; clear SREG
+
+  b4:	cf ef       	ldi	r28, 0xFF	; SPL
+  b6:	d8 e0       	ldi	r29, 0x08	; SPH
+  b8:	de bf       	out	0x3e, r29	; set SPH
+  ba:	cd bf       	out	0x3d, r28	; set SPL
+
+  bc:	ce ea       	ldi	r28, 0xAE	; SPL
+  be:	d7 e0       	ldi	r29, 0x07	; SPH
+  c0:	cd bf       	out	0x3d, r28	; set SPL
+  c2:	de bf       	out	0x3e, r29	; set SPH
+```
 
 ## Debugging
 
@@ -282,7 +318,7 @@ My install :
 Steps : 
 1. Building project in debug mode : 
   - `build_type = debug`
-  - Make sure to use timer1 as syslock !
+  - Make sure to use timer1 as syslock as it's the only hardware timer supported for now !
   
 2. Emulate on qemu : Run command from WSL :
   `~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off`
@@ -365,7 +401,6 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
     - `@T` : thread `T` was awakened
 - During scheduler call :
     - `!` : The timer of a waiting thread expired and the scheduler poped it off in order to execute it.
-    - `'T` : The thread `T` should be executed immediately, before the thread awakened by the timer expiration `!`
     - `~` : Current thread has just been set in WAITING mode and has been removed from the runqueue. The scheduler get the next thread to be executed.
     - `>` : The scheduler simply requeue the current thread and get the next thread to be executed.
     - `p` : Next thread to be executed is the IDLE thread, since there are other threads to be executed we skip the IDLE thread.

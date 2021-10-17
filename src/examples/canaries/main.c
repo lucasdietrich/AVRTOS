@@ -40,9 +40,9 @@ void thread_led(void *p);
 void thread_task1(void *p);
 void thread_task2(void *p);
 
-K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'L');
-K_THREAD_DEFINE(task1, thread_task1, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, '1');
-K_THREAD_DEFINE(task2, thread_task2, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, '2');
+K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, 'L');
+K_THREAD_DEFINE(task1, thread_task1, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, '1');
+K_THREAD_DEFINE(task2, thread_task2, 0x200, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, '2');
 
 /*___________________________________________________________________________*/
 

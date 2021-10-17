@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-#include "multithreading.h"
+#include "avrtos.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,7 +75,11 @@ K_NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
 
 /**
  * @brief Unlock a mutex, wake up the first waiting thread if the waiting queue
- * is not empty, do k_yield this function doesn't check if the current thread 
+ * is not empty.
+ * 
+ * Switch thread before returning if a thread is waiting on the mutex.
+ * 
+ * This function doesn't check if the current thread 
  * actually own the mutex. This function sets interrupt flag when returning.
  * 
  *  * Don't unlock a mutex from an interrupt routine !

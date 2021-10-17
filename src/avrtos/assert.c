@@ -4,20 +4,6 @@
 
 #include "misc/uart.h"
 
-#define K_MODULE_AVRTOS         0
-#define K_MODULE_KERNEL         1
-#define K_MODULE_ARCH           2
-#define K_MODULE_SYSCLOCK       3
-#define K_MODULE_THREAD         4
-#define K_MODULE_IDLE           5
-
-#define K_MODULE_MUTEX          10
-#define K_MODULE_SEMAPHORE      11
-#define K_MODULE_SIGNAL         12
-#define K_MODULE_WORKQUEUE      13
-#define K_MODULE_FIFO           14
-#define K_MODULE_MEMSLAB        15
-
 static const char * const module_to_str(uint8_t module)
 {
     static const char modules_str[][sizeof("WORKQUEUE")] PROGMEM = {
@@ -36,7 +22,8 @@ static const char * const module_to_str(uint8_t module)
         {"SIGNAL"},
         {"WORKQUEUE"},
         {"FIFO"},
-        {"MEMSLAB"}
+        {"MEMSLAB"},
+        {"TIMER"},
     };
 
     return modules_str[MIN(module, ARRAY_SIZE(modules_str))];

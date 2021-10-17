@@ -3,9 +3,11 @@
 
 #include <stddef.h>
 
-#include "multithreading.h"
-#include "dstruct/tqueue.h"
+#include "avrtos.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -85,12 +87,15 @@ void k_work_init(struct k_work * work, k_work_handler_t handler);
  * If the work item has already been queued but didn't get processed, the 
  * work is not sent a new time.
  * 
+ * A work item started being processed can be submitted again.
+ * 
+ * A work item can be sent from an interrupt handler. 
+ * With "signals", this is the recommanded way to handle interrupts.
+ * 
  * Assumptions :
  *  - workqueue is not null
  *  - work is not null
  *  - work->handler is not null
- * 
- * A work item being processed can be submitted again.
  * 
  * @param workqueue 
  * @param work 
@@ -137,5 +142,9 @@ void k_system_workqueue_submit(struct k_work * work);
 
 /*___________________________________________________________________________*/
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -97,30 +97,33 @@ int8_t k_mem_slab_alloc(struct k_mem_slab* slab, void** mem, k_timeout_t timeout
     return ret;
 }
 
-int8_t _k_mem_slab_free(struct k_mem_slab* slab, void** mem)
+int8_t _k_mem_slab_free(struct k_mem_slab* slab, void* mem)
 {
     __ASSERT_NOTNULL(slab);
     __ASSERT_NOTNULL(mem);
 
     /* eq to "**(struct qitem***)mem = slab->free_list;" */
 
-    (*(struct qitem**)mem)->next = slab->free_list;
-    slab->free_list = *(struct qitem**)mem;
+    ((struct qitem*)mem)->next = slab->free_list;
+    slab->free_list = (struct qitem*)mem;
 
     return 0;
 }
 
-void k_mem_slab_free(struct k_mem_slab* slab, void** mem)
+void k_mem_slab_free(struct k_mem_slab* slab, void* mem)
 {
     __ASSERT_NOTNULL(slab);
-    __ASSERT_NOTNULL(mem);
+    
+    if (mem == NULL) {
+        return;
+    }
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
         /* if a thread is waiting on a memory slab we give the block
          * directly to the thread (using thread->swap_data)
          */
-        if (_k_unpend_first_thread(&slab->waitqueue, *mem) != 0) {
+        if (_k_unpend_first_thread(&slab->waitqueue, mem) != 0) {
             /* otherwise we free the block */
             _k_mem_slab_free(slab, mem);
         }

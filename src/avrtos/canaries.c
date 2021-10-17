@@ -4,16 +4,14 @@ extern struct k_thread __k_threads_start;
 
 void _k_init_thread_canaries(void)
 {
-    for (uint8_t i = 0; i < _k_thread_count; i++)
-    {
-        struct k_thread *const th = &(&__k_threads_start)[i];
+    for (uint_fast8_t i = 0; i < _k_thread_count; i++) {
+        struct k_thread* const th = &(&__k_threads_start)[i];
 
         void* const stack_end = th->stack.end;
         const size_t stack_size = th->stack.size;
         uint8_t* addr = K_STACK_START(stack_end, stack_size);
-        
-        while (addr < (uint8_t*) stack_end - K_THREAD_STACK_VOID_SIZE)
-        {
+
+        while (addr < (uint8_t*)stack_end - K_THREAD_STACK_VOID_SIZE) {
             *addr++ = THREAD_CANARIES_SYMBOL;
         }
     }
@@ -55,8 +53,7 @@ void print_current_canaries(void)
 
 void dump_threads_canaries(void)
 {
-    for (uint8_t i = 0; i < _k_thread_count; i++)
-    {
+    for (uint8_t i = 0; i < _k_thread_count; i++) {
         print_thread_canaries(&(&__k_threads_start)[i]);
     }
 }

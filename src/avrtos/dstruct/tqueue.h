@@ -9,6 +9,20 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Scheduling queue data structure
+ * 
+ * - n : number of items in the list
+ * 
+ * tqueue_schedule/tqueue_pop are O(1)
+ * tqueue_remove is O(n)
+ * tqueue_shift is O(n)
+ * 
+ * TODO tqueue_remove could be optimized to O(1), using a doubly linked list
+ */
+
+/*___________________________________________________________________________*/
+
 struct titem
 {
     union
@@ -72,6 +86,14 @@ void tqueue_schedule(struct titem** root,
  * @param time_passed 
  */
 void tqueue_shift(struct titem** root, k_delta_ms_t time_passed);
+
+/**
+ * @brief 
+ * 
+ * @param root 
+ * @return struct titem* 
+ */
+struct titem* tqueue_pop_reschedule(struct titem** root, k_delta_ms_t timeout);
 
 /**
  * @brief Pop an item from the time queue.

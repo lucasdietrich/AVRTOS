@@ -17,9 +17,8 @@
 #define K_FLAG_PREEMPT              (0 << K_FLAG_PREEMPT_SHIFT)
 
 #define K_FLAG_STOPPED              (0b00 << 0)
-#define K_FLAG_RUNNING              (0b01 << 0)
-#define K_FLAG_READY                (0b10 << 0)
-#define K_FLAG_WAITING              (0b11 << 0)
+#define K_FLAG_READY                (0b01 << 0)
+#define K_FLAG_WAITING              (0b10 << 0)
 
 #define K_FLAG_PRIO_SHIFT           4
 
@@ -37,10 +36,7 @@
 #define K_PRIO_DEFAULT              K_PRIO_PREEMPT(K_PRIO_HIGH)
 #define K_STOPPED                   K_FLAG_STOPPED
 
-#define K_FLAG_IMMEDIATE_SHIFT       6
-#define K_FLAG_IMMEDIATE             (1 << K_FLAG_IMMEDIATE_SHIFT)
-
-#define K_FLAG_TIMER_EXPIRED_SHIFT   7
+#define K_FLAG_TIMER_EXPIRED_SHIFT   6
 #define K_FLAG_TIMER_EXPIRED         (1 << K_FLAG_TIMER_EXPIRED_SHIFT)
 
 /*___________________________________________________________________________*/

@@ -17,8 +17,8 @@
 void thread_blink(void *p);
 void thread_coop(void *p);
 
-K_THREAD_DEFINE(blink, thread_blink, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, 'B');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), nullptr, 'C');
+K_THREAD_DEFINE(blink, thread_blink, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, 'B');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PRIO_COOP(K_PRIO_HIGH), NULL, 'C');
 
 /*___________________________________________________________________________*/
 

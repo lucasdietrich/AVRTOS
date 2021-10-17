@@ -25,8 +25,6 @@ static inline bool _k_runqueue_single(void)
     return runqueue->next == runqueue;
 }
 
-extern bool __k_interrupts(void);
-
 /*___________________________________________________________________________*/
 
 //
@@ -126,7 +124,12 @@ void k_start(struct k_thread *th)
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
-uint8_t _k_thread_count = 1;
+uint8_t _k_thread_count = 0;
+
+inline static void swap_endianness(uint16_t * const addr)
+{
+    *addr = HTONS(*addr);
+}
 
 void _k_kernel_init(void)
 {
@@ -137,10 +140,34 @@ void _k_kernel_init(void)
     for (uint8_t i = 0; i < _k_thread_count; i++)
     {
         struct k_thread *const thread = &(&__k_threads_start)[i];
-        if (!IS_THREAD_IDLE(thread) && (thread->state == READY))
-        {
-            push_front(runqueue, &thread->tie.runqueue);
+
+        /* idle thread must not be added to the 
+         * runqueue as the main thread is running */
+        if (!IS_THREAD_IDLE(thread) &&
+            (thread->state == READY) &&
+            (thread != _current)) {
+            push_back(runqueue, &thread->tie.runqueue);
         }
+
+        /* Swap endianness of addresses in compilation-time built stacks.
+         * We cannot change the endianness of addresses determined by the
+         * linker at compilation time. So we need to do it on system start up
+         */
+        if (_current != thread)
+        {
+            /* thread kernel entry function address */
+            swap_endianness(thread->stack.end - 1u);
+
+#if THREAD_ALLOW_RETURN == 1
+            /* thread kernel entry function address */
+            swap_endianness(thread->stack.end - 1u -
+                (6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+#endif
+
+            /* thread context address */
+            swap_endianness(thread->stack.end - 1u -
+                (8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+        }        
     }
 }
 
@@ -173,7 +200,9 @@ void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 
     if (timeout.value != K_FOREVER.value)
     {
-        tqueue_schedule(&events_queue, &_current->tie.event, timeout.value);
+        _current->tie.event.timeout = timeout.value;
+        _current->tie.event.next = NULL;
+        _tqueue_schedule(&events_queue, &_current->tie.event);
     }
 }
 
@@ -210,7 +239,6 @@ struct k_thread* _k_scheduler(void)
     __ASSERT_NOINTERRUPT();
 
     _current->timer_expired = 0;
-    _current->immediate = 0;
 
     if (_current->state == WAITING) {
         /* runqueue is positionned to the normally next thread to be executed */
@@ -225,26 +253,15 @@ struct k_thread* _k_scheduler(void)
 
     struct ditem* ready = (struct ditem*)tqueue_pop(&events_queue);
     if (ready != NULL) {
-        __K_DBG_SCHED_EVENT();  // !
+        __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
 
         /* set ready thread expired flag */
         THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
 
-        /* if a thread has been woken up with the immediate flag set,
-         * the expired thread will be push just after it */
-        /* as idle thread cannot be immediate, it will never be prioritized */
-        if (THREAD_FROM_EVENTQUEUE(runqueue)->immediate) {
-            __K_DBG_SCHED_EVENT_ON_IMMEDIATE(THREAD_FROM_EVENTQUEUE(ready));   // '
-
-            push_front(runqueue->next, ready);
-        }
-        else {
-            _k_schedule(ready);
-        }
+        _k_schedule(ready);
     }
 
     _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
-    _current->state = READY;
 
     __K_DBG_SCHED_NEXT(_current);  // thread symbol
 
@@ -263,15 +280,6 @@ void _k_wake_up(struct k_thread *th)
     _k_unschedule(th);
 
     _k_schedule(&th->tie.runqueue);     // schedule in runqueue
-}
-
-void _k_immediate_wake_up(struct k_thread *th)
-{
-    __ASSERT_NOINTERRUPT();
-
-    th->immediate = 1u;
-
-    _k_wake_up(th);
 }
 
 void _k_reschedule(k_timeout_t timeout)
@@ -296,13 +304,21 @@ void _k_system_shift(void)
 
 int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
+    __ASSERT_NOINTERRUPT();
+
     int8_t err = -1;
     if (timeout.value != 0) {
+        /* queue thread to waiting queue of the object */
         dlist_queue(waitqueue, &_current->wany);
 
+        /* schedule thread wake up if timeout is set */
         _k_reschedule(timeout);
+
         k_yield();
 
+        /* if timer expired, we nned to manually remove the thread from 
+         * the waiting queue
+         */
         if (_current->timer_expired) {
             dlist_remove(&_current->wany);
             err = -ETIMEOUT;
@@ -315,25 +331,63 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
     
 uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
 {
+    __ASSERT_NOINTERRUPT();
+    
     struct ditem* pending_thread = dlist_dequeue(waitqueue);
     if (DITEM_VALID(waitqueue, pending_thread)) {
         struct k_thread* th = THREAD_FROM_WAITQUEUE(pending_thread);
 
-        /* the first thread in the queue must be the first to get the object,
-         * so we set the immediate flag */
-        _k_immediate_wake_up(th);
+        /* immediate wake up is not more required because 
+         * with the swap model, the object is already reserved for the 
+         * first waiting thread
+         */
+        _k_wake_up(th);
 
         /* set the available object address */
         th->swap_data = swap_data;
 
-        /* yield to this thread */
+        /* TODO
+         * - For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc 
+         *    automatically switch to the first thread waiting on the 
+         *    object (this will probably be changed). If the function is 
+         *    called from an interrupt, it could preempt a cooperative thread
+         *    if the function is called from an interrupt handler. And this
+         *    is an unwished behavior.
+         * 
+         * - There is no mechanism to prevent the switch for now.
+         * 
+         * - As we cannot predict the current thread beeing processed 
+         *    when an interrupt occurs and we cannot know if we 
+         *    are actually in an interrupt handler (when calling 
+         *    k_fifo_put for example), I decided the default 
+         *    behavior as described above.
+         * 
+         * - First, I wanted to automatically switch to the thread waiting
+         *   on an object when it became available, but this should probably 
+         *   be changed ...
+         * 
+         * - Nothing is yet planned to prevent the developper from doing weird 
+         *   things from interrupt handlers.
+         * 
+         * IDEA but impossible : yield to this thread if the current thread 
+         *   isn't cooperative and we are in an interrupt 
+         */
+#if KERNEL_YIELD_ON_UNPEND
         k_yield();
+#endif
 
         /* we return 0 if a pending thread got the object*/
         return 0;
     }
     /* if no thread is pending on the object, we simply return */
     return -1;
+}
+
+/*___________________________________________________________________________*/
+
+void _k_on_thread_return(void)
+{
+    k_suspend();
 }
 
 /*___________________________________________________________________________*/

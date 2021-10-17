@@ -11,10 +11,21 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-// a ditem is already in the list if next != null and prev != null
-// a ditem is not in the list if next == null && prev == null
+/**
+ * @brief Advanced doubly linked list data structure
+ * 
+ * push_front/push_pack/dlist_queue/dlist_dequeue are all O(1)
+ * 
+ * - n : number of items in the list
+ * 
+ * dlist_count is O(n)
+ */
 
-// poping the last element of the runqueue doesn't have no any effect
+/**
+ * - a ditem is already in the list if next != null and prev != null
+ * - a ditem is not in the list if next == null && prev == null
+ * - poping the last element of the runqueue doesn't have no any effect
+ */
 
 /*___________________________________________________________________________*/
 

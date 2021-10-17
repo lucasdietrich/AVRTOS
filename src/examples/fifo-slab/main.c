@@ -27,7 +27,7 @@ struct block
 #define BLOCK_COUNT   10u
 #define BLOCK_SIZE    sizeof(struct block)
 
-void block_read(uint8_t *buffer, uint16_t size)
+void block_read(uint8_t* buffer, uint16_t size)
 {
   for (uint16_t i = 0u; i < size; i++) {
     usart_hex(buffer[i]);
@@ -36,7 +36,7 @@ void block_read(uint8_t *buffer, uint16_t size)
   usart_transmit('\n');
 }
 
-void block_write(uint8_t *buffer, uint16_t size, uint8_t symb)
+void block_write(uint8_t* buffer, uint16_t size, uint8_t symb)
 {
   for (uint16_t i = 0u; i < size; i++) {
     buffer[i] = symb;
@@ -45,10 +45,10 @@ void block_write(uint8_t *buffer, uint16_t size, uint8_t symb)
 
 /*___________________________________________________________________________*/
 
-void consumer_thread(void *);
+void consumer_thread(void*);
 
 K_FIFO_DEFINE(fifo);
-K_THREAD_DEFINE(consumer, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), nullptr, 'A');
+K_THREAD_DEFINE(consumer, consumer_thread, 0x50, K_PRIO_PREEMPT(K_PRIO_MAX), NULL, 'A');
 
 #if MEM_SLAB_COMPILATION_TIME
 K_MEM_SLAB_DEFINE(myslab, BLOCK_SIZE, BLOCK_COUNT);
@@ -64,9 +64,9 @@ int main(void)
   led_init();
   usart_init();
 
-  #if !MEM_SLAB_COMPILATION_TIME
+#if !MEM_SLAB_COMPILATION_TIME
   k_mem_slab_init(&myslab, buffer, BLOCK_SIZE, BLOCK_COUNT);
-  #endif
+#endif
 
   k_thread_dump_all();
 
@@ -75,11 +75,11 @@ int main(void)
   uint8_t x = 0;
   while (1) {
     struct block* mem;
-    int8_t ret = k_mem_slab_alloc(&myslab, (void**) &mem, K_FOREVER);
+    int8_t ret = k_mem_slab_alloc(&myslab, (void**)&mem, K_FOREVER);
     if (ret == 0) {
       k_sched_lock();
       usart_print("Allocated : ");
-      usart_hex16((uint16_t) mem);
+      usart_hex16((uint16_t)mem);
       usart_transmit('\n');
       k_sched_unlock();
 
@@ -89,7 +89,7 @@ int main(void)
   }
 }
 
-void consumer_thread(void*)
+void consumer_thread(void* context)
 {
   while (1) {
     struct block* mem = (struct block*)k_fifo_get(&fifo, K_FOREVER);
@@ -101,7 +101,7 @@ void consumer_thread(void*)
       block_read(mem->data, sizeof(mem->data));
       k_sched_unlock();
 
-      k_mem_slab_free(&myslab, (void**) &mem);
+      k_mem_slab_free(&myslab, (void*)mem);
     }
 
     k_sleep(K_SECONDS(1));

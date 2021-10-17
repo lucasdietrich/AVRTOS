@@ -13,10 +13,10 @@
 void thread(void *p);
 void threadp(void *p);
 
-K_THREAD_DEFINE(thread1, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, '1');
-K_THREAD_DEFINE(thread2, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, '2');
-K_THREAD_DEFINE(thread3, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, '3');
-K_THREAD_DEFINE(thread4, threadp, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), nullptr, '4');
+K_THREAD_DEFINE(thread1, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, '1');
+K_THREAD_DEFINE(thread2, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, '2');
+K_THREAD_DEFINE(thread3, thread, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, '3');
+K_THREAD_DEFINE(thread4, threadp, 0x100, K_PRIO_PREEMPT(K_PRIO_HIGH), NULL, '4');
 
 /*___________________________________________________________________________*/
 

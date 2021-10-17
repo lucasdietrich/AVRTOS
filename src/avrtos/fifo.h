@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <avrtos/dstruct/oqueue.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,15 +23,16 @@ extern "C" {
  */
 struct k_fifo
 {
-    struct qitem *queue;       // fifo reference to head item
+    struct oqref queue;        // fifo reference to head item
     struct ditem waitqueue;    // waitqueue of thread waiting to get an item
 };
 
 /*___________________________________________________________________________*/
 
+
 #define K_FIFO_INIT(fifo)                       \
     {                                           \
-        .queue = NULL,                          \
+        .queue = INIT_OQREF(),                  \
         .waitqueue = DLIST_INIT(fifo.waitqueue) \
     }
 
@@ -51,10 +54,28 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  * 
  * Wake up the first thread pending on a fifo item.
  * 
+ * Switch thread before returning if a thread is waiting on the item.
+ * 
+ * Can be called from an interrupt routine.
+ * 
+ * IMPORTANT : first two bytes of the memory space {item_tie} are reserved
+ * for internal usage and cannot be use to store data.
+ * 
+ * Note :
  * Actually it's not the item itself which is added to the fifo but its "tie"
- * member `item_tie`. As for workqueue we're using the CONTAINER_OF paragigm.
+ * member `item_tie` (first 2 bytes). As for workqueue we're using the CONTAINER_OF paragigm.
  * For each item added to the fifo, you must define a structure containing 
- * this "tie" and the actual item data. See example "fifo-slab".
+ * this "tie" and the actual item data. See example "fifo-slab" or "interrupt-yield".
+ * 
+ * Reference design :
+ * 
+ * struct
+ * {
+ *  struct qitem tie;
+ *  uint8_t value;
+ * } block1;
+ * block1.data = 17u;
+ * k_fifo_put(&myfifo, &block1);
  * 
  * Note : in Zephyr RTOS project, there are two functions : 
  * - k_fifo_put : which needs the first word of the data to be reserved
@@ -74,6 +95,9 @@ K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem * item_tie);
  * 
  * If there is no item in the fifo and timeout is different from K_NO_WAIT,
  * the function is blocking until a item is added or timeout.
+ * 
+ * Cannot be called from an interrupt routine 
+ * if timeout is different from K_NO_WAIT.
  * 
  * @param fifo 
  * @param timeout 

@@ -2,15 +2,15 @@
 
 /*___________________________________________________________________________*/
 
-void queue(struct qitem ** p_root, struct qitem * elem)
+void queue(struct qitem ** p_root, struct qitem * item)
 {
-    elem->next = NULL;
+    item->next = NULL;
     struct qitem **p_next = p_root;
     while (*p_next != NULL)
     {
         p_next = &(*p_next)->next;
     }
-    *p_next = elem;
+    *p_next = item;
 }
 
 struct qitem * dequeue(struct qitem ** p_root)

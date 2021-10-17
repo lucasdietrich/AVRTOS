@@ -30,7 +30,6 @@
 
 #define EWOULDBLOCK EAGAIN
 
-
 /*___________________________________________________________________________*/
 
 // arch specific fixups
@@ -272,6 +271,18 @@
 #   define KERNEL_ASSERT DEFAULT_KERNEL_ASSERT
 #endif
 
+#ifdef CONFIG_KERNEL_YIELD_ON_UNPEND
+#   define KERNEL_YIELD_ON_UNPEND CONFIG_KERNEL_YIELD_ON_UNPEND
+#else
+#   define KERNEL_YIELD_ON_UNPEND DEFAULT_KERNEL_YIELD_ON_UNPEND
+#endif
+
+#ifdef CONFIG_THREAD_ALLOW_RETURN
+#   define THREAD_ALLOW_RETURN CONFIG_THREAD_ALLOW_RETURN
+#else
+#   define THREAD_ALLOW_RETURN DEFAULT_THREAD_ALLOW_RETURN
+#endif
+
 /*___________________________________________________________________________*/
 
 // put all c specific definition  here
@@ -294,10 +305,19 @@ typedef struct
 
 #define K_TIMEOUT_EQ(t1, t2)    (t1.value == t2.value)
 
-#define K_SECONDS(delay_s)      ((k_timeout_t){(k_delta_ms_t) (delay_s * 1000)})
-#define K_MSEC(delay_ms)        ((k_timeout_t){(k_delta_ms_t) (delay_ms)})
-#define K_NO_WAIT               ((k_timeout_t){(k_delta_ms_t) (0)})
-#define K_FOREVER               ((k_timeout_t){(k_delta_ms_t) (-1)})
+#define K_SECONDS(delay_s)      ((k_timeout_t){.value = 1000u*delay_s})
+#define K_MSEC(delay_ms)        ((k_timeout_t){.value = delay_ms})
+#define K_NO_WAIT               ((k_timeout_t){.value = (k_delta_ms_t) 0})
+#define K_FOREVER               ((k_timeout_t){.value = (k_delta_ms_t) -1})
+#define K_UNTIL_WAKEUP          K_FOREVER
+
+#define HTONL(n) ((((((uint32_t)(n) & 0xFF)) << 24) |      \
+               ((((uint32_t)(n) & 0xFF00)) << 8) |         \
+               ((((uint32_t)(n) & 0xFF0000)) >> 8) |       \
+               ((((uint32_t)(n) & 0xFF000000)) >> 24)))
+
+#define HTONS(n) (((((uint16_t)(n) & 0xFF)) << 8) |       \
+               ((((uint16_t)(n) & 0xFF00)) >> 8))
 
 #define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n) & 0xFF)) << 8) | (((uint16_t)(n) & 0xFF00) >> 8))
 
@@ -336,7 +356,7 @@ typedef struct
 #define _K_STACK_INIT_SP(stack_end) (stack_end - K_THREAD_STACK_VOID_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly set
-#define _K_THREAD_STACK_START(name) ((uint16_t)&_k_stack_buf_##name)
+#define _K_THREAD_STACK_START(name) ((uint8_t*)(&_k_stack_buf_##name))
 
 #define _K_THREAD_STACK_SIZE(name) (sizeof(_k_stack_buf_##name))
 
@@ -348,40 +368,58 @@ typedef struct
 #define THREAD_FROM_WAITQUEUE(item) CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
-#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
-    struct                                                                 \
-    {                                                                      \
-        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE];              \
-        struct                                                             \
+#if THREAD_ALLOW_RETURN == 1
+
+#define _K_CORE_CONTEXT_STRUCT() struct                                    \
         {                                                                  \
             uint8_t sreg;                                                  \
             uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
             void *context;                                                 \
-            uint8_t r17r0r18_r23_3Baddrmsb[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
-            void *ret_addr;                                                \
-        } base;                                                            \
-    } _k_stack_buf_##name = {                                              \
-        {0x00},                                                            \
+            thread_entry_t *entry;                                         \
+            uint8_t r17r0r18_r21_3Baddrmsb[6u + _K_ARCH_STACK_SIZE_FIXUP]; \
+            void *k_thread_entry;                                          \
+        }
+
+#define _K_CORE_CONTEXT(entry, context_p)                                  \
         {THREAD_DEFAULT_SREG,                                              \
          {0x00},                                                           \
-         (void *)K_SWAP_ENDIANNESS(context_p),                             \
+         (void*) context_p,                                                \
+         (thread_entry_t*) entry,                                          \
          {0x00},                                                           \
-         (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}}
+         (void*) _k_thread_entry}
+
+#else
+
+#define _K_CORE_CONTEXT_STRUCT() struct                                    \
+        {                                                                  \
+            uint8_t sreg;                                                  \
+            uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
+            void *context;                                                 \
+            uint8_t r17r0r18_r21_3Baddrmsb[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
+            thread_entry_t *entry;                                         \
+        }
+
+#define _K_CORE_CONTEXT(entry, context_p)                                  \
+        {THREAD_DEFAULT_SREG,                                              \
+         {0x00},                                                           \
+         (void*) context_p,                                                \
+         {0x00},                                                           \
+         (thread_entry_t*) entry}
+
+#endif
+
+#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
+    struct                                                                 \
+    {                                                                      \
+        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE];              \
+        _K_CORE_CONTEXT_STRUCT() base;                                     \
+    } _k_stack_buf_##name = {                                              \
+        {0x00},                                                            \
+       _K_CORE_CONTEXT(entry, context_p)}
 
 #define _K_STACK_MIN_INITIALIZER(name, entry, context_p)     \
-    struct                                                   \
-    {                                                        \
-        uint8_t sreg;                                        \
-        uint8_t r26_r27r30r31r28r29r1_r16[22u];              \
-        void *context;                                       \
-        uint8_t r17r0r18_r23[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
-        void *ret_addr;                                      \
-    } _k_stack_buf_##name = {                                \
-        THREAD_DEFAULT_SREG,                                 \
-        {0x00},                                              \
-        (void *)K_SWAP_ENDIANNESS(context_p),                \
-        {0x00},                                              \
-        (void *)K_SWAP_ENDIANNESS((uint16_t)entry)}
+    _K_CORE_CONTEXT_STRUCT() _k_stack_buf_##name =           \
+    _K_CORE_CONTEXT(entry, context_p)
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \
