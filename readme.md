@@ -25,6 +25,7 @@ Following features are supported:
 - Memory slabs
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
 - Timers
+- Signals (poll on a single signal)
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -44,6 +45,7 @@ Minor features:
 - Efficient pending feature, allowing to pass directly an object (mutex, semaphore, mem slab bloc, fifo item) to a pending thread. No need to do the whole process : unlock/lock for a mutex or free/allocate for a memory block if a thread is pending for the object being available.
 - Mutex thread owner
 - Fully C/C++ compliant
+- Allow thread safe termination
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -53,7 +55,6 @@ What paradigms/concepts are not supported:
 What features will be implemented :
 - System time
 - Statistics CPU use per thread
-- Signals
 - Delayed start, suspending/resuming threads
 - Stack sentinels
 - Task scheduling
@@ -63,8 +64,6 @@ What enhancements are planned :
 - Using makefile to build the project for a target
 - Propose this project as a library
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
-- Check that the thread own the mutex/semaphore when releasing it
-- Allow thread safe termination
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
 - Remove RUNNING state which is implicitely represented by the position of the current thread in the runqueue.
   - A thread is running if it is at the top on the runqueue
@@ -187,6 +186,7 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
     - thread idle stack is at least 35/36 byte + 18B thread structure (configurable)
   - a thread structure is 18B + stack size which is at least 35/36byte
   - a mutex is 7B
+  - a signal is 6B
   - a semaphore is 6B
   - a workqueue is 7B
     - a k_work item is 6B
