@@ -332,6 +332,7 @@ typedef struct
 
 #define ARG_UNUSED(arg) ((void) arg)
 
+#define IN_RANGE(x, a, b) ((x >= a) && (x <= b))
 
 #endif
 
