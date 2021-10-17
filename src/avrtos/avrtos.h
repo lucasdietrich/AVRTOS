@@ -29,6 +29,7 @@
 #include "mutex.h"
 #include "semaphore.h"
 #include "timer.h"
+#include "signal.h"
 
 #include "fifo.h"
 #include "mem_slab.h"

@@ -4,45 +4,44 @@
 
 #include "kernel.h"
 
+#define K_MODULE K_MODULE_SIGNAL
 /*___________________________________________________________________________*/
 
-void k_signal_init(struct k_signal *sig, uint8_t initial_value)
+void k_signal_init(struct k_signal *sig)
 {
-    sig->signal = initial_value;
+    __ASSERT_NOTNULL(sig);
+
+    sig->signal = 0u;
     sig->flags = K_POLL_STATE_NOT_READY;
-    sig->waitqueue = NULL;
+    dlist_init(&sig->waitqueue);
 }
 
-void k_signal_raise(struct k_signal *sig)
+void k_signal_raise(struct k_signal *sig, uint8_t value)
 {
+    __ASSERT_NOTNULL(sig);
+    
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
+        sig->signal = value;
         sig->flags |= K_POLL_STATE_SIGNALED;
 
-        struct ditem * wthread;
-        while((wthread = dlist_dequeue(&sig->waitqueue)) != NULL) 
-        {
-            struct k_thread *const th = THREAD_OF_QITEM(wthread);
-            th->wsig.next = NULL;
-            _k_wake_up(th);
-        }
-        k_yield();
+        _k_unpend_first_thread(&sig->waitqueue, NULL);
     }
 }
 
-uint8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
+int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 {
+    __ASSERT_NOTNULL(sig);
+    
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        if (!TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED) && timeout.value != K_NO_WAIT.value)
-        {
-            dlist_queue(&sig->waitqueue, &k_current->wsig);
-            _k_reschedule(timeout);
-            k_yield();
-            dlist_remove(&sig->waitqueue, &k_current->wsig);
+        if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
+            return 0;
+        } else if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+            return _k_pend_current(&sig->waitqueue, timeout);
+        } else {
+            return -1;
         }
-
-        return sig->signal;
     }
 
     __builtin_unreachable();
