@@ -63,6 +63,7 @@ struct k_thread
         struct
         {
             uint8_t state : 2;          // @see thread_state_t
+            uint8_t sched_lock: 1;    // tells if scheduled is temporarely locked
             uint8_t coop : 1;           // cooperative/preemptive thread
             uint8_t priority : 2;       // thread priority : not supported for now
             uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 

@@ -35,7 +35,7 @@ void k_sched_lock(void)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        SET_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+        _current->sched_lock = 1u;
     }
 
     __K_DBG_SCHED_LOCK(_current);
@@ -47,7 +47,7 @@ void k_sched_unlock(void)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        CLR_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+        _current->sched_lock = 0u;
     }
 }
 

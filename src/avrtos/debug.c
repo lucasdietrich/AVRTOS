@@ -25,7 +25,7 @@ uint16_t k_thread_usage(struct k_thread *th)
     {
         // stack pointer refers to the first empty addr (from end)
         // empty stack : th->stack.end == th->sp
-        return ((uint16_t)th->stack.end) - ((uint16_t)th->sp) - K_THREAD_STACK_VOID_SIZE;
+        return ((uint16_t)th->stack.end) - SP; /* K_THREAD_STACK_VOID_SIZE */
     }
     else
     {
