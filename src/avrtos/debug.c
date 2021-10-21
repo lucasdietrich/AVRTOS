@@ -20,13 +20,13 @@ uint16_t k_thread_usage(struct k_thread *th)
         if (NULL == th->sp) {
                 return 0u;
         } else if (th == _current) {
-            // stack pointer refers to the first empty addr (from end)
-            // empty stack : th->stack.end == th->sp
+                // stack pointer refers to the first empty addr (from end)
+                // empty stack : th->stack.end == th->sp
                 return ((uint16_t)th->stack.end) -
                         ((uint16_t)th->sp) - K_THREAD_STACK_VOID_SIZE;
         } else {
-            // stack pointer refers to the first empty addr (from end)
-            // empty stack : th->stack.end == th->sp
+                // stack pointer refers to the first empty addr (from end)
+                // empty stack : th->stack.end == th->sp
                 return ((uint16_t)th->stack.end) - ((uint16_t)th->sp);
         }
 }
