@@ -73,9 +73,9 @@ K_NOINLINE bool k_sched_locked(void);
  */
 static __inline__ void __k_sched_restore(const uint8_t *__s)
 {
-   k_sched_unlock();
-   __asm__ volatile ("" ::: "memory");
-   ARG_UNUSED(__s);
+        k_sched_unlock();
+        __asm__ volatile ("" ::: "memory");
+        ARG_UNUSED(__s);
 }
 
 /**
@@ -85,9 +85,9 @@ static __inline__ void __k_sched_restore(const uint8_t *__s)
  */
 static __inline__ uint8_t __k_sched_lock_ret(void)
 {
-    k_sched_lock();
+        k_sched_lock();
 
-    return 1;
+        return 1;
 }
 
 /**
@@ -176,7 +176,7 @@ void _k_queue(struct k_thread * const th);
  * @param thread_tie thread.tie.runqueue item
  * @return __attribute__((noinline)) 
  */
-K_NOINLINE void _k_schedule(struct ditem * const thread_tie);
+K_NOINLINE void _k_schedule(struct ditem *const thread_tie);
 
 /**
  * @brief Schedule the thread wake up.

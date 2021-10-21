@@ -32,11 +32,6 @@
 /*___________________________________________________________________________*/
 
 //
-// Define the maximum number of threads supported.
-//
-#define DEFAULT_THREAD_MAX                          7
-
-//
 // Define the main thread type (coop/prempt) and priority
 //
 #define DEFAULT_THREAD_MAIN_THREAD_PRIORITY         K_PREEMPTIVE
@@ -176,6 +171,11 @@
 // Enable timers support
 //
 #define DEFAULT_KERNEL_TIMERS                   1
+
+//
+// Enabled thread errno
+//
+#define DEFAULT_THREAD_ERRNO                    0
 
 /*___________________________________________________________________________*/
 

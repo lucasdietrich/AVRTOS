@@ -35,8 +35,8 @@ extern "C" {
 
 struct oqref
 {
-    struct qitem* head;
-    struct qitem* tail;
+        struct qitem *head;
+        struct qitem *tail;
 };
 
 #define INIT_OQREF()  \
@@ -56,18 +56,18 @@ struct qitem * odequeue(struct oqref *oref);
 
 inline struct qitem * opeek_head(struct oqref *oref)
 {
-    return oref->head;
+        return oref->head;
 }
 
-inline struct qitem * opeek_tail(struct oqref *oref)
+inline struct qitem *opeek_tail(struct oqref *oref)
 {
 #if OQUEUE_OPT_TYPE == OQUEUE_OPT_DEQUEUE
-    if (oref->head == NULL) {
-        return NULL;
-    }
+        if (oref->head == NULL) {
+                return NULL;
+        }
 #endif
 
-    return oref->tail;
+        return oref->tail;
 }
 
 /*___________________________________________________________________________*/

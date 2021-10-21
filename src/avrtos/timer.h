@@ -44,16 +44,16 @@ void _k_timer_init_module(void);
 
 K_NOINLINE void _k_timers_process(void);
 
-K_NOINLINE void _k_timer_start(struct k_timer* timer, k_timeout_t starting_delay);
+K_NOINLINE void _k_timer_start(struct k_timer *timer, k_timeout_t starting_delay);
 
-K_NOINLINE void k_timer_init(struct k_timer* timer, k_timer_handler_t handler,
-    k_timeout_t timeout, k_timeout_t starting_delay);
+K_NOINLINE void k_timer_init(struct k_timer *timer, k_timer_handler_t handler,
+        k_timeout_t timeout, k_timeout_t starting_delay);
 
-K_NOINLINE bool k_timer_started(struct k_timer* timer);
+K_NOINLINE bool k_timer_started(struct k_timer *timer);
 
-K_NOINLINE int8_t k_timer_stop(struct k_timer* timer);
+K_NOINLINE int8_t k_timer_stop(struct k_timer *timer);
 
-K_NOINLINE int8_t k_timer_start(struct k_timer* timer, k_timeout_t starting_delay);
+K_NOINLINE int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay);
 
 /*___________________________________________________________________________*/
 

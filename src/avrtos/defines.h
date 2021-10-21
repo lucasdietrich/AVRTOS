@@ -57,18 +57,6 @@
 
 /*___________________________________________________________________________*/
 
-// MAX threads
-#ifdef CONFIG_THREAD_MAX
-#   if CONFIG_THREAD_MAX > 1
-#       define THREAD_MAX CONFIG_THREAD_MAX
-#   else
-#       error Cannot configure this library for less than 2 threads (CONFIG_THREAD_MAX < 2)
-#   endif
-#else
-#   define THREAD_MAX DEFAULT_THREAD_MAX
-#endif
-
-
 // main thread priority
 #ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #   define THREAD_MAIN_THREAD_PRIORITY CONFIG_THREAD_MAIN_THREAD_PRIORITY
@@ -283,9 +271,15 @@
 #   define THREAD_ALLOW_RETURN DEFAULT_THREAD_ALLOW_RETURN
 #endif
 
+#ifdef CONFIG_THREAD_ERRNO
+#   define THREAD_ERRNO CONFIG_THREAD_ERRNO
+#else
+#   define THREAD_ERRNO DEFAULT_THREAD_ERRNO
+#endif
+
 /*___________________________________________________________________________*/
 
-// put all c specific definition  here
+// put all c specific definitions  here
 
 #if !__ASSEMBLER__
 

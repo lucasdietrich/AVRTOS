@@ -47,11 +47,11 @@ extern "C" {
  */
 struct k_mem_slab
 {
-    void *buffer;
-    uint8_t count;
-    uint16_t block_size;
-    struct qitem *free_list;
-    struct ditem waitqueue;
+        void *buffer;
+        uint8_t count;
+        uint16_t block_size;
+        struct qitem *free_list;
+        struct ditem waitqueue;
 };
 
 /*___________________________________________________________________________*/
@@ -89,8 +89,8 @@ void _k_mem_slab_init_module(void);
  * @param num_blocks 
  * @return K_NOINLINE return 0 on success else error code
  */
-K_NOINLINE int8_t k_mem_slab_init(struct k_mem_slab* slab, void* buffer,
-    size_t block_size, uint8_t num_blocks);
+K_NOINLINE int8_t k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
+        size_t block_size, uint8_t num_blocks);
 
 /**
  * @brief Internal function to allocate a block
@@ -104,7 +104,7 @@ K_NOINLINE int8_t k_mem_slab_init(struct k_mem_slab* slab, void* buffer,
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE int8_t _k_mem_slab_alloc(struct k_mem_slab* slab, void** mem);
+K_NOINLINE int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem);
 
 /**
  * @brief Internal function to free a block
@@ -119,7 +119,7 @@ K_NOINLINE int8_t _k_mem_slab_alloc(struct k_mem_slab* slab, void** mem);
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE int8_t _k_mem_slab_free(struct k_mem_slab* slab, void* mem);
+K_NOINLINE int8_t _k_mem_slab_free(struct k_mem_slab *slab, void *mem);
 
 /**
  * @brief Allocate a memory block. 
@@ -138,7 +138,7 @@ K_NOINLINE int8_t _k_mem_slab_free(struct k_mem_slab* slab, void* mem);
  * @param timeout 
  * @return K_NOINLINE 
  */
-K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab* slab, void** mem,
+K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem,
     k_timeout_t timeout);
 
 /**
@@ -159,7 +159,7 @@ K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab* slab, void** mem,
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_mem_slab_free(struct k_mem_slab* slab, void* mem);
+K_NOINLINE void k_mem_slab_free(struct k_mem_slab *slab, void *mem);
 
 /*___________________________________________________________________________*/
 

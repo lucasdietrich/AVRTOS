@@ -16,13 +16,13 @@
  * @brief Runqueue containing the queue of all ready threads.
  * Should never be NULL.
  */
-struct ditem *runqueue = &_k_thread_main.tie.runqueue; 
+struct ditem *runqueue = &_k_thread_main.tie.runqueue;
 
 struct titem *events_queue = NULL;
 
 static inline bool _k_runqueue_single(void)
 {
-    return runqueue->next == runqueue;
+        return runqueue->next == runqueue;
 }
 
 /*___________________________________________________________________________*/
@@ -33,45 +33,44 @@ static inline bool _k_runqueue_single(void)
 
 void k_sched_lock(void)
 {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        SET_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
-    }
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+                SET_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+        }
 
-    __K_DBG_SCHED_LOCK(_current);
+        __K_DBG_SCHED_LOCK(_current);
 }
 
 void k_sched_unlock(void)
 {
-    __K_DBG_SCHED_UNLOCK();
+        __K_DBG_SCHED_UNLOCK();
 
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        CLR_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
-    }
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+                CLR_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+        }
 }
 
 bool k_sched_locked(void)
 {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        return (bool) TEST_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
-    }
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+                return (bool)TEST_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+        }
 
-    __builtin_unreachable();
+        __builtin_unreachable();
 }
 
 void k_sleep(k_timeout_t timeout)
 {
-    if (timeout.value != K_NO_WAIT.value)
-    {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-            _k_reschedule(timeout);
+        if (timeout.value != K_NO_WAIT.value) {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                        _k_reschedule(timeout);
 
-            k_yield();
+                        k_yield();
+                }
         }
-    }
 }
 
 /*___________________________________________________________________________*/
@@ -82,37 +81,33 @@ void k_sleep(k_timeout_t timeout)
 
 void k_suspend(void)
 {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        _k_suspend();
-    }
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+                _k_suspend();
+        }
 }
 
 void k_resume(struct k_thread *th)
 {
-    if (th->state == WAITING)
-    {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-            th->state = READY;
-            _k_schedule(&th->tie.runqueue);
+        if (th->state == WAITING) {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                        th->state = READY;
+                        _k_schedule(&th->tie.runqueue);
+                }
+        } else {
+                /* thread waiting, ready of running and then already started */
         }
-    }
-    else // thread waiting, ready of running and then already started
-    {
-
-    }
 }
 
 void k_start(struct k_thread *th)
 {
-    if (th->state == STOPPED)
-    {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-            _k_queue(th);
+        if (th->state == STOPPED) {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                        _k_queue(th);
+                }
         }
-    }
 }
 
 /*___________________________________________________________________________*/
@@ -126,268 +121,235 @@ extern struct k_thread __k_threads_end;
 
 uint8_t _k_thread_count = 0;
 
-inline static void swap_endianness(uint16_t * const addr)
+inline static void swap_endianness(uint16_t *const addr)
 {
-    *addr = HTONS(*addr);
+        *addr = HTONS(*addr);
 }
 
 void _k_kernel_init(void)
 {
-    _k_thread_count = &__k_threads_end - &__k_threads_start;
+        _k_thread_count = &__k_threads_end - &__k_threads_start;
 
-    /* main thread is the first running (ready or not), 
-     * and it is already in queue */
-    for (uint8_t i = 0; i < _k_thread_count; i++)
-    {
-        struct k_thread *const thread = &(&__k_threads_start)[i];
+        /* main thread is the first running (ready or not),
+         * and it is already in queue */
+        for (uint8_t i = 0; i < _k_thread_count; i++) {
+                struct k_thread *const thread = &(&__k_threads_start)[i];
 
-        /* idle thread must not be added to the 
-         * runqueue as the main thread is running */
-        if (!IS_THREAD_IDLE(thread) &&
-            (thread->state == READY) &&
-            (thread != _current)) {
-            push_back(runqueue, &thread->tie.runqueue);
-        }
+                /* idle thread must not be added to the
+                 * runqueue as the main thread is running */
+                if (!IS_THREAD_IDLE(thread) &&
+                        (thread->state == READY) &&
+                        (thread != _current)) {
+                        push_back(runqueue, &thread->tie.runqueue);
+                }
 
-        /* Swap endianness of addresses in compilation-time built stacks.
-         * We cannot change the endianness of addresses determined by the
-         * linker at compilation time. So we need to do it on system start up
-         */
-        if (_current != thread)
-        {
-            /* thread kernel entry function address */
-            swap_endianness(thread->stack.end - 1u);
+                /* Swap endianness of addresses in compilation-time built stacks.
+                 * We cannot change the endianness of addresses determined by the
+                 * linker at compilation time. So we need to do it on system start up
+                 */
+                if (_current != thread) {
+                    /* thread kernel entry function address */
+                        swap_endianness(thread->stack.end - 1u);
 
 #if THREAD_ALLOW_RETURN == 1
-            /* thread kernel entry function address */
-            swap_endianness(thread->stack.end - 1u -
-                (6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+                        /* thread kernel entry function address */
+                        swap_endianness(thread->stack.end - 1u -
+                                (6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
 #endif
 
-            /* thread context address */
-            swap_endianness(thread->stack.end - 1u -
-                (8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
-        }        
-    }
+                        /* thread context address */
+                        swap_endianness(thread->stack.end - 1u -
+                                (8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+                }
+        }
 }
 
 void _k_queue(struct k_thread *const th)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    push_back(runqueue, &th->tie.runqueue);
+        push_back(runqueue, &th->tie.runqueue);
 }
 
 void _k_schedule(struct ditem *const thread_tie)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
 #if KERNEL_THREAD_IDLE
-    if (_k_runqueue_idle())
-    {
-        dlist_ref(thread_tie);
-        runqueue = thread_tie;
-        return;
-    }
+        if (_k_runqueue_idle()) {
+                dlist_ref(thread_tie);
+                runqueue = thread_tie;
+                return;
+        }
 #endif
 
-    push_front(runqueue, thread_tie);
+        push_front(runqueue, thread_tie);
 }
 
 void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    if (timeout.value != K_FOREVER.value)
-    {
-        _current->tie.event.timeout = timeout.value;
-        _current->tie.event.next = NULL;
-        _tqueue_schedule(&events_queue, &_current->tie.event);
-    }
+        if (timeout.value != K_FOREVER.value) {
+                _current->tie.event.timeout = timeout.value;
+                _current->tie.event.next = NULL;
+                _tqueue_schedule(&events_queue, &_current->tie.event);
+        }
 }
 
 void _k_suspend(void)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    _current->state = WAITING;
+        _current->state = WAITING;
 
 #if KERNEL_THREAD_IDLE
-    if (_k_runqueue_single())
-    {
-        struct ditem *const tie = &_k_idle.tie.runqueue;
-        dlist_ref(tie);
-        runqueue = tie;
-        return;
-    }
+        if (_k_runqueue_single()) {
+                struct ditem *const tie = &_k_idle.tie.runqueue;
+                dlist_ref(tie);
+                runqueue = tie;
+                return;
+        }
 #else
-    __ASSERT_LEASTONE_RUNNING();
+        __ASSERT_LEASTONE_RUNNING();
 #endif
 
-    pop_ref(&runqueue);
+        pop_ref(&runqueue);
 }
 
 void _k_unschedule(struct k_thread *th)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    tqueue_remove(&events_queue, &th->tie.event);
+        tqueue_remove(&events_queue, &th->tie.event);
 }
 
-struct k_thread* _k_scheduler(void)
+struct k_thread *_k_scheduler(void)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    _current->timer_expired = 0;
+        _current->timer_expired = 0;
+        if (_current->state == WAITING) {
+                /* runqueue is positionned to the 
+                 * normally next thread to be executed */
+                __K_DBG_SCHED_WAITING();        // ~
+        } else {
+                /* next thread is positionned at the top of the runqueue */
+                ref_requeue(&runqueue);
 
-    if (_current->state == WAITING) {
-        /* runqueue is positionned to the normally next thread to be executed */
-        __K_DBG_SCHED_WAITING();        // ~
-    }
-    else {
-        /* next thread is positionned at the top of the runqueue */
-        ref_requeue(&runqueue);
+                __K_DBG_SCHED_REQUEUE();        // >
+        }
 
-        __K_DBG_SCHED_REQUEUE();        // >
-    }
+        struct ditem *ready = (struct ditem *)tqueue_pop(&events_queue);
+        if (ready != NULL) {
+                __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
 
-    struct ditem* ready = (struct ditem*)tqueue_pop(&events_queue);
-    if (ready != NULL) {
-        __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
+                /* set ready thread expired flag */
+                THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
 
-        /* set ready thread expired flag */
-        THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
+                _k_schedule(ready);
+        }
+        _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
 
-        _k_schedule(ready);
-    }
+        __K_DBG_SCHED_NEXT(_current);
 
-    _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
-
-    __K_DBG_SCHED_NEXT(_current);  // thread symbol
-
-    return _current;
+        return _current;
 }
 
 void _k_wake_up(struct k_thread *th)
 {
-    __ASSERT_NOINTERRUPT();
-    __ASSERT_THREAD_STATE(th, WAITING);
+        __ASSERT_NOINTERRUPT();
+        __ASSERT_THREAD_STATE(th, WAITING);
 
-    __K_DBG_WAKEUP(th); // @
+        __K_DBG_WAKEUP(th); // @
 
-    th->state = READY;
+        th->state = READY;
 
-    _k_unschedule(th);
+        _k_unschedule(th);
 
-    _k_schedule(&th->tie.runqueue);     // schedule in runqueue
+        _k_schedule(&th->tie.runqueue);
 }
 
 void _k_reschedule(k_timeout_t timeout)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    _k_suspend();
-    
-    _k_schedule_wake_up(_current, timeout);
+        _k_suspend();
+
+        _k_schedule_wake_up(_current, timeout);
 }
 
 /*___________________________________________________________________________*/
 
 void _k_system_shift(void)
 {
-    __ASSERT_NOINTERRUPT();
-    
-    tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
+        __ASSERT_NOINTERRUPT();
+
+        tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 }
 
 /*___________________________________________________________________________*/
 
 int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
-    __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
-    int8_t err = -1;
-    if (timeout.value != 0) {
-        /* queue thread to waiting queue of the object */
-        dlist_queue(waitqueue, &_current->wany);
+        int8_t err = -1;
+        if (timeout.value != 0) {
+                /* queue thread to waiting queue of the object */
+                dlist_queue(waitqueue, &_current->wany);
 
-        /* schedule thread wake up if timeout is set */
-        _k_reschedule(timeout);
+                /* schedule thread wake up if timeout is set */
+                _k_reschedule(timeout);
 
-        k_yield();
+                k_yield();
 
-        /* if timer expired, we nned to manually remove the thread from 
-         * the waiting queue
-         */
-        if (_current->timer_expired) {
-            dlist_remove(&_current->wany);
-            err = -ETIMEOUT;
-        } else {
-            err = 0;
+                /* if timer expired, we manually remove the thread from
+                 * the waiting queue
+                 */
+                if (_current->timer_expired) {
+                        dlist_remove(&_current->wany);
+                        err = -ETIMEOUT;
+                } else {
+                        err = 0;
+                }
         }
-    }
-    return err;
+        return err;
 }
     
-uint8_t _k_unpend_first_thread(struct ditem* waitqueue, void* swap_data)
+uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void *swap_data)
 {
-    __ASSERT_NOINTERRUPT();
-    
-    struct ditem* pending_thread = dlist_dequeue(waitqueue);
-    if (DITEM_VALID(waitqueue, pending_thread)) {
-        struct k_thread* th = THREAD_FROM_WAITQUEUE(pending_thread);
+        __ASSERT_NOINTERRUPT();
 
-        /* immediate wake up is not more required because 
-         * with the swap model, the object is already reserved for the 
-         * first waiting thread
-         */
-        _k_wake_up(th);
+        struct ditem *pending_thread = dlist_dequeue(waitqueue);
+        if (DITEM_VALID(waitqueue, pending_thread)) {
+                struct k_thread *th = THREAD_FROM_WAITQUEUE(pending_thread);
 
-        /* set the available object address */
-        th->swap_data = swap_data;
+                /* immediate wake up is not more required because
+                 * with the swap model, the object is already reserved for the
+                 * first waiting thread
+                 */
+                _k_wake_up(th);
 
-        /* TODO
-         * - For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc 
-         *    automatically switch to the first thread waiting on the 
-         *    object (this will probably be changed). If the function is 
-         *    called from an interrupt, it could preempt a cooperative thread
-         *    if the function is called from an interrupt handler. And this
-         *    is an unwished behavior.
-         * 
-         * - There is no mechanism to prevent the switch for now.
-         * 
-         * - As we cannot predict the current thread beeing processed 
-         *    when an interrupt occurs and we cannot know if we 
-         *    are actually in an interrupt handler (when calling 
-         *    k_fifo_put for example), I decided the default 
-         *    behavior as described above.
-         * 
-         * - First, I wanted to automatically switch to the thread waiting
-         *   on an object when it became available, but this should probably 
-         *   be changed ...
-         * 
-         * - Nothing is yet planned to prevent the developper from doing weird 
-         *   things from interrupt handlers.
-         * 
-         * IDEA but impossible : yield to this thread if the current thread 
-         *   isn't cooperative and we are in an interrupt 
-         */
+                /* set the available object address */
+                th->swap_data = swap_data;
+
 #if KERNEL_YIELD_ON_UNPEND
-        k_yield();
+                k_yield();
 #endif
 
-        /* we return 0 if a pending thread got the object*/
-        return 0;
-    }
-    /* if no thread is pending on the object, we simply return */
-    return -1;
+                /* we return 0 if a pending thread got the object*/
+                return 0;
+        }
+        /* if no thread is pending on the object, we simply return */
+        return -1;
 }
 
 /*___________________________________________________________________________*/
 
 void _k_on_thread_return(void)
 {
-    k_suspend();
+        k_suspend();
 }
 
 /*___________________________________________________________________________*/

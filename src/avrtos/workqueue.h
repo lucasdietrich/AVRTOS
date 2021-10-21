@@ -38,9 +38,9 @@ struct k_work
 
 struct k_workqueue
 {
-    struct ditem queue;
-    struct k_thread* thread;
-    uint8_t flags;
+        struct ditem queue;
+        struct k_thread* thread;
+        uint8_t flags;
 };
 
 #define k_workq k_workqueue
@@ -79,7 +79,7 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue);
  * @param work work item
  * @param handler handler 
  */
-void k_work_init(struct k_work * work, k_work_handler_t handler);
+void k_work_init(struct k_work *work, k_work_handler_t handler);
 
 /**
  * @brief Submit a work item to the desired workqueue.
@@ -100,7 +100,7 @@ void k_work_init(struct k_work * work, k_work_handler_t handler);
  * @param workqueue 
  * @param work 
  */
-void k_work_submit(struct k_workqueue * workqueue, struct k_work * work);
+void k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
 
 /**
  * @brief Configure the workqueue to release the cpu after each work item
@@ -111,7 +111,7 @@ void k_work_submit(struct k_workqueue * workqueue, struct k_work * work);
  * 
  * @param workqueue 
  */
-void k_workqueue_set_yieldeach(struct k_workqueue * workqueue);
+void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
 
 /**
  * @brief Configure the workqueue to not release the cpu after each work
@@ -125,7 +125,7 @@ void k_workqueue_set_yieldeach(struct k_workqueue * workqueue);
  * 
  * @param workqueue 
  */
-void k_workqueue_clr_yieldeach(struct k_workqueue * workqueue);
+void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
 
 /*___________________________________________________________________________*/
 
@@ -138,7 +138,7 @@ void k_workqueue_clr_yieldeach(struct k_workqueue * workqueue);
  * 
  * @param work 
  */
-void k_system_workqueue_submit(struct k_work * work);
+void k_system_workqueue_submit(struct k_work *work);
 
 /*___________________________________________________________________________*/
 

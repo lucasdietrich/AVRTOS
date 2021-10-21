@@ -31,16 +31,16 @@ extern "C" {
 
 struct ditem
 {
-    union
-    {
-        struct ditem *next;
-        struct ditem *head;
-    };
-    union
-    {
-        struct ditem *prev;
-        struct ditem *tail;
-    };
+        union
+        {
+                struct ditem *next;
+                struct ditem *head;
+        };
+        union
+        {
+                struct ditem *prev;
+                struct ditem *tail;
+        };
 };
 
 #define DITEM_INIT(self)  \
@@ -75,9 +75,9 @@ void push_front(struct ditem *dlist, struct ditem *item);
 
 void push_back(struct ditem *dlist, struct ditem *item);
 
-struct ditem * pop_front(struct ditem *dlist);
+struct ditem *pop_front(struct ditem *dlist);
 
-struct ditem * pop_back(struct ditem *dlist);
+struct ditem *pop_back(struct ditem *dlist);
 
 void pop(struct ditem *item);
 
@@ -87,7 +87,7 @@ void dlist_init(struct ditem *dlist);
 
 void dlist_queue(struct ditem *dlist, struct ditem *item);
 
-struct ditem * dlist_dequeue(struct ditem *dlist);
+struct ditem *dlist_dequeue(struct ditem *dlist);
 
 void dlist_remove(struct ditem *item);
 
@@ -101,13 +101,13 @@ uint8_t dlist_count(struct ditem *dlist);
 
 /*___________________________________________________________________________*/
 
-struct ditem * push_ref(struct ditem **ref, struct ditem *item);
+struct ditem *push_ref(struct ditem **ref, struct ditem *item);
 
-struct ditem * pop_ref(struct ditem **ref);
+struct ditem *pop_ref(struct ditem **ref);
 
-struct ditem * ref_requeue(struct ditem **ref);
+struct ditem *ref_requeue(struct ditem **ref);
 
-struct ditem * ref_forward_tail(struct ditem **ref);
+struct ditem *ref_forward_tail(struct ditem **ref);
 
 /*___________________________________________________________________________*/
 

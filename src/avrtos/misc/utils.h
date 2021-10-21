@@ -61,7 +61,8 @@ void usart_ram_dump(uint16_t start, const size_t len, const uint16_t sp);
  * @param len 
  * @param sp 
  */
-void usart_dump_as_ram(const uint8_t *ram, const size_t len, const uint16_t start_addr, const uint16_t sp);
+void usart_dump_as_ram(const uint8_t *ram, const size_t len,
+        const uint16_t start_addr, const uint16_t sp);
 
 /*___________________________________________________________________________*/
 

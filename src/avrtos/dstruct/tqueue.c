@@ -14,104 +14,105 @@
 
 /*___________________________________________________________________________*/
 
-void _tqueue_schedule(struct titem** root, struct titem* item)
+void _tqueue_schedule(struct titem **root, struct titem *item)
 {
-    struct titem** prev_next_p = root;
-    while (*prev_next_p != NULL) {
-        /* next of previous become current */
-        struct titem* p_current = *prev_next_p;
+        struct titem **prev_next_p = root;
+        while (*prev_next_p != NULL) {
+            /* next of previous become current */
+                struct titem *p_current = *prev_next_p;
 
-        /* if current element expires before or at the same time
-         * that the input item, we go to next item.
-         */
-        if (p_current->delay_shift <= item->delay_shift) {
-            item->delay_shift -= p_current->delay_shift;
-            prev_next_p = &(p_current->next);
-        } else {
-            /* if current element expire after, we need to insert
-             * the new_item before current and linked *prev_next_p
-             */
-            item->next = p_current;
-            p_current->delay_shift -= item->delay_shift;
-            break;
+                /* if current element expires before or at the same time
+                 * that the input item, we go to next item.
+                 */
+                if (p_current->delay_shift <= item->delay_shift) {
+                        item->delay_shift -= p_current->delay_shift;
+                        prev_next_p = &(p_current->next);
+                } else {
+                    /* if current element expire after, we need to insert
+                     * the new_item before current and linked *prev_next_p
+                     */
+                        item->next = p_current;
+                        p_current->delay_shift -= item->delay_shift;
+                        break;
+                }
         }
-    }
-    *prev_next_p = item;
+        *prev_next_p = item;
 }
 
-void tqueue_schedule(struct titem** root,
-    struct titem* item, k_delta_ms_t timeout)
+void tqueue_schedule(struct titem **root,
+        struct titem *item, k_delta_ms_t timeout)
 {
-    if (item == NULL)
-        return;
+        if (item == NULL)
+                return;
 
-    /* last item doesn't have a "next" item */
-    item->next = NULL;
-    item->timeout = timeout;
+            /* last item doesn't have a "next" item */
+        item->next = NULL;
+        item->timeout = timeout;
 
-    _tqueue_schedule(root, item);
+        _tqueue_schedule(root, item);
 }
 
 void tqueue_shift(struct titem **root, k_delta_ms_t time_passed)
 {
-    struct titem** prev_next_p = root;
-    while (*prev_next_p != NULL) {
-        /* next of previous become current */
-        struct titem* p_current = *prev_next_p;
+        struct titem **prev_next_p = root;
+        while (*prev_next_p != NULL) {
+            /* next of previous become current */
+                struct titem *p_current = *prev_next_p;
 
-        if (p_current->delay_shift <= time_passed) {
-            /* if item delay_shift is different from 0 */
-            if (p_current->delay_shift != 0) {
-                time_passed -= p_current->delay_shift;
-                p_current->delay_shift = 0;
-            }
-            prev_next_p = &(p_current->next);
-        } else {
-            p_current->delay_shift -= time_passed;
-            break;
+                if (p_current->delay_shift <= time_passed) {
+                    /* if item delay_shift is different from 0 */
+                        if (p_current->delay_shift != 0) {
+                                time_passed -= p_current->delay_shift;
+                                p_current->delay_shift = 0;
+                        }
+                        prev_next_p = &(p_current->next);
+                } else {
+                        p_current->delay_shift -= time_passed;
+                        break;
+                }
         }
-    }
 }
 
-struct titem * tqueue_pop(struct titem **root)
+struct titem *tqueue_pop(struct titem **root)
 {
-    struct titem* item = NULL;
-    /* pop the first item if expired */
-    if ((*root != NULL) && ((*root)->delay_shift == 0))
-    {
-        item = *root;
-        *root = (*root)->next;
-    }
-    return item;
+        struct titem *item = NULL;
+        /* pop the first item if expired */
+        if ((*root != NULL) && ((*root)->delay_shift == 0)) {
+                item = *root;
+                *root = (*root)->next;
+        }
+        return item;
 }
 
-struct titem* tqueue_pop_reschedule(struct titem** root, k_delta_ms_t timeout)
+struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_ms_t timeout)
 {
-    struct titem* item = tqueue_pop(root);
-    if (item != NULL) {
-        tqueue_schedule(root, item, timeout);
-    }
-    return item;
+        struct titem *item = tqueue_pop(root);
+        if (item != NULL) {
+                tqueue_schedule(root, item, timeout);
+        }
+        return item;
 }
 
 void tqueue_remove(struct titem **root, struct titem *item)
 {
-    struct titem** prev_next_p = root;
-    while (*prev_next_p != NULL) {
-        struct titem* p_current = *prev_next_p;
-        if (p_current == item) {
-            *prev_next_p = p_current->next;
+        struct titem **prev_next_p = root;
+        while (*prev_next_p != NULL) {
+                struct titem *p_current = *prev_next_p;
+                if (p_current == item) {
+                        *prev_next_p = p_current->next;
 
-            /* add removed item remaining time to the next item if exists */
-            if (p_current->next != NULL) {
-                p_current->next->delay_shift += item->delay_shift;
-            }
+                        /* add removed item remaining time 
+                         * to the next item if exists */
+                        if (p_current->next != NULL) {
+                                p_current->next->delay_shift
+                                        += item->delay_shift;
+                        }
 
-            item->next = NULL;
-            break;
+                        item->next = NULL;
+                        break;
+                }
+                prev_next_p = &(p_current->next);
         }
-        prev_next_p = &(p_current->next);
-    }
 }
 
 /*___________________________________________________________________________*/

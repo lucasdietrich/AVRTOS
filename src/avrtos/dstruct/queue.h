@@ -36,14 +36,14 @@ struct qitem
 
 /*___________________________________________________________________________*/
 
-inline void queue_init(struct qitem ** p_root)
+inline void queue_init(struct qitem **p_root)
 {
-    *p_root = NULL;
+        *p_root = NULL;
 }
 
-void queue(struct qitem ** p_root, struct qitem * item);
+void queue(struct qitem **p_root, struct qitem *item);
 
-struct qitem * dequeue(struct qitem ** p_root);
+struct qitem *dequeue(struct qitem **p_root);
 
 /*___________________________________________________________________________*/
 

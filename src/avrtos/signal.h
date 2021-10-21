@@ -33,9 +33,9 @@ extern "C" {
 
 struct k_signal
 {
-    uint8_t signal;
-    uint8_t flags;
-    struct ditem waitqueue;
+        uint8_t signal;
+        uint8_t flags;
+        struct ditem waitqueue;
 };
 
 /*___________________________________________________________________________*/

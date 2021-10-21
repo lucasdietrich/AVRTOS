@@ -29,7 +29,6 @@ struct k_fifo
 
 /*___________________________________________________________________________*/
 
-
 #define K_FIFO_INIT(fifo)                       \
     {                                           \
         .queue = INIT_OQREF(),                  \
@@ -88,7 +87,7 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  * @param item_tie 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem * item_tie);
+K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem *item_tie);
 
 /**
  * @brief Get and remove an item from the fifo. 
@@ -103,7 +102,17 @@ K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem * item_tie);
  * @param timeout 
  * @return K_NOINLINE struct* not null if success
  */
-K_NOINLINE struct qitem * k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
+K_NOINLINE struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
+
+/**
+ * @brief Cancel waiting on a fifo queue.
+ * This routine causes first thread pending on fifo, if any, 
+ * to return from k_fifo_get() call with NULL value (as if timeout expired).
+ * 
+ * @param fifo 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE void k_fifo_cancel_wait(struct k_fifo *fifo);
 
 /**
  * @brief Tells if the fifo is empty.
@@ -128,14 +137,6 @@ K_NOINLINE struct qitem * k_fifo_peek_head(struct k_fifo *fifo);
  * @return K_NOINLINE struct* 
  */
 K_NOINLINE struct qitem * k_fifo_peek_tail(struct k_fifo *fifo);
-
-/**
- * @brief CONCEPT : NOT IMPLEMENTED
- * 
- * @param fifo 
- * @return K_NOINLINE 
- */
-// K_NOINLINE void k_fifo_cancel_wait(struct k_fifo *fifo);
 
 /*___________________________________________________________________________*/
 

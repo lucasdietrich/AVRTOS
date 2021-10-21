@@ -90,6 +90,9 @@ struct k_thread
         size_t size;                    // stack size
     } stack;                            // thread stack definition
     char symbol;                        // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
+#if THREAD_ERRNO
+    uint8_t errno;                      // Thread errno
+#endif
 };
 
 /**

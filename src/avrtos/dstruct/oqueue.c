@@ -4,43 +4,43 @@
 
 void oqref_init(struct oqref *oref)
 {
-    oref->head = NULL;
-    oref->tail = NULL;
+        oref->head = NULL;
+        oref->tail = NULL;
 }
 
 void oqueue(struct oqref *oref, struct qitem *item)
 {
-    /* safely set next item pointer to NULL */
-    item->next = NULL;
+        /* safely set next item pointer to NULL */
+        item->next = NULL;
 
-    if (oref->head == NULL) {
-        /* case queue empty */
-        oref->head = item;
-    } else {
-        /* case queue not empty */
-        oref->tail->next = item;
-    }
-    oref->tail = item;
+        if (oref->head == NULL) {
+                /* case queue empty */
+                oref->head = item;
+        } else {
+                /* case queue not empty */
+                oref->tail->next = item;
+        }
+        oref->tail = item;
 }
 
-struct qitem * odequeue(struct oqref *oref)
+struct qitem *odequeue(struct oqref *oref)
 {
-    struct qitem * dequeued = oref->head;
-    if (oref->head != NULL) {
-        oref->head = dequeued->next;
+        struct qitem *dequeued = oref->head;
+        if (oref->head != NULL) {
+                oref->head = dequeued->next;
 
-        /* in OQUEUE_OPT_PEEK optimization mode
-         * it's not necessary to set ref->tail to NULL
-         * if dequeued->next is null
-         */
+                /* in OQUEUE_OPT_PEEK optimization mode
+                 * it's not necessary to set ref->tail to NULL
+                 * if dequeued->next is null
+                 */
 #if OQUEUE_OPT_TYPE == OQUEUE_OPT_PEEK
-        
-        if (oref->head == NULL) {
-            oref->tail = NULL;
-        }
+
+                if (oref->head == NULL) {
+                        oref->tail = NULL;
+                }
 #endif
-    }
-    return dequeued;
+        }
+        return dequeued;
 }
 
 /*___________________________________________________________________________*/

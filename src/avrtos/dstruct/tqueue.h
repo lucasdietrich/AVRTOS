@@ -25,13 +25,13 @@ extern "C" {
 
 struct titem
 {
-    union
-    {
-        k_delta_ms_t delay_shift;
-        k_delta_ms_t abs_delay;
-        k_delta_ms_t timeout;
-    };
-    struct titem* next;
+        union
+        {
+                k_delta_ms_t delay_shift;
+                k_delta_ms_t abs_delay;
+                k_delta_ms_t timeout;
+        };
+        struct titem* next;
 };
 
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
@@ -60,7 +60,7 @@ struct titem
  * @param root 
  * @param item 
  */
-void _tqueue_schedule(struct titem** root, struct titem* item);
+void _tqueue_schedule(struct titem **root, struct titem *item);
 
 /**
  * @see _tqueue_schedule
@@ -72,8 +72,8 @@ void _tqueue_schedule(struct titem** root, struct titem* item);
  * @param item 
  * @param timeout 
  */
-void tqueue_schedule(struct titem** root,
-    struct titem* item, k_delta_ms_t timeout);
+void tqueue_schedule(struct titem **root,
+        struct titem *item, k_delta_ms_t timeout);
 
 /**
  * @brief Shift the queue time of {time_passe}
@@ -85,45 +85,45 @@ void tqueue_schedule(struct titem** root,
  * @param root 
  * @param time_passed 
  */
-void tqueue_shift(struct titem** root, k_delta_ms_t time_passed);
+void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
 
 /**
- * @brief 
- * 
- * @param root 
- * @return struct titem* 
+ * @brief
+ *
+ * @param root
+ * @return struct titem*
  */
-struct titem* tqueue_pop_reschedule(struct titem** root, k_delta_ms_t timeout);
+struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_ms_t timeout);
 
 /**
  * @brief Pop an item from the time queue.
- * 
+ *
  * Note: this function doesn't set the poped item->next parameter to null.
- * 
- * Assumptions: 
+ *
+ * Assumptions:
  * - root is not null
- * 
- * @param root 
- * @return struct titem* 
+ *
+ * @param root
+ * @return struct titem*
  */
-struct titem* tqueue_pop(struct titem** root);
+struct titem *tqueue_pop(struct titem **root);
 
 /**
  * @brief Remove an item from the time queue.
  * Item->next attribute is set to null if found.
- * 
- * Note: this function is very expensive in term of time if there are a 
+ *
+ * Note: this function is very expensive in term of time if there are a
  *  lot of items in the titem queue.
- * 
+ *
  * Assumptions :
  *  - root is not null
  *  - item is not null
  *  - item is in root tqueue
- * 
- * @param root 
+ *
+ * @param root
  * @param item Item to remove if exists in the time queue.
  */
-void tqueue_remove(struct titem** root, struct titem* item);
+void tqueue_remove(struct titem **root, struct titem *item);
 
 /*___________________________________________________________________________*/
 
