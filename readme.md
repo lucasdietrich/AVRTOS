@@ -189,12 +189,13 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
   - a mutex is 7B
   - a signal is 6B
   - a semaphore is 6B
-  - a workqueue is 7B
+  - a workqueue is 7B (system workqueue enabled via SYSTEM_WORKQUEUE)
     - a k_work item is 6B
   - a fifo is 8B
     - a fifo item is at least 2B
   - a memory slab is 11B
   - a timer is 8B (or 12B with high precision)
+    - timer timeout queue is 2B (enabled via KERNEL_TIMERS)
 - In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
 - Plan additionnal stack for every thread that have their interrupt flag set, whose the stack could be used during interrupt handlers calls.
   
@@ -274,6 +275,7 @@ monitor_speed = 500000
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
 | KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
 | THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
+| KERNEL_TIMERS | Enables timers |
 
 
 ## Known issues

@@ -120,9 +120,6 @@ system_shift:
 #endif
     call _k_system_shift
 
-timers_handlers_exec:
-    call _k_timers_process
-
 yield_from_interrupt:
     ; Interrupt flag is disabled in interrupt handler, 
     ; we need to set it manually in SREG

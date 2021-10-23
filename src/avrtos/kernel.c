@@ -240,15 +240,6 @@ struct k_thread *_k_scheduler(void)
                 __K_DBG_SCHED_REQUEUE();        // >
         }
 
-        struct ditem *ready = (struct ditem *)tqueue_pop(&events_queue);
-        if (ready != NULL) {
-                __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
-
-                /* set ready thread expired flag */
-                THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
-
-                _k_schedule(ready);
-        }
         _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
 
         __K_DBG_SCHED_NEXT(_current);
@@ -286,6 +277,20 @@ void _k_system_shift(void)
         __ASSERT_NOINTERRUPT();
 
         tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
+        
+        struct ditem *ready = (struct ditem *)tqueue_pop(&events_queue);
+        if (ready != NULL) {
+                __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
+
+                /* set ready thread expired flag */
+                THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
+
+                _k_schedule(ready);
+        }
+
+#if KERNEL_TIMERS
+        _k_timers_process();
+#endif
 }
 
 /*___________________________________________________________________________*/

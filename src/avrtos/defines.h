@@ -271,11 +271,18 @@
 #   define THREAD_ALLOW_RETURN DEFAULT_THREAD_ALLOW_RETURN
 #endif
 
+#ifdef CONFIG_KERNEL_TIMERS
+#   define KERNEL_TIMERS CONFIG_KERNEL_TIMERS
+#else
+#   define KERNEL_TIMERS DEFAULT_KERNEL_TIMERS
+#endif
+
 #ifdef CONFIG_THREAD_ERRNO
 #   define THREAD_ERRNO CONFIG_THREAD_ERRNO
 #else
 #   define THREAD_ERRNO DEFAULT_THREAD_ERRNO
 #endif
+
 
 /*___________________________________________________________________________*/
 
