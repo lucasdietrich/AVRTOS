@@ -12,35 +12,27 @@
 
 void _k_workqueue_entry(struct k_workqueue *const workqueue)
 {
-        struct ditem *item;
+        struct qitem *item;
+        struct k_work *work;
 
         for (;;) {
+                item = k_fifo_get(&workqueue->q, K_FOREVER);
+
+                /* we cannot cancel a workqueue waiting on a work item */
+                __ASSERT_NOTNULL(item);
+
+                work = CONTAINER_OF(item, struct k_work, _tie);
+
+                /* set the work item as "submittable" again */
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                        item = dlist_dequeue(&workqueue->queue);
+                        item->next = NULL;
                 }
 
-                if (DITEM_VALID(&workqueue->queue, item)) {
-                        /* set the work as "submittable" */
-                        item->next = NULL;
+                work->handler(work);
 
-                        struct k_work *work =
-                                CONTAINER_OF(item, struct k_work, tie);
-
-                        work->handler(work);
-
-                        /* yield if "yieldeach" option is enabled */
-                        if (TEST_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH)) {
-                                k_yield();
-                        }
-                } else {
-                        /* K_WORKQUEUE_IDLE help to differentiate a work sleep
-                         * from the workqueue sleeping */
-                        SET_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
-
-                        /* sleep until a new work item is added to the queue */
-                        k_sleep(K_UNTIL_WAKEUP);
-
-                        CLR_BIT(workqueue->flags, K_WORKQUEUE_IDLE);
+                /* yield if "yieldeach" option is enabled */
+                if (workqueue->yieldeach) {
+                        k_yield();
                 }
         }
 }
@@ -52,34 +44,21 @@ void k_work_init(struct k_work *work, k_work_handler_t handler)
         work->handler = handler;
 }
 
+inline bool k_work_submittable(struct k_work *work)
+{
+        return work->_tie.next == NULL;
+}
+
 void k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
         __ASSERT_NOTNULL(workqueue);
         __ASSERT_NOTNULL(work);
         __ASSERT_NOTNULL(work->handler);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                /* if item not already in queue */
-                if (work->tie.next == NULL)
-                {
-                        /* we need to check if the workqueue is processing 
-                        * an item, because we shouldn't wake it up if a work item
-                        * being processed is waiting for an event while
-                        * beiing processed.
-                        *
-                        * The workqueue should be idle to wake it up.
-                        *
-                        * If a work item is rescheduling another work item while
-                        * beiing processed, there is no need to wake up the 
-                        * workqueue thread.
-                        */
-                        if (TEST_BIT(workqueue->flags, K_WORKQUEUE_IDLE) &&
-                                workqueue->thread->state == WAITING) {
-                                _k_wake_up(workqueue->thread);
-                        }
-
-                        dlist_queue(&workqueue->queue, &work->tie);
+        /* if item not already in queue */
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                if (k_work_submittable(work)) {
+                        _k_fifo_put(&workqueue->q, &work->_tie);
                 }
         }
 }
@@ -88,18 +67,18 @@ void k_workqueue_set_yieldeach(struct k_workqueue *workqueue)
 {
         __ASSERT_NOTNULL(workqueue);
 
-        k_sched_lock();
-        SET_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
-        k_sched_unlock();
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                workqueue->yieldeach = 1u;
+        }
 }
 
 void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue)
 {
         __ASSERT_NOTNULL(workqueue);
 
-        k_sched_lock();
-        CLR_BIT(workqueue->flags, K_WORKQUEUE_YIELDEACH);
-        k_sched_unlock();
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                workqueue->yieldeach = 0u;
+        }
 }
 
 /*___________________________________________________________________________*/

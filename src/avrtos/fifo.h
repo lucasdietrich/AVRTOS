@@ -90,6 +90,17 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
 K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem *item_tie);
 
 /**
+ * @brief @see k_fifo_put
+ * 
+ * Assume interrupts are disabled
+ * 
+ * @param fifo 
+ * @param item 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE void _k_fifo_put(struct k_fifo *fifo, struct qitem *item);
+
+/**
  * @brief Get and remove an item from the fifo. 
  * 
  * If there is no item in the fifo and timeout is different from K_NO_WAIT,

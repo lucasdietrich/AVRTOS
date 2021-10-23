@@ -3,7 +3,8 @@
 
 #include <stddef.h>
 
-#include "avrtos.h"
+#include <avrtos/kernel.h>
+#include <avrtos/fifo.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,13 +18,13 @@ typedef void (*k_work_handler_t)(struct k_work *);
 
 struct k_work
 {
-    struct ditem tie;
+    struct qitem _tie;
     k_work_handler_t handler;
 };
 
 #define K_WORK_INIT(work_handler) \
     {                             \
-        .tie = DITEM_INIT_NULL(), \
+        ._tie = INIT_QITEM(),     \
         .handler = work_handler,  \
     }
 
@@ -32,35 +33,35 @@ struct k_work
 
 /*___________________________________________________________________________*/
 
-#define K_WORKQUEUE_IDLE        (1 << 0)
-
-#define K_WORKQUEUE_YIELDEACH   (2 << 0)
-
 struct k_workqueue
 {
-        struct ditem queue;
-        struct k_thread* thread;
-        uint8_t flags;
+        struct k_fifo q;
+        union {
+                uint8_t flags;
+                struct {
+                        uint8_t yieldeach: 1;
+                };
+        };
 };
 
 #define k_workq k_workqueue
 
+
 #define _K_WORKQUEUE_THREAD_NAME(name) _k_workq_##name
 
 #define K_WORKQUEUE_DEFINE(name, stack_size, prio_flags, symbol) \
-    extern struct k_workqueue name;                              \
+    struct k_workqueue name =                                    \
+        {                                                        \
+            .q = K_FIFO_INIT(name.q),                            \
+            .flags = 0u,                                         \
+        };                                                       \
     K_THREAD_DEFINE(                                             \
         _K_WORKQUEUE_THREAD_NAME(name),                          \
         _k_workqueue_entry, stack_size,                          \
         prio_flags,                                              \
         &name,                                                   \
         symbol)                                                  \
-    struct k_workqueue name =                                    \
-        {                                                        \
-            .queue = DLIST_INIT(name.queue),                     \
-            .thread = &_K_WORKQUEUE_THREAD_NAME(name),           \
-            .flags = 0u,                                         \
-    };
+
 
 /*___________________________________________________________________________*/
 
@@ -68,7 +69,7 @@ struct k_workqueue
 // Workqueue internal
 //
 
-void _k_workqueue_entry(struct k_workqueue *const workqueue);
+K_NOINLINE void _k_workqueue_entry(struct k_workqueue *const workqueue);
 
 /*___________________________________________________________________________*/
 
@@ -79,7 +80,16 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue);
  * @param work work item
  * @param handler handler 
  */
-void k_work_init(struct k_work *work, k_work_handler_t handler);
+K_NOINLINE void k_work_init(struct k_work *work, k_work_handler_t handler);
+
+/**
+ * @brief Tells if the work item is submittable or not.
+ * 
+ * @param work 
+ * @return true if submittable
+ * @return false if in a workqueueu fifo
+ */
+bool k_work_submittable(struct k_work *work);
 
 /**
  * @brief Submit a work item to the desired workqueue.
@@ -100,7 +110,7 @@ void k_work_init(struct k_work *work, k_work_handler_t handler);
  * @param workqueue 
  * @param work 
  */
-void k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
+K_NOINLINE void k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
 
 /**
  * @brief Configure the workqueue to release the cpu after each work item
@@ -111,7 +121,7 @@ void k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
  * 
  * @param workqueue 
  */
-void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
+K_NOINLINE void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
 
 /**
  * @brief Configure the workqueue to not release the cpu after each work
@@ -125,7 +135,7 @@ void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
  * 
  * @param workqueue 
  */
-void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
+K_NOINLINE void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
 
 /*___________________________________________________________________________*/
 

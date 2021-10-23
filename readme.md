@@ -190,7 +190,7 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
   - a signal is 6B
   - a semaphore is 6B
   - a workqueue is 7B (system workqueue enabled via SYSTEM_WORKQUEUE)
-    - a k_work item is 6B
+    - a k_work item is 4B
   - a fifo is 8B
     - a fifo item is at least 2B
   - a memory slab is 11B

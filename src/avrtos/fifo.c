@@ -11,21 +11,27 @@ void k_fifo_init(struct k_fifo *fifo)
         dlist_init(&fifo->waitqueue);
 }
 
-void k_fifo_put(struct k_fifo *fifo, struct qitem *item)
+void _k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 {
         __ASSERT_NOTNULL(fifo);
         __ASSERT_NOTNULL(item);
+        __ASSERT_NOINTERRUPT();
 
+        /* If there is a thread waiting on a fifo item,
+        * we to give the item directly to the thread
+        * (using thread->swap_data)
+        */
+        if (_k_unpend_first_thread(&fifo->waitqueue, (void *)item) != 0) {
+                        /* otherwise we queue the item to the fifo */
+                oqueue(&fifo->queue, item);
+        }
+}
+
+void k_fifo_put(struct k_fifo *fifo, struct qitem *item)
+{
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-                /* If there is a thread waiting on a fifo item,
-                * we to give the item directly to the thread
-                * (using thread->swap_data)
-                */
-                if (_k_unpend_first_thread(&fifo->waitqueue, (void *)item) != 0) {
-                        /* otherwise we queue the item to the fifo */
-                        oqueue(&fifo->queue, item);
-                }
+                _k_fifo_put(fifo, item);
         }
 }
 
