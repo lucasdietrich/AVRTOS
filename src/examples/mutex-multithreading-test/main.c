@@ -8,8 +8,6 @@
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
-// if this example reset, there is a problem when mutex lock timeout check K_FLAG_TIMER_EXPIRED flag
-
 void thread(void *p);
 void threadp(void *p);
 

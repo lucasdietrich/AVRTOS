@@ -13,50 +13,6 @@
 
 /*___________________________________________________________________________*/
 
-/* non standart */
-#define ENOERROR        0
-#define EERROR          1
-#define ETIMEOUT        2
-
-/* standart */
-#define EINTR 4
-#define EIO 5
-#define EAGAIN 11
-#define ENOMEM 12
-#define EACCES 13
-#define EFAULT 14
-#define EBUSY 16
-#define EINVAL 22
-
-#define EWOULDBLOCK EAGAIN
-
-/*___________________________________________________________________________*/
-
-// arch specific fixups
-
-// compiler constants :
-// https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html#AVR-Built-in-Macros
-
-#if defined(__AVR_3_BYTE_PC__)
-#   define _K_ARCH_STACK_SIZE_FIXUP         1
-#   define _K_ARCH_PC_SIZE                  3
-#else
-#   if defined(__AVR_2_BYTE_PC__) 
-#       define _K_ARCH_STACK_SIZE_FIXUP     0
-#       define _K_ARCH_PC_SIZE              2
-#   else
-#       error unsupported PC size
-#       define _K_ARCH_STACK_SIZE_FIXUP     0
-#       define _K_ARCH_PC_SIZE              0
-# endif
-#endif
-
-#define NOINLINE            __attribute__((noinline))
-#define NORETURN            __attribute__((__noreturn__))
-#define CODE_UNREACHABLE    __builtin_unreachable();
-
-/*___________________________________________________________________________*/
-
 // main thread priority
 #ifdef CONFIG_THREAD_MAIN_THREAD_PRIORITY
 #   define THREAD_MAIN_THREAD_PRIORITY CONFIG_THREAD_MAIN_THREAD_PRIORITY
@@ -304,37 +260,27 @@ typedef struct
     k_delta_ms_t value;
 } k_timeout_t;
 
-#define K_TIMEOUT_EQ(t1, t2)    (t1.value == t2.value)
+#endif
 
-#define K_SECONDS(delay_s)      ((k_timeout_t){.value = 1000u*delay_s})
-#define K_MSEC(delay_ms)        ((k_timeout_t){.value = delay_ms})
-#define K_NO_WAIT               ((k_timeout_t){.value = (k_delta_ms_t) 0})
-#define K_FOREVER               ((k_timeout_t){.value = (k_delta_ms_t) -1})
-#define K_UNTIL_WAKEUP          K_FOREVER
+/*___________________________________________________________________________*/
 
-#define HTONL(n) ((((((uint32_t)(n) & 0xFF)) << 24) |      \
-               ((((uint32_t)(n) & 0xFF00)) << 8) |         \
-               ((((uint32_t)(n) & 0xFF0000)) >> 8) |       \
-               ((((uint32_t)(n) & 0xFF000000)) >> 24)))
+// arch specific fixups
 
-#define HTONS(n) (((((uint16_t)(n) & 0xFF)) << 8) |       \
-               ((((uint16_t)(n) & 0xFF00)) >> 8))
+// compiler constants :
+// https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html#AVR-Built-in-Macros
 
-#define K_SWAP_ENDIANNESS(n) (((((uint16_t)(n) & 0xFF)) << 8) | (((uint16_t)(n) & 0xFF00) >> 8))
-
-#define MIN(a, b) ((a < b) ? (a) : (b))
-#define MAX(a, b) ((a > b) ? (a) : (b))
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-#define CONTAINER_OF(ptr, type, field) ((type *)(((char *)(ptr)) - offsetof(type, field)))
-
-#define SET_BIT(x, b)  ((x) |= b)
-#define CLR_BIT(x, b)  ((x) &= (~(b)))
-#define TEST_BIT(x, b) ((bool) ((x) & b))
-
-#define ARG_UNUSED(arg) ((void) arg)
-
-#define IN_RANGE(x, a, b) ((x >= a) && (x <= b))
-
+#if defined(__AVR_3_BYTE_PC__)
+#   define _K_ARCH_STACK_SIZE_FIXUP         1
+#   define _K_ARCH_PC_SIZE                  3
+#else
+#   if defined(__AVR_2_BYTE_PC__) 
+#       define _K_ARCH_STACK_SIZE_FIXUP     0
+#       define _K_ARCH_PC_SIZE              2
+#   else
+#       error unsupported PC size
+#       define _K_ARCH_STACK_SIZE_FIXUP     0
+#       define _K_ARCH_PC_SIZE              0
+# endif
 #endif
 
 /*___________________________________________________________________________*/
