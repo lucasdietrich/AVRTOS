@@ -15,10 +15,8 @@
 /*___________________________________________________________________________*/
 
 void consumer(void *context);
-void task(void *context);
 
 K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
-K_THREAD_DEFINE(t1, task, 0x100, K_PREEMPTIVE, NULL, 'T');
 
 struct in
 {
@@ -61,11 +59,18 @@ static inline void input(const char rx)
         }
 
         switch (rx) {
+        case 0x1A: /* Ctrl + Z -> drop */
+                mem->len = 0;
         case '\n': /* process the packet */
                 mem->buffer[mem->len] = '\0';
                 push(&mem);
                 break;
-
+        case 0x08: /* backspace */
+                if (mem->len > 0) {
+                        mem->len--;
+                        usart_transmit(rx);
+                }
+                break;
         default:
                 if (mem->len == sizeof(mem->buffer) - 1u) {
                         mem->len = 0;
@@ -91,7 +96,7 @@ void consumer(void *context)
                 struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
                 __ASSERT_NOTNULL(mem);
                 if (mem->len == 0) {
-                        usart_print("\nTOO LONG !\n");
+                        usart_print("\nCOMMAND DROPPED !");
                 } else {
                         /* process/parsed the command */
                         usart_print("CMD received ! len = ");
@@ -99,11 +104,6 @@ void consumer(void *context)
                 }
                 k_mem_slab_free(&myslab, mem);
         }
-}
-
-void task(void *context)
-{
-        for (;;) {}
 }
 
 int main(void)

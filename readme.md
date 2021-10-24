@@ -45,7 +45,7 @@ Minor features:
 - Efficient pending feature, allowing to pass directly an object (mutex, semaphore, mem slab bloc, fifo item) to a pending thread. No need to do the whole process : unlock/lock for a mutex or free/allocate for a memory block if a thread is pending for the object being available.
 - Mutex thread owner
 - Fully C/C++ compliant
-- Allow thread safe termination
+- Allow thread safe termination (doesn't work for `main` thread yet).
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -73,6 +73,7 @@ What enhancements are planned :
 - Optimizing timers code
 - Unifying `k_timeout_t` and `k_delta_ms_t` types
 - Move the examples from a directory above
+- Allowing `main` thread to return.
 
 What enhancements/features are not planned :
 - Prioritization
