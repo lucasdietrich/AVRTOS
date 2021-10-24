@@ -16,7 +16,7 @@ extern "C" {
  * @brief Structure describing a semaphore, "count" parameter tells the number 
  * of available semaphore, "limit" describe the maximum number of semaphores.
  * 
- * Waitqueue list contains all threads waiting for the semaphore, 
+ * Waitqueue list contains all threads pending for the semaphore, 
  * first thread to wake up when a semaphore is available is at the 
  * first element of the queue.
  */
@@ -55,13 +55,13 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
  * If a semaphore is available, the scheduler is not called. 
  * 
  * If no semaphore is available, the current thread is unscheduled and added 
- * to the waiting queue ("waitqueue") of the semaphore,  it will be woke up 
+ * to the pending queue ("waitqueue") of the semaphore,  it will be woke up 
  * when the thread reach the top of this waitqueue and a semaphore is available.
  * 
  * If timeout is different from K_FOREVER, the thread will be woke up 
  * when the timeout expires, in this case the function will check
  * again for a semaphore availability. 
- * (current thread is removed from the waiting queue).
+ * (current thread is removed from the pending queue).
  * 
  * Cannot be called from an interrupt routine 
  * if timeout is different from K_NO_WAIT.
@@ -73,10 +73,10 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
 K_NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
- * @brief Give a semaphore, wake up the first waiting thread if the waiting 
+ * @brief Give a semaphore, wake up the first pending thread if the pending 
  * queue is not empty.
  * 
- * Switch thread before returning if a thread is waiting on a semaphores.
+ * Switch thread before returning if a thread is pending on a semaphore.
  * 
  * This function sets interrupt flag when returning.
  * 

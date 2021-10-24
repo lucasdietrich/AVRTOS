@@ -62,6 +62,15 @@
 
 /*___________________________________________________________________________*/
 
+#define PROGMEM_STRING(name, string)            \
+    static const char name[] PROGMEM = string
+
+#define PRINT_PROGMEM_STRING(name, string)      \
+    static const char name[] PROGMEM = string;  \
+    usart_print_p(name)
+
+/*___________________________________________________________________________*/
+
 #define K_PRIO_MAX                  0b00
 #define K_PRIO_HIGH                 0b01
 #define K_PRIO_LOW                  0b10
@@ -77,7 +86,7 @@
 
 #define K_FLAG_STOPPED              (0b00 << 0)
 #define K_FLAG_READY                (0b01 << 0)
-#define K_FLAG_WAITING              (0b10 << 0)
+#define K_FLAG_PENDING              (0b10 << 0)
 
 #define K_FLAG_PRIO_SHIFT           4
 
@@ -100,8 +109,6 @@
 
 #define K_FLAG_TIMER_EXPIRED_SHIFT   6
 #define K_FLAG_TIMER_EXPIRED         (1 << K_FLAG_TIMER_EXPIRED_SHIFT)
-
-/*___________________________________________________________________________*/
 
 /*___________________________________________________________________________*/
 

@@ -16,7 +16,7 @@ extern "C" {
  * @brief Structure representing a mutex, "lock" parameter tells 
  * if the current is locked or not (0 if lock, 0xFF otherwise).
  * 
- * Waitqueue list contains all threads waiting for the mutex, 
+ * Waitqueue list contains all threads pending for the mutex, 
  * first thread to wake up when mutex is unlocked is first in the queue.
  */
 struct k_mutex
@@ -54,30 +54,30 @@ void k_mutex_init(struct k_mutex *mutex);
  * If the mutex is available, the scheduler is minot called. 
  * 
  * If the mutex ic locked, the current thread is unscheduled and 
- * added to the waiting queue ("waitqueue") of the mutex, 
+ * added to the pending queue ("waitqueue") of the mutex, 
  * it will be woke up when the thread reach the top of this 
  * waitqueue and the mutex is available again.
  * 
  * If timeout is different from K_FOREVER, 
  * the thread will be woke up when the timeout expires, in this case
  * the function will check again for the mutex availability. 
- * (current thread is removed from the waiting queue).
+ * (current thread is removed from the pending queue).
  * 
  * Don't lock a mutex from an interrupt routine !
  * 
  * If timeout is K_NO_WAIT, this function returns immediately.
  * 
  * @param mutex address of the mutex structure
- * @param timeout time waiting the mutex (K_NO_WAIT, K_MSEC(1000), K_FOREVER)
+ * @param timeout time pending the mutex (K_NO_WAIT, K_MSEC(1000), K_FOREVER)
  * @return uint8_t 0 if mutex locked any other value otherwise
  */
 K_NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
 
 /**
- * @brief Unlock a mutex, wake up the first waiting thread if the waiting queue
+ * @brief Unlock a mutex, wake up the first pending thread if the pending queue
  * is not empty.
  * 
- * Switch thread before returning if a thread is waiting on the mutex.
+ * Switch thread before returning if a thread is pending on the mutex.
  * 
  * This function doesn't check if the current thread 
  * actually own the mutex. This function sets interrupt flag when returning.

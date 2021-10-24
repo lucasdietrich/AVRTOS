@@ -113,7 +113,7 @@ static __inline__ uint8_t __k_sched_lock_ret(void)
  * 
  * @see k_yield
  * 
- * @param timeout waiting delay
+ * @param timeout pending timeout
  */
 K_NOINLINE void k_sleep(k_timeout_t timeout);
 
@@ -182,7 +182,7 @@ K_NOINLINE void _k_schedule(struct ditem *const thread_tie);
  * @brief Schedule the thread wake up.
  * 
  * Assumptions:
- * - thread is suspended (WAITING)
+ * - thread is suspended (PENDING)
  * - thread is not in the runqueue
  * 
  * @param thread 
@@ -194,7 +194,7 @@ K_NOINLINE void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout
 /**
  * @brief Remove the current thread from the runqueue.
  * Stop the execution of the current thread (until it is scheduled again with function _k_schedule or _k_schedule_wake_up)
- * State flag is changed to WAITING.
+ * State flag is changed to PENDING.
  * 
  * Assumptions:
  * - interrupt flag is cleared when called.
@@ -225,10 +225,10 @@ K_NOINLINE void _k_unschedule(struct k_thread *th);
 K_NOINLINE struct k_thread *_k_scheduler(void);
 
 /**
- * @brief Wake up a thread that is waiting for an event.
+ * @brief Wake up a thread that is pending for an event.
  * 
  * Assumptions:
- *  - thread is in waiting mode
+ *  - thread is in PENDING mode
  *  - thread is not in the runqueue
  *  - thread may be in the events queue
  *  - interrupt flag is cleared when called.
@@ -281,7 +281,7 @@ K_NOINLINE void _k_system_shift(void);
 K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
 
 /**
- * @brief Wake up the first thread waiting for an object.
+ * @brief Wake up the first thread pending on an object.
  * Set the first pending thread swap_data parameter before switching.
  * Switch thread before returning.
  * 

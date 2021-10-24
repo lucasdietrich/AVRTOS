@@ -36,8 +36,7 @@ extern struct k_thread __k_threads_end;
 
 void k_thread_dbg_count(void)
 {
-        static const char string_1[] PROGMEM = "THREADS COUNT : _k_thread_count = ";
-        usart_print_p(string_1);
+        PRINT_PROGMEM_STRING(s1, "THREADS COUNT : _k_thread_count = ");
         usart_u8(_k_thread_count);
         usart_transmit('\n');
 }
@@ -53,9 +52,9 @@ void k_thread_dump(struct k_thread *th)
         usart_transmit(' ');
         usart_hex16((const uint16_t)th);
         if (th->coop) {
-                usart_print(" [COOP ");
+                PRINT_PROGMEM_STRING(coop_s, " [COOP ");
         } else {
-                usart_print(" [PREE ");
+                PRINT_PROGMEM_STRING(pree_s, " [PREE ");
         }
 
         usart_s8(th->priority);
@@ -65,25 +64,24 @@ void k_thread_dump(struct k_thread *th)
         static const char strings[4][11] PROGMEM = {
              "STOPPED",
              "READY  ",
-             "WAITING",
+             "PENDING",
         };
 
         usart_print_p(strings[th->state]);
 
-        usart_print(" : SP ");
+        PRINT_PROGMEM_STRING(sp_s, " : SP ");
 
         usart_u16(k_thread_usage(th));
         usart_transmit('/');
         usart_u16(th->stack.size);
-        usart_print(" -| END @");
+        PRINT_PROGMEM_STRING(end_s, " -| END @");
         usart_hex16((uint16_t)th->stack.end);
         usart_transmit('\n');
 }
 
 void k_thread_dump_all(void)
 {
-        static const char string[] PROGMEM = "===== k_thread =====\n";
-        usart_print_p(string);
+        PRINT_PROGMEM_STRING(thread_s, "===== k_thread =====\n");
 
         for (uint_fast8_t i = 0; i < _k_thread_count; i++) {
                 k_thread_dump(&(&__k_threads_start)[i]);

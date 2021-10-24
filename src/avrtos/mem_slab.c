@@ -120,7 +120,7 @@ void k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-                /* if a thread is waiting on a memory slab we give the block
+                /* if a thread is pending on a memory slab we give the block
                  * directly to the thread (using thread->swap_data)
                  */
                 if (_k_unpend_first_thread(&slab->waitqueue, mem) != 0) {

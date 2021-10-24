@@ -17,7 +17,7 @@ void _k_fifo_put(struct k_fifo *fifo, struct qitem *item)
         __ASSERT_NOTNULL(item);
         __ASSERT_NOINTERRUPT();
 
-        /* If there is a thread waiting on a fifo item,
+        /* If there is a thread pending on a fifo item,
         * we to give the item directly to the thread
         * (using thread->swap_data)
         */

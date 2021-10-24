@@ -39,11 +39,11 @@ typedef void (*thread_entry_t)(void*);
  * 
  * READY : the thread is ready to be executed and it somewhere is in the runqueue but is not at the top
  * 
- * WAITING : the thread is waiting for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
+ * PENDING : the thread is pending for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
  * It can be wake up with function _k_wake_up()
  * 
  */
-enum thread_state_t { STOPPED = 0, READY = 1, WAITING = 2, _UNDEFINED = 3};
+enum thread_state_t { STOPPED = 0, READY = 1, PENDING = 2, _UNDEFINED = 3};
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -78,11 +78,11 @@ struct k_thread
             
     union
     {
-        struct ditem wany;              // represent the thread waiting on a generic object
-        struct ditem wmutex;            // represent the thread waiting on an mutex
-        struct ditem wsem;              // represent the thread waiting on an semaphore
-        struct ditem wsig;              // represent the thread waiting on an signal
-        struct ditem wfifo;             // represent the thread waiting on a fifo item
+        struct ditem wany;              // represent the thread pending on a generic object
+        struct ditem wmutex;            // represent the thread pending on an mutex
+        struct ditem wsem;              // represent the thread pending on an semaphore
+        struct ditem wsig;              // represent the thread pending on an signal
+        struct ditem wfifo;             // represent the thread pending on a fifo item
     };
     void * swap_data;                   // data returned by kernel API's when calling _k_unpend_first_thread
     struct

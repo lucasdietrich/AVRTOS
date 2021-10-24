@@ -39,12 +39,12 @@ void k_sem_give(struct k_sem *sem)
         {
                 __K_DBG_SEM_GIVE(_current);
 
-                /* if a thread is thread is waiting on a semaphore
+                /* if a thread is thread is pending on a semaphore
                  * it means that its count is necessary 0. So we don't
                  * need to check if we reached the limit.
                  */
 
-                /* If there is a thread waiting on a semaphore,
+                /* If there is a thread pending on a semaphore,
                  * we to give the semaphore directly to the thread
                  */
                 if (_k_unpend_first_thread(&sem->waitqueue, NULL) != 0) {

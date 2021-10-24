@@ -145,7 +145,7 @@ K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem,
  * @brief Free a memory block and notify the first pending thread that
  * a mem slab is available.
  * 
- * Switch thread before returning if a thread is waiting on a block.
+ * Switch thread before returning if a thread is pending on a block.
  * 
  * Cannot be called from an interrupt routine 
  * if timeout is different from K_NO_WAIT.

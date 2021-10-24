@@ -19,12 +19,12 @@ extern "C" {
  * 
  * Queue lists all items added to the fifo in order.
  * 
- * Waitqueue list contains all threads waiting for a fifo item.
+ * Waitqueue list contains all threads pending for a fifo item.
  */
 struct k_fifo
 {
     struct oqref queue;        // fifo reference to head item
-    struct ditem waitqueue;    // waitqueue of thread waiting to get an item
+    struct ditem waitqueue;    // waitqueue of thread pending to get an item
 };
 
 /*___________________________________________________________________________*/
@@ -53,7 +53,7 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  * 
  * Wake up the first thread pending on a fifo item.
  * 
- * Switch thread before returning if a thread is waiting on the item.
+ * Switch thread before returning if a thread is pending on the item.
  * 
  * Can be called from an interrupt routine.
  * 
@@ -116,7 +116,7 @@ K_NOINLINE void _k_fifo_put(struct k_fifo *fifo, struct qitem *item);
 K_NOINLINE struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
 
 /**
- * @brief Cancel waiting on a fifo queue.
+ * @brief Cancel pending on a fifo queue.
  * This routine causes first thread pending on fifo, if any, 
  * to return from k_fifo_get() call with NULL value (as if timeout expired).
  * 

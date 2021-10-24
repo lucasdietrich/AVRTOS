@@ -18,7 +18,7 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue)
         for (;;) {
                 item = k_fifo_get(&workqueue->q, K_FOREVER);
 
-                /* we cannot cancel a workqueue waiting on a work item */
+                /* we cannot cancel a workqueue pending on a work item */
                 __ASSERT_NOTNULL(item);
 
                 work = CONTAINER_OF(item, struct k_work, _tie);

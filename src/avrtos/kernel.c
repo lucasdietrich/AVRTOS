@@ -89,14 +89,14 @@ void k_suspend(void)
 
 void k_resume(struct k_thread *th)
 {
-        if (th->state == WAITING) {
+        if (th->state == PENDING) {
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {
                         th->state = READY;
                         _k_schedule(&th->tie.runqueue);
                 }
         } else {
-                /* thread waiting, ready of running and then already started */
+                /* thread pending, ready of running and then already started */
         }
 }
 
@@ -201,7 +201,7 @@ void _k_suspend(void)
 {
         __ASSERT_NOINTERRUPT();
 
-        _current->state = WAITING;
+        _current->state = PENDING;
 
 #if KERNEL_THREAD_IDLE
         if (_k_runqueue_single()) {
@@ -229,10 +229,10 @@ struct k_thread *_k_scheduler(void)
         __ASSERT_NOINTERRUPT();
 
         _current->timer_expired = 0;
-        if (_current->state == WAITING) {
+        if (_current->state == PENDING) {
                 /* runqueue is positionned to the 
                  * normally next thread to be executed */
-                __K_DBG_SCHED_WAITING();        // ~
+                __K_DBG_SCHED_PENDING();        // ~
         } else {
                 /* next thread is positionned at the top of the runqueue */
                 ref_requeue(&runqueue);
@@ -250,7 +250,7 @@ struct k_thread *_k_scheduler(void)
 void _k_wake_up(struct k_thread *th)
 {
         __ASSERT_NOINTERRUPT();
-        __ASSERT_THREAD_STATE(th, WAITING);
+        __ASSERT_THREAD_STATE(th, PENDING);
 
         __K_DBG_WAKEUP(th); // @
 
@@ -301,7 +301,7 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 
         int8_t err = -1;
         if (timeout.value != 0) {
-                /* queue thread to waiting queue of the object */
+                /* queue thread to pending queue of the object */
                 dlist_queue(waitqueue, &_current->wany);
 
                 /* schedule thread wake up if timeout is set */
@@ -310,7 +310,7 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
                 k_yield();
 
                 /* if timer expired, we manually remove the thread from
-                 * the waiting queue
+                 * the pending queue
                  */
                 if (_current->timer_expired) {
                         dlist_remove(&_current->wany);
@@ -332,7 +332,7 @@ uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void *swap_data)
 
                 /* immediate wake up is not more required because
                  * with the swap model, the object is already reserved for the
-                 * first waiting thread
+                 * first pending thread
                  */
                 _k_wake_up(th);
 

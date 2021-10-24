@@ -25,7 +25,7 @@ K_THREAD struct k_thread _k_thread_main = {
             .next = &_k_thread_main.tie.runqueue
         }
     },
-    .wmutex = DITEM_INIT_NULL(),   // the thread isn't waiting of an y events
+    .wany = DITEM_INIT_NULL(),   // the thread isn't pending on any events
     .swap_data = NULL,
 #if THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
     .stack = {

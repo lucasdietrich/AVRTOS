@@ -110,7 +110,7 @@
 #define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0
 
 //
-// Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting status
+// Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status
 //
 #define DEFAULT_KERNEL_THREAD_IDLE              1
 
@@ -158,7 +158,7 @@
 
 //
 // Tells if function _k_unpend_first_thread should immediately switch to 
-//   the first waiting thread when the object become  available.
+//   the first pending thread when the object become  available.
 //
 #define DEFAULT_KERNEL_YIELD_ON_UNPEND          0
 
