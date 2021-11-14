@@ -26,6 +26,7 @@ Following features are supported:
 - Pseudo random number generator : [LFSR](https://es.wikipedia.org/wiki/LFSR)
 - Timers
 - Signals (poll on a single signal)
+- Messages Queues (msgq)
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -195,9 +196,10 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
     - a k_work item is 4B
   - a fifo is 8B
     - a fifo item is at least 2B
-  - a memory slab is 11B
+  - a memory slab is 11B + allocated buffer
   - a timer is 8B (or 12B with high precision)
     - timer timeout queue is 2B (enabled via KERNEL_TIMERS)
+  - a msgq is 15B + allocated buffer
 - In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
 - Plan additionnal stack for every thread that have their interrupt flag set, whose the stack could be used during interrupt handlers calls.
   
@@ -266,7 +268,7 @@ monitor_speed = 500000
 | KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
 | KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
 | KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
-| KERNEL_THREAD_IDLE | KERNEL_DEBUG_PREEMPT_UART |
+| KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
 | KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
 | KERNEL_ALLOW_INTERRUPT_YIELD |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
 | THREAD_CANARIES | Enable thread canaries |
@@ -275,20 +277,12 @@ monitor_speed = 500000
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
-| KERNEL_YIELD_ON_UNPEND | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
+| **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
 | THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
 | KERNEL_TIMERS | Enables timers |
 
 
 ## Known issues
-
-- For now, functions k_fifo_put, k_sem_give, k_mem_slab_alloc automatically switch to the first thread waiting on the object (this will probably be changed). If the function is called from an interrupt, it could preempt a cooperative thread if the function is called from an interrupt handler. And this is an unwished behavior.
-  - As we cannot predict the current thread beeing processed when an interrupt occurs and we cannot know if we 
-  are actually in an interrupt handler (when calling k_fifo_put for example), I decided the default behavior as described above.
-  - First, I wanted to automatically switch to the thread waiting on an object when it became available, but this should probably be changed ...
-  - For now, setting configuration option `KERNEL_YIELD_ON_UNPEND` to `0` prevent the switch.
-  - Moreover nothing is yet planned to prevent the developper from doing weird things from interrupt handlers.
-
 
 - Set stack pointer only one time, remove instructions `b4` to `ba` (.init2):
   - See linker script
