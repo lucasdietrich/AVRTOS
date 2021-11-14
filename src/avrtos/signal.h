@@ -40,15 +40,17 @@ struct k_signal
 
 /*___________________________________________________________________________*/
 
-void k_signal_init(struct k_signal *sig);
+K_NOINLINE void k_signal_init(struct k_signal *sig);
 
-void k_signal_raise(struct k_signal *sig, uint8_t value);
+K_NOINLINE void k_signal_raise(struct k_signal *sig, uint8_t value);
 
 // poll a single signal, thread "tie" is enough
-int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
+K_NOINLINE int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
 
 // to poll several signal we need as many "tie" (to an event queue) as signals we have
 // void k_poll(struct k_signal *signals[], uint8_t size, k_timeout_t timeout);
+
+K_NOINLINE uint8_t k_poll_cancel_wait(struct k_signal *sig);
 
 /*___________________________________________________________________________*/
 

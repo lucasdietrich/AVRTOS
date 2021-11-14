@@ -65,8 +65,9 @@ struct k_thread
                         uint8_t state : 2;          // @see thread_state_t
                         uint8_t sched_lock : 1;     // tells if scheduled is temporarely locked
                         uint8_t coop : 1;           // cooperative/preemptive thread
-                        uint8_t priority : 2;       // thread priority : not supported for now
+                        uint8_t priority : 1;       // thread priority : not supported for now
                         uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
+                        uint8_t pend_canceled : 1;  // tells if the thread pending on an object was canceled
                 };
                 uint8_t flags;
         };
@@ -83,6 +84,7 @@ struct k_thread
                 struct ditem wsem;              // represent the thread pending on an semaphore
                 struct ditem wsig;              // represent the thread pending on an signal
                 struct ditem wfifo;             // represent the thread pending on a fifo item
+                struct ditem wmsgq;             // represent the thread pending on a msgq item
         };
         void *swap_data;                        // data returned by kernel API's when calling _k_unpend_first_thread
         struct

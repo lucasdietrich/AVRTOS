@@ -28,6 +28,7 @@ extern "C" {
 #define K_MODULE_FIFO           14
 #define K_MODULE_MEMSLAB        15
 #define K_MODULE_TIMER          16
+#define K_MODULE_MSGQ           17
 
 #define K_MODULE_APPLICATION    0x20
 
@@ -40,6 +41,9 @@ extern "C" {
 
 #define K_ASSERT_LEASTONE_RUNNING       3
 #define K_ASSERT_THREAD_STATE           4
+
+#define K_ASSERT_TRUE                   5
+#define K_ASSERT_FALSE                  6
 
 #define K_ASSERT_WORKQUEUE              10
 
@@ -56,6 +60,9 @@ extern "C" {
 #endif
 
 /*___________________________________________________________________________*/
+
+#define __ASSERT_TRUE(test)                 __ASSERT(K_ASSERT_TRUE, test != 0)
+#define __ASSERT_FALSE(test)                __ASSERT(K_ASSERT_FALSE, test == 0)
 
 #define __ASSERT_INTERRUPT()                __ASSERT(K_ASSERT_INTERRUPT, __k_interrupts() != 0)
 #define __ASSERT_NOINTERRUPT()              __ASSERT(K_ASSERT_NOINTERRUPT, __k_interrupts() == 0)

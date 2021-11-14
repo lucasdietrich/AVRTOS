@@ -123,7 +123,7 @@ K_NOINLINE struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
  * @param fifo 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_fifo_cancel_wait(struct k_fifo *fifo);
+K_NOINLINE uint8_t k_fifo_cancel_wait(struct k_fifo *fifo);
 
 /**
  * @brief Tells if the fifo is empty.

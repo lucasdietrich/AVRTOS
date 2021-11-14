@@ -5,8 +5,12 @@
 
 #include <util/atomic.h>
 
+#define K_MODULE K_MODULE_MUTEX
+
 void k_mutex_init(struct k_mutex *mutex)
 {
+        __ASSERT_NOTNULL(mutex);
+
         mutex->lock = 0xFFu;
         mutex->owner = NULL;
         dlist_init(&mutex->waitqueue);
@@ -14,6 +18,8 @@ void k_mutex_init(struct k_mutex *mutex)
 
 uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 {
+        __ASSERT_NOTNULL(mutex);
+
         uint8_t lock;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
@@ -32,6 +38,8 @@ uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 
 void k_mutex_unlock(struct k_mutex *mutex)
 {
+        __ASSERT_NOTNULL(mutex);
+
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
             /* we check if the current thread actually owns the mutex */
@@ -53,4 +61,15 @@ void k_mutex_unlock(struct k_mutex *mutex)
                         mutex->owner = NULL;
                 }
         }
+}
+
+uint8_t k_mutex_cancel_wait(struct k_mutex *mutex)
+{
+        __ASSERT_NOTNULL(mutex);
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                return _k_cancel_pending(&mutex->waitqueue);
+        }
+
+        __builtin_unreachable();
 }

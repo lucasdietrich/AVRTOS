@@ -47,4 +47,15 @@ int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
         __builtin_unreachable();
 }
 
+uint8_t k_poll_cancel_wait(struct k_signal *sig)
+{
+        __ASSERT_NOTNULL(sig);
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                return _k_cancel_pending(&sig->waitqueue);
+        }
+
+        __builtin_unreachable();
+}
+
 /*___________________________________________________________________________*/

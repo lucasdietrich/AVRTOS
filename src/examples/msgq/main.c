@@ -26,6 +26,8 @@ K_MSGQ_DEFINE(msgq, buffer, BLOCK_SIZE, BLOCKS_COUNT);
 #define READER_TIMEOUT  1000
 #define READER_DELAY    1000
 
+#define PURGE_PERIOD    10000
+
 void writer(struct k_msgq *msgq);
 void reader(struct k_msgq *msgq);
 
@@ -38,20 +40,24 @@ K_THREAD_DEFINE(r1, reader, 0x50, K_PREEMPTIVE, &msgq, 'R');
 
 void writer(struct k_msgq *msgq)
 {
-        static char buf[BLOCK_SIZE];
+        int8_t ret;
+        char buf[BLOCK_SIZE];
 
         for (;;) {
                 (*(uint16_t*) buf)++;
 
-                if (k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT)) == 0) {
-                        usart_transmit(_current->symbol);
+                ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
+                usart_transmit(_current->symbol);
+
+                if (ret == 0) {
                         usart_transmit(' ');
                         usart_u16(*(uint16_t*)buf);
                         usart_transmit('\n');
 
                         k_sleep(K_MSEC(WRITER_DELAY));
+                } else if (ret == -ECANCEL) {
+                        usart_print(" canceled\n");
                 } else {
-                        usart_transmit(_current->symbol);
                         usart_print(" !\n");
                 }
         }
@@ -59,18 +65,22 @@ void writer(struct k_msgq *msgq)
 
 void reader(struct k_msgq *msgq)
 {
-        static char buf[BLOCK_SIZE];
+        int8_t ret;
+        char buf[BLOCK_SIZE];
 
         for (;;) {
-                if (k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT)) == 0) {
-                        usart_transmit(_current->symbol);
+                ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
+                usart_transmit(_current->symbol);
+                if (ret == 0) {
+                        
                         usart_transmit(' ');
                         usart_u16(*(uint16_t*)buf);
                         usart_transmit('\n');
 
                         k_sleep(K_MSEC(READER_DELAY));
+                } else if (ret == -ECANCEL) {
+                        usart_print(" canceled\n");
                 } else {
-                        usart_transmit(_current->symbol);
                         usart_print(" !\n");
                 }
         }
@@ -85,7 +95,11 @@ int main(void)
 
         k_thread_dump_all();
 
-        k_sleep(K_FOREVER);
+        for (;;) {
+                k_sleep(K_MSEC(PURGE_PERIOD));
+
+                k_msgq_purge(&msgq);
+        }
 }
 
 /*___________________________________________________________________________*/

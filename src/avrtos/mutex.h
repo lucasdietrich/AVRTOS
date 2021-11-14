@@ -82,14 +82,14 @@ K_NOINLINE uint8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
  * This function doesn't check if the current thread 
  * actually own the mutex. This function sets interrupt flag when returning.
  * 
- *  * Don't unlock a mutex from an interrupt routine !
+ * Don't unlock a mutex from an interrupt routine !
  * 
  * @param mutex : address of the mutex structure
  */
 K_NOINLINE void k_mutex_unlock(struct k_mutex *mutex);
 
 /* concept */
-K_NOINLINE void k_mutex_cancel_wait(struct k_mutex *mutex);
+K_NOINLINE uint8_t k_mutex_cancel_wait(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 

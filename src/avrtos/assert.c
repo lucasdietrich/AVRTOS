@@ -6,7 +6,8 @@
 
 static const char *const module_to_str(uint8_t module)
 {
-        static const char modules_str[][sizeof("WORKQUEUE")] PROGMEM = {
+        /* TODO optimize size */
+        static const char modules_str[][sizeof("APPLICATION")] PROGMEM = {
             {"AVRTOS"},
             {"KERNEL"},
             {"ARCH"},
@@ -24,6 +25,22 @@ static const char *const module_to_str(uint8_t module)
             {"FIFO"},
             {"MEMSLAB"},
             {"TIMER"},
+            {"MSGQ"},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {""},
+            {"APPLICATION"}
         };
 
         return modules_str[MIN(module, ARRAY_SIZE(modules_str))];
@@ -40,6 +57,8 @@ static const char *const acode_to_str(uint8_t acode)
             {K_ASSERT_NOINTERRUPT, "NOINTERRUPT"},
             {K_ASSERT_LEASTONE_RUNNING, "LEASTONE_RUNNING"},
             {K_ASSERT_THREAD_STATE, "THREAD_STATE"},
+            {K_ASSERT_TRUE, "TRUE"},
+            {K_ASSERT_FALSE, "FALSE"},
             {K_ASSERT_WORKQUEUE, "WORKQUEUE"},
             {K_ASSSERT_NOTNULL, "NOTNULL"},
             {K_ASSSERT_NULL, "NULL"}
