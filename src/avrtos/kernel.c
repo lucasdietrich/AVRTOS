@@ -321,33 +321,32 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
         }
         return err;
 }
-    
-uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void *swap_data)
+
+struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue,
+                                        void *set_swap_data)
 {
         __ASSERT_NOINTERRUPT();
 
-        struct ditem *pending_thread = dlist_dequeue(waitqueue);
-        if (DITEM_VALID(waitqueue, pending_thread)) {
-                struct k_thread *th = THREAD_FROM_WAITQUEUE(pending_thread);
+        struct ditem *tie = dlist_dequeue(waitqueue);
+        if (DITEM_VALID(waitqueue, tie)) {
+                struct k_thread *pending_thread = THREAD_FROM_WAITQUEUE(tie);
 
                 /* immediate wake up is not more required because
                  * with the swap model, the object is already reserved for the
                  * first pending thread
                  */
-                _k_wake_up(th);
+                _k_wake_up(pending_thread);
 
-                /* set the available object address */
-                th->swap_data = swap_data;
-
-#if KERNEL_YIELD_ON_UNPEND
-                k_yield();
-#endif
-
-                /* we return 0 if a pending thread got the object*/
-                return 0;
+                if (set_swap_data != NULL) {
+                        /* set the available object address */
+                        pending_thread->swap_data = set_swap_data;
+                }
+                
+                /* we return !NULL if a pending thread got the object*/
+                return pending_thread;
         }
         /* if no thread is pending on the object, we simply return */
-        return -1;
+        return NULL;
 }
 
 /*___________________________________________________________________________*/

@@ -294,7 +294,10 @@ K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
  * @param swap_data : available object information
  * @return uint8_t return 0 if a thread got the object, any other value otherwise
  */
-K_NOINLINE uint8_t _k_unpend_first_thread(struct ditem *waitqueue, void * swap_data);
+
+ 
+K_NOINLINE struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue,
+                                                   void *set_swap_data);
 
 /*___________________________________________________________________________*/
 

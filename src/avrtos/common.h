@@ -17,6 +17,7 @@
 #define EFAULT 14
 #define EBUSY 16
 #define EINVAL 22
+#define ENOMSG 35
 
 #define EWOULDBLOCK EAGAIN
 

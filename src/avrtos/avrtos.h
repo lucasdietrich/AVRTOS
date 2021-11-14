@@ -33,5 +33,6 @@
 
 #include "fifo.h"
 #include "mem_slab.h"
+#include "msgq.h"
 
 #endif

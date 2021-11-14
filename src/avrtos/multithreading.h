@@ -58,41 +58,41 @@ enum thread_state_t { STOPPED = 0, READY = 1, PENDING = 2, _UNDEFINED = 3};
  */
 struct k_thread
 {
-    void *sp;       // stack point, keep it at the beginning of the structure
-    union {
+        void *sp;       // stack point, keep it at the beginning of the structure
+        union {
+                struct
+                {
+                        uint8_t state : 2;          // @see thread_state_t
+                        uint8_t sched_lock : 1;     // tells if scheduled is temporarely locked
+                        uint8_t coop : 1;           // cooperative/preemptive thread
+                        uint8_t priority : 2;       // thread priority : not supported for now
+                        uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
+                };
+                uint8_t flags;
+        };
+        union
+        {
+                struct ditem runqueue;          // represent the thread in the runqueue     (4B)
+                struct titem event;             // represent the thread in the events queue (4B)
+        } tie;                                  // the thread cannot be in the events_queue and the runqueue at the same time
+
+        union
+        {
+                struct ditem wany;              // represent the thread pending on a generic object
+                struct ditem wmutex;            // represent the thread pending on an mutex
+                struct ditem wsem;              // represent the thread pending on an semaphore
+                struct ditem wsig;              // represent the thread pending on an signal
+                struct ditem wfifo;             // represent the thread pending on a fifo item
+        };
+        void *swap_data;                        // data returned by kernel API's when calling _k_unpend_first_thread
         struct
         {
-            uint8_t state : 2;          // @see thread_state_t
-            uint8_t sched_lock: 1;    // tells if scheduled is temporarely locked
-            uint8_t coop : 1;           // cooperative/preemptive thread
-            uint8_t priority : 2;       // thread priority : not supported for now
-            uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
-        };
-        uint8_t flags;
-    };
-    union
-    {
-        struct ditem runqueue;          // represent the thread in the runqueue     (4B)
-        struct titem event;             // represent the thread in the events queue (4B)
-    } tie;                              // the thread cannot be in the events_queue and the runqueue at the same time
-            
-    union
-    {
-        struct ditem wany;              // represent the thread pending on a generic object
-        struct ditem wmutex;            // represent the thread pending on an mutex
-        struct ditem wsem;              // represent the thread pending on an semaphore
-        struct ditem wsig;              // represent the thread pending on an signal
-        struct ditem wfifo;             // represent the thread pending on a fifo item
-    };
-    void * swap_data;                   // data returned by kernel API's when calling _k_unpend_first_thread
-    struct
-    {
-        void *end;                      // stack end
-        size_t size;                    // stack size
-    } stack;                            // thread stack definition
-    char symbol;                        // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
+                void *end;                      // stack end
+                size_t size;                    // stack size
+        } stack;                                // thread stack definition
+        char symbol;                            // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
 #if THREAD_ERRNO
-    uint8_t errno;                      // Thread errno
+        uint8_t errno;                          // Thread errno
 #endif
 };
 

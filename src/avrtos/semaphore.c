@@ -47,7 +47,7 @@ void k_sem_give(struct k_sem *sem)
                 /* If there is a thread pending on a semaphore,
                  * we to give the semaphore directly to the thread
                  */
-                if (_k_unpend_first_thread(&sem->waitqueue, NULL) != 0) {
+                if (_k_unpend_first_thread(&sem->waitqueue, NULL) == NULL) {
                         _k_sem_give(sem);
                 }
         }

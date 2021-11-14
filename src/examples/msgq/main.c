@@ -1,0 +1,91 @@
+/*___________________________________________________________________________*/
+
+#include <util/delay.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#include <avrtos/misc/uart.h>
+#include <avrtos/misc/led.h>
+
+#include <avrtos/kernel.h>
+#include <avrtos/debug.h>
+
+/*___________________________________________________________________________*/
+
+#define BLOCKS_COUNT    10
+#define BLOCK_SIZE      0x20
+
+char buffer[BLOCKS_COUNT * BLOCK_SIZE];
+K_MSGQ_DEFINE(msgq, buffer, BLOCK_SIZE, BLOCKS_COUNT);
+
+/*___________________________________________________________________________*/
+
+#define WRITER_TIMEOUT  500
+#define WRITER_DELAY    250
+
+#define READER_TIMEOUT  1000
+#define READER_DELAY    1000
+
+void writer(struct k_msgq *msgq);
+void reader(struct k_msgq *msgq);
+
+K_THREAD_DEFINE(w0, writer, 0x50, K_PREEMPTIVE, &msgq, 'w');
+K_THREAD_DEFINE(w1, writer, 0x50, K_PREEMPTIVE, &msgq, 'W');
+K_THREAD_DEFINE(r0, reader, 0x50, K_PREEMPTIVE, &msgq, 'r');
+K_THREAD_DEFINE(r1, reader, 0x50, K_PREEMPTIVE, &msgq, 'R');
+
+/*___________________________________________________________________________*/
+
+void writer(struct k_msgq *msgq)
+{
+        static char buf[BLOCK_SIZE];
+
+        for (;;) {
+                (*(uint16_t*) buf)++;
+
+                if (k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT)) == 0) {
+                        usart_transmit(_current->symbol);
+                        usart_transmit(' ');
+                        usart_u16(*(uint16_t*)buf);
+                        usart_transmit('\n');
+
+                        k_sleep(K_MSEC(WRITER_DELAY));
+                } else {
+                        usart_transmit(_current->symbol);
+                        usart_print(" !\n");
+                }
+        }
+}
+
+void reader(struct k_msgq *msgq)
+{
+        static char buf[BLOCK_SIZE];
+
+        for (;;) {
+                if (k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT)) == 0) {
+                        usart_transmit(_current->symbol);
+                        usart_transmit(' ');
+                        usart_u16(*(uint16_t*)buf);
+                        usart_transmit('\n');
+
+                        k_sleep(K_MSEC(READER_DELAY));
+                } else {
+                        usart_transmit(_current->symbol);
+                        usart_print(" !\n");
+                }
+        }
+}
+
+int main(void)
+{
+        /* interrupts are disabled in this thread */
+
+        led_init();
+        usart_init();
+
+        k_thread_dump_all();
+
+        k_sleep(K_FOREVER);
+}
+
+/*___________________________________________________________________________*/
