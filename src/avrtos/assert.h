@@ -61,14 +61,14 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-#define __ASSERT_TRUE(test)                 __ASSERT(K_ASSERT_TRUE, test != 0)
-#define __ASSERT_FALSE(test)                __ASSERT(K_ASSERT_FALSE, test == 0)
+#define __ASSERT_TRUE(test)                 __ASSERT(K_ASSERT_TRUE, (test) != 0)
+#define __ASSERT_FALSE(test)                __ASSERT(K_ASSERT_FALSE, (test) == 0)
 
 #define __ASSERT_INTERRUPT()                __ASSERT(K_ASSERT_INTERRUPT, __k_interrupts() != 0)
 #define __ASSERT_NOINTERRUPT()              __ASSERT(K_ASSERT_NOINTERRUPT, __k_interrupts() == 0)
 
-#define __ASSERT_NOTNULL(var)               __ASSERT(K_ASSSERT_NOTNULL, var != NULL)
-#define __ASSERT_NULL(var)                  __ASSERT(K_ASSSERT_NULL, var == NULL)
+#define __ASSERT_NOTNULL(var)               __ASSERT(K_ASSSERT_NOTNULL, (var) != NULL)
+#define __ASSERT_NULL(var)                  __ASSERT(K_ASSSERT_NULL, (var) == NULL)
 
 #define __ASSERT_LEASTONE_RUNNING()         __ASSERT(K_ASSERT_LEASTONE_RUNNING, !_k_runqueue_single())
 #define __ASSERT_THREAD_STATE(th, th_state) __ASSERT(K_ASSERT_THREAD_STATE, th->state == th_state)

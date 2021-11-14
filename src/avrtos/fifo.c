@@ -21,7 +21,8 @@ void _k_fifo_put(struct k_fifo *fifo, struct qitem *item)
         * we to give the item directly to the thread
         * (using thread->swap_data)
         */
-        if (_k_unpend_first_thread(&fifo->waitqueue, (void *)item) == NULL) {
+
+        if (_k_unpend_first_and_swap(&fifo->waitqueue, (void *)item) == NULL) {
                         /* otherwise we queue the item to the fifo */
                 oqueue(&fifo->queue, item);
         }

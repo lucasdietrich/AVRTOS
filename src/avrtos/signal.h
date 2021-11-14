@@ -42,6 +42,13 @@ struct k_signal
 
 K_NOINLINE void k_signal_init(struct k_signal *sig);
 
+/**
+ * @brief Wake up the first thread (TODO all threads) polling on the signal.
+ * 
+ * @param sig 
+ * @param value 
+ * @return K_NOINLINE 
+ */
 K_NOINLINE void k_signal_raise(struct k_signal *sig, uint8_t value);
 
 // poll a single signal, thread "tie" is enough

@@ -25,7 +25,8 @@ void k_signal_raise(struct k_signal *sig, uint8_t value)
                 sig->signal = value;
                 sig->flags |= K_POLL_STATE_SIGNALED;
 
-                _k_unpend_first_thread(&sig->waitqueue, NULL);
+                /* TODO: unpend all threads */
+                _k_unpend_first_thread(&sig->waitqueue);
         }
 }
 

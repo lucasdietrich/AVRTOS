@@ -38,7 +38,7 @@ static int8_t _k_msgq_put(struct k_msgq *msgq, const void *data,
 
         if (msgq->used_msgs < msgq->max_msgs) {
                 struct k_thread *pending_thread =
-                        _k_unpend_first_thread(&msgq->waitqueue, NULL);
+                        _k_unpend_first_thread(&msgq->waitqueue);
                 if (pending_thread != NULL) {
                         /* a thread is waiting to get a msg, we write directly the
                          * data to the thread buffer. Passed through swap_data
@@ -96,7 +96,7 @@ static int8_t _k_msgq_get(struct k_msgq *msgq, void *data,
                 msgq->used_msgs--;
 
                 struct k_thread *pending_thread =
-                        _k_unpend_first_thread(&msgq->waitqueue, NULL);
+                        _k_unpend_first_thread(&msgq->waitqueue);
                 if (pending_thread != NULL) {
                         /* a thread is waiting to write a msg,
                          * we copy the data from the thread to the msgq

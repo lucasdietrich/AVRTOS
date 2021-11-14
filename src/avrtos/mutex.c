@@ -53,7 +53,7 @@ void k_mutex_unlock(struct k_mutex *mutex)
                  * The mutex owner is changed when returning to the
                  * k_mutex_lock function.
                  */
-                if (_k_unpend_first_thread(&mutex->waitqueue, NULL) == NULL) {
+                if (_k_unpend_first_thread(&mutex->waitqueue) == NULL) {
                     /* no new owner, we need to unlock
                      * the mutex and remove the owner
                      */

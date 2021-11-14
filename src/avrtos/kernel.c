@@ -328,8 +328,7 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
         return err;
 }
 
-struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue,
-                                        void *set_swap_data)
+struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue)
 {
         __ASSERT_NOINTERRUPT();
         __ASSERT_NOTNULL(waitqueue);
@@ -343,11 +342,6 @@ struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue,
                  * first pending thread
                  */
                 _k_wake_up(pending_thread);
-
-                if (set_swap_data != NULL) {
-                        /* set the available object address */
-                        pending_thread->swap_data = set_swap_data;
-                }
                 
                 /* we return !NULL if a pending thread got the object*/
                 return pending_thread;
@@ -356,23 +350,28 @@ struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue,
         return NULL;
 }
 
+K_NOINLINE struct k_thread *_k_unpend_first_and_swap(struct ditem *waitqueue,
+                                                     void *set_swap_data)
+{
+        __ASSERT_NOINTERRUPT();
+        __ASSERT_NOTNULL(waitqueue);
+
+        struct k_thread *pending_thread = _k_unpend_first_thread(waitqueue);
+        if ((pending_thread != NULL) && (set_swap_data != NULL)) {
+                pending_thread->swap_data = set_swap_data;
+        }
+        return pending_thread;
+}
+
 void _k_cancel_first_pending(struct ditem *waitqueue)
 {
         __ASSERT_NOINTERRUPT();
         __ASSERT_NOTNULL(waitqueue);
 
-        struct ditem *tie = dlist_dequeue(waitqueue);
-        if (DITEM_VALID(waitqueue, tie)) {
-                struct k_thread *pending_thread = THREAD_FROM_WAITQUEUE(tie);
-
+        struct k_thread *pending_thread = _k_unpend_first_thread(waitqueue);
+        if (pending_thread != NULL) {
                 /* tells that we canceled the thread pending on the object */
                 pending_thread->pend_canceled = 1;
-
-                /* immediate wake up is not more required because
-                 * with the swap model, the object is already reserved for the
-                 * first pending thread
-                 */
-                _k_wake_up(pending_thread);
         }
 }
 
@@ -382,16 +381,11 @@ uint8_t _k_cancel_pending(struct ditem *waitqueue)
         __ASSERT_NOTNULL(waitqueue);
 
         uint8_t count = 0;
-        struct ditem *tie;
+        struct k_thread *pending_thread;
         for (;;) {
-                tie = dlist_dequeue(waitqueue);
-                if (DITEM_VALID(waitqueue, tie)) {
-                        struct k_thread *pending_thread =
-                                THREAD_FROM_WAITQUEUE(tie);
-                        
+                pending_thread = _k_unpend_first_thread(waitqueue);
+                if (pending_thread != NULL) {
                         pending_thread->pend_canceled = 1;
-
-                        _k_wake_up(pending_thread);
 
                         count++;
                 } else {
