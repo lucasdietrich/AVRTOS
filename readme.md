@@ -46,6 +46,7 @@ Minor features:
 - Mutex thread owner
 - Fully C/C++ compliant
 - Allow thread safe termination (doesn't work for `main` thread yet).
+- Project fully PlatformIO compatible for Windows and Linux
 
 What paradigms/concepts are not supported:
 - Nested interrupts
