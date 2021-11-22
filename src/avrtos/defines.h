@@ -132,6 +132,13 @@
 
 #endif
 
+// kernel auto init
+#ifdef CONFIG_KERNEL_AUTO_INIT
+#   define KERNEL_AUTO_INIT CONFIG_KERNEL_AUTO_INIT
+#else
+#   define KERNEL_AUTO_INIT DEFAULT_KERNEL_AUTO_INIT
+#endif
+
 // select hardware timer
 #ifdef CONFIG_KERNEL_SYSLOCK_HW_TIMER
 #   define KERNEL_SYSLOCK_HW_TIMER CONFIG_KERNEL_SYSLOCK_HW_TIMER

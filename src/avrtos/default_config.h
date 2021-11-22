@@ -105,6 +105,11 @@
 #define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       1
 
 //
+//  Kernel auto initialisation
+//
+#define DEFAULT_KERNEL_AUTO_INIT                1
+
+//
 //  Use uart rx interrupt as preempt signal
 //
 #define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0

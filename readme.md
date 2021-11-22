@@ -267,6 +267,7 @@ monitor_speed = 500000
 | KERNEL_TIME_SLICE | Time slice in milliseconds |
 | KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
 | KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
+| KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
 | KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
 | KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |

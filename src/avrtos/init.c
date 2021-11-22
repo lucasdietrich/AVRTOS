@@ -37,4 +37,14 @@ void _k_avrtos_init(void)
 #endif
 }
 
+
+void k_avrtos_init(void)
+{
+        _k_kernel_sp();
+
+#if THREAD_EXPLICIT_MAIN_STACK == 1
+        _k_avrtos_init();
+#endif
+}
+
 /*___________________________________________________________________________*/
