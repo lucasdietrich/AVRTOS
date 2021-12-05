@@ -16,9 +16,9 @@ __attribute__((naked, used, section(".init3")))
 void _k_kernel_sp(void);
 
 #if KERNEL_AUTO_INIT == 1
-void __attribute__((naked, used, section(".init8")))
+__attribute__((naked, used, section(".init8")))
 #endif
-_k_avrtos_init(void);
+void _k_avrtos_init(void);
 
 /**
  * @brief Manual user AVRTOS init
