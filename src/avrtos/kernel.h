@@ -43,9 +43,8 @@ void k_yield(void);
  * 
  * Cannot be called from an interrupt routine.
  * 
- * If CONFIG_KERNEL_SCHED_LOCK_COUNTER is defined, k_sched_unlock() and 
- * k_sched_unlock_all() can be called as as a group. In this case, the maximum 
- * number of calls without calling k_sched_unlock() is 255.
+ * If CONFIG_KERNEL_SCHED_LOCK_COUNTER is defined, k_sched_unlock() can be called recursively. 
+ * In this case, the maximum  number of calls without calling k_sched_unlock() is 255.
  * 
  * Note: Scheduler is called anyway if a function yielding the CPU is called 
  *  like k_yield(), k_sleep() or any kernel function waiting for an 

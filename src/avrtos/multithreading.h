@@ -90,8 +90,7 @@ struct k_thread
 
 #if KERNEL_SCHED_LOCK_COUNTER
         /**
-         * @brief Number of timer the function k_sched_lock() is called minus 
-         * the number of timer the function k_sched_unlock() is called.
+         * @brief Depth of calls to k_sched_lock()
          */
         uint8_t sched_lock_cnt;
 #endif /* KERNEL_SCHED_LOCK_COUNTER */

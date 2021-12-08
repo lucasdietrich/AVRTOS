@@ -178,7 +178,10 @@
 
 /***
  * @brief Enable scheduler lock counter for each thread to allow 
- * k_sched_lock() and k_sched_unlock() to be called as a group. 
+ * k_sched_lock() to be called recursively. 
+ * 
+ * Note: This option leads to performance overhead when locking/unlocking the scheduler,
+ * enable it only if needed.
  * 
  */
 #define DEFAULT_KERNEL_SCHED_LOCK_COUNTER       0
