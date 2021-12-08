@@ -40,17 +40,26 @@ void k_yield(void);
  * shift the timed threads in the time queue.
  * As cooperative threads, executing should no last very long, since it could delay other threads execution and break time sensitive (RT) threads.
  * In cooperative threads locking/unlocking the scheduler doesn't have no effect.
+ * 
+ * Cannot be called from an interrupt routine.
+ * 
+ * If CONFIG_KERNEL_SCHED_LOCK_COUNTER is defined, k_sched_unlock() and 
+ * k_sched_unlock_all() can be called as as a group. In this case, the maximum 
+ * number of calls without calling k_sched_unlock() is 255.
+ * 
+ * Note: Scheduler is called anyway if a function yielding the CPU is called 
+ *  like k_yield(), k_sleep() or any kernel function waiting for an 
+ *  event to be signaled (e.g. k_sem_take(), k_mutex_lock() with delay)
  */
 K_NOINLINE void k_sched_lock(void);
 
 /**
  * @brief Unlock the CPU for the current thread being executed @see k_sched_lock. Set it as preemptive.
  * In cooperative threads locking/unlocking the scheduler doesn't have no effect.
- * TODO :
- * - for a cooperative thread : yield it
- * - for a preemptive thread, set it as a preemptive thread again
- * - add a new flag that tells if the thread is defined as a preemptive thread but locked the scheduler or is a real cooperative thread
  * 
+ * Cannot be called from an interrupt routine.
+ * 
+ * @see k_sched_lock()
  */
 K_NOINLINE void k_sched_unlock(void);
 

@@ -240,6 +240,13 @@
 #   define THREAD_ERRNO DEFAULT_THREAD_ERRNO
 #endif
 
+#ifdef CONFIG_KERNEL_SCHED_LOCK_COUNTER
+#   define KERNEL_SCHED_LOCK_COUNTER CONFIG_KERNEL_SCHED_LOCK_COUNTER
+#else
+#   define KERNEL_SCHED_LOCK_COUNTER DEFAULT_KERNEL_SCHED_LOCK_COUNTER
+#endif
+
+
 
 /*___________________________________________________________________________*/
 

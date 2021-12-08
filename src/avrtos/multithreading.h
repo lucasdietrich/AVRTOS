@@ -63,7 +63,7 @@ struct k_thread
                 struct
                 {
                         uint8_t state : 2;          // @see thread_state_t
-                        uint8_t sched_lock : 1;     // tells if scheduled is temporarely locked
+                        uint8_t sched_lock : 1;     // tells if scheduler is temporarely locked
                         uint8_t coop : 1;           // cooperative/preemptive thread
                         uint8_t priority : 1;       // thread priority : not supported for now
                         uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
@@ -87,6 +87,15 @@ struct k_thread
                 struct ditem wmsgq;             // represent the thread pending on a msgq item
         };
         void *swap_data;                        // data returned by kernel API's when calling _k_unpend_first_thread
+
+#if KERNEL_SCHED_LOCK_COUNTER
+        /**
+         * @brief Number of timer the function k_sched_lock() is called minus 
+         * the number of timer the function k_sched_unlock() is called.
+         */
+        uint8_t sched_lock_cnt;
+#endif /* KERNEL_SCHED_LOCK_COUNTER */
+
         struct
         {
                 void *end;                      // stack end

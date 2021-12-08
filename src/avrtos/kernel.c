@@ -33,29 +33,42 @@ static inline bool _k_runqueue_single(void)
 
 void k_sched_lock(void)
 {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                SET_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                _current->sched_lock = 1;
         }
+
+#if KERNEL_SCHED_LOCK_COUNTER
+        _current->sched_lock_cnt++;
+#endif /* KERNEL_SCHED_LOCK_COUNTER */
 
         __K_DBG_SCHED_LOCK(_current);
 }
 
 void k_sched_unlock(void)
 {
-        __K_DBG_SCHED_UNLOCK();
-
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                CLR_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+#if KERNEL_SCHED_LOCK_COUNTER
+        if (_current->sched_lock_cnt == 0) {
+                return;
+        } else if (_current->sched_lock_cnt == 1) {
+                _current->sched_lock_cnt = 0;
+        } else {
+                _current->sched_lock_cnt--;
+                return;
         }
+#endif /* KERNEL_SCHED_LOCK_COUNTER */
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+                _current->sched_lock = 0;
+        }
+
+        __K_DBG_SCHED_UNLOCK();
 }
 
 bool k_sched_locked(void)
 {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-                return (bool)TEST_BIT(_current->flags, K_FLAG_SCHED_LOCKED);
+                return _current->sched_lock == 1;
         }
 
         __builtin_unreachable();

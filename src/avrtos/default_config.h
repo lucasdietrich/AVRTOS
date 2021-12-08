@@ -176,6 +176,13 @@
 //
 #define DEFAULT_THREAD_ERRNO                    0
 
+/***
+ * @brief Enable scheduler lock counter for each thread to allow 
+ * k_sched_lock() and k_sched_unlock() to be called as a group. 
+ * 
+ */
+#define DEFAULT_KERNEL_SCHED_LOCK_COUNTER       0
+
 /*___________________________________________________________________________*/
 
 #endif
