@@ -31,6 +31,29 @@ static inline bool _k_runqueue_single(void)
 // Kernel Public API
 //
 
+#if KERNEL_IRQ_LOCK_COUNTER
+void irq_disable(void)
+{
+        cli();
+
+        _current->irq_lock_cnt++;
+}
+
+void irq_enable(void)
+{
+        if (_current->irq_lock_cnt == 0) {
+                return;
+        } else if (_current->irq_lock_cnt == 1) {
+                _current->irq_lock_cnt = 0;
+        } else {
+                _current->irq_lock_cnt--;
+                return;
+        }
+
+        sei();
+}
+#endif
+
 void k_sched_lock(void)
 {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {

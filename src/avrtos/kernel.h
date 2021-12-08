@@ -15,15 +15,24 @@ extern bool __k_interrupts(void);
 // Kernel Public API
 //
 
+#if KERNEL_IRQ_LOCK_COUNTER == 0
+/**
+ * @brief Disable interrupts in the current thread
+ */
+#define irq_disable     cli
+
 /**
  * @brief Enable interrupts in the current thread
  */
 #define irq_enable      sei
 
-/**
- * @brief Disable interrupts in the current thread
- */
-#define irq_disable     cli
+#else
+
+K_NOINLINE void irq_disable(void);
+
+K_NOINLINE void irq_enable(void);
+
+#endif /* KERNEL_IRQ_LOCK_COUNTER */
 
 /**
  * @brief Release the CPU: Stop the execution of the current thread and set it at the end of the runqueue 

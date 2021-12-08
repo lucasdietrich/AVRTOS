@@ -88,6 +88,13 @@ struct k_thread
         };
         void *swap_data;                        // data returned by kernel API's when calling _k_unpend_first_thread
 
+#if KERNEL_IRQ_LOCK_COUNTER
+        /**
+         * @brief Depth of calls to irq_disable()
+         */
+        uint8_t irq_lock_cnt;
+#endif /* KERNEL_IRQ_LOCK_COUNTER */
+
 #if KERNEL_SCHED_LOCK_COUNTER
         /**
          * @brief Depth of calls to k_sched_lock()

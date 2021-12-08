@@ -186,6 +186,19 @@
  */
 #define DEFAULT_KERNEL_SCHED_LOCK_COUNTER       0
 
+/***
+ * @brief Enable IRQ lock counter for each thread to allow 
+ * irq_enable() to be called recursively. 
+ * 
+ * If enabled, calling irq_disable() doesn't garantee that interrupts 
+ * are actually enabled again.
+ * 
+ * Note: This option leads to performance overhead when enabling/disabling irqs,
+ * enable it only if needed.
+ * 
+ */
+#define DEFAULT_KERNEL_IRQ_LOCK_COUNTER       0
+
 /*___________________________________________________________________________*/
 
 #endif

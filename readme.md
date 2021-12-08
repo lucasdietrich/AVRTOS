@@ -190,6 +190,7 @@ As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://githu
     - thread idle stack is at least 35/36 byte + 18B thread structure (configurable)
   - a thread structure is 18B + stack size which is at least 35/36byte
         - + 1B if CONFIG_KERNEL_SCHED_LOCK_COUNTER is enabled
+        - + 1B if CONFIG_KERNEL_IRQ_LOCK_COUNTER is enabled
   - a mutex is 7B
   - a signal is 6B
   - a semaphore is 6B
@@ -283,6 +284,7 @@ monitor_speed = 500000
 | THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
 | KERNEL_TIMERS | Enables timers |
 | KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
+| KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
 
 ## Known issues
 
