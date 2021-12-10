@@ -11,6 +11,7 @@
 .global atomic_set_bit
 .global atomic_set_bit_to
 .global atomic_blind_clear
+.global atomic_cas
 
 atomic_get:
         mov     r26, r24
@@ -82,4 +83,18 @@ atomic_dec:
         dec     r24
         sts     SREG, r18
         st      X, r24
+        ret
+
+atomic_cas:
+        mov     r26, r24
+        lds     r18, SREG
+        cli
+        ld      r24, X
+        sub     r24, r22
+        ldi     r24, 0 /* set return value to false */
+        brne    atomic_cas_end /* if no equal, do nothing */
+        ldi     r24, 1 /* set return value to true */
+        st      X, r20 /* if equal, store new value */
+atomic_cas_end: 
+        sts     SREG, r18
         ret

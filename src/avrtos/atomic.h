@@ -167,6 +167,13 @@ K_NOINLINE bool atomic_test_and_clear_bit(atomic_t *target, uint8_t bit);
  * @return K_NOINLINE 
  */
 K_NOINLINE bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit);
+
+/*___________________________________________________________________________*/
+
+K_NOINLINE bool atomic_cas(atomic_t *target,
+                           atomic_val_t test_value,
+                           atomic_val_t new_value);
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
