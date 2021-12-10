@@ -17,6 +17,7 @@
 #include "dstruct/tqueue.h"
 #include "dstruct/debug.h"
 
+#include "atomic.h"
 #include "assert.h"
 #include "kernel.h"
 #include "sysclock.h"

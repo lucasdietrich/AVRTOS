@@ -29,6 +29,9 @@
         "tqueue.h": "c",
         "oqueue.h": "c",
         "led.h": "c",
-        "delay.h": "c"
+        "delay.h": "c",
+        "cpufunc.h": "c",
+        "stdint.h": "c",
+        "default_config.h": "c"
     }
 }
