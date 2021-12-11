@@ -55,7 +55,8 @@ What paradigms/concepts are not supported:
 - Thread local storage (removed)
 
 What features will be implemented :
-- System time
+- **System time**
+- **Optimized circular buffer** / **Stream** / **Asymetric put/get**
 - Statistics CPU use per thread
 - Delayed start, suspending/resuming threads
 - Stack sentinels
