@@ -199,6 +199,9 @@
  */
 #define DEFAULT_KERNEL_IRQ_LOCK_COUNTER       0
 
+
+#define DEFAULT_FD_MAX_COUNT                  3
+
 /*___________________________________________________________________________*/
 
 #endif

@@ -252,6 +252,11 @@
 #   define KERNEL_IRQ_LOCK_COUNTER DEFAULT_KERNEL_IRQ_LOCK_COUNTER
 #endif
 
+#ifdef CONFIG_FD_MAX_COUNT
+#   define FD_MAX_COUNT CONFIG_FD_MAX_COUNT
+#else
+#   define FD_MAX_COUNT DEFAULT_FD_MAX_COUNT
+#endif
 
 
 /*___________________________________________________________________________*/
