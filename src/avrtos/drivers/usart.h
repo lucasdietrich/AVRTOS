@@ -71,6 +71,16 @@ struct usart_config
         uint8_t speed_mode: 1;
 };
 
+#define USART_CONFIG_DEFAULT_2400() { \
+        .baudrate = USART_BAUD_2400, \
+        .receiver = 1, \
+        .transmitter = 1, \
+        .mode = USART_MODE_ASYNCHRONOUS, \
+        .parity = USART_PARITY_NONE, \
+        .stopbits = USART_STOPBITS_1, \
+        .databits = USART_DATABITS_8, \
+        .speed_mode = USART_SPEED_MODE_NORMAL \
+}
 
 #define USART_CONFIG_DEFAULT_9600() { \
         .baudrate = USART_BAUD_9600, \
