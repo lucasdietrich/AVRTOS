@@ -1,6 +1,9 @@
 #include "usart.h"
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+
 #include <avr/pgmspace.h>
 #include <avr/io.h>
 
@@ -127,7 +130,7 @@ static void set_baudrate(const struct usart_reg *regs,
         set_ubrr(regs, ubrr);
 };
 
-int usart_drv_init(uint8_t usart_id,
+int usart_ll_init(uint8_t usart_id,
                    const struct usart_config *config)
 {
         const struct usart_reg *regs = get_pgm_regs(usart_id);
@@ -176,7 +179,7 @@ int usart_drv_init(uint8_t usart_id,
         return 0;
 }
 
-int usart_drv_deinit(uint8_t usart_id)
+int usart_ll_deinit(uint8_t usart_id)
 {
         const struct usart_reg *regs = get_pgm_regs(usart_id);
         if (regs == NULL) {
@@ -202,7 +205,7 @@ int usart_drv_deinit(uint8_t usart_id)
 //  862:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7000c6>
 //  866:	08 95       	ret
 
-// 0000076e <usart_drv_sync_putc.constprop.6>:
+// 0000076e <usart_ll_sync_putc.constprop.6>:
 //  76e:	2c e7       	ldi	r18, 0x7C	; 124
 //  770:	33 e0       	ldi	r19, 0x03	; 3
 //  772:	f9 01       	movw	r30, r18
@@ -210,7 +213,7 @@ int usart_drv_deinit(uint8_t usart_id)
 //  776:	b4 91       	lpm	r27, Z
 //  778:	8c 91       	ld	r24, X
 //  77a:	85 ff       	sbrs	r24, 5
-//  77c:	fa cf       	rjmp	.-12     	; 0x772 <usart_drv_sync_putc.constprop.6+0x4>
+//  77c:	fa cf       	rjmp	.-12     	; 0x772 <usart_ll_sync_putc.constprop.6+0x4>
 //  77e:	e6 e8       	ldi	r30, 0x86	; 134
 //  780:	f3 e0       	ldi	r31, 0x03	; 3
 //  782:	a5 91       	lpm	r26, Z+
@@ -220,7 +223,7 @@ int usart_drv_deinit(uint8_t usart_id)
 //  78a:	90 e0       	ldi	r25, 0x00	; 0
 //  78c:	80 e0       	ldi	r24, 0x00	; 0
 //  78e:	08 95       	ret
-int usart_drv_sync_putc(uint8_t usart_id, char c)
+int usart_ll_sync_putc(uint8_t usart_id, char c)
 {
         const struct usart_reg *regs = get_pgm_regs(usart_id);
         if (regs == NULL) {
@@ -237,8 +240,209 @@ int usart_drv_sync_putc(uint8_t usart_id, char c)
 }
 
 /* as fast as usart_transmit */
-void usart0_drv_sync_putc_opt(char c)
+void usart0_ll_sync_putc_opt(char c)
 {
         while(!(UCSR0A & BIT(UDRE0)));
         UDR0 = c;
+}
+
+/*___________________________________________________________________________*/
+
+int usart_drv_init(struct usart *dev,
+                   const struct usart_config *config)
+{
+        int ret;
+        
+        ret = usart_ll_init(dev->data.id, config);
+
+        if (ret != 0) {
+                goto exit;
+        }
+
+        k_msgq_init(&dev->data.rx_msgq, dev->data.rx.buf,
+                    1u, USART_DRV_RX_BUF_SIZE);
+
+        k_msgq_init(&dev->data.tx_msgq, dev->data.tx.buf,
+                    1u, USART_DRV_TX_BUF_SIZE);
+
+	return 0;
+exit:
+        return ret;
+};
+
+int usart_drv_put_c(struct usart *dev,
+                   char c,
+                   k_timeout_t timeout)
+{
+        int ret;
+
+	if (!dev) {
+		return -EINVAL;
+	}
+
+        ret = k_msgq_put(&dev->data.tx_msgq, &c, timeout);
+
+	switch(dev->data.id) {
+		case USART_0:
+			UCSR0B |= BIT(UDRIE0);
+			break;
+		
+		case USART_1:
+			UCSR1B |= BIT(UDRIE1);
+			break;
+
+		case USART_2:
+			UCSR2B |= BIT(UDRIE2);
+			break;
+
+		case USART_3:
+			UCSR3B |= BIT(UDRIE3);
+			break;
+
+		default:
+			return -EINVAL;
+	}	
+
+        return ret;
+}
+
+char usart_drv_get_c(struct usart *dev,
+                    k_timeout_t timeout)
+{
+        char c;
+        int ret;
+
+        ret = k_msgq_get(&dev->data.rx_msgq, &c, timeout);
+
+        if (ret == 0) {
+                return c;
+        }
+
+        return -EAGAIN;
+}
+
+int usart_drv_put_buf(struct usart *dev,
+                     const char *buf,
+                     size_t size,
+                     k_timeout_t timeout)
+{
+        int ret;
+
+        for (const char *c = buf; c < buf + size; c++) {
+                ret = k_msgq_put(&dev->data.tx_msgq, c, timeout);
+                if (ret != 0) {
+                        return ret;
+                }
+        }
+
+        return ret;
+}
+
+int usart_drv_get_buf(struct usart *dev,
+                     char *buf,
+                     size_t size,
+                     k_timeout_t timeout)
+{
+        int ret;
+
+        for (char *c = buf; c < buf + size; c++) {
+                ret = k_msgq_get(&dev->data.rx_msgq, c, timeout);
+                if (ret != 0) {
+                        return ret;
+                }
+        }
+
+        return ret;
+}
+
+
+static const struct usart_api usart_std_api = {
+        .init = usart_drv_init,
+        .put_c = usart_drv_put_c,
+        .get_c = usart_drv_get_c,
+        .put_buf = usart_drv_put_buf,
+        .get_buf = usart_drv_get_buf,
+};
+
+
+struct usart usart0 = {
+        .api = &usart_std_api,
+        .data = {
+                .id = USART_0,
+        }
+};
+
+struct usart usart1 = {
+        .api = &usart_std_api,
+        .data = {
+                .id = USART_1,
+        }
+};
+
+ISR(USART1_RX_vect)
+{
+	const uint8_t c = UDR1;
+	k_msgq_put(&usart1.data.rx_msgq, &c, K_NO_WAIT);
+}
+
+ISR(USART1_UDRE_vect)
+{
+	char c;
+	int8_t ret = k_msgq_get(&usart1.data.tx_msgq, &c, K_NO_WAIT);
+
+	if (ret == 0) {
+		UDR1 = c;
+	} else {
+		UCSR1B &= ~BIT(UDRIE1);
+	}
+}
+
+struct usart usart2 = {
+        .api = &usart_std_api,
+        .data = {
+                .id = USART_2,
+        }
+};
+
+ISR(USART2_RX_vect)
+{
+	const uint8_t c = UDR2;
+	k_msgq_put(&usart2.data.rx_msgq, &c, K_NO_WAIT);
+}
+
+ISR(USART2_UDRE_vect)
+{
+	char c;
+	int8_t ret = k_msgq_get(&usart2.data.tx_msgq, &c, K_NO_WAIT);
+
+	if (ret == 0) {
+		UDR2 = c;
+	} else {
+		UCSR2B &= ~BIT(UDRIE2);
+	}
+}
+
+struct usart usart3 = {
+        .api = &usart_std_api,
+        .data = {
+                .id = USART_3,
+        }
+};
+
+ISR(USART3_RX_vect)
+{
+	const uint8_t c = UDR3;
+	k_msgq_put(&usart3.data.rx_msgq, &c, K_NO_WAIT);
+}
+
+ISR(USART3_UDRE_vect)
+{
+	char c;
+	int8_t ret = k_msgq_get(&usart3.data.tx_msgq, &c, K_NO_WAIT);
+
+	if (ret == 0) {
+		UDR3 = c;
+	} else {
+		UCSR3B &= ~BIT(UDRIE3);
+	}
 }

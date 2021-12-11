@@ -56,7 +56,7 @@
 //
 // Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
 //
-#define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32   0
+#define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32   1
 
 //
 // Default SREG value for other thread on stack creation.
@@ -201,6 +201,10 @@
 
 
 #define DEFAULT_FD_MAX_COUNT                  3
+
+#define USART_DRV_RX_BUF_SIZE                 32
+#define USART_DRV_TX_BUF_SIZE                 32
+#define USART_DRV_BUF_SIZE                    32
 
 /*___________________________________________________________________________*/
 
