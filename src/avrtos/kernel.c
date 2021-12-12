@@ -324,12 +324,29 @@ void _k_reschedule(k_timeout_t timeout)
 
 /*___________________________________________________________________________*/
 
+
+#if KERNEL_UPTIME
+union {
+	uint32_t u32;
+#if KERNEL_UPTIME_40BITS
+	uint8_t bytes[5]; /* 35 years overflow */
+#else
+	uint8_t bytes[4]; /* 49 days overflow */
+#endif /* KERNEL_UPTIME_40BITS */
+
+} _k_uptime_ms = { .u32 = 0LU };
+#endif /* KERNEL_UPTIME */
+
+#if KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS
+uint8_t _k_remaining_sysclock_hits = KERNEL_TIME_SLICE / SYSCLOCK_PERIOD_MS;
+#endif /* KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS */
+
 void _k_system_shift(void)
 {
-        __ASSERT_NOINTERRUPT();
+	__ASSERT_NOINTERRUPT();
 
         tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
-        
+
         struct ditem *ready = (struct ditem *)tqueue_pop(&events_queue);
         if (ready != NULL) {
                 __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
@@ -341,8 +358,43 @@ void _k_system_shift(void)
         }
 
 #if KERNEL_TIMERS
-        _k_timers_process();
+	_k_timers_process();
 #endif
+}
+
+uint32_t k_uptime_get_ms32(void)
+{
+#if KERNEL_UPTIME
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		return _k_uptime_ms.u32;
+	}
+
+	__builtin_unreachable();
+#else
+	return 0;
+#endif /* KERNEL_UPTIME */
+}
+
+uint64_t k_uptime_get_ms64(void)
+{
+	uint64_t ms64 = 0x0ULL;
+#if KERNEL_UPTIME_40BITS
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		// ms64 = (uint64_t) _k_uptime_ms.u32;
+		// ms64 <<= 8;
+		// ms64 |= _k_uptime_ms.bytes[4];
+		memcpy(&ms64, &_k_uptime_ms.bytes, sizeof(_k_uptime_ms.bytes));
+	}
+#elif KERNEL_UPTIME
+	ms64 |= (uint32_t) k_uptime_get_ms32();
+#endif /* KERNEL_UPTIME */
+
+return ms64;
+}
+
+uint32_t k_uptime_get(void)
+{
+	return k_uptime_get_ms32() / 1000;
 }
 
 /*___________________________________________________________________________*/
@@ -440,12 +492,6 @@ uint8_t _k_cancel_pending(struct ditem *waitqueue)
                         return count;
                 }
         }
-}
-/*___________________________________________________________________________*/
-
-void _k_on_thread_return(void)
-{
-        k_suspend();
 }
 
 /*___________________________________________________________________________*/

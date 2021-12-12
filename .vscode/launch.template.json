@@ -42,6 +42,27 @@
                     "ignoreFailures": true
                 }
             ]
-        }
+        },
+        {
+		"name": "(gdb) remote QEMU VMDEV",
+		"type": "cppdbg",
+		"request": "launch",
+		"program": "${workspaceFolder}/.pio/build/Uptime-qemu-ATmega328p/firmware.elf",
+		"args": [],
+		"stopAtEntry": true,
+		"cwd": "${workspaceFolder}",
+		"environment": [],
+		"externalConsole": true,
+		"MIMode": "gdb",
+		"miDebuggerPath": "/usr/bin/avr-gdb",
+		"miDebuggerServerAddress": "localhost:1234",
+		"setupCommands": [
+		    {
+			"description": "Enable pretty-printing for gdb",
+			"text": "-enable-pretty-printing",
+			"ignoreFailures": true
+		    }
+		]
+	}
     ]
 }

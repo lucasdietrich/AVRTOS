@@ -286,6 +286,10 @@ monitor_speed = 500000
 | KERNEL_TIMERS | Enables timers |
 | KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
 | KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
+| STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART |
+| KERNEL_UPTIME | Enable uptime counter (ms) feature |
+| KERNEL_UPTIME_40BITS | Enable 40 bits timer counter (ms), extends maximum uptime to ~37 years instead of ~47days with the 32bits counter. |
+| KERNEL_MAX_SYSCLOCK_PERIOD_MS | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
 
 ## Known issues
 

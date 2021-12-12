@@ -276,6 +276,29 @@ K_NOINLINE void _k_reschedule(k_timeout_t timeout);
  */
 K_NOINLINE void _k_system_shift(void);
 
+/**
+ * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE uint32_t k_uptime_get_ms32(void);
+
+/**
+ * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
+ * 
+ * Should be used if KERNEL_UPTIME_40BITS is enabled.
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE uint64_t k_uptime_get_ms64(void);
+
+/**
+ * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE uint32_t k_uptime_get(void);
+
 /*___________________________________________________________________________*/
 
 /**
@@ -334,10 +357,6 @@ K_NOINLINE struct k_thread *_k_unpend_first_and_swap(struct ditem *waitqueue,
 K_NOINLINE void _k_cancel_first_pending(struct ditem *waitqueue);
 
 K_NOINLINE uint8_t _k_cancel_pending(struct ditem *waitqueue);
-
-/*___________________________________________________________________________*/
-
-K_NOINLINE void _k_on_thread_return(void);
 
 /*___________________________________________________________________________*/
 

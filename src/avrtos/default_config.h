@@ -205,6 +205,32 @@
  */
 #define DEFAULT_STDIO_PRINTF_TO_USART		-1
 
+/**
+ * @brief Enable uptime counter in milliseconds
+ */
+#define DEFAULT_KERNEL_UPTIME			1
+
+/**
+ * @brief Enable 40 bits timer counter (ms), extends maximum uptime to ~37 years instead of ~47days with the 32bits counter.
+ */
+#define DEFAULT_KERNEL_UPTIME_40BITS	0
+
+/**
+ * @brief Enable millisecond precision for uptime counter 
+ * Active only if DEFAULT_KERNEL_UPTIME is enabled.
+ * 
+ * 0 (default) : KERNEL_TIME_SLICE
+ * 1 -> KERNEL_TIME_SLICE : specified value
+ * 
+ * Define the maximum period of the sysclock in ms. Normally,
+ *  the period is automatically calculated from KERNEL_TIME_SLICE
+ *  but if a higher precision is required for the uptime (in ms). 
+ * The syslock period can be adjusted independently from thread 
+ * switch period (KERNEL_TIME_SLICE).
+ */
+#define DEFAULT_KERNEL_MAX_SYSCLOCK_PERIOD_MS	0
+
+
 /*___________________________________________________________________________*/
 
 #endif

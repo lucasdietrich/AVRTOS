@@ -258,6 +258,63 @@
 #   define STDIO_PRINTF_TO_USART DEFAULT_STDIO_PRINTF_TO_USART
 #endif
 
+#ifdef CONFIG_KERNEL_UPTIME
+#   define KERNEL_UPTIME CONFIG_KERNEL_UPTIME
+#else
+#   define KERNEL_UPTIME DEFAULT_KERNEL_UPTIME
+
+#endif
+
+#if KERNEL_UPTIME
+#    ifdef CONFIG_KERNEL_UPTIME_40BITS
+#   	define KERNEL_UPTIME_40BITS CONFIG_KERNEL_UPTIME_40BITS
+#    else
+#   	define KERNEL_UPTIME_40BITS DEFAULT_KERNEL_UPTIME_40BITS
+#   endif
+#else
+#   define KERNEL_UPTIME_40BITS 0
+#endif
+
+#ifdef CONFIG_KERNEL_MAX_SYSCLOCK_PERIOD_MS
+#   define KERNEL_MAX_SYSCLOCK_PERIOD_MS CONFIG_KERNEL_MAX_SYSCLOCK_PERIOD_MS
+#else
+#   define KERNEL_MAX_SYSCLOCK_PERIOD_MS DEFAULT_KERNEL_MAX_SYSCLOCK_PERIOD_MS
+#endif
+
+/*___________________________________________________________________________*/
+
+/**
+ * @brief Sysclock period is :
+ *  - KERNEL_TIME_SLICE if KERNEL_MAX_SYSCLOCK_PERIOD_MS is off
+ *  - MIN(KERNEL_MAX_SYSCLOCK_PERIOD_MS, KERNEL_TIME_SLICE) if KERNEL_MAX_SYSCLOCK_PERIOD_MS is on
+ */
+
+#if KERNEL_UPTIME == 0 || KERNEL_MAX_SYSCLOCK_PERIOD_MS == 0
+#define SYSCLOCK_PERIOD_MS  KERNEL_TIME_SLICE
+#else 
+
+#if KERNEL_MAX_SYSCLOCK_PERIOD_MS >= 64
+# 	error KERNEL_MAX_SYSCLOCK_PERIOD_MS must be less than 64 !
+	/* because of ADIW instruction 0 <= K < 64 */
+#endif
+
+#if KERNEL_TIME_SLICE % KERNEL_MAX_SYSCLOCK_PERIOD_MS != 0
+#	error KERNEL_TIME_SLICE must be multiple of KERNEL_MAX_SYSCLOCK_PERIOD_MS !
+	/* because of precision */
+#endif
+
+#if KERNEL_TIME_SLICE / KERNEL_MAX_SYSCLOCK_PERIOD_MS > 255
+#	error "KERNEL_TIME_SLICE / KERNEL_MAX_SYSCLOCK_PERIOD_MS must be less than 255 !"
+	/* because of remaining_sysclock_ints size (1B) in arch.S */
+#endif
+
+#if KERNEL_MAX_SYSCLOCK_PERIOD_MS < KERNEL_TIME_SLICE
+#define SYSCLOCK_PERIOD_MS  KERNEL_MAX_SYSCLOCK_PERIOD_MS
+#else 
+#define SYSCLOCK_PERIOD_MS  KERNEL_TIME_SLICE
+#endif /* KERNEL_MAX_SYSCLOCK_PERIOD_MS < KERNEL_TIME_SLICE */
+#endif /* KERNEL_UPTIME == 0 || KERNEL_MAX_SYSCLOCK_PERIOD_MS == 0 */
+
 /*___________________________________________________________________________*/
 
 // put all c specific definitions  here

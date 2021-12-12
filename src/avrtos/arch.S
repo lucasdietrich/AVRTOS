@@ -5,6 +5,14 @@
 
 .extern _k_timers_process
 
+
+#if KERNEL_UPTIME
+.extern _k_uptime_ms
+#if KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS
+.extern _k_remaining_sysclock_hits
+#endif /* KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS */ 
+#endif /* KERNEL_UPTIME */
+
 /*___________________________________________________________________________*/
 
 .global __k_interrupts
@@ -94,6 +102,76 @@ SYSCLOCK_TIMERX_OVF_vect:
 
     lds r17, SREG
 
+#if KERNEL_UPTIME
+    push r24
+    push r25
+
+    lds r24, _k_uptime_ms
+    lds r25, _k_uptime_ms+1
+    adiw r24, SYSCLOCK_PERIOD_MS
+    sts _k_uptime_ms, r24
+    sts _k_uptime_ms+1, r25
+
+    /* It took me 5 hours of debugging with QEMU to figure out why my
+      _k_uptime_ms counter got randomly crazy ... sad =(
+      The reason is I used r0 (__tmp_reg__) instead of r1 (__zero_reg__).
+
+      Actually I think that GitHub copilot advised me to use this r0
+      register instead of r1 .. fool
+      */
+    lds r24, _k_uptime_ms+2
+    adc r24, r1
+    sts _k_uptime_ms+2, r24
+
+    lds r24, _k_uptime_ms+3
+    adc r24, r1
+    sts _k_uptime_ms+3, r24
+
+#if KERNEL_UPTIME_40BITS
+    lds r24, _k_uptime_ms+4
+    adc r24, r1
+    sts _k_uptime_ms+4, r24
+#endif 
+
+
+#if KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS
+    lds r24, _k_remaining_sysclock_hits
+    dec r24
+    sts _k_remaining_sysclock_hits, r24
+
+    /* restore registers that were temporarely 
+    pushed in a wrong but convenient order */
+    pop r25
+
+    breq isr_save_context1
+    
+    pop r24
+    sts SREG, r17
+    pop r17
+    reti
+#else 
+
+    /* restore registers that were temporarely 
+    pushed in a wrong but convenient order */
+
+    pop r25
+    pop r24
+
+#endif /* KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS */
+#endif /* KERNEL_UPTIME */
+
+isr_save_context1:
+
+#if KERNEL_UPTIME && (KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS)
+    
+    /* reset _k_remaining_sysclock_hits */
+    ldi r24, KERNEL_TIME_SLICE / SYSCLOCK_PERIOD_MS
+    sts _k_remaining_sysclock_hits, r24
+
+    pop r24
+
+#endif /* KERNEL_UPTIME && (KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS) */
+
     push r0
 
     push r18
@@ -101,6 +179,7 @@ SYSCLOCK_TIMERX_OVF_vect:
     push r20
     push r21
     push r22
+
     push r23
     push r24
     push r25
