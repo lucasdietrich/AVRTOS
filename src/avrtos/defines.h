@@ -360,8 +360,8 @@ typedef struct
 
 /*___________________________________________________________________________*/
 
-// 32 registers (32) + SREG (1) + return address (2)
-#define K_THREAD_STACK_VOID_SIZE (35 + _K_ARCH_STACK_SIZE_FIXUP)
+// 31 registers (31) + SREG (1) + return address (2 or 3)
+#define K_THREAD_STACK_VOID_SIZE (34 + _K_ARCH_STACK_SIZE_FIXUP)
 #define K_THREAD_STACK_MIN_SIZE K_THREAD_STACK_VOID_SIZE
 
 // some of following macros need to be differenciate for c or asm :
@@ -396,7 +396,7 @@ typedef struct
 #define _K_CORE_CONTEXT_STRUCT() struct                                    \
         {                                                                  \
             uint8_t sreg;                                                  \
-            uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
+            uint8_t r26_r27r30r31r28r29_r16[21u];                        \
             void *context;                                                 \
             thread_entry_t *entry;                                         \
             uint8_t r17r0r18_r21_3Baddrmsb[6u + _K_ARCH_STACK_SIZE_FIXUP]; \
@@ -416,7 +416,7 @@ typedef struct
 #define _K_CORE_CONTEXT_STRUCT() struct                                    \
         {                                                                  \
             uint8_t sreg;                                                  \
-            uint8_t r26_r27r30r31r28r29r1_r16[22u];                        \
+            uint8_t r26_r27r30r31r28r29_r16[21u];                        \
             void *context;                                                 \
             uint8_t r17r0r18_r21_3Baddrmsb[8u + _K_ARCH_STACK_SIZE_FIXUP]; \
             thread_entry_t *entry;                                         \

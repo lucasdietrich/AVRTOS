@@ -103,7 +103,7 @@ void *k_thread_get_return_addr(struct k_thread *th)
 int k_thread_copy_registers(struct k_thread *th, 
 uint8_t *buffer, const size_t size)
 {
-        const uint16_t context_size = 35u + _K_ARCH_STACK_SIZE_FIXUP;
+        const uint16_t context_size = K_THREAD_STACK_VOID_SIZE;
         if ((th != _current) && (size >= context_size)) {
                 memcpy(buffer, K_STACK_START(th->stack.end,
                         context_size), context_size);

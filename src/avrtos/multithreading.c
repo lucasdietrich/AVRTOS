@@ -83,7 +83,7 @@ void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
         *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)context_p);
         sp -= 1u;
 
-        for (uint_fast8_t i = 0u; i < 22u; i++) {
+        for (uint_fast8_t i = 0u; i < 21u; i++) {
                 *sp-- = 0u;
         }
 

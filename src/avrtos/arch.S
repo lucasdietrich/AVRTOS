@@ -302,7 +302,6 @@ scheduler_entry:
     jmp restore_context1
 
 save_context2:
-    push r1
     push r2
     push r3
     push r4
@@ -355,7 +354,6 @@ restore_context2:
     pop r4
     pop r3
     pop r2
-    pop r1
 
     pop r29
     pop r28
@@ -461,7 +459,7 @@ _k_thread_stack_create:
     st -X, r18
     st -X, r19
 
-    ldi r29, 22
+    ldi r29, 21
     dec r29
     st -X, r28
     brne .-6

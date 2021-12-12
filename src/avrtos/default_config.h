@@ -211,7 +211,7 @@
 #define DEFAULT_KERNEL_UPTIME			1
 
 /**
- * @brief Enable 40 bits timer counter (ms), extends maximum uptime to ~37 years instead of ~47days with the 32bits counter.
+ * @brief Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter.
  */
 #define DEFAULT_KERNEL_UPTIME_40BITS	0
 
