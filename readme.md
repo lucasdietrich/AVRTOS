@@ -88,6 +88,44 @@ What enhancements/features are not planned :
 - Saving thread errno
 - Cancel submitted item
 
+## All onfiguration options
+| Configuration option | Description |
+| --- | --- |
+| THREAD_MAIN_THREAD_PRIORITY   | Define the main thread type (coop/prempt) and priority |
+| THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
+| THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
+| THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
+| KERNEL_HIGH_RANGE_TIME_OBJECT_U32 | Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds |
+| THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
+| KERNEL_DEBUG | Enable Kernel Debug features |
+| KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
+| KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
+| KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
+| KERNEL_TIME_SLICE | Time slice in milliseconds |
+| KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
+| KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
+| KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
+| KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
+| KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
+| KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
+| KERNEL_ALLOW_INTERRUPT_YIELD |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
+| THREAD_CANARIES | Enable thread canaries |
+| THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
+| SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
+| SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
+| SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
+| KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
+| **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
+| THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
+| KERNEL_TIMERS | Enables timers |
+| KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
+| KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
+| STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART |
+| KERNEL_UPTIME | Enable uptime counter (ms) feature |
+| KERNEL_UPTIME_40BITS | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
+| KERNEL_MAX_SYSCLOCK_PERIOD_MS | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
+
+
 ## Getting started example :
 
 ### Description
@@ -203,17 +241,6 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 - [interrupt-yield](./src/examples/interrupt-yield/main.c)
 - [idle](./src/examples/idle/main.c)
 
-
-
-
-
-
-
-
-
-
-
-
 ## Note
 
 ### Peripherals
@@ -302,43 +329,6 @@ upload_port = COM3
 monitor_port = COM3
 monitor_speed = 500000
 ```
-
-## Configuration options
-| Configuration option | Description |
-| --- | --- |
-| THREAD_MAIN_THREAD_PRIORITY   | Define the main thread type (coop/prempt) and priority |
-| THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
-| THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
-| THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
-| KERNEL_HIGH_RANGE_TIME_OBJECT_U32 | Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds |
-| THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
-| KERNEL_DEBUG | Enable Kernel Debug features |
-| KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
-| KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
-| KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
-| KERNEL_TIME_SLICE | Time slice in milliseconds |
-| KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
-| KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
-| KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
-| KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
-| KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
-| KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
-| KERNEL_ALLOW_INTERRUPT_YIELD |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
-| THREAD_CANARIES | Enable thread canaries |
-| THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
-| SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
-| SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
-| SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
-| KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
-| **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
-| THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
-| KERNEL_TIMERS | Enables timers |
-| KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
-| KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
-| STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART |
-| KERNEL_UPTIME | Enable uptime counter (ms) feature |
-| KERNEL_UPTIME_40BITS | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
-| KERNEL_MAX_SYSCLOCK_PERIOD_MS | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
 
 ## Known issues
 
