@@ -299,6 +299,13 @@ K_NOINLINE uint64_t k_uptime_get_ms64(void);
  */
 K_NOINLINE uint32_t k_uptime_get(void);
 
+struct timespec {
+    uint32_t tv_sec;
+    uint16_t tv_msec;
+};
+
+K_NOINLINE void k_timespec_get(struct timespec *ts);
+
 /*___________________________________________________________________________*/
 
 /**

@@ -32,6 +32,7 @@
         "delay.h": "c",
         "cpufunc.h": "c",
         "stdint.h": "c",
-        "default_config.h": "c"
+        "default_config.h": "c",
+        "time.h": "c"
     }
 }

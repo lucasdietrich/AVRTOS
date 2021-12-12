@@ -397,6 +397,22 @@ uint32_t k_uptime_get(void)
 	return k_uptime_get_ms32() / 1000;
 }
 
+void k_timespec_get(struct timespec *ts)
+{
+	if (ts == NULL) {
+		return;
+	}
+
+#if KERNEL_UPTIME_40BITS
+	uint64_t ms = k_uptime_get_ms64();
+#else 
+	uint32_t ms = k_uptime_get_ms32();
+#endif
+
+	ts->tv_sec = ms / 1000;
+	ts->tv_msec = ms % 1000;
+}
+
 /*___________________________________________________________________________*/
 
 int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)

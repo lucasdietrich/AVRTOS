@@ -27,6 +27,8 @@ Following features are supported:
 - Timers
 - Signals (poll on a single signal)
 - Messages Queues (msgq)
+- System uptime in ms and seconds (32bits or 40bits ms counter)
+- Atomic operations on 8bits variables
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -48,6 +50,7 @@ Minor features:
 - Fully C/C++ compliant
 - Allow thread safe termination (doesn't work for `main` thread yet).
 - Project fully PlatformIO compatible for Windows and Linux
+- Redirection of stdout to USART0 (e.g. printf)
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -55,7 +58,6 @@ What paradigms/concepts are not supported:
 - Thread local storage (removed)
 
 What features will be implemented :
-- **System time**
 - **Optimized circular buffer** / **Stream** / **Asymetric put/get**
 - Statistics CPU use per thread
 - Delayed start, suspending/resuming threads
@@ -396,6 +398,21 @@ debug_load_mode = manual
 monitor_port = socket://localhost:5678
 debug_extra_cmds =
     tbreak main
+```
+
+## QEMU installation :
+
+- https://www.qemu.org/download/#source
+
+Prerequisites :
+```
+sudo apt install make, ninja-build, pkg-config, libglib2.0-dev
+sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+```
+
+Install
+```
+sudo apt install gdb-avr
 ```
 
 
