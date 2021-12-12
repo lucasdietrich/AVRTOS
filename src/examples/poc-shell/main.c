@@ -21,7 +21,7 @@ K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 struct in
 {
         struct qitem tie;
-        char buffer[20];
+        uint8_t buffer[20];
         uint8_t len;
 };
 
@@ -101,6 +101,12 @@ void consumer(void *context)
                         /* process/parsed the command */
                         usart_print("CMD received ! len = ");
                         usart_u8(mem->len);
+			usart_print(" : ");
+
+			for (uint8_t *c = (uint8_t *)mem->buffer;
+			     c < mem->buffer + mem->len; c++) {
+				usart_transmit(*c);
+			}
                 }
                 k_mem_slab_free(&myslab, mem);
         }
