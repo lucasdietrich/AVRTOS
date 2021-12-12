@@ -5,9 +5,6 @@
 
 #include <util/atomic.h>
 
-extern struct ditem* runqueue;
-extern struct titem* events_queue;
-
 void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 {
         sem->limit = limit;

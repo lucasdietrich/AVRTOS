@@ -5,9 +5,16 @@
 
 #if KERNEL_THREAD_IDLE
 
+static void _k_idle_entry(void *context);
+
 K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PREEMPTIVE, NULL, 'I');
 
-void _k_idle_entry(void *context)
+/**
+ * @brief Idle thread entry function
+ * 
+ * @param context : ignored for now
+ */
+static void _k_idle_entry(void *context)
 {
         for (;;) {
                 /* only an interrupt can wake up the CPU after this instruction */
@@ -15,13 +22,17 @@ void _k_idle_entry(void *context)
         }
 }
 
+#endif /* KERNEL_THREAD_IDLE */
+
 extern struct ditem *runqueue;
 
-bool _k_runqueue_idle(void)
+inline bool k_is_cpu_idle(void)
 {
-        return runqueue == &_k_idle.tie.runqueue;
+#if KERNEL_THREAD_IDLE
+	return runqueue == &_k_idle.tie.runqueue;
+#else 
+	return false;
+#endif /* KERNEL_THREAD_IDLE */
 }
-
-#endif
 
 /*___________________________________________________________________________*/

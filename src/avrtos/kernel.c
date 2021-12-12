@@ -4,6 +4,7 @@
 
 #include <util/atomic.h>
 
+#include "io.h"
 #include "debug.h"
 
 /*___________________________________________________________________________*/
@@ -18,7 +19,7 @@
  */
 struct ditem *runqueue = &_k_thread_main.tie.runqueue;
 
-struct titem *events_queue = NULL;
+static struct titem *events_queue = NULL;
 
 static inline bool _k_runqueue_single(void)
 {
@@ -155,6 +156,8 @@ void k_start(struct k_thread *th)
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
+extern struct k_thread _k_idle;
+
 uint8_t _k_thread_count = 0;
 
 inline static void swap_endianness(uint16_t *const addr)
@@ -164,40 +167,49 @@ inline static void swap_endianness(uint16_t *const addr)
 
 void _k_kernel_init(void)
 {
-        _k_thread_count = &__k_threads_end - &__k_threads_start;
+	_k_thread_count = &__k_threads_end - &__k_threads_start;
 
-        /* main thread is the first running (ready or not),
-         * and it is already in queue */
-        for (uint8_t i = 0; i < _k_thread_count; i++) {
-                struct k_thread *const thread = &(&__k_threads_start)[i];
+	/* main thread is the first running (ready or not),
+	 * and it is already in queue */
+	for (uint8_t i = 0; i < _k_thread_count; i++) {
+		struct k_thread *const thread = &(&__k_threads_start)[i];
 
-                /* idle thread must not be added to the
-                 * runqueue as the main thread is running */
-                if (!IS_THREAD_IDLE(thread) &&
-                        (thread->state == READY) &&
-                        (thread != _current)) {
-                        push_back(runqueue, &thread->tie.runqueue);
-                }
-
-                /* Swap endianness of addresses in compilation-time built stacks.
-                 * We cannot change the endianness of addresses determined by the
-                 * linker at compilation time. So we need to do it on system start up
-                 */
-                if (_current != thread) {
-                    /* thread kernel entry function address */
-                        swap_endianness(thread->stack.end - 1u);
-
-#if THREAD_ALLOW_RETURN == 1
-                        /* thread kernel entry function address */
-                        swap_endianness(thread->stack.end - 1u -
-                                (6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+#if KERNEL_THREAD_IDLE
+		const bool is_thread_idle = thread == &_k_idle;
+#else
+		const bool is_thread_idle = false;
 #endif
 
-                        /* thread context address */
-                        swap_endianness(thread->stack.end - 1u -
-                                (8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
-                }
-        }
+		/* idle thread must not be added to the
+		 * runqueue as the main thread is running */
+		if (!is_thread_idle &&
+		    (thread->state == READY) &&
+		    (thread != _current)) {
+			push_back(runqueue, &thread->tie.runqueue);
+		}
+
+		/* Swap endianness of addresses in compilation-time built stacks.
+		 * We cannot change the endianness of addresses determined by the
+		 * linker at compilation time. So we need to do it on system start up
+		 */
+		if (_current != thread) {
+		    /* thread kernel entry function address */
+			swap_endianness(thread->stack.end - 1u);
+
+#if THREAD_ALLOW_RETURN == 1
+			/* thread kernel entry function address */
+			swap_endianness(thread->stack.end - 1u -
+					(6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+#endif
+
+			/* thread context address */
+			swap_endianness(thread->stack.end - 1u -
+					(8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+		}
+	}
+	
+	/* Send output stream to usart0 */
+	k_set_stdio_usart0();
 }
 
 void _k_queue(struct k_thread *const th)
@@ -212,7 +224,7 @@ void _k_schedule(struct ditem *const thread_tie)
         __ASSERT_NOINTERRUPT();
 
 #if KERNEL_THREAD_IDLE
-        if (_k_runqueue_idle()) {
+        if (k_is_cpu_idle()) {
                 dlist_ref(thread_tie);
                 runqueue = thread_tie;
                 return;

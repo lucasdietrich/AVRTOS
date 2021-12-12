@@ -36,4 +36,6 @@
 #include "mem_slab.h"
 #include "msgq.h"
 
+#include "io.h"
+
 #endif

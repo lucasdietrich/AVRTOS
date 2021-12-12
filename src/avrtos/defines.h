@@ -252,7 +252,11 @@
 #   define KERNEL_IRQ_LOCK_COUNTER DEFAULT_KERNEL_IRQ_LOCK_COUNTER
 #endif
 
-
+#ifdef CONFIG_STDIO_PRINTF_TO_USART
+#   define STDIO_PRINTF_TO_USART CONFIG_STDIO_PRINTF_TO_USART
+#else
+#   define STDIO_PRINTF_TO_USART DEFAULT_STDIO_PRINTF_TO_USART
+#endif
 
 /*___________________________________________________________________________*/
 

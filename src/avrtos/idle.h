@@ -27,25 +27,7 @@ extern "C" {
 #define K_TRHEAD_IDLE_STACK_SIZE K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
 #endif
 
-#if KERNEL_THREAD_IDLE
-#define IS_THREAD_IDLE(thread)  (thread == &_k_idle)
-#else
-#define IS_THREAD_IDLE(thread)  0
-#endif
-
 /*___________________________________________________________________________*/
-
-/**
- * @brief idle thread structure location
- */
-extern struct k_thread _k_idle;
-
-/**
- * @brief Idle thread entry function
- * 
- * @param context : ignored for now
- */
-void _k_idle_entry(void *context);
 
 /**
  * @brief Tells if the runqueue contains the thread IDLE
@@ -53,7 +35,9 @@ void _k_idle_entry(void *context);
  * @return true 
  * @return false 
  */
-bool _k_runqueue_idle(void);
+
+bool k_is_cpu_idle(void);
+
 
 /*___________________________________________________________________________*/
 

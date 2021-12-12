@@ -197,7 +197,13 @@
  * enable it only if needed.
  * 
  */
-#define DEFAULT_KERNEL_IRQ_LOCK_COUNTER       0
+#define DEFAULT_KERNEL_IRQ_LOCK_COUNTER       	0
+
+/**
+ * @brief Tells to which USART printf function output should be redirected.
+ * Disable the option by setting to -1.
+ */
+#define DEFAULT_STDIO_PRINTF_TO_USART		-1
 
 /*___________________________________________________________________________*/
 
