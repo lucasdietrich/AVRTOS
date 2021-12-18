@@ -53,7 +53,7 @@ void thread(struct k_prng *prng)
                 number = k_prng_get(prng);
 
                 usart_transmit(_current->symbol);
-                usart_print(" : ");
+                usart_print_p(PSTR(" : "));
                 usart_hex16(number);
                 usart_transmit('\n');
 

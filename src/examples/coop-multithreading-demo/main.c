@@ -63,7 +63,7 @@ int main(void)
 
   while(1)
   {
-    usart_printl("::main");
+    usart_printl_p(PSTR("::main"));
 
     k_yield();
   }
@@ -77,12 +77,12 @@ void inthread_setled(uint8_t state)
   if (state == 0)
   {
     led_off();
-    usart_printl("::thread off");
+    usart_printl_p(PSTR("::thread off"));
   }
   else
   {
     led_on();
-    usart_printl("::thread on");
+    usart_printl_p(PSTR("::thread on"));
   }
 }
 
@@ -102,7 +102,7 @@ void thread_monitor(void *p)
 {
   while(1)
   {
-    usart_printl("::monitoring");
+    usart_printl_p(PSTR("::monitoring"));
 
     k_yield();
   }

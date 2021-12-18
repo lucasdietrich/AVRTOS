@@ -34,7 +34,7 @@ int main(void)
 	for (;;) {
 		k_sem_take(&mysem, K_FOREVER);
 
-		usart_print("Thread terminated : ");
+		usart_print_p(PSTR("Thread terminated : "));
 		usart_hex16(s_thread->symbol);
 		usart_transmit('\n');
 
@@ -46,7 +46,7 @@ int main(void)
 				K_PREEMPTIVE, NULL, 'T');
 		k_start(s_thread);
 
-		usart_printl("Thread started again");
+		usart_printl_p(PSTR("Thread started again"));
 		k_start(s_thread);
 	}
 
@@ -58,7 +58,7 @@ void thread_entry(void *_c)
 	s_thread = _current;
 
 	for (uint_fast8_t i = 0; i < 5; i++) {
-		usart_printl("Hello !");
+		usart_printl_p(PSTR("Hello !"));
 		k_sleep(K_MSEC(250));
 	}
 

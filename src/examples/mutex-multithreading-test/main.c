@@ -50,11 +50,11 @@ void thread(void *p)
 
   if (lock)
   {
-    usart_printl(" : Didn't get the mutex ...");
+    usart_printl_p(PSTR(" : Didn't get the mutex ..."));
   }
   else
   {
-    usart_printl(" : Got the mutex !");
+    usart_printl_p(PSTR(" : Got the mutex !"));
 
     k_sleep(K_SECONDS(1));
 
@@ -72,11 +72,11 @@ void threadp(void *p)
 
   if (lock)
   {
-    usart_printl(" : Didn't get the mutex ...");
+    usart_printl_p(PSTR(" : Didn't get the mutex ..."));
   }
   else
   {
-    usart_printl(" : Got the mutex !");
+    usart_printl_p(PSTR(" : Got the mutex !"));
 
     k_sleep(K_SECONDS(1));
 

@@ -90,16 +90,16 @@ ISR(USART_RX_vect)
 void consumer(void *context)
 {
         for (;;) {
-                usart_print("\n# ");
+                usart_print_p(PSTR("\n# "));
                 struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
                 __ASSERT_NOTNULL(mem);
                 if (mem->len == 0) {
-                        usart_print("\nCOMMAND DROPPED !");
+                        usart_print_p(PSTR("\nCOMMAND DROPPED !"));
                 } else {
                         /* process/parsed the command */
-                        usart_print("CMD received ! len = ");
+                        usart_print_p(PSTR("CMD received ! len = "));
                         usart_u8(mem->len);
-			usart_print(" : ");
+			usart_print_p(PSTR(" : "));
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
 			     c < mem->buffer + mem->len; c++) {

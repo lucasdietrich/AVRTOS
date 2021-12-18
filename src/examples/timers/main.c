@@ -40,7 +40,7 @@ int main(void)
 
   for (;;) {
     irq_disable();
-    usart_print("MAIN : ");
+    usart_print_p(PSTR("MAIN : "));
     usart_u16(counter);
     usart_transmit('\n');
     irq_enable();
@@ -66,7 +66,7 @@ void work_handler(struct k_work* work)
 {
   k_sleep(K_MSEC(200));
 
-  usart_print("WORKQUEUE : ");
+  usart_print_p(PSTR("WORKQUEUE : "));
   usart_u16(counter2);
   usart_transmit('\n');
 }

@@ -85,7 +85,7 @@ int main(void)
                         blocks[count++] = alloc(K_FOREVER);
                 }
 
-                usart_printl("Get all memory slabs !");
+                usart_printl_p(PSTR("Get all memory slabs !"));
                 for (uint8_t i = 0; i < BLOCKS; i++) {
                         debug(blocks[i], 0);
                 }

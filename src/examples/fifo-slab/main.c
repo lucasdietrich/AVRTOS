@@ -78,7 +78,7 @@ int main(void)
     int8_t ret = k_mem_slab_alloc(&myslab, (void**)&mem, K_FOREVER);
     if (ret == 0) {
       k_sched_lock();
-      usart_print("Allocated : ");
+      usart_print_p(PSTR("Allocated : "));
       usart_hex16((uint16_t)mem);
       usart_transmit('\n');
       k_sched_unlock();
@@ -95,9 +95,9 @@ void consumer_thread(void* context)
     struct block* mem = (struct block*)k_fifo_get(&fifo, K_FOREVER);
     if (mem != NULL) {
       k_sched_lock();
-      usart_print("Received mem slab at address ");
+      usart_print_p(PSTR("Received mem slab at address "));
       usart_hex16((uint16_t)mem);
-      usart_print(" data = ");
+      usart_print_p(PSTR(" data = "));
       block_read(mem->data, sizeof(mem->data));
       k_sched_unlock();
 

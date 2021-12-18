@@ -46,15 +46,15 @@ int main(void)
 void waiting_thread(k_timeout_t *timeout)
 {
   usart_transmit(_current->symbol);
-  usart_printl(": starting");
+  usart_printl_p(PSTR(": starting"));
   
   uint8_t locked = k_mutex_lock(&mymutex, *timeout);
 
   usart_transmit(_current->symbol);
   if (locked == 0) {
-    usart_printl(": locked the mutex !");
+    usart_printl_p(PSTR(": locked the mutex !"));
   } else {
-    usart_printl(": didn't get the mutex !");
+    usart_printl_p(PSTR(": didn't get the mutex !"));
   }
 
   k_sleep(K_FOREVER);

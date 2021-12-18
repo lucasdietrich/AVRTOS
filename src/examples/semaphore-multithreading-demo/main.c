@@ -52,7 +52,7 @@ int main(void)
 
     k_sched_lock();
 #if !KERNEL_SCHEDULER_DEBUG
-    usart_print("M: giving a semaphore ");
+    usart_print_p(PSTR("M: giving a semaphore "));
 #endif
     // k_sem_debug(&mysem);
     k_sched_unlock();
@@ -72,7 +72,7 @@ void waiter_entry(void* context)
       k_sched_lock();
 #if !KERNEL_SCHEDULER_DEBUG
       usart_transmit(_current->symbol);
-      usart_printl(": got a semaphore !");
+      usart_printl_p(PSTR(": got a semaphore !"));
 #endif
       k_sched_unlock();
 
@@ -80,7 +80,7 @@ void waiter_entry(void* context)
     }
     else
     {
-      usart_printl("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM");
+      usart_printl_p(PSTR("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM"));
     }
   }
 }

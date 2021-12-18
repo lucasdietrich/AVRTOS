@@ -61,7 +61,7 @@ void k_thread_dump(struct k_thread *th)
 
         usart_s8(th->priority);
 
-        usart_print("] ");
+        usart_print_p(PSTR("] "));
 
         static const char strings[4][11] PROGMEM = {
              "STOPPED",
@@ -153,7 +153,7 @@ void k_sem_debug(struct k_sem *sem)
                 limit = sem->limit;
         }
 
-        usart_print("K_SEM ");
+        usart_print_p(PSTR("K_SEM "));
         usart_u8(count);
         usart_transmit('/');
         usart_u8(limit);

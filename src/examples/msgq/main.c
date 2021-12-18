@@ -56,9 +56,9 @@ void writer(struct k_msgq *msgq)
 
                         k_sleep(K_MSEC(WRITER_DELAY));
                 } else if (ret == -ECANCEL) {
-                        usart_print(" canceled\n");
+                        usart_print_p(PSTR(" canceled\n"));
                 } else {
-                        usart_print(" !\n");
+                        usart_print_p(PSTR(" !\n"));
                 }
         }
 }
@@ -79,9 +79,9 @@ void reader(struct k_msgq *msgq)
 
                         k_sleep(K_MSEC(READER_DELAY));
                 } else if (ret == -ECANCEL) {
-                        usart_print(" canceled\n");
+                        usart_print_p(PSTR(" canceled\n"));
                 } else {
-                        usart_print(" !\n");
+                        usart_print_p(PSTR(" !\n"));
                 }
         }
 }

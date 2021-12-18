@@ -50,7 +50,7 @@ int main(void)
   while(1)
   {
     usart_transmit(_current->symbol);
-    usart_print(" : Send = ");
+    usart_print_p(PSTR(" : Send = "));
     usart_transmit(letters[pos].chr);
     usart_transmit('\n');
 
@@ -70,13 +70,13 @@ void consumer_thread(k_timeout_t *p_timeout)
     usart_transmit(_current->symbol);
     if (tie != NULL)
     {
-      usart_print(" : Received = ");
+      usart_print_p(PSTR(" : Received = "));
       usart_transmit(CONTAINER_OF(tie, struct item, tie)->chr);
       usart_transmit('\n');
     }
     else
     {
-      usart_printl(" : Failed to get a fifo item");
+      usart_printl_p(PSTR(" : Failed to get a fifo item"));
     }
   }
 }

@@ -32,17 +32,17 @@ int main(void)
   usart_init();
 
 #if TESTS & FLAG_QUEUE
-  usart_printl("queue");
+  usart_printl_p(PSTR("queue"));
   test_queue();
 #endif
 
 #if TESTS & FLAG_OQUEUE
-  usart_printl("oqueue");
+  usart_printl_p(PSTR("oqueue"));
   test_oqueue();
 #endif
 
 #if TESTS & FLAG_DLIST
-  usart_printl("queue/dequeue dlist");
+  usart_printl_p(PSTR("queue/dequeue dlist"));
   test_queue_dlist();
 #endif
 
@@ -51,7 +51,7 @@ int main(void)
   // todo cdlist
 
 #if TESTS & FLAG_TQUEUE
-  usart_printl("tqueue");
+  usart_printl_p(PSTR("tqueue"));
   test_tqueue();
 #endif
 }
@@ -106,7 +106,7 @@ void test_queue(void)
   print_queue();
   dequeued = dequeue();
   print_queue();
-  usart_print("queue ");
+  usart_print_p(PSTR("queue "));
   print_queue_item(&dequeued->i);
   usart_transmit('\n');
   queue(dequeued);
@@ -115,7 +115,7 @@ void test_queue(void)
   print_queue();
   dequeued = dequeue();
   print_queue();
-  usart_print("queue ");
+  usart_print_p(PSTR("queue "));
   print_queue_item(&dequeued->i);
   usart_transmit('\n');
   queue(dequeued);
@@ -134,11 +134,11 @@ void print_odequeue(void)
 {
   struct qitem* dequeued = odequeue(&oref);
   if (dequeued != NULL) {
-    usart_print("dequeued : ");
+    usart_print_p(PSTR("dequeued : "));
     print_queue_item(dequeued);
     usart_transmit('\n');
   } else {
-    usart_printl("dequeued NULL");
+    usart_printl_p(PSTR("dequeued NULL"));
   }
   print_oqueue();
 }
@@ -194,7 +194,7 @@ static void test_dlist_dequeue(struct ditem *dlist)
     print_dlist_item(out);
     usart_transmit('\n');
     print_dlist(dlist, print_dlist_item);
-  } else { usart_print("dlist empty="); usart_u8(dlist_is_empty(dlist)); }
+  } else { usart_print_p(PSTR("dlist empty=")); usart_u8(dlist_is_empty(dlist)); }
 }
 
 

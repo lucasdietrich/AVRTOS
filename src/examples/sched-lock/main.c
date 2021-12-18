@@ -42,11 +42,11 @@ int main(void)
 #else
       k_sched_lock();
 #endif
-      usart_printl("k_sched_lock()");
+      usart_printl_p(PSTR("k_sched_lock()"));
 
       _delay_ms(500);
 
-      usart_printl("k_sched_unlock()");
+      usart_printl_p(PSTR("k_sched_unlock()"));
 
 #if USE_SCHED_LOCK_TRICK == 0
       k_sched_unlock();
@@ -80,7 +80,7 @@ void thread_coop(void *p)
   {
     k_sleep(K_MSEC(5000));
 
-    usart_printl("full cooperative thread");
+    usart_printl_p(PSTR("full cooperative thread"));
 
     _delay_ms(1000);
   }

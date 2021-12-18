@@ -32,7 +32,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Inc");
+        usart_printl_p(PSTR("Inc"));
 
         val = atomic_inc(&a1);
         usart_hex(val);
@@ -46,7 +46,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Dec");
+        usart_printl_p(PSTR("Dec"));
 
         val = atomic_dec(&a1);
         usart_hex(val);
@@ -60,7 +60,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Or");
+        usart_printl_p(PSTR("Or"));
 
         val = atomic_or(&a1, 0xA0);
         usart_hex(val);
@@ -80,7 +80,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("And");
+        usart_printl_p(PSTR("And"));
 
         val = atomic_and(&a1, 0x0F);
         usart_hex(val);
@@ -100,7 +100,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Xor");
+        usart_printl_p(PSTR("Xor"));
 
         val = atomic_xor(&a1, 0xF0);
         usart_hex(val);
@@ -120,7 +120,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Test");
+        usart_printl_p(PSTR("Test"));
 
         val = atomic_test_bit(&a1, 7);
         usart_hex(val);
@@ -128,7 +128,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Test & clear");
+        usart_printl_p(PSTR("Test & clear"));
 
         val = atomic_test_and_clear_bit(&a1, 7);
         usart_hex(val);
@@ -136,7 +136,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Test & clear");
+        usart_printl_p(PSTR("Test & clear"));
 
         val = atomic_test_and_clear_bit(&a1, 7);
         usart_hex(val);
@@ -150,7 +150,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Test & set");
+        usart_printl_p(PSTR("Test & set"));
 
         val = atomic_test_and_set_bit(&a1, 7);
         usart_hex(val);
@@ -170,7 +170,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Clear");
+        usart_printl_p(PSTR("Clear"));
 
         atomic_clear(&a1);
 
@@ -182,7 +182,7 @@ int main(void)
 
         atomic_clear(&a1);
 
-        usart_printl("Set bit");
+        usart_printl_p(PSTR("Set bit"));
 
         atomic_set_bit(&a1, 5);
         val = atomic_get(&a1);
@@ -191,7 +191,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Clear bit");
+        usart_printl_p(PSTR("Clear bit"));
 
         atomic_clear_bit(&a1, 5);
         val = atomic_get(&a1);
@@ -200,7 +200,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Set bit True");
+        usart_printl_p(PSTR("Set bit True"));
 
         atomic_set_bit_to(&a1, 5, true);
         val = atomic_get(&a1);
@@ -209,7 +209,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Blind clear");
+        usart_printl_p(PSTR("Blind clear"));
 
         atomic_set_bit_to(&a1, 5, false);
         val = atomic_get(&a1);
@@ -218,7 +218,7 @@ int main(void)
 
         __ASSERT_INTERRUPT();
 
-        usart_printl("Set bit False");
+        usart_printl_p(PSTR("Set bit False"));
 
         atomic_blind_clear(&a1);
         val = atomic_get(&a1);

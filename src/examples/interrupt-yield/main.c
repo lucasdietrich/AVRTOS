@@ -83,7 +83,7 @@ void waiting_thread(void *p)
     void* mem = k_fifo_get(&myfifo, K_SECONDS(5));
     if (mem != NULL)
     {
-      usart_print("Got a letter from the UART : ");
+      usart_print_p(PSTR("Got a letter from the UART : "));
       usart_transmit(*(char*)(mem + 2u));
       usart_transmit('\n');
 
@@ -96,7 +96,7 @@ void waiting_thread(void *p)
     }
     else
     {
-      usart_printl("Didn't get a letter from the UART in time.");
+      usart_printl_p(PSTR("Didn't get a letter from the UART in time."));
     }
   }
 }

@@ -40,7 +40,7 @@ void task_handler(struct k_work* self)
 
   k_sched_lock();
   usart_hex16((uint16_t) self);
-  usart_printl(" finished");
+  usart_printl_p(PSTR(" finished"));
   k_sched_unlock();
 
   k_sem_give(&task->sem);
@@ -78,7 +78,7 @@ void tasks_generator(void *p)
     if (k_sem_take(&tasks[i].sem, K_NO_WAIT) == 0)
     {
       usart_hex16((uint16_t)&tasks[i]);
-      usart_printl(" submitted");
+      usart_printl_p(PSTR(" submitted"));
       k_work_submit(&workqueue, &tasks[i].work);
     }
 

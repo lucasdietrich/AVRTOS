@@ -45,7 +45,7 @@ int main(void)
   k_thread_dump_all();
 
 #if KERNEL_DEBUG_PREEMPT_UART
-  usart_printl(" Send a char over the UART to switch thread !");
+  usart_printl_p(PSTR(" Send a char over the UART to switch thread !"));
 #endif
 
   k_sleep(K_FOREVER);
@@ -78,9 +78,9 @@ void thread_processing(void *p)
     {
       k_sched_lock();
       usart_transmit(_current->symbol);
-      usart_print(": ");
+      usart_print_p(PSTR(": "));
       usart_hex16(counter >> 16);
-      usart_print("0000\n");
+      usart_print_p(PSTR("0000\n"));
       k_sched_unlock();
     }
   }

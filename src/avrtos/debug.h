@@ -32,7 +32,7 @@ extern "C" {
 #define __K_DBG_SCHED_EVENT(th)     __K_DBG_HELPER_TH(th, '!')
 #define __K_DBG_SCHED_PENDING()     usart_transmit('~')
 #define __K_DBG_SCHED_REQUEUE()     usart_transmit('>')
-#define __K_DBG_SCHED_SKIP_IDLE()   usart_print("p")
+#define __K_DBG_SCHED_SKIP_IDLE()   usart_print_p(PSTR("p"))
 #define __K_DBG_SCHED_NEXT(th)      usart_transmit(th->symbol)
 #define __K_DBG_WAKEUP(th)          __K_DBG_HELPER_TH(th, '@')
 

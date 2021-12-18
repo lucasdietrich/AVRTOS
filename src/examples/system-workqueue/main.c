@@ -22,7 +22,7 @@ void task_handler(struct k_work* self)
    */
   k_sleep(K_SECONDS(1));
 
-  usart_print("Hello from system workqueue, counter value = ");
+  usart_print_p(PSTR("Hello from system workqueue, counter value = "));
   usart_u8(counter++);
   usart_transmit('\n');
 
