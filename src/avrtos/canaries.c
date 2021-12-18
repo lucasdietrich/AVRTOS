@@ -1,20 +1,24 @@
 #include "canaries.h"
 
-extern struct k_thread __k_threads_start;
-
-void _k_init_stack_canaries(void)
+void _k_init_thread_stack_canaries(struct k_thread *th)
 {
-        for (uint_fast8_t i = 0; i < _k_thread_count; i++) {
-                struct k_thread *const th = &(&__k_threads_start)[i];
+	for (uint8_t *addr = K_THREAD_STACK_START_USABLE(th);
+	     addr < (uint8_t *)th->stack.end - K_THREAD_STACK_VOID_SIZE;
+	     addr++) {
+		*addr = THREAD_CANARIES_SYMBOL;
+	}
+}
 
-                void *const stack_end = th->stack.end;
-                const size_t stack_size = th->stack.size;
-		uint8_t *addr = K_STACK_START_USABLE(stack_end, stack_size);
+extern struct k_thread __k_threads_start;
+extern struct k_thread __k_threads_end;
 
-                while (addr < (uint8_t *)stack_end - K_THREAD_STACK_VOID_SIZE) {
-                        *addr++ = THREAD_CANARIES_SYMBOL;
-                }
-        }
+void _k_init_stacks_canaries(void)
+{
+	struct k_thread *thread;
+
+	for (thread = &__k_threads_start; thread < &__k_threads_end; thread++) {
+		_k_init_thread_stack_canaries(thread);
+	}
 }
 
 void *_k_stack_canaries(struct k_thread *th)

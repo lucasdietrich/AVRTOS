@@ -34,11 +34,11 @@ void _k_avrtos_init(void)
 #endif
 
 #if THREAD_CANARIES
-        _k_init_stack_canaries();
+        _k_init_stacks_canaries();
 #endif
 
 #if THREAD_STACK_SENTINEL
-        _k_init_stack_sentinel();
+        _k_init_stacks_sentinel();
 #endif
 
 #if KERNEL_SYSCLOCK_AUTO_INIT

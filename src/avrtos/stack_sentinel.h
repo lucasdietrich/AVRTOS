@@ -11,7 +11,7 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-void _k_init_stack_sentinel(void);
+void _k_init_stacks_sentinel(void);
 
 void _k_init_thread_stack_sentinel(struct k_thread *th);
 

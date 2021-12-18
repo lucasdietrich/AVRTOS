@@ -3,7 +3,7 @@
 #include <avrtos/debug.h>
 
 #define THREADS_COUNT   15
-#define MAX_DELAY_MS	5000
+#define MAX_DELAY_MS	500
 
 #define K_MODULE K_MODULE_APPLICATION
 
@@ -15,7 +15,7 @@ struct mystruct
 	struct k_event ev; 
 	struct k_signal sig;
 	struct k_thread thread;
-	char stack[0x50];
+	char stack[0x60];
 };
 
 struct mystruct threads[THREADS_COUNT];
@@ -28,6 +28,11 @@ int main(void)
 	
 	struct mystruct *ms;
 
+	static uint32_t counter = 0;
+	static uint32_t now;
+
+	irq_enable();
+
 	for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
 		k_event_init(&ms->ev, event_handler);
 		k_signal_init(&ms->sig);
@@ -38,7 +43,23 @@ int main(void)
 
 	/* act as IDLE thread */
 	for (;;) {
-		k_idle();
+		K_SCHED_LOCK_CONTEXT {
+			for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
+				print_stack_canaries(&ms->thread);
+			}
+		}
+
+		if (counter++ % 6 == 0) {
+			now = k_uptime_get_ms32();
+
+			K_SCHED_LOCK_CONTEXT {
+				printf_P(PSTR("Uptime : %lu (ms)\n"), now);
+			}
+
+			k_block(K_SECONDS(2));
+		}
+
+		k_wait(K_SECONDS(10));
 	}
 }
 

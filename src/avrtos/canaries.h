@@ -10,6 +10,13 @@ extern "C" {
 /*___________________________________________________________________________*/
 
 /**
+ * @brief Initialize canaries in thread stack.
+ * 
+ * @param th 
+ */
+void _k_init_thread_stack_canaries(struct k_thread *th);
+
+/**
  * @brief Automatically initialize thread canaries in stack 
  * if configuration option THREAD_CANARIES is enabled.
  * 
@@ -17,7 +24,7 @@ extern "C" {
  * 
  * Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010
  */
-void _k_init_stack_canaries(void);
+void _k_init_stacks_canaries(void);
 
 /**
  * @brief Get the address of the furthest stack location used by the thread.

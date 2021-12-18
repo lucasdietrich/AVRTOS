@@ -134,6 +134,28 @@ static __inline__ uint8_t __k_sched_lock_ret(void)
  */
 K_NOINLINE void k_sleep(k_timeout_t timeout);
 
+/**
+ * @brief Make the thread waiting for timeout milliseconds.
+ * 
+ * Important: Doesn't release the CPU. Poll on k_uptime_get() to know if the timeout has expired.
+ * 
+ * Note: Can be used in the case there is no IDLE thread.
+ * 
+ * Note: Require KERNEL_UPTIME to be set.
+ * 
+ * @param timeout 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE void k_wait(k_timeout_t timeout);
+
+/**
+ * @brief Block the RTOS for a specified amount of time.
+ * 
+ * @param timeout 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE void k_block(k_timeout_t timeout);
+
 /*___________________________________________________________________________*/
 
 //

@@ -12,7 +12,7 @@ void _k_init_thread_stack_sentinel(struct k_thread *th)
 	}
 }
 
-void _k_init_stack_sentinel(void)
+void _k_init_stacks_sentinel(void)
 {
 	for (struct k_thread *thread = &__k_threads_start;
 	     thread < &__k_threads_end; thread++) {

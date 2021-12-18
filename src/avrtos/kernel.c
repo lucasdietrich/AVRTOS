@@ -2,6 +2,7 @@
 
 #include "idle.h"
 
+#include <util/delay.h>
 #include <util/atomic.h>
 
 #include "debug.h"
@@ -107,6 +108,30 @@ void k_sleep(k_timeout_t timeout)
                         k_yield();
                 }
         }
+}
+
+#if KERNEL_UPTIME
+void k_wait(k_timeout_t timeout)
+{
+	__ASSERT_INTERRUPT();
+
+	uint64_t ms = k_uptime_get_ms64();
+	uint64_t now;
+	
+	do {
+		k_idle(); /* idle the thread */
+
+		now = k_uptime_get_ms64();
+	} while (now - ms < K_TIMEOUT_MS(timeout));
+}
+#endif /* KERNEL_UPTIME */
+
+void k_block(k_timeout_t timeout)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		_delay_ms(K_TIMEOUT_MS(timeout));
+	}
 }
 
 /*___________________________________________________________________________*/

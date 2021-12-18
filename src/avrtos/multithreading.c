@@ -107,13 +107,20 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         }
 
         th->stack.end = (void *)_K_STACK_END(stack, stack_size);
+	th->stack.size = stack_size;
 
         _k_thread_stack_create(th, entry, th->stack.end, context_p);
 
+#if THREAD_STACK_SENTINEL
+	_k_init_thread_stack_sentinel(th);
+#endif /* THREAD_STACK_SENTINEL */
+
+#if THREAD_CANARIES
+	_k_init_thread_stack_canaries(th);
+#endif /* THREAD_CANARIES */
+
         /* clear internal flags */
         th->flags = 0;
-	
-        th->stack.size = stack_size;
         th->state = STOPPED;
         th->coop = prio & K_FLAG_COOP ? 1 : 0;
         th->priority = prio & K_FLAG_PRIO;
