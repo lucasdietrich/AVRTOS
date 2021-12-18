@@ -109,7 +109,7 @@ void monitoring_thread(void *p)
 
     print_runqueue();
     print_events_queue();
-    dump_threads_canaries();
+    dump_stack_canaries();
   }
 }
 

@@ -29,7 +29,7 @@ int main(void)
 
 		k_sleep(K_MSEC(5000));
 
-		dump_threads_canaries();
+		dump_stack_canaries();
 	}
 }
 

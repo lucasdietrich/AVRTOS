@@ -2,6 +2,8 @@
 
 #include <avrtos/kernel.h>
 
+#include "io.h"
+
 /*___________________________________________________________________________*/
 
 extern char _k_main_stack[];
@@ -21,6 +23,9 @@ void _k_avrtos_init(void)
         UCSR0B = 1 << RXCIE0;
 #endif
 
+	/* Send output stream to usart0 */
+	k_set_stdio_usart0();
+
         _k_kernel_init();
         _k_mem_slab_init_module();
 
@@ -29,7 +34,11 @@ void _k_avrtos_init(void)
 #endif
 
 #if THREAD_CANARIES
-        _k_init_thread_canaries();
+        _k_init_stack_canaries();
+#endif
+
+#if THREAD_STACK_SENTINEL
+        _k_init_stack_sentinel();
 #endif
 
 #if KERNEL_SYSCLOCK_AUTO_INIT

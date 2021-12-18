@@ -192,6 +192,30 @@
 #   define THREAD_CANARIES_SYMBOL  0x00
 #endif
 
+// Sentinel
+#ifdef CONFIG_THREAD_STACK_SENTINEL
+#   define THREAD_STACK_SENTINEL CONFIG_THREAD_STACK_SENTINEL
+#else
+#   define THREAD_STACK_SENTINEL DEFAULT_THREAD_STACK_SENTINEL
+#endif
+
+#if THREAD_STACK_SENTINEL
+#ifdef CONFIG_THREAD_STACK_SENTINEL_SIZE
+#	define THREAD_STACK_SENTINEL_SIZE CONFIG_THREAD_STACK_SENTINEL_SIZE
+#else
+#	define THREAD_STACK_SENTINEL_SIZE DEFAULT_THREAD_STACK_SENTINEL_SIZE
+#endif
+#else
+#	define THREAD_STACK_SENTINEL_SIZE	0
+#endif /* THREAD_STACK_SENTINEL */
+
+#ifdef CONFIG_THREAD_STACK_SENTINEL_SYMBOL
+#   define THREAD_STACK_SENTINEL_SYMBOL CONFIG_THREAD_STACK_SENTINEL_SYMBOL
+#else
+#   define THREAD_STACK_SENTINEL_SYMBOL DEFAULT_THREAD_STACK_SENTINEL_SYMBOL
+#endif
+
+
 #if THREAD_EXPLICIT_MAIN_STACK == 0 && THREAD_CANARIES == 1
 #   warning unable to monitor main thread stack canaries as the main stack is defined as explicit (see THREAD_EXPLICIT_MAIN_STACK)
 #endif
@@ -371,7 +395,7 @@ typedef struct
 
 // 31 registers (31) + SREG (1) + return address (2 or 3)
 #define K_THREAD_STACK_VOID_SIZE (34 + _K_ARCH_STACK_SIZE_FIXUP)
-#define K_THREAD_STACK_MIN_SIZE K_THREAD_STACK_VOID_SIZE
+#define K_THREAD_STACK_MIN_SIZE (K_THREAD_STACK_VOID_SIZE + THREAD_STACK_SENTINEL_SIZE)
 
 // some of following macros need to be differenciate for c or asm :
 // - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on poointers
@@ -380,6 +404,11 @@ typedef struct
 #define K_STACK_START(stack_end, size) (void*) ((uint8_t*) stack_end - size + 1)
 #define K_THREAD_STACK_START(th) K_STACK_START(th->stack.end, th->stack.size)
 #define K_THREAD_STACK_END(th) (th->stack.end)
+
+/* real stack start and size without counting sentinel */
+#define K_STACK_START_USABLE(stack_end, size) (K_STACK_START(stack_end, size) + THREAD_STACK_SENTINEL_SIZE)
+#define K_STACK_SIZE_USABLE(size) (size - THREAD_STACK_SENTINEL_SIZE)
+#define K_THREAD_STACK_START_USABLE(th) K_STACK_START_USABLE(th->stack.end, th->stack.size)
 
 #define _K_STACK_END(stack_start, size) (stack_start + size - 1)
 
@@ -440,6 +469,20 @@ typedef struct
 
 #endif
 
+
+
+#if THREAD_STACK_SENTINEL
+#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
+    struct                                                                 \
+    {                                                                      \
+        uint8_t stack_sentinel[THREAD_STACK_SENTINEL_SIZE];                \
+        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE - THREAD_STACK_SENTINEL_SIZE]; \
+        _K_CORE_CONTEXT_STRUCT() base;                                     \
+    } _k_stack_buf_##name = {                                              \
+	{THREAD_STACK_SENTINEL_SYMBOL},                                     \
+        {0x00},                                                            \
+       _K_CORE_CONTEXT(entry, context_p)}
+#else
 #define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
     struct                                                                 \
     {                                                                      \
@@ -448,10 +491,7 @@ typedef struct
     } _k_stack_buf_##name = {                                              \
         {0x00},                                                            \
        _K_CORE_CONTEXT(entry, context_p)}
-
-#define _K_STACK_MIN_INITIALIZER(name, entry, context_p)     \
-    _K_CORE_CONTEXT_STRUCT() _k_stack_buf_##name =           \
-    _K_CORE_CONTEXT(entry, context_p)
+#endif /* THREAD_STACK_SENTINEL */
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \
@@ -466,12 +506,8 @@ typedef struct
         .symbol = sym}
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, symbol)                  \
-    __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p);              \
+    __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
     __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol);
-
-#define K_THREAD_MINSTACK_DEFINE(name, entry, prio_flags, context_p, symbol)                  \
-    __attribute__((used)) _K_STACK_MIN_INITIALIZER(name, entry, context_p);                   \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, K_THREAD_STACK_VOID_SIZE, prio_flags, symbol);
 
 /*___________________________________________________________________________*/
 

@@ -19,11 +19,13 @@
 
 #include "atomic.h"
 #include "assert.h"
+#include "fault.h"
 #include "kernel.h"
 #include "sysclock.h"
 #include "idle.h"
 
 #include "canaries.h"
+#include "stack_sentinel.h"
 #include "prng.h"
 
 #include "workqueue.h"

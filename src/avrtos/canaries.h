@@ -17,7 +17,7 @@ extern "C" {
  * 
  * Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010
  */
-void _k_init_thread_canaries(void);
+void _k_init_stack_canaries(void);
 
 /**
  * @brief Get the address of the furthest stack location used by the thread.
@@ -27,7 +27,7 @@ void _k_init_thread_canaries(void);
  * @return void* Address of byte following the last found canary. 
  * (Address of the furthest stack location used by the thread.)
  */
-void* _k_thread_canaries(struct k_thread *th);
+void* _k_stack_canaries(struct k_thread *th);
 
 /*___________________________________________________________________________*/
 
@@ -36,7 +36,7 @@ void* _k_thread_canaries(struct k_thread *th);
  * 
  * @param th thread to check
  */
-void print_thread_canaries(struct k_thread *th);
+void print_stack_canaries(struct k_thread *th);
 
 /**
  * @brief Pretty print found canaries in the current thread
@@ -55,7 +55,7 @@ void print_current_canaries(void);
  * [K] CANARIES until @051F [found 26], MAX usage = 36 / 62
  * 
  */
-void dump_threads_canaries(void);
+void dump_stack_canaries(void);
 
 /*___________________________________________________________________________*/
 

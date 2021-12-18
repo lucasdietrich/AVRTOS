@@ -4,7 +4,6 @@
 
 #include <util/atomic.h>
 
-#include "io.h"
 #include "debug.h"
 
 /*___________________________________________________________________________*/
@@ -130,7 +129,7 @@ void k_resume(struct k_thread *th)
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {
                         th->state = READY;
-                        _k_schedule(&th->tie.runqueue);
+                        _k_schedule(th);
                 }
         } else {
                 /* thread pending, ready of running and then already started */
@@ -207,9 +206,6 @@ void _k_kernel_init(void)
 					(8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
 		}
 	}
-	
-	/* Send output stream to usart0 */
-	k_set_stdio_usart0();
 }
 
 void _k_queue(struct k_thread *const th)
@@ -219,19 +215,26 @@ void _k_queue(struct k_thread *const th)
         push_back(runqueue, &th->tie.runqueue);
 }
 
-void _k_schedule(struct ditem *const thread_tie)
+void _k_schedule(struct k_thread *thread)
 {
         __ASSERT_NOINTERRUPT();
 
+#if THREAD_STACK_SENTINEL
+	/* check that stack sentinel is still valid before switching to thread */
+	if (k_verify_stack_sentinel(thread) == false) {
+		__fault(K_FAULT_SENTINEL);
+	}
+#endif
+
 #if KERNEL_THREAD_IDLE
         if (k_is_cpu_idle()) {
-                dlist_ref(thread_tie);
-                runqueue = thread_tie;
+                dlist_ref(&thread->tie.runqueue);
+                runqueue = &thread->tie.runqueue;
                 return;
         }
 #endif
 
-        push_front(runqueue, thread_tie);
+        push_front(runqueue, &thread->tie.runqueue);
 }
 
 void _k_schedule_wake_up(k_timeout_t timeout)
@@ -309,7 +312,7 @@ void _k_wake_up(struct k_thread *th)
 	th->state = READY;
 	th->wakeup_schd = 0;
 
-        _k_schedule(&th->tie.runqueue);
+        _k_schedule(th);
 }
 
 void _k_reschedule(k_timeout_t timeout)
@@ -348,15 +351,17 @@ void _k_system_shift(void)
 
         struct ditem *ready = (struct ditem *)tqueue_pop(&events_queue);
         if (ready != NULL) {
-                __K_DBG_SCHED_EVENT(THREAD_FROM_EVENTQUEUE(ready));  // !
+		struct k_thread *thread = THREAD_FROM_EVENTQUEUE(ready);
+
+                __K_DBG_SCHED_EVENT(thread);  // !
 
                 /* set ready thread expired flag */
-                THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
+                thread->timer_expired = 1u;
 
 		/* mark as "not in events queue" */
-		THREAD_FROM_EVENTQUEUE(ready)->wakeup_schd = 0;
+		thread->wakeup_schd = 0;
 
-                _k_schedule(ready);
+                _k_schedule(thread);
         }
 
 #if KERNEL_TIMERS

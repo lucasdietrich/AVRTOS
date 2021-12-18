@@ -142,6 +142,21 @@
 #define DEFAULT_THREAD_CANARIES_SYMBOL          0xAA
 
 //
+// Define thread sentinel symbol
+//
+#define DEFAULT_THREAD_STACK_SENTINEL          	0
+
+//
+// Define thread sentinel size
+//
+#define DEFAULT_THREAD_STACK_SENTINEL_SIZE      1
+
+//
+// Define thread sentinel symbol
+//
+#define DEFAULT_THREAD_STACK_SENTINEL_SYMBOL    0xAA
+
+//
 // Enable system workqueue
 //
 #define DEFAULT_SYSTEM_WORKQUEUE_ENABLE         0

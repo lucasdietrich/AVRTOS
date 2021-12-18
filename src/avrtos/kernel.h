@@ -181,7 +181,7 @@ void _k_kernel_init(void);
  * 
  * @param th : ready thread to queue 
  */
-void _k_queue(struct k_thread * const th);
+void _k_queue(struct k_thread *const th);
 
 /**
  * @brief Schedule the thread to be executed.
@@ -193,7 +193,7 @@ void _k_queue(struct k_thread * const th);
  * @param thread_tie thread.tie.runqueue item
  * @return __attribute__((noinline)) 
  */
-K_NOINLINE void _k_schedule(struct ditem *const thread_tie);
+K_NOINLINE void _k_schedule(struct k_thread *thread);
 
 /**
  * @brief Schedule current thread wake up.

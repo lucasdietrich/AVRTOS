@@ -36,6 +36,8 @@
         "time.h": "c",
         "event.h": "c",
         "atomic.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "stack_sentinel.h": "c",
+        "fault.h": "c"
     }
 }
