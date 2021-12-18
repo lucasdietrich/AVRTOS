@@ -6,7 +6,9 @@
 #include <stdio.h>
 
 #include "debug.h"
-#include "dstruct/tqueue.h"
+#include "dstruct/dlist.h"
+#include "dstruct/queue.h"
+#include "dstruct/debug.h"
 
 /*___________________________________________________________________________*/
 
@@ -117,9 +119,6 @@ uint8_t *buffer, const size_t size)
 
 /*___________________________________________________________________________*/
 
-#include "dstruct/dlist.h"
-#include "dstruct/queue.h"
-#include "dstruct/debug.h"
 
 void _thread_symbol_runqueue(struct ditem *item)
 {

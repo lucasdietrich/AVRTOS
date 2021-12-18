@@ -29,6 +29,7 @@ extern "C" {
 #define K_MODULE_MEMSLAB        15
 #define K_MODULE_TIMER          16
 #define K_MODULE_MSGQ           17
+#define K_MODULE_EVENT          18
 
 #define K_MODULE_APPLICATION    0x20
 

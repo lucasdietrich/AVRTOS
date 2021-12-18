@@ -34,6 +34,8 @@ struct titem
         struct titem* next;
 };
 
+#define tqref titem
+
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
 #define INIT_TITEM(timeout_ms)       \
     {                                \
@@ -42,7 +44,9 @@ struct titem
         },                           \
         .next = NULL                 \
     }
-#define DEFINE_TITEM(name) struct titem name = INIT_TITEM(timeout_ms)
+#define INIT_TITEM_DEFAULT() INIT_TITEM(0)
+
+#define DEFINE_TITEM(name) struct titem name = INIT_TITEM_DEFAULT()
 
 /*___________________________________________________________________________*/
 

@@ -30,6 +30,7 @@
 #include "mutex.h"
 #include "semaphore.h"
 #include "timer.h"
+#include "event.h"
 #include "signal.h"
 
 #include "fifo.h"

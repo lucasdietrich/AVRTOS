@@ -169,7 +169,12 @@
 //
 // Enable timers support
 //
-#define DEFAULT_KERNEL_TIMERS                   1
+#define DEFAULT_KERNEL_TIMERS                   0
+
+//
+// Enable events support
+//
+#define DEFAULT_KERNEL_EVENTS                   0
 
 //
 // Enabled thread errno

@@ -44,6 +44,7 @@ int main(void)
 					      s_thread->stack.size),
 				s_thread->stack.size,
 				K_PREEMPTIVE, NULL, 'T');
+		k_start(s_thread);
 
 		usart_printl("Thread started again");
 		k_start(s_thread);

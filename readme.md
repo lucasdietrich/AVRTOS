@@ -29,6 +29,7 @@ Following features are supported:
 - Messages Queues (msgq)
 - System uptime in ms and seconds (32bits or 40bits ms counter)
 - Atomic operations on 8bits variables
+- Events scheduling 
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -62,10 +63,11 @@ What features will be implemented :
 - Statistics CPU use per thread
 - Delayed start, suspending/resuming threads
 - Stack sentinels
-- Task scheduling
 - Kernel fault
 
 What enhancements are planned :
+- Optimize thread switch function by pushing only call-clobbered registers (https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.c#L67). Handle switch from interrupt handler (could this help https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.h#L193 ?).
+- Making timers and events process period configurable.
 - Using makefile to build the project for a target
 - Propose this project as a library
 - Fix when submitting the same work two time, while it has not yet been executed -> use double linked lists for (tqueue)
@@ -118,6 +120,7 @@ What enhancements/features are not planned :
 | **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
 | THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
 | KERNEL_TIMERS | Enables timers |
+| KERNEL_EVENTS | Enables kernel events |
 | KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
 | KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
 | STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART |
@@ -219,6 +222,7 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 - [msgq](./src/examples/msgq/main.c)
 - [signal](./src/examples/signal/main.c)
 - [timers](./src/examples/timers/main.c)
+- [events](./src/examples/events/main.c)
 - [workqueue](./src/examples/workqueue/main.c)
 - [prng](./src/examples/prng/main.c)
 - [data-structures](./src/examples/data-structures/main.cpp)

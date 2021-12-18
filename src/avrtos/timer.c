@@ -6,6 +6,8 @@
 
 #include "misc/uart.h"
 
+#if KERNEL_TIMERS
+
 /*___________________________________________________________________________*/
 
 #define K_MODULE    K_MODULE_TIMER
@@ -42,7 +44,7 @@ void _k_timers_process(void)
 {
         __ASSERT_NOINTERRUPT();
 
-        tqueue_shift(&_k_timers_runqueue, KERNEL_TIME_SLICE);
+        tqueue_shift(&_k_timers_runqueue, K_TIMERS_PERIOD_MS);
 
         for (;;) {
                 struct titem *item = tqueue_pop(&_k_timers_runqueue);
@@ -120,5 +122,6 @@ int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
         return 0;
 }
 
+#endif
 
 /*___________________________________________________________________________*/

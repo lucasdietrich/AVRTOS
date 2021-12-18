@@ -196,7 +196,7 @@ void _k_queue(struct k_thread * const th);
 K_NOINLINE void _k_schedule(struct ditem *const thread_tie);
 
 /**
- * @brief Schedule the thread wake up.
+ * @brief Schedule current thread wake up.
  * 
  * Assumptions:
  * - thread is suspended (PENDING)
@@ -206,7 +206,7 @@ K_NOINLINE void _k_schedule(struct ditem *const thread_tie);
  * @param timeout 
  * @return K_NOINLINE 
  */
-K_NOINLINE void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout);
+K_NOINLINE void _k_schedule_wake_up(k_timeout_t timeout);
 
 /**
  * @brief Remove the current thread from the runqueue.
@@ -218,17 +218,6 @@ K_NOINLINE void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout
  * - thread is in the runqueue
  */
 K_NOINLINE void _k_suspend(void);
-
-/**
- * @brief Remove the thread from the events queue
- * 
- * Assumptions:
- * - interrupt flag is cleared when called.
- * - thread is in the time_queue
- * 
- * @param th 
- */
-K_NOINLINE void _k_unschedule(struct k_thread *th);
 
 /**
  * @brief Choose the next thread to be executed. 

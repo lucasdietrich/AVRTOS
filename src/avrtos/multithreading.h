@@ -61,13 +61,33 @@ struct k_thread
         void *sp;       // stack point, keep it at the beginning of the structure
         union {
                 struct
-                {
-                        uint8_t state : 2;          // @see thread_state_t
-                        uint8_t sched_lock : 1;     // tells if scheduler is temporarely locked
-                        uint8_t coop : 1;           // cooperative/preemptive thread
-                        uint8_t priority : 1;       // thread priority : not supported for now
-                        uint8_t timer_expired : 1;  // tells if the timer expiration caused this thread to be awakened 
-                        uint8_t pend_canceled : 1;  // tells if the thread pending on an object was canceled
+                {	
+			/* @see thread_state_t */
+                        uint8_t state : 2;
+
+			/* tells if scheduler is temporarely locked */
+                        uint8_t sched_lock : 1;
+
+			/* cooperative/preemptive thread */
+                        uint8_t coop : 1;
+
+			/* thread priority : not supported for now */
+                        uint8_t priority : 1;
+
+			/* tells if the timer expiration caused 
+			 * this thread to be awakened 
+			 */
+                        uint8_t timer_expired : 1;
+
+			/* tells if the thread pending on 
+			 * an object was canceled
+			 */
+                        uint8_t pend_canceled : 1;
+			
+			/* tells if the thread wake up is scheduled 
+			 * in events_queue (flag for optimisation purpose)
+			 */
+			uint8_t wakeup_schd: 1;      
                 };
                 uint8_t flags;
         };
@@ -146,7 +166,7 @@ extern uint8_t _k_thread_count;
  * 
  * @param th hread structure pointer
  * @param entry thread entry function
- * @param stack_end thread stack start location
+ * @param stack thread stack start location
  * @param stack_size thread stack size
  * @param priority thread priority
  * @param context_p thread context passed to entry function

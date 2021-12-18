@@ -50,6 +50,10 @@ int main(void)
   k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, 'O');
   k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, 'F');
   k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, NULL, 'R');
+
+  k_start(&O);
+  k_start(&F);
+  k_start(&R);
 #endif
 
   print_runqueue();

@@ -35,4 +35,21 @@ inline bool k_is_cpu_idle(void)
 #endif /* KERNEL_THREAD_IDLE */
 }
 
+static inline bool _k_runqueue_single(void)
+{
+        return runqueue->next == runqueue;
+}
+
+void k_idle(void)
+{
+	/* if others thread a ready, yield the CPU */
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		if (!_k_runqueue_single()) {
+			return k_yield();
+		}
+	}
+
+	sleep_cpu();
+}
+
 /*___________________________________________________________________________*/

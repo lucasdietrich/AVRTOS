@@ -19,7 +19,7 @@
  */
 struct ditem *runqueue = &_k_thread_main.tie.runqueue;
 
-static struct titem *events_queue = NULL;
+struct titem *events_queue = NULL;
 
 static inline bool _k_runqueue_single(void)
 {
@@ -139,12 +139,12 @@ void k_resume(struct k_thread *th)
 
 void k_start(struct k_thread *th)
 {
-        if (th->state == STOPPED) {
-                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-                {
-                        _k_queue(th);
-                }
-        }
+	if (th->state == STOPPED) {
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+		{
+			_k_queue(th);
+		}
+	}
 }
 
 /*___________________________________________________________________________*/
@@ -234,12 +234,14 @@ void _k_schedule(struct ditem *const thread_tie)
         push_front(runqueue, thread_tie);
 }
 
-void _k_schedule_wake_up(struct k_thread *thread, k_timeout_t timeout)
+void _k_schedule_wake_up(k_timeout_t timeout)
 {
         __ASSERT_NOINTERRUPT();
-
-        if (timeout.value != K_FOREVER.value) {
-                _current->tie.event.timeout = timeout.value;
+	__ASSERT_TRUE(_current->wakeup_schd == 0);
+	
+        if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
+		_current->wakeup_schd = 1;
+                _current->tie.event.timeout = K_TIMEOUT_MS(timeout);
                 _current->tie.event.next = NULL;
                 _tqueue_schedule(&events_queue, &_current->tie.event);
         }
@@ -263,14 +265,6 @@ void _k_suspend(void)
 #endif
 
         pop_ref(&runqueue);
-}
-
-void _k_unschedule(struct k_thread *th)
-{
-        __ASSERT_NOINTERRUPT();
-        __ASSERT_NOTNULL(th);
-
-        tqueue_remove(&events_queue, &th->tie.event);
 }
 
 struct k_thread *_k_scheduler(void)
@@ -301,14 +295,19 @@ struct k_thread *_k_scheduler(void)
 
 void _k_wake_up(struct k_thread *th)
 {
+	__ASSERT_NOTNULL(th);
         __ASSERT_NOINTERRUPT();
         __ASSERT_THREAD_STATE(th, PENDING);
 
         __K_DBG_WAKEUP(th); // @
 
-        th->state = READY;
+	/* Remove the thread from the events queue */
+	if (th->wakeup_schd) {
+		tqueue_remove(&events_queue, &th->tie.event);
+	}
 
-        _k_unschedule(th);
+	th->state = READY;
+	th->wakeup_schd = 0;
 
         _k_schedule(&th->tie.runqueue);
 }
@@ -319,7 +318,7 @@ void _k_reschedule(k_timeout_t timeout)
 
         _k_suspend();
 
-        _k_schedule_wake_up(_current, timeout);
+        _k_schedule_wake_up(timeout);
 }
 
 /*___________________________________________________________________________*/
@@ -354,12 +353,19 @@ void _k_system_shift(void)
                 /* set ready thread expired flag */
                 THREAD_FROM_EVENTQUEUE(ready)->timer_expired = 1u;
 
+		/* mark as "not in events queue" */
+		THREAD_FROM_EVENTQUEUE(ready)->wakeup_schd = 0;
+
                 _k_schedule(ready);
         }
 
 #if KERNEL_TIMERS
 	_k_timers_process();
 #endif
+
+#if KERNEL_EVENTS
+	_k_event_q_process();
+#endif /* KERNEL_EVENTS */
 }
 
 uint32_t k_uptime_get_ms32(void)

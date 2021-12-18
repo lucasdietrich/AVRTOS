@@ -36,7 +36,18 @@ extern "C" {
  * @return false 
  */
 
-bool k_is_cpu_idle(void);
+K_NOINLINE bool k_is_cpu_idle(void);
+
+/**
+ * @brief IDLE the CPU.
+ * 
+ * This function can be called from a thread to make it behave as an IDLE thread.
+ * 
+ * Important: if others thread a ready, they will be blocked until an interrupt occurs !
+ * 
+ * Note: This function forces interrupts to be enabled.
+ */
+K_NOINLINE void k_idle(void);
 
 
 /*___________________________________________________________________________*/

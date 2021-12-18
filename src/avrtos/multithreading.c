@@ -112,17 +112,13 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
 
         /* clear internal flags */
         th->flags = 0;
-
+	
         th->stack.size = stack_size;
-        th->state = READY;
-        th->coop = prio & K_FLAG_PREEMPT;
+        th->state = STOPPED;
+        th->coop = prio & K_FLAG_COOP ? 1 : 0;
         th->priority = prio & K_FLAG_PRIO;
         th->symbol = symbol;
         th->swap_data = NULL;
-
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                _k_queue(th);
-        }
 
         return 0;
 }
