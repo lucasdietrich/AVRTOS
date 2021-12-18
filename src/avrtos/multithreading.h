@@ -143,11 +143,6 @@ extern struct k_thread _k_thread_main;
  */
 extern struct k_thread * _current;
 
-/**
- * @brief Get the number of threads defined.
- */
-extern uint8_t _k_thread_count;
-
 /*___________________________________________________________________________*/
 
 /**

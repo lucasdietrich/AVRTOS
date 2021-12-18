@@ -66,15 +66,6 @@
 
 /*___________________________________________________________________________*/
 
-#define PROGMEM_STRING(name, string)            \
-    static const char name[] PROGMEM = string
-
-#define PRINT_PROGMEM_STRING(name, string)      \
-    static const char name[] PROGMEM = string;  \
-    usart_print_p(name)
-
-/*___________________________________________________________________________*/
-
 #define K_FLAG_SCHED_LOCKED_SHIFT   2
 #define K_FLAG_SCHED_LOCKED         (1 << K_FLAG_SCHED_LOCKED_SHIFT)
 

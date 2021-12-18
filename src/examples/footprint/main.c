@@ -13,7 +13,6 @@ Total RAM : 63 bytes :
 TODO gather all this in a buffer.
  - Events_queue = 2
  - runqueue = 2
- - _k_thread_count = 1
  - _k_timers_runqueue = 2
  - _k_uptime_ms = 4
  - _current = 2
@@ -36,7 +35,7 @@ int main(void)
 	usart_init();
 
 	for (;;) {
-		PRINT_PROGMEM_STRING(s, "Hello\n");
+		usart_print_p(PSTR("Hello\n"));
 		sleep(K_SECONDS(1));
 	}
 }

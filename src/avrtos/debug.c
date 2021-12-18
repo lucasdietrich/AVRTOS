@@ -38,8 +38,8 @@ extern struct k_thread __k_threads_end;
 
 void k_thread_dbg_count(void)
 {
-        PRINT_PROGMEM_STRING(s1, "THREADS COUNT : _k_thread_count = ");
-        usart_u8(_k_thread_count);
+	usart_print_p(PSTR("THREADS COUNT :"));
+        usart_u8(&__k_threads_end - &__k_threads_start);
         usart_transmit('\n');
 }
 
@@ -54,9 +54,9 @@ void k_thread_dump(struct k_thread *th)
         usart_transmit(' ');
         usart_hex16((const uint16_t)th);
         if (th->coop) {
-                PRINT_PROGMEM_STRING(coop_s, " [COOP ");
+                usart_print_p(PSTR(" [COOP "));
         } else {
-                PRINT_PROGMEM_STRING(pree_s, " [PREE ");
+                usart_print_p(PSTR(" [PREE "));
         }
 
         usart_s8(th->priority);
@@ -71,21 +71,21 @@ void k_thread_dump(struct k_thread *th)
 
         usart_print_p(strings[th->state]);
 
-        PRINT_PROGMEM_STRING(sp_s, " : SP ");
+        usart_print_p(PSTR(" : SP "));
 
         usart_u16(k_thread_usage(th));
         usart_transmit('/');
         usart_u16(th->stack.size);
-        PRINT_PROGMEM_STRING(end_s, " -| END @");
+        usart_print_p(PSTR(" -| END @"));
         usart_hex16((uint16_t)th->stack.end);
         usart_transmit('\n');
 }
 
 void k_thread_dump_all(void)
 {
-        PRINT_PROGMEM_STRING(thread_s, "===== k_thread =====\n");
+        usart_print_p(PSTR("===== k_thread =====\n"));
 
-        for (uint_fast8_t i = 0; i < _k_thread_count; i++) {
+        for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
                 k_thread_dump(&(&__k_threads_start)[i]);
         }
 }

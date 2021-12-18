@@ -182,8 +182,6 @@ extern struct k_thread __k_threads_end;
 
 extern struct k_thread _k_idle;
 
-uint8_t _k_thread_count = 0;
-
 inline static void swap_endianness(uint16_t *const addr)
 {
         *addr = HTONS(*addr);
@@ -191,11 +189,9 @@ inline static void swap_endianness(uint16_t *const addr)
 
 void _k_kernel_init(void)
 {
-	_k_thread_count = &__k_threads_end - &__k_threads_start;
-
 	/* main thread is the first running (ready or not),
 	 * and it is already in queue */
-	for (uint8_t i = 0; i < _k_thread_count; i++) {
+	for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
 		struct k_thread *const thread = &(&__k_threads_start)[i];
 
 #if KERNEL_THREAD_IDLE
