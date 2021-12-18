@@ -26,7 +26,7 @@ static void _k_idle_entry(void *context)
 
 extern struct ditem *runqueue;
 
-inline bool k_is_cpu_idle(void)
+bool k_is_cpu_idle(void)
 {
 #if KERNEL_THREAD_IDLE
 	return runqueue == &_k_idle.tie.runqueue;

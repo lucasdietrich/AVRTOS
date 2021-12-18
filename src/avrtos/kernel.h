@@ -154,7 +154,7 @@ K_NOINLINE void k_wait(k_timeout_t timeout);
  * @param timeout 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_block(k_timeout_t timeout);
+void k_block(k_timeout_t timeout);
 
 /*___________________________________________________________________________*/
 
