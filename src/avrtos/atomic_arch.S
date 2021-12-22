@@ -1,5 +1,7 @@
 #include <avr/io.h>
 
+#if KERNEL_ATOMIC_API
+
 .global atomic_get
 .global atomic_clear
 .global atomic_or
@@ -83,3 +85,5 @@ atomic_dec:
         sts     SREG, r18
         st      X, r24
         ret
+
+#endif /* KERNEL_ATOMIC_API */

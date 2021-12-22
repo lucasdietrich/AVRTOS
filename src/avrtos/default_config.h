@@ -250,6 +250,10 @@
  */
 #define DEFAULT_KERNEL_MAX_SYSCLOCK_PERIOD_MS	0
 
+/**
+ * @brief Enable atomic API
+ */
+#define DEFAULT_KERNEL_ATOMIC_API	0
 
 /*___________________________________________________________________________*/
 

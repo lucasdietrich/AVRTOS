@@ -127,6 +127,7 @@ What enhancements/features are not planned :
 | KERNEL_UPTIME | Enable uptime counter (ms) feature |
 | KERNEL_UPTIME_40BITS | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
 | KERNEL_MAX_SYSCLOCK_PERIOD_MS | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
+| KERNEL_ATOMIC_API | Enable atomic API |
 
 
 ## Getting started example :

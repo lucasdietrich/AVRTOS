@@ -311,6 +311,12 @@
 #   define KERNEL_MAX_SYSCLOCK_PERIOD_MS DEFAULT_KERNEL_MAX_SYSCLOCK_PERIOD_MS
 #endif
 
+#ifdef CONFIG_KERNEL_ATOMIC_API
+#   define KERNEL_ATOMIC_API CONFIG_KERNEL_ATOMIC_API
+#else
+#   define KERNEL_ATOMIC_API DEFAULT_KERNEL_ATOMIC_API
+#endif
+
 /*___________________________________________________________________________*/
 
 /**
