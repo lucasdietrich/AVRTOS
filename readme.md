@@ -124,7 +124,7 @@ What enhancements/features are not planned :
 | KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
 | KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
 | STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART |
-| KERNEL_UPTIME | Enable uptime counter (ms) feature |
+| KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
 | KERNEL_UPTIME_40BITS | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
 | KERNEL_MAX_SYSCLOCK_PERIOD_MS | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
 | KERNEL_ATOMIC_API | Enable atomic API |
@@ -354,6 +354,9 @@ monitor_speed = 500000
   c0:	cd bf       	out	0x3d, r28	; set SPL
   c2:	de bf       	out	0x3e, r29	; set SPH
 ```
+
+- In order to have a reliable uptime value, interrupts should be enabled in all threads.
+  - Disabling interrupt for too long, breaks the uptime accuracy.
 
 ## Debugging
 
