@@ -370,9 +370,9 @@ void _k_system_shift(void)
 
         tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
 
-        struct ditem *ready = (struct ditem *)tqueue_pop(&events_queue);
+        struct ditem *const ready = (struct ditem *)tqueue_pop(&events_queue);
         if (ready != NULL) {
-		struct k_thread *thread = THREAD_FROM_EVENTQUEUE(ready);
+		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
 
                 __K_DBG_SCHED_EVENT(thread);  // !
 

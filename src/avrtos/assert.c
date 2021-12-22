@@ -6,92 +6,92 @@
 
 static const char *const module_to_str(uint8_t module)
 {
-        /* TODO optimize size */
-        static const char modules_str[][sizeof("APPLICATION")] PROGMEM = {
-            {"AVRTOS"},
-            {"KERNEL"},
-            {"ARCH"},
-            {"SYSCLOCK"},
-            {"THREAD"},
-            {"IDLE"},
-            {""},
-            {""},
-            {""},
-            {""},
-            {"MUTEX"},
-            {"SEMAPHORE"},
-            {"SIGNAL"},
-            {"WORKQUEUE"},
-            {"FIFO"},
-            {"MEMSLAB"},
-            {"TIMER"},
-            {"MSGQ"},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {""},
-            {"APPLICATION"}
-        };
-
-        return modules_str[MIN(module, ARRAY_SIZE(modules_str))];
+	switch (module) {
+	case K_MODULE_KERNEL:
+		return PSTR("KERNEL");
+	case K_MODULE_ARCH:
+		return PSTR("ARCH");
+	case K_MODULE_SYSCLOCK:
+		return PSTR("SYSCLOCK");
+	case K_MODULE_THREAD:
+		return PSTR("THREAD");
+	case K_MODULE_IDLE:
+		return PSTR("IDLE");
+	case K_MODULE_MUTEX:
+		return PSTR("MUTEX");
+	case K_MODULE_SEMAPHORE:
+		return PSTR("SEMAPHORE");
+	case K_MODULE_SIGNAL:
+		return PSTR("SIGNAL");
+	case K_MODULE_WORKQUEUE:
+		return PSTR("WORKQUEUE");
+	case K_MODULE_FIFO:
+		return PSTR("FIFO");
+	case K_MODULE_MEMSLAB:
+		return PSTR("MEMSLAB");
+	case K_MODULE_TIMER:
+		return PSTR("TIMER");
+	case K_MODULE_MSGQ:
+		return PSTR("MSGQ");
+	case K_MODULE_EVENT:
+		return PSTR("EVENT");
+	case K_MODULE_APPLICATION:
+		return PSTR("APPLICATION");
+	default:
+		return PSTR("UNSPECIFIED");
+	}
 }
 
 static const char *const acode_to_str(uint8_t acode)
 {
-        static const struct {
-                uint8_t acode;
-                char name[sizeof("LEASTONE_RUNNING")];
-        } acodes_str[] PROGMEM = {
-            {K_ASSERT_UNDEFINED, "UNDEFINED"},
-            {K_ASSERT_INTERRUPT, "INTERRUPT"},
-            {K_ASSERT_NOINTERRUPT, "NOINTERRUPT"},
-            {K_ASSERT_LEASTONE_RUNNING, "LEASTONE_RUNNING"},
-            {K_ASSERT_THREAD_STATE, "THREAD_STATE"},
-            {K_ASSERT_TRUE, "TRUE"},
-            {K_ASSERT_FALSE, "FALSE"},
-            {K_ASSERT_WORKQUEUE, "WORKQUEUE"},
-            {K_ASSSERT_NOTNULL, "NOTNULL"},
-            {K_ASSSERT_NULL, "NULL"}
-        };
+	switch (acode) {
+	case K_ASSERT_INTERRUPT:
+		return PSTR("INTERRUPT");
 
-        for (uint_fast8_t i = 1; i < ARRAY_SIZE(acodes_str); i++) {
-                if ((uint8_t)pgm_read_byte(&acodes_str[i].acode) == acode) {
-                        return acodes_str[i].name;
-                }
-        }
-        return acodes_str[0].name;
+	case K_ASSERT_NOINTERRUPT:
+		return PSTR("NOINTERRUPT");
+
+	case K_ASSERT_LEASTONE_RUNNING:
+		return PSTR("LEASTONE_RUNNING");
+
+	case K_ASSERT_THREAD_STATE:
+		return PSTR("THREAD_STATE");
+
+	case K_ASSERT_TRUE:
+		return PSTR("TRUE");
+
+	case K_ASSERT_FALSE:
+		return PSTR("FALSE");
+
+	case K_ASSSERT_NOTNULL:
+		return PSTR("NOTNULL");
+
+	case K_ASSSERT_NULL:
+		return PSTR("NULL");
+
+	case K_ASSERT_UNDEFINED:
+	default:
+		return PSTR("UNDEFINED");
+	}
 }
 
 void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line)
 {
-        static const char assert_msg[] PROGMEM =
-                "***** Kernel Assertion failed *****\n  K_MODULE_";
-        static const char assert_acode_msg[] PROGMEM = " L [K_ASSERT_";
+	if (expression == 0) {
+		cli();
 
-        if (expression == 0) {
-                cli();
+		usart_print_p(PSTR("***** Kernel Assertion failed *****\n"
+				   "  K_MODULE_"));
 
-                usart_print_p(assert_msg);
+		usart_print_p(module_to_str(module));
+		usart_transmit(':');
+		usart_u16(line);
+		usart_print_p(PSTR(" L [K_ASSERT_"));
+		usart_print_p(acode_to_str(acode));
+		usart_transmit(']');
 
-                usart_print_p(module_to_str(module));
-                usart_transmit(':');
-                usart_u16(line);
-                usart_print_p(assert_acode_msg);
-                usart_print_p(acode_to_str(acode));
-                usart_transmit(']');
+		asm("jmp _exit");
 
-                asm("jmp _exit");
-
-                __builtin_unreachable();
-        }
+		__builtin_unreachable();
+	}
 }

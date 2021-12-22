@@ -63,13 +63,19 @@ void k_thread_dump(struct k_thread *th)
 
         usart_print_p(PSTR("] "));
 
-        static const char strings[4][11] PROGMEM = {
-             "STOPPED",
-             "READY  ",
-             "PENDING",
-        };
-
-        usart_print_p(strings[th->state]);
+	switch (th->state) {
+		case READY:
+			usart_print_p(PSTR("READY  "));
+			break;
+		case STOPPED:
+			usart_print_p(PSTR("STOPPED"));
+			break;
+		case PENDING:
+			usart_print_p(PSTR("PENDING"));
+			break;
+		default:
+			break;
+	}
 
         usart_print_p(PSTR(" : SP "));
 

@@ -46,8 +46,6 @@ extern "C" {
 #define K_ASSERT_TRUE                   5
 #define K_ASSERT_FALSE                  6
 
-#define K_ASSERT_WORKQUEUE              10
-
 #define K_ASSSERT_NOTNULL               15
 #define K_ASSSERT_NULL                  16
 

@@ -2,8 +2,6 @@
 
 #include <avr/pgmspace.h>
 
-static const char _usart_alpha16[16] PROGMEM = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
 inline void _usart_init(const uint16_t baudrate_ubrr)
 {
   // set baud rate (function of oscillator frequency)
@@ -45,11 +43,16 @@ void usart_send(const char *buffer, size_t len)
         }
 }
 
+static char figure2hex(uint8_t value)
+{
+	return (value < 10) ? value + '0' : value + 'A' - 10;
+}
+
 void usart_u8(const uint8_t val)
 {
-        const char hundred = pgm_read_byte(&_usart_alpha16[(val / 100)]);
-        const char ten = pgm_read_byte(&_usart_alpha16[(val / 10) % 10]);
-        const char unit = pgm_read_byte(&_usart_alpha16[val % 10]);
+        const char hundred = figure2hex(val / 100);
+        const char ten = figure2hex((val / 10) % 10);
+        const char unit = figure2hex(val % 10);
 
         if (val >= 100) {
                 usart_transmit(hundred);
@@ -68,7 +71,7 @@ void  usart_u16(uint16_t val)
         uint8_t first_digit = 4u;
 
         for (uint_fast8_t p = 0; p < 5; p++) {
-                char cur = pgm_read_byte(&_usart_alpha16[val % 10]);
+                char cur = figure2hex(val % 10);
 
                 val /= 10;
 
@@ -101,8 +104,8 @@ void usart_s8(const int8_t val)
 
 void usart_hex(const uint8_t val)
 {
-        const char high = pgm_read_byte(&_usart_alpha16[val >> 4]);
-        const char low = pgm_read_byte(&_usart_alpha16[val & 0xF]);
+        const char high = figure2hex(val >> 4);
+        const char low = figure2hex(val & 0xF);
 
         usart_transmit(high);
         usart_transmit(low);
