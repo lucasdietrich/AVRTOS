@@ -1,7 +1,7 @@
 #ifndef _AVRTOS_KERNEL_H
 #define _AVRTOS_KERNEL_H
 
-#include "avrtos.h"
+#include <avrtos/avrtos.h>
 
 #ifdef __cplusplus
 extern "C" {

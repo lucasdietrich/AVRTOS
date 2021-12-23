@@ -36,7 +36,7 @@ struct k_mutex
     }
 
 #define K_MUTEX_DEFINE(mutex_name) \
-    static struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)
+    struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)
 
 /*___________________________________________________________________________*/
 

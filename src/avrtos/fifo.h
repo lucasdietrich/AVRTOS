@@ -36,7 +36,7 @@ struct k_fifo
     }
 
 #define K_FIFO_DEFINE(fifo_name) \
-    static struct k_fifo fifo_name = K_FIFO_INIT(fifo_name)
+    struct k_fifo fifo_name = K_FIFO_INIT(fifo_name)
 
 /*___________________________________________________________________________*/
 

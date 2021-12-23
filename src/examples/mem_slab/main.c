@@ -40,7 +40,7 @@ static uint8_t ms(struct k_prng *prng)
 static void debug(void *mem, int8_t rc)
 {
         static char buffer[32];
-        sprintf(buffer, "current=%c mem=%x rc=%d\n",
+        sprintf(buffer, "current=%c mem=0x%x rc=%d\n",
                 _current->symbol, (unsigned int)mem, rc);
         usart_print(buffer);
 }

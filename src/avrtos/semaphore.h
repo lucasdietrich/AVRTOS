@@ -37,7 +37,7 @@ struct k_sem
     }
 
 #define K_SEM_DEFINE(sem_name, initial_count, count_limit) \
-    static struct k_sem sem_name = K_SEM_INIT(sem_name, initial_count, count_limit)
+    struct k_sem sem_name = K_SEM_INIT(sem_name, initial_count, count_limit)
 
 /*___________________________________________________________________________*/
 

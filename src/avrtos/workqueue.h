@@ -29,7 +29,7 @@ struct k_work
     }
 
 #define K_WORK_DEFINE(work_name, work_handler) \
-    static struct k_work work_name = K_WORK_INIT(work_handler)
+    struct k_work work_name = K_WORK_INIT(work_handler)
 
 /*___________________________________________________________________________*/
 

@@ -22,7 +22,7 @@ extern "C" {
  */
 
 #define K_ATOMIC_INIT(val)              ((atomic_t) (val))
-#define K_ATOMIC_DEFINE(name, val)      static atomic_t name = K_ATOMIC_INIT(val)
+#define K_ATOMIC_DEFINE(name, val)      atomic_t name = K_ATOMIC_INIT(val)
 
 #define ATOMIC_SIZE_BITS (sizeof(atomic_val_t) * 8)
 

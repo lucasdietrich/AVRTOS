@@ -14,7 +14,9 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-typedef void (*k_event_handler_t)(void*);
+struct k_event;
+
+typedef void (*k_event_handler_t)(struct k_event*);
 
 struct k_event
 {

@@ -42,7 +42,7 @@ struct k_msgq
 }
 
 #define K_MSGQ_DEFINE(msgq, p_buffer, d_msg_size, d_max_msgs) \
-        static struct k_msgq msgq = K_MSGQ_INIT(msgq, p_buffer, d_msg_size, d_max_msgs)
+        struct k_msgq msgq = K_MSGQ_INIT(msgq, p_buffer, d_msg_size, d_max_msgs)
 
 
 /*___________________________________________________________________________*/
