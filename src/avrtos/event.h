@@ -22,6 +22,8 @@ struct k_event
 {
     struct titem tie;
     k_event_handler_t handler;
+    
+    uint8_t scheduled: 1;
 };
 
 
@@ -63,6 +65,16 @@ K_NOINLINE int k_event_schedule(struct k_event *event, k_timeout_t timeout);
  * @return int 
  */
 K_NOINLINE int k_event_cancel(struct k_event *event);
+
+/**
+ * @brief Unschedule the event.
+ * 
+ * Can be called from an interrupt.
+ * 
+ * @param event 
+ * @return int 
+ */
+K_NOINLINE bool k_event_pending(struct k_event *event);
 
 /**
  * @brief Internal function shifting the event queue and executing the handlers

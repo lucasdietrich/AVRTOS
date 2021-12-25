@@ -28,13 +28,15 @@ int k_event_init(struct k_event *event, k_event_handler_t handler)
 	}
 
 	event->handler = handler;
+
+	event->scheduled = 0;
 	
 	return 0;
 }
 
 int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
-	if (!event || K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+	if (!event || event->scheduled || K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		return -EINVAL;
 	}
 
@@ -50,15 +52,26 @@ int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 
 int k_event_cancel(struct k_event *event)
 {
-	if (!event) {
+	if (!event || !event->scheduled) {
 		return -EINVAL;
 	}
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		tqueue_remove(&_k_event_q.first, &event->tie);
+		
+		event->scheduled = 0;
 	}
 
 	return 0;
+}
+
+bool k_event_pending(struct k_event *event)
+{
+	if (!event) {
+		return false;
+	}
+
+	return event->scheduled == 1;;
 }
 
 void _k_event_q_process(void)

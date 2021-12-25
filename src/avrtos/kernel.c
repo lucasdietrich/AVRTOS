@@ -426,7 +426,11 @@ return ms64;
 
 uint32_t k_uptime_get(void)
 {
-	return k_uptime_get_ms32() / 1000;
+	struct timespec ts;
+	
+	k_timespec_get(&ts);
+
+	return ts.tv_sec;
 }
 
 void k_timespec_get(struct timespec *ts)
