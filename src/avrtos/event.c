@@ -23,7 +23,7 @@ K_EVENT_Q_DEFINE(_k_event_q);
 
 int k_event_init(struct k_event *event, k_event_handler_t handler)
 {
-	if (!event) {
+	if (!event || !handler) {
 		return -EINVAL;
 	}
 
@@ -40,10 +40,11 @@ int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 		return -EINVAL;
 	}
 
-	event->tie.next = NULL;
-	event->tie.timeout = K_TIMEOUT_MS(timeout);
-
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		event->scheduled = 1;
+		event->tie.next = NULL;
+		event->tie.timeout = K_TIMEOUT_MS(timeout);
+
 		_tqueue_schedule(&_k_event_q.first, &event->tie);
 	}
 
@@ -71,7 +72,7 @@ bool k_event_pending(struct k_event *event)
 		return false;
 	}
 
-	return event->scheduled == 1;;
+	return event->scheduled == 1;
 }
 
 void _k_event_q_process(void)
@@ -86,6 +87,8 @@ void _k_event_q_process(void)
 		struct k_event *event = CONTAINER_OF(tie, struct k_event, tie);
 
 		event->handler(event);
+
+		event->scheduled = 0;
 	}
 }
 
