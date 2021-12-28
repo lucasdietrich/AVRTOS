@@ -56,7 +56,7 @@ static int8_t _k_msgq_put(struct k_msgq *msgq, const void *data,
                 }
                 return 0;
         } else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-                return -ENOMEM;
+                return -ENOMSG;
         } else {
                 /* tells from were the data should be copied
                 * where there will be space in the msgq
@@ -110,7 +110,7 @@ static int8_t _k_msgq_get(struct k_msgq *msgq, void *data,
                 }
                 return 0;
         } else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-                return -ENOMEM;
+                return -ENOMSG;
         } else {
                 /* tells were the data should be copied
                  * where there will be a new message in the msgq

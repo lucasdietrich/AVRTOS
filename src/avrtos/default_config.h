@@ -67,7 +67,7 @@
 //  0x3F (0x5F) I T H S V N Z C SREG
 //  Read/Write R/W R/W R/W R/W R/W R/W R/W R/W
 //  Initial Value 0 0 0 0 0 0 0 0
-#define DEFAULT_THREAD_DEFAULT_SREG             1 << SREG_I
+#define DEFAULT_THREAD_DEFAULT_SREG             (1 << SREG_I)
 
 //
 //  Enable Kernel Debug features
