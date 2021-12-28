@@ -16,16 +16,19 @@
 
 void thread(void *p);
 
-K_THREAD_DEFINE(w0, thread, 0x50, K_PREEMPTIVE, NULL, '0');
-K_THREAD_DEFINE(w1, thread, 0x50, K_PREEMPTIVE, NULL, '1');
-K_THREAD_DEFINE(w2, thread, 0x50, K_PREEMPTIVE, NULL, '2');
-K_THREAD_DEFINE(w3, thread, 0x50, K_PREEMPTIVE, NULL, '3');
-K_THREAD_DEFINE(w4, thread, 0x50, K_PREEMPTIVE, NULL, '4');
-K_THREAD_DEFINE(w5, thread, 0x50, K_PREEMPTIVE, NULL, '5');
-K_THREAD_DEFINE(w6, thread, 0x50, K_PREEMPTIVE, NULL, '6');
-K_THREAD_DEFINE(w7, thread, 0x50, K_PREEMPTIVE, NULL, '7');
-K_THREAD_DEFINE(w8, thread, 0x50, K_PREEMPTIVE, NULL, '8');
-K_THREAD_DEFINE(w9, thread, 0x50, K_PREEMPTIVE, NULL, '9');
+#define STACK_SIZE 0x70
+#define THREAD_PRIO K_PREEMPTIVE
+
+K_THREAD_DEFINE(w0, thread, STACK_SIZE, THREAD_PRIO, NULL, '0');
+K_THREAD_DEFINE(w1, thread, STACK_SIZE, THREAD_PRIO, NULL, '1');
+K_THREAD_DEFINE(w2, thread, STACK_SIZE, THREAD_PRIO, NULL, '2');
+K_THREAD_DEFINE(w3, thread, STACK_SIZE, THREAD_PRIO, NULL, '3');
+K_THREAD_DEFINE(w4, thread, STACK_SIZE, THREAD_PRIO, NULL, '4');
+K_THREAD_DEFINE(w5, thread, STACK_SIZE, THREAD_PRIO, NULL, '5');
+K_THREAD_DEFINE(w6, thread, STACK_SIZE, THREAD_PRIO, NULL, '6');
+K_THREAD_DEFINE(w7, thread, STACK_SIZE, THREAD_PRIO, NULL, '7');
+K_THREAD_DEFINE(w8, thread, STACK_SIZE, THREAD_PRIO, NULL, '8');
+K_THREAD_DEFINE(w9, thread, STACK_SIZE, THREAD_PRIO, NULL, '9');
 
 
 K_MEM_SLAB_DEFINE(myslab, 0x10, BLOCKS);
@@ -39,10 +42,8 @@ static uint8_t ms(struct k_prng *prng)
 
 static void debug(void *mem, int8_t rc)
 {
-        static char buffer[32];
-        sprintf(buffer, "current=%c mem=0x%x rc=%d\n",
-                _current->symbol, (unsigned int)mem, rc);
-        usart_print(buffer);
+	printf_P(PSTR("current=%c mem=0x%x rc=%d\n"),
+		 _current->symbol, (unsigned int)mem, rc);
 }
 
 static void *alloc(k_timeout_t timeout)
@@ -85,10 +86,12 @@ int main(void)
                         blocks[count++] = alloc(K_FOREVER);
                 }
 
-                usart_printl_p(PSTR("Get all memory slabs !"));
+                printf_P(PSTR("Collected all memory slabs !"));
                 for (uint8_t i = 0; i < BLOCKS; i++) {
                         debug(blocks[i], 0);
                 }
+
+		dump_stack_canaries();
 
                 _delay_ms(15000);
 

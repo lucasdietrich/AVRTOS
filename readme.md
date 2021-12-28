@@ -499,6 +499,52 @@ K 034E [PREE 3] READY   : SP 35/62 -| END @02E6
 ~C~F}Ff~O#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!C_.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>K
 ```
 
+## Optimization
+
+Stacks sizes are tricky to size. Depending when the threads are interrupted, the stack usage can be different and reach high usage very quickly. However following things can help to prevent stack overflow or identify leaks :
+- Enable stack canaries (`THREAD_CANARIES`) to have a precise idea of stack usage.
+- Enable stack sentinel(`THREAD_STACK_SENTINEL`) to detect stack overflow.
+- Using k_sched_lock() arround stack consuming functions.
+- Declare thread as COOPERATIVE instead of PREEMPTIVE.
+- Use static variables
+- Use dynamic allocation (`k_memslab`) for big memory needs.
+
+Example with `MemSlab` :
+
+Priority *PREEMPTIVE* :
+
+```
+[0] CANARIES until @0166 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[1] CANARIES until @01D6 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[2] CANARIES until @0246 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[3] CANARIES until @02B6 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[4] CANARIES until @0326 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[5] CANARIES until @0396 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[6] CANARIES until @03EE [found 15], MAX usage = 96 / 111 + 1 (sentinel)
+[7] CANARIES until @0476 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[8] CANARIES until @04C8 [found 9], MAX usage = 102 / 111 + 1 (sentinel)
+[9] CANARIES until @0556 [found 39], MAX usage = 72 / 111 + 1 (sentinel)
+[M] CANARIES until @079D [found 13], MAX usage = 86 / 99 + 1 (sentinel)
+[I] CANARIES until @011B [found 26], MAX usage = 35 / 61 + 1 (sentinel)
+```
+
+Priority *COOPERATIVE* :
+
+```
+[0] CANARIES until @015E [found 31], MAX usage = 72 / 103 + 1 (sentinel)
+[1] CANARIES until @01AC [found 5], MAX usage = 98 / 103 + 1 (sentinel)
+[2] CANARIES until @021E [found 15], MAX usage = 88 / 103 + 1 (sentinel)
+[3] CANARIES until @027C [found 5], MAX usage = 98 / 103 + 1 (sentinel)
+[4] CANARIES until @02E4 [found 5], MAX usage = 98 / 103 + 1 (sentinel)
+[5] CANARIES until @034C [found 5], MAX usage = 98 / 103 + 1 (sentinel)
+[6] CANARIES until @03CE [found 31], MAX usage = 72 / 103 + 1 (sentinel)
+[7] CANARIES until @0426 [found 15], MAX usage = 88 / 103 + 1 (sentinel)
+[8] CANARIES until @0484 [found 5], MAX usage = 98 / 103 + 1 (sentinel)
+[9] CANARIES until @04EC [found 5], MAX usage = 98 / 103 + 1 (sentinel)
+[M] CANARIES until @074D [found 13], MAX usage = 86 / 99 + 1 (sentinel)
+[I] CANARIES until @011B [found 26], MAX usage = 35 / 61 + 1 (sentinel)
+```
+
 # Ideas: 
 - Malloc : https://www.nongnu.org/avr-libc/user-manual/malloc.html
 - Exceptions
