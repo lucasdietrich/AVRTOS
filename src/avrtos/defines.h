@@ -292,7 +292,6 @@
 #   define KERNEL_UPTIME CONFIG_KERNEL_UPTIME
 #else
 #   define KERNEL_UPTIME DEFAULT_KERNEL_UPTIME
-
 #endif
 
 #if KERNEL_UPTIME
@@ -327,13 +326,11 @@
 
 #if KERNEL_UPTIME == 0 || KERNEL_MAX_SYSCLOCK_PERIOD_MS == 0
 #define SYSCLOCK_PERIOD_MS  KERNEL_TIME_SLICE
-#else 
-
+#else
 #if KERNEL_MAX_SYSCLOCK_PERIOD_MS >= 64
 # 	error KERNEL_MAX_SYSCLOCK_PERIOD_MS must be less than 64 !
 	/* because of ADIW instruction 0 <= K < 64 */
 #endif
-
 #if KERNEL_TIME_SLICE % KERNEL_MAX_SYSCLOCK_PERIOD_MS != 0
 #	error KERNEL_TIME_SLICE must be multiple of KERNEL_MAX_SYSCLOCK_PERIOD_MS !
 	/* because of precision */
@@ -350,6 +347,11 @@
 #define SYSCLOCK_PERIOD_MS  KERNEL_TIME_SLICE
 #endif /* KERNEL_MAX_SYSCLOCK_PERIOD_MS < KERNEL_TIME_SLICE */
 #endif /* KERNEL_UPTIME == 0 || KERNEL_MAX_SYSCLOCK_PERIOD_MS == 0 */
+
+#if KERNEL_UPTIME == 1 && SYSCLOCK_PERIOD_MS > 63
+/* see arch.S line #111 */
+#error Because of ADIW instruction 0 <= K < 64, SYSCLOCK_PERIOD_MS must be less than 64 when KERNEL_UPTIME is enabled !
+#endif /* KERNEL_UPTIME == 1 && SYSCLOCK_PERIOD_MS > 63 */
 
 #define K_EVENTS_PERIOD_MS	KERNEL_TIME_SLICE
 #define K_TIMERS_PERIOD_MS	KERNEL_TIME_SLICE
