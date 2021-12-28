@@ -2,13 +2,13 @@
 #include <avrtos/misc/uart.h>
 #include <avrtos/debug.h>
 
-#define THREADS_COUNT   15
+#define THREADS_COUNT   14
 #define MAX_DELAY_MS	500
 
 #define K_MODULE K_MODULE_APPLICATION
 
 static void thread(void *);
-static void event_handler(void *ev);
+static void event_handler(struct k_event *ev);
 
 struct mystruct
 {
@@ -29,7 +29,6 @@ int main(void)
 	struct mystruct *ms;
 
 	static uint32_t counter = 0;
-	static uint32_t now;
 
 	irq_enable();
 
@@ -50,7 +49,7 @@ int main(void)
 		}
 
 		if (counter++ % 6 == 0) {
-			now = k_uptime_get_ms32();
+			const uint32_t now = k_uptime_get_ms32();
 
 			K_SCHED_LOCK_CONTEXT {
 				printf_P(PSTR("Uptime : %lu (ms)\n"), now);
@@ -65,13 +64,13 @@ int main(void)
 
 static unsigned int random(void)
 {
-	K_PRNG_DEFINE_DEFAULT(prng);
+	static K_PRNG_DEFINE_DEFAULT(prng);
 	
 	/* protect with mutex or K_SCHED_LOCK_CONTEXT if threads are preemptive */
 	return k_prng_get(&prng);
 }
 
-static void event_handler(void *ev)
+static void event_handler(struct k_event *ev)
 {
 	struct mystruct *ms = CONTAINER_OF(ev, struct mystruct, ev);
 

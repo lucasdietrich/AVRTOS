@@ -1,6 +1,8 @@
 #include <avr/io.h>
 
-#if KERNEL_ATOMIC_API
+#include <avrtos/defines.h>
+
+#if KERNEL_ATOMIC_API == 1
 
 .global atomic_get
 .global atomic_clear
