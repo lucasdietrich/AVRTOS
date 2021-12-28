@@ -34,7 +34,8 @@ struct k_event
 #define K_EVENT_INIT(hdlr)           \
     {                                \
     	.tie = INIT_TITEM_DEFAULT(), \
-        .handler = hdlr              \
+        .handler = hdlr,             \
+	.scheduled = 0               \
     }
 #define K_EVENT_DEFINE(name, hdlr) struct k_event name = K_EVENT_INIT(hdlr)
 
