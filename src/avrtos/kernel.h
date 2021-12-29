@@ -75,10 +75,24 @@ K_NOINLINE void k_sched_unlock(void);
  * @brief Tells if the scheduler is locked by the current thread or not.
  * @see k_sched_lock/k_sched_unlock.
  * 
- * @return true     if scheduler is locked for the current thread or is thread is cooperative
+ * @return true     if scheduler is locked for the current thread or thread is cooperative
  * @return false    if not 
  */
 K_NOINLINE bool k_sched_locked(void);
+
+/**
+ * @brief Tells if current thread is preemptive.
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE bool _k_preemptive(void);
+
+/**
+ * @brief Tells if current thread is cooperative
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE bool _k_cooperative(void);
 
 /**
  * @brief used in K_SCHED_LOCK_CONTEXT macro

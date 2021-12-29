@@ -49,6 +49,10 @@ extern "C" {
 #define K_ASSSERT_NOTNULL               15
 #define K_ASSSERT_NULL                  16
 
+#define K_ASSERT_PREEMPTIVE	     	17
+#define K_ASSERT_COOPERATIVE	     	18
+#define K_ASSERT_SCHED_LOCKED	     	19
+
 /*___________________________________________________________________________*/
 
 // move to assert.h
@@ -71,6 +75,10 @@ extern "C" {
 
 #define __ASSERT_LEASTONE_RUNNING()         __ASSERT(K_ASSERT_LEASTONE_RUNNING, !_k_runqueue_single())
 #define __ASSERT_THREAD_STATE(th, th_state) __ASSERT(K_ASSERT_THREAD_STATE, th->state == th_state)
+
+#define __ASSERT_PREEMPTIVE()               __ASSERT(K_ASSERT_PREEMPTIVE, _k_preemptive())
+#define __ASSERT_COOPERATIVE()              __ASSERT(K_ASSERT_COOPERATIVE, _k_cooperative())
+#define __ASSERT_SCHED_LOCKED()             __ASSERT(K_ASSERT_SCHED_LOCKED, k_sched_locked())
 
 /*___________________________________________________________________________*/
 

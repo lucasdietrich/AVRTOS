@@ -69,6 +69,15 @@ static const char *const acode_to_str(uint8_t acode)
 	case K_ASSSERT_NULL:
 		return PSTR("NULL");
 
+	case K_ASSERT_PREEMPTIVE:
+		return PSTR("PREEMPTIVE");
+	
+	case K_ASSERT_COOPERATIVE:
+		return PSTR("COOPERATIVE");
+	
+	case K_ASSERT_SCHED_LOCKED:
+		return PSTR("SCHED_LOCKED");
+
 	case K_ASSERT_UNDEFINED:
 	default:
 		return PSTR("UNDEFINED");
