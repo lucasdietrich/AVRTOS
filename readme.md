@@ -93,7 +93,7 @@ What enhancements/features are not planned :
 ## All onfiguration options
 | Configuration option | Description |
 | --- | --- |
-| THREAD_MAIN_THREAD_PRIORITY   | Define the main thread type (coop/prempt) and priority |
+| THREAD_MAIN_COOPERATIVE   | Define main thread as cooperative (default prempt) |
 | THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
 | THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
 | THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
