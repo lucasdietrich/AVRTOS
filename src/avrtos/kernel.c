@@ -240,12 +240,12 @@ void _k_kernel_init(void)
 #if THREAD_ALLOW_RETURN == 1
 			/* thread kernel entry function address */
 			swap_endianness(thread->stack.end - 1u -
-					(6u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+					(7u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
 #endif
 
 			/* thread context address */
 			swap_endianness(thread->stack.end - 1u -
-					(8u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
+					(9u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
 		}
 	}
 }
