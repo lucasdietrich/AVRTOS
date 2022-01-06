@@ -347,17 +347,25 @@ void _k_reschedule(k_timeout_t timeout)
 
 /*___________________________________________________________________________*/
 
-
 #if KERNEL_UPTIME
-union {
-	uint32_t u32;
 #if KERNEL_UPTIME_40BITS
+struct {
 	uint8_t bytes[5]; /* 35 years overflow */
+	struct {
+		uint32_t u32;
+		uint8_t u40_byte;
+	};
+} _k_uptime_ms = {
+	.bytes = { 0, 0, 0, 0, 0 }
+};
 #else
+union {
 	uint8_t bytes[4]; /* 49 days overflow */
+	uint32_t u32;
+} _k_uptime_ms = {
+	.bytes = { 0, 0, 0, 0 }
+};
 #endif /* KERNEL_UPTIME_40BITS */
-
-} _k_uptime_ms = { .u32 = 0LU };
 #endif /* KERNEL_UPTIME */
 
 #if KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS
