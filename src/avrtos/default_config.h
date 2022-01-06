@@ -34,7 +34,7 @@
 //
 // Define the main thread type (coop/prempt) and priority
 //
-#define DEFAULT_THREAD_MAIN_THREAD_PRIORITY         K_PREEMPTIVE
+#define DEFAULT_THREAD_MAIN_COOPERATIVE         0
 
 //
 // Tells if the main stack location and size must be defined at compilation time (1)

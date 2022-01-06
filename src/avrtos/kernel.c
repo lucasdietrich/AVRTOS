@@ -92,10 +92,31 @@ bool k_sched_locked(void)
 {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-                return _current->sched_lock == 1;
+                return (_current->sched_lock) == 1 || (_current->coop == 1);
         }
 
         __builtin_unreachable();
+}
+
+
+bool _k_preemptive(void)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		return _current->coop == 0;
+	}
+
+	__builtin_unreachable();
+}
+
+bool _k_cooperative(void)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		return _current->coop == 1;
+	}
+
+	__builtin_unreachable();
 }
 
 void k_sleep(k_timeout_t timeout)
