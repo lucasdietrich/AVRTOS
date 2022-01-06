@@ -63,9 +63,9 @@ void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
         sp -= 1u;
 
 #if THREAD_ALLOW_RETURN == 1
-        const uint8_t ilimit = 6u + _K_ARCH_STACK_SIZE_FIXUP;
+        const uint8_t ilimit = 7u + _K_ARCH_STACK_SIZE_FIXUP;
 #else
-        const uint8_t ilimit = 8u + _K_ARCH_STACK_SIZE_FIXUP;
+        const uint8_t ilimit = 9u + _K_ARCH_STACK_SIZE_FIXUP;
 #endif
         for (uint_fast8_t i = 0u; i < ilimit; i++) {
                 *sp-- = 0u;

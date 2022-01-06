@@ -32,8 +32,13 @@ __k_interrupts:
 
 _K_USART_RX_vect:
     push r17
-
     lds r17, SREG
+
+    /* reset r1 
+     * @see __zero_reg__ : https://gcc.gnu.org/wiki/avr-gcc
+     */
+    push r1
+    eor r1, r1
 
     push r0
 
@@ -86,6 +91,12 @@ USART_Continue:
 
 SYSCLOCK_TIMERX_OVF_vect:
     push r17
+
+    /* push __zero_reg__ and reset it to 0 as instructions may have used it as MUL
+     * @see https://gcc.gnu.org/wiki/avr-gcc
+     */
+    push r1
+    eor r1, r1
 
 #if KERNEL_SYSLOCK_HW_TIMER == 1
     ; from ATmega328p documentation : timer1 (16 bits)
@@ -146,6 +157,7 @@ SYSCLOCK_TIMERX_OVF_vect:
     breq isr_save_context1
     
     pop r24
+    pop r1
     sts SREG, r17
     pop r17
     reti
@@ -228,7 +240,9 @@ k_yield:
     push r17
     lds r17, SREG
 
-save_context1:  ; save call-used registers
+save_context1:  ;  save __zero_reg__ + call-used registers
+    push r1 /* __zero_reg__ is normally 0 here */
+
     push r0
 
     push r18
@@ -375,6 +389,8 @@ restore_context1:
 
     pop r0
 
+    pop r1
+
     ; if I flag is set : we need to make sure to set interrupt back 
     ;   at the very last intruction
     sbrs r17, SREG_I
@@ -441,9 +457,9 @@ _k_thread_stack_create:
     ; push 30 default registers (r1 == 0 for example, ...) + pass (void * context)
     ldi r28, 0x00
 #if THREAD_ALLOW_RETURN == 1
-    ldi r29, 6 + _K_ARCH_STACK_SIZE_FIXUP
+    ldi r29, 7 + _K_ARCH_STACK_SIZE_FIXUP
 #else
-    ldi r29, 8 + _K_ARCH_STACK_SIZE_FIXUP
+    ldi r29, 9 + _K_ARCH_STACK_SIZE_FIXUP
 #endif
     dec r29
     st -X, r28
