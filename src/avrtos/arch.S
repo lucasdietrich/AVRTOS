@@ -3,6 +3,8 @@
 
 #include <avrtos/defines.h>
 
+#define K_FAULT_ZEROREG		3
+
 .extern _k_timers_process
 
 
@@ -71,6 +73,7 @@ USART_Continue:
 .global k_yield
 .extern _k_scheduler
 .extern _current
+.extern __fault
 
 ; push order
 ; r17 | r0 r18 > r27 r30 r31 | r28 r19 r1 > r16 | SREG
@@ -111,6 +114,13 @@ SYSCLOCK_TIMERX_OVF_vect:
     adiw r24, SYSCLOCK_PERIOD_MS
     sts _k_uptime_ms, r24
     sts _k_uptime_ms+1, r25
+
+    tst r1
+    breq r1_eqzero
+    ldi r24, K_FAULT_ZEROREG
+    call __fault
+
+r1_eqzero:
 
     /* It took me 5 hours of debugging with QEMU to figure out why my
       _k_uptime_ms counter got randomly crazy ... sad =(

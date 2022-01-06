@@ -11,6 +11,8 @@ static const char *reason_to_str(uint8_t reason)
 		return PSTR("ASSERT");
 	case K_FAULT_SENTINEL:
 		return PSTR("SENTINEL");
+	case K_FAULT_ZEROREG:
+		return PSTR("__ZERO_REG__");
 	default:
 		return PSTR("<UNKNOWN>");
 	}

@@ -12,6 +12,7 @@ extern "C" {
 #define K_FAULT_ASSERT    	0
 #define K_FAULT_SENTINEL	1
 #define K_FAULT_MEMORY		2
+#define K_FAULT_ZEROREG		3
 
 #define K_FAULT 		0xFF
 
