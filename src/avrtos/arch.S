@@ -92,12 +92,6 @@ USART_Continue:
 SYSCLOCK_TIMERX_OVF_vect:
     push r17
 
-    /* push __zero_reg__ and reset it to 0 as instructions may have used it as MUL
-     * @see https://gcc.gnu.org/wiki/avr-gcc
-     */
-    push r1
-    eor r1, r1
-
 #if KERNEL_SYSLOCK_HW_TIMER == 1
     ; from ATmega328p documentation : timer1 (16 bits)
     ; > To do a 16-bit write, the high byte must be written before the low byte. 
@@ -113,6 +107,12 @@ SYSCLOCK_TIMERX_OVF_vect:
 
     lds r17, SREG
 
+    /* push __zero_reg__ and reset it to 0 as instructions may have used it as MUL
+     * @see https://gcc.gnu.org/wiki/avr-gcc
+     */
+    push r1
+    eor r1, r1
+    
 #if KERNEL_UPTIME
     push r24
     push r25

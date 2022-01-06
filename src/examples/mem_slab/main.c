@@ -16,7 +16,7 @@
 
 void thread(void *p);
 
-#define STACK_SIZE 0x70
+#define STACK_SIZE 0x90
 #define THREAD_PRIO K_PREEMPTIVE
 
 K_THREAD_DEFINE(w0, thread, STACK_SIZE, THREAD_PRIO, NULL, '0');

@@ -464,7 +464,7 @@ typedef struct
             uint8_t sreg;                                                  \
             uint8_t r26_r27r30r31r28r29_r16[21u];                        \
             void *context;                                                 \
-            uint8_t r17r1r0r18_r21_3Baddrmsb[9u + _K_ARCH_STACK_SIZE_FIXUP]; \
+            uint8_t r17r1r0r18_r23_3Baddrmsb[9u + _K_ARCH_STACK_SIZE_FIXUP]; \
             thread_entry_t *entry;                                         \
         }
 
