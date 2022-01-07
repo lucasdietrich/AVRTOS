@@ -81,6 +81,8 @@ What enhancements are planned :
 - Unifying `k_timeout_t` and `k_delta_ms_t` types
 - Move the examples from a directory above
 - Allowing `main` thread to return.
+- Improve sysclock precision by not resetting TCNTx (check Arduino millis() function for more details)
+- Implement Arduino `yield()` function as a wrapper for `k_yield()`
 
 What enhancements/features are not planned :
 - Prioritization
