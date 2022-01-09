@@ -253,7 +253,12 @@
 /**
  * @brief Enable atomic API
  */
-#define DEFAULT_KERNEL_ATOMIC_API	0
+#define DEFAULT_KERNEL_ATOMIC_API		0
+
+/**
+ * @brief Enable system time API
+ */
+#define DEFAULT_KERNEL_TIME			0
 
 /*___________________________________________________________________________*/
 

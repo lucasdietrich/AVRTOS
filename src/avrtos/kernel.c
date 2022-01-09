@@ -423,59 +423,25 @@ void _k_system_shift(void)
 #endif /* KERNEL_EVENTS */
 }
 
-uint32_t k_uptime_get_ms32(void)
+uint32_t k_uptime_get(void)
 {
-#if KERNEL_UPTIME
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		return _k_uptime_ms.u32;
-	}
-
-	__builtin_unreachable();
+#if KERNEL_UPTIME_40BITS
+	return k_uptime_get_ms64() / 1000;
+#elif KERNEL_UPTIME
+	return k_uptime_get_ms32() / 1000;
 #else
 	return 0;
 #endif /* KERNEL_UPTIME */
 }
 
-uint64_t k_uptime_get_ms64(void)
+K_NOINLINE void k_uptime_ms64(uint64_t *ms64)
 {
-	uint64_t ms64 = 0x0ULL;
-#if KERNEL_UPTIME_40BITS
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		// ms64 = (uint64_t) _k_uptime_ms.u32;
-		// ms64 <<= 8;
-		// ms64 |= _k_uptime_ms.bytes[4];
-		memcpy(&ms64, &_k_uptime_ms.bytes, sizeof(_k_uptime_ms.bytes));
-	}
-#elif KERNEL_UPTIME
-	ms64 |= (uint32_t) k_uptime_get_ms32();
-#endif /* KERNEL_UPTIME */
-
-return ms64;
+	*ms64 = k_uptime_get_ms64();
 }
 
-uint32_t k_uptime_get(void)
+K_NOINLINE void k_uptime_ms32(uint32_t *ms32)
 {
-	struct timespec ts;
-	
-	k_timespec_get(&ts);
-
-	return ts.tv_sec;
-}
-
-void k_timespec_get(struct timespec *ts)
-{
-	if (ts == NULL) {
-		return;
-	}
-
-#if KERNEL_UPTIME_40BITS
-	uint64_t ms = k_uptime_get_ms64();
-#else 
-	uint32_t ms = k_uptime_get_ms32();
-#endif
-
-	ts->tv_sec = ms / 1000;
-	ts->tv_msec = ms % 1000;
+	*ms32 = k_uptime_get_ms32();
 }
 
 /*___________________________________________________________________________*/

@@ -27,6 +27,7 @@
 #include "canaries.h"
 #include "stack_sentinel.h"
 #include "prng.h"
+#include "time.h"
 
 #include "workqueue.h"
 #include "mutex.h"

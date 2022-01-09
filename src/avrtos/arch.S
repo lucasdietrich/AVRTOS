@@ -505,3 +505,38 @@ _k_thread_stack_create:
 #endif
 
 /*___________________________________________________________________________*/
+
+#if KERNEL_UPTIME
+
+.global k_uptime_get_ms32
+.global k_uptime_get_ms64
+
+k_uptime_get_ms32:
+	lds	r26, SREG
+	cli
+	lds 	r22, _k_uptime_ms
+	lds 	r23, _k_uptime_ms + 1
+	lds 	r24, _k_uptime_ms + 2
+	sts	SREG, r26
+	lds 	r25, _k_uptime_ms + 3
+	ret
+
+k_uptime_get_ms64:
+	lds	r26, SREG
+	cli
+	lds 	r18, _k_uptime_ms
+	lds 	r19, _k_uptime_ms + 1
+	lds 	r20, _k_uptime_ms + 2
+	lds 	r21, _k_uptime_ms + 3
+	sts	SREG, r26
+#if KERNEL_UPTIME_40BITS
+	lds	r22, _k_uptime_ms + 4
+#else
+	ldi	r22, 0x00
+#endif /* KERNEL_UPTIME_40BITS */
+	ldi	r23, 0x00
+	ldi	r24, 0x00
+	ldi	r25, 0x00
+	ret
+#endif /* KERNEL_UPTIME */
+

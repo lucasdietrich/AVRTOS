@@ -308,6 +308,8 @@ K_NOINLINE void _k_system_shift(void);
  */
 K_NOINLINE uint32_t k_uptime_get_ms32(void);
 
+K_NOINLINE void k_uptime_ms32(uint32_t *ms32);
+
 /**
  * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
  * 
@@ -317,19 +319,14 @@ K_NOINLINE uint32_t k_uptime_get_ms32(void);
  */
 K_NOINLINE uint64_t k_uptime_get_ms64(void);
 
+K_NOINLINE void k_uptime_ms64(uint64_t *ms64);
+
 /**
  * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_uptime_get(void);
-
-struct timespec {
-    uint32_t tv_sec;
-    uint16_t tv_msec;
-};
-
-K_NOINLINE void k_timespec_get(struct timespec *ts);
 
 /*___________________________________________________________________________*/
 
