@@ -83,6 +83,7 @@ What enhancements are planned :
 - Allowing `main` thread to return.
 - Improve sysclock precision by not resetting TCNTx (check Arduino millis() function for more details)
 - Implement Arduino `yield()` function as a wrapper for `k_yield()`
+- Read this : https://www.avrfreaks.net/forum/memory-barrier-what-it-does-and-what-it-does-not-do?page=all
 
 What enhancements/features are not planned :
 - Prioritization
