@@ -15,7 +15,8 @@ def create_dir(path: str):
 
 def dis(name: str, elf: str):
     commands = [
-        (f"avr-objdump -S {elf}", f"tmp/{name}/disassembly.asm"),
+        (f"avr-objdump -d {elf}", f"tmp/{name}/disassembly.asm"),
+        (f"avr-objdump -S {elf}", f"tmp/{name}/disassembly_source.asm"),
         (f"avr-readelf -a {elf}", f"tmp/{name}/readelf.txt"),
         (f"avr-nm {elf}", f"tmp/{name}/nm.txt"),
     ]

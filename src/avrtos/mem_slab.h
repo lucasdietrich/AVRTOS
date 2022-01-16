@@ -78,7 +78,7 @@ struct k_mem_slab
  * @brief This function is called on start up to initialize all memory
  * slabs defined at runtime using the macro K_MEM_SLAB_DEFINE
  */
-void _k_mem_slab_init_module(void);
+K_NOINLINE void _k_mem_slab_init_module(void);
 
 /**
  * @brief Initialize a memory slab at runtime

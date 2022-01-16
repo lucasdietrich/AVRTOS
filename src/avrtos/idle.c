@@ -18,7 +18,11 @@ static void _k_idle_entry(void *context)
 {
         for (;;) {
                 /* only an interrupt can wake up the CPU after this instruction */
+
+#ifndef __QEMU__
+		/* A bit buggy on QEMU but normally works fine */
                 sleep_cpu();
+#endif /* __QEMU__ */
         }
 }
 
@@ -42,14 +46,17 @@ static inline bool _k_runqueue_single(void)
 
 void k_idle(void)
 {
-	/* if others thread a ready, yield the CPU */
+	/* if others thread are ready, yield the CPU */
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		if (!_k_runqueue_single()) {
-			return k_yield();
+		if (_k_runqueue_single() == false) {
+			return _k_yield();
 		}
 	}
 
+#ifndef __QEMU__
+	/* A bit buggy on QEMU but normally works fine */
 	sleep_cpu();
+#endif /* __QEMU__ */
 }
 
 /*___________________________________________________________________________*/

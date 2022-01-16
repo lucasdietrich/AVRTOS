@@ -34,16 +34,71 @@ typedef void (*thread_entry_t)(void*);
  * 
  * STOPPED : the thread is not running and is not in the runqueue, it can be resumed/started with k_resume/k_start functions.
  * 
- * RUNNING : the thread is currently running and can be retrieved with via `_current`, 
- * moreover the thread is at the top of the 'runqueue'.
- * 
- * READY : the thread is ready to be executed and it somewhere is in the runqueue but is not at the top
+ * READY : the thread is ready to be executed and is the runqueue
  * 
  * PENDING : the thread is pending for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
  * It can be wake up with function _k_wake_up()
  * 
  */
 enum thread_state_t { STOPPED = 0, READY = 1, PENDING = 2, _UNDEFINED = 3};
+
+/* size 19B */
+struct _k_callsaved_ctx {
+	uint8_t sreg;
+	
+	uint8_t r29;
+	uint8_t r28;
+
+	uint8_t r17;
+	uint8_t r16;
+	uint8_t r15;
+	uint8_t r14;
+	uint8_t r13;
+	uint8_t r12;
+	uint8_t r11;
+	uint8_t r10;
+	uint8_t r9;
+	uint8_t r8;
+	uint8_t r7;
+	uint8_t r6;
+	union {
+		struct {
+			uint8_t r5;
+			uint8_t r4;
+		};
+		void *thread_entry;
+	};
+	union {
+		struct {
+			uint8_t r3;
+			uint8_t r2;
+		};
+		void *thread_context;
+	};
+
+	/* what about r0 */
+
+	/* DOCUMENTATION
+	 * R0, T-Flag: 
+	 * The temporary register and the T-flag in SREG are also call-clobbered, but this knowledge is not exposed explicitly to the compiler (R0 is a fixed register).
+	 */
+};
+
+struct _k_thread_context_ext
+{
+	uint8_t r18;
+	uint8_t r19;
+	uint8_t r20;
+	uint8_t r21;
+	uint8_t r22;
+	uint8_t r23;
+	uint8_t r24;
+	uint8_t r25;
+	uint8_t r26;
+	uint8_t r27;
+	uint8_t r30;
+	uint8_t r31;
+};
 
 /**
  * @brief This structure represents a thread, it defines:
@@ -59,6 +114,7 @@ enum thread_state_t { STOPPED = 0, READY = 1, PENDING = 2, _UNDEFINED = 3};
 struct k_thread
 {
         void *sp;       // stack point, keep it at the beginning of the structure
+
         union {
                 struct
                 {	
@@ -128,9 +184,14 @@ struct k_thread
                 size_t size;                    // stack size
         } stack;                                // thread stack definition
         char symbol;                            // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
+
 #if THREAD_ERRNO
         uint8_t errno;                          // Thread errno
-#endif
+#endif /* THREAD_ERRNO */
+
+#if KERNEL_THREAD_MONITORING
+	uint32_t ticks; /* TODO implement uint40 */
+#endif /* KERNEL_THREAD_MONITORING */
 };
 
 /**
@@ -184,7 +245,7 @@ void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
 
 /*___________________________________________________________________________*/
 
-void _k_thread_entry(void* context, thread_entry_t entry);
+void _k_thread_entry(void);
 
 /*___________________________________________________________________________*/
 

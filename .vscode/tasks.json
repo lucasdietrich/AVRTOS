@@ -57,5 +57,13 @@
 			],
 			"label": "QEMU VMDEV Ubuntu - Uptime-qemu-ATmega2560"
 		},
+		{
+			"type": "shell",
+			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/QEMU-V2/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU V2"
+		},
 	]
 }

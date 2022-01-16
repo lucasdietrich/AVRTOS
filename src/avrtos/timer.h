@@ -36,11 +36,11 @@ struct k_timer
     __attribute__((used, section(".k_timers"))) static struct k_timer              \
     timer_name = K_TIMER_INIT(handler, timeout_ms, starting_delay) 
 
-#define K_TIMER_STOPPED         ((k_delta_ms_t) -1)
+#define K_TIMER_STOPPED         ((k_delta_t) -1)
 
 /*___________________________________________________________________________*/
 
-void _k_timer_init_module(void);
+K_NOINLINE void _k_timer_init_module(void);
 
 K_NOINLINE void _k_timers_process(void);
 

@@ -11,6 +11,8 @@ static const char *reason_to_str(uint8_t reason)
 		return PSTR("ASSERT");
 	case K_FAULT_SENTINEL:
 		return PSTR("SENTINEL");
+	case K_THREAD_TERMINATED:
+		return PSTR("THREAD_TERMINATED");
 	default:
 		return PSTR("<UNKNOWN>");
 	}
@@ -23,6 +25,8 @@ void __fault(uint8_t reason)
 
 	usart_print_p(PSTR("***** Kernel Fault *****\n Reason > "));
 	usart_print_p(reason_to_str(reason));
+
+	asm("call __debug");
 
 	asm("jmp _exit");
 

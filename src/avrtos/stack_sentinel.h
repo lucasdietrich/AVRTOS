@@ -15,7 +15,7 @@ extern "C" {
  * @brief Initialize stack sentinel byte(s) for all threads.
  * 
  */
-void _k_init_stacks_sentinel(void);
+K_NOINLINE void _k_init_stacks_sentinel(void);
 
 /**
  * @brief Initialize stack sentinel byte(s) for specified thread.

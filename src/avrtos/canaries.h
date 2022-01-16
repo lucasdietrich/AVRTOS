@@ -24,7 +24,7 @@ void _k_init_thread_stack_canaries(struct k_thread *th);
  * 
  * Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010
  */
-void _k_init_stacks_canaries(void);
+K_NOINLINE void _k_init_stacks_canaries(void);
 
 /**
  * @brief Get the address of the furthest stack location used by the thread.

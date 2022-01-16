@@ -16,7 +16,7 @@ void k_timespec_get(struct timespec *ts)
 	ts->tv_msec = ms % 1000;
 }
 
-#if CONFIG_KERNEL_TIME
+#if KERNEL_TIME
 static struct {
 	uint32_t timestamp;
 	uint32_t uptime_sec;

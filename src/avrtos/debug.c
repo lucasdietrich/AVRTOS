@@ -82,7 +82,7 @@ void k_thread_dump(struct k_thread *th)
         usart_u16(k_thread_usage(th));
         usart_transmit('/');
         usart_u16(th->stack.size);
-        usart_print_p(PSTR(" -| END @"));
+        usart_print_p(PSTR(" -| END 0x"));
         usart_hex16((uint16_t)th->stack.end);
         usart_transmit('\n');
 }
@@ -108,18 +108,19 @@ void *k_thread_get_return_addr(struct k_thread *th)
         return NULL;
 }
 
-int k_thread_copy_registers(struct k_thread *th, 
-uint8_t *buffer, const size_t size)
-{
-        const uint16_t context_size = K_THREAD_STACK_VOID_SIZE;
-        if ((th != _current) && (size >= context_size)) {
-                memcpy(buffer, K_STACK_START(th->stack.end,
-                        context_size), context_size);
+/* OUTDATED */
+// int k_thread_copy_registers(struct k_thread *th, 
+// uint8_t *buffer, const size_t size)
+// {
+//         const uint16_t context_size = K_THREAD_STACK_VOID_SIZE;
+//         if ((th != _current) && (size >= context_size)) {
+//                 memcpy(buffer, K_STACK_START(th->stack.end,
+//                         context_size), context_size);
 
-                return context_size;
-        }
-        return -1;
-}
+//                 return context_size;
+//         }
+//         return -1;
+// }
 
 
 

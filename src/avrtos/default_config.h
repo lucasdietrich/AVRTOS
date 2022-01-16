@@ -34,29 +34,24 @@
 //
 // Define the main thread type (coop/prempt) and priority
 //
-#define DEFAULT_THREAD_MAIN_COOPERATIVE         0
+#define DEFAULT_THREAD_MAIN_COOPERATIVE         	0
 
 //
 // Tells if the main stack location and size must be defined at compilation time (1)
 // or if the default main stack behaviour (stack at RAMEND) should be kept (0)
 //
-#define DEFAULT_THREAD_EXPLICIT_MAIN_STACK          1
+#define DEFAULT_THREAD_EXPLICIT_MAIN_STACK          	1
 
 //
 // In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option
 // defines the size of the main stack
 //
-#define DEFAULT_THREAD_MAIN_STACK_SIZE              0x200
+#define DEFAULT_THREAD_MAIN_STACK_SIZE              	0x200
 
 //
 // Tells if we should use the C or the Assembler function to define our threads at runtime
 //
-#define DEFAULT_THREAD_USE_INIT_STACK_ASM           1
-
-//
-// Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds
-//
-#define DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32   0
+#define DEFAULT_THREAD_USE_INIT_STACK_ASM           	1
 
 //
 // Default SREG value for other thread on stack creation.
@@ -67,134 +62,139 @@
 //  0x3F (0x5F) I T H S V N Z C SREG
 //  Read/Write R/W R/W R/W R/W R/W R/W R/W R/W
 //  Initial Value 0 0 0 0 0 0 0 0
-#define DEFAULT_THREAD_DEFAULT_SREG             (1 << SREG_I)
+#define DEFAULT_THREAD_DEFAULT_SREG             	(1 << SREG_I)
 
 //
 //  Enable Kernel Debug features
 //
-#define DEFAULT_KERNEL_DEBUG                    0
+#define DEFAULT_KERNEL_DEBUG                    	0
 
 //
 //  Enable Kernel debug for function, that set some of them noinline 
 //
-#define DEFAULT_KERNEL_API_NOINLINE             0
+#define DEFAULT_KERNEL_API_NOINLINE             	0
 
 //
 // Enable Kernel Debug in scheduler
 //
-#define DEFAULT_KERNEL_SCHEDULER_DEBUG          0
+#define DEFAULT_KERNEL_SCHEDULER_DEBUG          	0
 
 //
 // Enable preemtive threads feature
 //
-#define DEFAULT_KERNEL_PREEMPTIVE_THREADS       1
+#define DEFAULT_KERNEL_PREEMPTIVE_THREADS       	1
 
 //
-// Time slice in milliseconds
+// Time slice in milliseconds (0 if using SYSCLOCK period)
 //
-#define DEFAULT_KERNEL_TIME_SLICE               4
+#define DEFAULT_KERNEL_TIME_SLICE               	4096LLU
 
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
 //
-#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         0
+#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	1
 
 //
 //  Auto start kernel sysclock
 //
-#define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       1
+#define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       	1
+
+//
+//  Sysclock precision mode
+//
+#define DEFAULT_KERNEL_SYSCLOCK_PRECISION_MODE		1
+
+//
+// Sysclock period when precision mode is disabled (LLU is important)
+//
+#define DEFAULT_KERNEL_SYSCLOCK_PERIOD_US       	4096LLU
+
+//
+// Give the size of the ticks variable
+//
+#define DEFAULT_KERNEL_TICKS_40BITS   			5
 
 //
 //  Kernel auto initialisation
 //
-#define DEFAULT_KERNEL_AUTO_INIT                1
-
-//
-//  Use uart rx interrupt as preempt signal
-//
-#define DEFAULT_KERNEL_DEBUG_PREEMPT_UART       0
+#define DEFAULT_KERNEL_AUTO_INIT                	1
 
 //
 // Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status
 //
-#define DEFAULT_KERNEL_THREAD_IDLE              1
+#define DEFAULT_KERNEL_THREAD_IDLE              	1
 
 //
 // Kernel thread idle addtionnal stack
 //
-#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    0
+#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	30
 
 //
 // Allow interrupt yield, this forces to add more stack to idle thread, 
 // since it is possible to save the current interrupt context while being in idle thread 
 // this happens often
 //
-#define DEFAULT_KERNEL_ALLOW_INTERRUPT_YIELD    1
+#define DEFAULT_KERNEL_ALLOW_INTERRUPT_YIELD    	1
 
 //
 // Enable thread canaries
 //
-#define DEFAULT_THREAD_CANARIES                 0
+#define DEFAULT_THREAD_CANARIES                 	0
 
 //
 // Define thread canaries symbol
 //
-#define DEFAULT_THREAD_CANARIES_SYMBOL          0xAA
+#define DEFAULT_THREAD_CANARIES_SYMBOL          	0xAA
 
 //
 // Define thread sentinel symbol
 //
-#define DEFAULT_THREAD_STACK_SENTINEL          	0
+#define DEFAULT_THREAD_STACK_SENTINEL          		0
 
 //
 // Define thread sentinel size
 //
-#define DEFAULT_THREAD_STACK_SENTINEL_SIZE      1
+#define DEFAULT_THREAD_STACK_SENTINEL_SIZE      	1
 
 //
 // Define thread sentinel symbol
 //
-#define DEFAULT_THREAD_STACK_SENTINEL_SYMBOL    0xAA
+#define DEFAULT_THREAD_STACK_SENTINEL_SYMBOL    	0xAA
 
 //
 // Enable system workqueue
 //
-#define DEFAULT_SYSTEM_WORKQUEUE_ENABLE         0
+#define DEFAULT_SYSTEM_WORKQUEUE_ENABLE         	0
 
 //
 // Define system workqueue stack size
 //
-#define DEFAULT_SYSTEM_WORKQUEUE_STACK_SIZE     0x200
+#define DEFAULT_SYSTEM_WORKQUEUE_STACK_SIZE     	0x200
 
 //
 // Define system workqueue thread priority
 //
-#define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       K_PREEMPTIVE
+#define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       	K_PREEMPTIVE
 
 //
 // Enable kernel assertion test for debug purpose
 //
-#define DEFAULT_KERNEL_ASSERT                   0
-
-//
-// Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks)
-//
-#define DEFAULT_THREAD_ALLOW_RETURN             0
+#define DEFAULT_KERNEL_ASSERT                   	0
 
 //
 // Enable timers support
 //
-#define DEFAULT_KERNEL_TIMERS                   0
+#define DEFAULT_KERNEL_TIMERS                   	0
 
 //
 // Enable events support
 //
-#define DEFAULT_KERNEL_EVENTS                   0
+#define DEFAULT_KERNEL_EVENTS                   	0
 
 //
 // Enabled thread errno
 //
-#define DEFAULT_THREAD_ERRNO                    0
+#define DEFAULT_THREAD_ERRNO                    	0
 
 /***
  * @brief Enable scheduler lock counter for each thread to allow 
@@ -204,7 +204,7 @@
  * enable it only if needed.
  * 
  */
-#define DEFAULT_KERNEL_SCHED_LOCK_COUNTER       0
+#define DEFAULT_KERNEL_SCHED_LOCK_COUNTER       	0
 
 /***
  * @brief Enable IRQ lock counter for each thread to allow 
@@ -217,48 +217,33 @@
  * enable it only if needed.
  * 
  */
-#define DEFAULT_KERNEL_IRQ_LOCK_COUNTER       	0
+#define DEFAULT_KERNEL_IRQ_LOCK_COUNTER       		0
 
 /**
  * @brief Tells to which USART printf function output should be redirected.
  * Disable the option by setting to -1.
  */
-#define DEFAULT_STDIO_PRINTF_TO_USART		-1
+#define DEFAULT_STDIO_PRINTF_TO_USART			-1
 
 /**
  * @brief Enable uptime counter in milliseconds
  */
-#define DEFAULT_KERNEL_UPTIME			1
+#define DEFAULT_KERNEL_UPTIME				1
 
 /**
- * @brief Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter.
+ * @brief Enable performance monitoring 
  */
-#define DEFAULT_KERNEL_UPTIME_40BITS	0
-
-/**
- * @brief Enable millisecond precision for uptime counter 
- * Active only if DEFAULT_KERNEL_UPTIME is enabled.
- * 
- * 0 (default) : KERNEL_TIME_SLICE
- * 1 -> KERNEL_TIME_SLICE : specified value
- * 
- * Define the maximum period of the sysclock in ms. Normally,
- *  the period is automatically calculated from KERNEL_TIME_SLICE
- *  but if a higher precision is required for the uptime (in ms). 
- * The syslock period can be adjusted independently from thread 
- * switch period (KERNEL_TIME_SLICE).
- */
-#define DEFAULT_KERNEL_MAX_SYSCLOCK_PERIOD_MS	0
+#define DEFAULT_KERNEL_THREAD_MONITORING		0
 
 /**
  * @brief Enable atomic API
  */
-#define DEFAULT_KERNEL_ATOMIC_API		0
+#define DEFAULT_KERNEL_ATOMIC_API			0
 
 /**
  * @brief Enable system time API
  */
-#define DEFAULT_KERNEL_TIME			0
+#define DEFAULT_KERNEL_TIME				0
 
 /*___________________________________________________________________________*/
 

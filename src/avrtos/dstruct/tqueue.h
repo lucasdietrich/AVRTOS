@@ -27,9 +27,9 @@ struct titem
 {
         union
         {
-                k_delta_ms_t delay_shift;
-                k_delta_ms_t abs_delay;
-                k_delta_ms_t timeout;
+                k_delta_t delay_shift;
+                k_delta_t abs_delay;
+                k_delta_t timeout;
         };
         struct titem* next;
 };
@@ -77,7 +77,7 @@ void _tqueue_schedule(struct titem **root, struct titem *item);
  * @param timeout 
  */
 void tqueue_schedule(struct titem **root,
-        struct titem *item, k_delta_ms_t timeout);
+        struct titem *item, k_delta_t timeout);
 
 /**
  * @brief Shift the queue time of {time_passed}
@@ -89,7 +89,7 @@ void tqueue_schedule(struct titem **root,
  * @param root 
  * @param time_passed 
  */
-void tqueue_shift(struct titem **root, k_delta_ms_t time_passed);
+void tqueue_shift(struct titem **root, k_delta_t time_passed);
 
 /**
  * @brief Pop an item from the time queue.
@@ -114,7 +114,7 @@ struct titem *tqueue_pop(struct titem **root);
  * @param time_passed 
  * @return struct titem* 
  */
-// struct titem *tqueue_shift_pop(struct titem **root, k_delta_ms_t time_passed);
+// struct titem *tqueue_shift_pop(struct titem **root, k_delta_t time_passed);
 
 /**
  * @brief
@@ -122,7 +122,7 @@ struct titem *tqueue_pop(struct titem **root);
  * @param root
  * @return struct titem*
  */
-struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_ms_t timeout);
+struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout);
 
 /**
  * @brief Remove an item from the time queue.

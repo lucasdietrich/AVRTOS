@@ -36,7 +36,7 @@ void task_handler(struct k_work* self)
 {
   struct task_t * const task = CONTAINER_OF(self, struct task_t, work);
 
-  k_sleep(K_MSEC((k_delta_ms_t) task->input));
+  k_sleep(K_MSEC((k_delta_t) task->input));
 
   k_sched_lock();
   usart_hex16((uint16_t) self);

@@ -44,7 +44,7 @@ void _k_timers_process(void)
 {
         __ASSERT_NOINTERRUPT();
 
-        tqueue_shift(&_k_timers_runqueue, K_TIMERS_PERIOD_MS);
+        tqueue_shift(&_k_timers_runqueue, K_TIMERS_PERIOD_TICKS);
 
         for (;;) {
                 struct titem *item = tqueue_pop(&_k_timers_runqueue);

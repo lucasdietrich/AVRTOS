@@ -28,8 +28,18 @@ extern bool __k_interrupts(void);
 
 #else
 
+/**
+ * @brief Disable interrupts in the current thread.
+ * 
+ * Can be called recursively.
+ */
 K_NOINLINE void irq_disable(void);
 
+/**
+ * @brief Enable interrupts in the current thread
+ * 
+ * Can be called recursively.
+ */
 K_NOINLINE void irq_enable(void);
 
 #endif /* KERNEL_IRQ_LOCK_COUNTER */
@@ -41,7 +51,7 @@ K_NOINLINE void irq_enable(void);
  * This function restore the context of the current thread when returning.
  * This function can be called from either a cooperative thread or a premptive thread.
  */
-void k_yield(void);
+K_NOINLINE void k_yield(void);
 
 /**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
@@ -195,6 +205,20 @@ K_NOINLINE void k_resume(struct k_thread *th);
  */
 K_NOINLINE void k_start(struct k_thread *th);
 
+/**
+ * @brief Stop the thread
+ * 
+ * @param th : ready/pending thread to start.
+ */
+K_NOINLINE void _k_stop(void);
+
+/**
+ * @brief Stop the thread
+ * 
+ * @param th : ready/pending thread to start.
+ */
+K_NOINLINE void k_stop(void);
+
 /*___________________________________________________________________________*/
 
 //
@@ -204,10 +228,22 @@ K_NOINLINE void k_start(struct k_thread *th);
 // for the most of following functions, we assume that the interrupt flag is cleared when called
 
 /**
+ * @brief Do a thread switch (ASM function)
+ * 1. save context of the first thread
+ * 2. store the SP of the first thread to its structure
+ * 3. restore the SP of the second thread from its structure
+ * 4. restore context of the second thread
+ * 
+ * @param from 
+ * @param to 
+ */
+void _k_thread_switch(struct k_thread *from, struct k_thread *to);
+
+/**
  * @brief Initialize the runqueue with all threads ready to be executed.
  * Assume that the interrupt flag is cleared when called.
  */
-void _k_kernel_init(void);
+K_NOINLINE void _k_kernel_init(void);
 
 /**
  * @brief Queue the thread in the runqueue. We assume that the thread {th} is READY. 
@@ -264,7 +300,17 @@ K_NOINLINE void _k_suspend(void);
  * 
  * @return struct k_thread* : next thread to be executed
  */
-K_NOINLINE struct k_thread *_k_scheduler(void);
+K_NOINLINE void _k_scheduler(void);
+
+static inline void _k_yield(void)
+{
+	_k_scheduler();
+}
+
+static inline void yield(void)
+{
+	k_yield();
+}
 
 /**
  * @brief Wake up a thread that is pending for an event.
@@ -302,13 +348,25 @@ K_NOINLINE void _k_reschedule(k_timeout_t timeout);
 K_NOINLINE void _k_system_shift(void);
 
 /**
+ * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE uint32_t k_ticks_get_32(void);
+
+/**
+ * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled
+ * 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE uint64_t k_ticks_get_64(void);
+
+/**
  * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_uptime_get_ms32(void);
-
-K_NOINLINE void k_uptime_ms32(uint32_t *ms32);
 
 /**
  * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
@@ -318,8 +376,6 @@ K_NOINLINE void k_uptime_ms32(uint32_t *ms32);
  * @return K_NOINLINE 
  */
 K_NOINLINE uint64_t k_uptime_get_ms64(void);
-
-K_NOINLINE void k_uptime_ms64(uint64_t *ms64);
 
 /**
  * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled

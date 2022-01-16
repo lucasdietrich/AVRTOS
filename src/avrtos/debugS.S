@@ -9,12 +9,13 @@
 
 ;_____________________________________________________________________________;
 
-; return the return address of when ther callee calls it
+; return the return address of when ther caller calls it
 read_ra:
     pop r25
     pop r24
 #if __AVR_3_BYTE_PC__
     pop r23
+    ldi r22, 0x00
     push r23
 #endif
     push r24
@@ -32,8 +33,11 @@ read_ra:
     ret
 
 read_sp:
+    lds r20, SREG
+    cli
     lds r24, SPL
     lds r25, SPH
+    sts SREG, r20
     ret
 
 ; structure address in r24, r25
@@ -55,7 +59,7 @@ set_stack_pointer:
     ret
 
 read_sreg:
-    lds r24,SREG
+    lds r24, SREG
     ret
 
 ;_____________________________________________________________________________;

@@ -62,6 +62,14 @@ extern "C" {
 #   define __ASSERT(acode, assertion) 
 #endif
 
+#define K_ASSERT __ASSERT
+
+/*___________________________________________________________________________*/
+
+#define __STATIC_ASSERT(test_for_true) _Static_assert((test_for_true), "(" #test_for_true ") failed")
+
+#define K_STATIC_ASSERT __STATIC_ASSERT
+
 /*___________________________________________________________________________*/
 
 #define __ASSERT_TRUE(test)                 __ASSERT(K_ASSERT_TRUE, (test) != 0)

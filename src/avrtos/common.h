@@ -31,15 +31,6 @@
 
 /*___________________________________________________________________________*/
 
-#define K_TIMEOUT_EQ(t1, t2)    (K_TIMEOUT_MS(t1) == K_TIMEOUT_MS(t2))
-#define K_TIMEOUT_MS(t)		(t.value)
-
-#define K_SECONDS(delay_s)      ((k_timeout_t){.value = (k_delta_ms_t) (((k_delta_ms_t) 1000u)*(delay_s))})
-#define K_MSEC(delay_ms)        ((k_timeout_t){.value = (k_delta_ms_t) (delay_ms)})
-#define K_NO_WAIT               ((k_timeout_t){.value = (k_delta_ms_t) 0})
-#define K_FOREVER               ((k_timeout_t){.value = (k_delta_ms_t) -1})
-#define K_UNTIL_WAKEUP          K_FOREVER
-
 #define HTONL(n) ((((((uint32_t)(n) & 0xFF)) << 24) |      \
                ((((uint32_t)(n) & 0xFF00)) << 8) |         \
                ((((uint32_t)(n) & 0xFF0000)) >> 8) |       \
