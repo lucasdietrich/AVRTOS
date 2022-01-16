@@ -407,9 +407,9 @@ void _k_system_shift(void)
 #endif /* KERNEL_EVENTS */
 }
 
-void _k_scheduler(void)
+struct k_thread *_k_scheduler(void)
 {
-        // __ASSERT_NOINTERRUPT();
+        __ASSERT_NOINTERRUPT();
 
 	struct k_thread *const prev = _current;
 
@@ -439,24 +439,11 @@ void _k_scheduler(void)
 
         _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
 	
-	// __ASSERT_THREAD_STATE(_current, READY);
+	__ASSERT_THREAD_STATE(_current, READY);
 
         __K_DBG_SCHED_NEXT(_current);
 
-	// if (prev != _current) {
-	// 	_k_thread_switch(prev, _current);
-	// }
-
-	_k_thread_switch(prev, _current);
-}
-
-void _k_scheduler2(void)
-{
-	static uint8_t i = 1;
-
-	i = (i + 1) % 2;
-
-	_current = &__k_threads_start + i;
+	return _current;
 }
 
 void _k_wake_up(struct k_thread *th)

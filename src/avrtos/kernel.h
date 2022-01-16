@@ -300,9 +300,7 @@ K_NOINLINE void _k_suspend(void);
  * 
  * @return struct k_thread* : next thread to be executed
  */
-K_NOINLINE void _k_scheduler(void);
-
-K_NOINLINE void _k_scheduler2(void);
+struct k_thread *_k_scheduler(void);
 
 static inline void _k_yield(void)
 {

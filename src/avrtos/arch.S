@@ -11,7 +11,6 @@
 .extern usart_hex16
 
 .extern _k_scheduler
-.extern _k_scheduler2
 
 .extern _current
 .extern runqueue
@@ -132,54 +131,6 @@ __int_restore_minimal_context:
 	pop	r0
 	pop	r1
 	reti
-
-
-; _k_scheduler2:
-; ; clear flags
-; 	lds	r30, _current
-; 	lds	r31, _current + 1
-; 	ldd	r25, Z+2
-; 	andi	r25, 0xBF	; MASK
-; 	andi	r25, 0xDF 	; MASK
-; 	std	Z+2, r25
-
-; ; PENDING ?
-; 	andi	r25, 0x03	; MASK
-; 	cpi	r25, 0x02	; PENDING
-
-; ; go to refrequeue
-; 	brne	refrequeue
-
-; ; _current = runqueue
-; update_current:
-; 	lds	r22, runqueue		; 0x80020e <runqueue>
-; 	lds	r23, runqueue + 1	; 0x80020f <runqueue+0x1>
-; 	subi	r22, 0x03		; get thread from ditem addr
-; 	sbc	r23, r1
-; 	sts	_current + 1, r23	; 0x800211 <_current+0x1>
-; 	sts	_current, r22		; 0x800210 <_current>
- 
-;  ; prev == _current ?
-;  	cp	r22, r30
-;  	cpc	r23, r31
-
-;  ; go to return
-;  	breq	.+6
-
-;  ; thread switch
-;  	movw	r24, r30
-;  	call	_k_thread_switch
-;  	ret
-
-; ; ref requeue
-; refrequeue:
-; 	lds	r26, runqueue	; 0x80020e <runqueue>
-; 	lds	r27, runqueue + 1	; 0x80020f <runqueue+0x1>
-; 	ld	r24, X+
-; 	ld	r25, X
-; 	sts	runqueue + 1, r25	; 0x80020f <runqueue+0x1>
-; 	sts	runqueue, r24	; 0x80020e <runqueue>
-; 	jmp 	update_current
 
 ; "from" thread addr is in r24, r25
 ; "to" thread  addr in in r22, r23
@@ -355,7 +306,7 @@ _K_USART_RX_vect:
 	call k_thread_dump_all
 
 __debug_sched:
-	call _k_scheduler2
+	call _k_scheduler
 
 	jmp __int_restore
 #endif
@@ -392,28 +343,22 @@ _K_USART_RX_vect:
 	
 	push r2
 	push r3
-	push r4
-	push r5
 
 	lds r24, UDR0
 	call usart_transmit
 
-	lds r24, _current
-	lds r25, _current + 1
-	movw r2, r24
-	call usart_hex16
-	ldi r24, 0x3a ; ':'
-	call usart_transmit
+	; current thread
+	lds r2, _current
+	lds r3, _current + 1
 
-	call _k_scheduler2
+	call _k_scheduler
 
-	lds r24, _current
-	lds r25, _current + 1
-	movw r4, r24
-	call usart_hex16
-	ldi r24, 0x2f ; '/'
-	call usart_transmit
+	; prepare X and Z registers for saving and restoring contexts
+	movw r30, r2 ; current thread
+	movw r26, r24 ; next thread
 
+	push r4
+	push r5
 	push r6
 	push r7
 	push r8
@@ -432,16 +377,14 @@ _K_USART_RX_vect:
 	push r17
 
 	; save context and write SP in thread structure
-	movw r30, r2
 	lds r20, SPL
 	lds r21, SPH
 	st Z+, r20
 	st Z+, r21
 
 	; restore SP and restore context
-	movw r30, r4
-	ld r20, Z+
-	ld r21, Z+
+	ld r20, X+
+	ld r21, X+
 	sts SPL, r20
 	sts SPH, r21
 
