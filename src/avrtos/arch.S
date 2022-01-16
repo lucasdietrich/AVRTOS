@@ -91,24 +91,22 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	ldi r24, 0x2e           ; '.'
 	call usart_transmit
 #endif
-
 ; KERNEL_DEBUG
+
 	call _k_system_shift
 
+#if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
 	lds ZL, _current           ; load current thread addr in Z
 	lds ZH, _current + 1
 
-#if KERNEL_PREEMPTIVE_THREADS
 	ldd r18, Z + 2      ; read flag
 	andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
 	brne __int_restore
-#endif
-; KERNEL_PREEMPTIVE_THREADS
 
 __scheduler:
-.extern k_thread_dump_all
-	; call k_thread_dump_all
 	call _k_scheduler
+#endif
+; KERNEL_PREEMPTIVE_THREADS
 
 __int_restore:
 	pop	r31
@@ -296,5 +294,35 @@ k_ticks_get_64:
 
 .global __debug
 __debug:
-
 	ret
+
+
+#if KERNEL_DEBUG_PREEMPT_UART
+.global _K_USART_RX_vect
+_K_USART_RX_vect:
+	push	r1
+	push	r0
+	lds	r0, SREG
+	push	r0
+	eor	r1, r1
+	push	r18
+	push	r19
+	push	r20
+	push	r21
+	push	r22
+	push	r23
+	push	r24
+	push	r25
+	push	r26
+	push	r27
+	push	r30
+	push	r31
+
+	lds r24, UDR0
+	call usart_transmit
+
+	call _k_scheduler
+
+	jmp __int_restore
+#endif
+; KERNEL_DEBUG_PREEMPT_UART

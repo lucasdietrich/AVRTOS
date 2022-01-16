@@ -17,11 +17,13 @@ K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PREEMPTIVE, 
 static void _k_idle_entry(void *context)
 {
         for (;;) {
-                /* only an interrupt can wake up the CPU after this instruction */
-
-#ifndef __QEMU__
+		
 		/* A bit buggy on QEMU but normally works fine */
+#ifndef __QEMU__
+		
+		/* only an interrupt can wake up the CPU after this instruction */
                 sleep_cpu();
+		
 #endif /* __QEMU__ */
         }
 }

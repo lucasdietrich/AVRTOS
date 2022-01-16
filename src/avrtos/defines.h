@@ -134,6 +134,15 @@
 #   define KERNEL_TIME_SLICE DEFAULT_KERNEL_TIME_SLICE
 #endif
 
+//
+// debug preempt via uart
+//
+#ifdef CONFIG_KERNEL_DEBUG_PREEMPT_UART
+#	define KERNEL_DEBUG_PREEMPT_UART CONFIG_KERNEL_DEBUG_PREEMPT_UART
+#else
+#	define KERNEL_DEBUG_PREEMPT_UART DEFAULT_KERNEL_DEBUG_PREEMPT_UART
+#endif
+
 // idle thread, only in preemptive mode
 #if KERNEL_PREEMPTIVE_THREADS
 #   ifdef CONFIG_KERNEL_THREAD_IDLE
@@ -385,6 +394,20 @@ typedef struct
 #       define _K_ARCH_PC_SIZE              0
 # endif
 #endif
+
+#if KERNEL_DEBUG_PREEMPT_UART
+
+// refactor this
+#   if defined(__AVR_ATmega328P__)
+#       define _K_USART_RX_vect  USART_RX_vect
+#   elif defined(__AVR_ATmega2560__)
+#       define _K_USART_RX_vect  USART0_RX_vect
+#   else
+#       warning   KERNEL_DEBUG_PREEMPT_UART enaabled, USART RX vector no configured, default = "USART_RX_vect"
+#       define _K_USART_RX_vect  USART_RX_vect
+#   endif
+
+#endif /* KERNEL_DEBUG_PREEMPT_UART */
 
 /*___________________________________________________________________________*/
 

@@ -245,6 +245,11 @@
  */
 #define DEFAULT_KERNEL_TIME				0
 
+/**
+ * @brief Use UART RX interrupt as preemptive signal
+ */
+#define DEFAULT_KERNEL_DEBUG_PREEMPT_UART		0
+
 /*___________________________________________________________________________*/
 
 #endif

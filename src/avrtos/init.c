@@ -20,7 +20,7 @@ void _k_kernel_sp(void)
 void _k_avrtos_init(void)
 {
 #if KERNEL_DEBUG_PREEMPT_UART
-        UCSR0B = 1 << RXCIE0;
+	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif
 
 	/* Send output stream to usart0 */

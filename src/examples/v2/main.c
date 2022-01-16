@@ -21,13 +21,16 @@ int main(void)
 
 	k_thread_dump_all();
 
-	USART_DUMP_RAM_ALL();
+	// USART_DUMP_RAM_ALL();
 
 	sei();
 
 	while (1) {
-		usart_transmit('m');
-		k_sleep(K_SECONDS(1));
+		// usart_transmit('m');
+
+		// k_wait(K_SECONDS(1));
+
+		// k_yield();
 	}
 }
 
@@ -35,7 +38,8 @@ void mythread(char *ctx)
 {
 	while (1) {
 		usart_transmit(*ctx);
-		k_sleep(K_MSEC(500));
+		
+		_delay_ms(1000);
 	}
 }
 
