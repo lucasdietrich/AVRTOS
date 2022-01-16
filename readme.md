@@ -70,6 +70,12 @@ AVRTOS2:
 	- Optimized "thread_switch" function
 	- Cooperative threads needs less stacks
 	- Change time ms to us OR ticks ? (max sleep is now 4h or more if using 64bit time objects)
+TODO AVRTOS 2:
+- Inline _k_scheduler with thread_switch (or jump to _k_scheduler and jump to thread_switch)
+- Maybe only push SREG a single time ? (--> NO)
+- Handle configuration
+- Add tools to help to minimize stack usage
+- config option to forbid thread termination by jumping to function in _k_thread_entry
 
 What enhancements are planned :
 - Optimize thread switch function by pushing only call-clobbered registers (https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.c#L67). Handle switch from interrupt handler (could this help https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.h#L193 ?).

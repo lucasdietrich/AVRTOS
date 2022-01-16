@@ -8,12 +8,9 @@
 .global _k_thread_entry
 .global K_SYSCLOCK_TIMERX_OVF_vect
 
-.extern usart_hex16
-
 .extern _k_scheduler
 
 .extern _current
-.extern runqueue
 
 .extern _k_ticks 			; u32/u40
 .extern _k_sched_ticks_remaining 	; u8
@@ -75,7 +72,7 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	lds r18, _k_sched_ticks_remaining
 	subi r18, 0x01
 	sts _k_sched_ticks_remaining, r18
-	brne __int_restore_minimal_context
+	brne __intctx_restore_minimal
 #endif 
 #endif
 ; KERNEL_TICKS
@@ -99,20 +96,29 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 
 	call _k_system_shift
 
+; check if scheduler is locked (cooperative thread or temporarely locked)
 #if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
 	lds ZL, _current           ; load current thread addr in Z
 	lds ZH, _current + 1
 
 	ldd r18, Z + 2      ; read flag
 	andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
-	brne __int_restore
+	brne __intctx_restore
 
 __scheduler:
+	; prepare return context for preempted thread
+	ldi r24, pm_lo8(__intctx_restore)
+	ldi r25, pm_hi8(__intctx_restore)
+	push r24
+	push r25
+
 	call _k_scheduler
+
+	ret
 #endif
 ; KERNEL_PREEMPTIVE_THREADS
 
-__int_restore:
+__intctx_restore:
 	pop	r31
 	pop	r30
 	pop	r27
@@ -124,7 +130,7 @@ __int_restore:
 	pop	r21
 	pop	r20
 	pop	r19
-__int_restore_minimal_context:
+__intctx_restore_minimal:
 	pop	r18
 	pop	r0
 	sts	SREG, r0
@@ -155,28 +161,13 @@ _k_thread_switch:
 	push r29
 	lds r17, SREG
 	push r17
-
-
-	call usart_hex16
-	movw r20, r24
-	ldi r24, 0x3a ; ':'
-	call usart_transmit
-	movw r24, r22
-	call usart_hex16
-	movw r24, r20
 	
-
 	; save context and write SP in thread structure
 	movw r30, r24
 	lds r20, SPL
 	lds r21, SPH
-	st Y+, r20
-	st Y+, r21
-
-	ldi r24, 0x2f ; '/'
-	call usart_transmit
-	movw r24, r20
-	call usart_hex16
+	st Z+, r20
+	st Z+, r21
 
 	; restore SP and restore context
 	movw r30, r22
@@ -184,11 +175,6 @@ _k_thread_switch:
 	ld r21, Z+
 	sts SPL, r20
 	sts SPH, r21
-
-	ldi r24, 0x3a ; ':'
-	call usart_transmit
-	movw r24, r20
-	call usart_hex16
 
 	pop r17
 	sts SREG, r17
@@ -272,12 +258,8 @@ k_ticks_get_64:
 __debug:
 	ret
 
-
-#if 0
-
 #if KERNEL_DEBUG_PREEMPT_UART
 .global _K_USART_RX_vect
-.extern k_thread_dump_all
 _K_USART_RX_vect:
 	push	r1
 	push	r0
@@ -300,137 +282,13 @@ _K_USART_RX_vect:
 	lds r24, UDR0
 	call usart_transmit
 
-	ldi r25, 0x6b ; 'k'
-	cpse r24, r25
-	jmp __debug_sched
-	call k_thread_dump_all
-
-__debug_sched:
-	call _k_scheduler
-
-	jmp __int_restore
-#endif
-; KERNEL_DEBUG_PREEMPT_UART
-
-#elif 1
-
-#if KERNEL_DEBUG_PREEMPT_UART
-.global _K_USART_RX_vect
-.extern k_thread_dump_all
-_K_USART_RX_vect:
-	push	r1
-	push	r0
-	lds	r0, SREG
-	push	r0
-	eor	r1, r1
-	push	r18
-	push	r19
-	push	r20
-	push	r21
-	push	r22
-	push	r23
-	push	r24
-	push	r25
-	push	r26
-	push	r27
-	push	r30
-	push	r31
-
-	ldi r24, pm_lo8(restore_intctx)
-	ldi r25, pm_hi8(restore_intctx)
+	ldi r24, pm_lo8(__intctx_restore)
+	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
-	
-	push r2
-	push r3
-
-	lds r24, UDR0
-	call usart_transmit
-
-	; current thread
-	lds r2, _current
-	lds r3, _current + 1
 
 	call _k_scheduler
 
-	; prepare X and Z registers for saving and restoring contexts
-	movw r30, r2 ; current thread
-	movw r26, r24 ; next thread
-
-	push r4
-	push r5
-	push r6
-	push r7
-	push r8
-	push r9
-	push r10
-	push r11
-	push r12
-	push r13
-	push r14
-	push r15
-	push r16
-	push r17
-	push r28
-	push r29
-	lds r17, SREG
-	push r17
-
-	; save context and write SP in thread structure
-	lds r20, SPL
-	lds r21, SPH
-	st Z+, r20
-	st Z+, r21
-
-	; restore SP and restore context
-	ld r20, X+
-	ld r21, X+
-	sts SPL, r20
-	sts SPH, r21
-
-	pop r17
-	sts SREG, r17
-	pop r29
-	pop r28
-	pop r17
-	pop r16
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop r7
-	pop r6
-	pop r5
-	pop r4
-	pop r3
-	pop r2
-
 	ret
-
-restore_intctx:
-	pop	r31
-	pop	r30
-	pop	r27
-	pop	r26
-	pop	r25
-	pop	r24
-	pop	r23
-	pop	r22
-	pop	r21
-	pop	r20
-	pop	r19
-	pop	r18
-	pop	r0
-	sts	SREG, r0
-	pop	r0
-	pop	r1
-	reti
-
 #endif
 ; KERNEL_DEBUG_PREEMPT_UART
-
-#endif

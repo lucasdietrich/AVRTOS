@@ -191,13 +191,6 @@ void k_block(k_timeout_t timeout)
 
 /*___________________________________________________________________________*/
 
-void k_yield(void)
-{
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		_k_scheduler();
-	}
-}
-
 void k_suspend(void)
 {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -407,7 +400,7 @@ void _k_system_shift(void)
 #endif /* KERNEL_EVENTS */
 }
 
-struct k_thread *_k_scheduler(void)
+void _k_scheduler(void)
 {
         __ASSERT_NOINTERRUPT();
 
@@ -443,7 +436,9 @@ struct k_thread *_k_scheduler(void)
 
         __K_DBG_SCHED_NEXT(_current);
 
-	return _current;
+	if (prev != _current) {
+		_k_thread_switch(prev, _current);
+	}
 }
 
 void _k_wake_up(struct k_thread *th)

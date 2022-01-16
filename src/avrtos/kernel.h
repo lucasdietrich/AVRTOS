@@ -44,6 +44,13 @@ K_NOINLINE void irq_enable(void);
 
 #endif /* KERNEL_IRQ_LOCK_COUNTER */
 
+void _k_scheduler(void);
+
+static inline void _k_yield(void)
+{
+	_k_scheduler();
+}
+
 /**
  * @brief Release the CPU: Stop the execution of the current thread and set it at the end of the runqueue 
  * (if it's still ready) in order to execute it one "cycle" later.
@@ -51,7 +58,18 @@ K_NOINLINE void irq_enable(void);
  * This function restore the context of the current thread when returning.
  * This function can be called from either a cooperative thread or a premptive thread.
  */
-K_NOINLINE void k_yield(void);
+
+static inline void k_yield(void)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		_k_yield();
+	}
+}
+
+static inline void yield(void)
+{
+	k_yield();
+}
 
 /**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
@@ -300,17 +318,7 @@ K_NOINLINE void _k_suspend(void);
  * 
  * @return struct k_thread* : next thread to be executed
  */
-struct k_thread *_k_scheduler(void);
-
-static inline void _k_yield(void)
-{
-	_k_scheduler();
-}
-
-static inline void yield(void)
-{
-	k_yield();
-}
+void _k_scheduler(void);
 
 /**
  * @brief Wake up a thread that is pending for an event.

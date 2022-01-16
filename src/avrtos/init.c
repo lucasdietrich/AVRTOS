@@ -42,7 +42,7 @@ void _k_avrtos_init(void)
 #endif
 
 #if KERNEL_SYSCLOCK_AUTO_INIT
-        // _k_init_sysclock();
+        _k_init_sysclock();
 #endif
 }
 
