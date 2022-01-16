@@ -24,10 +24,13 @@ uint16_t k_thread_usage(struct k_thread *th)
         } else if (th == _current) {
                 // stack pointer refers to the first empty addr (from end)
                 // empty stack : th->stack.end == th->sp
-                return ((uint16_t)th->stack.end) -
-                        ((uint16_t)th->sp) - K_THREAD_STACK_VOID_SIZE;
+		uint16_t sp;
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			sp = SP;
+		}
+                return ((uint16_t)th->stack.end) - sp;
         } else {
-                // stack pointer refers to the first empty addr (from end)
+                // stack pointer points to the top of the stack
                 // empty stack : th->stack.end == th->sp
                 return ((uint16_t)th->stack.end) - ((uint16_t)th->sp);
         }

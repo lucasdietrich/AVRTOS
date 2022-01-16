@@ -302,6 +302,8 @@ K_NOINLINE void _k_suspend(void);
  */
 K_NOINLINE void _k_scheduler(void);
 
+K_NOINLINE void _k_scheduler2(void);
+
 static inline void _k_yield(void)
 {
 	_k_scheduler();

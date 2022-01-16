@@ -15,7 +15,7 @@ char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 #endif
 
 K_THREAD struct k_thread _k_thread_main = {
-    .sp = NULL, // main thread is running, context already "restored"
+    .sp = 0, // main thread is running, context already "restored"
     {
 #if THREAD_MAIN_COOPERATIVE == 1
         .flags = READY | K_COOPERATIVE,

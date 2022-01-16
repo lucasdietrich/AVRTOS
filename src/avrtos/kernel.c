@@ -450,6 +450,15 @@ void _k_scheduler(void)
 	_k_thread_switch(prev, _current);
 }
 
+void _k_scheduler2(void)
+{
+	static uint8_t i = 1;
+
+	i = (i + 1) % 2;
+
+	_current = &__k_threads_start + i;
+}
+
 void _k_wake_up(struct k_thread *th)
 {
 	__ASSERT_NOTNULL(th);
