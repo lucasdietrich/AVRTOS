@@ -347,7 +347,7 @@ K_NOINLINE void _k_reschedule(k_timeout_t timeout);
 /*___________________________________________________________________________*/
 
 /**
- * @brief Shift time in kernel time queue list (events_queue) 
+ * @brief Shift time in kernel time queue list (_k_events_queue) 
  * and process timers if any
  * 
  * Assumptions :

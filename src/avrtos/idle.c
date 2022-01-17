@@ -7,6 +7,8 @@
 
 static void _k_idle_entry(void *context);
 
+#define K_TRHEAD_IDLE_STACK_SIZE K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
+
 K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PREEMPTIVE, NULL, 'I');
 
 /**
@@ -30,12 +32,12 @@ static void _k_idle_entry(void *context)
 
 #endif /* KERNEL_THREAD_IDLE */
 
-extern struct ditem *runqueue;
+extern struct ditem *_k_runqueue;
 
 bool k_is_cpu_idle(void)
 {
 #if KERNEL_THREAD_IDLE
-	return runqueue == &_k_idle.tie.runqueue;
+	return _k_runqueue == &_k_idle.tie.runqueue;
 #else 
 	return false;
 #endif /* KERNEL_THREAD_IDLE */
@@ -43,7 +45,7 @@ bool k_is_cpu_idle(void)
 
 static inline bool _k_runqueue_single(void)
 {
-        return runqueue->next == runqueue;
+        return _k_runqueue->next == _k_runqueue;
 }
 
 void k_idle(void)

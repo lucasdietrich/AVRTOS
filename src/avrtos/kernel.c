@@ -17,13 +17,13 @@
  * @brief Runqueue containing the queue of all ready threads.
  * Should never be NULL.
  */
-struct ditem *runqueue = &_k_thread_main.tie.runqueue;
+struct ditem *_k_runqueue = &_k_thread_main.tie.runqueue;
 
-struct titem *events_queue = NULL;
+struct titem *_k_events_queue = NULL;
 
 static inline bool _k_runqueue_single(void)
 {
-        return runqueue->next == runqueue;
+        return _k_runqueue->next == _k_runqueue;
 }
 
 #if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
@@ -276,7 +276,7 @@ void _k_kernel_init(void)
 		 * runqueue as the main thread is running */
 		if (!is_thread_idle &&
 		    (thread->state == READY)) {
-			push_back(runqueue, &thread->tie.runqueue);
+			push_back(_k_runqueue, &thread->tie.runqueue);
 		}
 
 		/* Swap endianness of addresses in compilation-time built stacks.
@@ -295,7 +295,7 @@ void _k_queue(struct k_thread *const th)
 {
         __ASSERT_NOINTERRUPT();
 
-        push_back(runqueue, &th->tie.runqueue);
+        push_back(_k_runqueue, &th->tie.runqueue);
 }
 
 void _k_schedule(struct k_thread *thread)
@@ -318,12 +318,12 @@ void _k_schedule(struct k_thread *thread)
 #if KERNEL_THREAD_IDLE
         if (k_is_cpu_idle()) {
                 dlist_ref(&thread->tie.runqueue);
-                runqueue = &thread->tie.runqueue;
+                _k_runqueue = &thread->tie.runqueue;
                 return;
         }
 #endif
 
-        push_front(runqueue, &thread->tie.runqueue);
+        push_front(_k_runqueue, &thread->tie.runqueue);
 }
 
 void _k_schedule_wake_up(k_timeout_t timeout)
@@ -335,7 +335,7 @@ void _k_schedule_wake_up(k_timeout_t timeout)
 		_current->wakeup_schd = 1;
                 _current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
                 _current->tie.event.next = NULL;
-                _tqueue_schedule(&events_queue, &_current->tie.event);
+                _tqueue_schedule(&_k_events_queue, &_current->tie.event);
         }
 }
 
@@ -349,14 +349,14 @@ void _k_suspend(void)
         if (_k_runqueue_single()) {
                 struct ditem *const tie = &_k_idle.tie.runqueue;
                 dlist_ref(tie);
-                runqueue = tie;
+                _k_runqueue = tie;
                 return;
         }
 #else
         __ASSERT_LEASTONE_RUNNING();
 #endif
 
-        pop_ref(&runqueue);
+        pop_ref(&_k_runqueue);
 }
 
 void _k_system_shift(void)
@@ -364,7 +364,7 @@ void _k_system_shift(void)
 	__ASSERT_NOINTERRUPT();
 	__STATIC_ASSERT(KERNEL_TIME_SLICE_TICKS != 0);
 
-	tqueue_shift(&events_queue, KERNEL_TIME_SLICE_TICKS);
+	tqueue_shift(&_k_events_queue, KERNEL_TIME_SLICE_TICKS);
 
 #if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
 	_k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
@@ -379,7 +379,7 @@ void _k_system_shift(void)
 #endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
 #endif /* KERNEL_THREAD_MONITORING */
 
-        struct ditem *const ready = (struct ditem *)tqueue_pop(&events_queue);
+        struct ditem *const ready = (struct ditem *)tqueue_pop(&_k_events_queue);
         if (ready != NULL) {
 		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
 
@@ -425,12 +425,12 @@ void _k_scheduler(void)
                 __K_DBG_SCHED_PENDING();        // ~
         } else {
                 /* next thread is positionned at the top of the runqueue */
-                ref_requeue(&runqueue);
+                ref_requeue(&_k_runqueue);
 
                 __K_DBG_SCHED_REQUEUE();        // >
         }
 
-        _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
+        _current = CONTAINER_OF(_k_runqueue, struct k_thread, tie.runqueue);
 	
 	__ASSERT_THREAD_STATE(_current, READY);
 
@@ -451,7 +451,7 @@ void _k_wake_up(struct k_thread *th)
 
 	/* Remove the thread from the events queue */
 	if (th->wakeup_schd) {
-		tqueue_remove(&events_queue, &th->tie.event);
+		tqueue_remove(&_k_events_queue, &th->tie.event);
 	}
 
         _k_schedule(th);

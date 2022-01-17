@@ -125,7 +125,7 @@ What enhancements/features are not planned :
 | ~~KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
 | KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
-| KERNEL_ALLOW_INTERRUPT_YIELD |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
+| ~~KERNEL_ALLOW_INTERRUPT_YIELD~~ |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
 | THREAD_CANARIES | Enable thread canaries |
 | THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
 | SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |

@@ -1163,6 +1163,8 @@
 #	define K_SYSCLOCK_TIMER_TCNTL        0x0
 #	define K_SYSCLOCK_TIMER_TCNTH        0x0
 #	define K_SYSCLOCK_TCNT_ISNULL        1
+#else
+#error Unsupported SYSCLOCK period for timer 1
 #endif
 
 
@@ -4798,6 +4800,8 @@
 #	define K_SYSCLOCK_TIMER_TCNTL        0x0
 #	define K_SYSCLOCK_TIMER_TCNTH        0x0
 #	define K_SYSCLOCK_TCNT_ISNULL        1
+#else
+#error Unsupported SYSCLOCK period for timer 1
 #endif
 
 #elif KERNEL_SYSLOCK_HW_TIMER == 2
@@ -5828,6 +5832,8 @@
 #	define K_SYSCLOCK_TIMER_TCNTL        0x0
 #	define K_SYSCLOCK_TIMER_TCNTH        0x0
 #	define K_SYSCLOCK_TCNT_ISNULL        1
+#else
+#error Unsupported SYSCLOCK period for timer 2
 #endif
 
 #endif /* timer number */

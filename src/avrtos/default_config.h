@@ -85,14 +85,19 @@
 #define DEFAULT_KERNEL_PREEMPTIVE_THREADS       	1
 
 //
+// Sysclock period when precision mode is disabled (LLU is important)
+//
+#define DEFAULT_KERNEL_SYSCLOCK_PERIOD_US       	1024LLU
+
+//
 // Time slice in milliseconds (0 if using SYSCLOCK period)
 //
-#define DEFAULT_KERNEL_TIME_SLICE               	4096LLU
+#define DEFAULT_KERNEL_TIME_SLICE               	1024LLU
 
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
 //
-#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	1
+#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	2
 
 //
 //  Auto start kernel sysclock
@@ -103,11 +108,6 @@
 //  Sysclock precision mode
 //
 #define DEFAULT_KERNEL_SYSCLOCK_PRECISION_MODE		1
-
-//
-// Sysclock period when precision mode is disabled (LLU is important)
-//
-#define DEFAULT_KERNEL_SYSCLOCK_PERIOD_US       	4096LLU
 
 //
 // Give the size of the ticks variable
@@ -127,14 +127,7 @@
 //
 // Kernel thread idle addtionnal stack
 //
-#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	30
-
-//
-// Allow interrupt yield, this forces to add more stack to idle thread, 
-// since it is possible to save the current interrupt context while being in idle thread 
-// this happens often
-//
-#define DEFAULT_KERNEL_ALLOW_INTERRUPT_YIELD    	1
+#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	0
 
 //
 // Enable thread canaries

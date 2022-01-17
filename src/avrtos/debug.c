@@ -12,8 +12,8 @@
 
 /*___________________________________________________________________________*/
 
-extern struct ditem *runqueue; 
-extern struct titem *events_queue;
+extern struct ditem *_k_runqueue; 
+extern struct titem *_k_events_queue;
 
 /*___________________________________________________________________________*/
 
@@ -142,12 +142,12 @@ void _thread_symbol_events_queue(struct titem *item)
 
 void print_runqueue(void)
 {
-        print_ref_dlist(runqueue, _thread_symbol_runqueue);
+        print_ref_dlist(_k_runqueue, _thread_symbol_runqueue);
 }
 
 void print_events_queue(void)
 {
-        print_tqueue(events_queue, _thread_symbol_events_queue);
+        print_tqueue(_k_events_queue, _thread_symbol_events_queue);
 }
 
 /*___________________________________________________________________________*/
