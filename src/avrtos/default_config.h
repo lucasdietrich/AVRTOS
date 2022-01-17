@@ -243,6 +243,14 @@
  */
 #define DEFAULT_KERNEL_DEBUG_PREEMPT_UART		0
 
+/**
+ * @brief Allow, or not thread termination
+ * 0 : not allowed
+ * 1 : allowed
+ * -1 : not allow but fault
+ */
+#define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
+
 /*___________________________________________________________________________*/
 
 #endif

@@ -76,6 +76,7 @@ TODO AVRTOS 2:
 - Handle configuration
 - Add tools to help to minimize stack usage
 - config option to forbid thread termination by jumping to function in _k_thread_entry
+- make it possible to switch thread from an interrupt handler (--> need to save more registers and to place the return address)
 
 What enhancements are planned :
 - Optimize thread switch function by pushing only call-clobbered registers (https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.c#L67). Handle switch from interrupt handler (could this help https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.h#L193 ?).

@@ -400,7 +400,7 @@ void _k_system_shift(void)
 #endif /* KERNEL_EVENTS */
 }
 
-void _k_scheduler(void)
+/* __attribute((naked)) */ struct k_thread *_k_scheduler(void)
 {
         __ASSERT_NOINTERRUPT();
 
@@ -436,9 +436,7 @@ void _k_scheduler(void)
 
         __K_DBG_SCHED_NEXT(_current);
 
-	if (prev != _current) {
-		_k_thread_switch(prev, _current);
-	}
+	return prev;
 }
 
 void _k_wake_up(struct k_thread *th)

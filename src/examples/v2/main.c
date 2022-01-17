@@ -28,6 +28,8 @@ int main(void)
 		usart_transmit('M');
 		k_sleep(K_SECONDS(5));
 		k_thread_dump_all();
+
+		// _delay_ms(5000);
 	}
 }
 

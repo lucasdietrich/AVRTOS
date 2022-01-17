@@ -105,16 +105,13 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
 	brne __intctx_restore
 
-__scheduler:
 	; prepare return context for preempted thread
 	ldi r24, pm_lo8(__intctx_restore)
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
 
-	call _k_scheduler
-
-	ret
+	jmp _k_yield
 #endif
 ; KERNEL_PREEMPTIVE_THREADS
 
@@ -137,6 +134,17 @@ __intctx_restore_minimal:
 	pop	r0
 	pop	r1
 	reti
+
+.global _k_yield
+_k_yield:
+	call _k_scheduler
+
+	; previous thread
+	movw r26, r24
+	
+	; current thread
+	lds r30, _current
+	lds r31, _current + 1
 
 ; "from" thread addr is in r24, r25
 ; "to" thread  addr in in r22, r23
@@ -163,14 +171,12 @@ _k_thread_switch:
 	push r17
 	
 	; save context and write SP in thread structure
-	movw r30, r24
 	lds r20, SPL
 	lds r21, SPH
-	st Z+, r20
-	st Z+, r21
+	st X+, r20
+	st X+, r21
 
 	; restore SP and restore context
-	movw r30, r22
 	ld r20, Z+
 	ld r21, Z+
 	sts SPL, r20
@@ -199,18 +205,49 @@ _k_thread_switch:
 
 	ret
 
+; #if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
+; __intctx_restore:
+; 	pop	r31
+; 	pop	r30
+; 	pop	r27
+; 	pop	r26
+; 	pop	r25
+; 	pop	r24
+; 	pop	r23
+; 	pop	r22
+; 	pop	r21
+; 	pop	r20
+; 	pop	r19
+; __intctx_restore_minimal:
+; 	pop	r18
+; 	pop	r0
+; 	sts	SREG, r0
+; 	pop	r0
+; 	pop	r1
+; 	reti
+; #endif
+; ; KERNEL_PREEMPTIVE_THREADS == 0 || (KERNEL_DEBUG_PREEMPT_UART != 0)
+
 .extern k_stop
 .extern __fault
 _k_thread_entry:
 	movw r24, r2
 	movw r30, r4
+#if KERNEL_THREAD_TERMINATION_TYPE == 0
+	ijmp
+#elif KERNEL_THREAD_TERMINATION_TYPE == -1
 	icall
 
-; TODO remove or add configuration to forbid thread termination
 	ldi r24, 0x03 ; K_THREAD_TERMINATED
 	call __fault
+#else
+	icall
 
 	call k_stop
+#endif
+	
+
+	
 
 
 .global __k_interrupts
@@ -287,8 +324,6 @@ _K_USART_RX_vect:
 	push r24
 	push r25
 
-	call _k_scheduler
-
-	ret
+	jmp _k_yield
 #endif
 ; KERNEL_DEBUG_PREEMPT_UART

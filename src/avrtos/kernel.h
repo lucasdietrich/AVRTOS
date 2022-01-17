@@ -44,33 +44,6 @@ K_NOINLINE void irq_enable(void);
 
 #endif /* KERNEL_IRQ_LOCK_COUNTER */
 
-void _k_scheduler(void);
-
-static inline void _k_yield(void)
-{
-	_k_scheduler();
-}
-
-/**
- * @brief Release the CPU: Stop the execution of the current thread and set it at the end of the runqueue 
- * (if it's still ready) in order to execute it one "cycle" later.
- * This function call the scheduler that determine which thread is the next on to be executing.
- * This function restore the context of the current thread when returning.
- * This function can be called from either a cooperative thread or a premptive thread.
- */
-
-static inline void k_yield(void)
-{
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		_k_yield();
-	}
-}
-
-static inline void yield(void)
-{
-	k_yield();
-}
-
 /**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
  * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and it stills
@@ -318,7 +291,7 @@ K_NOINLINE void _k_suspend(void);
  * 
  * @return struct k_thread* : next thread to be executed
  */
-void _k_scheduler(void);
+// struct k_thread *_k_scheduler(void);
 
 /**
  * @brief Wake up a thread that is pending for an event.
@@ -342,7 +315,29 @@ K_NOINLINE void _k_wake_up(struct k_thread *th);
  * 
  * @param timeout 
  */
-K_NOINLINE void _k_reschedule(k_timeout_t timeout);
+void _k_reschedule(k_timeout_t timeout);
+
+void _k_yield(void);
+
+/**
+ * @brief Release the CPU: Stop the execution of the current thread and set it at the end of the runqueue 
+ * (if it's still ready) in order to execute it one "cycle" later.
+ * This function call the scheduler that determine which thread is the next on to be executing.
+ * This function restore the context of the current thread when returning.
+ * This function can be called from either a cooperative thread or a premptive thread.
+ */
+
+static inline void k_yield(void)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		_k_yield();
+	}
+}
+
+static inline void yield(void)
+{
+	k_yield();
+}
 
 /*___________________________________________________________________________*/
 
