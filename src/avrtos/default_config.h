@@ -87,12 +87,12 @@
 //
 // Sysclock period when precision mode is disabled (LLU is important)
 //
-#define DEFAULT_KERNEL_SYSCLOCK_PERIOD_US       	1024LLU
+#define DEFAULT_KERNEL_SYSCLOCK_PERIOD_US       	1000LLU
 
 //
 // Time slice in milliseconds (0 if using SYSCLOCK period)
 //
-#define DEFAULT_KERNEL_TIME_SLICE               	1024LLU
+#define DEFAULT_KERNEL_TIME_SLICE               	4096LLU
 
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
@@ -250,6 +250,13 @@
  * -1 : not allow but fault
  */
 #define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
+
+/**
+ * @brief Tell if IDLE thread is preemptive or cooperative
+ * 
+ * Note: If preemptive, additonal stack is allocated for thread
+ */
+#define DEFAULT_THREAD_IDLE_COOPERATIVE			0
 
 /*___________________________________________________________________________*/
 

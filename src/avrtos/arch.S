@@ -204,30 +204,7 @@ _k_thread_switch:
 	pop r2
 
 	ret
-
-; #if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
-; __intctx_restore:
-; 	pop	r31
-; 	pop	r30
-; 	pop	r27
-; 	pop	r26
-; 	pop	r25
-; 	pop	r24
-; 	pop	r23
-; 	pop	r22
-; 	pop	r21
-; 	pop	r20
-; 	pop	r19
-; __intctx_restore_minimal:
-; 	pop	r18
-; 	pop	r0
-; 	sts	SREG, r0
-; 	pop	r0
-; 	pop	r1
-; 	reti
-; #endif
-; ; KERNEL_PREEMPTIVE_THREADS == 0 || (KERNEL_DEBUG_PREEMPT_UART != 0)
-
+	
 .extern k_stop
 .extern __fault
 _k_thread_entry:
@@ -245,9 +222,6 @@ _k_thread_entry:
 
 	call k_stop
 #endif
-	
-
-	
 
 
 .global __k_interrupts

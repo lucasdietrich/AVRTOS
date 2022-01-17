@@ -7,9 +7,19 @@
 
 static void _k_idle_entry(void *context);
 
-#define K_TRHEAD_IDLE_STACK_SIZE K_THREAD_STACK_MIN_SIZE + 10u + KERNEL_THREAD_IDLE_ADD_STACK
+/*
+ * 1U is just a to make sure there is no stack overflow.
+ * K_THREAD_STACK_MIN_SIZE would be enough
+ */
+#if THREAD_IDLE_COOPERATIVE
+K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 1U, K_COOPERATIVE, NULL, 'I');
+#else
 
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PREEMPTIVE, NULL, 'I');
+/**
+ * @brief If IDLE thread can be preempted, plan additionnal stack
+ */
+K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 1U + 17U, K_PREEMPTIVE, NULL, 'I');
+#endif
 
 /**
  * @brief Idle thread entry function
@@ -19,13 +29,15 @@ K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_TRHEAD_IDLE_STACK_SIZE, K_PREEMPTIVE, 
 static void _k_idle_entry(void *context)
 {
         for (;;) {
-		
+
+#if THREAD_IDLE_COOPERATIVE
+		k_yield();
+#endif /* THREAD_IDLE_COOPERATIVE */
+
 		/* A bit buggy on QEMU but normally works fine */
 #ifndef __QEMU__
-		
 		/* only an interrupt can wake up the CPU after this instruction */
                 sleep_cpu();
-		
 #endif /* __QEMU__ */
         }
 }

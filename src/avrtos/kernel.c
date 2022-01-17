@@ -480,7 +480,7 @@ uint32_t k_uptime_get(void)
 uint32_t k_uptime_get_ms32(void)
 {
 #if KERNEL_TICKS
-	return k_ticks_get_32() / K_TICKS_PER_SECOND;
+	return k_ticks_get_32() / K_TICKS_PER_MS;
 #else
 	return 0;
 #endif /* KERNEL_UPTIME */
@@ -489,9 +489,9 @@ uint32_t k_uptime_get_ms32(void)
 uint64_t k_uptime_get_ms64(void)
 {
 #if KERNEL_TICKS_40BITS
-	return k_ticks_get_64() / K_TICKS_PER_SECOND;
+	return k_ticks_get_64() / K_TICKS_PER_MS;
 #elif KERNEL_TICKS
-	return k_ticks_get_32() / K_TICKS_PER_SECOND;
+	return k_ticks_get_32() / K_TICKS_PER_MS;
 #else
 	return 0;
 #endif /* KERNEL_UPTIME */
