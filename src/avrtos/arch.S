@@ -110,9 +110,7 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
-
-	jmp _k_yield
-#endif
+#else
 ; KERNEL_PREEMPTIVE_THREADS
 
 __intctx_restore:
@@ -134,6 +132,7 @@ __intctx_restore_minimal:
 	pop	r0
 	pop	r1
 	reti
+#endif
 
 .global _k_yield
 _k_yield:
@@ -205,28 +204,28 @@ _k_thread_switch:
 
 	ret
 
-; #if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
-; __intctx_restore:
-; 	pop	r31
-; 	pop	r30
-; 	pop	r27
-; 	pop	r26
-; 	pop	r25
-; 	pop	r24
-; 	pop	r23
-; 	pop	r22
-; 	pop	r21
-; 	pop	r20
-; 	pop	r19
-; __intctx_restore_minimal:
-; 	pop	r18
-; 	pop	r0
-; 	sts	SREG, r0
-; 	pop	r0
-; 	pop	r1
-; 	reti
-; #endif
-; ; KERNEL_PREEMPTIVE_THREADS == 0 || (KERNEL_DEBUG_PREEMPT_UART != 0)
+#if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
+__intctx_restore:
+	pop	r31
+	pop	r30
+	pop	r27
+	pop	r26
+	pop	r25
+	pop	r24
+	pop	r23
+	pop	r22
+	pop	r21
+	pop	r20
+	pop	r19
+__intctx_restore_minimal:
+	pop	r18
+	pop	r0
+	sts	SREG, r0
+	pop	r0
+	pop	r1
+	reti
+#endif
+; KERNEL_PREEMPTIVE_THREADS == 0 || (KERNEL_DEBUG_PREEMPT_UART != 0)
 
 .extern k_stop
 .extern __fault
