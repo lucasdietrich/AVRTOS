@@ -50,47 +50,31 @@ struct k_thread * _current = &_k_thread_main;
 
 /*___________________________________________________________________________*/
 
-#if THREAD_USE_INIT_STACK_ASM == 0
-
-void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
-        void *const stack_end, void *const context_p)
+static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
+				   void *const context_p)
 {
-        // get stack pointer value
-        uint8_t *sp = (uint8_t *)stack_end - 1;
+	struct _k_callsaved_ctx *const ctx = K_THREAD_CTX_START(th->stack.end);
 
-        // add return addr to stack (with format >> 1)
+	/* initialize unused registers with default value */
+	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
+		*reg = 0x00U;
+	}
+	
+	ctx->sreg = THREAD_DEFAULT_SREG;
+	ctx->thread_context = (void*) K_SWAP_ENDIANNESS(context_p);
+	ctx->thread_entry = (void*) K_SWAP_ENDIANNESS(entry);
+	ctx->pc = (void*) K_SWAP_ENDIANNESS(_k_thread_entry);
 
-        *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)entry);
-
-        sp -= 1u;
-
-        const uint8_t ilimit = 9u + _K_ARCH_STACK_SIZE_FIXUP;
-        for (uint_fast8_t i = 0u; i < ilimit; i++) {
-                *sp-- = 0u;
-        }
-
-        // set entry (p)
-        sp -= 1u;
-        *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)entry);
-        sp -= 1u;
-
-        // set context (p)
-        sp -= 1u;
-        *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)context_p);
-        sp -= 1u;
-
-        for (uint_fast8_t i = 0u; i < 21u; i++) {
-                *sp-- = 0u;
-        }
-
-        // push sreg
-        *sp = (uint8_t)THREAD_DEFAULT_SREG;
-        sp -= 1u;
-
-        // save SP in thread structure
-        th->sp = sp;
-}
+#if __AVR_3_BYTE_PC__
+	ctx->pch = 0;
 #endif
+
+        /* save SP in thread structure */
+        th->sp = ctx;
+
+	/* adjust pointer to the top of the stack */
+	th->sp--;
+}
 
 #include "misc/uart.h"
 
@@ -105,7 +89,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         th->stack.end = (void *)_K_STACK_END(stack, stack_size);
 	th->stack.size = stack_size;
 
-        _k_thread_stack_create(th, entry, th->stack.end, context_p);
+        _k_thread_stack_create(th, entry, context_p);
 
 #if THREAD_STACK_SENTINEL
 	_k_init_thread_stack_sentinel(th);

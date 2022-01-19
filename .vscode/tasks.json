@@ -65,5 +65,14 @@
 			],
 			"label": "QEMU V2"
 		},
+		
+		{
+			"type": "shell",
+			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/QEMU-CoopMultithreadingDemo/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"label": "QEMU-CoopMultithreadingDemo"
+		},
 	]
 }

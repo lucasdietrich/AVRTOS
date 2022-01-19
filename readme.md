@@ -112,7 +112,7 @@ What enhancements/features are not planned :
 | THREAD_MAIN_COOPERATIVE   | Define main thread as cooperative (default prempt) |
 | THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
 | THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
-| THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
+| ~~THREAD_USE_INIT_STACK_ASM~~ | Tells if we should use the C or the Assembler function to define our threads at runtime |
 | ~~KERNEL_HIGH_RANGE_TIME_OBJECT_U32~~ | ~~Configure to use uint32_t as k_delta_t ~= 50 days or keep (uint16_t) ~= 65seconds~~ |
 | THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
 | KERNEL_DEBUG | Enable Kernel Debug features |

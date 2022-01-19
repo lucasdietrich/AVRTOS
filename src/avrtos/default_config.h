@@ -49,11 +49,6 @@
 #define DEFAULT_THREAD_MAIN_STACK_SIZE              	0x200
 
 //
-// Tells if we should use the C or the Assembler function to define our threads at runtime
-//
-#define DEFAULT_THREAD_USE_INIT_STACK_ASM           	1
-
-//
 // Default SREG value for other thread on stack creation.
 // Main thread default SREG is always 0
 //
@@ -65,14 +60,14 @@
 #define DEFAULT_THREAD_DEFAULT_SREG             	(1 << SREG_I)
 
 //
-//  Enable Kernel Debug features
-//
-#define DEFAULT_KERNEL_DEBUG                    	0
-
-//
 //  Enable Kernel debug for function, that set some of them noinline 
 //
 #define DEFAULT_KERNEL_API_NOINLINE             	0
+
+//
+//  Enable Kernel Debug features
+//
+#define DEFAULT_KERNEL_DEBUG                    	0
 
 //
 // Enable Kernel Debug in scheduler
@@ -106,8 +101,9 @@
 
 //
 //  Sysclock precision mode
+// 0 - None, 1 - Optional, 2 - Required
 //
-#define DEFAULT_KERNEL_SYSCLOCK_PRECISION_MODE		1
+#define DEFAULT_KERNEL_SYSCLOCK_PRECISION_MODE		0
 
 //
 // Give the size of the ticks variable
@@ -128,6 +124,12 @@
 // Kernel thread idle addtionnal stack
 //
 #define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	0
+
+//
+// Tell if IDLE thread is preemptive or cooperative
+// Note: If preemptive, additonal stack is allocated for thread
+//
+#define DEFAULT_THREAD_IDLE_COOPERATIVE			0
 
 //
 // Enable thread canaries
@@ -187,7 +189,7 @@
 //
 // Enabled thread errno
 //
-#define DEFAULT_THREAD_ERRNO                    	0
+// #define DEFAULT_THREAD_ERRNO                    	0
 
 /***
  * @brief Enable scheduler lock counter for each thread to allow 
@@ -221,11 +223,12 @@
 /**
  * @brief Enable uptime counter in milliseconds
  */
-#define DEFAULT_KERNEL_UPTIME				1
+#define DEFAULT_KERNEL_UPTIME				0
 
 /**
  * @brief Enable performance monitoring 
  */
+// NOT TESTED
 #define DEFAULT_KERNEL_THREAD_MONITORING		0
 
 /**
@@ -250,13 +253,6 @@
  * -1 : not allow but fault
  */
 #define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
-
-/**
- * @brief Tell if IDLE thread is preemptive or cooperative
- * 
- * Note: If preemptive, additonal stack is allocated for thread
- */
-#define DEFAULT_THREAD_IDLE_COOPERATIVE			0
 
 /*___________________________________________________________________________*/
 

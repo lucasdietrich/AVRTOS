@@ -48,10 +48,7 @@ void canariesthread(void *ctx)
 {
 	while (1) {
 		dump_stack_canaries();
-
-		k_sleep(K_SECONDS(30));
-
-		
+		k_sleep(K_SECONDS(30));		
 	}
 }
 

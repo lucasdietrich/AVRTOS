@@ -284,10 +284,14 @@ void _k_kernel_init(void)
 		* linker at compilation time. So we need to do it on system start up
 		*/
 		struct _k_callsaved_ctx *ctx = thread->stack.end -
-			sizeof(struct _k_callsaved_ctx) - _K_ARCH_PC_SIZE + 1u;
+			_K_CALLSAVED_CTX_SIZE + 1u;
 		swap_endianness(&ctx->thread_context);
-		swap_endianness(&ctx->thread_entry);
-		swap_endianness(thread->stack.end - _K_ARCH_PC_SIZE + 1u);
+		swap_endianness((void*) &ctx->thread_entry);
+		swap_endianness(&ctx->pc);
+		
+#if __AVR_3_BYTE_PC__
+		ctx->pch = 0;
+#endif /* __AVR_3_BYTE_PC__ */
 	}
 }
 

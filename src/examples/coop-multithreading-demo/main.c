@@ -61,6 +61,8 @@ int main(void)
   // USART_DUMP_RAM_ALL();
   k_thread_dump_all();
 
+  sei();
+
   while(1)
   {
     usart_printl_p(PSTR("::main"));

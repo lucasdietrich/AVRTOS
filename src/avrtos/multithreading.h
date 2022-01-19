@@ -45,28 +45,33 @@ enum thread_state_t { STOPPED = 0, READY = 1, PENDING = 2, _UNDEFINED = 3};
 /* size 19B */
 struct _k_callsaved_ctx {
 	uint8_t sreg;
-	
-	uint8_t r29;
-	uint8_t r28;
 
-	uint8_t r17;
-	uint8_t r16;
-	uint8_t r15;
-	uint8_t r14;
-	uint8_t r13;
-	uint8_t r12;
-	uint8_t r11;
-	uint8_t r10;
-	uint8_t r9;
-	uint8_t r8;
-	uint8_t r7;
-	uint8_t r6;
+	union {
+		uint8_t regs[14];
+		struct {
+			uint8_t r29;
+			uint8_t r28;
+
+			uint8_t r17;
+			uint8_t r16;
+			uint8_t r15;
+			uint8_t r14;
+			uint8_t r13;
+			uint8_t r12;
+			uint8_t r11;
+			uint8_t r10;
+			uint8_t r9;
+			uint8_t r8;
+			uint8_t r7;
+			uint8_t r6;
+		};
+	};
 	union {
 		struct {
 			uint8_t r5;
 			uint8_t r4;
 		};
-		void *thread_entry;
+		thread_entry_t *thread_entry;
 	};
 	union {
 		struct {
@@ -76,15 +81,22 @@ struct _k_callsaved_ctx {
 		void *thread_context;
 	};
 
-	/* what about r0 */
-
-	/* DOCUMENTATION
-	 * R0, T-Flag: 
+	/*
+	 * DOCUMENTATION
+	 * R0, T-Flag:
 	 * The temporary register and the T-flag in SREG are also call-clobbered, but this knowledge is not exposed explicitly to the compiler (R0 is a fixed register).
 	 */
+
+	struct {
+#if _K_ARCH_PC_SIZE == 3
+		uint8_t pch;
+#endif /* _K_ARCH_PC_SIZE == 3 */
+
+		void *pc;
+	};
 };
 
-struct _k_thread_context_ext
+struct _k_callused_ctx
 {
 	uint8_t r18;
 	uint8_t r19;
@@ -98,6 +110,22 @@ struct _k_thread_context_ext
 	uint8_t r27;
 	uint8_t r30;
 	uint8_t r31;
+};
+
+struct _k_intctx
+{
+	struct {
+#if _K_ARCH_PC_SIZE == 3
+		uint8_t pch;
+#endif /* _K_ARCH_PC_SIZE == 3 */
+		void *pc;
+	};
+
+	uint8_t r1;
+	uint8_t r0;
+	uint8_t sreg;
+
+	struct _k_callused_ctx callused_reg;
 };
 
 /**
@@ -231,17 +259,6 @@ extern struct k_thread * _current;
 int k_thread_create(struct k_thread* const th, thread_entry_t entry,
     void* const stack, const size_t stack_size, const int8_t priority,
     void* const context_p, const char symbol);
-
-/**
- * @brief Initialize a thread stack at runtime
- * 
- * @param th thread structure pointer
- * @param entry thread entry function
- * @param stack thread stack start location
- * @param context_p thread context
- */
-void _k_thread_stack_create(struct k_thread* const th, thread_entry_t entry,
-    void* const stack, void* const context_p);
 
 /*___________________________________________________________________________*/
 

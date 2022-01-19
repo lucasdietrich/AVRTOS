@@ -8,18 +8,19 @@
 static void _k_idle_entry(void *context);
 
 /*
- * 1U is just a to make sure there is no stack overflow.
  * K_THREAD_STACK_MIN_SIZE would be enough
  */
 #if THREAD_IDLE_COOPERATIVE
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 1U, K_COOPERATIVE, NULL, 'I');
+K_THREAD_MINIMAL_DEFINE(_k_idle, _k_idle_entry, K_COOPERATIVE, NULL, 'I');
 #else
 
 /**
  * @brief If IDLE thread can be preempted, plan additionnal stack
  */
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 1U + 17U, K_PREEMPTIVE, NULL, 'I');
+K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE +
+		KERNEL_THREAD_IDLE_ADD_STACK, K_PREEMPTIVE, NULL, 'I');
 #endif
+
 
 /**
  * @brief Idle thread entry function

@@ -81,7 +81,6 @@ void k_thread_dump(struct k_thread *th)
 	}
 
         usart_print_p(PSTR(" : SP "));
-
         usart_u16(k_thread_usage(th));
         usart_transmit('/');
         usart_u16(th->stack.size);

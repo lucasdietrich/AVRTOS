@@ -34,13 +34,6 @@
 #   define THREAD_MAIN_STACK_SIZE DEFAULT_THREAD_MAIN_STACK_SIZE
 #endif
 
-// use asm thread stack init function
-#ifdef CONFIG_THREAD_USE_INIT_STACK_ASM
-#   define THREAD_USE_INIT_STACK_ASM CONFIG_THREAD_USE_INIT_STACK_ASM
-#else
-#   define THREAD_USE_INIT_STACK_ASM DEFAULT_THREAD_USE_INIT_STACK_ASM
-#endif
-
 // set default SREG (interrupt flag or not)
 #ifdef CONFIG_THREAD_DEFAULT_SREG
 #   define THREAD_DEFAULT_SREG CONFIG_THREAD_DEFAULT_SREG
@@ -423,10 +416,17 @@ typedef struct
 #if !__ASSEMBLER__
 #define _K_CALLSAVED_CTX_SIZE	  sizeof(struct _k_callsaved_ctx)
 #else 
-#define _K_CALLSAVED_CTX_SIZE	  19U
+#define _K_CALLSAVED_CTX_SIZE	  19U + _K_ARCH_PC_SIZE
 #endif 
 
-#define K_THREAD_STACK_VOID_SIZE (_K_CALLSAVED_CTX_SIZE + _K_ARCH_PC_SIZE)
+// call-clobbered (or call-used) registers
+#define _K_CALLUSED_CTX_SIZE	  sizeof(struct _k_callused_ctx)
+
+// interrupt context
+#define _K_INTCTX_SIZE		  sizeof(struct _k_intctx)
+
+#define K_THREAD_STACK_VOID_SIZE 	_K_CALLSAVED_CTX_SIZE
+#define K_THREAD_CTX_START(stack_end)	((struct _k_callsaved_ctx *)((uint8_t*)stack_end - _K_CALLSAVED_CTX_SIZE + 1U))
 
 #define K_THREAD_STACK_MIN_SIZE (K_THREAD_STACK_VOID_SIZE + THREAD_STACK_SENTINEL_SIZE)
 
@@ -447,7 +447,7 @@ typedef struct
 
 #define _K_STACK_END_ASM(stack_start, size) _K_STACK_END(stack_start, size)
 
-#define _K_STACK_INIT_SP(stack_end) (stack_end - sizeof(struct _k_callsaved_ctx) - _K_ARCH_PC_SIZE)
+#define _K_STACK_INIT_SP(stack_end) (stack_end - _K_CALLSAVED_CTX_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly set
 #define _K_THREAD_STACK_START(name) ((uint8_t*)(&_k_stack_buf_##name))
@@ -462,7 +462,7 @@ typedef struct
 #define THREAD_FROM_WAITQUEUE(item) CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
-#define _K_CORE_CONTEXT_INIT(entry, ctx) \
+#define _K_CORE_CONTEXT_INIT(entry, ctx, __entry) \
 (struct _k_callsaved_ctx) { \
 	.sreg = THREAD_DEFAULT_SREG, \
 	.r29 = 0x00, \
@@ -481,19 +481,21 @@ typedef struct
 	.r6 = 0x00, \
 	.thread_entry = (void*) entry, \
 	.thread_context = (void*) ctx, \
+	.pc = (void*) __entry, \
 }
 
 #define _K_STACK_INITIALIZER(name, stack_size, entry, ctx) \
     struct \
     { \
-        uint8_t empty[stack_size - sizeof(struct _k_callsaved_ctx) - _K_ARCH_PC_SIZE]; \
+        uint8_t empty[stack_size - _K_CALLSAVED_CTX_SIZE]; \
         struct _k_callsaved_ctx core; \
-	void *_start;	\
     } _k_stack_buf_##name = { \
         {0x00}, \
-       _K_CORE_CONTEXT_INIT(entry, ctx), \
-       _k_thread_entry,\
+       _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry), \
     }
+
+#define _K_STACK_MINIMAL_INITIALIZER(name, entry, ctx) \
+    struct _k_callsaved_ctx _k_stack_buf_##name = _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry)
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \
@@ -510,6 +512,10 @@ typedef struct
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, symbol)                  \
     __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
     __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol);
+
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flags, context_p, symbol)                  \
+    __attribute__((used)) _K_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flags, symbol);
 
 /*___________________________________________________________________________*/
 
