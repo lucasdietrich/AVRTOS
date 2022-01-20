@@ -11,7 +11,12 @@ static void _k_idle_entry(void *context);
  * K_THREAD_STACK_MIN_SIZE would be enough
  */
 #if THREAD_IDLE_COOPERATIVE
-K_THREAD_MINIMAL_DEFINE(_k_idle, _k_idle_entry, K_COOPERATIVE, NULL, 'I');
+
+/* TODO, cannot exaplin why it needs 22B instead of 21B ??? */
+/* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue function ?*/
+
+// K_THREAD_MINIMAL_DEFINE(_k_idle, _k_idle_entry, K_COOPERATIVE, NULL, 'I');
+K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 10, K_COOPERATIVE, NULL, 'I');
 #else
 
 /**

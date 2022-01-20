@@ -103,7 +103,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         th->flags = 0;
         th->state = STOPPED;
         th->coop = prio & K_FLAG_COOP ? 1 : 0;
-        th->priority = prio & K_FLAG_PRIO;
+        th->preempted = 0;
         th->symbol = symbol;
         th->swap_data = NULL;
 

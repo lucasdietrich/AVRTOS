@@ -81,13 +81,14 @@
 
 //
 // Sysclock period when precision mode is disabled (LLU is important)
+// Reducing this value can cause some precision loss
 //
 #define DEFAULT_KERNEL_SYSCLOCK_PERIOD_US       	1000LLU
 
 //
 // Time slice in milliseconds (0 if using SYSCLOCK period)
 //
-#define DEFAULT_KERNEL_TIME_SLICE               	4096LLU
+#define DEFAULT_KERNEL_TIME_SLICE               	4000LLU
 
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
@@ -97,7 +98,7 @@
 //
 //  Auto start kernel sysclock
 //
-#define DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT       	1
+#define DEFAULT_KERNEL_SYSCLOCK_AUTO_START       	1
 
 //
 //  Sysclock precision mode
@@ -121,9 +122,9 @@
 #define DEFAULT_KERNEL_THREAD_IDLE              	1
 
 //
-// Kernel thread idle addtionnal stack
+// Kernel thread idle addtionnal stack (for interrupt handles stack)
 //
-#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	0
+#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	20
 
 //
 // Tell if IDLE thread is preemptive or cooperative
@@ -248,11 +249,21 @@
 
 /**
  * @brief Allow, or not thread termination
- * 0 : not allowed
- * 1 : allowed
- * -1 : not allow but fault
+ * 0 : not allowed (need less stack)
+ * 1 : allowed (need more stack)
+ * -1 : not allow but fault (need more stack but fault if terminate)
  */
 #define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
+
+/**
+ * @brief Force interrupt after all thread switch
+ * 0 : not optimization and not forced
+ * 1 : smart (interrupt flag set only at the very end of restoring context if set)
+ * 2 : force (force interrupt flag set at the very end each context switch)
+ * 
+ * THREAD_DEFAULT_SREG has no effect if set with this configuration option
+ */
+#define DEFAULT_THREAD_INTERRUPT_MODE			1
 
 /*___________________________________________________________________________*/
 

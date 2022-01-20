@@ -13,6 +13,8 @@ static const char *reason_to_str(uint8_t reason)
 		return PSTR("SENTINEL");
 	case K_THREAD_TERMINATED:
 		return PSTR("THREAD_TERMINATED");
+	case K_FAULT_INTERRUPT:
+		return PSTR("INTERRUPT");
 	default:
 		return PSTR("<UNKNOWN>");
 	}

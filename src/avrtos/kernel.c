@@ -436,6 +436,13 @@ void _k_system_shift(void)
 
         _current = CONTAINER_OF(_k_runqueue, struct k_thread, tie.runqueue);
 	
+#if THREAD_STACK_SENTINEL
+	/* check that stack sentinel is still valid before switching to thread */
+	if (k_verify_stack_sentinel(_current) == false) {
+		__fault(K_FAULT_SENTINEL);
+	}
+#endif
+	
 	__ASSERT_THREAD_STATE(_current, READY);
 
         __K_DBG_SCHED_NEXT(_current);

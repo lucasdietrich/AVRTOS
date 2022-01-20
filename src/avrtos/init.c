@@ -41,9 +41,11 @@ void _k_avrtos_init(void)
         _k_init_stacks_sentinel();
 #endif
 
-#if KERNEL_SYSCLOCK_AUTO_INIT
-        _k_init_sysclock();
-#endif
+	k_init_sysclock();
+
+#if KERNEL_SYSCLOCK_AUTO_START
+	k_start_sysclock();
+#endif	
 }
 
 

@@ -156,7 +156,7 @@ struct k_thread
                         uint8_t coop : 1;
 
 			/* thread priority : not supported for now */
-                        uint8_t priority : 1;
+                        uint8_t preempted : 1;
 
 			/* tells if the timer expiration caused 
 			 * this thread to be awakened 

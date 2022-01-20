@@ -77,10 +77,10 @@
 
 // kernel sysclock auto init
 
-#ifdef CONFIG_KERNEL_SYSCLOCK_AUTO_INIT
-#    define KERNEL_SYSCLOCK_AUTO_INIT CONFIG_KERNEL_SYSCLOCK_AUTO_INIT
+#ifdef CONFIG_KERNEL_SYSCLOCK_AUTO_START
+#    define KERNEL_SYSCLOCK_AUTO_START CONFIG_KERNEL_SYSCLOCK_AUTO_START
 #else
-#    define KERNEL_SYSCLOCK_AUTO_INIT DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT
+#    define KERNEL_SYSCLOCK_AUTO_START DEFAULT_KERNEL_SYSCLOCK_AUTO_START
 #endif
 
 // kernel auto init
@@ -294,6 +294,15 @@
 #   define KERNEL_THREAD_TERMINATION_TYPE DEFAULT_KERNEL_THREAD_TERMINATION_TYPE
 #endif /* CONFIG_KERNEL_THREAD_TERMINATION_TYPE */
 
+#define THREAD_INTERRUPT_MODE_NONE	0
+#define THREAD_INTERRUPT_MODE_SMART	1
+#define THREAD_INTERRUPT_MODE_FORCE	2
+
+#ifdef CONFIG_THREAD_INTERRUPT_MODE
+#   define THREAD_INTERRUPT_MODE CONFIG_THREAD_INTERRUPT_MODE
+#else
+#   define THREAD_INTERRUPT_MODE DEFAULT_THREAD_INTERRUPT_MODE
+#endif /* CONFIG_THREAD_INTERRUPT_MODE */
 
 /*___________________________________________________________________________*/
 
@@ -322,18 +331,23 @@
 #endif /* K_SYSCLOCK_TCNT_ISNULL */
 
 #if KERNEL_TIME_SLICE < KERNEL_SYSCLOCK_PERIOD_US
-#error [UNSUPPORTED] KERNEL_TIME_SLICE < KERNEL_SYSCLOCK_PERIOD_US
+#	error [UNSUPPORTED] KERNEL_TIME_SLICE < KERNEL_SYSCLOCK_PERIOD_US
 #elif KERNEL_TIME_SLICE > KERNEL_SYSCLOCK_PERIOD_US
-#define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 1
-#if KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US <= 255
-#	define KERNEL_TIME_SLICE_TICKS	(KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US)
-#else 
-#	error "Time slice too different compared to KERNEL_SYSCLOCK_PERIOD_US\
+#	define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 1
+
+#	if KERNEL_TIME_SLICE % KERNEL_SYSCLOCK_PERIOD_US != 0
+#		warning [WARNING] KERNEL_TIME_SLICE must be a multiple of KERNEL_SYSCLOCK_PERIOD_US
+#	endif 
+
+#	if KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US <= 255
+#		define KERNEL_TIME_SLICE_TICKS	(KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US)
+#	else 
+#		error "Time slice too different compared to KERNEL_SYSCLOCK_PERIOD_US\
 		KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US > 255"
-#endif 
+#	endif 
 #else 
-#define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 	0
-#define KERNEL_TIME_SLICE_TICKS			1
+#	define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 	0
+#	define KERNEL_TIME_SLICE_TICKS			1
 #endif /* KERNEL_TIME_SLICE != KERNEL_SYSCLOCK_PERIOD_US */
 
 
@@ -367,12 +381,23 @@ typedef struct
 #define K_TIMEOUT_MS(t)		((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
 #define K_TIMEOUT_SECONDS(t)	((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_SECOND))
 
+#ifndef __cplusplus
+
 #define K_SECONDS(seconds)      ((k_timeout_t){.value = K_TICKS_PER_SECOND * seconds})
 #define K_MSEC(milliseconds)    ((k_timeout_t){.value = K_TICKS_PER_MS * milliseconds})
 #define K_NO_WAIT               ((k_timeout_t){.value = (k_ticks_t) 0})
 #define K_FOREVER               ((k_timeout_t){.value = (k_ticks_t) -1})
 #define K_UNTIL_WAKEUP          K_FOREVER
 
+#else
+
+#define K_SECONDS(seconds)      ((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_SECOND * seconds) })
+#define K_MSEC(milliseconds)    ((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_MS * milliseconds) })
+#define K_NO_WAIT               ((k_timeout_t){.value = (k_ticks_t) 0})
+#define K_FOREVER               ((k_timeout_t){.value = (k_ticks_t) -1})
+#define K_UNTIL_WAKEUP          K_FOREVER
+
+#endif /* __cplusplus */
 /*___________________________________________________________________________*/
 
 // arch specific fixups
@@ -416,7 +441,7 @@ typedef struct
 #if !__ASSEMBLER__
 #define _K_CALLSAVED_CTX_SIZE	  sizeof(struct _k_callsaved_ctx)
 #else 
-#define _K_CALLSAVED_CTX_SIZE	  19U + _K_ARCH_PC_SIZE
+#define _K_CALLSAVED_CTX_SIZE	  (19U + _K_ARCH_PC_SIZE)
 #endif 
 
 // call-clobbered (or call-used) registers

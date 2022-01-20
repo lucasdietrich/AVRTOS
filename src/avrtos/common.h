@@ -69,23 +69,11 @@
 #define K_FLAG_READY                (0b01 << 0)
 #define K_FLAG_PENDING              (0b10 << 0)
 
-#define K_FLAG_PRIO_SHIFT           4
-#define K_FLAG_PRIO                 (1 << K_FLAG_PRIO_SHIFT)
+#define K_FLAG_INTPREEMPT_SHIFT     4
+#define K_FLAG_INTPREEMPT           (1 << K_FLAG_INTPREEMPT_SHIFT)
 
-#define K_PRIO_HIGH                 0b1
-#define K_PRIO_LOW                  0b0
-
-#define K_FLAG_PRIO_HIGH            (K_PRIO_HIGH << K_FLAG_PRIO_SHIFT)
-#define K_FLAG_PRIO_LOW             (K_PRIO_LOW << K_FLAG_PRIO_SHIFT)
-
-// (K_FLAG_READY | K_FLAG_COOP | ((p & 0b11) << 3))
-#define K_PRIO_PREEMPT(p)           (K_FLAG_PREEMPT | ((p & 0b1) << K_FLAG_PRIO_SHIFT))
-
-// (K_FLAG_READY | K_FLAG_PREEMPT | ((p & 0b11) << 3))
-#define K_PRIO_COOP(p)              (K_FLAG_COOP | ((p & 0b1) << K_FLAG_PRIO_SHIFT))
-
-#define K_COOPERATIVE               K_PRIO_COOP(K_PRIO_HIGH)
-#define K_PREEMPTIVE                K_PRIO_PREEMPT(K_PRIO_HIGH)
+#define K_COOPERATIVE               K_FLAG_COOP
+#define K_PREEMPTIVE                K_FLAG_PREEMPT
 
 #define K_PRIO_DEFAULT              K_PREEMPTIVE
 #define K_STOPPED                   K_FLAG_STOPPED

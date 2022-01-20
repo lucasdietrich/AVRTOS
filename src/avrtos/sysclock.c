@@ -8,7 +8,7 @@
 
 #include "sysclock_config.h"
 
-void _k_init_sysclock(void)
+void k_init_sysclock(void)
 {
 	K_SYSCLOCK_HW_REG_TCNTXL = K_SYSCLOCK_TIMER_TCNTL;
 
@@ -22,6 +22,10 @@ void _k_init_sysclock(void)
 #if KERNEL_SYSLOCK_HW_TIMER == 1
 	K_SYSCLOCK_HW_REG_TCCRXC = K_SYSCLOCK_HW_VAL_TCCRXC;
 #endif /* KERNEL_SYSLOCK_HW_TIMER == 1 */
+}
 
+void k_start_sysclock(void)
+{
+	/* unmask sysclock interrupt */
 	K_SYSCLOCK_HW_REG_TIMSKX = K_SYSCLOCK_HW_VAL_TIMSKX;
 }

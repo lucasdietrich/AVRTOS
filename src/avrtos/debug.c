@@ -54,17 +54,10 @@ void k_thread_dump_hex(struct k_thread *th)
 void k_thread_dump(struct k_thread *th)
 {
         usart_transmit(th->symbol);
-        usart_transmit(' ');
+        usart_print_p(PSTR(" 0x"));
         usart_hex16((const uint16_t)th);
-        if (th->coop) {
-                usart_print_p(PSTR(" [COOP "));
-        } else {
-                usart_print_p(PSTR(" [PREE "));
-        }
 
-        usart_s8(th->priority);
-
-        usart_print_p(PSTR("] "));
+	usart_transmit(' ');
 
 	switch (th->state) {
 		case READY:
@@ -79,12 +72,22 @@ void k_thread_dump(struct k_thread *th)
 		default:
 			break;
 	}
+	
+	usart_transmit(' ');
+
+	usart_transmit(th->coop ? 'C' : 'P');
+	usart_transmit(' ');
+	usart_transmit(th->preempted ? 'K' : ' ');
+	usart_transmit(th->sched_lock ? 'S' : '_');
+	usart_transmit(th->timer_expired ? 'X' : '_');
+	usart_transmit(th->pend_canceled ? 'Y' : '_');
+	usart_transmit(th->wakeup_schd ? 'W' : '_');
 
         usart_print_p(PSTR(" : SP "));
         usart_u16(k_thread_usage(th));
         usart_transmit('/');
         usart_u16(th->stack.size);
-        usart_print_p(PSTR(" -| END 0x"));
+        usart_print_p(PSTR(":0x"));
         usart_hex16((uint16_t)th->stack.end);
         usart_transmit('\n');
 }

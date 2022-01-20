@@ -121,7 +121,7 @@ What enhancements/features are not planned :
 | KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
 | KERNEL_TIME_SLICE | Time slice in milliseconds |
 | KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
-| KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
+| KERNEL_SYSCLOCK_AUTO_START | Auto start kernel sysclock |
 | KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
 | ~~KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
@@ -145,7 +145,8 @@ What enhancements/features are not planned :
 | ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
 | KERNEL_TIME | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
-
+| THREAD_INTERRUPT_MODE |  |
+| THREAD_TERMINATION_TYPE |  |
 
 ## Getting started example :
 

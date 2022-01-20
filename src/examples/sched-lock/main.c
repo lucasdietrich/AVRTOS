@@ -18,72 +18,71 @@ void thread_blink(void *p);
 void thread_coop(void *p);
 
 K_THREAD_DEFINE(blink, thread_blink, 0x100, K_PREEMPTIVE, NULL, 'B');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PREEMPTIVE, NULL, 'C');
+K_THREAD_DEFINE(coop, thread_coop, 0x100, K_COOPERATIVE, NULL, 'C');
 
 /*___________________________________________________________________________*/
 
 int main(void)
 {
-  led_init();
-  usart_init();
-  
-  k_thread_dump_all();
+	led_init();
+	usart_init();
 
-  print_runqueue();
+	k_thread_dump_all();
 
-  sei();
+	print_runqueue();
 
-  while (1)
-  {
-  
+	sei();
+
+	while (1) {
+
 #if USE_SCHED_LOCK_TRICK
-    K_SCHED_LOCK_CONTEXT
-    {
-#else
-      k_sched_lock();
+		K_SCHED_LOCK_CONTEXT
+		{
+	    #else
+		  k_sched_lock();
+	    #endif
+		  usart_printl_p(PSTR("k_sched_lock()"));
+
+		  _delay_ms(500);
+
+		  usart_printl_p(PSTR("k_sched_unlock()"));
+
+	    #if USE_SCHED_LOCK_TRICK == 0
+		  k_sched_unlock();
+	    #else
+		}
 #endif
-      usart_printl_p(PSTR("k_sched_lock()"));
 
-      _delay_ms(500);
-
-      usart_printl_p(PSTR("k_sched_unlock()"));
-
-#if USE_SCHED_LOCK_TRICK == 0
-      k_sched_unlock();
-#else
-    }
-#endif
-
-    _delay_ms(2000);
-  }
+	_delay_ms(2000);
+	}
 }
 
 void thread_blink(void *p)
 {
-  while (1)
-  {
-    usart_transmit('o');
-    led_on();
+	while (1) {
+		usart_transmit('o');
+		led_on();
 
-    k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(100));
 
-    usart_transmit('f');
-    led_off();
+		usart_transmit('f');
+		led_off();
 
-    k_sleep(K_MSEC(100));
-  }
+		k_sleep(K_MSEC(100));
+	}
 }
 
 void thread_coop(void *p)
 {
-  while (1)
-  {
-    k_sleep(K_MSEC(5000));
+	while (1) {
+		k_sleep(K_MSEC(5000));
 
-    usart_printl_p(PSTR("full cooperative thread"));
+		usart_printl_p(PSTR("<<<< full cooperative thread"));
 
-    _delay_ms(1000);
-  }
+		_delay_ms(1000);
+
+		usart_printl_p(PSTR(">>>>\n"));
+	}
 }
 
 /*___________________________________________________________________________*/

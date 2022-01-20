@@ -67,6 +67,8 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	sts _k_ticks + 4, r0		; 2 cycles
 #endif
 ; KERNEL_TICKS_40BITS
+#endif
+; KERNEL_TICKS
 
 #if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
 	lds r18, _k_sched_ticks_remaining
@@ -74,8 +76,8 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	sts _k_sched_ticks_remaining, r18
 	brne __intctx_restore_minimal
 #endif 
-#endif
-; KERNEL_TICKS
+;KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+
 	push	r19
 	push	r20
 	push	r21
@@ -97,13 +99,19 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	call _k_system_shift
 
 ; check if scheduler is locked (cooperative thread or temporarely locked)
-#if KERNEL_PREEMPTIVE_THREADS && (KERNEL_DEBUG_PREEMPT_UART == 0)
+#if KERNEL_PREEMPTIVE_THREADS
 	lds ZL, _current           ; load current thread addr in Z
 	lds ZH, _current + 1
 
 	ldd r18, Z + 2      ; read flag
 	andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
-	brne __intctx_restore
+
+	brne __sched_locked
+
+	; mark the thread as preempted
+	ldd r18, Z + 2      ; read flag
+	ori r18, 0b00010000
+	std Z + 2, r18      ; write flag
 
 	; prepare return context for preempted thread
 	ldi r24, pm_lo8(__intctx_restore)
@@ -111,9 +119,15 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	push r24
 	push r25
 
-	jmp _k_yield
+	jmp _int_k_yield
 #endif
 ; KERNEL_PREEMPTIVE_THREADS
+
+__sched_locked:
+#if KERNEL_PREEMPTIVE_THREADS && KERNEL_SCHEDULER_DEBUG
+	ldi r24, 0x63	    ; 'c'
+	call usart_transmit
+#endif
 
 __intctx_restore:
 	pop	r31
@@ -137,6 +151,16 @@ __intctx_restore_minimal:
 
 .global _k_yield
 _k_yield:
+	; load current thread addr in Z
+	lds ZL, _current
+	lds ZH, _current + 1
+
+	; clear "preempted" flag
+	ldd r18, Z + 2      ; read flag
+	andi r18, 0b11101111
+	std Z + 2, r18      ; write flag
+
+_int_k_yield:
 	call _k_scheduler
 
 	; previous thread
@@ -183,7 +207,49 @@ _k_thread_switch:
 	sts SPH, r21
 
 	pop r17
+
+#if THREAD_INTERRUPT_MODE == THREAD_INTERRUPT_MODE_SMART
+	sbrs r17, SREG_I
+	jmp __callsaved_ctx_restore
+#endif 
+
+#if THREAD_INTERRUPT_MODE != THREAD_INTERRUPT_MODE_NONE
+	cbr r17, 1 << SREG_I
+
+	; if preempted, restore I flag only when restoring call-used int context
+	ld r16, Z      ; read flag
+	andi r16, 0b00010000
+	brne __callsaved_ctx_restore
+
+__callsaved_ctx_restore_force_int:
 	sts SREG, r17
+
+	pop r29
+	pop r28
+	pop r17
+	pop r16
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+	pop r7
+	pop r6
+	pop r5
+	pop r4
+	pop r3
+	pop r2
+
+	reti
+#endif
+; THREAD_INTERRUPT_MODE == THREAD_INTERRUPT_MODE_SMART
+
+__callsaved_ctx_restore:
+	sts SREG, r17
+
 	pop r29
 	pop r28
 	pop r17
@@ -204,7 +270,7 @@ _k_thread_switch:
 	pop r2
 
 	ret
-	
+
 .extern k_stop
 .extern __fault
 _k_thread_entry:
@@ -298,6 +364,6 @@ _K_USART_RX_vect:
 	push r24
 	push r25
 
-	jmp _k_yield
+	jmp _int_k_yield
 #endif
 ; KERNEL_DEBUG_PREEMPT_UART
