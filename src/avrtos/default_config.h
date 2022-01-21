@@ -257,6 +257,15 @@
 
 /**
  * @brief Use 32 bits for delay objects (k_timeout_t / k_ticks_t / k_delta_t)
+ * 
+ * Disabling this object can save some flash and RAM space.
+ * - Adding two U32 objects instead of U16 needs twice as much code.
+ * - There are many wait function
+ * - IMPORTANT : Increasing the sysclock period can help to reduce the
+ *   maximum number we need to store for a delay.
+ * 
+ * This configuration is unrelated to time functions, it only applies when 
+ *  giving a timeout to a kernel function (as k_sleep, k_mutex_lock, ...)
  */
 #define DEFAULT_KERNEL_DELAY_OBJECT_U32			0
 
