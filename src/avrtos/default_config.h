@@ -252,6 +252,8 @@
  * 0 : not allowed (need less stack)
  * 1 : allowed (need more stack)
  * -1 : not allow but fault (need more stack but fault if terminate)
+ * 
+ * Disabling the option (0) saves up to 2/3 bytes of stack per thread. (depending on the architecture)
  */
 #define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
 
