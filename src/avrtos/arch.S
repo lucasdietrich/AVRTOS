@@ -108,18 +108,13 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 
 	brne __sched_locked
 
-	; mark the thread as preempted
-	ldd r18, Z + 2      ; read flag
-	ori r18, 0b00010000
-	std Z + 2, r18      ; write flag
-
 	; prepare return context for preempted thread
 	ldi r24, pm_lo8(__intctx_restore)
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
 
-	jmp _int_k_yield
+	jmp _k_yield
 #endif
 ; KERNEL_PREEMPTIVE_THREADS
 
@@ -151,16 +146,6 @@ __intctx_restore_minimal:
 
 .global _k_yield
 _k_yield:
-	; load current thread addr in Z
-	lds ZL, _current
-	lds ZH, _current + 1
-
-	; clear "preempted" flag
-	ldd r18, Z + 2      ; read flag
-	andi r18, 0b11101111
-	std Z + 2, r18      ; write flag
-
-_int_k_yield:
 	call _k_scheduler
 
 	; previous thread
@@ -207,49 +192,7 @@ _k_thread_switch:
 	sts SPH, r21
 
 	pop r17
-
-#if THREAD_INTERRUPT_MODE == THREAD_INTERRUPT_MODE_SMART
-	sbrs r17, SREG_I
-	jmp __callsaved_ctx_restore
-#endif 
-
-#if THREAD_INTERRUPT_MODE != THREAD_INTERRUPT_MODE_NONE
-	cbr r17, 1 << SREG_I
-
-	; if preempted, restore I flag only when restoring call-used int context
-	ld r16, Z      ; read flag
-	andi r16, 0b00010000
-	brne __callsaved_ctx_restore
-
-__callsaved_ctx_restore_force_int:
 	sts SREG, r17
-
-	pop r29
-	pop r28
-	pop r17
-	pop r16
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop r7
-	pop r6
-	pop r5
-	pop r4
-	pop r3
-	pop r2
-
-	reti
-#endif
-; THREAD_INTERRUPT_MODE == THREAD_INTERRUPT_MODE_SMART
-
-__callsaved_ctx_restore:
-	sts SREG, r17
-
 	pop r29
 	pop r28
 	pop r17
@@ -276,16 +219,16 @@ __callsaved_ctx_restore:
 _k_thread_entry:
 	movw r24, r2
 	movw r30, r4
+	sts SREG, r6
+	
 #if KERNEL_THREAD_TERMINATION_TYPE == 0
 	ijmp
 #elif KERNEL_THREAD_TERMINATION_TYPE == -1
 	icall
-
 	ldi r24, 0x03 ; K_THREAD_TERMINATED
 	call __fault
 #else
 	icall
-
 	call k_stop
 #endif
 

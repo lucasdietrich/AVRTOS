@@ -145,7 +145,6 @@ What enhancements/features are not planned :
 | ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
 | KERNEL_TIME | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
-| THREAD_INTERRUPT_MODE |  |
 | THREAD_TERMINATION_TYPE |  |
 
 ## Getting started example :

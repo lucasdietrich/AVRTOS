@@ -77,7 +77,6 @@ void k_thread_dump(struct k_thread *th)
 
 	usart_transmit(th->coop ? 'C' : 'P');
 	usart_transmit(' ');
-	usart_transmit(th->preempted ? 'K' : ' ');
 	usart_transmit(th->sched_lock ? 'S' : '_');
 	usart_transmit(th->timer_expired ? 'X' : '_');
 	usart_transmit(th->pend_canceled ? 'Y' : '_');

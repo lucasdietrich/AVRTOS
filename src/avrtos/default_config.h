@@ -255,16 +255,6 @@
  */
 #define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
 
-/**
- * @brief Force interrupt after all thread switch
- * 0 : not optimization and not forced
- * 1 : smart (interrupt flag set only at the very end of restoring context if set)
- * 2 : force (force interrupt flag set at the very end each context switch)
- * 
- * THREAD_DEFAULT_SREG has no effect if set with this configuration option
- */
-#define DEFAULT_THREAD_INTERRUPT_MODE			1
-
 /*___________________________________________________________________________*/
 
 #endif

@@ -47,7 +47,7 @@ struct _k_callsaved_ctx {
 	uint8_t sreg;
 
 	union {
-		uint8_t regs[14];
+		uint8_t regs[13];
 		struct {
 			uint8_t r29;
 			uint8_t r28;
@@ -63,8 +63,11 @@ struct _k_callsaved_ctx {
 			uint8_t r9;
 			uint8_t r8;
 			uint8_t r7;
-			uint8_t r6;
 		};
+	};
+	union {
+		uint8_t r6;
+		uint8_t init_sreg;
 	};
 	union {
 		struct {
@@ -155,8 +158,7 @@ struct k_thread
 			/* cooperative/preemptive thread */
                         uint8_t coop : 1;
 
-			/* thread priority : not supported for now */
-                        uint8_t preempted : 1;
+                        uint8_t _unused : 1;
 
 			/* tells if the timer expiration caused 
 			 * this thread to be awakened 

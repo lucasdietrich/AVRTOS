@@ -59,8 +59,9 @@ static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t ent
 	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
 		*reg = 0x00U;
 	}
-	
-	ctx->sreg = THREAD_DEFAULT_SREG;
+
+	ctx->sreg = 0U;
+	ctx->init_sreg = THREAD_DEFAULT_SREG;
 	ctx->thread_context = (void*) K_SWAP_ENDIANNESS(context_p);
 	ctx->thread_entry = (void*) K_SWAP_ENDIANNESS(entry);
 	ctx->pc = (void*) K_SWAP_ENDIANNESS(_k_thread_entry);
@@ -103,7 +104,6 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         th->flags = 0;
         th->state = STOPPED;
         th->coop = prio & K_FLAG_COOP ? 1 : 0;
-        th->preempted = 0;
         th->symbol = symbol;
         th->swap_data = NULL;
 

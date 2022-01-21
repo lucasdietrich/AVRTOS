@@ -294,16 +294,6 @@
 #   define KERNEL_THREAD_TERMINATION_TYPE DEFAULT_KERNEL_THREAD_TERMINATION_TYPE
 #endif /* CONFIG_KERNEL_THREAD_TERMINATION_TYPE */
 
-#define THREAD_INTERRUPT_MODE_NONE	0
-#define THREAD_INTERRUPT_MODE_SMART	1
-#define THREAD_INTERRUPT_MODE_FORCE	2
-
-#ifdef CONFIG_THREAD_INTERRUPT_MODE
-#   define THREAD_INTERRUPT_MODE CONFIG_THREAD_INTERRUPT_MODE
-#else
-#   define THREAD_INTERRUPT_MODE DEFAULT_THREAD_INTERRUPT_MODE
-#endif /* CONFIG_THREAD_INTERRUPT_MODE */
-
 /*___________________________________________________________________________*/
 
 #include "sysclock_config.h"
@@ -489,7 +479,7 @@ typedef struct
 
 #define _K_CORE_CONTEXT_INIT(entry, ctx, __entry) \
 (struct _k_callsaved_ctx) { \
-	.sreg = THREAD_DEFAULT_SREG, \
+	.sreg = 0x00, \
 	.r29 = 0x00, \
 	.r28 = 0x00, \
 	.r17 = 0x00, \
@@ -503,7 +493,7 @@ typedef struct
 	.r9 = 0x00, \
 	.r8 = 0x00, \
 	.r7 = 0x00, \
-	.r6 = 0x00, \
+	.init_sreg = THREAD_DEFAULT_SREG, \
 	.thread_entry = (void*) entry, \
 	.thread_context = (void*) ctx, \
 	.pc = (void*) __entry, \
