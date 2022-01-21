@@ -12,15 +12,16 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
         dlist_init(&sem->waitqueue);
 }
 
-uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
+int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 {
-        int8_t get;
+        int8_t get = 0x00;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-                get = _k_sem_take(sem);
-                if (get != 0) {
-                        get = _k_pend_current(&sem->waitqueue, timeout);
-                }
+		if (sem->count != 0) {
+			sem->count--;
+		} else {
+			get = _k_pend_current(&sem->waitqueue, timeout);
+		}
         }
 
         if (get == 0) {
@@ -45,7 +46,9 @@ void k_sem_give(struct k_sem *sem)
                  * we to give the semaphore directly to the thread
                  */
                 if (_k_unpend_first_thread(&sem->waitqueue) == NULL) {
-                        _k_sem_give(sem);
+                        if (sem->count != sem->limit) {
+				sem->count++;
+			}
                 }
         }
 }
