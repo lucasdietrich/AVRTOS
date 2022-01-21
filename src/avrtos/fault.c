@@ -6,16 +6,20 @@
 
 static const char *reason_to_str(uint8_t reason)
 {
-	switch (reason) {
-	case K_FAULT_ASSERT:
+	/*
+	 * Note: If using switch case instead if if-else,
+	 * need RAM to save the switch data
+	 * check for CSWTCH. in .elf symbols
+	 */
+	if (reason == K_FAULT_ASSERT) {
 		return PSTR("ASSERT");
-	case K_FAULT_SENTINEL:
+	} else if (reason == K_FAULT_SENTINEL) {
 		return PSTR("SENTINEL");
-	case K_THREAD_TERMINATED:
+	} else if (reason == K_THREAD_TERMINATED) {
 		return PSTR("THREAD_TERMINATED");
-	case K_FAULT_INTERRUPT:
+	} else if (reason == K_FAULT_INTERRUPT) {
 		return PSTR("INTERRUPT");
-	default:
+	} else {
 		return PSTR("<UNKNOWN>");
 	}
 }

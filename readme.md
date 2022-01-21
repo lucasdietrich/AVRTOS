@@ -146,6 +146,7 @@ What enhancements/features are not planned :
 | KERNEL_TIME | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
 | THREAD_TERMINATION_TYPE |  |
+| KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
 
 ## Getting started example :
 

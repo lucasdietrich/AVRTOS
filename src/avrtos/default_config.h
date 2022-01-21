@@ -255,6 +255,11 @@
  */
 #define DEFAULT_KERNEL_THREAD_TERMINATION_TYPE		0
 
+/**
+ * @brief Use 32 bits for delay objects (k_timeout_t / k_ticks_t / k_delta_t)
+ */
+#define DEFAULT_KERNEL_DELAY_OBJECT_U32			0
+
 /*___________________________________________________________________________*/
 
 #endif

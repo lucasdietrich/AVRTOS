@@ -294,6 +294,12 @@
 #   define KERNEL_THREAD_TERMINATION_TYPE DEFAULT_KERNEL_THREAD_TERMINATION_TYPE
 #endif /* CONFIG_KERNEL_THREAD_TERMINATION_TYPE */
 
+#ifdef CONFIG_KERNEL_DELAY_OBJECT_U32
+#   define KERNEL_DELAY_OBJECT_U32 CONFIG_KERNEL_DELAY_OBJECT_U32
+#else
+#   define KERNEL_DELAY_OBJECT_U32 DEFAULT_KERNEL_DELAY_OBJECT_U32
+#endif /* CONFIG_KERNEL_DELAY_OBJECT_U32 */
+
 /*___________________________________________________________________________*/
 
 #include "sysclock_config.h"
@@ -364,7 +370,12 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#if KERNEL_DELAY_OBJECT_U32
 typedef uint32_t k_ticks_t;
+#else 
+typedef uint16_t k_ticks_t;
+#endif /* KERNEL_DELAY_OBJECT_U32 */
+
 typedef k_ticks_t k_delta_t;
 
 typedef struct
@@ -374,8 +385,8 @@ typedef struct
 
 #endif
 
-#define K_TIMEOUT_EQ(t1, t2)    (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
 #define K_TIMEOUT_TICKS(t)	(t.value)
+#define K_TIMEOUT_EQ(t1, t2)    (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
 #define K_TIMEOUT_MS(t)		((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
 #define K_TIMEOUT_SECONDS(t)	((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_SECOND))
 
