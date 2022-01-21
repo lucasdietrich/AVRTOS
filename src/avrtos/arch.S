@@ -113,6 +113,9 @@ K_SYSCLOCK_TIMERX_OVF_vect:
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
+#if __AVR_3_BYTE_PC__
+	push r1
+#endif 
 
 	jmp _k_yield
 #endif
@@ -306,7 +309,10 @@ _K_USART_RX_vect:
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
+#if __AVR_3_BYTE_PC__
+	push r1
+#endif 
 
-	jmp _int_k_yield
+	jmp _k_yield
 #endif
 ; KERNEL_DEBUG_PREEMPT_UART
