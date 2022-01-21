@@ -340,6 +340,14 @@
 #	define KERNEL_TIME_SLICE_TICKS			1
 #endif /* KERNEL_TIME_SLICE != KERNEL_SYSCLOCK_PERIOD_US */
 
+#if (KERNEL_SYSCLOCK_PERIOD_US < 100) 
+#	warning SYSCLOCK is probably too fast !
+#endif 
+
+#if (KERNEL_TIME_SLICE < 500)
+# 	warning KERNEL_TIME_SLICE is probably too short !
+#endif 
+
 
 #define K_EVENTS_PERIOD_TICKS	KERNEL_TIME_SLICE_TICKS
 #define K_TIMERS_PERIOD_TICKS	KERNEL_TIME_SLICE_TICKS
@@ -480,23 +488,11 @@ typedef struct
 #define _K_CORE_CONTEXT_INIT(entry, ctx, __entry) \
 (struct _k_callsaved_ctx) { \
 	.sreg = 0x00, \
-	.r29 = 0x00, \
-	.r28 = 0x00, \
-	.r17 = 0x00, \
-	.r16 = 0x00, \
-	.r15 = 0x00, \
-	.r14 = 0x00, \
-	.r13 = 0x00, \
-	.r12 = 0x00, \
-	.r11 = 0x00, \
-	.r10 = 0x00, \
-	.r9 = 0x00, \
-	.r8 = 0x00, \
-	.r7 = 0x00, \
-	.init_sreg = THREAD_DEFAULT_SREG, \
-	.thread_entry = (void*) entry, \
-	.thread_context = (void*) ctx, \
-	.pc = (void*) __entry, \
+	{ .regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U} }, \
+	{ .init_sreg = THREAD_DEFAULT_SREG }, \
+	{ .thread_entry = (thread_entry_t) entry }, \
+	{ .thread_context = (void*) ctx }, \
+	{ .pc = (void*) __entry } \
 }
 
 #define _K_STACK_INITIALIZER(name, stack_size, entry, ctx) \

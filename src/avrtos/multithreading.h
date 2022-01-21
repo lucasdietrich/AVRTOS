@@ -74,7 +74,7 @@ struct _k_callsaved_ctx {
 			uint8_t r5;
 			uint8_t r4;
 		};
-		thread_entry_t *thread_entry;
+		thread_entry_t thread_entry;
 	};
 	union {
 		struct {
