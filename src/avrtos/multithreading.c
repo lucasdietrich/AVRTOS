@@ -12,6 +12,8 @@ extern int main(void);
 
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
+_K_STACK_SENTINEL_REGISTER(_k_main_stack);
+
 #endif
 
 K_THREAD struct k_thread _k_thread_main = {

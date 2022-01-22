@@ -33,6 +33,14 @@ void _k_init_thread_stack_sentinel(struct k_thread *th);
  */
 bool k_verify_stack_sentinel(struct k_thread *th);
 
+/**
+ * @brief Check all registered stack sentinel bytes and fault on error.
+ * 
+ * @param th 
+ * @return true 
+ * @return false 
+ */
+void k_assert_registered_stack_sentinel(void);
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
