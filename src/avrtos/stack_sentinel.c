@@ -1,5 +1,7 @@
 #include "stack_sentinel.h"
 
+#include "fault.h"
+
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
@@ -30,4 +32,20 @@ bool k_verify_stack_sentinel(struct k_thread *th)
 		}
 	}
 	return true;
+}
+
+extern void *__k_sent_start;
+extern void *__k_sent_end;
+
+void k_assert_registered_stack_sentinel(void)
+{
+	for (void **loc = &__k_sent_start; loc < &__k_sent_end; loc++) {
+		void *sent = pgm_read_ptr(loc);
+
+		for (void *p = sent; p < sent + THREAD_STACK_SENTINEL_SIZE; p++) {
+			if (*(uint8_t *)p != THREAD_STACK_SENTINEL_SYMBOL) {
+				__fault(K_FAULT_SENTINEL);
+			}
+		}
+	}
 }

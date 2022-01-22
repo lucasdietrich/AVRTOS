@@ -423,6 +423,14 @@ typedef struct
 
 #endif /* KERNEL_DEBUG_PREEMPT_UART */
 
+/* stack sentinel */
+
+#if THREAD_STACK_SENTINEL
+#	define _K_STACK_SENTINEL_REGISTER(stack_symb)	__attribute__((used, section(".k_sentinels"))) void *_k_sent_##stack_symb = (void *)(&stack_symb)
+#else
+#	define _K_STACK_SENTINEL_REGISTER(stack_symb)
+#endif /* THREAD_STACK_SENTINEL */
+
 /*___________________________________________________________________________*/
 
 // 31 registers (31) + SREG (1) + return address (2 or 3)
@@ -526,11 +534,15 @@ typedef struct
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, symbol)                  \
     __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol);
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol); \
+    _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
 
 #define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flags, context_p, symbol)                  \
     __attribute__((used)) _K_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flags, symbol);
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flags, symbol); \
+    _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
+
+//     __attribute__((used, section(".k_sentinels"))) void *_k_stack_sentinel_##name = (void *)(&_k_stack_buf_##name)
 
 /*___________________________________________________________________________*/
 

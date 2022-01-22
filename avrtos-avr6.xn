@@ -100,6 +100,10 @@ SECTIONS
      *libprintf_flt.a:*(.progmem.data)
      *libc.a:*(.progmem.data)
      *(.progmem*)
+    PROVIDE (__k_sent_start = .);
+    *(.k_sentinels)
+    KEEP(SORT(*)(.k_sentinels))
+    PROVIDE (__k_sent_end = .);
     . = ALIGN(2);
     /* For future tablejump instruction arrays for 3 byte pc devices.
        We don't relax jump/call instructions within these sections.  */
