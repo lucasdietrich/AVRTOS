@@ -47,8 +47,6 @@ struct k_workqueue
 #define k_workq k_workqueue
 
 
-#define _K_WORKQUEUE_THREAD_NAME(name) _k_workq_##name
-
 #define K_WORKQUEUE_DEFINE(name, stack_size, prio_flags, symbol) \
     struct k_workqueue name =                                    \
         {                                                        \
@@ -56,7 +54,7 @@ struct k_workqueue
             .flags = 0u,                                         \
         };                                                       \
     K_THREAD_DEFINE(                                             \
-        _K_WORKQUEUE_THREAD_NAME(name),                          \
+        _k_workq_##name,                                         \
         _k_workqueue_entry, stack_size,                          \
         prio_flags,                                              \
         &name,                                                   \

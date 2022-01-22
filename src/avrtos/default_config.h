@@ -168,9 +168,9 @@
 #define DEFAULT_SYSTEM_WORKQUEUE_STACK_SIZE     	0x200
 
 //
-// Define system workqueue thread priority
+// Tell if the system workqueue should be executed cooperatively
 //
-#define DEFAULT_SYSTEM_WORKQUEUE_PRIORITY       	K_PREEMPTIVE
+#define DEFAULT_SYSTEM_WORKQUEUE_COOPERATIVE       	0
 
 //
 // Enable kernel assertion test for debug purpose

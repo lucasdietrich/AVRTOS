@@ -23,13 +23,21 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue)
 
                 work = CONTAINER_OF(item, struct k_work, _tie);
 
-                /* set the work item as "submittable" again */
+		const k_work_handler_t handler = work->handler;
+
+		/*
+		 * Set the work item as "submittable" again.
+		 * This only means that the work item can be submitted again
+		 * (even during the being processed handler)
+		 * 
+		 * However, we can't do any assumption regarding the context of the work item
+		 **/
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
                         item->next = NULL;
                 }
 
-                work->handler(work);
-
+                handler(work);
+		
                 /* yield if "yieldeach" option is enabled */
                 if (workqueue->yieldeach) {
                         k_yield();
