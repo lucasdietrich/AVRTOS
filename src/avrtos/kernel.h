@@ -45,6 +45,19 @@ K_NOINLINE void irq_enable(void);
 #endif /* KERNEL_IRQ_LOCK_COUNTER */
 
 /**
+ * @brief Software reset the microcontroller by calling the reset vector (address 0x0000)
+ */
+static inline void k_sys_reset(void)
+{
+	cli();
+
+	/* jump to reset vector instead of calling it asm("jmp ...")*/
+	((void (*) (void)) (0x0000U))();
+
+	__builtin_unreachable();
+}
+
+/**
  * @brief Lock the CPU for the current thread being executed. Actually it sets the current 
  * thread as cooperative thread until function k_sched_unlock is called. The syslock is still executed and it stills
  * shift the timed threads in the time queue.

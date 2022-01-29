@@ -154,7 +154,6 @@ bool _k_cooperative(void)
 
 void k_sleep(k_timeout_t timeout)
 {
-	
         if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {

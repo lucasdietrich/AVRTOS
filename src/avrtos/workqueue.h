@@ -108,7 +108,7 @@ bool k_work_submittable(struct k_work *work);
  * @param workqueue 
  * @param work 
  */
-K_NOINLINE void k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
+K_NOINLINE bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
 
 /**
  * @brief Configure the workqueue to release the cpu after each work item
@@ -146,7 +146,7 @@ K_NOINLINE void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
  * 
  * @param work 
  */
-void k_system_workqueue_submit(struct k_work *work);
+bool k_system_workqueue_submit(struct k_work *work);
 
 /*___________________________________________________________________________*/
 
