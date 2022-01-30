@@ -9,8 +9,7 @@
  * @brief Example showing show what happens when IDLE thread is
  * disabled and all thread are sleeping.
  * 
- * Enable option CONFIG_KERNEL_THREAD_IDLE or make sure at least one thread is always
- * ready to solve the issue.
+ * Enable option CONFIG_KERNEL_THREAD_IDLE or make sure at least one thread is always running.
  * 
  * @return int 
  */

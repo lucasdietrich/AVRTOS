@@ -6,16 +6,18 @@
 #define K_MODULE K_MODULE_APPLICATION
 
 /*
-Total RAM : 63 bytes :
- - Main stack is 0x30 = 32
- - _k_thread_main = 18
 
-TODO gather all this in a buffer.
- - Events_queue = 2
- - runqueue = 2
- - _k_timers_runqueue = 2
- - _k_uptime_ms = 4
+- missing 1B, where ?
+
+Total RAM : 65 bytes :
+ - Main stack is 0x30 = 32
+ - _k_thread_main = 20
+ - _k_events_queue = 2
+ - (_k_timers_runqueue = 2)
+ - _k_runqueue = 2
+ - _k_ticks = 5
  - _current = 2
+ - _k_sched_ticks_remaining = 1
  */
 
 static void sleep(k_timeout_t ms)

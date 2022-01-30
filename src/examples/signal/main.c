@@ -15,7 +15,13 @@ K_SIGNAL_DEFINE(sig);
 
 /*___________________________________________________________________________*/
 
-ISR(USART_RX_vect)
+#if defined(__AVR_ATmega328P__)
+#	define board_USART_RX_vect  USART_RX_vect
+#elif defined(__AVR_ATmega2560__)
+#	define board_USART_RX_vect  USART0_RX_vect
+#endif /* __AVR_ATmega328P__ */
+
+ISR(board_USART_RX_vect)
 {
     const char rx = UDR0;
     usart_transmit(rx);

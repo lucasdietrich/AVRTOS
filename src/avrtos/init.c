@@ -4,23 +4,28 @@
 
 #include "io.h"
 
-/*___________________________________________________________________________*/
-
-extern char _k_main_stack[];
-
-/*___________________________________________________________________________*/
-
-void _k_kernel_sp(void)
-{
-        SP = (uint16_t)_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE);
-}
 
 /*___________________________________________________________________________*/
 
 void _k_avrtos_init(void)
 {
+	/* Page 52 (ATmega328p datasheet) :
+	 *	Note: If the Watchdog is accidentally enabled, for example by a runaway pointer or brown-out condition, the
+	 * device will be reset and the Watchdog Timer will stay enabled. If the code is not set up to handle the Watchdog,
+	 * this might lead to an eternal loop of time-out resets. To avoid this situation, the application software should
+	 * always clear the Watchdog System Reset Flag (WDRF) and the WDE control bit in the initialization routine,
+	 * even if the Watchdog is not in use.
+	 */
+
+	/* If the watchdog caused the reset, clear the flag */
+	// if (MCUSR & BIT(WDRF)) {
+	// 	MCUSR &= ~BIT(WDRF);
+	// 	WDTCSR |= (_BV(WDCE) | _BV(WDE)); // change
+	// 	WDTCSR = 0x00;
+	// }
+
 #if KERNEL_DEBUG_PREEMPT_UART
-        UCSR0B = 1 << RXCIE0;
+	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif
 
 	/* Send output stream to usart0 */
@@ -41,19 +46,11 @@ void _k_avrtos_init(void)
         _k_init_stacks_sentinel();
 #endif
 
-#if KERNEL_SYSCLOCK_AUTO_INIT
-        _k_init_sysclock();
-#endif
-}
+	k_init_sysclock();
 
-
-void k_avrtos_init(void)
-{
-#if THREAD_EXPLICIT_MAIN_STACK == 1
-        _k_kernel_sp();
-#endif
-
-        _k_avrtos_init();
+#if KERNEL_SYSCLOCK_AUTO_START
+	k_start_sysclock();
+#endif	
 }
 
 /*___________________________________________________________________________*/

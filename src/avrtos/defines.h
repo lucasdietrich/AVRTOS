@@ -34,20 +34,6 @@
 #   define THREAD_MAIN_STACK_SIZE DEFAULT_THREAD_MAIN_STACK_SIZE
 #endif
 
-// use asm thread stack init function
-#ifdef CONFIG_THREAD_USE_INIT_STACK_ASM
-#   define THREAD_USE_INIT_STACK_ASM CONFIG_THREAD_USE_INIT_STACK_ASM
-#else
-#   define THREAD_USE_INIT_STACK_ASM DEFAULT_THREAD_USE_INIT_STACK_ASM
-#endif
-
-// use u32 time objects or u16
-#ifdef CONFIG_KERNEL_HIGH_RANGE_TIME_OBJECT_U32
-#   define KERNEL_HIGH_RANGE_TIME_OBJECT_U32 CONFIG_KERNEL_HIGH_RANGE_TIME_OBJECT_U32
-#else
-#   define KERNEL_HIGH_RANGE_TIME_OBJECT_U32 DEFAULT_KERNEL_HIGH_RANGE_TIME_OBJECT_U32
-#endif
-
 // set default SREG (interrupt flag or not)
 #ifdef CONFIG_THREAD_DEFAULT_SREG
 #   define THREAD_DEFAULT_SREG CONFIG_THREAD_DEFAULT_SREG
@@ -89,47 +75,12 @@
 #   define KERNEL_PREEMPTIVE_THREADS DEFAULT_KERNEL_PREEMPTIVE_THREADS
 #endif
 
-//
-// if preemptive threads
-//
-#if KERNEL_PREEMPTIVE_THREADS
-
-// debug preempt via uart
-#   ifdef CONFIG_KERNEL_DEBUG_PREEMPT_UART
-#       define KERNEL_DEBUG_PREEMPT_UART CONFIG_KERNEL_DEBUG_PREEMPT_UART
-#   else
-#       define KERNEL_DEBUG_PREEMPT_UART DEFAULT_KERNEL_DEBUG_PREEMPT_UART
-#   endif
-
-#else 
-
-#   define KERNEL_DEBUG_PREEMPT_UART 0
-
-#endif
-
 // kernel sysclock auto init
-#if KERNEL_DEBUG_PREEMPT_UART
 
-#   define KERNEL_SYSCLOCK_AUTO_INIT   0
-
-// refactor this
-#   if defined(__AVR_ATmega328P__)
-#       define _K_USART_RX_vect  USART_RX_vect
-#   elif defined(__AVR_ATmega2560__)
-#       define _K_USART_RX_vect  USART0_RX_vect
-#   else
-#       warning   KERNEL_DEBUG_PREEMPT_UART enaabled, USART RX vector no configured, default = "USART_RX_vect"
-#       define _K_USART_RX_vect  USART_RX_vect
-#   endif
-
+#ifdef CONFIG_KERNEL_SYSCLOCK_AUTO_START
+#    define KERNEL_SYSCLOCK_AUTO_START CONFIG_KERNEL_SYSCLOCK_AUTO_START
 #else
-
-#   ifdef CONFIG_KERNEL_SYSCLOCK_AUTO_INIT
-#       define KERNEL_SYSCLOCK_AUTO_INIT CONFIG_KERNEL_SYSCLOCK_AUTO_INIT
-#   else
-#       define KERNEL_SYSCLOCK_AUTO_INIT DEFAULT_KERNEL_SYSCLOCK_AUTO_INIT
-#   endif
-
+#    define KERNEL_SYSCLOCK_AUTO_START DEFAULT_KERNEL_SYSCLOCK_AUTO_START
 #endif
 
 // kernel auto init
@@ -146,34 +97,65 @@
 #   define KERNEL_SYSLOCK_HW_TIMER DEFAULT_KERNEL_SYSLOCK_HW_TIMER
 #endif
 
-// preemptive threads time_slice in ms
+// select precision mode
+#define KERNEL_SYSCLOCK_PRECISION_MODE_NONE		0
+#define KERNEL_SYSCLOCK_PRECISION_MODE_OPTIONAL		1	
+#define KERNEL_SYSCLOCK_PRECISION_MODE_REQUIRED		2
+#ifdef CONFIG_KERNEL_SYSCLOCK_PRECISION_MODE
+#   define KERNEL_SYSCLOCK_PRECISION_MODE CONFIG_KERNEL_SYSCLOCK_PRECISION_MODE
+#else
+#   define KERNEL_SYSCLOCK_PRECISION_MODE DEFAULT_KERNEL_SYSCLOCK_PRECISION_MODE
+#endif
+
+// select sysclock period us when precision mode disabled
+#ifdef CONFIG_KERNEL_SYSCLOCK_PERIOD_US
+#   define KERNEL_SYSCLOCK_PERIOD_US CONFIG_KERNEL_SYSCLOCK_PERIOD_US
+#else
+#   define KERNEL_SYSCLOCK_PERIOD_US DEFAULT_KERNEL_SYSCLOCK_PERIOD_US
+#endif
+
+#ifdef CONFIG_KERNEL_TICKS_40BITS
+#   define KERNEL_TICKS_40BITS CONFIG_KERNEL_TICKS_40BITS
+#else
+#   define KERNEL_TICKS_40BITS DEFAULT_KERNEL_TICKS_40BITS
+#endif
+
+// preemptive threads time_slice in us
 #ifdef CONFIG_KERNEL_TIME_SLICE
 #   define KERNEL_TIME_SLICE CONFIG_KERNEL_TIME_SLICE
 #else
 #   define KERNEL_TIME_SLICE DEFAULT_KERNEL_TIME_SLICE
 #endif
 
-// idle thread, only in preemptive mode
-#if KERNEL_PREEMPTIVE_THREADS
-#   ifdef CONFIG_KERNEL_THREAD_IDLE
-#       define KERNEL_THREAD_IDLE CONFIG_KERNEL_THREAD_IDLE
-#   else
-#       define KERNEL_THREAD_IDLE DEFAULT_KERNEL_THREAD_IDLE
-#   endif
+//
+// debug preempt via uart
+//
+#ifdef CONFIG_KERNEL_DEBUG_PREEMPT_UART
+#	define KERNEL_DEBUG_PREEMPT_UART CONFIG_KERNEL_DEBUG_PREEMPT_UART
 #else
-#   define KERNEL_THREAD_IDLE 0
+#	define KERNEL_DEBUG_PREEMPT_UART DEFAULT_KERNEL_DEBUG_PREEMPT_UART
 #endif
+
+#ifdef CONFIG_KERNEL_THREAD_IDLE
+#   define KERNEL_THREAD_IDLE CONFIG_KERNEL_THREAD_IDLE
+#else
+#   define KERNEL_THREAD_IDLE DEFAULT_KERNEL_THREAD_IDLE
+#endif
+
+#if KERNEL_PREEMPTIVE_THREADS
+#	ifdef CONFIG_THREAD_IDLE_COOPERATIVE
+#   		define THREAD_IDLE_COOPERATIVE CONFIG_THREAD_IDLE_COOPERATIVE
+#	else
+#   		define THREAD_IDLE_COOPERATIVE DEFAULT_THREAD_IDLE_COOPERATIVE
+#	endif /* CONFIG_THREAD_IDLE_COOPERATIVE */
+#else
+#   	define THREAD_IDLE_COOPERATIVE 1
+#endif /* KERNEL_PREEMPTIVE_THREADS */
 
 #ifdef CONFIG_KERNEL_THREAD_IDLE_ADD_STACK
 #   define KERNEL_THREAD_IDLE_ADD_STACK CONFIG_KERNEL_THREAD_IDLE_ADD_STACK
 #else
 #   define KERNEL_THREAD_IDLE_ADD_STACK DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK
-#endif
-
-#ifdef CONFIG_KERNEL_ALLOW_INTERRUPT_YIELD
-#   define KERNEL_ALLOW_INTERRUPT_YIELD CONFIG_KERNEL_ALLOW_INTERRUPT_YIELD
-#else
-#   define KERNEL_ALLOW_INTERRUPT_YIELD DEFAULT_KERNEL_ALLOW_INTERRUPT_YIELD
 #endif
 
 #ifdef CONFIG_THREAD_CANARIES
@@ -227,29 +209,31 @@
 #endif
 
 #if SYSTEM_WORKQUEUE_ENABLE
-#   ifdef CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE
-#       define SYSTEM_WORKQUEUE_STACK_SIZE CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE
-#   else
-#       define SYSTEM_WORKQUEUE_STACK_SIZE DEFAULT_SYSTEM_WORKQUEUE_STACK_SIZE
-#   endif
 
-#   ifdef CONFIG_SYSTEM_WORKQUEUE_PRIORITY
-#       define SYSTEM_WORKQUEUE_PRIORITY CONFIG_SYSTEM_WORKQUEUE_PRIORITY
-#   else
-#       define SYSTEM_WORKQUEUE_PRIORITY DEFAULT_SYSTEM_WORKQUEUE_PRIORITY
-#   endif
+#	ifdef CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE
+#		define SYSTEM_WORKQUEUE_STACK_SIZE CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE
+#	else
+#		define SYSTEM_WORKQUEUE_STACK_SIZE DEFAULT_SYSTEM_WORKQUEUE_STACK_SIZE
+#	endif
+
+#	ifdef CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE
+#		 define SYSTEM_WORKQUEUE_COOPERATIVE CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE
+#	else
+#		define SYSTEM_WORKQUEUE_COOPERATIVE DEFAULT_SYSTEM_WORKQUEUE_COOPERATIVE
+#	endif
+
+#	if SYSTEM_WORKQUEUE_COOPERATIVE
+#		define SYSTEM_WORKQUEUE_PRIORITY			K_COOPERATIVE
+#	else
+#		define SYSTEM_WORKQUEUE_PRIORITY			K_PREEMPTIVE
+#	endif /* SYSTEM_WORKQUEUE_COOPERATIVE */
+
 #endif
 
 #ifdef CONFIG_KERNEL_ASSERT
 #   define KERNEL_ASSERT CONFIG_KERNEL_ASSERT
 #else
 #   define KERNEL_ASSERT DEFAULT_KERNEL_ASSERT
-#endif
-
-#ifdef CONFIG_THREAD_ALLOW_RETURN
-#   define THREAD_ALLOW_RETURN CONFIG_THREAD_ALLOW_RETURN
-#else
-#   define THREAD_ALLOW_RETURN DEFAULT_THREAD_ALLOW_RETURN
 #endif
 
 #ifdef CONFIG_KERNEL_TIMERS
@@ -294,20 +278,10 @@
 #   define KERNEL_UPTIME DEFAULT_KERNEL_UPTIME
 #endif
 
-#if KERNEL_UPTIME
-#    ifdef CONFIG_KERNEL_UPTIME_40BITS
-#   	define KERNEL_UPTIME_40BITS CONFIG_KERNEL_UPTIME_40BITS
-#    else
-#   	define KERNEL_UPTIME_40BITS DEFAULT_KERNEL_UPTIME_40BITS
-#   endif
+#ifdef CONFIG_KERNEL_TIME
+#   define KERNEL_TIME CONFIG_KERNEL_TIME
 #else
-#   define KERNEL_UPTIME_40BITS 0
-#endif
-
-#ifdef CONFIG_KERNEL_MAX_SYSCLOCK_PERIOD_MS
-#   define KERNEL_MAX_SYSCLOCK_PERIOD_MS CONFIG_KERNEL_MAX_SYSCLOCK_PERIOD_MS
-#else
-#   define KERNEL_MAX_SYSCLOCK_PERIOD_MS DEFAULT_KERNEL_MAX_SYSCLOCK_PERIOD_MS
+#   define KERNEL_TIME DEFAULT_KERNEL_TIME
 #endif
 
 #ifdef CONFIG_KERNEL_ATOMIC_API
@@ -316,47 +290,87 @@
 #   define KERNEL_ATOMIC_API DEFAULT_KERNEL_ATOMIC_API
 #endif
 
-/*___________________________________________________________________________*/
-
-/**
- * @brief Sysclock period is :
- *  - KERNEL_TIME_SLICE if KERNEL_MAX_SYSCLOCK_PERIOD_MS is off
- *  - MIN(KERNEL_MAX_SYSCLOCK_PERIOD_MS, KERNEL_TIME_SLICE) if KERNEL_MAX_SYSCLOCK_PERIOD_MS is on
- */
-
-#if KERNEL_UPTIME == 0 || KERNEL_MAX_SYSCLOCK_PERIOD_MS == 0
-#define SYSCLOCK_PERIOD_MS  KERNEL_TIME_SLICE
+#ifdef CONFIG_KERNEL_THREAD_MONITORING
+#   define KERNEL_THREAD_MONITORING CONFIG_KERNEL_THREAD_MONITORING
 #else
-#if KERNEL_MAX_SYSCLOCK_PERIOD_MS >= 64
-# 	error KERNEL_MAX_SYSCLOCK_PERIOD_MS must be less than 64 !
-	/* because of ADIW instruction 0 <= K < 64 */
-#endif
-#if KERNEL_TIME_SLICE % KERNEL_MAX_SYSCLOCK_PERIOD_MS != 0
-#	error KERNEL_TIME_SLICE must be multiple of KERNEL_MAX_SYSCLOCK_PERIOD_MS !
-	/* because of precision */
-#endif
+#   define KERNEL_THREAD_MONITORING DEFAULT_KERNEL_THREAD_MONITORING
+#endif /* CONFIG_KERNEL_THREAD_MONITORING */
 
-#if KERNEL_TIME_SLICE / KERNEL_MAX_SYSCLOCK_PERIOD_MS > 255
-#	error "KERNEL_TIME_SLICE / KERNEL_MAX_SYSCLOCK_PERIOD_MS must be less than 255 !"
-	/* because of remaining_sysclock_ints size (1B) in arch.S */
-#endif
+#ifdef CONFIG_KERNEL_THREAD_TERMINATION_TYPE
+#   define KERNEL_THREAD_TERMINATION_TYPE CONFIG_KERNEL_THREAD_TERMINATION_TYPE
+#else
+#   define KERNEL_THREAD_TERMINATION_TYPE DEFAULT_KERNEL_THREAD_TERMINATION_TYPE
+#endif /* CONFIG_KERNEL_THREAD_TERMINATION_TYPE */
 
-#if KERNEL_MAX_SYSCLOCK_PERIOD_MS < KERNEL_TIME_SLICE
-#define SYSCLOCK_PERIOD_MS  KERNEL_MAX_SYSCLOCK_PERIOD_MS
-#else 
-#define SYSCLOCK_PERIOD_MS  KERNEL_TIME_SLICE
-#endif /* KERNEL_MAX_SYSCLOCK_PERIOD_MS < KERNEL_TIME_SLICE */
-#endif /* KERNEL_UPTIME == 0 || KERNEL_MAX_SYSCLOCK_PERIOD_MS == 0 */
-
-#if KERNEL_UPTIME == 1 && SYSCLOCK_PERIOD_MS > 63
-/* see arch.S line #111 */
-#error Because of ADIW instruction 0 <= K < 64, SYSCLOCK_PERIOD_MS must be less than 64 when KERNEL_UPTIME is enabled !
-#endif /* KERNEL_UPTIME == 1 && SYSCLOCK_PERIOD_MS > 63 */
-
-#define K_EVENTS_PERIOD_MS	KERNEL_TIME_SLICE
-#define K_TIMERS_PERIOD_MS	KERNEL_TIME_SLICE
+#ifdef CONFIG_KERNEL_DELAY_OBJECT_U32
+#   define KERNEL_DELAY_OBJECT_U32 CONFIG_KERNEL_DELAY_OBJECT_U32
+#else
+#   define KERNEL_DELAY_OBJECT_U32 DEFAULT_KERNEL_DELAY_OBJECT_U32
+#endif /* CONFIG_KERNEL_DELAY_OBJECT_U32 */
 
 /*___________________________________________________________________________*/
+
+#include "sysclock_config.h"
+
+/*___________________________________________________________________________*/
+
+#if KERNEL_UPTIME
+#	define KERNEL_TICKS			1
+#	if KERNEL_TICKS_40BITS
+#		define KERNEL_TICKS_SIZE 	5
+#	else
+#		define KERNEL_TICKS_SIZE 	4
+#	endif
+#else
+#	define KERNEL_TICKS			0
+#	define KERNEL_TICKS_SIZE 		0
+#endif
+
+#if K_SYSCLOCK_TCNT_ISNULL == 0
+#if KERNEL_SYSCLOCK_PRECISION_MODE == KERNEL_SYSCLOCK_PRECISION_MODE_OPTIONAL
+#warning [OPTIONAL] SYSCLOCK precision mode requires the frequency to be F_CPU divided by a prescaler
+#elif KERNEL_SYSCLOCK_PRECISION_MODE == KERNEL_SYSCLOCK_PRECISION_MODE_REQUIRED
+#error [REQUIRED] SYSCLOCK precision mode requires the frequency to be F_CPU divided by a prescaler
+#endif /* information level */
+#endif /* K_SYSCLOCK_TCNT_ISNULL */
+
+#if KERNEL_TIME_SLICE < KERNEL_SYSCLOCK_PERIOD_US
+#	error [UNSUPPORTED] KERNEL_TIME_SLICE < KERNEL_SYSCLOCK_PERIOD_US
+#elif KERNEL_TIME_SLICE > KERNEL_SYSCLOCK_PERIOD_US
+#	define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 1
+
+#	if KERNEL_TIME_SLICE % KERNEL_SYSCLOCK_PERIOD_US != 0
+#		warning [WARNING] KERNEL_TIME_SLICE must be a multiple of KERNEL_SYSCLOCK_PERIOD_US
+#	endif 
+
+#	if KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US <= 255
+#		define KERNEL_TIME_SLICE_TICKS	(KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US)
+#	else 
+#		error "Time slice too different compared to KERNEL_SYSCLOCK_PERIOD_US\
+		KERNEL_TIME_SLICE / KERNEL_SYSCLOCK_PERIOD_US > 255"
+#	endif 
+#else 
+#	define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 	0
+#	define KERNEL_TIME_SLICE_TICKS			1
+#endif /* KERNEL_TIME_SLICE != KERNEL_SYSCLOCK_PERIOD_US */
+
+#if (KERNEL_SYSCLOCK_PERIOD_US < 100) 
+#	warning SYSCLOCK is probably too fast !
+#endif 
+
+#if (KERNEL_TIME_SLICE < 500)
+# 	warning KERNEL_TIME_SLICE is probably too short !
+#endif 
+
+
+#define K_EVENTS_PERIOD_TICKS	KERNEL_TIME_SLICE_TICKS
+#define K_TIMERS_PERIOD_TICKS	KERNEL_TIME_SLICE_TICKS
+
+#define KERNEL_TICK_PERIOD_US	KERNEL_SYSCLOCK_PERIOD_US
+#define KERNEL_TICK_PERIOD_MS	(KERNEL_TICK_PERIOD_US / 1000ULL)
+
+#define K_TICKS_PER_SECOND	(((float)1000000ULL) / KERNEL_SYSCLOCK_PERIOD_US)
+#define K_TICKS_PER_MS		(((float)1000ULL) / KERNEL_SYSCLOCK_PERIOD_US)
 
 // put all c specific definitions  here
 
@@ -365,19 +379,43 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#if KERNEL_HIGH_RANGE_TIME_OBJECT_U32 == 1
-    typedef uint32_t k_delta_ms_t;
-#else
-    typedef uint16_t k_delta_ms_t;
-#endif
+#if KERNEL_DELAY_OBJECT_U32
+typedef uint32_t k_ticks_t;
+#else 
+typedef uint16_t k_ticks_t;
+#endif /* KERNEL_DELAY_OBJECT_U32 */
+
+typedef k_ticks_t k_delta_t;
 
 typedef struct
 {
-    k_delta_ms_t value;
+    k_ticks_t value;
 } k_timeout_t;
 
 #endif
 
+#define K_TIMEOUT_TICKS(t)	(t.value)
+#define K_TIMEOUT_EQ(t1, t2)    (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
+#define K_TIMEOUT_MS(t)		((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
+#define K_TIMEOUT_SECONDS(t)	((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_SECOND))
+
+#ifndef __cplusplus
+
+#define K_SECONDS(seconds)      ((k_timeout_t){.value = K_TICKS_PER_SECOND * seconds})
+#define K_MSEC(milliseconds)    ((k_timeout_t){.value = K_TICKS_PER_MS * milliseconds})
+#define K_NO_WAIT               ((k_timeout_t){.value = (k_ticks_t) 0})
+#define K_FOREVER               ((k_timeout_t){.value = (k_ticks_t) -1})
+#define K_UNTIL_WAKEUP          K_FOREVER
+
+#else
+
+#define K_SECONDS(seconds)      ((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_SECOND * seconds) })
+#define K_MSEC(milliseconds)    ((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_MS * milliseconds) })
+#define K_NO_WAIT               ((k_timeout_t){.value = (k_ticks_t) 0})
+#define K_FOREVER               ((k_timeout_t){.value = (k_ticks_t) -1})
+#define K_UNTIL_WAKEUP          K_FOREVER
+
+#endif /* __cplusplus */
 /*___________________________________________________________________________*/
 
 // arch specific fixups
@@ -399,14 +437,52 @@ typedef struct
 # endif
 #endif
 
+#if KERNEL_DEBUG_PREEMPT_UART
+
+// refactor this
+#   if defined(__AVR_ATmega328P__)
+#       define _K_USART_RX_vect  USART_RX_vect
+#   elif defined(__AVR_ATmega2560__)
+#       define _K_USART_RX_vect  USART0_RX_vect
+#   else
+#       warning   KERNEL_DEBUG_PREEMPT_UART enaabled, USART RX vector no configured, default = "USART_RX_vect"
+#       define _K_USART_RX_vect  USART_RX_vect
+#   endif
+
+#endif /* KERNEL_DEBUG_PREEMPT_UART */
+
+/* stack sentinel */
+
+#if THREAD_STACK_SENTINEL
+#	define _K_STACK_SENTINEL_REGISTER(stack_symb)	__attribute__((used, section(".k_sentinels"))) void *_k_sent_##stack_symb = (void *)(&stack_symb)
+#else
+#	define _K_STACK_SENTINEL_REGISTER(stack_symb)
+#endif /* THREAD_STACK_SENTINEL */
+
 /*___________________________________________________________________________*/
 
 // 31 registers (31) + SREG (1) + return address (2 or 3)
-#define K_THREAD_STACK_VOID_SIZE (35 + _K_ARCH_STACK_SIZE_FIXUP)
+
+
+#if !__ASSEMBLER__
+#define _K_CALLSAVED_CTX_SIZE	  sizeof(struct _k_callsaved_ctx)
+#else 
+#define _K_CALLSAVED_CTX_SIZE	  (19U + _K_ARCH_PC_SIZE)
+#endif 
+
+// call-clobbered (or call-used) registers
+#define _K_CALLUSED_CTX_SIZE	  sizeof(struct _k_callused_ctx)
+
+// interrupt context
+#define _K_INTCTX_SIZE		  sizeof(struct _k_intctx)
+
+#define K_THREAD_STACK_VOID_SIZE 	_K_CALLSAVED_CTX_SIZE
+#define K_THREAD_CTX_START(stack_end)	((struct _k_callsaved_ctx *)((uint8_t*)stack_end - _K_CALLSAVED_CTX_SIZE + 1U))
+
 #define K_THREAD_STACK_MIN_SIZE (K_THREAD_STACK_VOID_SIZE + THREAD_STACK_SENTINEL_SIZE)
 
 // some of following macros need to be differenciate for c or asm :
-// - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on poointers
+// - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on pointers
 // - in asm files types are not understood by compiler
 #define K_STACK_END(stack_start, size) (void*) ((uint8_t*) stack_start + size - 1)
 #define K_STACK_START(stack_end, size) (void*) ((uint8_t*) stack_end - size + 1)
@@ -422,7 +498,7 @@ typedef struct
 
 #define _K_STACK_END_ASM(stack_start, size) _K_STACK_END(stack_start, size)
 
-#define _K_STACK_INIT_SP(stack_end) (stack_end - K_THREAD_STACK_VOID_SIZE)
+#define _K_STACK_INIT_SP(stack_end) (stack_end - _K_CALLSAVED_CTX_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly set
 #define _K_THREAD_STACK_START(name) ((uint8_t*)(&_k_stack_buf_##name))
@@ -437,69 +513,28 @@ typedef struct
 #define THREAD_FROM_WAITQUEUE(item) CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
-#if THREAD_ALLOW_RETURN == 1
+#define _K_CORE_CONTEXT_INIT(entry, ctx, __entry) \
+(struct _k_callsaved_ctx) { \
+	.sreg = 0x00, \
+	{ .regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U} }, \
+	{ .init_sreg = THREAD_DEFAULT_SREG }, \
+	{ .thread_entry = (thread_entry_t) entry }, \
+	{ .thread_context = (void*) ctx }, \
+	{ .pc = (void*) __entry } \
+}
 
-#define _K_CORE_CONTEXT_STRUCT() struct                                    \
-        {                                                                  \
-            uint8_t sreg;                                                  \
-            uint8_t r26_r27r30r31r28r29_r16[21u];                        \
-            void *context;                                                 \
-            thread_entry_t *entry;                                         \
-            uint8_t r17r1r0r18_r21_3Baddrmsb[7u + _K_ARCH_STACK_SIZE_FIXUP]; \
-            void *k_thread_entry;                                          \
-        }
+#define _K_STACK_INITIALIZER(name, stack_size, entry, ctx) \
+    struct \
+    { \
+        uint8_t empty[stack_size - _K_CALLSAVED_CTX_SIZE]; \
+        struct _k_callsaved_ctx core; \
+    } _k_stack_buf_##name = { \
+        {0x00}, \
+       _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry), \
+    }
 
-#define _K_CORE_CONTEXT(entry, context_p)                                  \
-        {THREAD_DEFAULT_SREG,                                              \
-         {0x00},                                                           \
-         (void*) context_p,                                                \
-         (thread_entry_t*) entry,                                          \
-         {0x00},                                                           \
-         (void*) _k_thread_entry}
-
-#else
-
-#define _K_CORE_CONTEXT_STRUCT() struct                                    \
-        {                                                                  \
-            uint8_t sreg;                                                  \
-            uint8_t r26_r27r30r31r28r29_r16[21u];                        \
-            void *context;                                                 \
-            uint8_t r17r1r0r18_r23_3Baddrmsb[9u + _K_ARCH_STACK_SIZE_FIXUP]; \
-            thread_entry_t *entry;                                         \
-        }
-
-#define _K_CORE_CONTEXT(entry, context_p)                                  \
-        {THREAD_DEFAULT_SREG,                                              \
-         {0x00},                                                           \
-         (void*) context_p,                                                \
-         {0x00},                                                           \
-         (thread_entry_t*) entry}
-
-#endif
-
-
-
-#if THREAD_STACK_SENTINEL
-#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
-    struct                                                                 \
-    {                                                                      \
-        uint8_t stack_sentinel[THREAD_STACK_SENTINEL_SIZE];                \
-        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE - THREAD_STACK_SENTINEL_SIZE]; \
-        _K_CORE_CONTEXT_STRUCT() base;                                     \
-    } _k_stack_buf_##name = {                                              \
-	{THREAD_STACK_SENTINEL_SYMBOL},                                     \
-        {0x00},                                                            \
-       _K_CORE_CONTEXT(entry, context_p)}
-#else
-#define _K_STACK_INITIALIZER(name, stack_size, entry, context_p)           \
-    struct                                                                 \
-    {                                                                      \
-        uint8_t empty[stack_size - K_THREAD_STACK_VOID_SIZE];              \
-        _K_CORE_CONTEXT_STRUCT() base;                                     \
-    } _k_stack_buf_##name = {                                              \
-        {0x00},                                                            \
-       _K_CORE_CONTEXT(entry, context_p)}
-#endif /* THREAD_STACK_SENTINEL */
+#define _K_STACK_MINIMAL_INITIALIZER(name, entry, ctx) \
+    struct _k_callsaved_ctx _k_stack_buf_##name = _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry)
 
 #define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
     struct k_thread name = {                                                                                 \
@@ -515,7 +550,15 @@ typedef struct
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, symbol)                  \
     __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol);
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol); \
+    _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
+
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flags, context_p, symbol)                  \
+    __attribute__((used)) _K_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flags, symbol); \
+    _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
+
+//     __attribute__((used, section(".k_sentinels"))) void *_k_stack_sentinel_##name = (void *)(&_k_stack_buf_##name)
 
 /*___________________________________________________________________________*/
 

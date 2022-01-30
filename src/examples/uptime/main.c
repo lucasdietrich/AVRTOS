@@ -48,6 +48,7 @@ void thread(void *ctx)
 		now = k_uptime_get_ms64();
 		if (now - last >= period) {
 			last = now;
+			k_show_uptime();
 			printf("now = %lu %lu\n", (uint32_t) (now >> 32), (uint32_t) now);
 		}
 	}

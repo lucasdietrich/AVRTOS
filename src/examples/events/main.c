@@ -15,7 +15,7 @@ struct mystruct
 	struct k_event ev; 
 	struct k_signal sig;
 	struct k_thread thread;
-	char stack[0x60];
+	char stack[0x80];
 };
 
 struct mystruct threads[THREADS_COUNT];

@@ -38,6 +38,7 @@
         "atomic.h": "c",
         "timer.h": "c",
         "stack_sentinel.h": "c",
-        "fault.h": "c"
+        "fault.h": "c",
+        "sysclock_config.h": "c"
     }
 }

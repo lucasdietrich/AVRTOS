@@ -65,6 +65,20 @@ What features will be implemented :
 - Stack sentinels
 - Kernel fault
 
+AVRTOS2:
+	- Enhanced clock precision
+	- Optimized "thread_switch" function
+	- Cooperative threads needs less stacks
+	- Change time ms to us OR ticks ? (max sleep is now 4h or more if using 64bit time objects)
+TODO AVRTOS 2:
+- Inline _k_scheduler with thread_switch (or jump to _k_scheduler and jump to thread_switch)
+- Maybe only push SREG a single time ? (--> NO)
+- Handle configuration
+- Add tools to help to minimize stack usage
+- config option to forbid thread termination by jumping to function in _k_thread_entry
+- make it possible to switch thread from an interrupt handler (--> need to save more registers and to place the return address)
+- **build_type = debug** sometimes doesn't work ? -> see caniot2-device with "build_type = debug"
+
 What enhancements are planned :
 - Optimize thread switch function by pushing only call-clobbered registers (https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.c#L67). Handle switch from interrupt handler (could this help https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.h#L193 ?).
 - Making timers and events process period configurable.
@@ -78,7 +92,7 @@ What enhancements are planned :
 - Optimizing `tqueue_remove` function from O(n) to O(1) where `n` is the number of items in the time queue
   - Optimizing corresponding code in the kernel
 - Optimizing timers code
-- Unifying `k_timeout_t` and `k_delta_ms_t` types
+- ~~Unifying `k_timeout_t` and `k_delta_t` types~~
 - Move the examples from a directory above
 - Allowing `main` thread to return.
 - Improve sysclock precision by not resetting TCNTx (check Arduino millis() function for more details)
@@ -100,8 +114,8 @@ What enhancements/features are not planned :
 | THREAD_MAIN_COOPERATIVE   | Define main thread as cooperative (default prempt) |
 | THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
 | THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
-| THREAD_USE_INIT_STACK_ASM | Tells if we should use the C or the Assembler function to define our threads at runtime |
-| KERNEL_HIGH_RANGE_TIME_OBJECT_U32 | Configure to use uint32_t as k_delta_ms_t ~= 50 days or keep (uint16_t) ~= 65seconds |
+| ~~THREAD_USE_INIT_STACK_ASM~~ | Tells if we should use the C or the Assembler function to define our threads at runtime |
+| ~~KERNEL_HIGH_RANGE_TIME_OBJECT_U32~~ | ~~Configure to use uint32_t as k_delta_t ~= 50 days or keep (uint16_t) ~= 65seconds~~ |
 | THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
 | KERNEL_DEBUG | Enable Kernel Debug features |
 | KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
@@ -109,12 +123,12 @@ What enhancements/features are not planned :
 | KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
 | KERNEL_TIME_SLICE | Time slice in milliseconds |
 | KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
-| KERNEL_SYSCLOCK_AUTO_INIT | Auto start kernel sysclock |
+| KERNEL_SYSCLOCK_AUTO_START | Auto start kernel sysclock |
 | KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
-| KERNEL_DEBUG_PREEMPT_UART | Use uart rx interrupt as preempt signal |
+| ~~KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
 | KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
-| KERNEL_ALLOW_INTERRUPT_YIELD |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
+| ~~KERNEL_ALLOW_INTERRUPT_YIELD~~ |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
 | THREAD_CANARIES | Enable thread canaries |
 | THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
 | SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
@@ -122,17 +136,19 @@ What enhancements/features are not planned :
 | SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
 | **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
-| THREAD_ALLOW_RETURN | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
+| ~~THREAD_ALLOW_RETURN~~ | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
 | KERNEL_TIMERS | Enables timers |
 | KERNEL_EVENTS | Enables kernel events |
 | KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
 | KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
 | STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART (0, 1, 2, ..), "-1" to disable.  |
 | KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
-| KERNEL_UPTIME_40BITS | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
-| KERNEL_MAX_SYSCLOCK_PERIOD_MS | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
+| ~~KERNEL_UPTIME_40BITS~~ | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
+| ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
+| KERNEL_TIME | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
-
+| THREAD_TERMINATION_TYPE |  |
+| KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
 
 ## Getting started example :
 
@@ -147,7 +163,7 @@ In this example, we spawn three threads (+ main thread + idle thread) :
 
 On an Arduino Pro (or Arduino Pro Mini), based on an ATmega328p (avr5) the led should be blinking at the frequency of 5Hz and then block for 500ms every 2 seconds.
 
-Configuration option : `CONFIG_KERNEL_TIME_SLICE=10`
+Configuration option : `CONFIG_KERNEL_TIME_SLICE=10000`
 
 ### Code
 
@@ -260,8 +276,6 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
   - timer2 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds
 
 The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER configuration option.
-
-- If configuration option KERNEL_DEBUG_PREEMPT_UART is enabled, the usart0 peripheral is used (+ RX interrupt vector)
 
 ### qemu
 
@@ -416,7 +430,7 @@ src_filter =
 build_flags = 
     ${env.build_flags}
     -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
-    -DCONFIG_KERNEL_TIME_SLICE=16
+    -DCONFIG_KERNEL_TIME_SLICE=16000
     -DCONFIG_KERNEL_DEBUG=0
     -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
     -DCONFIG_KERNEL_THREAD_IDLE=1
@@ -435,7 +449,7 @@ src_filter =
 build_flags = 
     ${env.build_flags}
     -DCONFIG_KERNEL_SYSLOCK_HW_TIMER=1
-    -DCONFIG_KERNEL_TIME_SLICE=4
+    -DCONFIG_KERNEL_TIME_SLICE=40000
     -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
     -DCONFIG_KERNEL_DEBUG=0
     -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
@@ -489,7 +503,6 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 
 Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
 - `.` : Each time the syslock timer expires, we check if the current thread can be preempted and then the scheduler is called in.
-    - If configuration option `KERNEL_DEBUG_PREEMPT_UART` is set, syslock timer overflow handler is replaced by the uart rx interrupt handler.
 
 #### Example with the getting-started example 
 

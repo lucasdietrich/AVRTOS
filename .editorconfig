@@ -61,3 +61,7 @@ cpp_space_around_ternary_operator=insert
 cpp_wrap_preserve_blocks=one_liners
 indent_size = 8
 indent_style = tab
+
+[*.py]
+indent_size = 4
+indent_style = space

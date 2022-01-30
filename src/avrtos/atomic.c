@@ -1,5 +1,7 @@
 #include "atomic.h"
 
+#if KERNEL_ATOMIC_API
+
 void atomic_clear_bit(atomic_t *target, uint8_t bit)
 {
         atomic_and(target, ~BIT(bit));
@@ -42,3 +44,5 @@ bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit)
 
         return (old & mask) != 0;
 }
+
+#endif /* KERNEL_ATOMIC_API */

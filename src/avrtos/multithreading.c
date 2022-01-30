@@ -12,10 +12,12 @@ extern int main(void);
 
 char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
+_K_STACK_SENTINEL_REGISTER(_k_main_stack);
+
 #endif
 
 K_THREAD struct k_thread _k_thread_main = {
-    .sp = NULL, // main thread is running, context already "restored"
+    .sp = 0, // main thread is running, context already "restored"
     {
 #if THREAD_MAIN_COOPERATIVE == 1
         .flags = READY | K_COOPERATIVE,
@@ -45,60 +47,37 @@ K_THREAD struct k_thread _k_thread_main = {
     .symbol = 'M'           // default main thread sumbol
 };
 
-struct k_thread *_current = &_k_thread_main;
+struct k_thread * _current = &_k_thread_main;
 
 
 /*___________________________________________________________________________*/
 
-#if THREAD_USE_INIT_STACK_ASM == 0
-
-void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
-        void *const stack_end, void *const context_p)
+static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
+				   void *const context_p)
 {
-        // get stack pointer value
-        uint8_t *sp = (uint8_t *)stack_end - 1;
+	struct _k_callsaved_ctx *const ctx = K_THREAD_CTX_START(th->stack.end);
 
-        // add return addr to stack (with format >> 1)
-#if THREAD_ALLOW_RETURN == 1
-        * (uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)_k_thread_entry);
-#else
-        *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)entry);
-#endif
-        sp -= 1u;
+	/* initialize unused registers with default value */
+	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
+		*reg = 0x00U;
+	}
 
-#if THREAD_ALLOW_RETURN == 1
-        const uint8_t ilimit = 7u + _K_ARCH_STACK_SIZE_FIXUP;
-#else
-        const uint8_t ilimit = 9u + _K_ARCH_STACK_SIZE_FIXUP;
-#endif
-        for (uint_fast8_t i = 0u; i < ilimit; i++) {
-                *sp-- = 0u;
-        }
+	ctx->sreg = 0U;
+	ctx->init_sreg = THREAD_DEFAULT_SREG;
+	ctx->thread_context = (void*) K_SWAP_ENDIANNESS(context_p);
+	ctx->thread_entry = (void*) K_SWAP_ENDIANNESS(entry);
+	ctx->pc = (void*) K_SWAP_ENDIANNESS(_k_thread_entry);
 
-#if THREAD_ALLOW_RETURN == 1
-        // set entry (p)
-        sp -= 1u;
-        *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)entry);
-        sp -= 1u;
+#if __AVR_3_BYTE_PC__
+	ctx->pch = 0;
 #endif
 
-        // set context (p)
-        sp -= 1u;
-        *(uint16_t *)sp = K_SWAP_ENDIANNESS((uint16_t)context_p);
-        sp -= 1u;
+        /* save SP in thread structure */
+        th->sp = ctx;
 
-        for (uint_fast8_t i = 0u; i < 21u; i++) {
-                *sp-- = 0u;
-        }
-
-        // push sreg
-        *sp = (uint8_t)THREAD_DEFAULT_SREG;
-        sp -= 1u;
-
-        // save SP in thread structure
-        th->sp = sp;
+	/* adjust pointer to the top of the stack */
+	th->sp--;
 }
-#endif
 
 #include "misc/uart.h"
 
@@ -113,7 +92,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         th->stack.end = (void *)_K_STACK_END(stack, stack_size);
 	th->stack.size = stack_size;
 
-        _k_thread_stack_create(th, entry, th->stack.end, context_p);
+        _k_thread_stack_create(th, entry, context_p);
 
 #if THREAD_STACK_SENTINEL
 	_k_init_thread_stack_sentinel(th);
@@ -127,30 +106,10 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         th->flags = 0;
         th->state = STOPPED;
         th->coop = prio & K_FLAG_COOP ? 1 : 0;
-        th->priority = prio & K_FLAG_PRIO;
         th->symbol = symbol;
         th->swap_data = NULL;
 
         return 0;
-}
-
-/*___________________________________________________________________________*/
-
-void _k_thread_entry(void *context, thread_entry_t entry)
-{
-        /* execute thread entry */
-        entry(context);
-
-        irq_disable();
-
-        /* terminate thread execution */
-        _k_suspend();
-        _current->state = STOPPED;
-
-        /* release CPU */
-        k_yield();
-
-        __builtin_unreachable();
 }
 
 /*___________________________________________________________________________*/

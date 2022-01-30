@@ -9,8 +9,8 @@ from parse_coredump_bin import parse_core
 
 # todo handle several ramdump in the same run
 
-LOCATION_DIR = "../res"
-COM_PORT = "COM5"
+LOCATION_DIR = "tmp"
+COM_PORT = "/dev/ttyACM0"
 BAUDRATE = 500000
 
 FILENAME = "ramdump.txt" # set None to have a new file every time
@@ -42,6 +42,8 @@ if __name__ == "__main__":
     with open(filepath, "bw") as fp:
         while state < 2:
             content = ser.read_until()
+
+            print(content)
             
             if content == boundary:
                 state += 1

@@ -17,14 +17,47 @@
  * @brief Runqueue containing the queue of all ready threads.
  * Should never be NULL.
  */
-struct ditem *runqueue = &_k_thread_main.tie.runqueue;
+struct ditem *_k_runqueue = &_k_thread_main.tie.runqueue;
 
-struct titem *events_queue = NULL;
+struct titem *_k_events_queue = NULL;
 
 static inline bool _k_runqueue_single(void)
 {
-        return runqueue->next == runqueue;
+        return _k_runqueue->next == _k_runqueue;
 }
+
+#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+uint8_t _k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
+#endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
+
+#if KERNEL_THREAD_MONITORING
+uint8_t _k_sched_ticks_last = KERNEL_TIME_SLICE_TICKS;
+#endif /* KERNEL_THREAD_MONITORING */
+
+#if KERNEL_TICKS
+// necessary ?
+volatile union {
+	uint8_t bytes[KERNEL_TICKS_SIZE];
+	struct {
+		uint32_t u32;
+
+#if KERNEL_TICKS_40BITS
+		uint8_t u40_byte;
+#endif
+	};
+
+} _k_ticks = {
+	.bytes = {
+		0,
+		0,
+		0,
+		0,
+#if KERNEL_TICKS_40BITS == 5
+		0,
+#endif
+	}
+};
+#endif /* KERNEL_TICKS */
 
 /*___________________________________________________________________________*/
 
@@ -121,12 +154,12 @@ bool _k_cooperative(void)
 
 void k_sleep(k_timeout_t timeout)
 {
-        if (timeout.value != K_NO_WAIT.value) {
+        if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {
                         _k_reschedule(timeout);
 
-                        k_yield();
+                        _k_yield();
                 }
         }
 }
@@ -136,14 +169,14 @@ void k_wait(k_timeout_t timeout)
 {
 	__ASSERT_INTERRUPT();
 
-	uint64_t ms = k_uptime_get_ms64();
+	uint64_t ticks = k_ticks_get_64();
 	uint64_t now;
 	
 	do {
 		k_idle(); /* idle the thread */
 
-		now = k_uptime_get_ms64();
-	} while (now - ms < K_TIMEOUT_MS(timeout));
+		now = k_ticks_get_64();
+	} while (now - ticks < K_TIMEOUT_TICKS(timeout));
 }
 #endif /* KERNEL_UPTIME */
 
@@ -151,15 +184,11 @@ void k_block(k_timeout_t timeout)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		_delay_ms(K_TIMEOUT_MS(timeout));
+		_delay_ms(K_TIMEOUT_TICKS(timeout));
 	}
 }
 
 /*___________________________________________________________________________*/
-
-//
-// Not tested
-//
 
 void k_suspend(void)
 {
@@ -174,7 +203,6 @@ void k_resume(struct k_thread *th)
         if (th->state == PENDING) {
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {
-                        th->state = READY;
                         _k_schedule(th);
                 }
         } else {
@@ -192,6 +220,24 @@ void k_start(struct k_thread *th)
 	}
 }
 
+void _k_stop(void)
+{
+	__ASSERT_NOINTERRUPT();
+
+	_k_suspend();
+
+	_current->state = STOPPED;
+}
+
+void k_stop()
+{
+	cli();
+
+	_k_stop();
+
+	_k_yield();
+}
+
 /*___________________________________________________________________________*/
 
 //
@@ -203,9 +249,9 @@ extern struct k_thread __k_threads_end;
 
 extern struct k_thread _k_idle;
 
-inline static void swap_endianness(uint16_t *const addr)
+inline static void swap_endianness(void **addr)
 {
-        *addr = HTONS(*addr);
+	*addr = (void*) HTONS(*addr);
 }
 
 void _k_kernel_init(void)
@@ -214,6 +260,10 @@ void _k_kernel_init(void)
 	 * and it is already in queue */
 	for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
 		struct k_thread *const thread = &(&__k_threads_start)[i];
+
+		if (thread == &_k_thread_main) {
+			continue;
+		}
 
 #if KERNEL_THREAD_IDLE
 		const bool is_thread_idle = thread == &_k_idle;
@@ -224,29 +274,23 @@ void _k_kernel_init(void)
 		/* idle thread must not be added to the
 		 * runqueue as the main thread is running */
 		if (!is_thread_idle &&
-		    (thread->state == READY) &&
-		    (thread != _current)) {
-			push_back(runqueue, &thread->tie.runqueue);
+		    (thread->state == READY)) {
+			push_back(_k_runqueue, &thread->tie.runqueue);
 		}
 
 		/* Swap endianness of addresses in compilation-time built stacks.
-		 * We cannot change the endianness of addresses determined by the
-		 * linker at compilation time. So we need to do it on system start up
-		 */
-		if (_current != thread) {
-		    /* thread kernel entry function address */
-			swap_endianness(thread->stack.end - 1u);
-
-#if THREAD_ALLOW_RETURN == 1
-			/* thread kernel entry function address */
-			swap_endianness(thread->stack.end - 1u -
-					(7u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
-#endif
-
-			/* thread context address */
-			swap_endianness(thread->stack.end - 1u -
-					(9u + _K_ARCH_STACK_SIZE_FIXUP + 2u));
-		}
+		* We cannot change the endianness of addresses determined by the
+		* linker at compilation time. So we need to do it on system start up
+		*/
+		struct _k_callsaved_ctx *ctx = thread->stack.end -
+			_K_CALLSAVED_CTX_SIZE + 1u;
+		swap_endianness(&ctx->thread_context);
+		swap_endianness((void*) &ctx->thread_entry);
+		swap_endianness(&ctx->pc);
+		
+#if __AVR_3_BYTE_PC__
+		ctx->pch = 0;
+#endif /* __AVR_3_BYTE_PC__ */
 	}
 }
 
@@ -254,7 +298,7 @@ void _k_queue(struct k_thread *const th)
 {
         __ASSERT_NOINTERRUPT();
 
-        push_back(runqueue, &th->tie.runqueue);
+        push_back(_k_runqueue, &th->tie.runqueue);
 }
 
 void _k_schedule(struct k_thread *thread)
@@ -268,15 +312,21 @@ void _k_schedule(struct k_thread *thread)
 	}
 #endif
 
+	/* mark as "not in events queue" */
+	thread->wakeup_schd = 0;
+
+	/* EXPLAIN WHY THIS DISAPPEARED IN THE ORIGINAL CODE */
+	thread->state = READY;
+	
 #if KERNEL_THREAD_IDLE
         if (k_is_cpu_idle()) {
                 dlist_ref(&thread->tie.runqueue);
-                runqueue = &thread->tie.runqueue;
+                _k_runqueue = &thread->tie.runqueue;
                 return;
         }
 #endif
 
-        push_front(runqueue, &thread->tie.runqueue);
+        push_front(_k_runqueue, &thread->tie.runqueue);
 }
 
 void _k_schedule_wake_up(k_timeout_t timeout)
@@ -286,9 +336,9 @@ void _k_schedule_wake_up(k_timeout_t timeout)
 	
         if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
 		_current->wakeup_schd = 1;
-                _current->tie.event.timeout = K_TIMEOUT_MS(timeout);
+                _current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
                 _current->tie.event.next = NULL;
-                _tqueue_schedule(&events_queue, &_current->tie.event);
+                _tqueue_schedule(&_k_events_queue, &_current->tie.event);
         }
 }
 
@@ -302,40 +352,98 @@ void _k_suspend(void)
         if (_k_runqueue_single()) {
                 struct ditem *const tie = &_k_idle.tie.runqueue;
                 dlist_ref(tie);
-                runqueue = tie;
+                _k_runqueue = tie;
                 return;
         }
 #else
         __ASSERT_LEASTONE_RUNNING();
 #endif
 
-        pop_ref(&runqueue);
+        pop_ref(&_k_runqueue);
+}
+
+void _k_system_shift(void)
+{
+	__ASSERT_NOINTERRUPT();
+	__STATIC_ASSERT(KERNEL_TIME_SLICE_TICKS != 0);
+
+	tqueue_shift(&_k_events_queue, KERNEL_TIME_SLICE_TICKS);
+
+#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+	_k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
+#endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
+
+#if KERNEL_THREAD_MONITORING
+#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+	_current->ticks += KERNEL_TIME_SLICE_TICKS - _k_sched_ticks_remaining;
+	_k_sched_ticks_last = KERNEL_TIME_SLICE_TICKS;
+#else
+	_current->ticks += KERNEL_TIME_SLICE_TICKS;
+#endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
+#endif /* KERNEL_THREAD_MONITORING */
+
+        struct ditem *const ready = (struct ditem *)tqueue_pop(&_k_events_queue);
+        if (ready != NULL) {
+		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
+
+                __K_DBG_SCHED_EVENT(thread);  // !
+
+                /* set ready thread expired flag */
+                thread->timer_expired = 1u;
+
+                _k_schedule(thread);
+        }
+
+#if KERNEL_TIMERS
+	_k_timers_process();
+#endif
+
+#if KERNEL_EVENTS
+	_k_event_q_process();
+#endif /* KERNEL_EVENTS */
 }
 
 struct k_thread *_k_scheduler(void)
 {
         __ASSERT_NOINTERRUPT();
 
-        /* reset flags */
-        _current->pend_canceled = 0;
-        _current->timer_expired = 0;
+#if THREAD_STACK_SENTINEL
+	k_assert_registered_stack_sentinel();
+#endif
 
-        if (_current->state == PENDING) {
+	struct k_thread *const prev = _current;
+
+#if KERNEL_THREAD_MONITORING && KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+	/* as this function can be called from either 
+	 * the sysclock handler or the yield function
+	 * only add time that passed since last scheduling
+	 */
+	prev->ticks += _k_sched_ticks_last - _k_sched_ticks_remaining;
+	_k_sched_ticks_last = _k_sched_ticks_remaining;
+#endif /* KERNEL_THREAD_MONITORING */
+
+        /* reset flags */
+        prev->pend_canceled = 0;
+        prev->timer_expired = 0;
+
+        if (prev->state == PENDING) {
                 /* runqueue is positionned to the 
                  * normally next thread to be executed */
                 __K_DBG_SCHED_PENDING();        // ~
         } else {
                 /* next thread is positionned at the top of the runqueue */
-                ref_requeue(&runqueue);
+                ref_requeue(&_k_runqueue);
 
                 __K_DBG_SCHED_REQUEUE();        // >
         }
 
-        _current = CONTAINER_OF(runqueue, struct k_thread, tie.runqueue);
+        _current = CONTAINER_OF(_k_runqueue, struct k_thread, tie.runqueue);
+	
+	__ASSERT_THREAD_STATE(_current, READY);
 
         __K_DBG_SCHED_NEXT(_current);
 
-        return _current;
+	return prev;
 }
 
 void _k_wake_up(struct k_thread *th)
@@ -348,11 +456,8 @@ void _k_wake_up(struct k_thread *th)
 
 	/* Remove the thread from the events queue */
 	if (th->wakeup_schd) {
-		tqueue_remove(&events_queue, &th->tie.event);
+		tqueue_remove(&_k_events_queue, &th->tie.event);
 	}
-
-	th->state = READY;
-	th->wakeup_schd = 0;
 
         _k_schedule(th);
 }
@@ -368,69 +473,21 @@ void _k_reschedule(k_timeout_t timeout)
 
 /*___________________________________________________________________________*/
 
-#if KERNEL_UPTIME
-#if KERNEL_UPTIME_40BITS
-struct {
-	uint8_t bytes[5]; /* 35 years overflow */
-	struct {
-		uint32_t u32;
-		uint8_t u40_byte;
-	};
-} _k_uptime_ms = {
-	.bytes = { 0, 0, 0, 0, 0 }
-};
-#else
-union {
-	uint8_t bytes[4]; /* 49 days overflow */
-	uint32_t u32;
-} _k_uptime_ms = {
-	.bytes = { 0, 0, 0, 0 }
-};
-#endif /* KERNEL_UPTIME_40BITS */
-#endif /* KERNEL_UPTIME */
-
-#if KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS
-uint8_t _k_remaining_sysclock_hits = KERNEL_TIME_SLICE / SYSCLOCK_PERIOD_MS;
-#endif /* KERNEL_TIME_SLICE != SYSCLOCK_PERIOD_MS */
-
-void _k_system_shift(void)
+uint32_t k_uptime_get(void)
 {
-	__ASSERT_NOINTERRUPT();
-
-        tqueue_shift(&events_queue, KERNEL_TIME_SLICE);
-
-        struct ditem *const ready = (struct ditem *)tqueue_pop(&events_queue);
-        if (ready != NULL) {
-		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
-
-                __K_DBG_SCHED_EVENT(thread);  // !
-
-                /* set ready thread expired flag */
-                thread->timer_expired = 1u;
-
-		/* mark as "not in events queue" */
-		thread->wakeup_schd = 0;
-
-                _k_schedule(thread);
-        }
-
-#if KERNEL_TIMERS
-	_k_timers_process();
-#endif
-
-#if KERNEL_EVENTS
-	_k_event_q_process();
-#endif /* KERNEL_EVENTS */
+#if KERNEL_TICKS_40BITS
+	return k_ticks_get_64() / K_TICKS_PER_SECOND;
+#elif KERNEL_TICKS
+	return k_ticks_get_32() / K_TICKS_PER_SECOND;
+#else
+	return 0;
+#endif /* KERNEL_UPTIME */
 }
 
 uint32_t k_uptime_get_ms32(void)
 {
-#if KERNEL_UPTIME
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		return _k_uptime_ms.u32;
-	}
-
-	__builtin_unreachable();
+#if KERNEL_TICKS
+	return k_ticks_get_32() / K_TICKS_PER_MS;
 #else
 	return 0;
 #endif /* KERNEL_UPTIME */
@@ -438,44 +495,13 @@ uint32_t k_uptime_get_ms32(void)
 
 uint64_t k_uptime_get_ms64(void)
 {
-	uint64_t ms64 = 0x0ULL;
-#if KERNEL_UPTIME_40BITS
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		// ms64 = (uint64_t) _k_uptime_ms.u32;
-		// ms64 <<= 8;
-		// ms64 |= _k_uptime_ms.bytes[4];
-		memcpy(&ms64, &_k_uptime_ms.bytes, sizeof(_k_uptime_ms.bytes));
-	}
-#elif KERNEL_UPTIME
-	ms64 |= (uint32_t) k_uptime_get_ms32();
+#if KERNEL_TICKS_40BITS
+	return k_ticks_get_64() / K_TICKS_PER_MS;
+#elif KERNEL_TICKS
+	return k_ticks_get_32() / K_TICKS_PER_MS;
+#else
+	return 0;
 #endif /* KERNEL_UPTIME */
-
-return ms64;
-}
-
-uint32_t k_uptime_get(void)
-{
-	struct timespec ts;
-	
-	k_timespec_get(&ts);
-
-	return ts.tv_sec;
-}
-
-void k_timespec_get(struct timespec *ts)
-{
-	if (ts == NULL) {
-		return;
-	}
-
-#if KERNEL_UPTIME_40BITS
-	uint64_t ms = k_uptime_get_ms64();
-#else 
-	uint32_t ms = k_uptime_get_ms32();
-#endif
-
-	ts->tv_sec = ms / 1000;
-	ts->tv_msec = ms % 1000;
 }
 
 /*___________________________________________________________________________*/
@@ -492,7 +518,7 @@ int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
                 /* schedule thread wake up if timeout is set */
                 _k_reschedule(timeout);
 
-                k_yield();
+                _k_yield();
 
                 /* if timer expired, we manually remove the thread from
                  * the pending queue

@@ -70,7 +70,7 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
  * @param timeout time waiting the semaphore (e.g. K_NO_WAIT, K_MSEC(1000), K_FOREVER)
  * @return uint8_t 0 if a semaphore is taken any other value otherwise
  */
-K_NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
+K_NOINLINE int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
  * @brief Give a semaphore, wake up the first pending thread if the pending 
@@ -87,27 +87,6 @@ K_NOINLINE uint8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
  * @param sem : address of the semaphore structure
  */
 K_NOINLINE void k_sem_give(struct k_sem *sem);
-
-/*___________________________________________________________________________*/
-
-/**
- * @brief Arch take a semaphore, doesn't clear the interrupt flag.
- * 
- * @param sem address of the semaphore structure
- * @return uint8_t 0 if a semaphore is taken any other value otherwise
- */
-uint8_t _k_sem_take(struct k_sem *sem);
-
-/**
- * @brief Arch give a semaphore, doesn't the interrupt flag (if set).
- * 
- * Giving a semaphore if the "limit" is reached will have no effect.
- * 
- * Can be called from an interrupt.
- * 
- * @param sem 
- */
-void _k_sem_give(struct k_sem *sem);
 
 /*___________________________________________________________________________*/
 

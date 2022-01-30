@@ -94,7 +94,7 @@ void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line)
 
 		usart_print_p(module_to_str(module));
 		usart_transmit(':');
-		usart_u16(line);
+		usart_hex16(line);
 		usart_print_p(PSTR(" L [K_ASSERT_"));
 		usart_print_p(acode_to_str(acode));
 		usart_transmit(']');

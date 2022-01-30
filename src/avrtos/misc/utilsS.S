@@ -62,7 +62,8 @@ usart_core_dump:
     ldi r24, 32 ; "space"
     call usart_transmit
 
-    adiw r26, K_THREAD_STACK_VOID_SIZE + 1    ; for return address + registers + sreg
+	/* TODO : OBSOLETE*/
+    adiw r26, _K_ARCH_PC_SIZE + 33 + 1    ; for return address + registers + sreg
 
     ; show return address
     ld r24, -X

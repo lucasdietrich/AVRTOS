@@ -11,10 +11,6 @@ struct k_thread *volatile s_thread = NULL;
 void thread_entry(void *_c);
 void thread_canaries_entry(void *_c);
 
-#if THREAD_ALLOW_RETURN == 0
-#error This example requires THREAD_ALLOW_RETURN configuration option to be set
-#endif
-
 K_THREAD_DEFINE(thread, thread_entry, 0x100,
 		K_PREEMPTIVE, &s_thread, 'T');
 

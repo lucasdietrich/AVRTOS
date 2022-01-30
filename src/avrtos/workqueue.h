@@ -47,8 +47,6 @@ struct k_workqueue
 #define k_workq k_workqueue
 
 
-#define _K_WORKQUEUE_THREAD_NAME(name) _k_workq_##name
-
 #define K_WORKQUEUE_DEFINE(name, stack_size, prio_flags, symbol) \
     struct k_workqueue name =                                    \
         {                                                        \
@@ -56,7 +54,7 @@ struct k_workqueue
             .flags = 0u,                                         \
         };                                                       \
     K_THREAD_DEFINE(                                             \
-        _K_WORKQUEUE_THREAD_NAME(name),                          \
+        _k_workq_##name,                                         \
         _k_workqueue_entry, stack_size,                          \
         prio_flags,                                              \
         &name,                                                   \
@@ -110,7 +108,7 @@ bool k_work_submittable(struct k_work *work);
  * @param workqueue 
  * @param work 
  */
-K_NOINLINE void k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
+K_NOINLINE bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
 
 /**
  * @brief Configure the workqueue to release the cpu after each work item
@@ -148,7 +146,7 @@ K_NOINLINE void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
  * 
  * @param work 
  */
-void k_system_workqueue_submit(struct k_work *work);
+bool k_system_workqueue_submit(struct k_work *work);
 
 /*___________________________________________________________________________*/
 

@@ -12,8 +12,8 @@
 
 /*___________________________________________________________________________*/
 
-extern struct ditem *runqueue; 
-extern struct titem *events_queue;
+extern struct ditem *_k_runqueue; 
+extern struct titem *_k_events_queue;
 
 /*___________________________________________________________________________*/
 
@@ -24,10 +24,13 @@ uint16_t k_thread_usage(struct k_thread *th)
         } else if (th == _current) {
                 // stack pointer refers to the first empty addr (from end)
                 // empty stack : th->stack.end == th->sp
-                return ((uint16_t)th->stack.end) -
-                        ((uint16_t)th->sp) - K_THREAD_STACK_VOID_SIZE;
+		uint16_t sp;
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			sp = SP;
+		}
+                return ((uint16_t)th->stack.end) - sp;
         } else {
-                // stack pointer refers to the first empty addr (from end)
+                // stack pointer points to the top of the stack
                 // empty stack : th->stack.end == th->sp
                 return ((uint16_t)th->stack.end) - ((uint16_t)th->sp);
         }
@@ -51,17 +54,10 @@ void k_thread_dump_hex(struct k_thread *th)
 void k_thread_dump(struct k_thread *th)
 {
         usart_transmit(th->symbol);
-        usart_transmit(' ');
+        usart_print_p(PSTR(" 0x"));
         usart_hex16((const uint16_t)th);
-        if (th->coop) {
-                usart_print_p(PSTR(" [COOP "));
-        } else {
-                usart_print_p(PSTR(" [PREE "));
-        }
 
-        usart_s8(th->priority);
-
-        usart_print_p(PSTR("] "));
+	usart_transmit(' ');
 
 	switch (th->state) {
 		case READY:
@@ -76,13 +72,21 @@ void k_thread_dump(struct k_thread *th)
 		default:
 			break;
 	}
+	
+	usart_transmit(' ');
+
+	usart_transmit(th->coop ? 'C' : 'P');
+	usart_transmit(' ');
+	usart_transmit(th->sched_lock ? 'S' : '_');
+	usart_transmit(th->timer_expired ? 'X' : '_');
+	usart_transmit(th->pend_canceled ? 'Y' : '_');
+	usart_transmit(th->wakeup_schd ? 'W' : '_');
 
         usart_print_p(PSTR(" : SP "));
-
         usart_u16(k_thread_usage(th));
         usart_transmit('/');
         usart_u16(th->stack.size);
-        usart_print_p(PSTR(" -| END @"));
+        usart_print_p(PSTR(":0x"));
         usart_hex16((uint16_t)th->stack.end);
         usart_transmit('\n');
 }
@@ -108,18 +112,19 @@ void *k_thread_get_return_addr(struct k_thread *th)
         return NULL;
 }
 
-int k_thread_copy_registers(struct k_thread *th, 
-uint8_t *buffer, const size_t size)
-{
-        const uint16_t context_size = K_THREAD_STACK_VOID_SIZE;
-        if ((th != _current) && (size >= context_size)) {
-                memcpy(buffer, K_STACK_START(th->stack.end,
-                        context_size), context_size);
+/* OUTDATED */
+// int k_thread_copy_registers(struct k_thread *th, 
+// uint8_t *buffer, const size_t size)
+// {
+//         const uint16_t context_size = K_THREAD_STACK_VOID_SIZE;
+//         if ((th != _current) && (size >= context_size)) {
+//                 memcpy(buffer, K_STACK_START(th->stack.end,
+//                         context_size), context_size);
 
-                return context_size;
-        }
-        return -1;
-}
+//                 return context_size;
+//         }
+//         return -1;
+// }
 
 
 
@@ -138,12 +143,12 @@ void _thread_symbol_events_queue(struct titem *item)
 
 void print_runqueue(void)
 {
-        print_ref_dlist(runqueue, _thread_symbol_runqueue);
+        print_ref_dlist(_k_runqueue, _thread_symbol_runqueue);
 }
 
 void print_events_queue(void)
 {
-        print_tqueue(events_queue, _thread_symbol_events_queue);
+        print_tqueue(_k_events_queue, _thread_symbol_events_queue);
 }
 
 /*___________________________________________________________________________*/

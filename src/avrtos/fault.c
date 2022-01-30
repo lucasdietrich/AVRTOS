@@ -6,12 +6,20 @@
 
 static const char *reason_to_str(uint8_t reason)
 {
-	switch (reason) {
-	case K_FAULT_ASSERT:
+	/*
+	 * Note: If using switch case instead if if-else,
+	 * need RAM to save the switch data
+	 * check for CSWTCH. in .elf symbols
+	 */
+	if (reason == K_FAULT_ASSERT) {
 		return PSTR("ASSERT");
-	case K_FAULT_SENTINEL:
+	} else if (reason == K_FAULT_SENTINEL) {
 		return PSTR("SENTINEL");
-	default:
+	} else if (reason == K_THREAD_TERMINATED) {
+		return PSTR("THREAD_TERMINATED");
+	} else if (reason == K_FAULT_INTERRUPT) {
+		return PSTR("INTERRUPT");
+	} else {
 		return PSTR("<UNKNOWN>");
 	}
 }
@@ -23,6 +31,10 @@ void __fault(uint8_t reason)
 
 	usart_print_p(PSTR("***** Kernel Fault *****\n Reason > "));
 	usart_print_p(reason_to_str(reason));
+	usart_print_p(PSTR("\n\tth: "));
+	usart_hex16((const uint16_t) _current);
+
+	asm("call __debug");
 
 	asm("jmp _exit");
 

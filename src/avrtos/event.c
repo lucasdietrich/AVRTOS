@@ -43,7 +43,7 @@ int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		event->scheduled = 1;
 		event->tie.next = NULL;
-		event->tie.timeout = K_TIMEOUT_MS(timeout);
+		event->tie.timeout = K_TIMEOUT_TICKS(timeout);
 
 		_tqueue_schedule(&_k_event_q.first, &event->tie);
 	}
@@ -81,7 +81,7 @@ void _k_event_q_process(void)
 
 	__ASSERT_NOINTERRUPT();
 
-	tqueue_shift(&_k_event_q.first, K_EVENTS_PERIOD_MS);
+	tqueue_shift(&_k_event_q.first, K_EVENTS_PERIOD_TICKS);
 
 	while ((tie = tqueue_pop(&_k_event_q.first)) != NULL) {
 		struct k_event *event = CONTAINER_OF(tie, struct k_event, tie);
