@@ -27,6 +27,8 @@ extern "C" {
 	K_KERNEL_INIT_SP() \
 	K_KERNEL_INIT_AVRTOS()
 
+#define K_AVRTOS_INIT	K_KERNEL_INIT
+
 /**
  * @brief Manual user AVRTOS init
  */
