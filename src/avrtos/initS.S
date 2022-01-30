@@ -3,6 +3,7 @@
 #include "defines.h"
 
 .extern _k_main_stack
+.extern _k_avrtos_init
 
 #if KERNEL_AUTO_INIT == 1
 
@@ -16,7 +17,7 @@ sts SPL, r28
 ; THREAD_EXPLICIT_MAIN_STACK
 
 .section .init8,"ax",@progbits
-call k_avrtos_init
+call _k_avrtos_init
 
 #endif
 ; KERNEL_AUTO_INIT
