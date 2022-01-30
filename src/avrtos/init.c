@@ -19,6 +19,21 @@ void _k_kernel_sp(void)
 
 void _k_avrtos_init(void)
 {
+	/* Page 52 (ATmega328p datasheet) :
+	 *	Note: If the Watchdog is accidentally enabled, for example by a runaway pointer or brown-out condition, the
+	 * device will be reset and the Watchdog Timer will stay enabled. If the code is not set up to handle the Watchdog,
+	 * this might lead to an eternal loop of time-out resets. To avoid this situation, the application software should
+	 * always clear the Watchdog System Reset Flag (WDRF) and the WDE control bit in the initialization routine,
+	 * even if the Watchdog is not in use.
+	 */
+
+	/* If the watchdog caused the reset, clear the flag */
+	// if (MCUSR & BIT(WDRF)) {
+	// 	MCUSR &= ~BIT(WDRF);
+	// 	WDTCSR |= (_BV(WDCE) | _BV(WDE)); // change
+	// 	WDTCSR = 0x00;
+	// }
+
 #if KERNEL_DEBUG_PREEMPT_UART
 	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif

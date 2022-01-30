@@ -47,7 +47,7 @@ K_NOINLINE void irq_enable(void);
 /**
  * @brief Software reset the microcontroller by calling the reset vector (address 0x0000)
  */
-static inline void k_sys_reset(void)
+static inline void k_sys_sw_reset(void)
 {
 	cli();
 
