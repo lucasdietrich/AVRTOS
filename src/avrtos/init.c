@@ -4,16 +4,6 @@
 
 #include "io.h"
 
-/*___________________________________________________________________________*/
-
-extern char _k_main_stack[];
-
-/*___________________________________________________________________________*/
-
-void _k_kernel_sp(void)
-{
-        SP = (uint16_t)_K_STACK_END_ASM(_k_main_stack, THREAD_MAIN_STACK_SIZE);
-}
 
 /*___________________________________________________________________________*/
 
@@ -61,16 +51,6 @@ void _k_avrtos_init(void)
 #if KERNEL_SYSCLOCK_AUTO_START
 	k_start_sysclock();
 #endif	
-}
-
-
-void k_avrtos_init(void)
-{
-#if THREAD_EXPLICIT_MAIN_STACK == 1
-        _k_kernel_sp();
-#endif
-
-        _k_avrtos_init();
 }
 
 /*___________________________________________________________________________*/

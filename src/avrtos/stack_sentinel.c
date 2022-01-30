@@ -7,6 +7,12 @@ extern struct k_thread __k_threads_end;
 
 void _k_init_thread_stack_sentinel(struct k_thread *th)
 {
+#if THREAD_EXPLICIT_MAIN_STACK == 0
+	if (th == &_k_thread_main) {
+		return;
+	}
+#endif
+
 	uint8_t *const stack = K_STACK_START(th->stack.end, th->stack.size);
 	for (uint8_t *addr = stack;
 	     addr < stack + THREAD_STACK_SENTINEL_SIZE; addr++) {
@@ -24,6 +30,12 @@ void _k_init_stacks_sentinel(void)
 
 bool k_verify_stack_sentinel(struct k_thread *th)
 {
+#if THREAD_EXPLICIT_MAIN_STACK == 0
+	if (th == &_k_thread_main) {
+		return true;
+	}
+#endif
+
 	uint8_t *const stack = K_STACK_START(th->stack.end, th->stack.size);
 	for (uint8_t *addr = stack;
 	     addr < stack + THREAD_STACK_SENTINEL_SIZE; addr++) {
