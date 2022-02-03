@@ -167,6 +167,30 @@ K_NOINLINE bool atomic_test_and_clear_bit(atomic_t *target, uint8_t bit);
  * @return K_NOINLINE 
  */
 K_NOINLINE bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit);
+
+/**
+ * @brief Compare and set, Compare the atomic variable value with @p cmd value
+ * 	- If equal update the atomic variable value with @p val value
+ * 	- Left the atomic variable value unchanged if not equal
+ * 
+ * Return true if the atomic variable value was updated, false otherwise.
+ * 
+ * @param target 
+ * @param value 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
+
+/**
+ * @brief see atomic_cas
+ * 
+ * @param target 
+ * @param cmd 
+ * @param val 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus

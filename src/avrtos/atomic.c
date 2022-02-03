@@ -45,4 +45,15 @@ bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit)
         return (old & mask) != 0;
 }
 
+bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		if (*target == cmd) {
+			*target = val;
+			return true;
+		}
+	}
+	return false;
+}
+
 #endif /* KERNEL_ATOMIC_API */
