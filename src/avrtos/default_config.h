@@ -227,12 +227,6 @@
 #define DEFAULT_KERNEL_UPTIME				0
 
 /**
- * @brief Enable performance monitoring 
- */
-// NOT TESTED
-#define DEFAULT_KERNEL_THREAD_MONITORING		0
-
-/**
  * @brief Enable atomic API
  */
 #define DEFAULT_KERNEL_ATOMIC_API			0

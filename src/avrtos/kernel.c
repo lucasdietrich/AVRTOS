@@ -30,10 +30,6 @@ static inline bool _k_runqueue_single(void)
 uint8_t _k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
 #endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
 
-#if KERNEL_THREAD_MONITORING
-uint8_t _k_sched_ticks_last = KERNEL_TIME_SLICE_TICKS;
-#endif /* KERNEL_THREAD_MONITORING */
-
 #if KERNEL_TICKS
 // necessary ?
 volatile union {
@@ -373,15 +369,6 @@ void _k_system_shift(void)
 	_k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
 #endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
 
-#if KERNEL_THREAD_MONITORING
-#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
-	_current->ticks += KERNEL_TIME_SLICE_TICKS - _k_sched_ticks_remaining;
-	_k_sched_ticks_last = KERNEL_TIME_SLICE_TICKS;
-#else
-	_current->ticks += KERNEL_TIME_SLICE_TICKS;
-#endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
-#endif /* KERNEL_THREAD_MONITORING */
-
         struct ditem *const ready = (struct ditem *)tqueue_pop(&_k_events_queue);
         if (ready != NULL) {
 		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
@@ -412,15 +399,6 @@ struct k_thread *_k_scheduler(void)
 #endif
 
 	struct k_thread *const prev = _current;
-
-#if KERNEL_THREAD_MONITORING && KERNEL_SCHEDULER_VARIABLE_FREQUENCY
-	/* as this function can be called from either 
-	 * the sysclock handler or the yield function
-	 * only add time that passed since last scheduling
-	 */
-	prev->ticks += _k_sched_ticks_last - _k_sched_ticks_remaining;
-	_k_sched_ticks_last = _k_sched_ticks_remaining;
-#endif /* KERNEL_THREAD_MONITORING */
 
         /* reset flags */
         prev->pend_canceled = 0;

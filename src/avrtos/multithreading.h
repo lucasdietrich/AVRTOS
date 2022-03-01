@@ -218,10 +218,6 @@ struct k_thread
 #if THREAD_ERRNO
         uint8_t errno;                          // Thread errno
 #endif /* THREAD_ERRNO */
-
-#if KERNEL_THREAD_MONITORING
-	uint32_t ticks; /* TODO implement uint40 */
-#endif /* KERNEL_THREAD_MONITORING */
 };
 
 /**
