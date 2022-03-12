@@ -115,4 +115,48 @@ void tqueue_remove(struct titem **root, struct titem *item)
         }
 }
 
+static int _tqueue_reschedule_later(struct titem **root,
+				     struct titem *item,
+				     k_delta_t timeout)
+{
+	/* TODO could be optimized,
+	 * One pass should be enough to reschedule for a later expiration
+	 */
+	tqueue_remove(root, item);
+	tqueue_schedule(root, item, timeout);
+
+	return 0;
+}
+
+static int _tqueue_reschedule_earlier(struct titem **root,
+				       struct titem *item,
+				       k_delta_t timeout)
+{
+	tqueue_remove(root, item);
+	tqueue_schedule(root, item, timeout);
+
+	return 0;
+}
+
+int tqueue_reschedule(struct titem **root,
+		      struct titem *item,
+		      k_delta_t timeout)
+{
+	if (timeout > item->timeout) {
+		return _tqueue_reschedule_later(root, item, timeout);
+	} else {
+		return _tqueue_reschedule_earlier(root, item, timeout);
+	}
+}
+
+int tqueue_reschedule_later(struct titem **root,
+			    struct titem *item,
+			    k_delta_t timeout)
+{
+	/* TODO could be optimized,
+	 * One pass should be enough to reschedule for a later expiration
+	 */
+	return _tqueue_reschedule_later(root, item, timeout);
+}
+
 /*___________________________________________________________________________*/

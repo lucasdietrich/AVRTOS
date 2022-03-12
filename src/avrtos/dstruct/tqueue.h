@@ -141,6 +141,31 @@ struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout);
  */
 void tqueue_remove(struct titem **root, struct titem *item);
 
+/**
+ * @brief Reschedule the item in the time queue for another expiration timeout.
+ * 
+ * Note: this function is very expensive in term of time if there are a
+ *  lot of items in the titem queue.
+ * 
+ * @param root 
+ * @param item 
+ * @param timeout 
+ */
+int tqueue_reschedule(struct titem **root,
+		      struct titem *item,
+		      k_delta_t timeout);
+
+/**
+ * @brief Reschedule the item in the time queue to make it timeout later.
+ * 
+ * @param root 
+ * @param item 
+ * @param timeout 
+ */
+int tqueue_reschedule_later(struct titem **root,
+			    struct titem *item,
+			    k_delta_t timeout);
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus
