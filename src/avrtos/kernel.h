@@ -347,10 +347,7 @@ static inline void k_yield(void)
 	}
 }
 
-static inline void yield(void)
-{
-	k_yield();
-}
+void yield(void);
 
 /*___________________________________________________________________________*/
 
