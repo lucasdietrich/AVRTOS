@@ -5,6 +5,8 @@
 
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/drivers/usart.h>
+
 
 /*___________________________________________________________________________*/
 
@@ -116,15 +118,48 @@ void consumer(void *context)
         }
 }
 
+/*___________________________________________________________________________*/
+
+// IPC uart
+const struct usart_config usart_ipc_cfg PROGMEM = {
+	.baudrate = USART_BAUD_115200,
+	.receiver = 1,
+	.transmitter = 1,
+	.mode = USART_MODE_ASYNCHRONOUS,
+	.parity = USART_PARITY_NONE,
+	.stopbits = USART_STOPBITS_1,
+	.databits = USART_DATABITS_8,
+	.speed_mode = USART_SPEED_MODE_NORMAL
+};
+
+ISR(USART1_RX_vect)
+{
+        usart_transmit(UDR1);
+}
+
 int main(void)
 {
+	irq_enable();
+
+	// initialize shell uart
         usart_init();
 
-        k_thread_dump_all();
+	// enable RX interrupt for shell uart
+	SET_BIT(UCSR0B, 1 << RXCIE0);
 
-        SET_BIT(UCSR0B, 1 << RXCIE0);
+	// initialize IPC uart
+	struct usart_config cfg;
+	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
+	usart_drv_init(1, &cfg);
 
-        k_sleep(K_FOREVER);
+	// enable RX interrupt for IPC uart
+	SET_BIT(UCSR1B, 1 << RXCIE1);
+
+        for (;;) {
+		usart_drv_sync_putc(1, 'a');
+
+		k_sleep(K_SECONDS(1));
+	}
 }
 
 /*___________________________________________________________________________*/
