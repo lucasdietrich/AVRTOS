@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <avrtos/kernel.h>
 
+#include <avrtos/drivers.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -117,12 +119,12 @@ struct usart_config
 
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
 
-K_NOINLINE int usart_drv_init(uint8_t usart_id,
+K_NOINLINE int usart_drv_init(UART_Device *dev,
                               const struct usart_config *config);
 
-K_NOINLINE int usart_drv_deinit(uint8_t usart_id);
+K_NOINLINE int usart_drv_deinit(UART_Device *dev);
 
-K_NOINLINE int usart_drv_sync_putc(uint8_t usart_id, char c);
+K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
 
 K_NOINLINE void usart0_drv_sync_putc_opt(char c);
 

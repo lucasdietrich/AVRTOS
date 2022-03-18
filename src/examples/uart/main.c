@@ -150,13 +150,14 @@ int main(void)
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
-	usart_drv_init(1, &cfg);
+	usart_drv_init(UART1_DEVICE, &cfg);
+	
 
 	// enable RX interrupt for IPC uart
 	SET_BIT(UCSR1B, 1 << RXCIE1);
 
         for (;;) {
-		usart_drv_sync_putc(1, 'a');
+		usart_drv_sync_putc(UART1_DEVICE, 'a');
 
 		k_sleep(K_SECONDS(1));
 	}

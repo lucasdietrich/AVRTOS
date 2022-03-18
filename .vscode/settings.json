@@ -39,6 +39,7 @@
         "timer.h": "c",
         "stack_sentinel.h": "c",
         "fault.h": "c",
-        "sysclock_config.h": "c"
+        "sysclock_config.h": "c",
+        "iom328p.h": "c"
     }
 }
