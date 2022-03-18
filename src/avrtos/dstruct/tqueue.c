@@ -122,10 +122,43 @@ static int _tqueue_reschedule_later(struct titem **root,
 	/* TODO could be optimized,
 	 * One pass should be enough to reschedule for a later expiration
 	 */
-	tqueue_remove(root, item);
-	tqueue_schedule(root, item, timeout);
+	int ret = 0;
 
-	return 0;
+        // struct titem **prev_next_p = root;
+	// k_delta_t total_time = 0U;
+        // while (*prev_next_p != NULL) {
+        //         struct titem *p_current = *prev_next_p;
+	// 	total_time += p_current->delay_shift;
+        //         if (p_current == item) {
+	// 		if (total_time < timeout) {
+	// 			const k_delta_t diff = timeout - total_time;
+
+	// 			if (diff > p_current->next->abs_delay) {
+
+	// 			}
+	// 		} else if (total_time == timeout) {
+	// 			break;
+	// 		} else {
+	// 			ret = -EINVAL;
+	// 			break;
+	// 		}
+        //                 *prev_next_p = p_current->next;
+
+        //                 /* add removed item remaining time 
+        //                  * to the next item if exists */
+        //                 if (p_current->next != NULL) {
+        //                         p_current->next->delay_shift
+        //                                 += item->delay_shift;
+        //                 }
+
+        //                 item->next = NULL;
+        //                 break;
+        //         }
+        //         prev_next_p = &(p_current->next);
+        // }
+
+exit:
+	return ret;
 }
 
 static int _tqueue_reschedule_earlier(struct titem **root,
