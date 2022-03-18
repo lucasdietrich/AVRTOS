@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @author Dietrich Lucas (ld.adecy@gmail.com)
+ * @brief ATmega2560 example, connect RX1 to TX1 using a wire
+ * @version 0.1
+ * @date 2022-03-18
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -6,7 +17,6 @@
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
-
 
 /*___________________________________________________________________________*/
 
@@ -127,14 +137,31 @@ const struct usart_config usart_ipc_cfg PROGMEM = {
 	.transmitter = 1,
 	.mode = USART_MODE_ASYNCHRONOUS,
 	.parity = USART_PARITY_NONE,
-	.stopbits = USART_STOPBITS_1,
-	.databits = USART_DATABITS_8,
+	.stopbits = USART_STOP_BITS_1,
+	.databits = USART_DATA_BITS_8,
 	.speed_mode = USART_SPEED_MODE_NORMAL
 };
+
+#if DRIVERS_UART_ASYNC == 0
 
 ISR(USART1_RX_vect)
 {
         usart_transmit(UDR1);
+}
+
+#endif 
+
+#define BUFFER_SIZE 16
+
+static uint8_t rx_buffer[BUFFER_SIZE];
+
+static uint8_t msgq_buffer[2][BUFFER_SIZE];
+
+K_MSGQ_DEFINE(ipc_msgq, msgq_buffer, BUFFER_SIZE, 2);
+
+void usart_ipc_rx_callback(UART_Device *dev, struct usart_async_context *ctx)
+{
+	k_msgq_put(&ipc_msgq, ctx->buf.data, K_NO_WAIT);
 }
 
 int main(void)
@@ -143,24 +170,58 @@ int main(void)
 
 	// initialize shell uart
         usart_init();
-
-	// enable RX interrupt for shell uart
-	SET_BIT(UCSR0B, 1 << RXCIE0);
+	SET_BIT(UCSR0B, 1 << RXCIE0); // enable RX interrupt for shell uart
 
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
 	usart_drv_init(UART1_DEVICE, &cfg);
-	
+
+	usart_set_callback(UART1_DEVICE, usart_ipc_rx_callback);
+	usart_rx_enable(UART1_DEVICE, rx_buffer, sizeof(rx_buffer));
 
 	// enable RX interrupt for IPC uart
 	SET_BIT(UCSR1B, 1 << RXCIE1);
 
-        for (;;) {
-		usart_drv_sync_putc(UART1_DEVICE, 'a');
+	uint8_t chr = 'a';
 
-		k_sleep(K_SECONDS(1));
+        for (;;) {
+		usart_drv_sync_putc(UART1_DEVICE, chr);
+
+		if (chr == 'z') {
+			chr = 'a';
+		} else {
+			chr++;
+		}
+
+		k_sleep(K_MSEC(100));
 	}
 }
 
-/*___________________________________________________________________________*/
+
+static void usart_rx_thread(struct k_msgq *msgq)
+{
+	static uint8_t data[BUFFER_SIZE];
+
+	for (;;) {
+		k_msgq_get(msgq, data, K_FOREVER);
+
+		// print data size
+		for (uint8_t *c = data; c < data + BUFFER_SIZE; c++) {
+			printf_P(PSTR(" %x"), *c);
+		}
+		printf_P(PSTR("\n"));
+	}
+}
+
+K_THREAD_DEFINE(rx_thread, usart_rx_thread, 0x100, K_COOPERATIVE, &ipc_msgq, 'X');
+
+static void thread_canaries(void *arg)
+{
+	for (;;) {
+		dump_stack_canaries();
+		k_sleep(K_SECONDS(15));
+	}
+}
+
+K_THREAD_DEFINE(canary, thread_canaries, 0x100, K_COOPERATIVE, NULL, 'C');

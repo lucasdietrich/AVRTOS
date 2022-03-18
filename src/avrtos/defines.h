@@ -308,6 +308,12 @@
 #   define KERNEL_DELAY_OBJECT_U32 DEFAULT_KERNEL_DELAY_OBJECT_U32
 #endif /* CONFIG_KERNEL_DELAY_OBJECT_U32 */
 
+#ifdef CONFIG_DRIVERS_UART_ASYNC
+#	define DRIVERS_UART_ASYNC CONFIG_DRIVERS_UART_ASYNC
+#else
+#	define DRIVERS_UART_ASYNC DEFAULT_DRIVERS_UART_ASYNC
+#endif
+
 /*___________________________________________________________________________*/
 
 #include "sysclock_config.h"
