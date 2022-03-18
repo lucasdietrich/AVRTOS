@@ -32,7 +32,7 @@ uint8_t _k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
 
 #if KERNEL_TICKS
 // necessary ?
-volatile union {
+union {
 	uint8_t bytes[KERNEL_TICKS_SIZE];
 	struct {
 		uint32_t u32;
