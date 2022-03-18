@@ -132,7 +132,7 @@ void consumer(void *context)
 
 // IPC uart
 const struct usart_config usart_ipc_cfg PROGMEM = {
-	.baudrate = USART_BAUD_115200,
+	.baudrate = USART_BAUD_1000000,
 	.receiver = 1,
 	.transmitter = 1,
 	.mode = USART_MODE_ASYNCHRONOUS,
@@ -156,7 +156,6 @@ ISR(USART1_RX_vect)
 static uint8_t rx_buffer[BUFFER_SIZE];
 
 static uint8_t msgq_buffer[2][BUFFER_SIZE];
-
 K_MSGQ_DEFINE(ipc_msgq, msgq_buffer, BUFFER_SIZE, 2);
 
 void usart_ipc_rx_callback(UART_Device *dev, struct usart_async_context *ctx)
