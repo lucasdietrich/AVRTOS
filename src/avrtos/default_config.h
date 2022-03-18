@@ -265,6 +265,9 @@
  */
 #define DEFAULT_KERNEL_DELAY_OBJECT_U32			0
 
+
+#define DEFAULT_FD_MAX_COUNT                  3
+
 /*___________________________________________________________________________*/
 
 #endif
