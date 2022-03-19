@@ -5,8 +5,14 @@
 #include <avr/io.h>
 
 /* same for all USARTs */
+#define UDRIEn UDRIE0
+#define TXCIEn TXCIE0
+#define RXCIEn RXCIE0
+
 #define TXENn TXEN0
 #define RXENn RXEN0
+#define UDREn UDRE0
+
 #define UMSELn0 UMSEL00
 #define UMSELn1 UMSEL01
 #define UPMn0 UPM00
@@ -16,6 +22,8 @@
 #define UCSZn1 UCSZ01
 #define UCSZn2 UCSZ02
 #define UDREn UDRE0
+
+#define K_MODULE K_MODULE_DRIVERS_USART
 
 /* check U2Xn bit which allow to double the speed */
 static uint16_t calculate_ubrr(uint32_t baudrate, bool speed_mode)
@@ -69,6 +77,13 @@ int usart_drv_init(UART_Device *dev,
                 SET_BIT(ucsrnb, BIT(TXENn));
         if (config->receiver)
                 SET_BIT(ucsrnb, BIT(RXENn));
+
+	/* enable interrupt */
+	if (DRIVERS_UART_ASYNC) {
+		SET_BIT(ucsrnb, BIT(RXCIEn));
+		SET_BIT(ucsrnb, BIT(TXCIEn));
+	}
+
 	dev->UCSRnB = ucsrnb;
 
         uint8_t ucsrc = 0u;
@@ -121,7 +136,7 @@ int usart_drv_sync_putc(UART_Device *dev, char c)
 /* as fast as usart_transmit */
 void usart0_drv_sync_putc_opt(char c)
 {
-	while (!(UART0_DEVICE->UCSRnA & BIT(UDREn)));
+	while (!(USART0_DEVICE->UCSRnA & BIT(UDREn)));
 	UDR0 = c;
 }
 
@@ -130,70 +145,171 @@ void usart0_drv_sync_putc_opt(char c)
 // size should be configurable
 static struct usart_async_context usart_async_contexts[ARCH_USART_COUNT];
 
-static struct usart_async_context* usart_get_async_context(UART_Device *dev)
+static inline struct usart_async_context* usart_get_async_context(UART_Device *dev)
 {
-	return &usart_async_contexts[AVR_UARTn_INDEX(dev)];
+	return &usart_async_contexts[AVR_USARTn_INDEX(dev)];
 }
 
 static void rx_interrupt(UART_Device *dev)
 {
 	const char chr = dev->UDRn;
-
 	struct usart_async_context *ctx = usart_get_async_context(dev);
 
-	ctx->buf.data[ctx->buf.cur++] = chr;
+	ctx->rx.buf[ctx->rx.cur++] = chr;
+	if (ctx->rx.cur == ctx->rx.size) {
 
-	if (ctx->buf.cur == ctx->buf.size) {
-		ctx->rx_callback(dev, ctx);
+		__ASSERT_FALSE(ctx->callback == NULL);
 
-		ctx->buf.cur = 0U;
+		ctx->evt = USART_EVENT_RX_COMPLETE;
+		ctx->callback(dev, ctx);
+		ctx->rx.cur = 0U;
 	}
 }
 
-// ISR(USART0_RX_vect)
-// {
-// 	rx_interrupt(UART0_DEVICE);
-// }
-
-ISR(USART1_RX_vect)
+static void tx_interrupt(UART_Device *dev)
 {
-	rx_interrupt(UART1_DEVICE);
+	struct usart_async_context *ctx = usart_get_async_context(dev);
+
+	if (ctx->tx.cur == ctx->tx.size) {
+		__ASSERT_FALSE(ctx->callback == NULL);
+
+		ctx->evt = USART_EVENT_TX_COMPLETE;
+		ctx->callback(dev, ctx);
+		ctx->tx.size = 0U;
+	}
 }
 
-// ISR(USART2_RX_vect)
-// {
-// 	rx_interrupt(UART0_DEVICE);
-// }
+static void udre_interrupt(UART_Device *dev)
+{
+	struct usart_async_context *ctx = usart_get_async_context(dev);
 
-// ISR(USART3_RX_vect)
-// {
-// 	rx_interrupt(UART0_DEVICE);
-// }
+	/* if there are more data to send */
+	if (ctx->tx.cur < ctx->tx.size) {
+		dev->UDRn = ctx->tx.buf[ctx->tx.cur++];
+	} else {
+		CLR_BIT(dev->UCSRnB, BIT(UDRIEn));
+	}
+}
 
-// same callback for all USARTs
-int usart_set_callback(UART_Device *dev, usart_rx_callback cb)
+#if DRIVERS_USART0_ASYNC
+ISR(USART0_RX_vect)
+{
+	rx_interrupt(USART0_DEVICE);
+}
+
+ISR(USART0_TX_vect)
+{
+	tx_interrupt(USART0_DEVICE);
+}
+
+ISR(USART0_UDRE_vect)
+{
+	udre_interrupt(USART0_DEVICE);
+}
+#endif /* DRIVERS_USART0_ASYNC */
+
+#if DRIVERS_USART1_ASYNC
+ISR(USART1_RX_vect)
+{
+	rx_interrupt(USART1_DEVICE);
+}
+
+ISR(USART1_TX_vect)
+{
+	tx_interrupt(USART1_DEVICE);
+}
+
+ISR(USART1_UDRE_vect)
+{
+	udre_interrupt(USART1_DEVICE);
+}
+#endif /* DRIVERS_USART1_ASYNC */
+
+#if DRIVERS_USART2_ASYNC
+ISR(USART2_RX_vect)
+{
+	rx_interrupt(USART2_DEVICE);
+}
+
+ISR(USART2_TX_vect)
+{
+	tx_interrupt(USART2_DEVICE);
+}
+
+ISR(USART2_UDRE_vect)
+{
+	udre_interrupt(USART2_DEVICE);
+}
+#endif /* DRIVERS_USART2_ASYNC */
+
+#if DRIVERS_USART3_ASYNC
+ISR(USART3_RX_vect)
+{
+	rx_interrupt(USART3_DEVICE);
+}
+
+ISR(USART3_TX_vect)
+{
+	tx_interrupt(USART3_DEVICE);
+}
+
+ISR(USART3_UDRE_vect)
+{
+	udre_interrupt(USART3_DEVICE);
+}
+#endif /* DRIVERS_USART3_ASYNC */
+
+int usart_set_callback(UART_Device *dev, usart_async_callback_t cb)
 {
 	if (dev == NULL) {
 		return -EINVAL;
 	}
 
-	usart_async_contexts[AVR_UARTn_INDEX(dev)].rx_callback = cb;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].callback = cb;
 
 	return 0;
 }
 
-int usart_rx_enable(UART_Device *dev, void *buf, size_t buffer_size)
+int usart_rx_enable(UART_Device *dev, void *buf, size_t size)
 {
 	if (dev == NULL) {
 		return -EINVAL;
 	}
 
-	usart_async_contexts[AVR_UARTn_INDEX(dev)].buf.data = (uint8_t*) buf;
-	usart_async_contexts[AVR_UARTn_INDEX(dev)].buf.size = buffer_size;
-	usart_async_contexts[AVR_UARTn_INDEX(dev)].buf.cur = 0U;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.buf = (uint8_t *)buf;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.size = size;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.cur = 0U;
 
 	/* enable receiver */
 	SET_BIT(dev->UCSRnB, BIT(RXENn));
+
+	return 0;
+}
+
+int usart_rx_disable(UART_Device *dev)
+{
+	if (dev == NULL) {
+		return -EINVAL;
+	}
+
+	/* disable receiver */
+	CLR_BIT(dev->UCSRnB, BIT(RXENn));
+
+	return 0;
+}
+
+int usart_tx(UART_Device *dev, const void *buf, size_t size)
+{
+	if (dev == NULL) {
+		return -EINVAL;
+	}
+
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.buf = (const uint8_t *)buf;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.size = size;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.cur = 0U;
+
+	/* enable transmitter */
+	SET_BIT(dev->UCSRnB, BIT(UDRIEn));
 
 	return 0;
 }

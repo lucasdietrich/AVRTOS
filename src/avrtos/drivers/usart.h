@@ -134,22 +134,41 @@ K_NOINLINE void usart0_drv_sync_putc_opt(char c);
 
 struct usart_async_context;
 
-typedef void (*usart_rx_callback)(UART_Device *dev, struct usart_async_context *ctx);
+typedef enum {
+	USART_EVENT_RX_COMPLETE = 0,
+	USART_EVENT_TX_COMPLETE = 1,
+	USART_EVENT_ERROR = 2,
+} usart_event_t;
+
+typedef void (*usart_async_callback_t)(UART_Device *dev,
+				       struct usart_async_context *ctx);
 
 struct usart_async_context {
-	usart_rx_callback rx_callback;
+	usart_event_t evt;
+
+	usart_async_callback_t callback;
+	
 	struct {
-		uint8_t *data;
+		uint8_t *buf;
 		size_t size;
 		size_t cur;
-	} buf;
+	} rx;
+
+	struct {
+		const uint8_t *buf;
+		size_t size;
+		size_t cur;
+	} tx;
 };
 // typedef struct usart_event_t;
 
-K_NOINLINE int usart_set_callback(UART_Device *dev, usart_rx_callback cb);
+K_NOINLINE int usart_set_callback(UART_Device *dev, usart_async_callback_t cb);
 
-K_NOINLINE int usart_rx_enable(UART_Device *dev, void *buf, size_t buffer_size);
+K_NOINLINE int usart_rx_disable(UART_Device *dev);
 
+K_NOINLINE int usart_rx_enable(UART_Device *dev, void *buf, size_t size);
+
+K_NOINLINE int usart_tx(UART_Device *dev, const void *buf, size_t size);	
 
 #ifdef __cplusplus
 }

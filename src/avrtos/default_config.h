@@ -268,7 +268,13 @@
 
 #define DEFAULT_FD_MAX_COUNT                  		3
 
-#define DEFAULT_DRIVERS_UART_ASYNC			0
+#define DEFAULT_DRIVERS_USART0_ASYNC			0
+
+#define DEFAULT_DRIVERS_USART1_ASYNC			1
+
+#define DEFAULT_DRIVERS_USART2_ASYNC			0
+
+#define DEFAULT_DRIVERS_USART3_ASYNC			0
 
 /*___________________________________________________________________________*/
 

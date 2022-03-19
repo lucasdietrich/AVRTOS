@@ -158,9 +158,23 @@ static uint8_t rx_buffer[BUFFER_SIZE];
 static uint8_t msgq_buffer[2][BUFFER_SIZE];
 K_MSGQ_DEFINE(ipc_msgq, msgq_buffer, BUFFER_SIZE, 2);
 
-void usart_ipc_rx_callback(UART_Device *dev, struct usart_async_context *ctx)
+const uint8_t tx_buffer[] = "Hello World !";
+
+void work_tx(struct k_work *w)
 {
-	k_msgq_put(&ipc_msgq, ctx->buf.data, K_NO_WAIT);
+	k_sleep(K_SECONDS(1));
+	usart_tx(USART1_DEVICE, tx_buffer, sizeof(tx_buffer) - 1);
+}
+
+K_WORK_DEFINE(tx_work, work_tx);
+
+void usart_ipc_callback(UART_Device *dev, struct usart_async_context *ctx)
+{
+	if (ctx->evt == USART_EVENT_RX_COMPLETE) {
+		k_msgq_put(&ipc_msgq, ctx->rx.buf, K_NO_WAIT);
+	} else if (ctx->evt == USART_EVENT_TX_COMPLETE) {
+		k_system_workqueue_submit(&tx_work);
+	}
 }
 
 int main(void)
@@ -174,27 +188,14 @@ int main(void)
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
-	usart_drv_init(UART1_DEVICE, &cfg);
+	usart_drv_init(USART1_DEVICE, &cfg);
 
-	usart_set_callback(UART1_DEVICE, usart_ipc_rx_callback);
-	usart_rx_enable(UART1_DEVICE, rx_buffer, sizeof(rx_buffer));
+	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
+	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));
 
-	// enable RX interrupt for IPC uart
-	SET_BIT(UCSR1B, 1 << RXCIE1);
+	usart_tx(USART1_DEVICE, tx_buffer, sizeof(tx_buffer) - 1);
 
-	uint8_t chr = 'a';
-
-        for (;;) {
-		usart_drv_sync_putc(UART1_DEVICE, chr);
-
-		if (chr == 'z') {
-			chr = 'a';
-		} else {
-			chr++;
-		}
-
-		k_sleep(K_MSEC(100));
-	}
+        k_sleep(K_FOREVER);
 }
 
 
@@ -207,7 +208,7 @@ static void usart_rx_thread(struct k_msgq *msgq)
 
 		// print data size
 		for (uint8_t *c = data; c < data + BUFFER_SIZE; c++) {
-			printf_P(PSTR(" %x"), *c);
+			printf_P(PSTR(" %c"), *c);
 		}
 		printf_P(PSTR("\n"));
 	}
@@ -219,7 +220,7 @@ static void thread_canaries(void *arg)
 {
 	for (;;) {
 		dump_stack_canaries();
-		k_sleep(K_SECONDS(15));
+		k_sleep(K_SECONDS(30));
 	}
 }
 

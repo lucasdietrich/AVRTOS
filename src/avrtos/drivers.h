@@ -8,8 +8,8 @@
 
 #define AVR_IO_BASE_ADDR 0x0000U
 
-// AVR_UART_BASE_ADDR is actually UCSR0A
-#define AVR_UART_BASE_ADDR (AVR_IO_BASE_ADDR + 0x00C0U)
+// AVR_USART_BASE_ADDR is actually UCSR0A
+#define AVR_USART_BASE_ADDR (AVR_IO_BASE_ADDR + 0x00C0U)
 
 typedef struct {
 	__IO uint8_t UCSRnA;
@@ -33,25 +33,24 @@ typedef struct {
 #endif
 
 
+#define AVR_USARTn_BASE(n) ((UART_Device*) (AVR_USART_BASE_ADDR + (n)*sizeof(UART_Device)))
 
-#define AVR_UARTn_BASE(n) ((UART_Device*) (AVR_UART_BASE_ADDR + (n)*sizeof(UART_Device)))
-
-#define AVR_UARTn_INDEX(usart_dev) (usart_dev - AVR_UARTn_BASE(0))
+#define AVR_USARTn_INDEX(usart_dev) (usart_dev - AVR_USARTn_BASE(0))
 
 #if ARCH_USART_COUNT > 0
-#	define UART0_DEVICE AVR_UARTn_BASE(0)
+#	define USART0_DEVICE AVR_USARTn_BASE(0)
 #endif /* ARCH_USART_COUNT > 0 */
 
 #if ARCH_USART_COUNT > 1
-#	define UART1_DEVICE AVR_UARTn_BASE(1)
+#	define USART1_DEVICE AVR_USARTn_BASE(1)
 #endif /* ARCH_USART_COUNT > 1 */
 
 #if ARCH_USART_COUNT > 2
-#	define UART2_DEVICE AVR_UARTn_BASE(2)
+#	define USART2_DEVICE AVR_USARTn_BASE(2)
 #endif /* ARCH_USART_COUNT > 2 */
 
 #if ARCH_USART_COUNT > 3
-#	define UART3_DEVICE AVR_UARTn_BASE(2)
+#	define USART3_DEVICE AVR_USARTn_BASE(2)
 #endif /* ARCH_USART_COUNT > 3 */
 
 #endif /* _AVRTOS_DRIVERS_H_ */
