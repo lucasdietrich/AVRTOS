@@ -142,15 +142,6 @@ const struct usart_config usart_ipc_cfg PROGMEM = {
 	.speed_mode = USART_SPEED_MODE_NORMAL
 };
 
-#if DRIVERS_UART_ASYNC == 0
-
-ISR(USART1_RX_vect)
-{
-        usart_transmit(UDR1);
-}
-
-#endif 
-
 #define BUFFER_SIZE 16
 
 static uint8_t rx_buffer[BUFFER_SIZE];

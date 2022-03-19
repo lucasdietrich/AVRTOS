@@ -449,6 +449,16 @@ typedef struct
 
 // arch specific fixups
 
+#if defined(__AVR_ATmega328P__)
+#define USART0_RX_vect USART_RX_vect
+#define USART0_RX_vect_num USART_RX_vect_num
+#define USART0_TX_vect USART_TX_vect
+#define USART0_TX_vect_num USART_TX_vect_num
+#define USART0_UDRE_vect USART_UDRE_vect
+#define USART0_UDRE_vect_num USART_UDRE_vect_num
+#endif /* __AVR_ATmega328P__ */
+
+
 // compiler constants :
 // https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html#AVR-Built-in-Macros
 
@@ -465,20 +475,6 @@ typedef struct
 #       define _K_ARCH_PC_SIZE              0
 # endif
 #endif
-
-#if KERNEL_DEBUG_PREEMPT_UART
-
-// refactor this
-#   if defined(__AVR_ATmega328P__)
-#       define _K_USART_RX_vect  USART_RX_vect
-#   elif defined(__AVR_ATmega2560__)
-#       define _K_USART_RX_vect  USART0_RX_vect
-#   else
-#       warning   KERNEL_DEBUG_PREEMPT_UART enaabled, USART RX vector no configured, default = "USART_RX_vect"
-#       define _K_USART_RX_vect  USART_RX_vect
-#   endif
-
-#endif /* KERNEL_DEBUG_PREEMPT_UART */
 
 /* stack sentinel */
 

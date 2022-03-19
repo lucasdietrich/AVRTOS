@@ -282,8 +282,8 @@ __debug:
 	ret
 
 #if KERNEL_DEBUG_PREEMPT_UART
-.global _K_USART_RX_vect
-_K_USART_RX_vect:
+.global USART0_RX_vect
+USART0_RX_vect:
 	push	r1
 	push	r0
 	lds	r0, SREG
