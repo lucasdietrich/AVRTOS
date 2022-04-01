@@ -16,7 +16,7 @@ struct k_msgq
 {
         struct ditem waitqueue;
 
-        uint8_t msg_size;
+        size_t msg_size;
         uint8_t max_msgs;
         uint8_t used_msgs;
 
@@ -36,7 +36,7 @@ struct k_msgq
         .max_msgs = d_max_msgs, \
         .used_msgs = 0, \
         .buf_start = p_buffer, \
-        .buf_end = p_buffer + ((d_msg_size)*(d_max_msgs)), \
+        .buf_end = p_buffer + (d_msg_size)*(d_max_msgs), \
         .read_cursor = p_buffer, \
         .write_cursor = p_buffer, \
 }

@@ -226,4 +226,33 @@ int main(void)
         usart_transmit('\n');
 
         __ASSERT_INTERRUPT();
+
+        usart_printl("Cas");
+
+        val = atomic_cas(&a1, 0x00, 0xAA);
+        usart_hex(val);
+        usart_transmit(':');
+        val = atomic_get(&a1);
+        usart_hex(val);
+        usart_transmit('\n');
+
+        __ASSERT_INTERRUPT();
+
+        val = atomic_cas(&a1, 0xAA, 0xBB);
+        usart_hex(val);
+        usart_transmit(':');
+        val = atomic_get(&a1);
+        usart_hex(val);
+        usart_transmit('\n');
+
+        __ASSERT_INTERRUPT();
+
+        val = atomic_cas(&a1, 0xAA, 0xCC);
+        usart_hex(val);
+        usart_transmit(':');
+        val = atomic_get(&a1);
+        usart_hex(val);
+        usart_transmit('\n');
+
+        __ASSERT_INTERRUPT();
 }

@@ -265,6 +265,17 @@
  */
 #define DEFAULT_KERNEL_DELAY_OBJECT_U32			0
 
+
+#define DEFAULT_FD_MAX_COUNT                  		3
+
+#define DEFAULT_DRIVERS_USART0_ASYNC			0
+
+#define DEFAULT_DRIVERS_USART1_ASYNC			1
+
+#define DEFAULT_DRIVERS_USART2_ASYNC			0
+
+#define DEFAULT_DRIVERS_USART3_ASYNC			0
+
 /*___________________________________________________________________________*/
 
 #endif
