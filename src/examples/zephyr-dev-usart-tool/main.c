@@ -9,7 +9,6 @@
 
 #define K_MODULE K_MODULE_APPLICATION
 
-
 #define IPC_MAX_DATA_SIZE 0x10U
 
 #define IPC_START_FRAME_DELIMITER ((uint32_t) 0xAAAAAAAALU)
@@ -33,7 +32,7 @@ typedef struct {
 } __attribute__((packed)) ipc_frame_t;
 
 const struct usart_config usart_ipc_cfg = {
-	.baudrate = USART_BAUD_2400,
+	.baudrate = USART_BAUD_500000,
 	.receiver = 1,
 	.transmitter = 1,
 	.mode = USART_MODE_ASYNCHRONOUS,
@@ -43,7 +42,7 @@ const struct usart_config usart_ipc_cfg = {
 	.speed_mode = USART_SPEED_MODE_NORMAL
 };
 
-static uint8_t rx_buffer[IPC_FRAME_SIZE];
+uint8_t rx_buffer[IPC_FRAME_SIZE];
 
 static uint8_t msgq_buffer[2][IPC_FRAME_SIZE];
 K_MSGQ_DEFINE(ipc_msgq, msgq_buffer, IPC_FRAME_SIZE, 2LU);
@@ -59,18 +58,25 @@ void usart_ipc_callback(UART_Device *dev, struct usart_async_context *ctx)
 	}
 }
 
-ipc_frame_t tx_frame = {
-	.start_delimiter = IPC_START_FRAME_DELIMITER,
-	.seq = 1,
-	.data = {
-		.size = 2,
-		.buf = { 'H' , 'A'}
-	},
-	.crc32 = 2,
-	.end_delimiter = IPC_END_FRAME_DELIMITER,
-};
+static ipc_frame_t tx_frame;
 
-static K_PRNG_DEFINE_DEFAULT(prng);
+K_PRNG_DEFINE_DEFAULT(prng);
+
+static void build_tx_frame(ipc_frame_t *frame)
+{
+	frame->start_delimiter = IPC_START_FRAME_DELIMITER;
+	frame->seq = 0U;
+	frame->data.size = IPC_MAX_DATA_SIZE;
+	frame->crc32 = 0xBBBBBBBBLU;
+	frame->end_delimiter = IPC_END_FRAME_DELIMITER;
+
+	for (uint32_t i = 0; i < IPC_MAX_DATA_SIZE; i++) {
+		frame->data.buf[i] = i;
+	}
+
+	// tx_frame.data.size = IPC_MAX_DATA_SIZE;
+	// k_prng_get_buffer(&prng, (uint8_t *)&tx_frame.data.buf, IPC_MAX_DATA_SIZE);
+}
 
 int main(void)
 {
@@ -81,30 +87,23 @@ int main(void)
 	usart_drv_init(USART1_DEVICE, &usart_ipc_cfg);
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 
-	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));
+	// usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));
 
-	uint32_t i = 1;
+	build_tx_frame(&tx_frame);
 
-        for (;;) {
-		
-
+	for (uint32_t i = 0;; i++) {
 		k_sem_take(&tx_finished_sem, K_FOREVER);
 
-		// tx_frame.data.size = IPC_MAX_DATA_SIZE;
-		// k_prng_get_buffer(&prng, (uint8_t *)&tx_frame.data.buf, IPC_MAX_DATA_SIZE);
-
-		k_sleep(K_MSEC(8000));
-
 		size_t len = sizeof(tx_frame);
-
-		if ((i % 4) == 0) {
-			len -= 1;
-		}
+		// if ((i % 10) == 0)
+		// 	len -= 1;
 
 		printf_P(PSTR("TX len : %u\n"), len);
+
+		tx_frame.seq++;
 		usart_tx(USART1_DEVICE, &tx_frame, len);
 
-		i++;
+		k_sleep(K_MSEC(5000));
 	}
 }
 
@@ -141,4 +140,4 @@ static void thread_canaries(void *arg)
 	}
 }
 
-// K_THREAD_DEFINE(canary, thread_canaries, 0x100, K_COOPERATIVE, NULL, 'C');
+K_THREAD_DEFINE(canary, thread_canaries, 0x100, K_COOPERATIVE, NULL, 'C');

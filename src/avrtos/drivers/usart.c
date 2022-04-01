@@ -157,7 +157,6 @@ static void rx_interrupt(UART_Device *dev)
 
 	ctx->rx.buf[ctx->rx.cur++] = chr;
 	if (ctx->rx.cur == ctx->rx.size) {
-
 		__ASSERT_FALSE(ctx->callback == NULL);
 
 		ctx->evt = USART_EVENT_RX_COMPLETE;
