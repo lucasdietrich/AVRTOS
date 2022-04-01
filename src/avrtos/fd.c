@@ -1,5 +1,7 @@
 #include "fd.h"
 
+#if FD_MAX_COUNT
+
 K_MUTEX_DEFINE(fd_table_mutex);
 
 static struct fd fd_table[FD_MAX_COUNT];
@@ -42,7 +44,7 @@ static int find_entry(void)
         return -ENFILE;
 }
 
-int z_fd_reserve(void)
+static int z_fd_reserve(void)
 {
         k_mutex_lock(&fd_table_mutex, K_FOREVER);
 
@@ -59,7 +61,7 @@ int z_fd_reserve(void)
         return fd;
 }
 
-void z_fd_finalize(int fd, void *obj, const struct fd_op_vtable *vtable)
+static void z_fd_finalize(int fd, void *obj, const struct fd_op_vtable *vtable)
 {
         fd_table[fd].obj = obj;
         fd_table[fd].vtable = vtable;
@@ -67,7 +69,7 @@ void z_fd_finalize(int fd, void *obj, const struct fd_op_vtable *vtable)
         k_mutex_init(&fd_table[fd].mutex);
 }
 
-int z_fd_alloc(void *obj, const struct fd_op_vtable *vtable)
+static int z_fd_alloc(void *obj, const struct fd_op_vtable *vtable)
 {
         int fd = z_fd_reserve();
         if (fd >= 0) {
@@ -77,7 +79,7 @@ int z_fd_alloc(void *obj, const struct fd_op_vtable *vtable)
         return fd;
 }
 
-void z_fd_free(int fd)
+static void z_fd_free(int fd)
 {
         fd_unref(fd);
 }
@@ -135,3 +137,5 @@ int ioctl(int fd, int req, void *arg)
 
         return fd_table[fd].vtable->ioctl(fd_table[fd].obj, req, arg);
 }
+
+#endif

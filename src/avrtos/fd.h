@@ -27,15 +27,6 @@ struct fd
         struct k_mutex mutex;
 };
 
-int z_fd_reserve(void);
-
-void z_fd_finalize(int fd, void *obj, const struct fd_op_vtable *vtable);
-
-int z_fd_alloc(void *obj, const struct fd_op_vtable *vtable);
-
-void z_fd_free(int fd);
-
-
 /*___________________________________________________________________________*/
 
 //
