@@ -29,34 +29,35 @@ extern "C" {
 #define USART_CALC_UBRRn(baudrate) (((F_CPU >> 4) / baudrate) - 1)
 #define USART_CALC_SPEED_MODE_UBRRn(baudrate) (((F_CPU >> 3) / baudrate) - 1)
 
-#define USART_MODE_ASYNCHRONOUS 0
-#define USART_MODE_SYNCHRONOUS  1
-#define USART_MODE_MSPI         2
+enum {
+	USART_MODE_ASYNCHRONOUS = 0,
+	USART_MODE_SYNCHRONOUS = 1,
+	USART_MODE_MSPI = 2,
+};
 
-#define USART_PARITY_NONE      0
-#define USART_PARITY_EVEN      2
-#define USART_PARITY_ODD       3
+enum {
+	USART_PARITY_NONE = 0,
+	USART_PARITY_EVEN = 2,
+	USART_PARITY_ODD = 3,
+};
 
-#define USART_STOPBITS_1        0
-#define USART_STOPBITS_2        1
+enum {
+	USART_STOP_BITS_1 = 0,
+	USART_STOP_BITS_2 = 1,
+};
 
-#define USART_DATABITS_5        0
-#define USART_DATABITS_6        1
-#define USART_DATABITS_7        2
-#define USART_DATABITS_8        3
-#define USART_DATABITS_9        7
+enum {
+	USART_DATA_BITS_5 = 0,
+	USART_DATA_BITS_6 = 1,
+	USART_DATA_BITS_7 = 2,
+	USART_DATA_BITS_8 = 3,
+	USART_DATA_BITS_9 = 7
+};
 
-#define USART_SPEED_MODE_NORMAL 0
-#define USART_SPEED_MODE_DOUBLE 1
-
-/* TODO make universal */
-#if defined(__AVR_ATmega328P__)
-#define ARCH_USART_COUNT 1
-#elif defined(__AVR_ATmega2560__)
-#define ARCH_USART_COUNT 4
-#else
-#error "Unsupported MCU"
-#endif
+enum {
+	USART_SPEED_MODE_NORMAL = 0,
+	USART_SPEED_MODE_DOUBLE = 1
+};
 
 struct usart_config
 {
@@ -79,8 +80,8 @@ struct usart_config
         .transmitter = 1, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
-        .stopbits = USART_STOPBITS_1, \
-        .databits = USART_DATABITS_8, \
+        .stopbits = USART_STOP_BITS_1, \
+        .databits = USART_DATA_BITS_8, \
         .speed_mode = USART_SPEED_MODE_NORMAL \
 }
 
@@ -90,8 +91,8 @@ struct usart_config
         .transmitter = 1, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
-        .stopbits = USART_STOPBITS_1, \
-        .databits = USART_DATABITS_8, \
+        .stopbits = USART_STOP_BITS_1, \
+        .databits = USART_DATA_BITS_8, \
         .speed_mode = USART_SPEED_MODE_NORMAL \
 }
 
@@ -101,8 +102,8 @@ struct usart_config
         .transmitter = 1, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
-        .stopbits = USART_STOPBITS_1, \
-        .databits = USART_DATABITS_8, \
+        .stopbits = USART_STOP_BITS_1, \
+        .databits = USART_DATA_BITS_8, \
         .speed_mode = USART_SPEED_MODE_NORMAL \
 }
 
@@ -112,21 +113,62 @@ struct usart_config
         .transmitter = 1, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
-        .stopbits = USART_STOPBITS_1, \
-        .databits = USART_DATABITS_8, \
+        .stopbits = USART_STOP_BITS_1, \
+        .databits = USART_DATA_BITS_8, \
         .speed_mode = USART_SPEED_MODE_NORMAL \
 }
 
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
 
+// drivers API
 K_NOINLINE int usart_drv_init(UART_Device *dev,
-                              const struct usart_config *config);
+			      const struct usart_config *config);
 
 K_NOINLINE int usart_drv_deinit(UART_Device *dev);
 
 K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
 
 K_NOINLINE void usart0_drv_sync_putc_opt(char c);
+
+// ASYNC API
+
+struct usart_async_context;
+
+typedef enum {
+	USART_EVENT_RX_COMPLETE = 0,
+	USART_EVENT_TX_COMPLETE = 1,
+	USART_EVENT_ERROR = 2,
+} usart_event_t;
+
+typedef void (*usart_async_callback_t)(UART_Device *dev,
+				       struct usart_async_context *ctx);
+
+struct usart_async_context {
+	usart_event_t evt;
+
+	usart_async_callback_t callback;
+	
+	struct {
+		uint8_t *buf;
+		size_t size;
+		size_t cur;
+	} rx;
+
+	struct {
+		const uint8_t *buf;
+		size_t size;
+		size_t cur;
+	} tx;
+};
+// typedef struct usart_event_t;
+
+K_NOINLINE int usart_set_callback(UART_Device *dev, usart_async_callback_t cb);
+
+K_NOINLINE int usart_rx_disable(UART_Device *dev);
+
+K_NOINLINE int usart_rx_enable(UART_Device *dev, void *buf, size_t size);
+
+K_NOINLINE int usart_tx(UART_Device *dev, const void *buf, size_t size);	
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @author Dietrich Lucas (ld.adecy@gmail.com)
+ * @brief ATmega2560 example, connect RX1 to TX1 using a wire
+ * @version 0.1
+ * @date 2022-03-18
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -6,7 +17,6 @@
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
-
 
 /*___________________________________________________________________________*/
 
@@ -122,19 +132,40 @@ void consumer(void *context)
 
 // IPC uart
 const struct usart_config usart_ipc_cfg PROGMEM = {
-	.baudrate = USART_BAUD_115200,
+	.baudrate = USART_BAUD_1000000,
 	.receiver = 1,
 	.transmitter = 1,
 	.mode = USART_MODE_ASYNCHRONOUS,
 	.parity = USART_PARITY_NONE,
-	.stopbits = USART_STOPBITS_1,
-	.databits = USART_DATABITS_8,
+	.stopbits = USART_STOP_BITS_1,
+	.databits = USART_DATA_BITS_8,
 	.speed_mode = USART_SPEED_MODE_NORMAL
 };
 
-ISR(USART1_RX_vect)
+#define BUFFER_SIZE 16
+
+static uint8_t rx_buffer[BUFFER_SIZE];
+
+static uint8_t msgq_buffer[2][BUFFER_SIZE];
+K_MSGQ_DEFINE(ipc_msgq, msgq_buffer, BUFFER_SIZE, 2);
+
+const uint8_t tx_buffer[] = "Hello World !";
+
+void work_tx(struct k_work *w)
 {
-        usart_transmit(UDR1);
+	k_sleep(K_SECONDS(1));
+	usart_tx(USART1_DEVICE, tx_buffer, sizeof(tx_buffer) - 1);
+}
+
+K_WORK_DEFINE(tx_work, work_tx);
+
+void usart_ipc_callback(UART_Device *dev, struct usart_async_context *ctx)
+{
+	if (ctx->evt == USART_EVENT_RX_COMPLETE) {
+		k_msgq_put(&ipc_msgq, ctx->rx.buf, K_NO_WAIT);
+	} else if (ctx->evt == USART_EVENT_TX_COMPLETE) {
+		k_system_workqueue_submit(&tx_work);
+	}
 }
 
 int main(void)
@@ -143,24 +174,45 @@ int main(void)
 
 	// initialize shell uart
         usart_init();
-
-	// enable RX interrupt for shell uart
-	SET_BIT(UCSR0B, 1 << RXCIE0);
+	SET_BIT(UCSR0B, 1 << RXCIE0); // enable RX interrupt for shell uart
 
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
-	usart_drv_init(UART1_DEVICE, &cfg);
-	
+	usart_drv_init(USART1_DEVICE, &cfg);
 
-	// enable RX interrupt for IPC uart
-	SET_BIT(UCSR1B, 1 << RXCIE1);
+	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
+	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));
 
-        for (;;) {
-		usart_drv_sync_putc(UART1_DEVICE, 'a');
+	usart_tx(USART1_DEVICE, tx_buffer, sizeof(tx_buffer) - 1);
 
-		k_sleep(K_SECONDS(1));
+        k_sleep(K_FOREVER);
+}
+
+
+static void usart_rx_thread(struct k_msgq *msgq)
+{
+	static uint8_t data[BUFFER_SIZE];
+
+	for (;;) {
+		k_msgq_get(msgq, data, K_FOREVER);
+
+		// print data size
+		for (uint8_t *c = data; c < data + BUFFER_SIZE; c++) {
+			printf_P(PSTR(" %c"), *c);
+		}
+		printf_P(PSTR("\n"));
 	}
 }
 
-/*___________________________________________________________________________*/
+K_THREAD_DEFINE(rx_thread, usart_rx_thread, 0x100, K_COOPERATIVE, &ipc_msgq, 'X');
+
+static void thread_canaries(void *arg)
+{
+	for (;;) {
+		dump_stack_canaries();
+		k_sleep(K_SECONDS(30));
+	}
+}
+
+K_THREAD_DEFINE(canary, thread_canaries, 0x100, K_COOPERATIVE, NULL, 'C');

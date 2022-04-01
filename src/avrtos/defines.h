@@ -308,6 +308,35 @@
 #   define KERNEL_DELAY_OBJECT_U32 DEFAULT_KERNEL_DELAY_OBJECT_U32
 #endif /* CONFIG_KERNEL_DELAY_OBJECT_U32 */
 
+#ifdef CONFIG_DRIVERS_USART0_ASYNC
+#	define DRIVERS_USART0_ASYNC CONFIG_DRIVERS_USART0_ASYNC
+#else
+#	define DRIVERS_USART0_ASYNC DEFAULT_DRIVERS_USART0_ASYNC
+#endif /* CONFIG_DRIVERS_USART0_ASYNC */
+
+#ifdef CONFIG_DRIVERS_USART1_ASYNC
+#	define DRIVERS_USART1_ASYNC CONFIG_DRIVERS_USART1_ASYNC
+#else
+#	define DRIVERS_USART1_ASYNC DEFAULT_DRIVERS_USART1_ASYNC
+#endif /* CONFIG_DRIVERS_USART1_ASYNC */
+
+#ifdef CONFIG_DRIVERS_USART2_ASYNC
+#	define DRIVERS_USART2_ASYNC CONFIG_DRIVERS_USART2_ASYNC
+#else
+#	define DRIVERS_USART2_ASYNC DEFAULT_DRIVERS_USART2_ASYNC
+#endif /* CONFIG_DRIVERS_USART2_ASYNC */
+
+#ifdef CONFIG_DRIVERS_USART3_ASYNC
+#	define DRIVERS_USART3_ASYNC CONFIG_DRIVERS_USART3_ASYNC
+#else
+#	define DRIVERS_USART3_ASYNC DEFAULT_DRIVERS_USART3_ASYNC
+#endif /* CONFIG_DRIVERS_USART3_ASYNC */
+
+#define DRIVERS_UART_ASYNC ((DRIVERS_USART0_ASYNC) || \
+	(DRIVERS_USART1_ASYNC) || \
+	(DRIVERS_USART2_ASYNC) || \
+	(DRIVERS_USART3_ASYNC))	
+
 /*___________________________________________________________________________*/
 
 #include "sysclock_config.h"
@@ -420,6 +449,16 @@ typedef struct
 
 // arch specific fixups
 
+#if defined(__AVR_ATmega328P__)
+#define USART0_RX_vect USART_RX_vect
+#define USART0_RX_vect_num USART_RX_vect_num
+#define USART0_TX_vect USART_TX_vect
+#define USART0_TX_vect_num USART_TX_vect_num
+#define USART0_UDRE_vect USART_UDRE_vect
+#define USART0_UDRE_vect_num USART_UDRE_vect_num
+#endif /* __AVR_ATmega328P__ */
+
+
 // compiler constants :
 // https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html#AVR-Built-in-Macros
 
@@ -436,20 +475,6 @@ typedef struct
 #       define _K_ARCH_PC_SIZE              0
 # endif
 #endif
-
-#if KERNEL_DEBUG_PREEMPT_UART
-
-// refactor this
-#   if defined(__AVR_ATmega328P__)
-#       define _K_USART_RX_vect  USART_RX_vect
-#   elif defined(__AVR_ATmega2560__)
-#       define _K_USART_RX_vect  USART0_RX_vect
-#   else
-#       warning   KERNEL_DEBUG_PREEMPT_UART enaabled, USART RX vector no configured, default = "USART_RX_vect"
-#       define _K_USART_RX_vect  USART_RX_vect
-#   endif
-
-#endif /* KERNEL_DEBUG_PREEMPT_UART */
 
 /* stack sentinel */
 

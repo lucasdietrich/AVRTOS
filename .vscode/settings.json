@@ -40,6 +40,8 @@
         "stack_sentinel.h": "c",
         "fault.h": "c",
         "sysclock_config.h": "c",
-        "iom328p.h": "c"
+        "iom328p.h": "c",
+        "stdbool.h": "c",
+        "usart.h": "c"
     }
 }
