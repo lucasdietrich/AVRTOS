@@ -46,8 +46,8 @@ extern "C" {
 #define K_ASSERT_TRUE                   5
 #define K_ASSERT_FALSE                  6
 
-#define K_ASSSERT_NOTNULL               15
-#define K_ASSSERT_NULL                  16
+#define K_ASSERT_NOTNULL               15
+#define K_ASSERT_NULL                  16
 
 #define K_ASSERT_PREEMPTIVE	     	17
 #define K_ASSERT_COOPERATIVE	     	18
@@ -78,8 +78,8 @@ extern "C" {
 #define __ASSERT_INTERRUPT()                __ASSERT(K_ASSERT_INTERRUPT, __k_interrupts() != 0)
 #define __ASSERT_NOINTERRUPT()              __ASSERT(K_ASSERT_NOINTERRUPT, __k_interrupts() == 0)
 
-#define __ASSERT_NOTNULL(var)               __ASSERT(K_ASSSERT_NOTNULL, (var) != NULL)
-#define __ASSERT_NULL(var)                  __ASSERT(K_ASSSERT_NULL, (var) == NULL)
+#define __ASSERT_NOTNULL(var)               __ASSERT(K_ASSERT_NOTNULL, (var) != NULL)
+#define __ASSERT_NULL(var)                  __ASSERT(K_ASSERT_NULL, (var) == NULL)
 
 #define __ASSERT_LEASTONE_RUNNING()         __ASSERT(K_ASSERT_LEASTONE_RUNNING, !_k_runqueue_single())
 #define __ASSERT_THREAD_STATE(th, th_state) __ASSERT(K_ASSERT_THREAD_STATE, th->state == th_state)
