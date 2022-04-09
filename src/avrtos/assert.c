@@ -63,10 +63,10 @@ static const char *const acode_to_str(uint8_t acode)
 	case K_ASSERT_FALSE:
 		return PSTR("FALSE");
 
-	case K_ASSSERT_NOTNULL:
+	case K_ASSERT_NOTNULL:
 		return PSTR("NOTNULL");
 
-	case K_ASSSERT_NULL:
+	case K_ASSERT_NULL:
 		return PSTR("NULL");
 
 	case K_ASSERT_PREEMPTIVE:
