@@ -424,6 +424,8 @@ typedef struct
 
 #endif
 
+#define MSEC_PER_SEC		(1000LU)
+
 #define K_TIMEOUT_TICKS(t)	(t.value)
 #define K_TIMEOUT_EQ(t1, t2)    (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
 #define K_TIMEOUT_MS(t)		((uint32_t) (K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
