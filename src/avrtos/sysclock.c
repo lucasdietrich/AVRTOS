@@ -1,31 +1,105 @@
-#include <avrtos/misc/uart.h>
-#include "sysclock.h"
+#include <avrtos/defines.h>
+#include <avrtos/drivers/timer.h>
 
-#include "kernel.h"
+#if (KERNEL_SYSCLOCK_PERIOD_US < 100) 
+#	warning SYSCLOCK is probably too fast !
+#endif 
 
-#include <avr/interrupt.h>
-#include <avr/io.h>
+#if (KERNEL_TIME_SLICE_US < 500)
+# 	warning KERNEL_TIME_SLICE_US is probably too short !
+#endif 
 
-#include "sysclock_config.h"
+#if KERNEL_SYSLOCK_HW_TIMER >= TIMERS_COUNT
+#	error "invalid KERNEL_SYSLOCK_HW_TIMER"
+#endif
 
-void k_init_sysclock(void)
+#define CALCULATE_COUNTER_VALUE(period, prescaler) ((((F_CPU / 1000000LU) * period) / prescaler - 1))
+#define COUNTER_VALUE_FIT(period, prescaler, max) (CALCULATE_COUNTER_VALUE(period, prescaler) <= max)
+
+#define TIMER_MAX_COUNTER TIMER_GET_MAX_COUNTER(KERNEL_SYSLOCK_HW_TIMER)
+
+#if COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 1LU, TIMER_MAX_COUNTER)
+#	define PRESCALER_VALUE 1
+#elif COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 8LU, TIMER_MAX_COUNTER)
+#	define PRESCALER_VALUE 8
+#elif COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 32LU, TIMER_MAX_COUNTER) && (KERNEL_SYSLOCK_HW_TIMER == 2)
+#	define PRESCALER_VALUE 32
+#elif COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 64LU, TIMER_MAX_COUNTER)
+#	define PRESCALER_VALUE 64
+#elif COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 128LU, TIMER_MAX_COUNTER) && (KERNEL_SYSLOCK_HW_TIMER == 2)
+#	define PRESCALER_VALUE 128
+#elif COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 256LU, TIMER_MAX_COUNTER)
+#	define PRESCALER_VALUE 256
+#elif COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 1024LU, TIMER_MAX_COUNTER)
+#	define PRESCALER_VALUE 1024
+#else
+#	error "KERNEL_SYSCLOCK_PERIOD_US is too big for the selected timer"
+#endif
+
+
+#if KERNEL_SYSLOCK_HW_TIMER == 2
+
+#	if PRESCALER_VALUE == 1
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_1
+#	elif PRESCALER_VALUE == 8
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_8
+#	elif PRESCALER_VALUE == 32
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_32
+#	elif PRESCALER_VALUE == 64
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_64
+#	elif PRESCALER_VALUE == 128
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_128
+#	elif PRESCALER_VALUE == 256
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_256
+#	elif PRESCALER_VALUE == 1024
+#		define PRESCALER_CONFIG TIMER2_PRESCALER_1024
+#	else
+#		error "invalid PRESCALER_VALUE (timer 2)"
+#	endif
+
+#else
+
+#	if PRESCALER_VALUE == 1
+#		define PRESCALER_CONFIG TIMER_PRESCALER_1
+#	elif PRESCALER_VALUE == 8
+#		define PRESCALER_CONFIG TIMER_PRESCALER_8
+#	elif PRESCALER_VALUE == 64
+#		define PRESCALER_CONFIG TIMER_PRESCALER_64
+#	elif PRESCALER_VALUE == 256
+#		define PRESCALER_CONFIG TIMER_PRESCALER_256
+#	elif PRESCALER_VALUE == 1024
+#		define PRESCALER_CONFIG TIMER_PRESCALER_1024
+#	else
+#		error "invalid PRESCALER_VALUE (timers 1, 3, 4, 5)"
+#	endif
+
+#endif /* KERNEL_SYSLOCK_HW_TIMER == 2 */
+
+
+#if (F_CPU * KERNEL_SYSCLOCK_PERIOD_US) % (PRESCALER_VALUE * 1000000LU) != 0
+#	warning "Sysclock may not be accurate"
+#endif
+
+#define COUNTER_VALUE CALCULATE_COUNTER_VALUE(KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
+
+
+void _k_init_sysclock(void)
 {
-	K_SYSCLOCK_HW_REG_TCNTXL = K_SYSCLOCK_TIMER_TCNTL;
+	void *const dev = timer_get_by_index(KERNEL_SYSLOCK_HW_TIMER);
 
-#if KERNEL_SYSLOCK_HW_TIMER == 1
-	K_SYSCLOCK_HW_REG_TCNTXH = K_SYSCLOCK_TIMER_TCNTH;
-#endif /* KERNEL_SYSLOCK_HW_TIMER == 1 */
+	struct timer_config cfg = {
+		.mode = TIMER_MODE_CTC,
+		.prescaler = PRESCALER_CONFIG,
+		.counter = COUNTER_VALUE
+	};
 
-	K_SYSCLOCK_HW_REG_TCCRXA = K_SYSCLOCK_HW_VAL_TCCRXA;
-	K_SYSCLOCK_HW_REG_TCCRXB = K_SYSCLOCK_HW_VAL_TCCRXB;
+#if IS_TIMER_INDEX_16BIT(KERNEL_SYSLOCK_HW_TIMER)
+	ll_timer16_drv_init(dev, &cfg);
+#elif IS_TIMER_INDEX_8BIT(KERNEL_SYSLOCK_HW_TIMER)
+	ll_timer8_drv_init(dev, &cfg);
+#else
+#	error "invalid timer type"
+#endif
 
-#if KERNEL_SYSLOCK_HW_TIMER == 1
-	K_SYSCLOCK_HW_REG_TCCRXC = K_SYSCLOCK_HW_VAL_TCCRXC;
-#endif /* KERNEL_SYSLOCK_HW_TIMER == 1 */
-}
-
-void k_start_sysclock(void)
-{
-	/* unmask sysclock interrupt */
-	K_SYSCLOCK_HW_REG_TIMSKX = K_SYSCLOCK_HW_VAL_TIMSKX;
+	TIMER_TIMSK_SET_OCIEA(KERNEL_SYSLOCK_HW_TIMER);
 }

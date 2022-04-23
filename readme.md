@@ -121,9 +121,9 @@ What enhancements/features are not planned :
 | KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
 | KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
 | KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
-| KERNEL_TIME_SLICE | Time slice in milliseconds |
+| KERNEL_TIME_SLICE_US | Time slice in milliseconds |
 | KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
-| KERNEL_SYSCLOCK_AUTO_START | Auto start kernel sysclock |
+| ~~KERNEL_SYSCLOCK_AUTO_START~~ | Auto start kernel sysclock |
 | KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
 | ~~KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
@@ -144,7 +144,7 @@ What enhancements/features are not planned :
 | STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART (0, 1, 2, ..), "-1" to disable.  |
 | KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
 | ~~KERNEL_UPTIME_40BITS~~ | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
-| ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE). |
+| ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE_US but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE_US). |
 | KERNEL_TIME | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
 | THREAD_TERMINATION_TYPE |  |
@@ -163,7 +163,7 @@ In this example, we spawn three threads (+ main thread + idle thread) :
 
 On an Arduino Pro (or Arduino Pro Mini), based on an ATmega328p (avr5) the led should be blinking at the frequency of 5Hz and then block for 500ms every 2 seconds.
 
-Configuration option : `CONFIG_KERNEL_TIME_SLICE=10000`
+Configuration option : `CONFIG_KERNEL_TIME_SLICE_US=10000`
 
 ### Code
 
@@ -271,9 +271,9 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 ### Peripherals
 
 - This library only needs one timer among following hardware timers :
-  - timer0 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds
-  - timer1 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds and 20ms, 25ms, 50ms, 100ms, 200ms, 250ms, 500ms, 1s, 2s, 2500ms, 3s, 4s
-  - timer2 : allow KERNEL_TIME_SLICE between 1 and 16 milliseconds
+  - timer0 : allow KERNEL_TIME_SLICE_US between 1 and 16 milliseconds
+  - timer1 : allow KERNEL_TIME_SLICE_US between 1 and 16 milliseconds and 20ms, 25ms, 50ms, 100ms, 200ms, 250ms, 500ms, 1s, 2s, 2500ms, 3s, 4s
+  - timer2 : allow KERNEL_TIME_SLICE_US between 1 and 16 milliseconds
 
 The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER configuration option.
 
@@ -430,7 +430,7 @@ src_filter =
 build_flags = 
     ${env.build_flags}
     -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
-    -DCONFIG_KERNEL_TIME_SLICE=16000
+    -DCONFIG_KERNEL_TIME_SLICE_US=16000
     -DCONFIG_KERNEL_DEBUG=0
     -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
     -DCONFIG_KERNEL_THREAD_IDLE=1
@@ -449,7 +449,7 @@ src_filter =
 build_flags = 
     ${env.build_flags}
     -DCONFIG_KERNEL_SYSLOCK_HW_TIMER=1
-    -DCONFIG_KERNEL_TIME_SLICE=40000
+    -DCONFIG_KERNEL_TIME_SLICE_US=40000
     -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
     -DCONFIG_KERNEL_DEBUG=0
     -DCONFIG_KERNEL_SCHEDULER_DEBUG=0

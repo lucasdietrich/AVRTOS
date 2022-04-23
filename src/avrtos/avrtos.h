@@ -21,7 +21,6 @@
 #include "assert.h"
 #include "fault.h"
 #include "kernel.h"
-#include "sysclock.h"
 #include "idle.h"
 
 #include "canaries.h"

@@ -2,45 +2,39 @@
 #include <avr/interrupt.h>
 
 #include <avrtos/defines.h>
-#include <avrtos/sysclock_config.h>
 
 .global _k_thread_switch
 .global _k_thread_entry
-.global K_SYSCLOCK_TIMERX_OVF_vect
 
 .extern _k_scheduler
-
 .extern _current
-
 .extern _k_ticks 			; u32/u40
 .extern _k_sched_ticks_remaining 	; u8
-
 .extern _k_system_shift
 
-K_SYSCLOCK_TIMERX_OVF_vect:
+#if KERNEL_SYSLOCK_HW_TIMER == 0
+#define TIMERn_COMPA_vect TIMER0_COMPA_vect
+#elif KERNEL_SYSLOCK_HW_TIMER == 1
+#define TIMERn_COMPA_vect TIMER1_COMPA_vect
+#elif KERNEL_SYSLOCK_HW_TIMER == 2
+#define TIMERn_COMPA_vect TIMER2_COMPA_vect
+#elif KERNEL_SYSLOCK_HW_TIMER == 3
+#define TIMERn_COMPA_vect TIMER3_COMPA_vect
+#elif KERNEL_SYSLOCK_HW_TIMER == 4
+#define TIMERn_COMPA_vect TIMER4_COMPA_vect
+#elif KERNEL_SYSLOCK_HW_TIMER == 5
+#define TIMERn_COMPA_vect TIMER5_COMPA_vect
+#endif
+
+.global TIMERn_COMPA_vect
+
+TIMERn_COMPA_vect:
 	push	r1
 	push	r0
 	lds	r0, SREG
 	push	r0
 	eor	r1, r1
 	push	r18
-
-#if K_SYSCLOCK_TCNT_ISNULL == 0
-#if KERNEL_SYSLOCK_HW_TIMER == 1
-	; from ATmega328p documentation : timer1 (16 bits)
-	; > To do a 16-bit write, the high byte must be written before the low byte. 
-	; > For a 16-bit read, the low byte must be read before the high byte.
-
-	ldi r18, K_SYSCLOCK_TIMER_TCNTH
-	sts K_SYSCLOCK_HW_REG_TCNTXH, r18
-#endif
-; KERNEL_SYSLOCK_HW_TIMER
-
-	ldi r18, K_SYSCLOCK_TIMER_TCNTL
-	sts K_SYSCLOCK_HW_REG_TCNTXL, r18
-	; reset timer counter as soon as possible (to maximize accuracy)
-#endif
-; KERNEL_SYSCLOCK_PRECISION_MODE
 
 #if KERNEL_TICKS
 	ldi r18, 0x01			; 1 cycle

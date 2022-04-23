@@ -5,7 +5,7 @@
 #include "io.h"
 
 
-/*___________________________________________________________________________*/
+extern void _k_init_sysclock(void);
 
 void _k_avrtos_init(void)
 {
@@ -46,11 +46,13 @@ void _k_avrtos_init(void)
         _k_init_stacks_sentinel();
 #endif
 
-	k_init_sysclock();
+	_k_init_sysclock();
 
-#if KERNEL_SYSCLOCK_AUTO_START
-	k_start_sysclock();
-#endif	
+#if (MAIN_STARTUP_INTERRUPT_POLICY == 2) && (THREAD_MAIN_COOPERATIVE == 0)
+	k_sched_lock();
+#endif
+
+#if MAIN_STARTUP_INTERRUPT_POLICY > 0
+	sei();
+#endif 
 }
-
-/*___________________________________________________________________________*/

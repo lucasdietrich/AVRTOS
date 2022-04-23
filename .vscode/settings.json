@@ -17,7 +17,6 @@
         "debug.h": "c",
         "fifo.h": "c",
         "assert.h": "c",
-        "sysclock.h": "c",
         "idle.h": "c",
         "canaries.h": "c",
         "queue.h": "c",
@@ -39,7 +38,6 @@
         "timer.h": "c",
         "stack_sentinel.h": "c",
         "fault.h": "c",
-        "sysclock_config.h": "c",
         "iom328p.h": "c",
         "stdbool.h": "c",
         "usart.h": "c"

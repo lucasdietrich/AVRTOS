@@ -88,7 +88,7 @@
 //
 // Time slice in milliseconds (0 if using SYSCLOCK period)
 //
-#define DEFAULT_KERNEL_TIME_SLICE               	4000LLU
+#define DEFAULT_KERNEL_TIME_SLICE_US               	4000LLU
 
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
@@ -96,20 +96,9 @@
 #define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	2
 
 //
-//  Auto start kernel sysclock
+// Use 40 bits for ticks counter size
 //
-#define DEFAULT_KERNEL_SYSCLOCK_AUTO_START       	1
-
-//
-//  Sysclock precision mode
-// 0 - None, 1 - Optional, 2 - Required
-//
-#define DEFAULT_KERNEL_SYSCLOCK_PRECISION_MODE		0
-
-//
-// Give the size of the ticks variable
-//
-#define DEFAULT_KERNEL_TICKS_40BITS   			5
+#define DEFAULT_KERNEL_TICKS_40BITS   			1
 
 //
 //  Kernel auto initialisation
@@ -274,6 +263,14 @@
 #define DEFAULT_DRIVERS_USART2_ASYNC			0
 
 #define DEFAULT_DRIVERS_USART3_ASYNC			0
+
+/**
+ * @brief Interrupt policy on main startup :
+ * 0 : interrupts are disabled
+ * 1 : interrupts enabled
+ * 2 : interrupts enabled but scheduler is locked if thread is preemptive
+ */
+#define DEFAULT_MAIN_STARTUP_INTERRUPT_POLICY		0
 
 /*___________________________________________________________________________*/
 

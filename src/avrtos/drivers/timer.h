@@ -56,15 +56,12 @@ typedef struct  {
 	};
 } TIMER16_Device;
 
-#define IS_TIMER8(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER8_Device))
-#define IS_TIMER16(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER16_Device))
-
-#define TIMER1_DEVICE ((TIMER16_Device*)(AVR_IO_BASE_ADDR + 0x80U))
+#define TIMER1_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x80U))
 
 #if defined(__AVR_ATmega2560__)
-#define TIMER3_DEVICE ((TIMER16_Device*)(AVR_IO_BASE_ADDR + 0x90U))
-#define TIMER4_DEVICE ((TIMER16_Device*)(AVR_IO_BASE_ADDR + 0xA0U))
-#define TIMER5_DEVICE ((TIMER16_Device*)(AVR_IO_BASE_ADDR + 0x120U))
+#define TIMER3_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x90U))
+#define TIMER4_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0xA0U))
+#define TIMER5_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x120U))
 #endif
 
 /**
@@ -79,8 +76,8 @@ typedef struct {
 	__IO uint8_t OCRnB; /* Timer/Counter Output Compare Register B */
 } TIMER8_Device;
  
-#define TIMER0_DEVICE ((TIMER8_Device*)(AVR_IO_BASE_ADDR + 0x44U))
-#define TIMER2_DEVICE ((TIMER8_Device*)(AVR_IO_BASE_ADDR + 0xB0U))
+#define TIMER0_DEVICE ((TIMER8_Device *)(AVR_IO_BASE_ADDR + 0x44U))
+#define TIMER2_DEVICE ((TIMER8_Device *)(AVR_IO_BASE_ADDR + 0xB0U))
 
 /**
  * @brief Timer/Counter Interrupt Flag Register
@@ -114,8 +111,8 @@ typedef struct {
 #define TIMER_TIMSK_READ_TOIE(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(TOIEn))
 #define TIMER_TIMSK_READ_ICIE(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(ICIEn))
 
-#define TIMER_TIMSK_HAS_OCIEC(tim_dev) IS_TIMER16(tim_dev)
-#define TIMER_TIMSK_HAS_ICIE(tim_dev) IS_TIMER16(tim_dev)
+// #define TIMER_TIMSK_HAS_OCIEC(tim_dev) IS_TIMER16(tim_dev)
+// #define TIMER_TIMSK_HAS_ICIE(tim_dev) IS_TIMER16(tim_dev)
 
 /* 8bits and 16 bits timers */
 #define FOCnA FOC0A
@@ -153,31 +150,48 @@ typedef struct {
 #define ICIEn ICIE1
 
 /* macros */
-#define IS_TIMER0_DEVICE(dev) (dev == (void *)TIMER0_DEVICE)
-#define IS_TIMER1_DEVICE(dev) (dev == (void *)TIMER1_DEVICE)
-#define IS_TIMER2_DEVICE(dev) (dev == (void *)TIMER2_DEVICE)
+#if defined(__AVR_ATmega2560__)
+#	define TIMERS_COUNT 6
+#else
+#	define TIMERS_COUNT 3
+#endif
+
+#define TIMER_INDEX_EXISTS(tim_idx) ((tim_idx) < TIMERS_COUNT)
+
+#define IS_TIMER_INDEX_8BIT(idx) ((idx == 0) || (idx == 2))
+#define IS_TIMER_INDEX_16BIT(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
+
+#define TIMER_GET_MAX_COUNTER(tim_idx) (IS_TIMER_INDEX_8BIT(tim_idx) ? 0xFFU : 0xFFFFU)
+
+#define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
+#define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
+#define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
 #if defined(TIMSK3)
-#	define IS_TIMER3_DEVICE(dev) (dev == (void *)TIMER3_DEVICE)
+#	define IS_TIMER3_DEVICE(dev) ((void *)dev == (void *)TIMER3_DEVICE)
 #else
 #	define IS_TIMER3_DEVICE(dev) (0)
 #endif 
 
 #if defined(TIMSK4)
-#	define IS_TIMER4_DEVICE(dev) (dev == (void *)TIMER4_DEVICE)
+#	define IS_TIMER4_DEVICE(dev) ((void *)dev == (void *)TIMER4_DEVICE)
 #else
 #	define IS_TIMER4_DEVICE(dev) (0)
 #endif 
 
 #if defined(TIMSK5)
-#	define IS_TIMER5_DEVICE(dev) (dev == (void *)TIMER5_DEVICE)
+#	define IS_TIMER5_DEVICE(dev) ((void *)dev == (void *)TIMER5_DEVICE)
 #else
 #	define IS_TIMER5_DEVICE(dev) (0)
 #endif 
 
-#define IS_TIMER1345_DEVICE(dev) \
+#define IS_TIMER_16BITS(dev) \
 	(IS_TIMER1_DEVICE(dev) || IS_TIMER3_DEVICE(dev) \
 	|| IS_TIMER4_DEVICE(dev) || IS_TIMER5_DEVICE(dev))
 
+#define IS_TIMER_8BITS(dev) (IS_TIMER0_DEVICE(dev) || IS_TIMER2_DEVICE(dev))
+
+// #define IS_TIMER8(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER8_Device))
+// #define IS_TIMER16(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER16_Device))
 
 typedef enum {
 	TIMER_MODE_NORMAL = 0x00,
@@ -212,27 +226,27 @@ typedef enum {
 
 struct timer_config
 {
-	timer_mode_t mode: 2;
+	timer_mode_t mode: 4;
 	uint8_t prescaler: 3;
 
 	uint16_t counter;
 };
 
-typedef enum {
-	TIMER_0 = 0x00,
-	TIMER_1,
-	TIMER_2,
-#if defined(TIMSK3)
-	TIMER_3,
-#endif
-#if defined(TIMSK4)
-	TIMER_4,
-#endif 
-#if defined(TIMSK5)
-	TIMER_5,
-#endif
-	TIMERS_COUNT,
-} timer_index_t;
+// typedef enum {
+// 	TIMER_0 = 0x00,
+// 	TIMER_1,
+// 	TIMER_2,
+// #if defined(TIMSK3)
+// 	TIMER_3,
+// #endif
+// #if defined(TIMSK4)
+// 	TIMER_4,
+// #endif 
+// #if defined(TIMSK5)
+// 	TIMER_5,
+// #endif
+// 	TIMERS_COUNT,
+// } timer_index_t;
 
 // typedef enum {
 // 	TIMER_INTERRUPT_INPUT_CAPTURE1 = 0x00,
@@ -242,16 +256,72 @@ typedef enum {
 // 	TIMER_INTERRUPT_OVERFLOW1
 // } timer_interrupt_type_t;
 
-int timer_get_index(void *dev);
+static inline int timer_get_index(void *dev)
+{
+	int ret = -EINVAL;
+
+	if (IS_TIMER0_DEVICE(dev)) {
+		ret = 0;
+	}
+	else if (IS_TIMER1_DEVICE(dev)) {
+		ret = 1;
+	}
+	else if (IS_TIMER2_DEVICE(dev)) {
+		ret = 2;
+	}
+#if defined(__AVR_ATmega2560__)
+	else if (IS_TIMER3_DEVICE(dev)) {
+		ret = 3;
+	}
+	else if (IS_TIMER4_DEVICE(dev)) {
+		ret = 4;
+	}
+	else if (IS_TIMER5_DEVICE(dev)) {
+		ret = 5;
+	}
+#endif
+
+	return  ret;
+}
+
+static inline void *timer_get_by_index(uint8_t idx)
+{
+	void *dev = NULL;
+
+	switch (idx) {
+	case 0:
+		dev = TIMER0_DEVICE;
+		break;
+	case 1:
+		dev = TIMER1_DEVICE;
+		break;
+	case 2:
+		dev = TIMER2_DEVICE;
+		break;
+#if defined(__AVR_ATmega2560__)
+	case 3:
+		dev = TIMER3_DEVICE;
+		break;
+	case 4:
+		dev = TIMER4_DEVICE;
+		break;
+	case 5:
+		dev = TIMER5_DEVICE;
+		break;
+	}
+#endif
+
+	return dev;
+}
 
 void ll_timer8_drv_init(TIMER8_Device *dev,
-		       const struct timer_config *config);
+			const struct timer_config *config);
 
 int timer8_drv_init(TIMER8_Device *dev,
 		    const struct timer_config *config);
 
 void ll_timer16_drv_init(TIMER16_Device *dev,
-			const struct timer_config *config);
+			 const struct timer_config *config);
 
 int timer16_drv_init(TIMER16_Device *dev,
 		     const struct timer_config *config);
