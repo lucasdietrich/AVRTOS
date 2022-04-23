@@ -43,5 +43,5 @@
         "iom328p.h": "c",
         "stdbool.h": "c",
         "usart.h": "c"
-    }
+    },
 }

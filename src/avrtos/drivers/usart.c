@@ -46,28 +46,9 @@ static void set_baudrate(UART_Device *dev,
 	dev->UBRRnL = (uint8_t)ubrr;
 };
 
-int usart_drv_init(UART_Device *dev,
-		   const struct usart_config *config)
+static void ll_drv_init(UART_Device *dev,
+			const struct usart_config *config)
 {
-	if (dev == NULL) {
-		return -EINVAL;
-	}
-
-	/* Only asynchrone mode is supported */
-	if (config->mode != USART_MODE_ASYNCHRONOUS) {
-		return -EINVAL;
-	}
-
-	/* Invalid parity mode (reserved) */
-	if (config->parity == 1u) {
-		return -EINVAL;
-	}
-
-	/* Invalid frame format (reserved) */
-	if ((config->databits & 0x4u) && (config->databits != USART_DATA_BITS_9)) {
-		return -EINVAL;
-	}
-
 	/* set baudrate */
 	set_baudrate(dev, config->baudrate, config->speed_mode);
 
@@ -96,6 +77,31 @@ int usart_drv_init(UART_Device *dev,
 	/* set frame format */
 	SET_BIT(ucsrc, config->databits << UCSZn0);
 	dev->UCSRnC = ucsrc;
+}
+
+int usart_drv_init(UART_Device *dev,
+		   const struct usart_config *config)
+{
+	if ((dev == NULL) || (config == NULL)) {
+		return -EINVAL;
+	}
+
+	/* Only asynchrone mode is supported */
+	if (config->mode != USART_MODE_ASYNCHRONOUS) {
+		return -EINVAL;
+	}
+
+	/* Invalid parity mode (reserved) */
+	if (config->parity == 1u) {
+		return -EINVAL;
+	}
+
+	/* Invalid frame format (reserved) */
+	if ((config->databits & 0x4u) && (config->databits != USART_DATA_BITS_9)) {
+		return -EINVAL;
+	}
+
+	ll_drv_init(dev, config);
 
 	return 0;
 }

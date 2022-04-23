@@ -74,35 +74,35 @@ typedef struct {
 #define USART_CALC_UBRRn(baudrate) (((F_CPU >> 4) / baudrate) - 1)
 #define USART_CALC_SPEED_MODE_UBRRn(baudrate) (((F_CPU >> 3) / baudrate) - 1)
 
-enum {
+typedef enum {
 	USART_MODE_ASYNCHRONOUS = 0,
 	USART_MODE_SYNCHRONOUS = 1,
 	USART_MODE_MSPI = 2,
-};
+} usart_mode_t;
 
-enum {
+typedef enum {
 	USART_PARITY_NONE = 0,
 	USART_PARITY_EVEN = 2,
 	USART_PARITY_ODD = 3,
-};
+} usart_parity_t;
 
-enum {
+typedef enum {
 	USART_STOP_BITS_1 = 0,
 	USART_STOP_BITS_2 = 1,
-};
+} usart_stop_bits_t;
 
-enum {
+typedef enum {
 	USART_DATA_BITS_5 = 0,
 	USART_DATA_BITS_6 = 1,
 	USART_DATA_BITS_7 = 2,
 	USART_DATA_BITS_8 = 3,
 	USART_DATA_BITS_9 = 7
-};
+} usart_data_bits_t;
 
-enum {
+typedef enum {
 	USART_SPEED_MODE_NORMAL = 0,
 	USART_SPEED_MODE_DOUBLE = 1
-};
+} usart_speed_mode_t;
 
 struct usart_config
 {
@@ -110,13 +110,11 @@ struct usart_config
         uint8_t receiver: 1;
         uint8_t transmitter: 1;
 
-        uint8_t mode: 2;
-
-        uint8_t parity: 2;
-        uint8_t stopbits: 1;
-        uint8_t databits: 3;
-
-        uint8_t speed_mode: 1;
+        usart_mode_t mode: 2;
+        usart_parity_t parity: 2;
+        usart_stop_bits_t stopbits: 1;
+        usart_data_bits_t databits: 3;
+        usart_speed_mode_t speed_mode: 1;
 };
 
 #define USART_CONFIG_DEFAULT_2400() { \
