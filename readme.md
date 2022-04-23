@@ -391,15 +391,17 @@ Steps :
 1. Building project in debug mode : 
   - `build_type = debug`
   - Make sure to use timer1 as syslock as it's the only hardware timer supported for now !
-  
-2. Emulate on qemu : Run command from WSL :
+
+2. Change program location in `launch.json`
+
+3. Emulate on qemu : Run command from WSL :
   `~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off`
 
-3. Attach serial :
+4. Attach serial :
   - From WSL : `telnet localhost 5678`
   - From Visual Studio Code IDE : Serial Monitor : `Ctrl + Alt + S`
 
-4. Attach debugger in VSC environnement :
+5. Attach debugger in VSC environnement :
   - `Ctrl + F5`
 
 Note that only few peripherals are supported on avr architecture (https://qemu-project.gitlab.io/qemu/system/target-avr.html) :
@@ -573,3 +575,9 @@ Priority *COOPERATIVE* :
 - Pseudo-ops and operators : https://www.nongnu.org/avr-libc/user-manual/assembler.html#ass_pseudoop
 - AVR Instruction Set Manual : http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
 - cross-referencer example : https://elixir.bootlin.com/zephyr/v2.6.1-rc1/source/kernel/sched.c
+
+## Troubleshooting
+
+- If your program crashes/restart/gets stuck, just increase all stack sizes, just in case (especially with `KERNEL_TIMERS`, `KERNEL_EVENTS`).
+  - Note: Also increase IDLE stack size with `KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
+  - Note: function call with ATmge2560 for example are stack consuming (because of the 3B return addresses)

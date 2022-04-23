@@ -3,6 +3,8 @@
 #include <avrtos/misc/uart.h>
 #include <avrtos/kernel.h>
 
+#include <avr/sleep.h>
+
 #define K_MODULE K_MODULE_APPLICATION
 
 /*
@@ -26,6 +28,7 @@ static void sleep(k_timeout_t ms)
 	uint32_t now;
 
 	do {
+		sleep_cpu();
 		now = k_uptime_get_ms32();
 	} while (now - start < ms.value);
 }

@@ -2,7 +2,9 @@
 #include <avrtos/misc/uart.h>
 #include <avrtos/debug.h>
 
-#define THREADS_COUNT   14
+#include <util/delay.h>
+
+#define THREADS_COUNT   10
 #define MAX_DELAY_MS	500
 
 #define K_MODULE K_MODULE_APPLICATION
@@ -55,7 +57,9 @@ int main(void)
 				printf_P(PSTR("Uptime : %lu (ms)\n"), now);
 			}
 
-			k_block(K_SECONDS(2));
+			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+				_delay_ms(2000);
+			}
 		}
 
 		k_wait(K_SECONDS(10));

@@ -18,12 +18,22 @@ volatile uint16_t counter2 = 0;
 void handler1(struct k_timer* timer);
 void handler2(struct k_timer* timer);
 void thread2(void *context);
+void thread_canaries(void *ctx)
+{
+	for (;;) {
+		dump_stack_canaries();
+		k_sleep(K_SECONDS(10));
+	}
+}
+
 void work_handler(struct k_work* work);
 
 K_WORK_DEFINE(mywork, work_handler);
 
+
 K_TIMER_DEFINE(mytimer1, handler1, K_MSEC(100), 0);
 K_TIMER_DEFINE(mytimer2, handler2, K_MSEC(100), K_TIMER_STOPPED);
+K_THREAD_DEFINE(cantid, thread_canaries, 0x200, K_COOPERATIVE, NULL, 'C');
 
 K_THREAD_DEFINE(th2, thread2, 0x100, K_PREEMPTIVE, NULL, 'A');
 

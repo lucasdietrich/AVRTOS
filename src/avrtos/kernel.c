@@ -187,7 +187,7 @@ void k_block(k_timeout_t timeout)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		_delay_ms(K_TIMEOUT_TICKS(timeout));
+		_delay_ms(K_TIMEOUT_TICKS(timeout) / K_TICKS_PER_SECOND);
 	}
 }
 

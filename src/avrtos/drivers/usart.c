@@ -146,6 +146,7 @@ void usart0_drv_sync_putc_opt(char c)
 	UDR0 = c;
 }
 
+
 #if DRIVERS_UART_ASYNC
 
 // size should be configurable

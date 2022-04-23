@@ -44,7 +44,7 @@ static uint8_t ms(struct k_prng *prng)
 
 static void debug(void *mem, int8_t rc)
 {
-	printf_P(PSTR("cur=%c mem=0x%x rc=%d"),
+	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"),
 		 _current->symbol, (unsigned int)mem, rc);
 }
 
@@ -99,7 +99,7 @@ int main(void)
                         blocks[count++] = alloc(K_FOREVER);
                 }
 
-                printf_P(PSTR("Collected all memory slabs !"));
+                printf_P(PSTR("Collected all memory slabs !\n"));
                 for (uint8_t i = 0; i < BLOCKS; i++) {
                         debug(blocks[i], 0);
                 }
@@ -114,6 +114,4 @@ int main(void)
                 }
                 count = 0;
         }
-
-        
 }

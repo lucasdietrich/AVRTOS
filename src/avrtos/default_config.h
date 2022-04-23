@@ -113,7 +113,7 @@
 //
 // Kernel thread idle addtionnal stack (for interrupt handles stack)
 //
-#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	20
+#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	0x50
 
 //
 // Tell if IDLE thread is preemptive or cooperative
@@ -168,6 +168,7 @@
 
 //
 // Enable timers support
+// - This feature needs (a lot) of additionnal stack 
 //
 #define DEFAULT_KERNEL_TIMERS                   	0
 
