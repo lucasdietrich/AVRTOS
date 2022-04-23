@@ -308,8 +308,8 @@ static inline void *timer_get_by_index(uint8_t idx)
 	case 5:
 		dev = TIMER5_DEVICE;
 		break;
-	}
 #endif
+	}
 
 	return dev;
 }
