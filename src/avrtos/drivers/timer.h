@@ -19,40 +19,22 @@ typedef struct  {
 		struct {
 			__IO uint8_t TCNTnL; /* Timer/Counter - Counter Register Low Byte */
 			__IO uint8_t TCNTnH; /* Timer/Counter - Counter Register High Byte */
-		};
-		__IO uint16_t TCNTn; /* Timer/Counter - Counter Register */
-	};
-
-	union {
-		struct {
 			__IO uint8_t ICRnL;  /* Timer/Counter - Input Capture Register High Byte */
 			__IO uint8_t ICRnH;  /* Timer/Counter - Input Capture Register High Byte */
-		};
-		__IO uint16_t IRCN; /* Timer/Counter - Input Capture Register */
-	};
-
-	union {
-		struct {
 			__IO uint8_t OCRnAL; /* Timer/Counter - Output Compare Register A Low Byte */
 			__IO uint8_t OCRnAH; /* Timer/Counter - Output Compare Register A High Byte */
-		};
-		__IO uint16_t OCRnA; /* Timer/Counter - Output Compare Register A */
-	};
-
-	union {
-		struct {
 			__IO uint8_t OCRnBL; /* Timer/Counter - Output Compare Register B Low Byte */
 			__IO uint8_t OCRnBH; /* Timer/Counter - Output Compare Register B High Byte */
-		};
-		__IO uint16_t OCRnB; /* Timer/Counter - Output Compare Register B */
-	};
-
-	union {
-		struct {
 			__IO uint8_t OCRnCL; /* Timer/Counter - Output Compare Register C Low Byte */
 			__IO uint8_t OCRnCH; /* Timer/Counter - Output Compare Register C High Byte */
 		};
-		__IO uint16_t OCRnC; /* Timer/Counter - Output Compare Register C */
+		struct {
+			__IO uint16_t TCNTn; /* Timer/Counter - Counter Register */
+			__IO uint16_t IRCN; /* Timer/Counter - Input Capture Register */
+			__IO uint16_t OCRnA; /* Timer/Counter - Output Compare Register A */
+			__IO uint16_t OCRnB; /* Timer/Counter - Output Compare Register B */
+			__IO uint16_t OCRnC; /* Timer/Counter - Output Compare Register C */
+		};
 	};
 } TIMER16_Device;
 
