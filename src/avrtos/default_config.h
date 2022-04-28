@@ -75,6 +75,12 @@
 #define DEFAULT_KERNEL_SCHEDULER_DEBUG          	0
 
 //
+// Compare threads addresses after scheduler call to prevent thread switch to the same thread
+//  (inefficient if at least two threads are always ready)
+//
+#define DEFAULT_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH	1
+
+//
 // Enable preemtive threads feature
 //
 #define DEFAULT_KERNEL_PREEMPTIVE_THREADS       	1

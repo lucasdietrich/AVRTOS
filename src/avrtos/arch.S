@@ -152,6 +152,19 @@ _k_yield:
 	lds r30, _current
 	lds r31, _current + 1
 
+#if KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH
+	; Compare threads addresses after scheduler call to prevent thread switch to the same thread
+	; - i.e.thread switch only if "previous" and "_current" threads are different
+	; - inefficient if at least two threads are always ready
+	; - compare low bytes before high bytes because 
+	;     they have a higher probability to be different
+	cp r26, r30
+	brne _k_thread_switch
+	cp r27, r31
+	brne _k_thread_switch
+	ret
+#endif
+
 ; "from" thread addr is in r24, r25
 ; "to" thread  addr in in r22, r23
 _k_thread_switch:
