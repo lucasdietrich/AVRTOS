@@ -250,7 +250,7 @@ void _k_thread_switch(struct k_thread *from, struct k_thread *to);
 K_NOINLINE void _k_kernel_init(void);
 
 /**
- * @brief Queue the thread in the runqueue. We assume that the thread {th} is READY. 
+ * @brief Queue the thread in the runqueue. We assume that the thread {th} is K_READY. 
  * The thread must not be added to the runqueue already. Keep it's flag unchanged.
  * Assume that the interrupt flag is cleared when called.
  * Assume that the runqueue doesn't contain the IDLE thread
@@ -263,7 +263,7 @@ void _k_queue(struct k_thread *const th);
  * @brief Schedule the thread to be executed.
  * If the IDLE thread is in the runqueue (it is removed), the scheduled thread become the only thread in the runqueue.
  * If other threads are in the runqueue, the thread is only appended.
- * - Assume that the thread is READY
+ * - Assume that the thread is K_READY
  * - Assume that the thread is not in the runqueue
  * 
  * @param thread_tie thread.tie.runqueue item
@@ -275,7 +275,7 @@ K_NOINLINE void _k_schedule(struct k_thread *thread);
  * @brief Schedule current thread wake up.
  * 
  * Assumptions:
- * - thread is suspended (PENDING)
+ * - thread is suspended (K_PENDING)
  * - thread is not in the runqueue
  * 
  * @param thread 
@@ -287,7 +287,7 @@ K_NOINLINE void _k_schedule_wake_up(k_timeout_t timeout);
 /**
  * @brief Remove the current thread from the runqueue.
  * Stop the execution of the current thread (until it is scheduled again with function _k_schedule or _k_schedule_wake_up)
- * State flag is changed to PENDING.
+ * State flag is changed to K_PENDING.
  * 
  * Assumptions:
  * - interrupt flag is cleared when called.
@@ -310,7 +310,7 @@ K_NOINLINE void _k_suspend(void);
  * @brief Wake up a thread that is pending for an event.
  * 
  * Assumptions:
- *  - thread is in PENDING mode
+ *  - thread is in K_PENDING mode
  *  - thread is not in the runqueue
  *  - thread may be in the events queue
  *  - interrupt flag is cleared when called.

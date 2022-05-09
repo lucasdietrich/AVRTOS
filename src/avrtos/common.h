@@ -79,7 +79,6 @@
 #define K_PREEMPTIVE                K_FLAG_PREEMPT
 
 #define K_PRIO_DEFAULT              K_PREEMPTIVE
-#define K_STOPPED                   K_FLAG_STOPPED
 
 #define K_FLAG_PEND_CANCELED_SHIFT  5
 #define K_FLAG_PEND_CANCELED        (1 << K_FLAG_PEND_CANCELED_SHIFT)

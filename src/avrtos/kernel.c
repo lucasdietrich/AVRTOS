@@ -203,7 +203,7 @@ void k_suspend(void)
 
 void k_resume(struct k_thread *th)
 {
-        if (th->state == PENDING) {
+        if (th->state == K_PENDING) {
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {
                         _k_schedule(th);
@@ -215,7 +215,7 @@ void k_resume(struct k_thread *th)
 
 void k_start(struct k_thread *th)
 {
-	if (th->state == STOPPED) {
+	if (th->state == K_STOPPED) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		{
 			_k_queue(th);
@@ -229,7 +229,7 @@ void _k_stop(void)
 
 	_k_suspend();
 
-	_current->state = STOPPED;
+	_current->state = K_STOPPED;
 }
 
 void k_stop()
@@ -277,7 +277,7 @@ void _k_kernel_init(void)
 		/* idle thread must not be added to the
 		 * runqueue as the main thread is running */
 		if (!is_thread_idle &&
-		    (thread->state == READY)) {
+		    (thread->state == K_READY)) {
 			push_back(_k_runqueue, &thread->tie.runqueue);
 		}
 
@@ -319,7 +319,7 @@ void _k_schedule(struct k_thread *thread)
 	thread->wakeup_schd = 0;
 
 	/* EXPLAIN WHY THIS DISAPPEARED IN THE ORIGINAL CODE */
-	thread->state = READY;
+	thread->state = K_READY;
 	
 #if KERNEL_THREAD_IDLE
         if (k_is_cpu_idle()) {
@@ -349,7 +349,7 @@ void _k_suspend(void)
 {
         __ASSERT_NOINTERRUPT();
 
-        _current->state = PENDING;
+        _current->state = K_PENDING;
 
 #if KERNEL_THREAD_IDLE
         if (_k_runqueue_single()) {
@@ -411,7 +411,7 @@ struct k_thread *_k_scheduler(void)
         prev->pend_canceled = 0;
         prev->timer_expired = 0;
 
-        if (prev->state == PENDING) {
+        if (prev->state == K_PENDING) {
                 /* runqueue is positionned to the 
                  * normally next thread to be executed */
                 __K_DBG_SCHED_PENDING();        // ~
@@ -424,7 +424,7 @@ struct k_thread *_k_scheduler(void)
 
         _current = CONTAINER_OF(_k_runqueue, struct k_thread, tie.runqueue);
 	
-	__ASSERT_THREAD_STATE(_current, READY);
+	__ASSERT_THREAD_STATE(_current, K_READY);
 
         __K_DBG_SCHED_NEXT(_current);
 
@@ -435,7 +435,7 @@ void _k_wake_up(struct k_thread *th)
 {
 	__ASSERT_NOTNULL(th);
         __ASSERT_NOINTERRUPT();
-        __ASSERT_THREAD_STATE(th, PENDING);
+        __ASSERT_THREAD_STATE(th, K_PENDING);
 
         __K_DBG_WAKEUP(th); // @
 

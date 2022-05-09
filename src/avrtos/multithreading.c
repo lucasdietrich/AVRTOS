@@ -20,9 +20,9 @@ K_THREAD struct k_thread _k_thread_main = {
     .sp = 0, // main thread is running, context already "restored"
     {
 #if THREAD_MAIN_COOPERATIVE == 1
-        .flags = READY | K_COOPERATIVE,
+        .flags = K_READY | K_COOPERATIVE,
 #else
-        .flags = READY | K_PREEMPTIVE,
+        .flags = K_READY | K_PREEMPTIVE,
 #endif
     },
     .tie = {
@@ -104,7 +104,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
 
         /* clear internal flags */
         th->flags = 0;
-        th->state = STOPPED;
+        th->state = K_STOPPED;
         th->coop = prio & K_FLAG_COOP ? 1 : 0;
         th->symbol = symbol;
         th->swap_data = NULL;

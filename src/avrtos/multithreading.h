@@ -27,20 +27,20 @@ extern "C" {
  * 
  * This function should never end (TODO handle the case when the function ends)
  */
-typedef void (*thread_entry_t)(void*);
+typedef void (*thread_entry_t)(void *);
 
 /**
  * @brief Thread state.
  * 
- * STOPPED : the thread is not running and is not in the runqueue, it can be resumed/started with k_resume/k_start functions.
+ * K_STOPPED : the thread is not running and is not in the runqueue, it can be resumed/started with k_resume/k_start functions.
  * 
- * READY : the thread is ready to be executed and is the runqueue
+ * K_READY : the thread is ready to be executed and is the runqueue
  * 
- * PENDING : the thread is pending for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
+ * K_PENDING : the thread is pending for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
  * It can be wake up with function _k_wake_up()
  * 
  */
-enum thread_state_t { STOPPED = 0, READY = 1, PENDING = 2, _UNDEFINED = 3};
+enum thread_state_t { K_STOPPED = 0, K_READY = 1, K_PENDING = 2, _K_RESERVED = 3 };
 
 /* size 19B */
 struct _k_callsaved_ctx {
@@ -213,7 +213,7 @@ struct k_thread
                 void *end;                      // stack end
                 size_t size;                    // stack size
         } stack;                                // thread stack definition
-        char symbol;                            // 1-letter symbol to name the thread, already used M (main), idle : I (idle)
+        char symbol;                            // 1-letter symbol to name the thread, reserver M (main), idle : I (idle)
 
 #if THREAD_ERRNO
         uint8_t errno;                          // Thread errno
@@ -254,9 +254,10 @@ extern struct k_thread * _current;
  * @param context_p thread context passed to entry function
  * @return int 0 on success
  */
-int k_thread_create(struct k_thread* const th, thread_entry_t entry,
-    void* const stack, const size_t stack_size, const int8_t priority,
-    void* const context_p, const char symbol);
+int k_thread_create(struct k_thread *const th, thread_entry_t entry,
+		    void *const stack, const size_t stack_size,
+		    const int8_t priority, void *const context_p,
+		    const char symbol);
 
 /*___________________________________________________________________________*/
 
@@ -271,7 +272,7 @@ void _k_thread_entry(void);
  * 
  * @return thread_t* 
  */
-struct k_thread * k_thread_current(void);
+struct k_thread *k_thread_current(void);
 
 /*___________________________________________________________________________*/
 

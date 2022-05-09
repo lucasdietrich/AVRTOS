@@ -60,13 +60,13 @@ void k_thread_dump(struct k_thread *th)
 	usart_transmit(' ');
 
 	switch (th->state) {
-		case READY:
+		case K_READY:
 			usart_print_p(PSTR("READY  "));
 			break;
-		case STOPPED:
+		case K_STOPPED:
 			usart_print_p(PSTR("STOPPED"));
 			break;
-		case PENDING:
+		case K_PENDING:
 			usart_print_p(PSTR("PENDING"));
 			break;
 		default:
