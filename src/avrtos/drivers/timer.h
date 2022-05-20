@@ -310,11 +310,9 @@ void ll_timer16_drv_init(TIMER16_Device *dev,
 int timer16_drv_init(TIMER16_Device *dev,
 		     const struct timer_config *config);
 
-int timer8_drv_deinit(TIMER8_Device *dev,
-		      const struct timer_config *config);
+int timer8_drv_deinit(TIMER8_Device *dev);
 
-int timer16_drv_deinit(TIMER16_Device *dev,
-		       const struct timer_config *config);
+int timer16_drv_deinit(TIMER16_Device *dev);
 
 static inline void timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
 {

@@ -58,14 +58,55 @@ int timer16_drv_init(TIMER16_Device *dev,
 	return 0;
 }
 
-int timer8_drv_deinit(TIMER8_Device *dev,
-		      const struct timer_config *config)
+static int timer_drv_clear_int_flags(void *dev)
 {
-	return -EINVAL;
+	if (dev == NULL) {
+		return -EINVAL;
+	}
+
+	int tim_idx = timer_get_index(dev);
+	if (tim_idx < 0) {
+		return -EINVAL;
+	}
+	
+	/* clear all interrupt flags */
+	TIMSKn[tim_idx] = 0U;
+
+	return 0;
 }
 
-int timer16_drv_deinit(TIMER16_Device *dev,
-		       const struct timer_config *config)
+int timer8_drv_deinit(TIMER8_Device *dev)
 {
-	return -EINVAL;
+	int ret = timer_drv_clear_int_flags(dev);
+
+	if (ret == 0) {
+		dev->TCCRnA = 0U;
+		dev->TCCRnB = 0U;
+		
+		dev->OCRnA = 0U;
+		dev->OCRnB = 0U;
+		dev->TCNTn = 0U;
+	}
+
+	return 0;
+}
+
+int timer16_drv_deinit(TIMER16_Device *dev)
+{
+	int ret = timer_drv_clear_int_flags(dev);
+
+	if (ret == 0) {
+		/* disable interrupts first */
+		dev->TCCRnA = 0U;
+		dev->TCCRnB = 0U;
+		dev->TCCRnC = 0U;
+
+		dev->OCRnA = 0U;
+		dev->OCRnB = 0U;
+		dev->OCRnC = 0U;
+		dev->IRCN = 0U;
+		dev->TCNTn = 0U;
+	}
+
+	return 0;
 }
