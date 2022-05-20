@@ -65,19 +65,11 @@ What features will be implemented :
 - Stack sentinels
 - Kernel fault
 
-AVRTOS2:
-	- Enhanced clock precision
-	- Optimized "thread_switch" function
-	- Cooperative threads needs less stacks
-	- Change time ms to us OR ticks ? (max sleep is now 4h or more if using 64bit time objects)
-TODO AVRTOS 2:
-- Inline _k_scheduler with thread_switch (or jump to _k_scheduler and jump to thread_switch)
-- Maybe only push SREG a single time ? (--> NO)
-- Handle configuration
-- Add tools to help to minimize stack usage
-- config option to forbid thread termination by jumping to function in _k_thread_entry
-- make it possible to switch thread from an interrupt handler (--> need to save more registers and to place the return address)
-- **build_type = debug** sometimes doesn't work ? -> see caniot2-device with "build_type = debug"
+AVRTOS2 (version 2) main improvements:
+- Enhanced clock precision
+- Optimized "thread_switch" function
+- Cooperative threads needs less stacks
+- Improve sysclock accuracy
 
 What enhancements are planned :
 - Optimize thread switch function by pushing only call-clobbered registers (https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.c#L67). Handle switch from interrupt handler (could this help https://github.com/greiman/NilRTOS-Arduino/blob/master/libraries/NilRTOS/nilcore.h#L193 ?).
@@ -121,19 +113,20 @@ What enhancements/features are not planned :
 | KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
 | KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
 | KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
-| KERNEL_TIME_SLICE_US | Time slice in milliseconds |
-| KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
+| KERNEL_SYSCLOCK_PERIOD_US | Sysclock period when precision mode is disabled (LLU is important) |
 | ~~KERNEL_SYSCLOCK_AUTO_START~~ | Auto start kernel sysclock |
 | KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
 | ~~KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
 | KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
 | KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
 | ~~KERNEL_ALLOW_INTERRUPT_YIELD~~ |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
+| THREAD_IDLE_COOPERATIVE | Tell if IDLE thread is preemptive or cooperative |
 | THREAD_CANARIES | Enable thread canaries |
 | THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
 | SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
 | SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
-| SYSTEM_WORKQUEUE_PRIORITY | Define system workqueue thread priority |
+| ~~SYSTEM_WORKQUEUE_PRIORITY~~ | Define system workqueue thread priority |
+| SYSTEM_WORKQUEUE_COOPERATIVE | Tell if the system workqueue should be executed cooperatively |
 | KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
 | **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
 | ~~THREAD_ALLOW_RETURN~~ | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
@@ -145,10 +138,23 @@ What enhancements/features are not planned :
 | KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
 | ~~KERNEL_UPTIME_40BITS~~ | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
 | ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE_US but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE_US). |
+| KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
+| KERNEL_TIME_SLICE_US | Time slice in milliseconds |
 | KERNEL_TIME | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
-| THREAD_TERMINATION_TYPE |  |
+| THREAD_TERMINATION_TYPE | Allow, or not thread termination. 0 : not allowed (need less stack). 1 : allowed (need more stack) . -1 : not allow but fault (need more stack but fault if terminate) |
 | KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
+| KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH | Compare threads addresses after scheduler call to prevent thread switch to the same thread |
+| KERNEL_TICKS_40BITS | Use 40 bits for ticks counter size (instead of 32 bits) |
+| THREAD_STACK_SENTINEL | Define thread sentinel size |
+| THREAD_STACK_SENTINEL_SIZE  | Define thread sentinel size |
+| THREAD_STACK_SENTINEL_SYMBOL | Define thread sentinel symbol |
+| FD_MAX_COUNT | **UNUSED** |
+| DRIVERS_USART0_ASYNC | Enable USART0 driver |
+| DRIVERS_USART1_ASYNC | Enable USART1 driver |
+| DRIVERS_USART2_ASYNC | Enable USART2 driver |
+| DRIVERS_USART3_ASYNC | Enable USART3 driver |
+| MAIN_STARTUP_INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
 
 ## Getting started example :
 
@@ -564,8 +570,12 @@ Priority *COOPERATIVE* :
 [I] CANARIES until @011B [found 26], MAX usage = 35 / 61 + 1 (sentinel)
 ```
 
-# Ideas: 
-- Malloc : https://www.nongnu.org/avr-libc/user-manual/malloc.html
+# Todo / ideas :
+- Heap, malloc : https://www.nongnu.org/avr-libc/user-manual/malloc.html
+- Building using cmake
+  - https://github.com/ptrks/CMake-avr-example/blob/master/basic_example/CMakeLists.txt
+  - Remove unused code
+- Extend drivers support
 - Exceptions
 
 ## Some links :

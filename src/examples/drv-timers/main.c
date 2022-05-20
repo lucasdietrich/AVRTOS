@@ -12,6 +12,12 @@
 
 volatile uint32_t cnt = 0;
 
+ISR(TIMER4_OVF_vect)
+{
+	timer16_set_tcnt(TIMER4_DEVICE, 0x8000U);
+	usart_transmit('4');
+}
+
 ISR(TIMER0_COMPA_vect)
 {
 	cnt++;
@@ -42,7 +48,14 @@ int main(void)
 
 	ll_timer8_drv_init(TIMER0_DEVICE, &cfg);
 	TIMER_TIMSK_SET_OCIEA(0);
-	
+
+	cfg.counter = 0U;
+	cfg.mode = TIMER_MODE_NORMAL;
+	cfg.prescaler = TIMER_PRESCALER_1024;
+
+	ll_timer16_drv_init(TIMER4_DEVICE, &cfg);
+	TIMER_TIMSK_SET_TOIE(timer_get_index(TIMER4_DEVICE));
+
 	for (;;) {
 		printf("\n");
 		k_show_uptime();

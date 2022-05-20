@@ -102,7 +102,7 @@
 #define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	2
 
 //
-// Use 40 bits for ticks counter size
+// Use 40 bits for ticks counter size (instead of 32 bits)
 //
 #define DEFAULT_KERNEL_TICKS_40BITS   			1
 

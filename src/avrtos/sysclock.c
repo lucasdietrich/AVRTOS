@@ -87,7 +87,7 @@ void _k_init_sysclock(void)
 {
 	void *const dev = timer_get_by_index(KERNEL_SYSLOCK_HW_TIMER);
 
-	struct timer_config cfg = {
+	const struct timer_config cfg = {
 		.mode = TIMER_MODE_CTC,
 		.prescaler = PRESCALER_CONFIG,
 		.counter = COUNTER_VALUE

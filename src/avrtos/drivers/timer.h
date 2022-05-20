@@ -202,6 +202,8 @@ typedef enum {
 	TIMER_PRESCALER_64 = 0x03,
 	TIMER_PRESCALER_256 = 0x04,
 	TIMER_PRESCALER_1024 = 0x05,
+
+	/* unsupported for now */
 	TIMER_EXT_FALLING = 0x06,
 	TIMER_EXT_RISING = 0x07,
 } timer_prescaler_t;
@@ -313,5 +315,15 @@ int timer8_drv_deinit(TIMER8_Device *dev,
 
 int timer16_drv_deinit(TIMER16_Device *dev,
 		       const struct timer_config *config);
+
+static inline void timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
+{
+	/** 
+	 * To do a 16-bit write, the high byte must be written before the low byte.
+	 *  For a 16-bit read, the low byte must be read before the high byte.
+	 */
+	dev->TCNTnH = val >> 8;
+	dev->TCNTnL = val & 0xffU;
+}
 
 #endif /* _AVRTOS_DRIVER_TIMER_H_ */
