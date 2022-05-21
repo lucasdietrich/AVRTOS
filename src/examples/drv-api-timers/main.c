@@ -13,11 +13,11 @@ void callback(void *dev, uint8_t tim_idx, void *arg)
 
 		/* if callback takes more time than the timer period,
 		* the interrupt flag will be set again by the peripheral and the callback
-		* will be called a last timer after this one.
+		* will be called a last time after this one.
 		* 
 		* To avoid this, clear all interrupt flags.
 		*/
-		ll_timer_clear_irq_flag(tim_idx);
+		ll_timer_clear_irq_flags(tim_idx);
 	}
 }
 

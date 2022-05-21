@@ -124,7 +124,7 @@ int timer8_drv_deinit(TIMER8_Device *dev)
 	}
 
 	ll_timer_clear_int_mask(tim_idx);
-	ll_timer_clear_irq_flag(tim_idx);
+	ll_timer_clear_irq_flags(tim_idx);
 
 	dev->TCCRnB = 0U;
 	dev->TCCRnA = 0U;
@@ -144,7 +144,7 @@ int timer16_drv_deinit(TIMER16_Device *dev)
 	}
 
 	ll_timer_clear_int_mask(tim_idx);
-	ll_timer_clear_irq_flag(tim_idx);
+	ll_timer_clear_irq_flags(tim_idx);
 
 		/* disable interrupts first */
 	dev->TCCRnA = 0U;
@@ -281,10 +281,11 @@ int timer_init(uint8_t tim_idx,
 	const bool is_timer2 = tim_idx == 2; /* timer2 has more prescaler values */
 
 	/* iterate over prescaler values and find the best match */
-	uint8_t prescaler_id = is_timer2 ? TIMER2_PRESCALER_1 : TIMER_PRESCALER_1;
+	uint8_t prescaler_id = 0;
 	uint32_t counter;
 
-	while (true) {
+	do {
+		prescaler_id++; /* fetch next prescaler */
 		int prescaler_val = is_timer2 ?
 			get_timer2_presc_value(prescaler_id) :
 			get_timer_presc_value(prescaler_id);
@@ -293,12 +294,7 @@ int timer_init(uint8_t tim_idx,
 		}
 
 		counter = CALCULATE_COUNTER_VALUE(period_us, prescaler_val);
-		if (counter <= max_counter) {
-			break;
-		}
-
-		prescaler_id++; /* fetch next prescaler */
-	}
+	} while (counter > max_counter);
 
 	tim_ctx[tim_idx].cb = cb;
 	tim_ctx[tim_idx].user_data = user_data;

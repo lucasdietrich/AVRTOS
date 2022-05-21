@@ -354,7 +354,7 @@ static inline void ll_timer_set_int_mask(uint8_t tim_idx, uint8_t mask)
 	TIMSKn[tim_idx] = mask;
 }
 
-static inline void ll_timer_clear_irq_flag(uint8_t tim_idx)
+static inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
 {
 	/* For example : OCF1A: 
 	 * OCFnA is automatically cleared when the Output Compare Match A 
