@@ -577,6 +577,8 @@ Priority *COOPERATIVE* :
   - Remove unused code
 - Extend drivers support
 - Exceptions
+- Add a logging system !
+- Find a way to not use the usart_print*() function anymore and to use the UART drivers instead
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
