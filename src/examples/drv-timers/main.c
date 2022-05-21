@@ -14,7 +14,8 @@ volatile uint32_t cnt = 0;
 
 ISR(TIMER4_OVF_vect)
 {
-	timer16_set_tcnt(TIMER4_DEVICE, 0x8000U);
+	ll_timer16_set_tcnt(TIMER4_DEVICE, 0x8000U);
+
 	usart_transmit('4');
 }
 
@@ -37,24 +38,22 @@ int main(void)
 	struct timer_config cfg = {
 		.mode = TIMER_MODE_CTC,
 		.prescaler = TIMER_PRESCALER_256,
-		.counter = 62500U - 1U
+		.counter = 62500U - 1U,
+		.timsk = BIT(OCIEnA),
 	};
-
-	ll_timer16_drv_init(TIMER5_DEVICE, &cfg);
-	TIMER_TIMSK_SET_OCIEA(timer_get_index(TIMER5_DEVICE));
+	ll_timer16_drv_init(TIMER5_DEVICE, timer_get_index(TIMER5_DEVICE), &cfg);
 
 	cfg.prescaler = TIMER_PRESCALER_1024;
 	cfg.counter = 255U;
 
-	ll_timer8_drv_init(TIMER0_DEVICE, &cfg);
-	TIMER_TIMSK_SET_OCIEA(0);
+	ll_timer8_drv_init(TIMER0_DEVICE, timer_get_index(TIMER0_DEVICE), &cfg);
 
 	cfg.counter = 0U;
 	cfg.mode = TIMER_MODE_NORMAL;
 	cfg.prescaler = TIMER_PRESCALER_1024;
+	cfg.timsk = BIT(TOIEn);
 
-	ll_timer16_drv_init(TIMER4_DEVICE, &cfg);
-	TIMER_TIMSK_SET_TOIE(timer_get_index(TIMER4_DEVICE));
+	ll_timer16_drv_init(TIMER4_DEVICE, timer_get_index(TIMER4_DEVICE), &cfg);
 
 	for (;;) {
 		printf("\n");

@@ -85,21 +85,20 @@
 
 void _k_init_sysclock(void)
 {
-	void *const dev = timer_get_by_index(KERNEL_SYSLOCK_HW_TIMER);
+	void *const dev = timer_get_device(KERNEL_SYSLOCK_HW_TIMER);
 
 	const struct timer_config cfg = {
 		.mode = TIMER_MODE_CTC,
 		.prescaler = PRESCALER_CONFIG,
-		.counter = COUNTER_VALUE
+		.counter = COUNTER_VALUE,
+		.timsk = BIT(OCIEnA),
 	};
 
 #if IS_TIMER_INDEX_16BIT(KERNEL_SYSLOCK_HW_TIMER)
-	ll_timer16_drv_init(dev, &cfg);
+	ll_timer16_drv_init(dev, KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #elif IS_TIMER_INDEX_8BIT(KERNEL_SYSLOCK_HW_TIMER)
-	ll_timer8_drv_init(dev, &cfg);
+	ll_timer8_drv_init(dev, KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #else
 #	error "invalid timer type"
 #endif
-
-	TIMER_TIMSK_SET_OCIEA(KERNEL_SYSLOCK_HW_TIMER);
 }

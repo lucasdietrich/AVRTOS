@@ -233,17 +233,6 @@ extern struct k_thread * _current;
 /*___________________________________________________________________________*/
 
 /**
- * @brief 
- * 
- * @param th thread structure pointer
- * @param entry thread entry function
- * @param stack thread stack start location
- * @param stack_size thread stack size
- * @param priority thread priority
- * @param context_p thread context passed to entry function
- */
-
-/**
  * @brief Define a new thread at runtime and initialize its stack
  * 
  * @param th hread structure pointer
@@ -252,6 +241,7 @@ extern struct k_thread * _current;
  * @param stack_size thread stack size
  * @param priority thread priority
  * @param context_p thread context passed to entry function
+ * @param symbol thread symbol letter
  * @return int 0 on success
  */
 int k_thread_create(struct k_thread *const th, thread_entry_t entry,

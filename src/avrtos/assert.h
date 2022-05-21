@@ -32,6 +32,7 @@ extern "C" {
 #define K_MODULE_EVENT          18
 
 #define K_MODULE_DRIVERS_USART  19
+#define K_MODULE_DRIVERS_TIMERS  20
 
 #define K_MODULE_APPLICATION    0x20
 
@@ -59,18 +60,19 @@ extern "C" {
 
 // move to assert.h
 #if KERNEL_ASSERT
-#   define __ASSERT(acode, assertion) __assert((uint8_t) (assertion), K_MODULE, acode, __LINE__)
+#   	define __ASSERT(acode, assertion) __assert((uint8_t) (assertion), K_MODULE, acode, __LINE__)
 #else
-#   define __ASSERT(acode, assertion) 
+#   	define __ASSERT(acode, assertion) 
 #endif
 
 #define K_ASSERT __ASSERT
 
 /*___________________________________________________________________________*/
 
-#define __STATIC_ASSERT(test_for_true) _Static_assert((test_for_true), "(" #test_for_true ") failed")
+#define __STATIC_ASSERT(test_for_true, msg) _Static_assert(test_for_true, msg)
+#define __STATIC_ASSERT_AUTOMSG(test_for_true) _Static_assert(test_for_true, "(" #test_for_true ") failed")
 
-#define K_STATIC_ASSERT __STATIC_ASSERT
+#define K_STATIC_ASSERT __STATIC_ASSERT_AUTOMSG
 
 /*___________________________________________________________________________*/
 

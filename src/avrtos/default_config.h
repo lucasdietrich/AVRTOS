@@ -97,7 +97,7 @@
 #define DEFAULT_KERNEL_TIME_SLICE_US               	4000LLU
 
 //
-// Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1)
+// Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timers : timer1 (1, 3, 4, 5)
 //
 #define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	2
 
@@ -279,6 +279,20 @@
  */
 #define DEFAULT_MAIN_STARTUP_INTERRUPT_POLICY		0
 
+/**
+ * @brief Add high level support for configuring an hardware timer
+ */
+#define DEFAULT_DRIVERS_TIMER0_API			0
+
+#define DEFAULT_DRIVERS_TIMER1_API			0
+
+#define DEFAULT_DRIVERS_TIMER2_API			0
+
+#define DEFAULT_DRIVERS_TIMER3_API			0
+
+#define DEFAULT_DRIVERS_TIMER4_API			0
+
+#define DEFAULT_DRIVERS_TIMER5_API			0
 /*___________________________________________________________________________*/
 
 #endif

@@ -81,11 +81,11 @@ typedef struct {
 #define TIMER_TIMSK_SET_TOIE(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(TOIEn))
 #define TIMER_TIMSK_SET_ICIE(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(ICIEn))
 
-#define TIMER_TIMSK_CLEAR_OCIEA(tim_idx) CLEAR_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
-#define TIMER_TIMSK_CLEAR_OCIEB(tim_idx) CLEAR_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
-#define TIMER_TIMSK_CLEAR_OCIEC(tim_idx) CLEAR_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
-#define TIMER_TIMSK_CLEAR_TOIE(tim_idx) CLEAR_BIT(TIMSKn[tim_idx], BIT(TOIEn))
-#define TIMER_TIMSK_CLEAR_ICIE(tim_idx) CLEAR_BIT(TIMSKn[tim_idx], BIT(ICIEn))
+#define TIMER_TIMSK_CLEAR_OCIEA(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
+#define TIMER_TIMSK_CLEAR_OCIEB(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
+#define TIMER_TIMSK_CLEAR_OCIEC(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
+#define TIMER_TIMSK_CLEAR_TOIE(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(TOIEn))
+#define TIMER_TIMSK_CLEAR_ICIE(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(ICIEn))
 
 #define TIMER_TIMSK_READ_OCIEA(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
 #define TIMER_TIMSK_READ_OCIEB(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
@@ -172,6 +172,9 @@ typedef struct {
 
 #define IS_TIMER_8BITS(dev) (IS_TIMER0_DEVICE(dev) || IS_TIMER2_DEVICE(dev))
 
+#define IS_TIMER_IDX_8BITS(idx) ((idx == 0) || (idx == 2))
+#define IS_TIMER_IDX_16BITS(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
+
 // #define IS_TIMER8(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER8_Device))
 // #define IS_TIMER16(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER16_Device))
 
@@ -210,10 +213,27 @@ typedef enum {
 
 struct timer_config
 {
-	timer_mode_t mode: 4;
-	uint8_t prescaler: 3;
+	/**
+	 * @brief Timer mode
+	 */
+	timer_mode_t mode : 4;
 
+	/**
+	 * @brief Timer prescaler (can be timer_prescaler_t or timer2_prescaler_t)
+	 */
+	uint8_t prescaler : 3;
+
+	/**
+	 * @brief Timer counter value
+	 * 
+	 * Note: Cast to uint8_t for 8 bits timers
+	 */
 	uint16_t counter;
+
+	/**
+	 * @brief Enable interrupts handlers
+	 */
+	uint8_t timsk; // TOIEn, OCIEnA, OCIEnB, OCIEnC, ICIEn
 };
 
 // typedef enum {
@@ -240,6 +260,19 @@ struct timer_config
 // 	TIMER_INTERRUPT_OVERFLOW1
 // } timer_interrupt_type_t;
 
+/**
+ * @brief Get the timer index from the device address
+ * 
+ * This function is declared static inline, because it can be mostly optimized 
+ * to a constant value by the compiler when called on a constant timer device.
+ * 
+ * Example: "timer_get_index(TIMER4_DEVICE)" will give "4" at compile time.
+ * 
+ * Note: Do not use this function to get the timer index dynamically.
+ * 
+ * @param dev 
+ * @return int 
+ */
 static inline int timer_get_index(void *dev)
 {
 	int ret = -EINVAL;
@@ -268,7 +301,20 @@ static inline int timer_get_index(void *dev)
 	return  ret;
 }
 
-static inline void *timer_get_by_index(uint8_t idx)
+/**
+ * @brief Get the timer device address from its index
+ * 
+ * This function is declared static inline, because it can be mostly optimized 
+ * to a constant value by the compiler when called on a constant timer device.
+ * 
+ * Example: "timer_get_device(4)" will give the value of TIMER4_DEVICE at compile time.
+ * 
+ * Note: Do not use this function to get the timer device address dynamically.
+ * 
+ * @param dev 
+ * @return int 
+ */
+static inline void *timer_get_device(uint8_t idx)
 {
 	void *dev = NULL;
 
@@ -298,14 +344,96 @@ static inline void *timer_get_by_index(uint8_t idx)
 	return dev;
 }
 
+static inline void ll_timer_clear_int_mask(uint8_t tim_idx)
+{
+	TIMSKn[tim_idx] = 0U;
+}
+
+static inline void ll_timer_set_int_mask(uint8_t tim_idx, uint8_t mask)
+{
+	TIMSKn[tim_idx] = mask;
+}
+
+static inline void ll_timer_clear_irq_flag(uint8_t tim_idx)
+{
+	/* For example : OCF1A: 
+	 * OCFnA is automatically cleared when the Output Compare Match A 
+	 * Interrupt Vector is executed. Alternatively, OCFnA can be cleared by 
+	 * writing a logic one to its bit location.
+	 */
+	TIFRn[tim_idx] = 0xFFU;
+}
+
+static inline void ll_timer8_stop(TIMER8_Device *dev)
+{
+	/* timer stops counting at the timer prescaler is set to zero */
+	dev->TCCRnB &= ~(BIT(CSn0) | BIT(CSn1) | BIT(CSn2));
+}
+
+static inline void ll_timer8_counter_reset(TIMER8_Device *dev)
+{
+	dev->TCNTn = 0x00U;
+}
+
+static inline void ll_timer8_start(TIMER8_Device *dev,
+				   uint8_t prescaler)
+{
+	/* timer starts counting at the timer prescaler is set*/
+	dev->TCCRnB |= prescaler << CSn0;
+}
+
+static inline void ll_timer16_set_tcnt(TIMER16_Device *dev,
+				       uint16_t val)
+{
+	/**
+	 * To do a 16-bit write, the high byte must be written before the low byte.
+	 *  For a 16-bit read, the low byte must be read before the high byte.
+	 */
+	dev->TCNTnH = val >> 8;
+	dev->TCNTnL = val & 0xffU;
+}
+
+static inline void ll_timer16_stop(TIMER16_Device *dev)
+{
+	/* timer stops counting at the timer prescaler is set to zero */
+	dev->TCCRnB &= ~(BIT(CSn0) | BIT(CSn1) | BIT(CSn2));
+}
+
+static inline void ll_timer16_counter_reset(TIMER16_Device *dev)
+{
+	ll_timer16_set_tcnt(dev, 0x0000U);
+}
+
+static inline void ll_timer16_start(TIMER16_Device *dev,
+				    uint8_t prescaler)
+{
+	/* timer starts counting at the timer prescaler is set*/
+	dev->TCCRnB |= prescaler < CSn0;
+}
+
+static inline void ll_timer_stop(void *dev)
+{
+	/* as TCCRnB is at the same address in the timer regisiters, we
+	 * can use the same function to stop all timers types */
+	ll_timer8_stop((TIMER8_Device *)dev);
+}
+
+static inline void ll_timer_start(void *dev, uint8_t prescaler)
+{
+	/* see ll_timer_stop */
+	ll_timer8_start((TIMER8_Device *)dev, prescaler);
+}
+
 void ll_timer8_drv_init(TIMER8_Device *dev,
+			uint8_t tim_idx,
 			const struct timer_config *config);
+
+void ll_timer16_drv_init(TIMER16_Device *dev,
+			 uint8_t tim_idx,
+			 const struct timer_config *config);
 
 int timer8_drv_init(TIMER8_Device *dev,
 		    const struct timer_config *config);
-
-void ll_timer16_drv_init(TIMER16_Device *dev,
-			 const struct timer_config *config);
 
 int timer16_drv_init(TIMER16_Device *dev,
 		     const struct timer_config *config);
@@ -314,14 +442,24 @@ int timer8_drv_deinit(TIMER8_Device *dev);
 
 int timer16_drv_deinit(TIMER16_Device *dev);
 
-static inline void timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
-{
-	/** 
-	 * To do a 16-bit write, the high byte must be written before the low byte.
-	 *  For a 16-bit read, the low byte must be read before the high byte.
-	 */
-	dev->TCNTnH = val >> 8;
-	dev->TCNTnL = val & 0xffU;
-}
+#define TIMER_API_FLAG_AUTOSTART		(1 << 0)
+
+typedef void (*timer_callback_t)(void *dev, uint8_t tim_idx, void *user_data);
+
+/* High level API */
+int timer_init(uint8_t tim_idx,
+	       uint32_t period_us,
+	       timer_callback_t cb,
+	       void *user_data,
+	       uint8_t flags);
+
+
+void timer_start(uint8_t tim_idx);
+
+void timer_stop(uint8_t tim_idx);
+
+uint8_t timer_get_prescaler(uint8_t tim_idx);
+
+uint32_t timer_get_max_period_us(uint8_t tim_idx);
 
 #endif /* _AVRTOS_DRIVER_TIMER_H_ */

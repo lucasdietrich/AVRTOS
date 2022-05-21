@@ -176,7 +176,7 @@ void k_wait(k_timeout_t timeout)
 	uint64_t now;
 	
 	do {
-		k_idle(); /* idle the thread */
+		k_idle(); /* idle the thread until next interrupt */
 
 		now = k_ticks_get_64();
 	} while (now - ticks < K_TIMEOUT_TICKS(timeout));
@@ -368,7 +368,7 @@ void _k_suspend(void)
 void _k_system_shift(void)
 {
 	__ASSERT_NOINTERRUPT();
-	__STATIC_ASSERT(KERNEL_TIME_SLICE_TICKS != 0);
+	__STATIC_ASSERT_AUTOMSG(KERNEL_TIME_SLICE_TICKS != 0);
 
 	tqueue_shift(&_k_events_queue, KERNEL_TIME_SLICE_TICKS);
 
