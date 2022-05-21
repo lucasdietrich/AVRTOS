@@ -57,7 +57,20 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
         return 0;
 }
 
-int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
+
+/**
+ * @brief Internal function to allocate a block
+ * 
+ * Assumptions :
+ * - slab not null
+ * - mem not null
+ * - interrupts are disabled
+ * 
+ * @param slab 
+ * @param mem 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
         __ASSERT_NOTNULL(slab);
         __ASSERT_NOTNULL(mem);
@@ -97,7 +110,20 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
         return ret;
 }
 
-int8_t _k_mem_slab_free(struct k_mem_slab *slab, void *mem)
+/**
+ * @brief Internal function to free a block
+ * 
+ * Assumptions :
+ * - slab not null
+ * - mem not null
+ * - interrupts are disabled
+ * - mem is currently "allocated"
+ * 
+ * @param slab 
+ * @param mem 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE static int8_t _k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
         __ASSERT_NOTNULL(slab);
         __ASSERT_NOTNULL(mem);

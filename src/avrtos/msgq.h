@@ -81,7 +81,7 @@ K_NOINLINE int8_t k_msgq_cleanup(struct k_msgq *msgq);
  *      ENOMSG on MsgQ full)
  */
 K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
-                          k_timeout_t timeout);
+			     k_timeout_t timeout);
 
 /**
  * @brief Try to get a message @a data to the MsgQ @a msgq.
@@ -97,7 +97,7 @@ K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
  *      ENOMSG on no message)
  */
 K_NOINLINE int8_t k_msgq_get(struct k_msgq *msgq, void *data,
-                          k_timeout_t timeout);
+			     k_timeout_t timeout);
 
 /**
  * @brief Cancel all thread pending on the MsgQ (reading or writing).
