@@ -10,11 +10,6 @@ static int _get_index(void *dev)
 	return timer_get_index(dev);
 }
 
-static void *_get_device(uint8_t tim_idx)
-{
-	return timer_get_device(tim_idx);
-}
-
 static bool _is_8bits(uint8_t tim_idx)
 {
 	return IS_TIMER_IDX_8BITS(tim_idx);
@@ -161,6 +156,11 @@ int timer16_drv_deinit(TIMER16_Device *dev)
 }
 
 #if DRIVERS_TIMERS_API
+
+static void *_get_device(uint8_t tim_idx)
+{
+	return timer_get_device(tim_idx);
+}
 
 struct timer_api_ctx {
 	timer_callback_t cb;
