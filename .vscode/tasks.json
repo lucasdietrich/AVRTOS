@@ -4,90 +4,112 @@
 		{
 			"type": "shell",
 			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU WSL Ubuntu - Sysclock-qemu-ATmega2560"
+			"label": "QEMU WSL Ubuntu - Sysclock-qemu-ATmega2560",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/Sysclock-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU WSL Ubuntu - Sysclock-qemu-ATmega328p"
+			"label": "QEMU WSL Ubuntu - Sysclock-qemu-ATmega328p",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Timer-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU WSL Ubuntu - Timer-qemu-ATmega2560"
+			"label": "QEMU WSL Ubuntu - Timer-qemu-ATmega2560",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/MutexMultithreadingDemo-qemu-ATmega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU WSL Ubuntu - MutexMultithreadingDemo-qemu-ATmega328p"
+			"label": "QEMU WSL Ubuntu - MutexMultithreadingDemo-qemu-ATmega328p",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/FifoQemuMega328p/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU WSL Ubuntu - FifoQemuMega328p"
+			"label": "QEMU WSL Ubuntu - FifoQemuMega328p",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/ThreadTermination-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU VMDEV Ubuntu - ThreadTermination-qemu-ATmega2560"
+			"label": "QEMU VMDEV Ubuntu - ThreadTermination-qemu-ATmega2560",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "wsl ~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/ThreadTermination-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU WSL Ubuntu - ThreadTermination-qemu-ATmega2560"
+			"label": "QEMU WSL Ubuntu - ThreadTermination-qemu-ATmega2560",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Uptime-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU VMDEV Ubuntu - Uptime-qemu-ATmega2560"
+			"label": "QEMU VMDEV Ubuntu - Uptime-qemu-ATmega2560",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/QEMU-V2/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU V2"
+			"label": "QEMU V2",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/QEMU-CoopMultithreadingDemo/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU-CoopMultithreadingDemo"
+			"label": "QEMU-CoopMultithreadingDemo",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 		{
 			"type": "shell",
 			"command": "~/qemu/build/avr-softmmu/qemu-system-avr -M uno -bios .pio/build/QEMU-StackSentinel/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off",
-			"problemMatcher": [
-				"$platformio"
-			],
-			"label": "QEMU-StackSentinel"
+			"label": "QEMU-StackSentinel",
+			"options": {
+				"statusbar": {
+					"hide": true
+				}
+			},
 		},
 	]
 }
