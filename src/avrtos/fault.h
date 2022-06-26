@@ -17,7 +17,7 @@ extern "C" {
 
 #define K_FAULT 		0xFF
 
-#if !__ASSEMBLER__
+#if !defined(__ASSEMBLER__)
 
 void __fault(uint8_t reason);
 

@@ -187,7 +187,11 @@ void k_block(k_timeout_t timeout)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		_delay_ms(K_TIMEOUT_TICKS(timeout) / K_TICKS_PER_SECOND);
+		k_ticks_t ticks = K_TIMEOUT_TICKS(timeout);
+		while (ticks != 0) {
+			_delay_us(K_TICKS_US);
+			ticks--;
+		}
 	}
 }
 
@@ -458,13 +462,14 @@ void _k_reschedule(k_timeout_t timeout)
 
 /*___________________________________________________________________________*/
 
+#if KERNEL_UPTIME
+
 uint32_t k_uptime_get(void)
 {
 #if KERNEL_TICKS_40BITS
 	return k_ticks_get_64() / K_TICKS_PER_SECOND;
-#elif KERNEL_TICKS
-	return k_ticks_get_32() / K_TICKS_PER_SECOND;
 #else
+	return k_ticks_get_32() / K_TICKS_PER_SECOND;
 	return 0;
 #endif /* KERNEL_UPTIME */
 }
@@ -488,6 +493,8 @@ uint64_t k_uptime_get_ms64(void)
 	return 0;
 #endif /* KERNEL_UPTIME */
 }
+
+#endif /* KERNEL_UPTIME */
 
 /*___________________________________________________________________________*/
 

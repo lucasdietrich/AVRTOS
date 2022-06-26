@@ -186,7 +186,7 @@
 //
 // Enabled thread errno
 //
-// #define DEFAULT_THREAD_ERRNO                    	0
+#define DEFAULT_THREAD_ERRNO                    	0
 
 /***
  * @brief Enable scheduler lock counter for each thread to allow 

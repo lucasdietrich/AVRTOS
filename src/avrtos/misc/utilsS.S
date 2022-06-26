@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <avrtos/defines.h>
 
 .global usart_core_dump
 .global usart_transmit

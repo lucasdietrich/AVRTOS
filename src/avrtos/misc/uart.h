@@ -43,7 +43,7 @@ void _usart_init(const uint16_t baudrate_ubrr);
 /**
  * @brief Initialize the USART at 115200 bauds/s
  */
-void usart_init();
+void usart_init(void);
 
 /**
  * @brief Send a single character over the USART

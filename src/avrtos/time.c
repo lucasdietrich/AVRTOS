@@ -1,16 +1,14 @@
 #include "time.h"
 
+#if KERNEL_TIME
+
 void k_timespec_get(struct timespec *ts)
 {
 	if (ts == NULL) {
 		return;
 	}
 
-#if KERNEL_UPTIME_40BITS
-	uint64_t ms = k_uptime_get_ms64();
-#else 
-	uint32_t ms = k_uptime_get_ms32();
-#endif
+	const uint64_t ms = k_uptime_get_ms64();
 
 	ts->tv_sec = ms / 1000;
 	ts->tv_msec = ms % 1000;
@@ -30,7 +28,6 @@ void k_show_uptime(void)
 		 ts.tv_sec, ts.tv_msec);
 }
 
-#if KERNEL_TIME
 static struct {
 	uint32_t timestamp;
 	uint32_t uptime_sec;

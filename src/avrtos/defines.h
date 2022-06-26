@@ -7,7 +7,7 @@
 
 /*___________________________________________________________________________*/
 
-// This find is include from asm files, make it compatible with ASM or user "#if !__ASSEMBLER__" preprocessor
+// This find is include from asm files, make it compatible with ASM or user "#if !defined(__ASSEMBLER__)" preprocessor
 
 #include "common.h"
 
@@ -335,7 +335,7 @@
 #if defined(CONFIG_DRIVERS_TIMER0_API)
 #	define DRIVERS_TIMER0_API CONFIG_DRIVERS_TIMER0_API
 #else
-#	define DRIVERS_TIMER0_API DRIVERS_TIMER0_API
+#	define DRIVERS_TIMER0_API DEFAULT_DRIVERS_TIMER0_API
 #endif /* CONFIG_DRIVERS_TIMER0_API */
 
 // timer1
@@ -422,12 +422,13 @@
 #define KERNEL_TICK_PERIOD_US	KERNEL_SYSCLOCK_PERIOD_US
 #define KERNEL_TICK_PERIOD_MS	(KERNEL_TICK_PERIOD_US / 1000ULL)
 
+#define K_TICKS_US		KERNEL_SYSCLOCK_PERIOD_US
 #define K_TICKS_PER_SECOND	(((float)1000000ULL) / KERNEL_SYSCLOCK_PERIOD_US)
 #define K_TICKS_PER_MS		(((float)1000ULL) / KERNEL_SYSCLOCK_PERIOD_US)
 
 // put all c specific definitions  here
 
-#if !__ASSEMBLER__
+#if !defined(__ASSEMBLER__)
 
 #include <stdint.h>
 #include <stddef.h>
@@ -517,7 +518,7 @@ typedef struct
 // 31 registers (31) + SREG (1) + return address (2 or 3)
 
 
-#if !__ASSEMBLER__
+#if !defined(__ASSEMBLER__)
 #define _K_CALLSAVED_CTX_SIZE	  sizeof(struct _k_callsaved_ctx)
 #else 
 #define _K_CALLSAVED_CTX_SIZE	  (19U + _K_ARCH_PC_SIZE)
@@ -537,8 +538,8 @@ typedef struct
 // some of following macros need to be differenciate for c or asm :
 // - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on pointers
 // - in asm files types are not understood by compiler
-#define K_STACK_END(stack_start, size) (void*) ((uint8_t*) stack_start + size - 1)
-#define K_STACK_START(stack_end, size) (void*) ((uint8_t*) stack_end - size + 1)
+#define K_STACK_END(stack_start, size) (uint8_t*) ((uint8_t*) stack_start + size - 1)
+#define K_STACK_START(stack_end, size) (uint8_t*) ((uint8_t*) stack_end - size + 1)
 #define K_THREAD_STACK_START(th) K_STACK_START(th->stack.end, th->stack.size)
 #define K_THREAD_STACK_END(th) (th->stack.end)
 

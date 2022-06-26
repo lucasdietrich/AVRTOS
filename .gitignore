@@ -6,4 +6,6 @@
 
 .idea
 
-tmp
+/tmp
+
+/build

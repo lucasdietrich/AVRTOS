@@ -14,6 +14,8 @@
 #	error "Unsupported MCU"
 #endif
 
+#define PERIOD_MS 200U
+
 int main(void)
 {
 	LED_DDR |= _BV(LED_PIN);
@@ -21,8 +23,8 @@ int main(void)
 
 	for (;;) {
 		LED_PORT |= _BV(LED_PIN);
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(PERIOD_MS));
 		LED_PORT &= ~_BV(LED_PIN);
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(PERIOD_MS));
 	}
 }

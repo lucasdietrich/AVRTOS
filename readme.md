@@ -579,6 +579,8 @@ Priority *COOPERATIVE* :
 - Exceptions
 - Add a logging system !
 - Find a way to not use the usart_print*() function anymore and to use the UART drivers instead
+- Get rid of the AVR startup code : [AVR Freaks : Custom Startup Code](https://www.avrfreaks.net/forum/custom-startup-code)
+  - Small overhead
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
