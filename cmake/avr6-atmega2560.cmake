@@ -7,9 +7,13 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "TRUE")
 set(CMAKE_GENERATOR "Unix Makefiles")
+
 set(F_CPU 16000000UL)
 set(MCU atmega2560)
 set(QEMU_MCU mega2560)
+
+set(BAUDRATE 500000)
+set(PROG_DEV "/dev/ttyACM0")
 
 set(VERBOSITY "")
 
@@ -40,6 +44,11 @@ set(CMAKE_EXE_LINKER_FLAGS
 set(PROG_TYPE wiring)
 set(PROG_PARTNO m2560)
 
+file(GLOB_RECURSE AVRTOS_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.c**")
+file(GLOB_RECURSE AVRTOS_ASM_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.S")
+
+set(AVRTOS_SRC ${AVRTOS_C_SRC} ${AVRTOS_ASM_SRC})
+
 function(qemu_generate_command PATH)
 	add_custom_target(qemu qemu-system-avr -M ${QEMU_MCU} -bios ${PATH}.elf -s -S -nographic)
 endfunction()
@@ -66,4 +75,8 @@ function(generate_post_build_command PATH)
 	add_custom_command(TARGET ${PATH} POST_BUILD
 		COMMAND avr-objdump -d ${PATH}.elf > ${PATH}.dis.asm VERBATIM
 	)
+endfunction()
+
+function(generate_miniterm_command PORT BAUDRATE)
+	add_custom_target(monitor python3 -m serial.tools.miniterm ${PORT} ${BAUDRATE})
 endfunction()

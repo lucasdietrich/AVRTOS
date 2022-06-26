@@ -1,8 +1,10 @@
+build:
+	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=cmake/avr6-atmega2560.cmake
+	make -C build
+# -–no-print-directory
 
-ELF = .pio/build/Sysclock-qemu-ATmega2560/firmware.elf
-CP_ELF = tmp/firmware.elf
+clean:
+	rm -rf build
 
-qemu: $(ELF)
-	mkdir -p tmp
-	cp $(ELF) $(CP_ELF)
-	qemu-system-avr -M mega2560 -bios $(CP_ELF) -s -S -nographic 
+qemu:
+	make -C build qemu
