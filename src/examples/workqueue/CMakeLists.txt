@@ -1,8 +1,6 @@
 
 project(workqueue)
 
-enable_language(C CXX ASM)
-
 set(EXE ${PROJECT_NAME})
 
 file(GLOB SOURCES "${CMAKE_CURRENT_LIST_DIR}/main.c")
@@ -26,9 +24,4 @@ target_include_directories(${EXE} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/../../
 )
 
-qemu_generate_command(${EXE})
-qemu_generate_debug_launch_json(${EXE})
-generate_hex(${EXE})
-generate_upload_command(${EXE})
-generate_post_build_command(${EXE})
-generate_miniterm_command(${PROG_DEV} ${BAUDRATE})
+target_prepare_env(${EXE})

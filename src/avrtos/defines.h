@@ -91,9 +91,17 @@
 
 // select hardware timer
 #if defined(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
-#   define KERNEL_SYSLOCK_HW_TIMER CONFIG_KERNEL_SYSLOCK_HW_TIMER
+#	define _DESIRED_SYSLOCK_HW_TIMER CONFIG_KERNEL_SYSLOCK_HW_TIMER
 #else
-#   define KERNEL_SYSLOCK_HW_TIMER DEFAULT_KERNEL_SYSLOCK_HW_TIMER
+#   	define _DESIRED_SYSLOCK_HW_TIMER DEFAULT_KERNEL_SYSLOCK_HW_TIMER
+#endif
+
+// in case of qemu emulator, check if the timer is available
+#if defined(__QEMU__) && (_DESIRED_SYSLOCK_HW_TIMER != 1U)
+#	warning "QEMU emulator detected, only timer 1 is supported"
+#	define KERNEL_SYSLOCK_HW_TIMER 1U
+#else
+#	define KERNEL_SYSLOCK_HW_TIMER _DESIRED_SYSLOCK_HW_TIMER
 #endif
 
 // select sysclock period us when precision mode disabled

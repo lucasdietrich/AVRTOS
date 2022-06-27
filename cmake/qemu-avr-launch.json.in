@@ -6,7 +6,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"miDebuggerServerAddress": "127.0.0.1:1234",
-			"program": "@CMAKE_BINARY_DIR@/src/examples/@PROJECT_NAME@/@PROJECT_NAME@.elf",
+			"program": "@ELF_PATH@",
 			"args": [],
 			"stopAtEntry": true,
 			"cwd": "${workspaceFolder}",

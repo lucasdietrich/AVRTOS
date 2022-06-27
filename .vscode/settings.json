@@ -3,6 +3,9 @@
 		"CMAKE_BUILD_TYPE": "Debug",
 		"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
 		"CMAKE_GENERATOR": "Unix Makefiles",
+		"CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/avr6-atmega2560.cmake",
+
+
 /* proc] Executing command: /usr/bin/cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE "-DCMAKE_GENERATOR:STRING=Unix Makefiles" -DCMAKE_C_COMPILER:FILEPATH=/usr/lib64/ccache/avr-gcc -DCMAKE_CXX_COMPILER:FILEPATH=/usr/lib64/ccache/avr-g++ -S/home/lucas/AVRTOS -B/home/lucas/AVRTOS/build */
 	},
 	"files.associations": {
@@ -46,6 +49,7 @@
 		"fault.h": "c",
 		"iom328p.h": "c",
 		"stdbool.h": "c",
-		"usart.h": "c"
+		"usart.h": "c",
+		"semaphore.h": "c"
 	},
 }

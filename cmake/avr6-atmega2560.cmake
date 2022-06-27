@@ -49,34 +49,36 @@ file(GLOB_RECURSE AVRTOS_ASM_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.S")
 
 set(AVRTOS_SRC ${AVRTOS_C_SRC} ${AVRTOS_ASM_SRC})
 
-function(qemu_generate_command PATH)
-	add_custom_target(qemu qemu-system-avr -M ${QEMU_MCU} -bios ${PATH}.elf -s -S -nographic)
-endfunction()
 
-function(qemu_generate_debug_launch_json)
+function(target_prepare_env target)
+	# get target output name
+	get_target_property(output_name ${target} OUTPUT_NAME)
+	set(ELF_PATH "${CMAKE_CURRENT_BINARY_DIR}/${output_name}")
+	message(STATUS ${ELF_PATH})
+
+	# create hex file
+	add_custom_target(hex_${target} ALL avr-objcopy -R .eeprom -O ihex ${output_name} ${exe}.hex)
+
+	# add upload command
+	add_custom_target(upload_${target} avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${exe}.hex DEPENDS hex_${target})
+	
+	# monitor command
+	# add_custom_target(monitor_${target} python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}")
+
+	# generate custom target for qemu
+	add_custom_target(qemu_${target} qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic)
+
+	# generate launch.json file
 	configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/qemu-avr-launch.json.in ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json @ONLY)
-endfunction()
 
-function(generate_hex PATH)
-	add_custom_target(hex ALL avr-objcopy -R .eeprom -O ihex ${PATH}.elf ${PATH}.hex)
-endfunction()
-
-function(generate_upload_command PATH)
-	add_custom_target(upload avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${PATH}.hex DEPENDS hex)
-endfunction()
-
-function(generate_post_build_command PATH)
-	add_custom_command(TARGET ${PATH} POST_BUILD
-		COMMAND avr-objdump -S ${PATH}.elf > ${PATH}.dis.src.asm VERBATIM
+	# disassembly
+	add_custom_command(TARGET ${target} POST_BUILD
+		COMMAND avr-objdump -S ${output_name} > ${target}.dis.src.asm VERBATIM
 	)
-	add_custom_command(TARGET ${PATH} POST_BUILD
-		COMMAND avr-readelf -a ${PATH}.elf > ${PATH}.readelf.txt VERBATIM
+	add_custom_command(TARGET ${target} POST_BUILD
+		COMMAND avr-readelf -a ${output_name} > ${target}.readelf.txt VERBATIM
 	)
-	add_custom_command(TARGET ${PATH} POST_BUILD
-		COMMAND avr-objdump -d ${PATH}.elf > ${PATH}.dis.asm VERBATIM
+	add_custom_command(TARGET ${target} POST_BUILD
+		COMMAND avr-objdump -d ${output_name} > ${target}.dis.asm VERBATIM
 	)
-endfunction()
-
-function(generate_miniterm_command PORT BAUDRATE)
-	add_custom_target(monitor python3 -m serial.tools.miniterm ${PORT} ${BAUDRATE})
 endfunction()
