@@ -4,9 +4,17 @@ project(avrtos-project)
 
 enable_language(C CXX ASM)
 
+
 # include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/avr6-atmega2560.cmake")
 # set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/avr6-atmega2560.cmake)
 # include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/avr6-atmega2560.cmake)
+
+# set(F_CPU 16000000UL)
+# set(MCU atmega2560)
+set(QEMU_MCU mega2560)
+
+set(BAUDRATE 500000)
+set(PROG_DEV "/dev/ttyACM0")
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug)
@@ -16,6 +24,4 @@ add_definitions(
     -DF_CPU=${F_CPU}
 )
 
-add_subdirectory(src/examples/workqueue)
-add_subdirectory(src/examples/blinking-led)
-add_subdirectory(src/examples/uptime)
+add_subdirectory(src/examples)

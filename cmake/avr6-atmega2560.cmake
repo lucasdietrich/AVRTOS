@@ -8,12 +8,9 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS "TRUE")
 set(CMAKE_GENERATOR "Unix Makefiles")
 
+# TODO move in main CMakeLists.txt
 set(F_CPU 16000000UL)
 set(MCU atmega2560)
-set(QEMU_MCU mega2560)
-
-set(BAUDRATE 500000)
-set(PROG_DEV "/dev/ttyACM0")
 
 set(VERBOSITY "")
 
@@ -49,27 +46,43 @@ file(GLOB_RECURSE AVRTOS_ASM_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.S")
 
 set(AVRTOS_SRC ${AVRTOS_C_SRC} ${AVRTOS_ASM_SRC})
 
+function(target_link_avrtos target)
+	target_sources(${target} PUBLIC ${AVRTOS_SRC})
+
+	target_include_directories(${target} PUBLIC
+		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/drivers
+		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/dstruct
+		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/misc
+		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/
+	)
+endfunction()
 
 function(target_prepare_env target)
 	# get target output name
 	get_target_property(output_name ${target} OUTPUT_NAME)
+	if (output_name STREQUAL "output_name-NOTFOUND")
+		set(output_name ${target})
+	endif()
+
 	set(ELF_PATH "${CMAKE_CURRENT_BINARY_DIR}/${output_name}")
-	message(STATUS ${ELF_PATH})
 
 	# create hex file
-	add_custom_target(hex_${target} ALL avr-objcopy -R .eeprom -O ihex ${output_name} ${exe}.hex)
+	add_custom_target(hex_${target} ALL avr-objcopy -R .eeprom -O ihex ${output_name} ${output_name}.hex DEPENDS ${target})
 
 	# add upload command
-	add_custom_target(upload_${target} avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${exe}.hex DEPENDS hex_${target})
+	add_custom_target(upload_${target} avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex DEPENDS hex_${target})
 	
 	# monitor command
 	# add_custom_target(monitor_${target} python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}")
 
-	# generate custom target for qemu
-	add_custom_target(qemu_${target} qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic)
-
 	# generate launch.json file
-	configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/qemu-avr-launch.json.in ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json @ONLY)
+	configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/qemu-avr-launch.json.in ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json @ONLY)
+
+	# generate custom target for qemu
+	add_custom_target(qemu_${target} 
+		COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json
+		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic)
+
 
 	# disassembly
 	add_custom_command(TARGET ${target} POST_BUILD
