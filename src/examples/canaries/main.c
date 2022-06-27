@@ -4,17 +4,17 @@
  * @brief Use of canaries to determine precise stacks needs for different threads
  * @version 0.1
  * @date 2021-08-06
- * 
+ *
  * @copyright Copyright (c) 2021
- * 
+ *
  * Configuration options
  *  - CONFIG_THREAD_CANARIES=1
  *  - CONFIG_THREAD_EXPLICIT_MAIN_STACK=1
- * 
+ *
  * Logs :
- * 
+ *
  * ...
- *  
+ *
  * [M] CANARIES until @07CE [found 468], MAX usage = 44 / 512
  * [2] CANARIES until @0113 [found 14], MAX usage = 498 / 512
  * [1] CANARIES until @03C7 [found 194], MAX usage = 62 / 256
@@ -48,66 +48,63 @@ K_THREAD_DEFINE(task2, thread_task2, 0x200, K_PREEMPTIVE, NULL, '2');
 
 int main(void)
 {
-  led_init();
-  usart_init();
-  
-  k_thread_dump_all();
+	led_init();
+	usart_init();
 
-  dump_stack_canaries();
+	k_thread_dump_all();
 
-  k_sleep(K_FOREVER);
+	dump_stack_canaries();
+
+	k_sleep(K_FOREVER);
 }
 
 void thread_led(void *p)
 {
-  while (1)
-  {
-    led_on();
+	while (1) {
+		led_on();
 
-    k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(1000));
 
-    led_off();
-  }
+		led_off();
+	}
 }
 
 void thread_task1(void *p)
 {
-  while (1)
-  {
-    dump_stack_canaries();
-    
-    k_sleep(K_MSEC(1000));
+	while (1) {
+		dump_stack_canaries();
 
-    // USART_DUMP_RAM_ALL();
+		k_sleep(K_MSEC(1000));
 
-    // k_sleep(K_MSEC(10000));
-  }
+		// USART_DUMP_RAM_ALL();
+
+		// k_sleep(K_MSEC(10000));
+	}
 }
 
 void thread_task2(void *p)
 {
-  uint16_t blocks = 0;
+	uint16_t blocks = 0;
 
-  while(1) {
-    blocks = (blocks + 1) % (0x200 - 30);
+	while (1) {
+		blocks = (blocks + 1) % (0x200 - 30);
 
-    if (blocks != 0)
-    {
-      cli();
-      SP -= (blocks - 1);
-      *((uint8_t*) SP--) = 0xBB;
-      sei();
+		if (blocks != 0) {
+			cli();
+			SP -= (blocks - 1);
+			*((uint8_t *)SP--) = 0xBB;
+			sei();
 
-      // at this moment we need the most of the stack
-      k_yield();
+			// at this moment we need the most of the stack
+			k_yield();
 
-      cli();
-      SP += blocks;
-      sei();
-    }
+			cli();
+			SP += blocks;
+			sei();
+		}
 
-    k_sleep(K_MSEC(50));
-  }
+		k_sleep(K_MSEC(50));
+	}
 }
 
 /*___________________________________________________________________________*/

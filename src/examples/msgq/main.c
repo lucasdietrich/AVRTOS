@@ -40,66 +40,66 @@ K_THREAD_DEFINE(r1, reader, 0x50, K_PREEMPTIVE, &msgq, 'R');
 
 void writer(struct k_msgq *msgq)
 {
-        int8_t ret;
-        char buf[BLOCK_SIZE];
+	int8_t ret;
+	char buf[BLOCK_SIZE];
 
-        for (;;) {
-                (*(uint16_t*) buf)++;
+	for (;;) {
+		(*(uint16_t *)buf)++;
 
-                ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
-                usart_transmit(_current->symbol);
+		ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
+		usart_transmit(_current->symbol);
 
-                if (ret == 0) {
-                        usart_transmit(' ');
-                        usart_u16(*(uint16_t*)buf);
-                        usart_transmit('\n');
+		if (ret == 0) {
+			usart_transmit(' ');
+			usart_u16(*(uint16_t *)buf);
+			usart_transmit('\n');
 
-                        k_sleep(K_MSEC(WRITER_DELAY));
-                } else if (ret == -ECANCEL) {
-                        usart_print_p(PSTR(" canceled\n"));
-                } else {
-                        usart_print_p(PSTR(" !\n"));
-                }
-        }
+			k_sleep(K_MSEC(WRITER_DELAY));
+		} else if (ret == -ECANCEL) {
+			usart_print_p(PSTR(" canceled\n"));
+		} else {
+			usart_print_p(PSTR(" !\n"));
+		}
+	}
 }
 
 void reader(struct k_msgq *msgq)
 {
-        int8_t ret;
-        char buf[BLOCK_SIZE];
+	int8_t ret;
+	char buf[BLOCK_SIZE];
 
-        for (;;) {
-                ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
-                usart_transmit(_current->symbol);
-                if (ret == 0) {
-                        
-                        usart_transmit(' ');
-                        usart_u16(*(uint16_t*)buf);
-                        usart_transmit('\n');
+	for (;;) {
+		ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
+		usart_transmit(_current->symbol);
+		if (ret == 0) {
 
-                        k_sleep(K_MSEC(READER_DELAY));
-                } else if (ret == -ECANCEL) {
-                        usart_print_p(PSTR(" canceled\n"));
-                } else {
-                        usart_print_p(PSTR(" !\n"));
-                }
-        }
+			usart_transmit(' ');
+			usart_u16(*(uint16_t *)buf);
+			usart_transmit('\n');
+
+			k_sleep(K_MSEC(READER_DELAY));
+		} else if (ret == -ECANCEL) {
+			usart_print_p(PSTR(" canceled\n"));
+		} else {
+			usart_print_p(PSTR(" !\n"));
+		}
+	}
 }
 
 int main(void)
 {
-        /* interrupts are disabled in this thread */
+	/* interrupts are disabled in this thread */
 
-        led_init();
-        usart_init();
+	led_init();
+	usart_init();
 
-        k_thread_dump_all();
+	k_thread_dump_all();
 
-        for (;;) {
-                k_sleep(K_MSEC(PURGE_PERIOD));
+	for (;;) {
+		k_sleep(K_MSEC(PURGE_PERIOD));
 
-                k_msgq_purge(&msgq);
-        }
+		k_msgq_purge(&msgq);
+	}
 }
 
 /*___________________________________________________________________________*/

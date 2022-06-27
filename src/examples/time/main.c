@@ -21,17 +21,17 @@ int main(void)
 	k_thread_dump_all();
 
 	_delay_ms(2000);
-	
+
 	irq_enable();
 
 	k_show_uptime();
 
 	uint32_t timestamp;
 
-	for(;;) {
+	for (;;) {
 		// now = k_uptime_get_ms64();
 		timestamp = k_time_get();
-		
+
 		k_show_uptime();
 
 		printf_P(PSTR(" %lu 64ms - %lu 32ms - "),
@@ -48,7 +48,7 @@ int main(void)
 void thread(void *ctx)
 {
 	uint32_t sec = 100000;
-	for(;;) {
+	for (;;) {
 		k_time_set(sec);
 
 		sec += 100000;
@@ -59,7 +59,7 @@ void thread(void *ctx)
 
 void processing(void *ctx)
 {
-	for(;;) {
+	for (;;) {
 
 	}
 }

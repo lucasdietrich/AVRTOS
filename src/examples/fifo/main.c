@@ -27,8 +27,8 @@ K_THREAD_DEFINE(consumer2, consumer_thread, 0x50, K_PREEMPTIVE, &timeouts[1], 'B
 
 struct item
 {
-  char chr;
-  struct qitem tie;
+	char chr;
+	struct qitem tie;
 };
 
 struct item letters[] = {
@@ -39,46 +39,41 @@ struct item letters[] = {
 
 int main(void)
 {
-  led_init();
-  usart_init();
-  
-  k_thread_dump_all();
+	led_init();
+	usart_init();
 
-  irq_enable();
+	k_thread_dump_all();
 
-  uint8_t pos = 0u;
-  while(1)
-  {
-    usart_transmit(_current->symbol);
-    usart_print_p(PSTR(" : Send = "));
-    usart_transmit(letters[pos].chr);
-    usart_transmit('\n');
+	irq_enable();
 
-    k_fifo_put(&fifo, &letters[pos].tie);
+	uint8_t pos = 0u;
+	while (1) {
+		usart_transmit(_current->symbol);
+		usart_print_p(PSTR(" : Send = "));
+		usart_transmit(letters[pos].chr);
+		usart_transmit('\n');
 
-    pos = (pos + 1) % ARRAY_SIZE(letters);
+		k_fifo_put(&fifo, &letters[pos].tie);
 
-    k_sleep(K_SECONDS(6));
-  }
+		pos = (pos + 1) % ARRAY_SIZE(letters);
+
+		k_sleep(K_SECONDS(6));
+	}
 }
 
 void consumer_thread(k_timeout_t *p_timeout)
 {
-  while(1)
-  {
-    struct qitem* tie = k_fifo_get(&fifo, *p_timeout);
-    usart_transmit(_current->symbol);
-    if (tie != NULL)
-    {
-      usart_print_p(PSTR(" : Received = "));
-      usart_transmit(CONTAINER_OF(tie, struct item, tie)->chr);
-      usart_transmit('\n');
-    }
-    else
-    {
-      usart_printl_p(PSTR(" : Failed to get a fifo item"));
-    }
-  }
+	while (1) {
+		struct qitem *tie = k_fifo_get(&fifo, *p_timeout);
+		usart_transmit(_current->symbol);
+		if (tie != NULL) {
+			usart_print_p(PSTR(" : Received = "));
+			usart_transmit(CONTAINER_OF(tie, struct item, tie)->chr);
+			usart_transmit('\n');
+		} else {
+			usart_printl_p(PSTR(" : Failed to get a fifo item"));
+		}
+	}
 }
 
 /*___________________________________________________________________________*/

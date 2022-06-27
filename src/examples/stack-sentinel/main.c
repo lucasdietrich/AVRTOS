@@ -32,14 +32,14 @@ int main(void)
 		dump_stack_canaries();
 
 		k_thread_dump_all();
-		
+
 		k_sleep(K_SECONDS(1));
 	}
 }
 
 void thread(void *p)
 {
-	for(;;) {
+	for (;;) {
 		sleep_cpu();
 	}
 }

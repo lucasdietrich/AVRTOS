@@ -27,35 +27,35 @@ K_MUTEX_DEFINE(mymutex);
 
 int main(void)
 {
-  led_init();
-  usart_init();
-  
-  k_thread_dump_all();
+	led_init();
+	usart_init();
 
-  k_mutex_lock(&mymutex, K_NO_WAIT);
+	k_thread_dump_all();
 
-  irq_enable();
+	k_mutex_lock(&mymutex, K_NO_WAIT);
 
-  k_sleep(K_SECONDS(1));
+	irq_enable();
 
-  k_mutex_unlock(&mymutex);
+	k_sleep(K_SECONDS(1));
 
-  k_sleep(K_FOREVER);
+	k_mutex_unlock(&mymutex);
+
+	k_sleep(K_FOREVER);
 }
 
 void waiting_thread(k_timeout_t *timeout)
 {
-  usart_transmit(_current->symbol);
-  usart_printl_p(PSTR(": starting"));
-  
-  uint8_t locked = k_mutex_lock(&mymutex, *timeout);
+	usart_transmit(_current->symbol);
+	usart_printl_p(PSTR(": starting"));
 
-  usart_transmit(_current->symbol);
-  if (locked == 0) {
-    usart_printl_p(PSTR(": locked the mutex !"));
-  } else {
-    usart_printl_p(PSTR(": didn't get the mutex !"));
-  }
+	uint8_t locked = k_mutex_lock(&mymutex, *timeout);
 
-  k_sleep(K_FOREVER);
+	usart_transmit(_current->symbol);
+	if (locked == 0) {
+		usart_printl_p(PSTR(": locked the mutex !"));
+	} else {
+		usart_printl_p(PSTR(": didn't get the mutex !"));
+	}
+
+	k_sleep(K_FOREVER);
 }

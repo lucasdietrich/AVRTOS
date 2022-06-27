@@ -14,7 +14,7 @@ static void event_handler(struct k_event *ev);
 
 struct mystruct
 {
-	struct k_event ev; 
+	struct k_event ev;
 	struct k_signal sig;
 	struct k_thread thread;
 	char stack[0x80];
@@ -27,7 +27,7 @@ int main(void)
 	usart_init();
 
 	k_thread_dump_all();
-	
+
 	struct mystruct *ms;
 
 	static uint32_t counter = 0;
@@ -44,23 +44,23 @@ int main(void)
 
 	/* act as IDLE thread */
 	for (;;) {
-		K_SCHED_LOCK_CONTEXT {
+		K_SCHED_LOCK_CONTEXT{
 			for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
 				print_stack_canaries(&ms->thread);
 			}
 		}
 
-		if (counter++ % 6 == 0) {
-			const uint32_t now = k_uptime_get_ms32();
+			if (counter++ % 6 == 0) {
+				const uint32_t now = k_uptime_get_ms32();
 
-			K_SCHED_LOCK_CONTEXT {
-				printf_P(PSTR("Uptime : %lu (ms)\n"), now);
-			}
+				K_SCHED_LOCK_CONTEXT{
+					printf_P(PSTR("Uptime : %lu (ms)\n"), now);
+				}
 
-			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-				_delay_ms(2000);
+					ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+					_delay_ms(2000);
+				}
 			}
-		}
 
 		k_wait(K_SECONDS(10));
 	}
@@ -69,7 +69,7 @@ int main(void)
 static unsigned int random(void)
 {
 	static K_PRNG_DEFINE_DEFAULT(prng);
-	
+
 	/* protect with mutex or K_SCHED_LOCK_CONTEXT if threads are preemptive */
 	return k_prng_get(&prng);
 }
@@ -85,7 +85,7 @@ static void thread(void *p)
 {
 	uint16_t rdm_ms;
 	uint32_t counter = 0;
-	struct mystruct *ms = (struct mystruct *) p;
+	struct mystruct *ms = (struct mystruct *)p;
 
 	/* protect with K_SCHED_LOCK_CONTEXT if threads are preemptive */
 	printf_P(PSTR("Thread %c started\n"), _current->symbol);

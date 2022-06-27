@@ -26,44 +26,42 @@ K_MUTEX_DEFINE(mymutex);
 
 int main(void)
 {
-  led_init();
-  usart_init();
-  
-  k_thread_dump_all();
+	led_init();
+	usart_init();
 
-  print_runqueue();
+	k_thread_dump_all();
 
-  sei();
+	print_runqueue();
 
-  k_sleep(K_FOREVER);
+	sei();
+
+	k_sleep(K_FOREVER);
 }
 
 void thread_led_on(void *p)
 {
-  while(1)
-  {
-    k_mutex_lock(&mymutex, K_FOREVER);
+	while (1) {
+		k_mutex_lock(&mymutex, K_FOREVER);
 
-    led_on();
+		led_on();
 
-    k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(1000));
 
-    k_mutex_unlock(&mymutex);
-  }
+		k_mutex_unlock(&mymutex);
+	}
 }
 
 void thread_led_off(void *p)
 {
-  while (1)
-  {
-    k_mutex_lock(&mymutex, K_FOREVER);
+	while (1) {
+		k_mutex_lock(&mymutex, K_FOREVER);
 
-    led_off();
+		led_off();
 
-    k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(1000));
 
-    k_mutex_unlock(&mymutex);
-  }
+		k_mutex_unlock(&mymutex);
+	}
 }
 
 /*___________________________________________________________________________*/

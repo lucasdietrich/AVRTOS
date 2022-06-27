@@ -287,6 +287,8 @@ The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER co
 
 As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://github.com/qemu/qemu/tree/master/target/avr), any program built using this RTOS can be emulated in qemu and debugged using GDB.
 
+Use of `_delay_ms`, `sleep_cpu` is deprecated in QEMU.
+
 ### Overhead
 - In term of flash, the overhead is approximately 3KB
 - In term of RAM :
@@ -599,5 +601,17 @@ Priority *COOPERATIVE* :
 
 ## CMake
 
+It's now possible to build the project with CMake.
+- Install `CMake Tools` extension for VS Code, or simply execute `make build && cd build && make`
+
+- When all samples are compiled for the given target, you can either :
+  - flash the program using `upload_sample_xxx`
+  - or run the program in `QEMU` with `run_sample_xxx`
+  - or even debug the program in `QEMU` with `qemu_sample_xxx` and then `Ctrl + F5` (VS Code)
+- Then `Ctrl-A`+ `X` to exit `QEMU`
+
+**Note: When running on QEMU, make sure to have compiled the sample with `__QEMU__` defined.**
+
+### TODo
 - Move ARCH, MCU, PORT, F_CPU, QEMU out of the general .cmake toolchain file
 - Synchronize platformio.ini and CMakeLists.txt flags -> enhance python script `pio_export_defflags.py`

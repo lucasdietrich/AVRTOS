@@ -14,7 +14,7 @@ void callback(void *dev, uint8_t tim_idx, void *arg)
 		/* if callback takes more time than the timer period,
 		* the interrupt flag will be set again by the peripheral and the callback
 		* will be called a last time after this one.
-		* 
+		*
 		* To avoid this, clear all interrupt flags.
 		*/
 		ll_timer_clear_irq_flags(tim_idx);
@@ -39,7 +39,7 @@ int main(void)
 	app_init_timer(5, period_us, 0U);
 	timer_start(5);
 
-	app_init_timer(4, 1LU*USEC_PER_SEC, TIMER_API_FLAG_AUTOSTART);
+	app_init_timer(4, 1LU * USEC_PER_SEC, TIMER_API_FLAG_AUTOSTART);
 
 	app_init_timer(2, 200LU, TIMER_API_FLAG_AUTOSTART);
 

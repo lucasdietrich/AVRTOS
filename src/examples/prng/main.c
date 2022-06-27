@@ -29,36 +29,36 @@ uint8_t buffer[512];
 
 int main(void)
 {
-        usart_init();
+	usart_init();
 
-        k_thread_dump_all();
+	k_thread_dump_all();
 
-        k_prng_get_buffer(&p4, buffer, sizeof(buffer));
-        for(uint16_t i = 0; i < sizeof(buffer); i++) {
-                usart_hex(buffer[i]);
-                usart_transmit(' ');
-                if ((i & 0xF) == 0xF)
-                        usart_transmit('\n');
-        }
-        usart_transmit('\n');
+	k_prng_get_buffer(&p4, buffer, sizeof(buffer));
+	for (uint16_t i = 0; i < sizeof(buffer); i++) {
+		usart_hex(buffer[i]);
+		usart_transmit(' ');
+		if ((i & 0xF) == 0xF)
+			usart_transmit('\n');
+	}
+	usart_transmit('\n');
 
-        k_sleep(K_FOREVER);
+	k_sleep(K_FOREVER);
 }
 
 void thread(struct k_prng *prng)
 {
-        uint16_t number;
+	uint16_t number;
 
-        for (;;) {
-                number = k_prng_get(prng);
+	for (;;) {
+		number = k_prng_get(prng);
 
-                usart_transmit(_current->symbol);
-                usart_print_p(PSTR(" : "));
-                usart_hex16(number);
-                usart_transmit('\n');
+		usart_transmit(_current->symbol);
+		usart_print_p(PSTR(" : "));
+		usart_hex16(number);
+		usart_transmit('\n');
 
-                k_sleep(K_MSEC(500));
-        }
+		k_sleep(K_MSEC(500));
+	}
 }
 
 /*___________________________________________________________________________*/

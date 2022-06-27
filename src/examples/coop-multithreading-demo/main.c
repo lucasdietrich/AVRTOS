@@ -42,33 +42,32 @@ static char stack3[0x100u];
 
 int main(void)
 {
-  led_init();
-  usart_init();
- 
+	led_init();
+	usart_init();
+
 
 #if !THREAD_PREPROCESSOR  
-  k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, 'O');
-  k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, 'F');
-  k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, NULL, 'R');
+	k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, 'O');
+	k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, 'F');
+	k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, NULL, 'R');
 
-  k_start(&O);
-  k_start(&F);
-  k_start(&R);
+	k_start(&O);
+	k_start(&F);
+	k_start(&R);
 #endif
 
-  print_runqueue();
+	print_runqueue();
 
-  // USART_DUMP_RAM_ALL();
-  k_thread_dump_all();
+	// USART_DUMP_RAM_ALL();
+	k_thread_dump_all();
 
-  sei();
+	sei();
 
-  while(1)
-  {
-    usart_printl_p(PSTR("::main"));
+	while (1) {
+		usart_printl_p(PSTR("::main"));
 
-    k_yield();
-  }
+		k_yield();
+	}
 }
 
 /*___________________________________________________________________________*/
@@ -76,38 +75,33 @@ int main(void)
 // use thread local storage
 void inthread_setled(uint8_t state)
 {
-  if (state == 0)
-  {
-    led_off();
-    usart_printl_p(PSTR("::thread off"));
-  }
-  else
-  {
-    led_on();
-    usart_printl_p(PSTR("::thread on"));
-  }
+	if (state == 0) {
+		led_off();
+		usart_printl_p(PSTR("::thread off"));
+	} else {
+		led_on();
+		usart_printl_p(PSTR("::thread on"));
+	}
 }
 
 void thread_led(void *p)
 {
-  while (1)
-  {
-    inthread_setled(*(uint8_t*) p);
+	while (1) {
+		inthread_setled(*(uint8_t *)p);
 
-    _delay_ms(500);
+		_delay_ms(500);
 
-    k_yield();
-  }
+		k_yield();
+	}
 }
 
 void thread_monitor(void *p)
 {
-  while(1)
-  {
-    usart_printl_p(PSTR("::monitoring"));
+	while (1) {
+		usart_printl_p(PSTR("::monitoring"));
 
-    k_yield();
-  }
+		k_yield();
+	}
 }
 
 /*___________________________________________________________________________*/

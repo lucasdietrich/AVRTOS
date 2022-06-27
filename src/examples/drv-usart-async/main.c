@@ -4,9 +4,9 @@
  * @brief ATmega2560 example, connect RX1 to TX1 using a wire
  * @version 0.1
  * @date 2022-03-18
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 
 #include <avr/io.h>
@@ -30,9 +30,9 @@ K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 
 struct in
 {
-        struct qitem tie;
-        uint8_t buffer[20];
-        uint8_t len;
+	struct qitem tie;
+	uint8_t buffer[20];
+	uint8_t len;
 };
 
 K_MEM_SLAB_DEFINE(myslab, sizeof(struct in), 2u);
@@ -40,57 +40,57 @@ K_FIFO_DEFINE(myfifo);
 
 void push(struct in **mem)
 {
-        k_fifo_put(&myfifo, *(void **)mem);
-        *mem = NULL;
+	k_fifo_put(&myfifo, *(void **)mem);
+	*mem = NULL;
 }
 
 int8_t alloc(struct in **mem)
 {
-        return k_mem_slab_alloc(&myslab, (void **)mem, K_NO_WAIT);
+	return k_mem_slab_alloc(&myslab, (void **)mem, K_NO_WAIT);
 }
 
 void free(struct in *mem)
 {
-        k_mem_slab_free(&myslab, mem);
+	k_mem_slab_free(&myslab, mem);
 }
 
 /*___________________________________________________________________________*/
 
 static inline void input(const char rx)
 {
-        static struct in *mem = NULL;
-        if (mem == NULL) {
-                if (alloc(&mem) != 0) {
-                        __ASSERT_NULL(mem);
-                        usart_transmit('!');
-                        return;
-                }
-                mem->len = 0;
-        }
+	static struct in *mem = NULL;
+	if (mem == NULL) {
+		if (alloc(&mem) != 0) {
+			__ASSERT_NULL(mem);
+			usart_transmit('!');
+			return;
+		}
+		mem->len = 0;
+	}
 
-        switch (rx) {
-        case 0x1A: /* Ctrl + Z -> drop */
-                mem->len = 0;
-        case '\n': /* process the packet */
-                mem->buffer[mem->len] = '\0';
-                push(&mem);
-                break;
-        case 0x08: /* backspace */
-                if (mem->len > 0) {
-                        mem->len--;
-                        usart_transmit(rx);
-                }
-                break;
-        default:
-                if (mem->len == sizeof(mem->buffer) - 1u) {
-                        mem->len = 0;
-                        push(&mem);
-                } else {
-                        mem->buffer[mem->len++] = rx;
-                }
-                usart_transmit(rx);
-                break;
-        }
+	switch (rx) {
+	case 0x1A: /* Ctrl + Z -> drop */
+		mem->len = 0;
+	case '\n': /* process the packet */
+		mem->buffer[mem->len] = '\0';
+		push(&mem);
+		break;
+	case 0x08: /* backspace */
+		if (mem->len > 0) {
+			mem->len--;
+			usart_transmit(rx);
+		}
+		break;
+	default:
+		if (mem->len == sizeof(mem->buffer) - 1u) {
+			mem->len = 0;
+			push(&mem);
+		} else {
+			mem->buffer[mem->len++] = rx;
+		}
+		usart_transmit(rx);
+		break;
+	}
 }
 
 #if defined(__AVR_ATmega328P__)
@@ -101,31 +101,31 @@ static inline void input(const char rx)
 
 ISR(board_USART_RX_vect)
 {
-        const char rx = UDR0;
-        input(rx);
+	const char rx = UDR0;
+	input(rx);
 }
 
 void consumer(void *context)
 {
-        for (;;) {
-                usart_print_p(PSTR("\n# "));
-                struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
-                __ASSERT_NOTNULL(mem);
-                if (mem->len == 0) {
-                        usart_print_p(PSTR("\nCOMMAND DROPPED !"));
-                } else {
-                        /* process/parsed the command */
-                        usart_print_p(PSTR("CMD received ! len = "));
-                        usart_u8(mem->len);
+	for (;;) {
+		usart_print_p(PSTR("\n# "));
+		struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
+		__ASSERT_NOTNULL(mem);
+		if (mem->len == 0) {
+			usart_print_p(PSTR("\nCOMMAND DROPPED !"));
+		} else {
+			/* process/parsed the command */
+			usart_print_p(PSTR("CMD received ! len = "));
+			usart_u8(mem->len);
 			usart_print_p(PSTR(" : "));
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
 			     c < mem->buffer + mem->len; c++) {
 				usart_transmit(*c);
 			}
-                }
-                k_mem_slab_free(&myslab, mem);
-        }
+		}
+		k_mem_slab_free(&myslab, mem);
+	}
 }
 
 /*___________________________________________________________________________*/
@@ -173,20 +173,20 @@ int main(void)
 	irq_enable();
 
 	// initialize shell uart
-        usart_init();
+	usart_init();
 	SET_BIT(UCSR0B, 1 << RXCIE0); // enable RX interrupt for shell uart
 
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
 	usart_drv_init(USART1_DEVICE, &cfg);
-	
+
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));
 
 	usart_tx(USART1_DEVICE, tx_buffer, sizeof(tx_buffer) - 1);
 
-        k_sleep(K_FOREVER);
+	k_sleep(K_FOREVER);
 }
 
 

@@ -22,7 +22,7 @@ int main(void)
 
 	uint8_t state = 0;
 
-	for(;;) {
+	for (;;) {
 
 		led_set(state);
 		state = 1 - state;
@@ -49,7 +49,7 @@ void thread(void *ctx)
 		if (now - last >= period) {
 			last = now;
 			k_show_uptime();
-			printf("now = %lu %lu\n", (uint32_t) (now >> 32), (uint32_t) now);
+			printf("now = %lu %lu\n", (uint32_t)(now >> 32), (uint32_t)now);
 		}
 	}
 }

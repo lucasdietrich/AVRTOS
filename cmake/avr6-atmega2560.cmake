@@ -78,11 +78,14 @@ function(target_prepare_env target)
 	# generate launch.json file
 	configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/qemu-avr-launch.json.in ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json @ONLY)
 
-	# generate custom target for qemu
+	# generate custom target for debug in qemu
 	add_custom_target(qemu_${target} 
 		COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json
 		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic)
 
+	# generate custom target for run in qemu
+	add_custom_target(run_${target} 
+		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic)
 
 	# disassembly
 	add_custom_command(TARGET ${target} POST_BUILD

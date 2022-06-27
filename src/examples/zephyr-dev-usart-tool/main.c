@@ -82,7 +82,7 @@ int main(void)
 {
 	irq_enable();
 
-        usart_init();
+	usart_init();
 
 	usart_drv_init(USART1_DEVICE, &usart_ipc_cfg);
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);

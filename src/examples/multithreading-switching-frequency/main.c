@@ -4,7 +4,7 @@
  * @brief Measurement frequency of the led in order to know at whch frequency does the kernel switch thread
  * @version 0.1
  * @date 2021-07-04
- * 
+ *
  * @copyright Copyright (c) 2021
  */
 
@@ -46,29 +46,27 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'O');
 
 int main(void)
 {
-  led_init();
-  usart_init();
+	led_init();
+	usart_init();
 
-  while(1)
-  {
-    led_on();
+	while (1) {
+		led_on();
 #if SET_10kHz_SWITCHING_FREQUENCY
-    _delay_us(22);
+		_delay_us(22);
 #endif
-    k_yield();
-  }
+		k_yield();
+	}
 }
 
 void thread_led(void *p)
 {
-  while (1)
-  {
-    led_off();
+	while (1) {
+		led_off();
 #if SET_10kHz_SWITCHING_FREQUENCY
-    _delay_us(22);
+		_delay_us(22);
 #endif
-    k_yield();
-  }
+		k_yield();
+	}
 }
 
 /*___________________________________________________________________________*/

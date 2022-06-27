@@ -8,7 +8,7 @@
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
-char chrs[2] = {'a', 'b'};
+char chrs[2] = { 'a', 'b' };
 void mythread(char *ctx);
 void canariesthread(void *ctx);
 
@@ -48,7 +48,7 @@ void canariesthread(void *ctx)
 {
 	while (1) {
 		dump_stack_canaries();
-		k_sleep(K_SECONDS(30));		
+		k_sleep(K_SECONDS(30));
 	}
 }
 
