@@ -612,6 +612,18 @@ It's now possible to build the project with CMake.
 
 **Note: When running on QEMU, make sure to have compiled the sample with `__QEMU__` defined.**
 
-### TODo
+### TODO
 - Move ARCH, MCU, PORT, F_CPU, QEMU out of the general .cmake toolchain file
-- Synchronize platformio.ini and CMakeLists.txt flags -> enhance python script `pio_export_defflags.py`
+- Synchronize platformio.ini and CMakeLists.txt flags -> enhance python script `pio_export_defflags.
+
+## Version
+
+```
+avr-gcc (Fedora 11.2.0-1.fc36) 11.2.0
+avr-gdb: GNU gdb (GDB) 12.1
+QEMU emulator version 7.0.0 (v7.0.0)
+avrdude version 6.4
+cmake version 3.22.2
+GNU Make 4.3
+Python 3.10.5
+```

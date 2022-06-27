@@ -3,9 +3,7 @@
     // for the documentation about the extensions.json format
     "recommendations": [
         "platformio.platformio-ide",
-        "rockcat.avr-support"
-    ],
-    "unwantedRecommendations": [
-        "ms-vscode.cpptools-extension-pack"
+        "rockcat.avr-support",
+        "ms-vscode.cmake-tools"
     ]
 }
