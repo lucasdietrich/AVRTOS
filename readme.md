@@ -581,6 +581,7 @@ Priority *COOPERATIVE* :
 - Find a way to not use the usart_print*() function anymore and to use the UART drivers instead
 - Get rid of the AVR startup code : [AVR Freaks : Custom Startup Code](https://www.avrfreaks.net/forum/custom-startup-code)
   - Small overhead
+- Merge `KERNEL_UPTIME` and `KERNEL_TIME`
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
@@ -595,3 +596,8 @@ Priority *COOPERATIVE* :
 - If your program crashes/restart/gets stuck, just increase all stack sizes, just in case (especially with `KERNEL_TIMERS`, `KERNEL_EVENTS`).
   - Note: Also increase IDLE stack size with `KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
   - Note: function call with ATmge2560 for example are stack consuming (because of the 3B return addresses)
+
+## CMake
+
+- Move ARCH, MCU, PORT, F_CPU, QEMU out of the general .cmake toolchain file
+- Synchronize platformio.ini and CMakeLists.txt flags -> enhance python script `pio_export_defflags.py`
