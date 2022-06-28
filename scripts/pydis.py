@@ -18,6 +18,7 @@ def dis(name: str, elf: str):
         (f"avr-objdump -d {elf}", f"tmp/{name}/disassembly.asm"),
         (f"avr-objdump -S {elf}", f"tmp/{name}/disassembly_source.asm"),
         (f"avr-readelf -a {elf}", f"tmp/{name}/readelf.txt"),
+        (f"avr-nm --print-size --size-sort --radix=x {elf}", f"tmp/{name}/nm-size.txt"),
         (f"avr-nm {elf}", f"tmp/{name}/nm.txt"),
     ]
 
