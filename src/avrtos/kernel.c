@@ -295,7 +295,7 @@ void _k_kernel_init(void)
 		swap_endianness((void*) &ctx->thread_entry);
 		swap_endianness(&ctx->pc);
 		
-#if __AVR_3_BYTE_PC__
+#if defined(__AVR_3_BYTE_PC__)
 		ctx->pch = 0;
 #endif /* __AVR_3_BYTE_PC__ */
 	}

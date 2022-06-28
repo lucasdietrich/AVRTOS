@@ -155,7 +155,7 @@ uint16_t read_sp(void);
  * 
  * Depends on arch (PC can be 2 or 3 bytes)
  */
-#if __AVR_3_BYTE_PC__
+#if defined(__AVR_3_BYTE_PC__)
 uint32_t read_ra(void);
 #else
 uint16_t read_ra(void);
