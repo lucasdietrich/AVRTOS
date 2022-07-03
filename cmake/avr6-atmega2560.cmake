@@ -67,10 +67,14 @@ function(target_prepare_env target)
 	set(ELF_PATH "${CMAKE_CURRENT_BINARY_DIR}/${output_name}")
 
 	# create hex file
-	add_custom_target(hex_${target} ALL avr-objcopy -R .eeprom -O ihex ${output_name} ${output_name}.hex DEPENDS ${target})
+	add_custom_target(hex_${target} ALL avr-objcopy -R .eeprom -O ihex ${output_name} ${output_name}.hex 
+		DEPENDS ${target}
+	)
 
 	# add upload command
-	add_custom_target(upload_${target} avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex DEPENDS hex_${target})
+	add_custom_target(upload_${target} avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
+		DEPENDS hex_${target}
+	)
 	
 	# monitor command
 	# add_custom_target(monitor_${target} python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}")
@@ -81,7 +85,8 @@ function(target_prepare_env target)
 	# generate custom target for debug in qemu
 	add_custom_target(qemu_${target} 
 		COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json
-		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic)
+		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic
+		DEPENDS ${target})
 
 	# generate custom target for run in qemu
 	add_custom_target(run_${target} 

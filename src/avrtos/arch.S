@@ -282,7 +282,7 @@ k_ticks_get_64:
 	ldi	r24, 0x00
 	ldi	r25, 0x00
 	ret
-#endif /* KERNEL_UPTIME */
+#endif /* KERNEL_TICKS */
 
 .global __debug
 __debug:

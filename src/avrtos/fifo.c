@@ -1,6 +1,7 @@
 #include "fifo.h"
 
 #include <avrtos/kernel.h>
+#include <avrtos/kernel_internals.h>
 #include <avrtos/dstruct/oqueue.h>
 
 #define K_MODULE    K_MODULE_FIFO

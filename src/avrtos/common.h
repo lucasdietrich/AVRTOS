@@ -68,9 +68,10 @@
 #define K_FLAG_COOP                 (1 << K_FLAG_PREEMPT_SHIFT)
 #define K_FLAG_PREEMPT              (0 << K_FLAG_PREEMPT_SHIFT)
 
-#define K_FLAG_STOPPED              (0b00 << 0)
-#define K_FLAG_READY                (0b01 << 0)
-#define K_FLAG_PENDING              (0b10 << 0)
+#define K_FLAG_STOPPED              (0U << 0)
+#define K_FLAG_READY                (1U << 0)
+#define K_FLAG_PENDING              (2U << 0)
+#define K_FLAG_IDLE                 (3U << 0)
 
 #define K_FLAG_INTPREEMPT_SHIFT     4
 #define K_FLAG_INTPREEMPT           (1 << K_FLAG_INTPREEMPT_SHIFT)

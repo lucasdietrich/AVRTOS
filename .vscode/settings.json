@@ -47,6 +47,7 @@
 		"iom328p.h": "c",
 		"stdbool.h": "c",
 		"usart.h": "c",
-		"semaphore.h": "c"
+		"semaphore.h": "c",
+		"kernel_internals.h": "c"
 	},
 }

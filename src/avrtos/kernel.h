@@ -99,14 +99,14 @@ K_NOINLINE bool k_sched_locked(void);
  * 
  * @return K_NOINLINE 
  */
-K_NOINLINE bool _k_preemptive(void);
+K_NOINLINE bool k_cur_is_preempt(void);
 
 /**
  * @brief Tells if current thread is cooperative
  * 
  * @return K_NOINLINE 
  */
-K_NOINLINE bool _k_cooperative(void);
+K_NOINLINE bool k_cur_is_coop(void);
 
 /**
  * @brief used in K_SCHED_LOCK_CONTEXT macro
@@ -214,13 +214,6 @@ K_NOINLINE void k_start(struct k_thread *th);
  * 
  * @param th : ready/pending thread to start.
  */
-K_NOINLINE void _k_stop(void);
-
-/**
- * @brief Stop the thread
- * 
- * @param th : ready/pending thread to start.
- */
 K_NOINLINE void k_stop(void);
 
 /*___________________________________________________________________________*/
@@ -232,104 +225,12 @@ K_NOINLINE void k_stop(void);
 // for the most of following functions, we assume that the interrupt flag is cleared when called
 
 /**
- * @brief Do a thread switch (ASM function)
- * 1. save context of the first thread
- * 2. store the SP of the first thread to its structure
- * 3. restore the SP of the second thread from its structure
- * 4. restore context of the second thread
- * 
- * @param from 
- * @param to 
- */
-void _k_thread_switch(struct k_thread *from, struct k_thread *to);
-
-/**
  * @brief Initialize the runqueue with all threads ready to be executed.
  * Assume that the interrupt flag is cleared when called.
  */
 K_NOINLINE void _k_kernel_init(void);
 
-/**
- * @brief Queue the thread in the runqueue. We assume that the thread {th} is K_READY. 
- * The thread must not be added to the runqueue already. Keep it's flag unchanged.
- * Assume that the interrupt flag is cleared when called.
- * Assume that the runqueue doesn't contain the IDLE thread
- * 
- * @param th : ready thread to queue 
- */
-void _k_queue(struct k_thread *const th);
-
-/**
- * @brief Schedule the thread to be executed.
- * If the IDLE thread is in the runqueue (it is removed), the scheduled thread become the only thread in the runqueue.
- * If other threads are in the runqueue, the thread is only appended.
- * - Assume that the thread is K_READY
- * - Assume that the thread is not in the runqueue
- * 
- * @param thread_tie thread.tie.runqueue item
- * @return __attribute__((noinline)) 
- */
-K_NOINLINE void _k_schedule(struct k_thread *thread);
-
-/**
- * @brief Schedule current thread wake up.
- * 
- * Assumptions:
- * - thread is suspended (K_PENDING)
- * - thread is not in the runqueue
- * 
- * @param thread 
- * @param timeout 
- * @return K_NOINLINE 
- */
-K_NOINLINE void _k_schedule_wake_up(k_timeout_t timeout);
-
-/**
- * @brief Remove the current thread from the runqueue.
- * Stop the execution of the current thread (until it is scheduled again with function _k_schedule or _k_schedule_wake_up)
- * State flag is changed to K_PENDING.
- * 
- * Assumptions:
- * - interrupt flag is cleared when called.
- * - thread is in the runqueue
- */
-K_NOINLINE void _k_suspend(void);
-
-/**
- * @brief Choose the next thread to be executed. 
- * This function is called during any thread switch in order to determine which 
- * one is the following thread to be executed. 
- * 
- * This function is called in k_yield function
- * 
- * @return struct k_thread* : next thread to be executed
- */
-// struct k_thread *_k_scheduler(void);
-
-/**
- * @brief Wake up a thread that is pending for an event.
- * 
- * Assumptions:
- *  - thread is in K_PENDING mode
- *  - thread is not in the runqueue
- *  - thread may be in the events queue
- *  - interrupt flag is cleared when called.
- *
- * 
- * @param th thread to wake up
- */
-K_NOINLINE void _k_wake_up(struct k_thread *th);
-
-/**
- * @brief Suspend the current thread and schedule its awakening for later
- * 
- * Assumptions :
- *  - interrupt flag is cleared when called.
- * 
- * @param timeout 
- */
-void _k_reschedule(k_timeout_t timeout);
-
+/* @see k_yield but suppose interrupts are disabled */
 void _k_yield(void);
 
 /**
@@ -339,13 +240,19 @@ void _k_yield(void);
  * This function restore the context of the current thread when returning.
  * This function can be called from either a cooperative thread or a premptive thread.
  */
-
 static inline void k_yield(void)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		_k_yield();
 	}
 }
+
+// static inline void k_yield_from_idle()
+// {
+// 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+// 		_k_yield_from_idle();
+// 	}
+// }
 
 void yield(void);
 
@@ -396,65 +303,6 @@ K_NOINLINE uint64_t k_uptime_get_ms64(void);
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_uptime_get(void);
-
-/*___________________________________________________________________________*/
-
-/**
- * @brief Make the current thread waiting/pending for an object being available.
- * 
- * Suspend the thread and add it to the waitqueue.
- * The function will return if the thread is awakaned or on timeout.
- * 
- * If timeout is K_FOREVER, the thread should we awakaned.
- * If timeout is K_NO_WAIT, the thread returns immediately
- * 
- * Assumptions :
- *  - interrupt flag is cleared when called.
- * 
- * @param waitqueue 
- * @param timeout 
- * @return 0 on success (object available), ETIMEOUT on timeout, negative error
- *  in other cases.
- */
-K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
-
-/**
- * @brief Wake up the first thread pending on an object.
- * Switch thread before returning.
- * 
- * Assumptions :
- * - interrupt flag is cleared when called
- * - waitqueue is not null
- * - Thread in the runqueue is suspended
- * 
- * @param waitqueue 
- * @param swap_data : available object information
- * @return uint8_t return 0 if a thread got the object, any other value otherwise
- */ 
-K_NOINLINE struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue);
-
-/**
- * @brief Wake up the first thread pending on an object.
- * Set the first pending thread swap_data parameter if set.
- * Switch thread before returning.
- * 
- * @see _k_unpend_first_thread
- * 
- * Assumptions :
- * - interrupt flag is cleared when called
- * - waitqueue is not null
- * - Thread in the runqueue is suspended
- * 
- * @param waitqueue 
- * @param set_swap_data 
- * @return K_NOINLINE struct* 
- */
-K_NOINLINE struct k_thread *_k_unpend_first_and_swap(struct ditem *waitqueue,
-                                                     void *set_swap_data);
-
-K_NOINLINE void _k_cancel_first_pending(struct ditem *waitqueue);
-
-K_NOINLINE uint8_t _k_cancel_pending(struct ditem *waitqueue);
 
 /*___________________________________________________________________________*/
 

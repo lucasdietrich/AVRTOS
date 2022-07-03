@@ -1,4 +1,8 @@
+#include <avrtos/kernel_internals.h>
+
 #include "msgq.h"
+
+
 
 #define K_MODULE K_MODULE_MSGQ
 

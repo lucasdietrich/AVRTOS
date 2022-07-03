@@ -1,6 +1,7 @@
 #include "semaphore.h"
 
 #include <avrtos/kernel.h>
+#include <avrtos/kernel_internals.h>
 #include <avrtos/debug.h>
 
 #include <util/atomic.h>

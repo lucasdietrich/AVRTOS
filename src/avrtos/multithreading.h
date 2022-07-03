@@ -31,16 +31,31 @@ typedef void (*thread_entry_t)(void *);
 
 /**
  * @brief Thread state.
- * 
- * K_STOPPED : the thread is not running and is not in the runqueue, it can be resumed/started with k_resume/k_start functions.
- * 
- * K_READY : the thread is ready to be executed and is the runqueue
- * 
- * K_PENDING : the thread is pending for an event, it may be in the time queue (events_queue) but it is not in the runqueue.
- * It can be wake up with function _k_wake_up()
- * 
  */
-enum thread_state_t { K_STOPPED = 0, K_READY = 1, K_PENDING = 2, _K_RESERVED = 3 };
+enum thread_state_t { 
+	/* the thread is not running and is not in the runqueue, 
+	 * it can be resumed/started with k_resume/k_start functions. 
+	 */
+	K_STOPPED = 0, 
+
+	/* the thread is (yet/still) ready for execution and is the runqueue
+	 */
+	K_READY = 1, 
+
+	/* The thread is pending for an event, it may be in the time queue (events_queue) 
+	 * but it is not in the runqueue. It can be wake up with function _k_wake_up()
+	 */
+	K_PENDING = 2, 
+
+	/* This flag is reserved for IDLE thread only (if enabled),
+	 * it is used to know whether the system is in idle mode 
+	 * (i.e. IDLE thread running) or not.
+	 * 
+	 * It is actually used only if the IDLE thread is cooperative.
+	 * If preemptive this particular state should be infered from the runqueue state
+	 */
+	// K_IDLE = 3
+};
 
 /* size 19B */
 struct _k_callsaved_ctx {

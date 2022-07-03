@@ -1,0 +1,18 @@
+{
+    "configurations": [
+	{
+		"name": "CMake build_commands.json",
+		"compileCommands": "${workspaceRoot}/build/compile_commands.json",
+		"intelliSenseMode": "gcc-avr",
+		"browse": {
+		    "path": [
+			"${workspaceFolder}"
+		    ]
+		},
+		"cStandard": "c11",
+		"cppStandard": "c++17",
+		"configurationProvider": "ms-vscode.cmake-tools",
+		"toolchainBinDir": "/usr/bin/avr-gcc"
+	}
+    ]
+}

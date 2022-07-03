@@ -51,7 +51,7 @@ static const char *const acode_to_str(uint8_t acode)
 	case K_ASSERT_NOINTERRUPT:
 		return PSTR("NOINTERRUPT");
 
-	case K_ASSERT_LEASTONE_RUNNING:
+	case K_ASSERT_LEASTTWO_RUNNING:
 		return PSTR("LEASTONE_RUNNING");
 
 	case K_ASSERT_THREAD_STATE:
@@ -94,7 +94,7 @@ void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line)
 
 		usart_print_p(module_to_str(module));
 		usart_transmit(':');
-		usart_hex16(line);
+		usart_u16(line);
 		usart_print_p(PSTR(" L [K_ASSERT_"));
 		usart_print_p(acode_to_str(acode));
 		usart_transmit(']');

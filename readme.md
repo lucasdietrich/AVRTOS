@@ -412,6 +412,8 @@ Steps :
 5. Attach debugger in VSC environnement :
   - `Ctrl + F5`
 
+6. Exit qemu with `Ctrl + A` then `X`
+
 Note that only few peripherals are supported on avr architecture (https://qemu-project.gitlab.io/qemu/system/target-avr.html) :
   - `timer1` : 
     - https://github.com/qemu/qemu/blob/master/hw/timer/avr_timer16.c

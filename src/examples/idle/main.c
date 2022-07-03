@@ -24,19 +24,8 @@ int main(void)
 	k_thread_dump_all();
 
 	for (;;) {
-		printf("Hello World, counter = %lx !\n", counter++);
+		printf_P(PSTR("Hello World, counter = %lx !\n"), counter++);
 
 		k_sleep(K_MSEC(1000));
 	}
-}
-
-void thread(void *ctx);
-
-K_THREAD_DEFINE(t1, thread, 0x100, K_PREEMPTIVE, NULL, 'T');
-
-void thread(void *ctx)
-{
-	_delay_ms(1000.0);
-
-	k_sleep(K_FOREVER);
 }

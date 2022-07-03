@@ -98,7 +98,7 @@
 
 // in case of qemu emulator, check if the timer is available
 #if defined(__QEMU__) && (_DESIRED_SYSLOCK_HW_TIMER != 1U)
-#	warning "QEMU emulator detected, only timer 1 is supported"
+#	warning "QEMU emulator detected, only timer 1 is supported (forced)"
 #	define KERNEL_SYSLOCK_HW_TIMER 1U
 #else
 #	define KERNEL_SYSLOCK_HW_TIMER _DESIRED_SYSLOCK_HW_TIMER
@@ -546,8 +546,8 @@ typedef struct
 // some of following macros need to be differenciate for c or asm :
 // - in c files the compiler needs to know the type of stack_start in order to do arithmetic operations on pointers
 // - in asm files types are not understood by compiler
-#define K_STACK_END(stack_start, size) (uint8_t*) ((uint8_t*) stack_start + size - 1)
-#define K_STACK_START(stack_end, size) (uint8_t*) ((uint8_t*) stack_end - size + 1)
+#define K_STACK_END(stack_start, size) (uint8_t*) ((uint8_t*) (stack_start) + (size) - 1)
+#define K_STACK_START(stack_end, size) (uint8_t*) ((uint8_t*) (stack_end) - (size) + 1)
 #define K_THREAD_STACK_START(th) K_STACK_START(th->stack.end, th->stack.size)
 #define K_THREAD_STACK_END(th) (th->stack.end)
 
@@ -556,7 +556,7 @@ typedef struct
 #define K_STACK_SIZE_USABLE(size) (size - THREAD_STACK_SENTINEL_SIZE)
 #define K_THREAD_STACK_START_USABLE(th) K_STACK_START_USABLE(th->stack.end, th->stack.size)
 
-#define _K_STACK_END(stack_start, size) (stack_start + size - 1)
+#define _K_STACK_END(stack_start, size) ((stack_start) + (size) - 1)
 
 #define _K_STACK_END_ASM(stack_start, size) _K_STACK_END(stack_start, size)
 
@@ -588,7 +588,7 @@ typedef struct
 #define _K_STACK_INITIALIZER(name, stack_size, entry, ctx) \
     struct \
     { \
-        uint8_t empty[stack_size - _K_CALLSAVED_CTX_SIZE]; \
+        uint8_t empty[(stack_size) - _K_CALLSAVED_CTX_SIZE]; \
         struct _k_callsaved_ctx core; \
     } _k_stack_buf_##name = { \
         {0x00}, \
@@ -607,7 +607,7 @@ typedef struct
         .tie = {.runqueue = DITEM_INIT(NULL)},                                                               \
         {.wmutex = DITEM_INIT(NULL)},                                                                        \
         .swap_data = NULL,                                                                                   \
-        .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = stack_size}, \
+        .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = (stack_size)}, \
         .symbol = sym}
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, symbol)                  \

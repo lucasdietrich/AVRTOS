@@ -99,7 +99,7 @@
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timers : timer1 (1, 3, 4, 5)
 //
-#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	2
+#define DEFAULT_KERNEL_SYSLOCK_HW_TIMER         	1
 
 //
 // Use 40 bits for ticks counter size (instead of 32 bits)
@@ -119,7 +119,7 @@
 //
 // Kernel thread idle addtionnal stack (for interrupt handles stack)
 //
-#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	0x30
+#define DEFAULT_KERNEL_THREAD_IDLE_ADD_STACK    	0x50
 
 //
 // Tell if IDLE thread is preemptive or cooperative

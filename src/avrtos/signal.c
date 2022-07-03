@@ -2,10 +2,11 @@
 
 #include <util/atomic.h>
 
-#include "kernel.h"
+#include <avrtos/kernel.h>
+#include <avrtos/kernel_internals.h>
+
 
 #define K_MODULE K_MODULE_SIGNAL
-/*___________________________________________________________________________*/
 
 void k_signal_init(struct k_signal *sig)
 {

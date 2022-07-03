@@ -2,8 +2,11 @@
     // See http://go.microsoft.com/fwlink/?LinkId=827846
     // for the documentation about the extensions.json format
     "recommendations": [
+        "ms-vscode.cmake-tools",
         "platformio.platformio-ide",
-        "rockcat.avr-support",
-        "ms-vscode.cmake-tools"
+        "rockcat.avr-support"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode.cpptools-extension-pack"
     ]
 }

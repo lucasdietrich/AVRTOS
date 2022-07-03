@@ -1,6 +1,7 @@
 #include "mem_slab.h"
 
 #include <avrtos/kernel.h>
+#include <avrtos/kernel_internals.h>
 #include <avrtos/dstruct/queue.h>
 
 #define K_MODULE K_MODULE_MEMSLAB
