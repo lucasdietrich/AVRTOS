@@ -20,6 +20,8 @@ def dis(name: str, elf: str):
         (f"avr-readelf -a {elf}", f"tmp/{name}/readelf.txt"),
         (f"avr-nm --print-size --size-sort --radix=x {elf}", f"tmp/{name}/nm-size.txt"),
         (f"avr-nm {elf}", f"tmp/{name}/nm.txt"),
+        # (f"grep -E '([a-f0-9]*)\s([a-f0-9]*)\s([^tT])' tmp/{name}/nm-size.txt", f"tmp/{name}/nm-size-sram.txt"),
+        # (f"grep -E '([a-f0-9]*)\s([a-f0-9]*)\s([^tT])' tmp/{name}/nm-size.txt", f"tmp/{name}/nm-size-rom.txt")
     ]
 
     for command in commands:

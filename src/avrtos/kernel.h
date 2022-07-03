@@ -51,7 +51,7 @@ static inline void k_sys_sw_reset(void)
 {
 	cli();
 
-	/* jump to reset vector instead of calling it asm("jmp ...")*/
+	/* TODO: jump to reset vector instead of calling it asm("jmp ...")*/
 	((void (*) (void)) (0x0000U))();
 
 	__builtin_unreachable();
