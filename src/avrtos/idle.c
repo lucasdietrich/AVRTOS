@@ -16,14 +16,23 @@ static void _k_idle_entry(void *context);
 /* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue function ?*/
 
 // K_THREAD_MINIMAL_DEFINE(_k_idle, _k_idle_entry, K_COOPERATIVE, NULL, 'I');
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + 10, K_COOPERATIVE, NULL, 'I');
+K_THREAD_DEFINE(_k_idle,
+		_k_idle_entry,
+		K_THREAD_STACK_MIN_SIZE + KERNEL_THREAD_IDLE_ADD_STACK,
+		K_COOPERATIVE,
+		NULL,
+		'I');
 #else
 
 /**
  * @brief If IDLE thread can be preempted, plan additionnal stack
  */
-K_THREAD_DEFINE(_k_idle, _k_idle_entry, K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE +
-		KERNEL_THREAD_IDLE_ADD_STACK, K_PREEMPTIVE, NULL, 'I');
+K_THREAD_DEFINE(_k_idle,
+		_k_idle_entry,
+		K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE + KERNEL_THREAD_IDLE_ADD_STACK,
+		K_PREEMPTIVE,
+		NULL,
+		'I');
 #endif
 
 

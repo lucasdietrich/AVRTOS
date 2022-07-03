@@ -31,7 +31,7 @@ void __fault(uint8_t reason)
 
 	usart_print_p(PSTR("***** Kernel Fault *****\n Reason > "));
 	usart_print_p(reason_to_str(reason));
-	usart_print_p(PSTR("\n\tth: "));
+	usart_print_p(PSTR("\n\tth: 0x"));
 	usart_hex16((const uint16_t) _current);
 
 	asm("call __debug");
