@@ -13,9 +13,6 @@
 #	error "invalid KERNEL_SYSLOCK_HW_TIMER"
 #endif
 
-#define TIMER_CALC_COUNTER_VALUE(period, prescaler) ((((F_CPU / 1000000LU) * period) / prescaler - 1))
-#define TIMER_COUNTER_VALUE_FIT(period, prescaler, max) (TIMER_CALC_COUNTER_VALUE(period, prescaler) <= max)
-
 #define TIMER_MAX_COUNTER TIMER_GET_MAX_COUNTER(KERNEL_SYSLOCK_HW_TIMER)
 
 #if TIMER_COUNTER_VALUE_FIT(KERNEL_SYSCLOCK_PERIOD_US, 1LU, TIMER_MAX_COUNTER)

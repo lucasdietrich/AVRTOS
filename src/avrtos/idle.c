@@ -5,6 +5,13 @@
 
 #define K_MODULE K_MODULE_IDLE
 
+extern struct ditem *_k_runqueue;
+
+static inline bool _k_runqueue_single(void)
+{
+        return _k_runqueue->next == _k_runqueue;
+}
+
 #if KERNEL_THREAD_IDLE
 
 static void _k_idle_entry(void *context);
@@ -40,13 +47,6 @@ K_THREAD_DEFINE(_k_idle,
 		NULL,
 		'I');
 #endif
-
-extern struct ditem *_k_runqueue;
-
-static inline bool _k_runqueue_single(void)
-{
-        return _k_runqueue->next == _k_runqueue;
-}
 
 /* TODO THREAD_IDLE_COOPERATIVE */
 #if 0
