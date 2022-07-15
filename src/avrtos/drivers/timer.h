@@ -144,6 +144,8 @@ typedef struct {
 #define IS_TIMER_INDEX_16BIT(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
 
 #define TIMER_GET_MAX_COUNTER(tim_idx) (IS_TIMER_INDEX_8BIT(tim_idx) ? 0xFFU : 0xFFFFU)
+#define TIMER_CALC_COUNTER_VALUE(period_us, prescaler) ((((F_CPU / 1000000LU) * period_us) / prescaler - 1))
+#define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max) (TIMER_CALC_COUNTER_VALUE(period_us, prescaler) <= max)
 
 #define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
 #define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
@@ -235,30 +237,6 @@ struct timer_config
 	 */
 	uint8_t timsk; // TOIEn, OCIEnA, OCIEnB, OCIEnC, ICIEn
 };
-
-// typedef enum {
-// 	TIMER_0 = 0x00,
-// 	TIMER_1,
-// 	TIMER_2,
-// #if defined(TIMSK3)
-// 	TIMER_3,
-// #endif
-// #if defined(TIMSK4)
-// 	TIMER_4,
-// #endif 
-// #if defined(TIMSK5)
-// 	TIMER_5,
-// #endif
-// 	TIMERS_COUNT,
-// } timer_index_t;
-
-// typedef enum {
-// 	TIMER_INTERRUPT_INPUT_CAPTURE1 = 0x00,
-// 	TIMER_INTERRUPT_OUTPUT_COMPARE1A,
-// 	TIMER_INTEERUPT_OUTPUT_COMPARE1B,
-// 	TIMER_INTERRUPT_OUTPUT_COMPARE1C,
-// 	TIMER_INTERRUPT_OVERFLOW1
-// } timer_interrupt_type_t;
 
 /**
  * @brief Get the timer index from the device address

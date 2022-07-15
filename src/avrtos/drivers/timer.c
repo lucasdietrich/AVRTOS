@@ -258,9 +258,6 @@ static int get_timer2_presc_value(timer2_prescaler_t prescaler)
 	}
 }
 
-#define CALCULATE_COUNTER_VALUE(period_us, prescaler) ((((F_CPU / 1000000LU) * period_us) / prescaler - 1))
-#define COUNTER_VALUE_FIT(period_us, prescaler, max) (CALCULATE_COUNTER_VALUE(period_us, prescaler) <= max)
-
 int timer_init(uint8_t tim_idx,
 	       uint32_t period_us,
 	       timer_callback_t cb,
@@ -293,7 +290,7 @@ int timer_init(uint8_t tim_idx,
 			return -1;
 		}
 
-		counter = CALCULATE_COUNTER_VALUE(period_us, prescaler_val);
+		counter = TIMER_CALC_COUNTER_VALUE(period_us, prescaler_val);
 	} while (counter > max_counter);
 
 	tim_ctx[tim_idx].cb = cb;
