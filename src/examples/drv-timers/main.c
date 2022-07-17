@@ -44,7 +44,7 @@ ISR(TIMER4_OVF_vect)
 {
 	/* Set counter to a value to have a 250ms period after first overflow */
 	ll_timer16_set_tcnt(TIMER4_DEVICE,
-			    TIMER_GET_MAX_COUNTER(4) -
+			    TIMER_GET_MAX_COUNTER(4) + 1 -
 			    TIMER_CALC_COUNTER_VALUE(250U * USEC_PER_MSEC, 1024));
 	usart_transmit('4');
 }
