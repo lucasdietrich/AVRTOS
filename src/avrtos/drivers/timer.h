@@ -296,6 +296,9 @@ static inline void *timer_get_device(uint8_t idx)
 {
 	void *dev = NULL;
 
+	/* TODO */
+	// __builtin_constant_p(idx);
+
 	switch (idx) {
 	case 0:
 		dev = TIMER0_DEVICE;

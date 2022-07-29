@@ -32,12 +32,12 @@ void push(struct in **mem)
 	*mem = NULL;
 }
 
-int8_t alloc(struct in **mem)
+int8_t alloc_buf(struct in **mem)
 {
 	return k_mem_slab_alloc(&myslab, (void **)mem, K_NO_WAIT);
 }
 
-void free(struct in *mem)
+void free_buf(struct in *mem)
 {
 	k_mem_slab_free(&myslab, mem);
 }
@@ -48,9 +48,9 @@ static inline void input(const char rx)
 {
 	static struct in *mem = NULL;
 	if (mem == NULL) {
-		if (alloc(&mem) != 0) {
+		if (alloc_buf(&mem) != 0) {
 			__ASSERT_NULL(mem);
-			usart_transmit('!');
+			putchar('!');
 			return;
 		}
 		mem->len = 0;
@@ -60,23 +60,26 @@ static inline void input(const char rx)
 	case 0x1A: /* Ctrl + Z -> drop */
 		mem->len = 0;
 	case '\n': /* process the packet */
+	case '\r':
 		mem->buffer[mem->len] = '\0';
 		push(&mem);
 		break;
 	case 0x08: /* backspace */
 		if (mem->len > 0) {
 			mem->len--;
-			usart_transmit(rx);
+			putchar(rx);
 		}
+		break;
+	case 0x09: /* tab */
 		break;
 	default:
 		if (mem->len == sizeof(mem->buffer) - 1u) {
-			mem->len = 0;
+			mem->len = 0xFF;
 			push(&mem);
 		} else {
 			mem->buffer[mem->len++] = rx;
 		}
-		usart_transmit(rx);
+		putchar(rx);
 		break;
 	}
 }
@@ -96,23 +99,22 @@ ISR(board_USART_RX_vect)
 void consumer(void *context)
 {
 	for (;;) {
-		usart_print_p(PSTR("\n# "));
+		printf("\n# ");
+		
 		struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
 		__ASSERT_NOTNULL(mem);
-		if (mem->len == 0) {
-			usart_print_p(PSTR("\nCOMMAND DROPPED !"));
-		} else {
+		if (mem->len == 0xFF) {
+			printf_P(PSTR("\nCOMMAND DROPPED !"));
+		} else if (mem->len > 0) {
 			/* process/parsed the command */
-			usart_print_p(PSTR("CMD received ! len = "));
-			usart_u8(mem->len);
-			usart_print_p(PSTR(" : "));
+			printf_P(PSTR("CMD received ! len = %hu : "), mem->len);
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
 			     c < mem->buffer + mem->len; c++) {
-				usart_transmit(*c);
+				putchar(*c);
 			}
 		}
-		k_mem_slab_free(&myslab, mem);
+		free_buf(mem);
 	}
 }
 

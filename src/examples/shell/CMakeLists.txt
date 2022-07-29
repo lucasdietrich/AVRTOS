@@ -1,4 +1,4 @@
-project(sample_poc_shell)
+project(sample_shell)
 add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration
@@ -9,7 +9,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 	CONFIG_KERNEL_SCHEDULER_DEBUG=0
 	CONFIG_KERNEL_ASSERT=1
 	CONFIG_KERNEL_THREAD_IDLE_ADD_STACK=0x60
-
+	CONFIG_STDIO_PRINTF_TO_USART=0
 )
 
 target_link_avrtos(${PROJECT_NAME})
