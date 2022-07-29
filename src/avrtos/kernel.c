@@ -75,21 +75,6 @@ extern struct k_thread __k_threads_end;
 extern struct k_thread _k_idle;
 
 /**
- * @brief Queue the thread in the runqueue. We assume that the thread {th} is K_READY.
- * The thread must not be added to the runqueue already. Keep it's flag unchanged.
- * Assume that the interrupt flag is cleared when called.
- * Assume that the runqueue doesn't contain the IDLE thread
- *
- * @param th : ready thread to queue
- */
-static K_NOINLINE void _k_queue(struct k_thread *const th)
-{
-	__ASSERT_NOINTERRUPT();
-
-	push_back(_k_runqueue, &th->tie.runqueue);
-}
-
-/**
  * @brief Schedule the thread to be executed.
  * If the IDLE thread is in the runqueue (it is removed), the scheduled thread become the only thread in the runqueue.
  * Thread is added to the top of the runqueue.
