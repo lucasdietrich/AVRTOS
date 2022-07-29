@@ -99,7 +99,7 @@ static void _k_idle_entry(void *context)
 #endif /* THREAD_IDLE_COOPERATIVE */
 
 		/* A bit buggy on QEMU but normally works fine */
-#if !defined(__QEMU__) || (THREAD_IDLE_COOPERATIVE == 0)
+#if !defined(__QEMU__) && (THREAD_IDLE_COOPERATIVE == 0)
 		/* only an interrupt can wake up the CPU after this instruction */
 		sleep_cpu();
 #endif /* __QEMU__ */
