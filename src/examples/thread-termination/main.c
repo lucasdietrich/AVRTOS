@@ -23,8 +23,6 @@ int main(void)
 {
 	usart_init();
 
-	k_thread_dump_all();
-
 	irq_enable();
 
 	for (;;) {
@@ -40,8 +38,6 @@ int main(void)
 					      s_thread->stack.size),
 				s_thread->stack.size,
 				K_PREEMPTIVE, NULL, 'T');
-		k_start(s_thread);
-
 		usart_printl_p(PSTR("Thread started again"));
 		k_start(s_thread);
 	}

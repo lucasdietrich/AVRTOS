@@ -92,7 +92,7 @@ static K_NOINLINE void _k_queue(struct k_thread *const th)
 /**
  * @brief Schedule the thread to be executed.
  * If the IDLE thread is in the runqueue (it is removed), the scheduled thread become the only thread in the runqueue.
- * If other threads are in the runqueue, the thread is only appended.
+ * Thread is added to the top of the runqueue.
  * - Assume that the thread is K_READY
  * - Assume that the thread is not in the runqueue
  *
@@ -373,7 +373,7 @@ struct k_thread *_k_scheduler(void)
 	prev->pend_canceled = 0;
 	prev->timer_expired = 0;
 
-	if (prev->state == K_PENDING) {
+ 	if (prev->state == K_PENDING) {
 		/* runqueue is positionned to the
 		 * normally next thread to be executed */
 		__K_DBG_SCHED_PENDING();        // ~
@@ -644,7 +644,7 @@ void k_start(struct k_thread *th)
 	if (th->state == K_STOPPED) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		{
-			_k_queue(th);
+			_k_schedule(th);
 		}
 	}
 }
