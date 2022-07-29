@@ -277,7 +277,7 @@
  * 1 : interrupts enabled
  * 2 : interrupts enabled but scheduler is locked if thread is preemptive
  */
-#define DEFAULT_MAIN_STARTUP_INTERRUPT_POLICY		0
+#define DEFAULT_INTERRUPT_POLICY		0
 
 /**
  * @brief Add high level support for configuring an hardware timer

@@ -154,7 +154,7 @@ What enhancements/features are not planned :
 | DRIVERS_USART1_ASYNC | Enable USART1 driver |
 | DRIVERS_USART2_ASYNC | Enable USART2 driver |
 | DRIVERS_USART3_ASYNC | Enable USART3 driver |
-| MAIN_STARTUP_INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
+| INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
 
 ## Getting started example :
 

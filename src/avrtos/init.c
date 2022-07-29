@@ -48,11 +48,11 @@ void _k_avrtos_init(void)
 
 	_k_init_sysclock();
 
-#if (MAIN_STARTUP_INTERRUPT_POLICY == 2) && (THREAD_MAIN_COOPERATIVE == 0)
+#if (INTERRUPT_POLICY == 2) && (THREAD_MAIN_COOPERATIVE == 0)
 	k_sched_lock();
 #endif
 
-#if MAIN_STARTUP_INTERRUPT_POLICY > 0
+#if INTERRUPT_POLICY > 0
 	sei();
 #endif 
 }
