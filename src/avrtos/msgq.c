@@ -145,7 +145,7 @@ uint8_t k_msgq_purge(struct k_msgq *msgq)
                 msgq->write_cursor = msgq->read_cursor;
                 msgq->used_msgs = 0;
 
-                return _k_cancel_pending(&msgq->waitqueue);
+                return _k_cancel_all_pending(&msgq->waitqueue);
         }
 
         __builtin_unreachable();

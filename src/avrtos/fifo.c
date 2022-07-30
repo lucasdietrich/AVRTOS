@@ -60,7 +60,7 @@ uint8_t k_fifo_cancel_wait(struct k_fifo *fifo)
         __ASSERT_NOTNULL(fifo);
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                return _k_cancel_pending(&fifo->waitqueue);
+                return _k_cancel_all_pending(&fifo->waitqueue);
         }
 
         __builtin_unreachable();

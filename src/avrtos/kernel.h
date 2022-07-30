@@ -222,13 +222,12 @@ K_NOINLINE void k_stop(void);
 // Kernel Private API
 //
 
-// for the most of following functions, we assume that the interrupt flag is cleared when called
-
 /**
- * @brief Initialize the runqueue with all threads ready to be executed.
- * Assume that the interrupt flag is cleared when called.
+ * @brief Get the number of threads currently ready. 0 if cpu is IDLE
+ * 
+ * @return uint8_t 
  */
-K_NOINLINE void _k_kernel_init(void);
+uint8_t k_ready_count(void);
 
 /* @see k_yield but suppose interrupts are disabled */
 void _k_yield(void);

@@ -14,7 +14,7 @@ set(MCU atmega2560)
 
 set(VERBOSITY "")
 
-set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -Wno-main -Wstrict-prototypes -Wundef -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fdata-sections -ffunction-sections -fno-split-wide-types -fno-tree-scev-cprop" )
+set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -Wno-main -Wundef -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fdata-sections -ffunction-sections -fno-split-wide-types -fno-tree-scev-cprop" )
 # -Werror -pedantic -Wfatal-errors
 
 set(DEBUG_FLAGS "-Og -g -gdwarf-2")
@@ -28,7 +28,7 @@ set(CMAKE_C_FLAGS_RELEASE ${RELEASE_FLAGS})
 set(CMAKE_CXX_FLAGS_RELEASE ${RELEASE_FLAGS})
 set(CMAKE_ASM_FLAGS_RELEASE ${RELEASE_FLAGS})
 
-set(CMAKE_C_FLAGS "${OBJECT_GEN_FLAGS} -std=gnu11 " CACHE INTERNAL "C Compiler options")
+set(CMAKE_C_FLAGS "${OBJECT_GEN_FLAGS} -Wstrict-prototypes -std=gnu11 " CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=gnu++11 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
 
@@ -90,16 +90,21 @@ function(target_prepare_env target)
 
 	# generate custom target for run in qemu
 	add_custom_target(run_${target} 
-		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic)
+		COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic
+		DEPENDS ${target}
+	)
 
 	# disassembly
 	add_custom_command(TARGET ${target} POST_BUILD
 		COMMAND avr-objdump -S ${output_name} > ${target}.dis.src.asm VERBATIM
+		DEPENDS ${target}
 	)
 	add_custom_command(TARGET ${target} POST_BUILD
 		COMMAND avr-readelf -a ${output_name} > ${target}.readelf.txt VERBATIM
+		DEPENDS ${target}
 	)
 	add_custom_command(TARGET ${target} POST_BUILD
 		COMMAND avr-objdump -d ${output_name} > ${target}.dis.asm VERBATIM
+		DEPENDS ${target}
 	)
 endfunction()

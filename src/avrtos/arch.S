@@ -64,13 +64,13 @@ TIMERn_COMPA_vect:
 #endif
 ; KERNEL_TICKS
 
-#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+#if KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	lds r18, _k_sched_ticks_remaining
 	subi r18, 0x01
 	sts _k_sched_ticks_remaining, r18
 	brne __intctx_restore_minimal
 #endif 
-;KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+;KERNEL_TIME_SLICE_MULTIPLE_TICKS
 
 	push	r19
 	push	r20

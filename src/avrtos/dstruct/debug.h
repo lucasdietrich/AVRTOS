@@ -36,11 +36,6 @@ void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item))
 //
 void print_dlist(struct ditem *dlist, void (*ditem_printer)(struct ditem *item));
 
-//
-// ref DList
-//
-void print_ref_dlist(struct ditem *ref, void (*ditem_printer)(struct ditem *item));
-
 /*___________________________________________________________________________*/
 
 #include "tqueue.h"

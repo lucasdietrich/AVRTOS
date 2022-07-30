@@ -60,33 +60,37 @@
 
 /*___________________________________________________________________________*/
 
-#define K_FLAG_SCHED_LOCKED_SHIFT   2
-#define K_FLAG_SCHED_LOCKED         (1 << K_FLAG_SCHED_LOCKED_SHIFT)
+/* Note: Willingly not adding unsigned "u" suffix to numbers
+ * because these flags are used in assembly code. */
 
-#define K_FLAG_PREEMPT_SHIFT        3
+#define K_FLAG_STATE_POS		0
+#define K_FLAG_STOPPED			(0 << K_FLAG_STATE_POS)
+#define K_FLAG_READY			(1 << K_FLAG_STATE_POS)
+#define K_FLAG_PENDING			(2 << K_FLAG_STATE_POS)
+#define K_FLAG_IDLE			(3 << K_FLAG_STATE_POS)
 
-#define K_FLAG_COOP                 (1 << K_FLAG_PREEMPT_SHIFT)
-#define K_FLAG_PREEMPT              (0 << K_FLAG_PREEMPT_SHIFT)
+#define K_FLAG_SCHED_LOCKED_POS 	2
+#define K_FLAG_SCHED_LOCKED     	(1 << K_FLAG_SCHED_LOCKED_POS)
 
-#define K_FLAG_STOPPED              (0U << 0)
-#define K_FLAG_READY                (1U << 0)
-#define K_FLAG_PENDING              (2U << 0)
-#define K_FLAG_IDLE                 (3U << 0)
+#define K_FLAG_PRIO_POS      		3
+#define K_MASK_PRIO			(3 << K_FLAG_PRIO_POS)
+#define K_FLAG_COOP      		(0 << K_FLAG_PRIO_POS)
+#define K_FLAG_PREEMPT          	(2 << K_FLAG_PRIO_POS)
+#define K_FLAG_PRIO_HIGH		(0 << K_FLAG_PRIO_POS)
+#define K_FLAG_PRIO_LOW			(1 << K_FLAG_PRIO_POS)
 
-#define K_FLAG_INTPREEMPT_SHIFT     4
-#define K_FLAG_INTPREEMPT           (1 << K_FLAG_INTPREEMPT_SHIFT)
+#define K_FLAG_TIMER_EXPIRED_POS  	5
+#define K_FLAG_TIMER_EXPIRED        	(1 << K_FLAG_TIMER_EXPIRED_POS)
 
-#define K_COOPERATIVE               K_FLAG_COOP
-#define K_PREEMPTIVE                K_FLAG_PREEMPT
+#define K_FLAG_PEND_CANCELED_POS 	6
+#define K_FLAG_PEND_CANCELED		(1 << K_FLAG_PEND_CANCELED_POS)
 
-#define K_PRIO_DEFAULT              K_PREEMPTIVE
+#define K_FLAG_WAKEUP_SCHED_POS 	7
+#define K_FLAG_WAKEUP_SCHED		(1 << K_FLAG_PEND_CANCK_FLAG_PEND_WAKEUPSCHED_POSELED_POS)
 
-#define K_FLAG_PEND_CANCELED_SHIFT  5
-#define K_FLAG_PEND_CANCELED        (1 << K_FLAG_PEND_CANCELED_SHIFT)
-
-#define K_FLAG_TIMER_EXPIRED_SHIFT  6
-#define K_FLAG_TIMER_EXPIRED        (1 << K_FLAG_TIMER_EXPIRED_SHIFT)
-
+#define K_COOPERATIVE          	 	K_FLAG_COOP
+#define K_PREEMPTIVE           	 	K_FLAG_PREEMPT
+#define K_PRIO_DEFAULT          	(K_COOPERATIVE | K_FLAG_PRIO_LOW)
 /*___________________________________________________________________________*/
 
 #endif

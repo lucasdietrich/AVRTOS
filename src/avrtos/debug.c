@@ -69,13 +69,18 @@ void k_thread_dump(struct k_thread *th)
 		case K_PENDING:
 			usart_print_p(PSTR("PENDING"));
 			break;
+		case K_IDLE:
+			usart_print_p(PSTR("IDLE   "));
+			break;
 		default:
 			break;
 	}
 	
 	usart_transmit(' ');
 
-	usart_transmit(th->coop ? 'C' : 'P');
+	usart_transmit((th->flags & K_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
+	usart_transmit(' ');
+	usart_transmit((th->flags & K_MASK_PRIO) == K_FLAG_PRIO_HIGH ? '0' : '1');
 	usart_transmit(' ');
 	usart_transmit(th->sched_lock ? 'S' : '_');
 	usart_transmit(th->timer_expired ? 'X' : '_');
@@ -143,7 +148,7 @@ void _thread_symbol_events_queue(struct titem *item)
 
 void print_runqueue(void)
 {
-        print_ref_dlist(_k_runqueue, _thread_symbol_runqueue);
+        /* TODO */
 }
 
 void print_events_queue(void)

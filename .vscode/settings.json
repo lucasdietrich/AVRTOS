@@ -50,4 +50,5 @@
 		"semaphore.h": "c",
 		"kernel_internals.h": "c"
 	},
+	"editor.rulers": [80]
 }

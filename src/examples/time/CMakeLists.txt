@@ -5,6 +5,7 @@ add_executable(${PROJECT_NAME} main.c)
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	CONFIG_KERNEL_UPTIME=1
 	CONFIG_KERNEL_TIME=1
+	CONFIG_STDIO_PRINTF_TO_USART=0
 )
 
 target_link_avrtos(${PROJECT_NAME})

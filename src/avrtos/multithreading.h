@@ -9,10 +9,9 @@
 
 #include <stddef.h>
 
+#include "defines.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
-
-#include "multithreading.h"
 
 /*___________________________________________________________________________*/
 
@@ -48,13 +47,9 @@ enum thread_state_t {
 	K_PENDING = 2, 
 
 	/* This flag is reserved for IDLE thread only (if enabled),
-	 * it is used to know whether the system is in idle mode 
-	 * (i.e. IDLE thread running) or not.
-	 * 
-	 * It is actually used only if the IDLE thread is cooperative.
-	 * If preemptive this particular state should be infered from the runqueue state
+	 * it is used to know whether the thread being evaluated is the IDLE thread
 	 */
-	// K_IDLE = 3
+	K_IDLE = 3
 };
 
 /* size 19B */
@@ -170,10 +165,15 @@ struct k_thread
 			/* tells if scheduler is temporarely locked */
                         uint8_t sched_lock : 1;
 
-			/* cooperative/preemptive thread */
-                        uint8_t coop : 1;
-
-                        uint8_t _unused : 1;
+			/* Thread priority
+			 * 0 : COOPERATIVE HIGH PRIORITY
+			 * 1 : COOPERATIVE LOW PRIORITY
+			 * 2 : PREEMPTIVE HIGH PRIORITY
+			 * 3 : PREEMPTIVE LOW PRIORITY
+			 * 
+			 * Cooperative threads have a higher priority than preemptive threads.
+			 */ 
+                        uint8_t priority : 2;
 
 			/* tells if the timer expiration caused 
 			 * this thread to be awakened 
@@ -192,6 +192,7 @@ struct k_thread
                 };
                 uint8_t flags;
         };
+
         union
         {
                 struct ditem runqueue;          // represent the thread in the runqueue     (4B)
@@ -261,7 +262,7 @@ extern struct k_thread * _current;
  */
 int k_thread_create(struct k_thread *const th, thread_entry_t entry,
 		    void *const stack, const size_t stack_size,
-		    const int8_t priority, void *const context_p,
+		    const uint8_t priority, void *const context_p,
 		    const char symbol);
 
 /*___________________________________________________________________________*/

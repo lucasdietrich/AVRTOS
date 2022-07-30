@@ -13,7 +13,7 @@ extern "C" {
 #define K_FAULT_SENTINEL	1
 #define K_FAULT_MEMORY		2
 #define K_THREAD_TERMINATED	3
-#define K_FAULT_INTERRUPT	4
+#define K_FAULT_KERNEL_HALT	4
 
 #define K_FAULT 		0xFF
 

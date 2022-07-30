@@ -79,7 +79,6 @@
 
 #define COUNTER_VALUE TIMER_CALC_COUNTER_VALUE(KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
 
-
 void _k_init_sysclock(void)
 {
 	void *const dev = timer_get_device(KERNEL_SYSLOCK_HW_TIMER);

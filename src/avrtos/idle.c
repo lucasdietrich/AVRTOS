@@ -5,19 +5,17 @@
 
 #define K_MODULE K_MODULE_IDLE
 
+extern uint8_t _k_ready_count;
 extern struct ditem *_k_runqueue;
 
-static inline bool _k_runqueue_single(void)
-{
-        return _k_runqueue->next == _k_runqueue;
-}
+extern bool _k_runqueue_single(void);
 
 #if KERNEL_THREAD_IDLE
 
 static void _k_idle_entry(void *context);
 
 #if defined(__QEMU__) && (THREAD_IDLE_COOPERATIVE != 0)
-#	error "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
+#	warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
 #endif
 
 /*
@@ -32,7 +30,7 @@ static void _k_idle_entry(void *context);
 K_THREAD_DEFINE(_k_idle,
 		_k_idle_entry,
 		K_THREAD_STACK_MIN_SIZE + KERNEL_THREAD_IDLE_ADD_STACK,
-		K_COOPERATIVE,
+		K_COOPERATIVE | K_FLAG_PRIO_LOW,
 		NULL,
 		'I');
 #else
@@ -43,47 +41,10 @@ K_THREAD_DEFINE(_k_idle,
 K_THREAD_DEFINE(_k_idle,
 		_k_idle_entry,
 		K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE + KERNEL_THREAD_IDLE_ADD_STACK,
-		K_PREEMPTIVE,
+		K_PREEMPTIVE | K_FLAG_PRIO_LOW,
 		NULL,
 		'I');
 #endif
-
-/* TODO THREAD_IDLE_COOPERATIVE */
-#if 0
-/**
- * @brief Yield function to be used only in the IDLE thread.
- * 
- * If detects the K_STOPPED is set for it and will remove itself from
- * the runqueue in order to let the ready thread to be executed.
- */
-static void _k_yield_from_idle_thread(void)
-{
-	cli();
-
-	__ASSERT_NOINTERRUPT();
-	__ASSERT(K_ASSERT_ISTHREADIDLE, _current == &_k_idle);
-
-	if (_k_idle.state == K_STOPPED) {
-		
-		/* check that the idle thread is still the first thread in the runqueue */
-		__ASSERT(
-			K_ASSERT_ISTHREADIDLE,
-			CONTAINER_OF(_k_runqueue, struct k_thread, tie.runqueue) == &_k_idle);
-		
-		/* check that there is another thread ready to run */
-		__ASSERT_LEASTTWO_RUNNING();
-
-		/* remove IDLE thread from runqueue */
-		pop_ref(&_k_runqueue);
-
-		/* yield to ready thread */
-		_k_yield();
-	}
-
-	/* interrupts are always enabled in idle thread */
-	sei();
-}
-#endif /* THREAD_IDLE_COOPERATIVE */
 
 /**
  * @brief Idle thread entry function
@@ -113,7 +74,7 @@ static void _k_idle_entry(void *context)
 bool k_is_cpu_idle(void)
 {
 #if KERNEL_THREAD_IDLE
-	return _k_runqueue == &_k_idle.tie.runqueue;
+	return _k_ready_count == 0;
 #else 
 	return false;
 #endif /* KERNEL_THREAD_IDLE */
@@ -123,7 +84,7 @@ void k_idle(void)
 {
 	/* if others thread are ready, yield the CPU */
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		if (_k_runqueue_single() == false) {
+		if (_k_ready_count != 0u) {
 			return _k_yield();
 		}
 	}

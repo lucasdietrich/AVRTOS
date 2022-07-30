@@ -20,9 +20,9 @@ K_THREAD struct k_thread _k_thread_main = {
     .sp = 0, // main thread is running, context already "restored"
     {
 #if THREAD_MAIN_COOPERATIVE == 1
-        .flags = K_READY | K_COOPERATIVE,
+        .flags = K_READY | K_COOPERATIVE | K_FLAG_PRIO_LOW,
 #else
-        .flags = K_READY | K_PREEMPTIVE,
+        .flags = K_READY | K_PREEMPTIVE | K_FLAG_PRIO_LOW,
 #endif
     },
     .tie = {
@@ -47,7 +47,7 @@ K_THREAD struct k_thread _k_thread_main = {
     .symbol = 'M'           // default main thread sumbol
 };
 
-struct k_thread * _current = &_k_thread_main;
+struct k_thread *_current = &_k_thread_main;
 
 
 /*___________________________________________________________________________*/
@@ -83,7 +83,7 @@ static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t ent
 
 int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         void *const stack, const size_t stack_size,
-        const int8_t prio, void *const context_p, const char symbol)
+        const uint8_t prio, void *const context_p, const char symbol)
 {
         if (stack_size < K_THREAD_STACK_MIN_SIZE) {
                 return -1;
@@ -105,9 +105,9 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         /* clear internal flags */
         th->flags = 0;
         th->state = K_STOPPED;
-        th->coop = prio & K_FLAG_COOP ? 1 : 0;
         th->symbol = symbol;
         th->swap_data = NULL;
+        th->state = prio & K_MASK_PRIO;
 
         return 0;
 }

@@ -39,10 +39,8 @@ int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
         {
                 if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
                         return 0;
-                } else if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-                        return _k_pend_current(&sig->waitqueue, timeout);
                 } else {
-                        return -1;
+                        return _k_pend_current(&sig->waitqueue, timeout);
                 }
         }
 
@@ -54,7 +52,7 @@ uint8_t k_poll_cancel_wait(struct k_signal *sig)
         __ASSERT_NOTNULL(sig);
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                return _k_cancel_pending(&sig->waitqueue);
+                return _k_cancel_all_pending(&sig->waitqueue);
         }
 
         __builtin_unreachable();

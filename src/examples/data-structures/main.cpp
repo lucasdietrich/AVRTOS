@@ -18,7 +18,7 @@
 #define FLAG_DLIST        4
 #define FLAG_TQUEUE       8
 
-#define TESTS             FLAG_OQUEUE
+#define TESTS             FLAG_QUEUE | FLAG_OQUEUE | FLAG_DLIST | FLAG_TQUEUE
 
 void test_queue(void);
 void test_oqueue(void);
@@ -186,7 +186,7 @@ inline void print_dlist(void) { print_dlist(&dlist, print_dlist_item); }
 
 static void test_dlist_dequeue(struct ditem *dlist)
 {
-	struct ditem *out = dlist_dequeue(dlist);
+	struct ditem *out = dlist_get(dlist);
 	if (DITEM_VALID(dlist, out)) {
 		print_dlist_item(out);
 		usart_transmit('\n');
@@ -198,11 +198,11 @@ static void test_dlist_dequeue(struct ditem *dlist)
 void test_queue_dlist(void)
 {
 	print_dlist(&dlist, print_dlist_item);
-	dlist_queue(&dlist, &ditems[0].i);
+	dlist_append(&dlist, &ditems[0].i);
 	print_dlist(&dlist, print_dlist_item);
-	dlist_queue(&dlist, &ditems[1].i);
+	dlist_append(&dlist, &ditems[1].i);
 	print_dlist(&dlist, print_dlist_item);
-	dlist_queue(&dlist, &ditems[2].i);
+	dlist_append(&dlist, &ditems[2].i);
 	print_dlist(&dlist, print_dlist_item);
 
 	test_dlist_dequeue(&dlist);

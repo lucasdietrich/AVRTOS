@@ -59,6 +59,6 @@ K_NOINLINE struct k_thread *_k_unpend_first_and_swap(struct ditem *waitqueue,
 
 K_NOINLINE void _k_cancel_first_pending(struct ditem *waitqueue);
 
-K_NOINLINE uint8_t _k_cancel_pending(struct ditem *waitqueue);
+K_NOINLINE uint8_t _k_cancel_all_pending(struct ditem *waitqueue);
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

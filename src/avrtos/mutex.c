@@ -71,7 +71,7 @@ int8_t k_mutex_cancel_wait(struct k_mutex *mutex)
         __ASSERT_NOTNULL(mutex);
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                return _k_cancel_pending(&mutex->waitqueue);
+                return _k_cancel_all_pending(&mutex->waitqueue);
         }
 
         __builtin_unreachable();

@@ -51,7 +51,7 @@ static const char *const acode_to_str(uint8_t acode)
 	case K_ASSERT_NOINTERRUPT:
 		return PSTR("NOINTERRUPT");
 
-	case K_ASSERT_LEASTTWO_RUNNING:
+	case K_ASSERT_LEASTONE_RUNNING:
 		return PSTR("LEASTONE_RUNNING");
 
 	case K_ASSERT_THREAD_STATE:

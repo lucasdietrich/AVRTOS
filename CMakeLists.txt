@@ -9,6 +9,10 @@ enable_language(C CXX ASM)
 # set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/avr6-atmega2560.cmake)
 # include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/avr6-atmega2560.cmake)
 
+
+
+# SET(ENABLE_SINGLE_SAMPLE "thread-prio-multiq")
+
 set(QEMU ON)
 
 # set(F_CPU 16000000UL)

@@ -7,6 +7,8 @@
 
 extern void _k_init_sysclock(void);
 
+extern void _k_kernel_init(void);
+
 void _k_avrtos_init(void)
 {
 	/* Page 52 (ATmega328p datasheet) :

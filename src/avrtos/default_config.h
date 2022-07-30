@@ -60,6 +60,10 @@
 #define DEFAULT_THREAD_DEFAULT_SREG             	(1 << SREG_I)
 
 //
+// Enable support for thread priorities using a multiple queues mechanism
+//
+#define DEFAULT_TREAD_PRIO_MULTIQ 		       	0
+//
 //  Enable Kernel debug for function, that set some of them noinline 
 //
 #define DEFAULT_KERNEL_API_NOINLINE             	0
@@ -94,7 +98,7 @@
 //
 // Time slice in milliseconds (0 if using SYSCLOCK period)
 //
-#define DEFAULT_KERNEL_TIME_SLICE_US               	4000LLU
+#define DEFAULT_KERNEL_TIME_SLICE_US               	1000LLU
 
 //
 // Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timers : timer1 (1, 3, 4, 5)

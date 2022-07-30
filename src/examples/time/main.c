@@ -25,6 +25,7 @@ int main(void)
 	irq_enable();
 
 	k_show_uptime();
+	printf_P(PSTR("Startup\n"));
 
 	uint32_t timestamp;
 

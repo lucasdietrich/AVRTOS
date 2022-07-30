@@ -13,8 +13,8 @@
 /*___________________________________________________________________________*/
 
 k_timeout_t timeouts[2] = {
-  K_FOREVER, // K_MSEC(10000),
-  K_FOREVER, // K_MSEC(1000)
+  K_FOREVER, // K_MSEC(2000)
+  K_FOREVER, // K_MSEC(1500)
 };
 
 void consumer_thread(k_timeout_t *p_timeout);
@@ -57,7 +57,7 @@ int main(void)
 
 		pos = (pos + 1) % ARRAY_SIZE(letters);
 
-		k_sleep(K_SECONDS(6));
+		k_sleep(K_SECONDS(3));
 	}
 }
 
@@ -73,6 +73,7 @@ void consumer_thread(k_timeout_t *p_timeout)
 		} else {
 			usart_printl_p(PSTR(" : Failed to get a fifo item"));
 		}
+		k_yield();
 	}
 }
 

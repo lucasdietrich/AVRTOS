@@ -1,4 +1,4 @@
-project(sample_mutex-multithreading_test)
+project(sample_mutex_multithreading_test)
 add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration

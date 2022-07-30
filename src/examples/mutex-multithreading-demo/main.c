@@ -35,7 +35,7 @@ int main(void)
 
 	sei();
 
-	k_sleep(K_FOREVER);
+	for (;;) { }
 }
 
 void thread_led_on(void *p)

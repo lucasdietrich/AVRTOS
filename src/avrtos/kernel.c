@@ -21,22 +21,51 @@ void yield(void)
 
 /*___________________________________________________________________________*/
 
+#if KERNEL_THREAD_IDLE
+#	define THREAD_IS_IDLE(_thread) (_thread == &_k_idle)
+#else
+#	define THREAD_IS_IDLE(_thread) (0)
+#endif
+
+#define THREAD_IS_MAIN(_thread) (_thread == &_k_thread_main)
+
+/**
+ * @brief number of threads in the runqueue(s)
+ * - 0: Only IDLE thread is running
+ * - 1: A single thread is running
+ * - n > 1: Multiple threads are running
+ */
+uint8_t _k_ready_count = 1u; /* On startup only main thread is running */
+
+uint8_t k_ready_count(void)
+{
+	return _k_ready_count;
+}
+
 /**
  * @brief Runqueue containing the queue of all ready threads.
  * Should never be NULL.
  */
-struct ditem *_k_runqueue = &_k_thread_main.tie.runqueue;
+#if TREAD_PRIO_MULTIQ
+dlist_t _k_runqs[4u] = {
+	DLIST_INIT(_k_runqs[K_PRIO_HIGHEST]),
+	DLIST_INIT(_k_runqs[K_PRIO_HIGH]),
+	DLIST_INIT(_k_runqs[K_PRIO_LOW]),
+	DLIST_INIT(_k_runqs[K_PRIO_LOWEST])
+};
+#define THREAD_GET_RUNQ(thread) (&_k_runqs[thread->priority])
+#else
+// struct ditem _k_runq = DLIST_INIT(_k_runq);
+// #define THREAD_GET_RUNQ(thread) (&_k_runq)
+
+struct ditem *_k_runq = &_k_thread_main.tie.runqueue;
+#endif
 
 struct titem *_k_events_queue = NULL;
 
-static inline bool _k_runqueue_single(void)
-{
-	return _k_runqueue->next == _k_runqueue;
-}
-
-#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+#if KERNEL_TIME_SLICE_MULTIPLE_TICKS
 uint8_t _k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
-#endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
+#endif /* KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
 #if KERNEL_TICKS
 // necessary ?
@@ -95,41 +124,19 @@ static K_NOINLINE void _k_schedule(struct k_thread *thread)
 	}
 #endif
 
-	/* Clear flag telling whether the thread is pending */
-	thread->wakeup_schd = 0;
-
 	/* Mark this thread as READY */
 	thread->state = K_READY;
 
-	if (KERNEL_THREAD_IDLE == 0) {
-		/* If there is no thread IDLE,
-		*  simply add the thread to running threads
-		*/
-		push_front(_k_runqueue, &thread->tie.runqueue);
-	} else if (0) { /* todo THREAD_IDLE_COOPERATIVE */
-		/* if there is a thread IDLE and it's cooperative,
-		 * simply add the thread to running threads
-		 *
-		 * Note: IDLE thread will remove itself from the runqueue.
-		 */
-		push_front(_k_runqueue, &thread->tie.runqueue);
+	if (_k_ready_count == 0) {
+		/* Resume from IDLE */
+		dlist_init(&thread->tie.runqueue);
 
-		/* Mark the IDLE thread as stopped so that it will
-		 * remove itself from the runqueue on _k_yield_from_idle_thread() call
-		 */
-		_k_idle.state = K_STOPPED;
+		_k_runq = &thread->tie.runqueue;
 	} else {
-		/* if thread IDLE is preemptive, then we need to update
-		 * the runqueue here, because thread idle will be preempted
-		 * immediately after
-		 */
-		if (k_is_cpu_idle() == true) {
-			dlist_ref(&thread->tie.runqueue);
-			_k_runqueue = &thread->tie.runqueue;
-		} else {
-			push_front(_k_runqueue, &thread->tie.runqueue);
-		}
+		dlist_append(_k_runq, &thread->tie.runqueue);
 	}
+	
+	_k_ready_count++;
 }
 
 /**
@@ -182,34 +189,35 @@ static K_NOINLINE void _k_suspend(void)
 {
 	__ASSERT_NOINTERRUPT();
 
+	/* Illegal to suspend the IDLE thread, handled by kernel */
+	__ASSERT_TRUE(&_current->tie.runqueue == _k_runq);
+
+	/* Mark this thread as pending */
 	_current->state = K_PENDING;
 
-	if (KERNEL_THREAD_IDLE) {
-		if (_k_runqueue_single() == true) {
-			/* if the suspended thread is the only one it the runqueue
-			 * then add the idle thread to the runqueue */
-			struct ditem *const tie = &_k_idle.tie.runqueue;
-			dlist_ref(tie);
-			_k_runqueue = tie;
-			
-			if (0) { /* todo THREAD_IDLE_COOPERATIVE */
-				/* if idle thread is cooperative,
-				 * we need to mark it as ready, to preserve
-				 * threads context integrity */
-				_k_idle.state = K_READY;
-			}
-		} else {
-			/* if there are more threads, simply remove the suspended
-			 * thread from the runqueue */
-			pop_ref(&_k_runqueue);
-		}
-	} else {
-		/* If IDLE thread is not enabled, check that at least one other
-		 * thread is running */
-		__ASSERT_LEASTTWO_RUNNING();
+	/* Remove thread from runqueue */
+	dlist_remove(_k_runq);
 
-		pop_ref(&_k_runqueue);
+	/* Reference next thread to be executed */
+	_k_runq = _current->tie.runqueue.next;
+
+	/* Decrement number of threads in the runqueue */
+	_k_ready_count--;
+
+	if (_k_ready_count == 0) {
+#if KERNEL_THREAD_IDLE == 0u
+		/* Assert*/
+		__ASSERT_LEASTONE_RUNNING();
+
+		/* If IDLE thread is not enabled, then fault */
+		__fault(K_FAULT_KERNEL_HALT);
+#else
+		/* Switch to IDLE thread */
+		_k_runq = &_k_idle.tie.runqueue;
+#endif
 	}
+
+	__K_DBG_SCHED_SUSPENDED(_current);
 }
 
 /**
@@ -235,26 +243,10 @@ static K_NOINLINE void _k_wake_up(struct k_thread *th)
 	/* Remove the thread from the events queue */
 	if (th->wakeup_schd) {
 		tqueue_remove(&_k_events_queue, &th->tie.event);
+		th->wakeup_schd = 0;
 	}
 
 	_k_schedule(th);
-}
-
-/**
- * @brief Suspend the current thread and schedule its awakening for later
- *
- * Assumptions :
- *  - interrupt flag is cleared when called.
- *
- * @param timeout
- */
-static K_NOINLINE void _k_reschedule(k_timeout_t timeout)
-{
-	__ASSERT_NOINTERRUPT();
-
-	_k_suspend();
-
-	_k_schedule_wake_up(timeout);
 }
 
 inline static void swap_endianness(void **addr)
@@ -262,33 +254,37 @@ inline static void swap_endianness(void **addr)
 	*addr = (void *)HTONS(*addr);
 }
 
+/**
+ * @brief Initialize the runqueue with all threads ready to be executed.
+ * Assume that the interrupt flag is cleared when called.
+ */
 void _k_kernel_init(void)
 {
+#if KERNEL_THREAD_IDLE
+	/* Mark idle thread */
+	_k_idle.state = K_IDLE;
+#endif
+
 	/* main thread is the first running (ready or not),
 	 * and it is already in queue */
 	for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
 		struct k_thread *const thread = &(&__k_threads_start)[i];
 
-		if (thread == &_k_thread_main) {
+		/* Main thread already in queue */
+		if (THREAD_IS_MAIN(thread)) {
 			continue;
 		}
 
-#if KERNEL_THREAD_IDLE
-		const bool is_thread_idle = thread == &_k_idle;
-#else
-		const bool is_thread_idle = false;
-#endif
-
 		/* idle thread must not be added to the
 		 * runqueue as the main thread is running */
-		if (!is_thread_idle &&
-		    (thread->state == K_READY)) {
-			push_back(_k_runqueue, &thread->tie.runqueue);
+		if (!THREAD_IS_IDLE(thread) && (thread->state == K_READY)) {
+			_k_ready_count++;
+			dlist_append(_k_runq, &thread->tie.runqueue);
 		}
 
 		/* Swap endianness of addresses in compilation-time built stacks.
 		* We cannot change the endianness of addresses determined by the
-		* linker at compilation time. So we need to do it on system start up
+		* linker at compilation time. So we need to do it here.
 		*/
 		struct _k_callsaved_ctx *ctx = thread->stack.end -
 			_K_CALLSAVED_CTX_SIZE + 1u;
@@ -302,6 +298,14 @@ void _k_kernel_init(void)
 	}
 }
 
+/* If KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the 
+ * IDLE thread. The expired thread will be rescheduled only after
+ * the current time slice interval finishes. So we lose few ticks in the 
+ * IDLE thread.
+ * 
+ * TODO Improve this by checking for expired threads more often when
+ *  we are in the IDLE thread.
+ */
 void _k_system_shift(void)
 {
 	__ASSERT_NOINTERRUPT();
@@ -309,9 +313,9 @@ void _k_system_shift(void)
 
 	tqueue_shift(&_k_events_queue, KERNEL_TIME_SLICE_TICKS);
 
-#if KERNEL_SCHEDULER_VARIABLE_FREQUENCY
+#if KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	_k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
-#endif /* KERNEL_SCHEDULER_VARIABLE_FREQUENCY */
+#endif /* KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
 	struct ditem *const ready = (struct ditem *)tqueue_pop(&_k_events_queue);
 	if (ready != NULL) {
@@ -321,6 +325,7 @@ void _k_system_shift(void)
 
 		/* set ready thread expired flag */
 		thread->timer_expired = 1u;
+		thread->wakeup_schd = 0;
 
 		_k_schedule(thread);
 	}
@@ -358,21 +363,19 @@ struct k_thread *_k_scheduler(void)
 	prev->pend_canceled = 0;
 	prev->timer_expired = 0;
 
- 	if (prev->state == K_PENDING) {
-		/* runqueue is positionned to the
-		 * normally next thread to be executed */
-		__K_DBG_SCHED_PENDING();        // ~
-	} else {
-		/* next thread is positionned at the top of the runqueue */
-		ref_requeue(&_k_runqueue);
-
-		__K_DBG_SCHED_REQUEUE();        // >
+	/* If previous thread put itself in pending state,
+	 * it already removed itself from the runqueue, so we don't need
+	 * to do it here 
+	 */
+	if (_current->state == K_READY) {
+		/* Rotate the runqueue, set next thread to first position */
+		_k_runq = _k_runq->next;
 	}
 
-	_current = CONTAINER_OF(_k_runqueue, struct k_thread, tie.runqueue);
+	/* Fetch next thread to execute */
+	_current = CONTAINER_OF(_k_runq, struct k_thread, tie.runqueue);
 
-	__ASSERT_THREAD_STATE(_current, K_READY);
-
+	__K_DBG_SCHED_NEXT_THREAD();
 	__K_DBG_SCHED_NEXT(_current);
 
 	return prev;
@@ -383,14 +386,20 @@ K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue,
 {
 	__ASSERT_NOINTERRUPT();
 
-	int8_t err = -1;
-	if (timeout.value != 0) {
+	/* In case of returning without waiting */
+	int8_t err = -EBUSY;
+	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+
 		/* queue thread to pending queue of the object */
-		dlist_queue(waitqueue, &_current->wany);
+		dlist_append(waitqueue, &_current->wany);
+
+		/* Suspend the thread */
+		_k_suspend();
 
 		/* schedule thread wake up if timeout is set */
-		_k_reschedule(timeout);
+		_k_schedule_wake_up(timeout);
 
+		/* Call scheduler */
 		_k_yield();
 
 		/* if timer expired, we manually remove the thread from
@@ -413,7 +422,7 @@ K_NOINLINE struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue)
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
 
-	struct ditem *tie = dlist_dequeue(waitqueue);
+	struct ditem *tie = dlist_get(waitqueue);
 	if (DITEM_VALID(waitqueue, tie)) {
 		struct k_thread *pending_thread = THREAD_FROM_WAITQUEUE(tie);
 
@@ -455,7 +464,7 @@ K_NOINLINE void _k_cancel_first_pending(struct ditem *waitqueue)
 	}
 }
 
-K_NOINLINE uint8_t _k_cancel_pending(struct ditem *waitqueue)
+K_NOINLINE uint8_t _k_cancel_all_pending(struct ditem *waitqueue)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
@@ -569,8 +578,13 @@ void k_sleep(k_timeout_t timeout)
 	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		{
-			_k_reschedule(timeout);
+			/* Suspend the thread */
+			_k_suspend();
 
+			/* schedule thread wake up if timeout is set */
+			_k_schedule_wake_up(timeout);
+
+			/* Call scheduler */
 			_k_yield();
 		}
 	}

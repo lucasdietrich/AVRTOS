@@ -41,6 +41,14 @@
 #   define THREAD_DEFAULT_SREG DEFAULT_THREAD_DEFAULT_SREG
 #endif
 
+// set priority mechanism
+#if defined(CONFIG_TREAD_PRIO_MULTIQ)
+#   define TREAD_PRIO_MULTIQ CONFIG_TREAD_PRIO_MULTIQ
+#else
+#   define TREAD_PRIO_MULTIQ DEFAULT_TREAD_PRIO_MULTIQ
+#endif
+
+
 // kernel debug mode
 #if defined(CONFIG_KERNEL_DEBUG)
 #   define KERNEL_DEBUG CONFIG_KERNEL_DEBUG
@@ -406,7 +414,7 @@
 #if KERNEL_TIME_SLICE_US < KERNEL_SYSCLOCK_PERIOD_US
 #	error [UNSUPPORTED] KERNEL_TIME_SLICE_US < KERNEL_SYSCLOCK_PERIOD_US
 #elif KERNEL_TIME_SLICE_US > KERNEL_SYSCLOCK_PERIOD_US
-#	define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 1
+#	define KERNEL_TIME_SLICE_MULTIPLE_TICKS 1
 
 #	if KERNEL_TIME_SLICE_US % KERNEL_SYSCLOCK_PERIOD_US != 0
 #		warning [WARNING] KERNEL_TIME_SLICE_US must be a multiple of KERNEL_SYSCLOCK_PERIOD_US
@@ -419,7 +427,7 @@
 		KERNEL_TIME_SLICE_US / KERNEL_SYSCLOCK_PERIOD_US > 255"
 #	endif 
 #else 
-#	define KERNEL_SCHEDULER_VARIABLE_FREQUENCY 	0
+#	define KERNEL_TIME_SLICE_MULTIPLE_TICKS 	0
 #	define KERNEL_TIME_SLICE_TICKS			1
 #endif /* KERNEL_TIME_SLICE_US != KERNEL_SYSCLOCK_PERIOD_US */
 
@@ -598,26 +606,26 @@ typedef struct
 #define _K_STACK_MINIMAL_INITIALIZER(name, entry, ctx) \
     struct _k_callsaved_ctx _k_stack_buf_##name = _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry)
 
-#define _K_THREAD_INITIALIZER(name, stack_size, prio_flags, sym)                                             \
-    struct k_thread name = {                                                                                 \
-        .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(name, stack_size),                                          \
+#define _K_THREAD_INITIALIZER(_name, stack_size, prio_flag, sym)                                              \
+    struct k_thread _name = {                                                                                 \
+        .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(_name, stack_size),                                          \
         {                                                                                                    \
-            .flags = K_FLAG_READY | prio_flags,                                                              \
+            .flags = K_FLAG_READY | prio_flag,                                                               \
         },                                                                                                   \
         .tie = {.runqueue = DITEM_INIT(NULL)},                                                               \
         {.wmutex = DITEM_INIT(NULL)},                                                                        \
         .swap_data = NULL,                                                                                   \
-        .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(name), stack_size), .size = (stack_size)}, \
+        .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(_name), stack_size), .size = (stack_size)}, \
         .symbol = sym}
 
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flags, context_p, symbol)                  \
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)                  \
     __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flags, symbol); \
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol); \
     _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
 
-#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flags, context_p, symbol)                  \
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)                  \
     __attribute__((used)) _K_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flags, symbol); \
+    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flag, symbol); \
     _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
 
 /*___________________________________________________________________________*/
