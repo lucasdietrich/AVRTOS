@@ -352,8 +352,8 @@ src_filter =
     +<avrtos/>
 
 build_flags = 
-    -Wl,-T./avrtos-avr5.xn
-    ; -Wl,-T./avrtos-avr6.xn
+    -Wl,-T./avrtos-avr5.ld
+    ; -Wl,-T./avrtos-avr6.ld
 
 upload_port = COM3
 

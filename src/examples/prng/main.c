@@ -25,7 +25,7 @@ K_THREAD_DEFINE(t3, thread, 0x100, K_PREEMPTIVE, &p3, 'C');
 
 /*___________________________________________________________________________*/
 
-uint8_t buffer[512];
+uint8_t buffer[256];
 
 int main(void)
 {

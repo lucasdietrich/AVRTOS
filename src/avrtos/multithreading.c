@@ -68,7 +68,7 @@ static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t ent
 	ctx->thread_entry = (void*) K_SWAP_ENDIANNESS(entry);
 	ctx->pc = (void*) K_SWAP_ENDIANNESS(_k_thread_entry);
 
-#if __AVR_3_BYTE_PC__
+#if defined(__AVR_3_BYTE_PC__)
 	ctx->pch = 0;
 #endif
 

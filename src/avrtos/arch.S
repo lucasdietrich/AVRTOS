@@ -107,7 +107,7 @@ TIMERn_COMPA_vect:
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
-#if __AVR_3_BYTE_PC__
+#if defined(__AVR_3_BYTE_PC__)
 	push r1
 #endif 
 
@@ -316,7 +316,7 @@ USART0_RX_vect:
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
 	push r25
-#if __AVR_3_BYTE_PC__
+#if defined(__AVR_3_BYTE_PC__)
 	push r1
 #endif 
 
