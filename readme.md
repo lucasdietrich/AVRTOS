@@ -352,8 +352,8 @@ src_filter =
     +<avrtos/>
 
 build_flags = 
-    -Wl,-T./avrtos-avr5.ld
-    ; -Wl,-T./avrtos-avr6.ld
+    -Wl,-T./avrtos-avr5.xn
+    ; -Wl,-T./avrtos-avr6.xn
 
 upload_port = COM3
 
@@ -594,6 +594,7 @@ Priority *COOPERATIVE* :
 - Pseudo-ops and operators : https://www.nongnu.org/avr-libc/user-manual/assembler.html#ass_pseudoop
 - AVR Instruction Set Manual : http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
 - cross-referencer example : https://elixir.bootlin.com/zephyr/v2.6.1-rc1/source/kernel/sched.c
+- cmake-avr github repository : https://github.com/mkleemann/cmake-avr
 
 ## Troubleshooting
 

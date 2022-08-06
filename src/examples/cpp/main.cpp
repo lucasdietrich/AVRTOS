@@ -23,7 +23,7 @@ public:
 		_entry = entry;
 	}
 
-	void start(void) { k_start(&_ctx); }
+	void start(void) { k_thread_start(&_ctx); }
 	void sleep(k_timeout_t timeout) { k_sleep(timeout); }
 	void print_name(void) { usart_print(_name); usart_transmit('\n'); }
 

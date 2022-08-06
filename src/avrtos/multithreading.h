@@ -33,7 +33,7 @@ typedef void (*thread_entry_t)(void *);
  */
 enum thread_state_t { 
 	/* the thread is not running and is not in the runqueue, 
-	 * it can be resumed/started with k_resume/k_start functions. 
+	 * it can be resumed/started with k_resume/k_thread_start functions. 
 	 */
 	K_STOPPED = 0, 
 

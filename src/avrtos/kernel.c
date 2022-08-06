@@ -133,7 +133,7 @@ static K_NOINLINE void _k_schedule(struct k_thread *thread)
 
 		_k_runq = &thread->tie.runqueue;
 	} else {
-		dlist_append(_k_runq, &thread->tie.runqueue);
+		dlist_prepend(_k_runq, &thread->tie.runqueue);
 	}
 	
 	_k_ready_count++;
@@ -317,8 +317,8 @@ void _k_system_shift(void)
 	_k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
 #endif /* KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
-	struct ditem *const ready = (struct ditem *)tqueue_pop(&_k_events_queue);
-	if (ready != NULL) {
+	struct titem *ready;
+	while ((ready = tqueue_pop(&_k_events_queue)) != NULL) {
 		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
 
 		__K_DBG_SCHED_EVENT(thread);  // !
@@ -638,7 +638,7 @@ void k_resume(struct k_thread *th)
 	}
 }
 
-void k_start(struct k_thread *th)
+void k_thread_start(struct k_thread *th)
 {
 	if (th->state == K_STOPPED) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)

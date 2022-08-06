@@ -39,7 +39,7 @@ int main(void)
 		k_signal_init(&ms->sig);
 		k_thread_create(&ms->thread, thread, ms->stack,
 				sizeof(ms->stack), K_COOPERATIVE, ms, '0' + (ms - threads));
-		k_start(&ms->thread);
+		k_thread_start(&ms->thread);
 	}
 
 	/* act as IDLE thread */

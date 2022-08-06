@@ -207,7 +207,7 @@ K_NOINLINE void k_resume(struct k_thread *th);
  * 
  * @param th : stopped thread to start.
  */
-K_NOINLINE void k_start(struct k_thread *th);
+K_NOINLINE void k_thread_start(struct k_thread *th);
 
 /**
  * @brief Stop the thread

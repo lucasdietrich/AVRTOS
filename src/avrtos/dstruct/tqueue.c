@@ -21,16 +21,14 @@ void _tqueue_schedule(struct titem **root, struct titem *item)
             /* next of previous become current */
                 struct titem *p_current = *prev_next_p;
 
-                /* if current element expires before or at the same time
-                 * that the input item, we go to next item.
-                 */
-                if (p_current->delay_shift <= item->delay_shift) {
+                /* if new element expires after we go to next */
+                if (p_current->delay_shift < item->delay_shift) {
                         item->delay_shift -= p_current->delay_shift;
                         prev_next_p = &(p_current->next);
                 } else {
-                    /* if current element expire after, we need to insert
-                     * the new_item before current and linked *prev_next_p
-                     */
+			/* if current element expire before or at the same time,
+			 * we insert the new item
+			 */
                         item->next = p_current;
                         p_current->delay_shift -= item->delay_shift;
                         break;

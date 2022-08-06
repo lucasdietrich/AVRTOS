@@ -64,7 +64,6 @@ static void _k_idle_entry(void *context)
 		/* only an interrupt can wake up the CPU after this instruction */
 		sleep_cpu();
 #endif /* __QEMU__ */
-
 		
 	}
 }

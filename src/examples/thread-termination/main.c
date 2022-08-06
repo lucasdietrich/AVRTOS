@@ -39,7 +39,7 @@ int main(void)
 				s_thread->stack.size,
 				K_PREEMPTIVE, NULL, 'T');
 		usart_printl_p(PSTR("Thread started again"));
-		k_start(s_thread);
+		k_thread_start(s_thread);
 	}
 
 	k_sleep(K_FOREVER);
