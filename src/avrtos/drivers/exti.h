@@ -24,6 +24,10 @@ typedef struct {
 
 #define EXTI_CTRL_DEVICE ((EXTI_Ctrl_Device *)(AVR_IO_BASE_ADDR + 0x69u))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 int exti_configure(uint8_t exti, uint8_t isc);
 
 static inline void exti_clear_flag(uint8_t exti) {
@@ -38,29 +42,9 @@ static inline void exti_disable(uint8_t exti) {
 	EIMSK &= ~BIT(exti);
 }
 
+#if defined(__cplusplus)
+}
+#endif
 
-// EICRA
-// EICRB
-// EIMSK
-// EIFR
-
-/* TODO Attempt for ATMmega2560 */
-// typedef struct {
-// 	__IO uint8_t PCICR;
-// 	__IO uint8_t EICRA;
-// 	__IO uint8_t EICRB;
-// 	__IO uint8_t PCMSK0;
-// 	__IO uint8_t PCMSK1;
-// 	__IO uint8_t PCMSK2;
-// } EXTI_Ctrl_Device;
-
-// typedef struct {
-// 	__IO uint8_t PCIFR;
-// 	__IO uint8_t EIFR;
-// } EXTI_Flag_Device;
-
-// typedef struct {
-// 	__IO uint8_t EIMSK;
-// } EXTI_Ctrl2_Device;
 
 #endif /* _AVRTOS_DRIVER_EXTI_H_ */

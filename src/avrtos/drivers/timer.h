@@ -4,6 +4,10 @@
 #include <avrtos/avrtos.h>
 #include <avrtos/drivers.h>
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 /**
  * @brief 16 bits timers registers structure
  * - Timer 1, 3, 4, 5 on ATmega2560
@@ -439,5 +443,9 @@ void timer_stop(uint8_t tim_idx);
 uint8_t timer_get_prescaler(uint8_t tim_idx);
 
 uint32_t timer_get_max_period_us(uint8_t tim_idx);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* _AVRTOS_DRIVER_TIMER_H_ */

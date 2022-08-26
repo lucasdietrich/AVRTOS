@@ -4,17 +4,21 @@
 #include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 typedef struct {
 	__IO uint8_t PIN;
 	__IO uint8_t DDR;
 	__IO uint8_t PORT;
 } GPIO_Device;
 
-#define INPUT 0u
-#define OUTPUT 1u
+#define DIR_INPUT 0u
+#define DIR_OUTPUT 1u
 
-#define INPUT_NO_PULLUP 0u
-#define INPUT_PULLUP 1u
+#define PIN_NO_PULLUP 0u
+#define PIN_PULLUP 1u
 
 #define OUTPUT_DRIVEN_LOW 0u
 #define OUTPUT_DRIVEN_HIGH 1u
@@ -73,6 +77,11 @@ static inline void gpio_toggle_pin(GPIO_Device *gpio, uint8_t pin) {
 #define GPIOC_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x26u))
 #define GPIOD_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x29u))
 
+#define GPIOA GPIOA_DEVICE
+#define GPIOB GPIOB_DEVICE
+#define GPIOC GPIOC_DEVICE
+#define GPIOD GPIOD_DEVICE
+
 #if defined(__AVR_ATmega2560__)
 #define GPIOE_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Cu))
 #define GPIOF_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Fu))
@@ -81,6 +90,19 @@ static inline void gpio_toggle_pin(GPIO_Device *gpio, uint8_t pin) {
 #define GPIOJ_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x103u))
 #define GPIOK_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x106u))
 #define GPIOL_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x109u))
+
+#define GPIOE GPIOE_DEVICE
+#define GPIOF GPIOF_DEVICE
+#define GPIOG GPIOG_DEVICE
+#define GPIOH GPIOH_DEVICE
+#define GPIOJ GPIOJ_DEVICE
+#define GPIOK GPIOK_DEVICE
+#define GPIOL GPIOL_DEVICE
 #endif /* __AVR_ATmega2560__ */
+
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* _GPIO_H_ */

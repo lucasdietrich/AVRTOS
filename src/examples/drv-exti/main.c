@@ -18,17 +18,17 @@ ISR(INT1_vect) {
 int main(void)
 {
 	/* Init INT gpios */
-	gpio_init(GPIOB_DEVICE, OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_init(GPIOB_DEVICE, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	/* Init measurements gpios */
-	gpio_init(GPIOD_DEVICE, OUTPUT, OUTPUT_DRIVEN_LOW);
-	gpio_set_pin_direction(GPIOD_DEVICE, PIN0, OUTPUT);
+	gpio_init(GPIOD_DEVICE, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_set_pin_direction(GPIOD_DEVICE, PIN0, DIR_OUTPUT);
 	gpio_set_pin_output_state(GPIOD_DEVICE, PIN0, STATE_LOW);
-	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, OUTPUT);
+	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, DIR_OUTPUT);
 	gpio_set_pin_output_state(GPIOD_DEVICE, PIN1, STATE_LOW);
 
 	/* Unecessary, just to have clean signals on my lines */
-	gpio_init(GPIOH_DEVICE, OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_init(GPIOH_DEVICE, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	/* Configure INT0 */
 	exti_configure(INT0, ISC_EDGE);

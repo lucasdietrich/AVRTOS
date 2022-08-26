@@ -8,7 +8,7 @@ int main(void)
 {
 	irq_enable();
 	
-	gpio_init(GPIO, OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_init(GPIO, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	for (;;) {
 		GPIO->PIN = BIT(PINn);
