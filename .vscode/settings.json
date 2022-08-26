@@ -48,7 +48,8 @@
 		"stdbool.h": "c",
 		"usart.h": "c",
 		"semaphore.h": "c",
-		"kernel_internals.h": "c"
+		"kernel_internals.h": "c",
+		"drivers.h": "c"
 	},
 	"editor.rulers": [80]
 }

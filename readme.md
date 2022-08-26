@@ -10,8 +10,8 @@ Following avr architectures are supported/tested :
 
 Following features are supported:
 - Cooperative threads
-- Preemptive threads with time slice between 1 ms and 16 ms (timer 0 and timer 2) up to 4 seconds (timer 1)
-- Configurable sysclock timer among hardware timers : timer0 (8bits), timer1 (16 bits), timer2 (8 bits)
+- Highly configurable sysclock, all hardware timers can be used (from 0 to 2 for the ATmega328p and 0 to 5 for the ATmega2560)
+- Preemptive threads with highly configure time slice
 - Mutex and Semaphores
 - Thread sleep up to 65 seconds (or more if using high precision time objects)
 - Scheduler lock/unlock to temporarily set a preemptive thread as cooperative
@@ -52,6 +52,10 @@ Minor features:
 - Allow thread safe termination (doesn't work for `main` thread yet).
 - Project fully PlatformIO compatible for Windows and Linux
 - Redirection of stdout to USART0 (e.g. printf)
+- Stack sentinels
+- Drivers
+  - UART
+  - Timers
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -62,8 +66,8 @@ What features will be implemented :
 - **Optimized circular buffer** / **Stream** / **Asymetric put/get**
 - Statistics CPU use per thread
 - Delayed start, suspending/resuming threads
-- Stack sentinels
 - Kernel fault
+- Threads priority
 
 AVRTOS2 (version 2) main improvements:
 - Enhanced clock precision
@@ -155,6 +159,12 @@ What enhancements/features are not planned :
 | DRIVERS_USART2_ASYNC | Enable USART2 driver |
 | DRIVERS_USART3_ASYNC | Enable USART3 driver |
 | INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
+| DEFAULT_DRIVERS_TIMER0_API | Enable TIMER0 API | 
+| DEFAULT_DRIVERS_TIMER1_API | Enable TIMER1 API |
+| DEFAULT_DRIVERS_TIMER2_API | Enable TIMER2 API |
+| DEFAULT_DRIVERS_TIMER3_API | Enable TIMER3 API |
+| DEFAULT_DRIVERS_TIMER4_API | Enable TIMER4 API |
+| DEFAULT_DRIVERS_TIMER5_API | Enable TIMER5 API |
 
 ## Getting started example :
 
@@ -273,15 +283,6 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 - [idle](./src/examples/idle/main.c)
 
 ## Note
-
-### Peripherals
-
-- This library only needs one timer among following hardware timers :
-  - timer0 : allow KERNEL_TIME_SLICE_US between 1 and 16 milliseconds
-  - timer1 : allow KERNEL_TIME_SLICE_US between 1 and 16 milliseconds and 20ms, 25ms, 50ms, 100ms, 200ms, 250ms, 500ms, 1s, 2s, 2500ms, 3s, 4s
-  - timer2 : allow KERNEL_TIME_SLICE_US between 1 and 16 milliseconds
-
-The hardware timer used can be configured with CONFIG_KERNEL_SYSLOCK_HW_TIMER configuration option.
 
 ### qemu
 
