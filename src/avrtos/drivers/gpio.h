@@ -60,7 +60,11 @@ static inline void gpio_set_pin_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t p
 }
 
 static inline void gpio_set_pin_output_state(GPIO_Device *gpio, uint8_t pin, uint8_t state) {
-	gpio->PIN = (gpio->PIN & ~BIT(pin)) | (state << pin);
+	gpio->PORT = (gpio->PORT & ~BIT(pin)) | (state << pin);
+}
+
+static inline void gpio_toggle_pin(GPIO_Device *gpio, uint8_t pin) {
+	gpio->PIN = BIT(pin);
 }
 
 
