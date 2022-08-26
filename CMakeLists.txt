@@ -8,8 +8,9 @@ enable_language(C CXX ASM)
 # set( CMAKE_VERBOSE_MAKEFILE on )
 
 set(CMAKE_BUILD_TYPE Debug)
-set(QEMU ON)
+set(QEMU OFF)
 set(PROG_DEV "/dev/ttyACM0")
+SET(ENABLE_SINGLE_SAMPLE "drv-exti")
+# SET(ENABLE_SINGLE_SAMPLE "drv-gpio")
 
-# SET(ENABLE_SINGLE_SAMPLE "many-threads")
 add_subdirectory(src/examples)

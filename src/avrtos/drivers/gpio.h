@@ -19,8 +19,8 @@ typedef struct {
 #define OUTPUT_DRIVEN_LOW 0u
 #define OUTPUT_DRIVEN_HIGH 1u
 
-#define PIN_LOW 0u
-#define PIN_HIGH 1u
+#define STATE_LOW 0u
+#define STATE_HIGH 1u
 
 #define PINn0 PINA0
 #define PINn1 PINA1
@@ -76,9 +76,10 @@ static inline void gpio_toggle_pin(GPIO_Device *gpio, uint8_t pin) {
 #if defined(__AVR_ATmega2560__)
 #define GPIOE_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Cu))
 #define GPIOF_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Fu))
-#define GPIOG_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x100u))
-#define GPIOH_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x103u))
-#define GPIOJ_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x106u))
+#define GPIOG_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x32u))
+#define GPIOH_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x100u))
+#define GPIOJ_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x103u))
+#define GPIOK_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x106u))
 #define GPIOL_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x109u))
 #endif /* __AVR_ATmega2560__ */
 
