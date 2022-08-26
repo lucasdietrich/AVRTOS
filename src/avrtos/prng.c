@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "prng.h"
 
 K_NOINLINE uint32_t _k_shift_lfsr(uint32_t *lfsr, uint32_t poly_mask)

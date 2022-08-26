@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "exti.h"
 
 int exti_configure(uint8_t exti, uint8_t isc)

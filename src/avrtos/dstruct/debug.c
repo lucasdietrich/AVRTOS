@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "debug.h"
 
 void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item))

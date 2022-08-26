@@ -1,13 +1,9 @@
-/**
- * @file main.c
- * @author Dietrich Lucas (ld.adecy@gmail.com)
- * @brief ATmega2560 example, connect RX1 to TX1 using a wire
- * @version 0.1
- * @date 2022-03-18
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
  *
- * @copyright Copyright (c) 2022
- *
+ * SPDX-License-Identifier: Apache-2.0
  */
+
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

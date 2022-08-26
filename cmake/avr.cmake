@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 find_program(AVR_CC avr-gcc REQUIRED)
 find_program(AVR_CXX avr-g++ REQUIRED)
 find_program(AVR_OBJCOPY avr-objcopy REQUIRED)

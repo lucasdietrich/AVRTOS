@@ -1,13 +1,9 @@
-/**
- * @file config.h
- * @author Lucas Dietrich (ldietrich.fr)
- * @brief 
- * @version 0.1
- * @date 2021-05-15
- * 
- * @copyright Copyright (c) 2021
- * 
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
+
 
 #ifndef _AVRTOS_DEFAULT_CONFIG_H
 #define _AVRTOS_DEFAULT_CONFIG_H

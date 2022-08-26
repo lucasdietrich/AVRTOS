@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef _UART_H
 #define _UART_H
 

@@ -1,12 +1,10 @@
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
- * @file main.cpp
- * @author Dietrich Lucas (ld.adecy@gmail.com)
- * @brief Use of canaries to determine precise stacks needs for different threads
- * @version 0.1
- * @date 2021-08-06
- *
- * @copyright Copyright (c) 2021
- *
  * Configuration options
  *  - CONFIG_THREAD_CANARIES=1
  *  - CONFIG_THREAD_EXPLICIT_MAIN_STACK=1
