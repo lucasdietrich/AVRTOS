@@ -46,12 +46,20 @@ int main(void)
 	exti_clear_flag(INT1);
 	exti_enable(INT1);
 
+	/* Configure GPIOK */
+	// gpio_init(GPIOK, GPIO_)
+
+	/* Configure PCINT16-23 */
+	pci_configure(PCINT_16_23, 0xFFu);
+	pci_clear_flag(PCINT_16_23);
+	pci_enable(PCINT_16_23);
+
 	/* Enable interrupts */
 	irq_enable();
 
 	for (;;) {
 		/* Generate a soft int on INT0 */
-		k_sleep(K_MSEC(1u));
 		gpio_toggle_pin(GPIOD_DEVICE, PIN0);
+		k_sleep(K_MSEC(1u));
 	}
 }
