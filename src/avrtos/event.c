@@ -12,6 +12,8 @@
 
 #define K_MODULE K_MODULE_EVENT
 
+#define CONFIG_EVENT_ALLOW_NO_WAIT 1u
+
 #if KERNEL_EVENTS
 
 struct k_event_q
@@ -42,16 +44,28 @@ int k_event_init(struct k_event *event, k_event_handler_t handler)
 
 int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
-	if (!event || event->scheduled || K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+	if (!event || event->scheduled) {
 		return -EINVAL;
 	}
 
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		event->scheduled = 1;
-		event->tie.next = NULL;
-		event->tie.timeout = K_TIMEOUT_TICKS(timeout);
+#if !CONFIG_EVENT_ALLOW_NO_WAIT
+	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+		return -EINVAL;
+	}
+#endif
 
-		_tqueue_schedule(&_k_event_q.first, &event->tie);
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		if (CONFIG_EVENT_ALLOW_NO_WAIT && K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+			/* If no wait is requested, execute the handler immediately 
+			 * without scheduling it */
+			event->handler(event);
+		} else {
+			event->scheduled = 1u;
+			event->tie.next = NULL;
+			event->tie.timeout = K_TIMEOUT_TICKS(timeout);
+
+			_tqueue_schedule(&_k_event_q.first, &event->tie);
+		}
 	}
 
 	return 0;
@@ -92,9 +106,11 @@ void _k_event_q_process(void)
 	while ((tie = tqueue_pop(&_k_event_q.first)) != NULL) {
 		struct k_event *event = CONTAINER_OF(tie, struct k_event, tie);
 
-		event->handler(event);
-
+		/* Clear scheduled flag here so that we can schedule the same
+		 * event directly from the handler */
 		event->scheduled = 0;
+		
+		event->handler(event);
 	}
 }
 

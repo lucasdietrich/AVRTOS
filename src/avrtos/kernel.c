@@ -477,16 +477,13 @@ K_NOINLINE uint8_t _k_cancel_all_pending(struct ditem *waitqueue)
 
 	uint8_t count = 0;
 	struct k_thread *pending_thread;
-	for (;;) {
-		pending_thread = _k_unpend_first_thread(waitqueue);
-		if (pending_thread != NULL) {
-			pending_thread->pend_canceled = 1;
 
-			count++;
-		} else {
-			return count;
-		}
+	while ((pending_thread = _k_unpend_first_thread(waitqueue)) != NULL) {
+		pending_thread->pend_canceled = 1;
+		count++;
 	}
+
+	return count;
 }
 
 /*___________________________________________________________________________*/

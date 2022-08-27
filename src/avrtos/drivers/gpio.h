@@ -25,12 +25,22 @@ typedef struct {
 
 #define PIN_NO_PULLUP 0u
 #define PIN_PULLUP 1u
-
 #define OUTPUT_DRIVEN_LOW 0u
 #define OUTPUT_DRIVEN_HIGH 1u
 
+#define GPIO_INPUT 0u
+#define GPIO_OUTPUT 1u
+
+#define GPIO_INPUT_NO_PULLUP 0u
+#define GPIO_INPUT_PULLUP 1u
+#define GPIO_OUTPUT_DRIVEN_LOW 0u
+#define GPIO_OUTPUT_DRIVEN_HIGH 1u
+
 #define STATE_LOW 0u
 #define STATE_HIGH 1u
+
+#define GPIO_LOW 0u
+#define GPIO_HIGH 1u
 
 #define PINn0 PINA0
 #define PINn1 PINA1
@@ -59,22 +69,28 @@ typedef struct {
 #define PORTn6 PORTA6
 #define PORTn7 PORTA7
 
-void gpio_init(GPIO_Device *gpio, uint8_t mode, uint8_t pullup);
+void gpio_init(GPIO_Device *gpio, uint8_t dir, uint8_t pullup);
+
+void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup);
 
 static inline void gpio_set_pin_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction) {
-	gpio->DDR = (gpio->DDR & ~BIT(pin)) | (direction << pin);
+	gpio->DDR = (gpio->DDR & ~BIT(pin)) | ((direction & 1u) << pin);
 }
 
 static inline void gpio_set_pin_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup) {
-	gpio->PORT = (gpio->PORT & ~BIT(pin)) | (pullup << pin);
+	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((pullup & 1u) << pin);
 }
 
 static inline void gpio_set_pin_output_state(GPIO_Device *gpio, uint8_t pin, uint8_t state) {
-	gpio->PORT = (gpio->PORT & ~BIT(pin)) | (state << pin);
+	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((state & 1u) << pin);
 }
 
 static inline void gpio_toggle_pin(GPIO_Device *gpio, uint8_t pin) {
 	gpio->PIN = BIT(pin);
+}
+
+static inline uint8_t gpio_get_pin_state(GPIO_Device *gpio, uint8_t pin) {
+	return (gpio->PIN >> pin) & 1u;
 }
 
 

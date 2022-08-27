@@ -484,8 +484,11 @@ typedef struct
 #define K_SECONDS(seconds)      ((k_timeout_t){.value = K_TICKS_PER_SECOND * seconds})
 #define K_MSEC(milliseconds)    ((k_timeout_t){.value = K_TICKS_PER_MS * milliseconds})
 #define K_NO_WAIT               ((k_timeout_t){.value = (k_ticks_t) 0})
+#define K_NEXT_TICK             ((k_timeout_t){.value = (k_ticks_t) 1})
 #define K_FOREVER               ((k_timeout_t){.value = (k_ticks_t) -1})
 #define K_UNTIL_WAKEUP          K_FOREVER
+
+#define K_IMMEDIATE 	   	K_NEXT_TICK
 
 #else
 
