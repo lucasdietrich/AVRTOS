@@ -24,17 +24,17 @@ ISR(INT1_vect) {
 int main(void)
 {
 	/* Init INT gpios */
-	gpio_init(GPIOB_DEVICE, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_init(GPIOB_DEVICE, GPIO_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	/* Init measurements gpios */
-	gpio_init(GPIOD_DEVICE, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
-	gpio_set_pin_direction(GPIOD_DEVICE, PIN0, DIR_OUTPUT);
+	gpio_init(GPIOD_DEVICE, GPIO_OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_set_pin_direction(GPIOD_DEVICE, PIN0, GPIO_OUTPUT);
 	gpio_set_pin_output_state(GPIOD_DEVICE, PIN0, STATE_LOW);
-	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, DIR_OUTPUT);
+	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, GPIO_OUTPUT);
 	gpio_set_pin_output_state(GPIOD_DEVICE, PIN1, STATE_LOW);
 
 	/* Unecessary, just to have clean signals on my lines */
-	gpio_init(GPIOH_DEVICE, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
+	gpio_init(GPIOH_DEVICE, GPIO_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	/* Configure INT0 */
 	exti_configure(INT0, ISC_EDGE);
@@ -47,7 +47,7 @@ int main(void)
 	exti_enable(INT1);
 
 	/* Configure GPIOK */
-	// gpio_init(GPIOK, GPIO_)
+	gpio_init(GPIOK, GPIO_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	/* Configure PCINT16-23 */
 	pci_configure(PCINT_16_23, 0xFFu);
