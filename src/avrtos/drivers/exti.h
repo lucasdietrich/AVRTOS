@@ -30,7 +30,7 @@
 #define PCI_COUNT	 24u
 #endif
 
-#define PCI_GROUPS_COUNT (PCI_COUNT >> 3u);
+#define PCI_GROUPS_COUNT (PCI_COUNT >> 3u)
 
 typedef struct {
 	__IO uint8_t EICRn[EXTI_COUNT >> 2u];
@@ -74,7 +74,7 @@ static inline void pci_pin_enable(uint8_t pci)
 	PCI_CTRL_DEVICE->PCMSK[pci >> 3u] |= BIT(pci & 0x07u);
 }
 
-static inline void pci_pin_disable(uint8_t pci);
+static inline void pci_pin_disable(uint8_t pci)
 {
 	PCI_CTRL_DEVICE->PCMSK[pci >> 3u] &= ~BIT(pci & 0x07u);
 }
