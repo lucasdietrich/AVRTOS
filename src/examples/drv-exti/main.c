@@ -21,6 +21,12 @@ ISR(INT1_vect) {
 	gpio_toggle_pin(GPIOB_DEVICE, PIN6);
 }
 
+ISR(PCINT2_vect) {
+	/* Generate signal on measurement line */
+	gpio_toggle_pin(GPIOB_DEVICE, PIN5);
+}
+
+
 int main(void)
 {
 	/* Init INT gpios */

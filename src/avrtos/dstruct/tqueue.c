@@ -28,7 +28,7 @@ void _tqueue_schedule(struct titem **root, struct titem *item)
                 struct titem *p_current = *prev_next_p;
 
                 /* if new element expires after we go to next */
-                if (p_current->delay_shift < item->delay_shift) {
+                if (p_current->delay_shift <= item->delay_shift) {
                         item->delay_shift -= p_current->delay_shift;
                         prev_next_p = &(p_current->next);
                 } else {
