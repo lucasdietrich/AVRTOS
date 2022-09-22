@@ -28,6 +28,8 @@
 #define ENFILE 23
 #define ENOMSG 35
 
+#define ENOTSUP 95
+
 
 #define EWOULDBLOCK EAGAIN
 
