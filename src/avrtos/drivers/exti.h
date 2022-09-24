@@ -7,8 +7,8 @@
 #ifndef _AVRTOS_DRIVER_EXTI_H_
 #define _AVRTOS_DRIVER_EXTI_H_
 
-#include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
+#include <avrtos/drivers.h>
 
 #define ISCn0 		0u
 #define ISCn1 		1u
@@ -21,6 +21,11 @@
 #define PCINT_0_7 	0u
 #define PCINT_8_15 	1u
 #define PCINT_16_23 	2u
+
+#define GPIO_EXTI_GROUP(_dev) (_dev == GPIOB ? PCINT_0_7 : \
+			       _dev == GPIOC ? PCINT_8_15 : \
+			       _dev == GPIOD ? PCINT_16_23 : \
+			       0xFF)
 
 #if defined(__AVR_ATmega2560__)
 #define EXTI_COUNT	 8u
@@ -69,14 +74,24 @@ static inline void pci_configure(uint8_t pci_group, uint8_t mask)
 	PCI_CTRL_DEVICE->PCMSK[pci_group] = mask;
 }
 
+static inline void pci_pin_enable_group_line(uint8_t group, uint8_t line)
+{
+	PCI_CTRL_DEVICE->PCMSK[group] |= BIT(line);
+}
+
+static inline void pci_pin_disable_group_line(uint8_t group, uint8_t line)
+{
+	PCI_CTRL_DEVICE->PCMSK[group] &= ~BIT(line);
+}
+
 static inline void pci_pin_enable(uint8_t pci)
 {
-	PCI_CTRL_DEVICE->PCMSK[pci >> 3u] |= BIT(pci & 0x07u);
+	pci_pin_enable_group_line(pci >> 3u, pci & 0x07u);
 }
 
 static inline void pci_pin_disable(uint8_t pci)
 {
-	PCI_CTRL_DEVICE->PCMSK[pci >> 3u] &= ~BIT(pci & 0x07u);
+	pci_pin_disable_group_line(pci >> 3u, pci & 0x07u);
 }
 
 static inline void pci_clear_flag(uint8_t pci)

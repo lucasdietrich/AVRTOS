@@ -81,7 +81,7 @@ static inline void gpio_set_pin_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t p
 	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((pullup & 1u) << pin);
 }
 
-static inline void gpio_set_pin_output_state(GPIO_Device *gpio, uint8_t pin, uint8_t state) {
+static inline void gpio_write_pin_state(GPIO_Device *gpio, uint8_t pin, uint8_t state) {
 	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((state & 1u) << pin);
 }
 
@@ -89,7 +89,7 @@ static inline void gpio_toggle_pin(GPIO_Device *gpio, uint8_t pin) {
 	gpio->PIN = BIT(pin);
 }
 
-static inline uint8_t gpio_get_pin_state(GPIO_Device *gpio, uint8_t pin) {
+static inline uint8_t gpio_read_pin_state(GPIO_Device *gpio, uint8_t pin) {
 	return (gpio->PIN >> pin) & 1u;
 }
 
@@ -104,8 +104,13 @@ static inline uint8_t gpio_get_pin_state(GPIO_Device *gpio, uint8_t pin) {
 #define GPIOC GPIOC_DEVICE
 #define GPIOD GPIOD_DEVICE
 
-#if defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328P__)
 #define GPIOE_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Cu))
+
+#define GPIOE GPIOE_DEVICE
+#endif 
+
+#if defined(__AVR_ATmega2560__)
 #define GPIOF_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Fu))
 #define GPIOG_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x32u))
 #define GPIOH_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x100u))
@@ -122,6 +127,15 @@ static inline uint8_t gpio_get_pin_state(GPIO_Device *gpio, uint8_t pin) {
 #define GPIOL GPIOL_DEVICE
 #endif /* __AVR_ATmega2560__ */
 
+/* Get the GPIO device from the port letter index (0: A, 1: B, ...) */
+#define GPIO_DEVICE_ABCDEFG(_idx) (GPIOA_DEVICE + (_idx * sizeof(GPIO_Device)))
+
+#if defined(__AVR_ATmega2560__)
+#define GPIO_DEVICE_HIKL(_idx) (GPIOH_DEVICE + ((_idx - 6u) * sizeof(GPIO_Device)))
+#define GPIO_DEVICE(_idx) ((_idx <= 5) ? GPIO_DEVICE_ABCDEFG(_idx) : GPIO_DEVICE_HIKL(_idx))
+#else
+#define GPIO_DEVICE GPIO_DEVICE_ABCDEFG
+#endif	
 
 #if defined(__cplusplus)
 }

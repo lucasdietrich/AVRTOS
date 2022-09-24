@@ -52,8 +52,8 @@ static void set_baudrate(UART_Device *dev,
 	dev->UBRRnL = (uint8_t)ubrr;
 }
 
-static void ll_drv_init(UART_Device *dev,
-			const struct usart_config *config)
+void usart_ll_drv_init(UART_Device *dev,
+		 const struct usart_config *config)
 {
 	/* set baudrate */
 	set_baudrate(dev, config->baudrate, config->speed_mode);
@@ -107,7 +107,7 @@ int usart_drv_init(UART_Device *dev,
 		return -EINVAL;
 	}
 
-	ll_drv_init(dev, config);
+	usart_ll_drv_init(dev, config);
 
 	return 0;
 }

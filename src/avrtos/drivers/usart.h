@@ -127,8 +127,8 @@ struct usart_config
 
 #define USART_CONFIG_DEFAULT_2400() { \
         .baudrate = USART_BAUD_2400, \
-        .receiver = 1, \
-        .transmitter = 1, \
+        .receiver = 1u, \
+        .transmitter = 1u, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
         .stopbits = USART_STOP_BITS_1, \
@@ -138,8 +138,8 @@ struct usart_config
 
 #define USART_CONFIG_DEFAULT_9600() { \
         .baudrate = USART_BAUD_9600, \
-        .receiver = 1, \
-        .transmitter = 1, \
+        .receiver = 1u, \
+        .transmitter = 1u, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
         .stopbits = USART_STOP_BITS_1, \
@@ -149,8 +149,8 @@ struct usart_config
 
 #define USART_CONFIG_DEFAULT_115200() { \
         .baudrate = USART_BAUD_115200, \
-        .receiver = 1, \
-        .transmitter = 1, \
+        .receiver = 1u, \
+        .transmitter = 1u, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
         .stopbits = USART_STOP_BITS_1, \
@@ -160,8 +160,8 @@ struct usart_config
 
 #define USART_CONFIG_DEFAULT_500000() { \
         .baudrate = USART_BAUD_500000, \
-        .receiver = 1, \
-        .transmitter = 1, \
+        .receiver = 1u, \
+        .transmitter = 1u, \
         .mode = USART_MODE_ASYNCHRONOUS, \
         .parity = USART_PARITY_NONE, \
         .stopbits = USART_STOP_BITS_1, \
@@ -172,6 +172,9 @@ struct usart_config
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
 
 // drivers API
+K_NOINLINE void usart_ll_drv_init(UART_Device *dev,
+				  const struct usart_config *config);
+
 K_NOINLINE int usart_drv_init(UART_Device *dev,
 			      const struct usart_config *config);
 

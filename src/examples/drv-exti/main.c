@@ -35,9 +35,9 @@ int main(void)
 	/* Init measurements gpios */
 	gpio_init(GPIOD_DEVICE, GPIO_OUTPUT, OUTPUT_DRIVEN_LOW);
 	gpio_set_pin_direction(GPIOD_DEVICE, PIN0, GPIO_OUTPUT);
-	gpio_set_pin_output_state(GPIOD_DEVICE, PIN0, STATE_LOW);
+	gpio_write_pin_state(GPIOD_DEVICE, PIN0, STATE_LOW);
 	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, GPIO_OUTPUT);
-	gpio_set_pin_output_state(GPIOD_DEVICE, PIN1, STATE_LOW);
+	gpio_write_pin_state(GPIOD_DEVICE, PIN1, STATE_LOW);
 
 	/* Unecessary, just to have clean signals on my lines */
 	gpio_init(GPIOH_DEVICE, GPIO_OUTPUT, OUTPUT_DRIVEN_LOW);
