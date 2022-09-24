@@ -50,9 +50,12 @@ typedef struct  {
 
 #define TIMER1_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x80U))
 
-#if defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
 #define TIMER3_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x90U))
 #define TIMER4_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0xA0U))
+#endif 
+
+#if defined(__AVR_ATmega2560__)
 #define TIMER5_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x120U))
 #endif
 
@@ -316,13 +319,15 @@ static inline void *timer_get_device(uint8_t idx)
 	case 2:
 		dev = TIMER2_DEVICE;
 		break;
-#if defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
 	case 3:
 		dev = TIMER3_DEVICE;
 		break;
 	case 4:
 		dev = TIMER4_DEVICE;
 		break;
+#endif
+#if defined(__AVR_ATmega2560__)
 	case 5:
 		dev = TIMER5_DEVICE;
 		break;

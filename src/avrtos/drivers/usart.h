@@ -34,6 +34,8 @@ typedef struct {
 /* TODO make universal */
 #if defined(__AVR_ATmega328P__)
 #	define ARCH_USART_COUNT 1
+#elif defined(__AVR_ATmega328PB__)
+#	define ARCH_USART_COUNT 2
 #elif defined(__AVR_ATmega2560__)
 #	define ARCH_USART_COUNT 4
 #else

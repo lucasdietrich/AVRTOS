@@ -18,7 +18,7 @@ K_SIGNAL_DEFINE(sig);
 
 #if defined(__AVR_ATmega328P__)
 #	define board_USART_RX_vect  USART_RX_vect
-#elif defined(__AVR_ATmega2560__)
+#elif defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
 #	define board_USART_RX_vect  USART0_RX_vect
 #endif /* __AVR_ATmega328P__ */
 

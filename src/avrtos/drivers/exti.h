@@ -25,7 +25,7 @@
 #if defined(__AVR_ATmega2560__)
 #define EXTI_COUNT	 8u
 #define PCI_COUNT	 24u
-#elif defined(__AVR_ATmega328P__)
+#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__)
 #define EXTI_COUNT 	 2u
 #define PCI_COUNT	 24u
 #endif
