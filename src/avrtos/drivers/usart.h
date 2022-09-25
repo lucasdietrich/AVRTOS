@@ -182,7 +182,11 @@ K_NOINLINE int usart_drv_deinit(UART_Device *dev);
 
 K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE void usart0_drv_sync_putc_opt(char c);
+K_NOINLINE int usart_drv_getc(UART_Device *dev);
+
+K_NOINLINE void usart0_drv_sync_putc(char c);
+
+K_NOINLINE int usart0_drv_getc(void);
 
 // ASYNC API
 

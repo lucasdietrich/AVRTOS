@@ -29,6 +29,15 @@
 #define UCSZn2 UCSZ02
 #define UDREn UDRE0
 
+#define MPCMn MPCM0
+#define U2Xn U2X0
+#define UPEn UPE0
+#define DORn DOR0
+#define FEn FE0
+#define UDREn UDRE0
+#define TXCn TXC0
+#define RXCn RXC0
+
 #define K_MODULE K_MODULE_DRIVERS_USART
 
 /* check U2Xn bit which allow to double the speed */
@@ -145,11 +154,34 @@ int usart_drv_sync_putc(UART_Device *dev, char c)
 	return 0;
 }
 
+K_NOINLINE int usart_drv_getc(UART_Device *dev)
+{
+	if (dev == NULL) {
+		return -EINVAL;
+	}
+
+	if (!(dev->UCSRnA & BIT(RXCn))) {
+		return -EAGAIN;
+	}
+
+	/* get and return received data from HW buffer */
+	return dev->UDRn;
+}
+
 /* as fast as usart_transmit */
-void usart0_drv_sync_putc_opt(char c)
+void usart0_drv_sync_putc(char c)
 {
 	while (!(USART0_DEVICE->UCSRnA & BIT(UDREn)));
 	UDR0 = c;
+}
+
+K_NOINLINE int usart0_drv_getc(void)
+{
+	if (!(USART0_DEVICE->UCSRnA & BIT(RXCn))) {
+		return -EAGAIN;
+	}
+	
+	return UDR0;
 }
 
 
