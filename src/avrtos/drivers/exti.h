@@ -22,10 +22,18 @@
 #define PCINT_8_15 	1u
 #define PCINT_16_23 	2u
 
-#define GPIO_EXTI_GROUP(_dev) (_dev == GPIOB ? PCINT_0_7 : \
-			       _dev == GPIOC ? PCINT_8_15 : \
-			       _dev == GPIOD ? PCINT_16_23 : \
-			       0xFF)
+#define PCINT_0_7_vect 		PCINT0_vect
+#define PCINT_8_15_vect 	PCINT1_vect
+#define PCINT_16_23_vect 	PCINT2_vect
+
+#define GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev) ((_dev) == GPIOB)
+#define GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev) ((_dev) == GPIOC)
+#define GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ((_dev) == GPIOD)
+
+#define GPIO_EXTI_GROUP(_dev) ((_dev) == GPIOB ? PCINT_0_7 : \
+			       (_dev) == GPIOC ? PCINT_8_15 : \
+			       (_dev) == GPIOD ? PCINT_16_23 : \
+			       0xFFu)
 
 #if defined(__AVR_ATmega2560__)
 #define EXTI_COUNT	 8u

@@ -108,11 +108,19 @@ static inline uint8_t gpio_read_pin_state(GPIO_Device *gpio, uint8_t pin) {
 #define GPIOC GPIOC_DEVICE
 #define GPIOD GPIOD_DEVICE
 
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328P__)
-#define GPIOE_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Cu))
+#define GPIOA_INDEX 0u
+#define GPIOB_INDEX 1u
+#define GPIOC_INDEX 2u
+#define GPIOD_INDEX 3u
 
+#if defined(PORTE)
+/* __AVR_ATmega2560__, __AVR_ATmega328PB__ */
+#define GPIOE_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Cu))
 #define GPIOE GPIOE_DEVICE
+#define GPIOE_INDEX 4u
 #endif 
+
+
 
 #if defined(__AVR_ATmega2560__)
 #define GPIOF_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Fu))
@@ -122,13 +130,19 @@ static inline uint8_t gpio_read_pin_state(GPIO_Device *gpio, uint8_t pin) {
 #define GPIOK_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x106u))
 #define GPIOL_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x109u))
 
-#define GPIOE GPIOE_DEVICE
 #define GPIOF GPIOF_DEVICE
 #define GPIOG GPIOG_DEVICE
 #define GPIOH GPIOH_DEVICE
 #define GPIOJ GPIOJ_DEVICE
 #define GPIOK GPIOK_DEVICE
 #define GPIOL GPIOL_DEVICE
+
+#define GPIOF_INDEX 5u
+#define GPIOG_INDEX 6u
+#define GPIOH_INDEX 7u
+#define GPIOJ_INDEX 8u
+#define GPIOK_INDEX 9u
+#define GPIOL_INDEX 10u
 #endif /* __AVR_ATmega2560__ */
 
 /* Get the GPIO device from the port letter index (0: A, 1: B, ...) */
