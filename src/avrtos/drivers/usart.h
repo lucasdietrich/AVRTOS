@@ -64,20 +64,20 @@ typedef struct {
 #endif /* ARCH_USART_COUNT > 3 */
 
 /* see ATmega328p datasheet page 190 */
-#define USART_BAUD_2400       2400
-#define USART_BAUD_4800       4800
-#define USART_BAUD_9600       9600
-#define USART_BAUD_14400      14400
-#define USART_BAUD_19200      19200
-#define USART_BAUD_28800      28800
-#define USART_BAUD_38400      38400
-#define USART_BAUD_57600      57600
-#define USART_BAUD_76800      76800
-#define USART_BAUD_115200     115200
-#define USART_BAUD_230400     230400 
-#define USART_BAUD_250000     250000
-#define USART_BAUD_500000     500000
-#define USART_BAUD_1000000    1000000
+#define USART_BAUD_2400       2400lu
+#define USART_BAUD_4800       4800lu
+#define USART_BAUD_9600       9600lu
+#define USART_BAUD_14400      14400lu
+#define USART_BAUD_19200      19200lu
+#define USART_BAUD_28800      28800lu
+#define USART_BAUD_38400      38400lu
+#define USART_BAUD_57600      57600lu
+#define USART_BAUD_76800      76800lu
+#define USART_BAUD_115200     115200lu
+#define USART_BAUD_230400     230400lu 
+#define USART_BAUD_250000     250000lu
+#define USART_BAUD_500000     500000lu
+#define USART_BAUD_1000000    1000000lu
 
 #define USART_CALC_UBRRn(baudrate) (((F_CPU >> 4) / baudrate) - 1)
 #define USART_CALC_SPEED_MODE_UBRRn(baudrate) (((F_CPU >> 3) / baudrate) - 1)

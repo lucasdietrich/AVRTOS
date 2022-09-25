@@ -69,7 +69,7 @@ typedef struct {
 #define PORTn6 PORTA6
 #define PORTn7 PORTA7
 
-void gpio_init(GPIO_Device *gpio, uint8_t dir, uint8_t pullup);
+void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask);
 
 void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup);
 
@@ -93,6 +93,10 @@ static inline uint8_t gpio_read_pin_state(GPIO_Device *gpio, uint8_t pin) {
 	return (gpio->PIN >> pin) & 1u;
 }
 
+#define AVR_GPIO_BASE_ADDR (AVR_IO_BASE_ADDR + 0x20u)
+
+#define AVR_GPIO_ABCDEFG_BASE_ADDR (AVR_IO_BASE_ADDR + 0x20u)
+#define AVR_GPIO_HIKL_BASE_ADDR (AVR_IO_BASE_ADDR + 0x100u)
 
 #define GPIOA_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x20u))
 #define GPIOB_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x23u))
@@ -128,11 +132,11 @@ static inline uint8_t gpio_read_pin_state(GPIO_Device *gpio, uint8_t pin) {
 #endif /* __AVR_ATmega2560__ */
 
 /* Get the GPIO device from the port letter index (0: A, 1: B, ...) */
-#define GPIO_DEVICE_ABCDEFG(_idx) (GPIOA_DEVICE + (_idx * sizeof(GPIO_Device)))
+#define GPIO_DEVICE_ABCDEFG(_idx) ((GPIO_Device*) (AVR_GPIO_BASE_ADDR + ((_idx)*sizeof(GPIO_Device))))
 
 #if defined(__AVR_ATmega2560__)
-#define GPIO_DEVICE_HIKL(_idx) (GPIOH_DEVICE + ((_idx - 6u) * sizeof(GPIO_Device)))
-#define GPIO_DEVICE(_idx) ((_idx <= 5) ? GPIO_DEVICE_ABCDEFG(_idx) : GPIO_DEVICE_HIKL(_idx))
+#define GPIO_DEVICE_HIKL(_idx) ((GPIO_Device*) (AVR_GPIO_HIKL_BASE_ADDR + ((_idx - 6u)*sizeof(GPIO_Device))))
+#define GPIO_DEVICE(_idx) (((_idx) <= 5) ? GPIO_DEVICE_ABCDEFG(_idx) : GPIO_DEVICE_HIKL(_idx))
 #else
 #define GPIO_DEVICE GPIO_DEVICE_ABCDEFG
 #endif	

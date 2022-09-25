@@ -6,36 +6,23 @@
 
 #include "gpio.h"
 
-void gpio_init(GPIO_Device *gpio, uint8_t dir, uint8_t pullup)
+void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
 {
-	if (dir == GPIO_INPUT) {
-		gpio->DDR = 0x00u;
-	} else {
-		gpio->DDR = 0xFFu;
-	}
-
-	if (pullup == GPIO_INPUT_NO_PULLUP) {
-		gpio->PORT = 0x00u;
-	} else {
-		gpio->PORT = 0xFFu;
-	}
-
-	gpio->PIN = 0x00u;
+	gpio->DDR = dir_mask;
+	gpio->PORT = pullup_mask;
 }
 
 void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup)
 {
 	if (dir == GPIO_INPUT) {
-		gpio->DDR = gpio->DDR & ~(1u << pin);
+		gpio->DDR = gpio->DDR & ~BIT(pin);
 	} else {
-		gpio->DDR = gpio->DDR | (1u << pin);
+		gpio->DDR = gpio->DDR | BIT(pin);
 	}
 
 	if (pullup == GPIO_INPUT_NO_PULLUP) {
-		gpio->PORT = gpio->PORT & ~(1u << pin);
+		gpio->PORT = gpio->PORT & ~BIT(pin);
 	} else {
-		gpio->PORT = gpio->PORT | (1u << pin);
+		gpio->PORT = gpio->PORT | BIT(pin);
 	}
-
-	gpio->PIN = (gpio->PIN & ~(1u << pin)) | ((gpio->PIN >> pin) & (1u << pin));
 }
