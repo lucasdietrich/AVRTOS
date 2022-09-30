@@ -100,6 +100,9 @@ extern "C" {
 #define __ASSERT_COOPERATIVE()              __ASSERT(K_ASSERT_COOPERATIVE, k_cur_is_coop())
 #define __ASSERT_SCHED_LOCKED()             __ASSERT(K_ASSERT_SCHED_LOCKED, k_sched_locked())
 
+#define __ASSERT_ISR_CONTEXT()
+#define __ASSERT_THREAD_CONTEXT()
+
 /*___________________________________________________________________________*/
 
 void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line);
