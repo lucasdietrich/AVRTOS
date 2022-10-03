@@ -50,6 +50,10 @@ K_NOINLINE void irq_enable(void);
 
 #endif /* KERNEL_IRQ_LOCK_COUNTER */
 
+
+#define CRITICAL_SECTION_BEGIN()    irq_disable()
+#define CRITICAL_SECTION_END()      irq_enable()
+
 /**
  * @brief Software reset the microcontroller by calling the reset vector (address 0x0000)
  */
