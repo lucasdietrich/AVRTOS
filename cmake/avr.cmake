@@ -84,6 +84,12 @@ function(target_prepare_env target)
 		DEPENDS hex_${target}
 	)
 	
+	if (DEFINED ENABLE_SINGLE_SAMPLE)
+		add_custom_target(upload avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
+			DEPENDS ${target}
+		)
+	endif()
+	
 	# monitor command
 	# add_custom_target(monitor_${target} python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}")
 

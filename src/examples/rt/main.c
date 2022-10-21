@@ -17,9 +17,7 @@ K_THREAD_DEFINE(t1, thread, 0x100, K_COOPERATIVE, NULL, '1');
 
 int main(void)
 {
-	irq_disable();
-
-	gpio_init(GPIO, 0xFF, 0x00);
+	gpio_pin_init(GPIOB, PINn, DIR_OUTPUT, OUTPUT_DRIVEN_LOW);
 
 	thread(NULL);
 }
@@ -31,7 +29,7 @@ void thread(void *arg)
 		 * independent on the value of DDRxn. Note that the SBI
 		 * instruction can be used to toggle one single bit in a port.
 		 */
-		GPIO->PIN = BIT(PINn);
+		GPIOB->PIN = BIT(PINn);
 		k_yield();
 	}
 }
