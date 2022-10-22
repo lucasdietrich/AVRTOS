@@ -293,6 +293,14 @@
 #define DEFAULT_DRIVERS_TIMER4_API			0
 
 #define DEFAULT_DRIVERS_TIMER5_API			0
+
+/**
+ * @brief Debug systick using given GPIO pin
+ * 
+ * Define CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG with desired pin mask (e.g. 0x80u for PB7) 
+ */
+#define DEFAULT_KERNEL_SYSTICK_GPIOB_DEBUG		0
+
 /*___________________________________________________________________________*/
 
 #endif

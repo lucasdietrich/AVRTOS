@@ -1,6 +1,6 @@
 # Unix Makefiles or Ninja
 generator="Unix Makefiles"
-sample="rt"
+sample="isr-unpend"
 
 all: mega2560 build_all
 

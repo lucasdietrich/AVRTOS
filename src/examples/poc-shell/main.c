@@ -38,12 +38,12 @@ void push(struct in **mem)
 	*mem = NULL;
 }
 
-int8_t alloc(struct in **mem)
+int8_t alloc_in(struct in **mem)
 {
 	return k_mem_slab_alloc(&myslab, (void **)mem, K_NO_WAIT);
 }
 
-void free(struct in *mem)
+void free_in(struct in *mem)
 {
 	k_mem_slab_free(&myslab, mem);
 }
@@ -54,7 +54,7 @@ static inline void input(const char rx)
 {
 	static struct in *mem = NULL;
 	if (mem == NULL) {
-		if (alloc(&mem) != 0) {
+		if (alloc_in(&mem) != 0) {
 			__ASSERT_NULL(mem);
 			usart_transmit('!');
 			return;
@@ -118,7 +118,7 @@ void consumer(void *context)
 				usart_transmit(*c);
 			}
 		}
-		k_mem_slab_free(&myslab, mem);
+		free_in(mem);
 	}
 }
 

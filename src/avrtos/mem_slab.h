@@ -136,7 +136,7 @@ K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem,
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_mem_slab_free(struct k_mem_slab *slab, void *mem);
+K_NOINLINE struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem);
 
 /*___________________________________________________________________________*/
 

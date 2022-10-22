@@ -17,7 +17,6 @@ extern "C" {
 #include <avr/io.h>
 #include <util/atomic.h>
 
-#include "avrtos.h"
 
 /*___________________________________________________________________________*/
 

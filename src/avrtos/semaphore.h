@@ -91,8 +91,10 @@ K_NOINLINE int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
  * Can be called from an interrupt routine.
  * 
  * @param sem : address of the semaphore structure
+ * 
+ * @return thread that was woken up, NULL otherwise
  */
-K_NOINLINE void k_sem_give(struct k_sem *sem);
+K_NOINLINE struct k_thread *k_sem_give(struct k_sem *sem);
 
 /*___________________________________________________________________________*/
 

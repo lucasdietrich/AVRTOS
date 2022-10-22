@@ -42,6 +42,11 @@ TIMERn_COMPA_vect:
 	eor	r1, r1
 	push	r18
 
+#if KERNEL_SYSTICK_GPIOB_DEBUG
+	ldi 	r18, KERNEL_SYSTICK_GPIOB_DEBUG
+	sts 	PINB, r18
+#endif /* KERNEL_SYSTICK_GPIOB_DEBUG */
+
 #if KERNEL_TICKS
 	ldi r18, 0x01			; 1 cycle
 
@@ -109,6 +114,7 @@ TIMERn_COMPA_vect:
 	brne __sched_locked
 
 	; prepare return context for preempted thread
+	; so that __intctx_restore is called when returning from _k_yield
 	ldi r24, pm_lo8(__intctx_restore)
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
@@ -116,7 +122,6 @@ TIMERn_COMPA_vect:
 #if defined(__AVR_3_BYTE_PC__)
 	push r1
 #endif 
-
 	jmp _k_yield
 #endif
 ; KERNEL_PREEMPTIVE_THREADS
@@ -139,7 +144,12 @@ __intctx_restore:
 	pop	r21
 	pop	r20
 	pop	r19
+
 __intctx_restore_minimal:
+#if KERNEL_SYSTICK_GPIOB_DEBUG
+	ldi 	r18, KERNEL_SYSTICK_GPIOB_DEBUG
+	sts 	PINB, r18
+#endif /* KERNEL_SYSTICK_GPIOB_DEBUG */
 	pop	r18
 	pop	r0
 	sts	SREG, r0
@@ -149,9 +159,10 @@ __intctx_restore_minimal:
 
 .global _k_yield
 _k_yield:
+	; call scheduler to determine which thread is next
 	call _k_scheduler
 
-	; previous thread
+	; r24 contain previous thread
 	movw r26, r24
 	
 	; current thread
@@ -212,6 +223,12 @@ _k_thread_switch:
 	pop r29
 	pop r28
 	pop r17
+
+#if KERNEL_SYSTICK_GPIOB_DEBUG
+	ldi 	r16, KERNEL_SYSTICK_GPIOB_DEBUG
+	sts 	PINB, r16
+#endif /* KERNEL_SYSTICK_GPIOB_DEBUG */
+
 	pop r16
 	pop r15
 	pop r14

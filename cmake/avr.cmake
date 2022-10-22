@@ -86,7 +86,7 @@ function(target_prepare_env target)
 	
 	if (DEFINED ENABLE_SINGLE_SAMPLE)
 		add_custom_target(upload avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
-			DEPENDS ${target}
+			DEPENDS hex_${target}
 		)
 	endif()
 	

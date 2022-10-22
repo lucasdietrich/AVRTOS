@@ -139,6 +139,12 @@ static K_NOINLINE void _k_schedule(struct k_thread *thread)
 
 		_k_runq = &thread->tie.runqueue;
 	} else {
+		/* Wokek up threads should be executed before any 
+		 * already running premptive thread, so prepend
+		 *
+		 * Call k_yield_from_isr() to switch to woke up thread
+		 * if called from ISR
+		 */
 		dlist_prepend(_k_runq, &thread->tie.runqueue);
 	}
 	
@@ -314,6 +320,7 @@ void _k_kernel_init(void)
  */
 void _k_system_shift(void)
 {
+
 	__ASSERT_NOINTERRUPT();
 	__STATIC_ASSERT_AUTOMSG(KERNEL_TIME_SLICE_TICKS != 0);
 

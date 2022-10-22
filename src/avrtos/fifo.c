@@ -18,7 +18,7 @@ void k_fifo_init(struct k_fifo *fifo)
         dlist_init(&fifo->waitqueue);
 }
 
-void _k_fifo_put(struct k_fifo *fifo, struct qitem *item)
+struct k_thread *_k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 {
         __ASSERT_NOTNULL(fifo);
         __ASSERT_NOTNULL(item);
@@ -28,19 +28,25 @@ void _k_fifo_put(struct k_fifo *fifo, struct qitem *item)
         * we to give the item directly to the thread
         * (using thread->swap_data)
         */
+	struct k_thread *const thread = 
+		_k_unpend_first_and_swap(&fifo->waitqueue, (void *)item);
 
-        if (_k_unpend_first_and_swap(&fifo->waitqueue, (void *)item) == NULL) {
+        if (thread == NULL) {
                         /* otherwise we queue the item to the fifo */
                 oqueue(&fifo->queue, item);
         }
+
+	return thread;
 }
 
-void k_fifo_put(struct k_fifo *fifo, struct qitem *item)
+struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
-                _k_fifo_put(fifo, item);
+                return _k_fifo_put(fifo, item);
         }
+
+	CODE_UNREACHABLE;
 }
 
 struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)

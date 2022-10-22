@@ -82,10 +82,12 @@
 
 #define K_FLAG_PRIO_POS      		3
 #define K_MASK_PRIO			(3 << K_FLAG_PRIO_POS)
-#define K_FLAG_COOP      		(0 << K_FLAG_PRIO_POS)
-#define K_FLAG_PREEMPT          	(2 << K_FLAG_PRIO_POS)
-#define K_FLAG_PRIO_HIGH		(0 << K_FLAG_PRIO_POS)
-#define K_FLAG_PRIO_LOW			(1 << K_FLAG_PRIO_POS)
+#define K_MASK_PRIO_COOP		(2 << K_FLAG_PRIO_POS)
+#define K_MASK_PRIO_LEVEL		(1 << K_FLAG_PRIO_POS)
+#define K_FLAG_COOP      		(2 << K_FLAG_PRIO_POS)
+#define K_FLAG_PREEMPT          	(0 << K_FLAG_PRIO_POS)
+#define K_FLAG_PRIO_HIGH		(1 << K_FLAG_PRIO_POS)
+#define K_FLAG_PRIO_LOW			(0 << K_FLAG_PRIO_POS)
 
 #define K_FLAG_TIMER_EXPIRED_POS  	5
 #define K_FLAG_TIMER_EXPIRED        	(1 << K_FLAG_TIMER_EXPIRED_POS)

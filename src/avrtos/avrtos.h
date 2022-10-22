@@ -25,10 +25,10 @@
 #include "dstruct/debug.h"
 
 #include "atomic.h"
-#include "assert.h"
 #include "fault.h"
 #include "kernel.h"
 #include "idle.h"
+#include "assert.h"
 
 #include "canaries.h"
 #include "stack_sentinel.h"

@@ -256,14 +256,33 @@ static inline void k_yield(void)
 	}
 }
 
-// static inline void k_yield_from_idle()
-// {
-// 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-// 		_k_yield_from_idle();
-// 	}
-// }
-
 void yield(void);
+
+/**
+ * @brief Yield the thread interrupted by the current interrupt, 
+ * give CPU to the next thread in the runqueue.
+ * 
+ * Should be called from interrupt routine ONLY.
+ * 
+ * Should be the call instruction called from interrupt routine. 
+ * Because everything after will be delayed.
+ * 
+ * Use this function in ISR after having unpend a thread (e.g. k_sem_give). This
+ * allow to immediately give CPU to woke up thread.
+ * 
+ * Inlining this function decrease the required stack size by 2 (o 3) bytes,
+ * when interrupt is called.
+ */
+static inline void k_yield_from_isr(struct k_thread *thread)
+{
+	// __ASSERT_NOINTERRUPT();
+	
+	if (thread) {
+		if ((_current->flags & K_MASK_PRIO_COOP) == K_FLAG_PREEMPT) {
+			_k_yield();
+		}
+	}
+}
 
 /*___________________________________________________________________________*/
 

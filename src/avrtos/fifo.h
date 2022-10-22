@@ -93,7 +93,7 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  * @param item_tie 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem *item_tie);
+K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item_tie);
 
 /**
  * @brief @see k_fifo_put
@@ -104,7 +104,7 @@ K_NOINLINE void k_fifo_put(struct k_fifo *fifo, struct qitem *item_tie);
  * @param item 
  * @return K_NOINLINE 
  */
-K_NOINLINE void _k_fifo_put(struct k_fifo *fifo, struct qitem *item);
+K_NOINLINE struct k_thread *_k_fifo_put(struct k_fifo *fifo, struct qitem *item);
 
 /**
  * @brief Get and remove an item from the fifo. 

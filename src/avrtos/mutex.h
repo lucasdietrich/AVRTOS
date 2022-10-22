@@ -92,7 +92,7 @@ K_NOINLINE int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
  * 
  * @param mutex : address of the mutex structure
  */
-K_NOINLINE void k_mutex_unlock(struct k_mutex *mutex);
+K_NOINLINE struct k_thread *k_mutex_unlock(struct k_mutex *mutex);
 
 /* concept */
 K_NOINLINE int8_t k_mutex_cancel_wait(struct k_mutex *mutex);
@@ -113,7 +113,7 @@ uint8_t _k_mutex_lock(struct k_mutex *mutex);
  * 
  * @param mutex 
  */
-void _k_mutex_unlock(struct k_mutex *mutex);
+struct k_thread *_k_mutex_unlock(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 

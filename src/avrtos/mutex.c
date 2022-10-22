@@ -45,15 +45,17 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	return lock;
 }
 
-void k_mutex_unlock(struct k_mutex *mutex)
+struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 {
 	__ASSERT_NOTNULL(mutex);
+
+	struct k_thread *thread = NULL;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
 		/* we check if the current thread actually owns the mutex */
 		if (mutex->owner != _current) {
-			return;
+			goto ret;
 		}
 
 		__K_DBG_MUTEX_UNLOCKED(_current); // {
@@ -62,7 +64,9 @@ void k_mutex_unlock(struct k_mutex *mutex)
 		 * The mutex owner is changed when returning to the
 		 * k_mutex_lock function.
 		 */
-		if (_k_unpend_first_thread(&mutex->waitqueue) == NULL) {
+		thread = _k_unpend_first_thread(&mutex->waitqueue);
+
+		if (thread == NULL) {
 		    /* no new owner, we need to unlock
 		     * the mutex and remove the owner
 		     */
@@ -70,6 +74,9 @@ void k_mutex_unlock(struct k_mutex *mutex)
 			mutex->owner = NULL;
 		}
 	}
+
+ret:
+	return thread;
 }
 
 int8_t k_mutex_cancel_wait(struct k_mutex *mutex)

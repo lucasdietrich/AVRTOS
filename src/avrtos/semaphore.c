@@ -38,8 +38,10 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
         return get;
 }
 
-void k_sem_give(struct k_sem *sem)
+struct k_thread *k_sem_give(struct k_sem *sem)
 {
+	struct k_thread *thread;
+	
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
                 __K_DBG_SEM_GIVE(_current);
@@ -48,14 +50,18 @@ void k_sem_give(struct k_sem *sem)
                  * it means that its count is necessary 0. So we don't
                  * need to check if we reached the limit.
                  */
+		
+		thread = _k_unpend_first_thread(&sem->waitqueue);
 
                 /* If there is a thread pending on a semaphore,
                  * we to give the semaphore directly to the thread
                  */
-                if (_k_unpend_first_thread(&sem->waitqueue) == NULL) {
+                if (thread == NULL) {
                         if (sem->count != sem->limit) {
 				sem->count++;
 			}
                 }
         }
+
+	return thread;
 }

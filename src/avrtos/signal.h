@@ -55,7 +55,7 @@ K_NOINLINE void k_signal_init(struct k_signal *sig);
  * @param value 
  * @return K_NOINLINE 
  */
-K_NOINLINE void k_signal_raise(struct k_signal *sig, uint8_t value);
+K_NOINLINE struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value);
 
 // poll a single signal, thread "tie" is enough
 K_NOINLINE int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);

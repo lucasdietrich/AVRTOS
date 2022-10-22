@@ -143,12 +143,14 @@ K_NOINLINE static int8_t _k_mem_slab_free(struct k_mem_slab *slab, void *mem)
         return 0;
 }
 
-void k_mem_slab_free(struct k_mem_slab *slab, void *mem)
+struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
         __ASSERT_NOTNULL(slab);
 
+	struct k_thread *thread = NULL;
+
         if (mem == NULL) {
-                return;
+                goto ret;
         }
 
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -156,9 +158,14 @@ void k_mem_slab_free(struct k_mem_slab *slab, void *mem)
                 /* if a thread is pending on a memory slab we give the block
                  * directly to the thread (using thread->swap_data)
                  */
-                if (_k_unpend_first_and_swap(&slab->waitqueue, mem) == NULL) {
+		thread = _k_unpend_first_and_swap(&slab->waitqueue, mem);
+		
+                if (thread == NULL) {
                         /* otherwise we free the block */
                         _k_mem_slab_free(slab, mem);
                 }
         }
+
+ret:
+	return thread;
 }

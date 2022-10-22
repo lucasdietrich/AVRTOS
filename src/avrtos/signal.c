@@ -23,7 +23,7 @@ void k_signal_init(struct k_signal *sig)
         dlist_init(&sig->waitqueue);
 }
 
-void k_signal_raise(struct k_signal *sig, uint8_t value)
+struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value)
 {
         __ASSERT_NOTNULL(sig);
 
@@ -33,8 +33,10 @@ void k_signal_raise(struct k_signal *sig, uint8_t value)
                 sig->flags |= K_POLL_STATE_SIGNALED;
 
                 /* TODO: unpend all threads */
-                _k_unpend_first_thread(&sig->waitqueue);
+                return _k_unpend_first_thread(&sig->waitqueue);
         }
+
+	CODE_UNREACHABLE;
 }
 
 int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
