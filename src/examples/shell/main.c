@@ -34,8 +34,9 @@ K_FIFO_DEFINE(myfifo);
 
 void push(struct in **mem)
 {
-	k_fifo_put(&myfifo, *(void **)mem);
+	struct k_thread *thread = k_fifo_put(&myfifo, *(void **)mem);
 	*mem = NULL;
+	k_yield_from_isr(thread);
 }
 
 int8_t alloc_in(struct in **mem)
@@ -53,6 +54,7 @@ void free_in(struct in *mem)
 static inline void input(const char rx)
 {
 	static struct in *mem = NULL;
+
 	if (mem == NULL) {
 		if (alloc_in(&mem) != 0) {
 			__ASSERT_NULL(mem);
@@ -62,14 +64,18 @@ static inline void input(const char rx)
 		mem->len = 0;
 	}
 
+	// usart_hex(rx);
+
 	switch (rx) {
 	case 0x1A: /* Ctrl + Z -> drop */
 		mem->len = 0;
+	case '\r':
 	case '\n': /* process the packet */
 		mem->buffer[mem->len] = '\0';
 		push(&mem);
 		break;
-	case 0x08: /* backspace */
+	case 0x7f:
+	case '\b': /* backspace */
 		if (mem->len > 0) {
 			mem->len--;
 			usart_transmit(rx);
@@ -103,13 +109,12 @@ void consumer(void *context)
 {
 	for (;;) {
 		usart_print_p(PSTR("\n# "));
+
 		struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
-		__ASSERT_NOTNULL(mem);
-		if (mem->len == 0) {
-			usart_print_p(PSTR("\nCOMMAND DROPPED !"));
-		} else {
+
+		if (mem->len != 0) {
 			/* process/parsed the command */
-			usart_print_p(PSTR("CMD received ! len = "));
+			usart_print_p(PSTR("\nlen="));
 			usart_u8(mem->len);
 			usart_print_p(PSTR(" : "));
 

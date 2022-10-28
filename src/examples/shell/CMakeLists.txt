@@ -1,4 +1,4 @@
-project(sample_poc_shell)
+project(sample_shell)
 add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration
