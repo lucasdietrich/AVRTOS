@@ -111,6 +111,7 @@ TIMERn_COMPA_vect:
 	ldd r18, Z + 2      ; read flag
 	andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
 
+	; scheduler is locked: do not switch thread and exit interrupt
 	brne __sched_locked
 
 	; prepare return context for preempted thread

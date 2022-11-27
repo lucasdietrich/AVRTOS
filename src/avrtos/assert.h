@@ -83,6 +83,8 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+extern bool __k_interrupts(void);
+
 #define __ASSERT_TRUE(test)                 __ASSERT(K_ASSERT_TRUE, (test) != 0)
 #define __ASSERT_FALSE(test)                __ASSERT(K_ASSERT_FALSE, (test) == 0)
 

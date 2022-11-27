@@ -147,6 +147,8 @@ typedef struct {
 /* macros */
 #if defined(__AVR_ATmega2560__)
 #	define TIMERS_COUNT 6
+#elif defined(__AVR_ATmega328PB__)
+#	define TIMERS_COUNT 5
 #else
 #	define TIMERS_COUNT 3
 #endif

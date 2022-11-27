@@ -78,7 +78,7 @@ K_NOINLINE int8_t k_msgq_cleanup(struct k_msgq *msgq);
  * 
  * Try until timeout.
  * 
- * Don't call from an ISR.
+ * Don't call from an ISR with timeout != K_NO_WAIT.
  * 
  * @param msgq 
  * @param data 
@@ -86,7 +86,8 @@ K_NOINLINE int8_t k_msgq_cleanup(struct k_msgq *msgq);
  * @return K_NOINLINE 0 on success (ETIMEOUT on timeout, ECANCEL on canceled
  *      ENOMSG on MsgQ full)
  */
-K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
+K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq,
+			     const void *data,
 			     k_timeout_t timeout);
 
 /**
@@ -94,7 +95,7 @@ K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
  * 
  *  Try until timeout.
  * 
- * Don't call from an ISR.
+ * Don't call from an ISR with timeout != K_NO_WAIT.
  * 
  * @param msgq 
  * @param data 
@@ -102,7 +103,8 @@ K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
  * @return K_NOINLINE  0 on success (ETIMEOUT on timeout, ECANCEL on canceled
  *      ENOMSG on no message)
  */
-K_NOINLINE int8_t k_msgq_get(struct k_msgq *msgq, void *data,
+K_NOINLINE int8_t k_msgq_get(struct k_msgq *msgq,
+			     void *data,
 			     k_timeout_t timeout);
 
 /**

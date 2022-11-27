@@ -12,6 +12,8 @@ int exti_configure(uint8_t exti, uint8_t isc)
 		return -EINVAL;
 	}
 
+	isc &= 0x3u;
+
 	const uint8_t regn = exti >> 2u;
 	const uint8_t group = exti & 0x03u;
 	const uint8_t group_mask = (BIT(ISCn0) | BIT(ISCn1)) << (group << 1u);
