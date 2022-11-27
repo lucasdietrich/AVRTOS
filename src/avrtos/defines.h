@@ -209,9 +209,9 @@
 #endif
 
 
-#if THREAD_EXPLICIT_MAIN_STACK == 0 && THREAD_CANARIES == 1
-#   warning unable to monitor main thread stack canaries as the main stack is defined as explicit (see THREAD_EXPLICIT_MAIN_STACK)
-#endif
+// #if THREAD_EXPLICIT_MAIN_STACK == 0 && THREAD_CANARIES == 1
+// #   warning unable to monitor main thread stack canaries as the main stack is defined as explicit (see THREAD_EXPLICIT_MAIN_STACK)
+// #endif
 
 #if defined(CONFIG_SYSTEM_WORKQUEUE_ENABLE)
 #   define SYSTEM_WORKQUEUE_ENABLE CONFIG_SYSTEM_WORKQUEUE_ENABLE
