@@ -47,7 +47,7 @@ K_THREAD struct k_thread _k_thread_main = {
 #else
     .stack = {          // implicit stack, we set the main thread stack end at the end of the RAM
         .end = (void *)RAMEND,
-        .size = 0,
+        .size = THREAD_MAIN_STACK_SIZE, /* Used as indication only */
     },
 #endif
     .symbol = 'M'           // default main thread sumbol

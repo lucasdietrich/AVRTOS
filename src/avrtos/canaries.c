@@ -70,6 +70,8 @@ void print_current_canaries(void)
 
 void dump_stack_canaries(void)
 {
+	usart_transmit('\n');
+	
         for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
                 print_stack_canaries(&(&__k_threads_start)[i]);
         }
