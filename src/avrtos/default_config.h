@@ -301,6 +301,8 @@
  */
 #define DEFAULT_KERNEL_SYSTICK_GPIOB_DEBUG		0
 
+#define DEFAULT_KERNEL_CHECKS				0
+
 /*___________________________________________________________________________*/
 
 #endif

@@ -29,6 +29,7 @@ static void create_free_list(struct k_mem_slab *slab)
 extern struct k_mem_slab __k_mem_slabs_start;
 extern struct k_mem_slab __k_mem_slabs_end;
 
+/* TODO Set always inline */
 void _k_mem_slab_init_module(void)
 {
         /* must be called during MCU initialization, in order to initialize
@@ -77,7 +78,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
+ALWAYS_INLINE static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
         __ASSERT_NOTNULL(slab);
         __ASSERT_NOTNULL(mem);

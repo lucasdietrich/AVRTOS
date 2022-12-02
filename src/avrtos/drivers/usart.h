@@ -180,6 +180,10 @@ K_NOINLINE int usart_drv_init(UART_Device *dev,
 
 K_NOINLINE int usart_drv_deinit(UART_Device *dev);
 
+K_NOINLINE void usart_ll_drv_sync_putc(UART_Device *dev, char c);
+
+K_NOINLINE int usart_ll_drv_sync_getc(UART_Device *dev);
+
 K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
 
 K_NOINLINE int usart_drv_getc(UART_Device *dev);

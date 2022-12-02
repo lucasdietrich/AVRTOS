@@ -409,6 +409,12 @@
 #	define KERNEL_SYSTICK_GPIOB_DEBUG DEFAULT_KERNEL_SYSTICK_GPIOB_DEBUG
 #endif /* CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG */
 
+#if defined(CONFIG_KERNEL_CHECKS)
+#	define KERNEL_CHECKS CONFIG_KERNEL_CHECKS
+#else
+#	define KERNEL_CHECKS DEFAULT_KERNEL_CHECKS
+#endif /* CONFIG_KERNEL_CHECKS */
+
 /*___________________________________________________________________________*/
 
 #if KERNEL_UPTIME

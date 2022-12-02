@@ -116,6 +116,9 @@ function(target_prepare_env target)
 		COMMAND avr-objdump -D ${output_name} > objdump_all.s VERBATIM
 		COMMAND avr-objdump -h ${output_name} > objdump_sections.s VERBATIM
 		COMMAND avr-readelf -a ${output_name} > readelf.txt VERBATIM
+		COMMAND avr-readelf -x .data ${output_name} > section_data.txt VERBATIM
+		COMMAND avr-readelf -x .bss ${output_name} > section_bss.txt VERBATIM
+		COMMAND avr-readelf -x .text ${output_name} > section_text.txt VERBATIM
 		COMMAND avr-nm --print-size --size-sort --radix=x ${output_name} > nm.txt VERBATIM
 		DEPENDS ${output_name}
 	)

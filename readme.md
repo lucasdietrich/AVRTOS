@@ -248,7 +248,7 @@ fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
 ## All Examples
 
 ### Demo
-- [poc-shell](./src/examples/poc-shell/main.c)
+- [shell](./src/examples/shell/main.c)
 
 ### Main Features
 - [mutex-multithreading-demo](./src/examples/mutex-multithreading-demo/main.c)

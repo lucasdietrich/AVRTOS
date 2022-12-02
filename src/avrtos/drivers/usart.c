@@ -134,6 +134,28 @@ int usart_drv_deinit(UART_Device *dev)
 	return 0;
 }
 
+void usart_ll_drv_sync_putc(UART_Device *dev, char c)
+{
+	/* wait for empty transmit buffer */
+	while (!(dev->UCSRnA & BIT(UDREn)));
+
+	/* put data into HW buffer, sends the data */
+	dev->UDRn = c;
+}
+
+
+int usart_ll_drv_sync_getc(UART_Device *dev)
+{
+	int ret = -EAGAIN;
+
+	/* get and return received data from HW buffer */
+	if (dev->UCSRnA & BIT(RXCn)) {
+		ret = dev->UDRn;
+	}
+
+	return ret;
+}
+
 /*
  * Problem is that execution time is much longer than the old "usart_transmit",
  * because of fetch IO address for the proper USART from flash.
@@ -145,11 +167,7 @@ int usart_drv_sync_putc(UART_Device *dev, char c)
 		return -EINVAL;
 	}
 
-	/* wait for empty transmit buffer */
-	while (!(dev->UCSRnA & BIT(UDREn)));
-
-	/* put data into HW buffer, sends the data */
-	dev->UDRn = c;
+	usart_ll_drv_sync_putc(dev, c);
 
 	return 0;
 }
@@ -160,12 +178,7 @@ K_NOINLINE int usart_drv_getc(UART_Device *dev)
 		return -EINVAL;
 	}
 
-	if (!(dev->UCSRnA & BIT(RXCn))) {
-		return -EAGAIN;
-	}
-
-	/* get and return received data from HW buffer */
-	return dev->UDRn;
+	return usart_ll_drv_sync_getc(dev);
 }
 
 /* as fast as usart_transmit */

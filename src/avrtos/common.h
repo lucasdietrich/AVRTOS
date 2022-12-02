@@ -39,6 +39,7 @@
 #define NOINLINE            __attribute__((noinline))
 #define NORETURN            __attribute__((__noreturn__))
 #define CODE_UNREACHABLE    __builtin_unreachable();
+#define ALWAYS_INLINE __attribute__((always_inline)) inline
 
 /*___________________________________________________________________________*/
 
