@@ -15,9 +15,15 @@ def create_dir(path: str):
 
 def dis(name: str, elf: str):
     commands = [
-        (f"avr-objdump -d {elf}", f"tmp/{name}/disassembly.asm"),
-        (f"avr-objdump -S {elf}", f"tmp/{name}/disassembly_source.asm"),
+        (f"avr-objdump -S {elf}", f"tmp/{name}/objdump_src.s"),
+        (f"avr-objdump -d {elf}", f"tmp/{name}/objdump.s"),
+        (f"avr-objdump -D {elf}", f"tmp/{name}/objdump_all.s"),
+        (f"avr-objdump -h {elf}", f"tmp/{name}/objdump_sections.s"),
         (f"avr-readelf -a {elf}", f"tmp/{name}/readelf.txt"),
+        (f"avr-readelf -x .data {elf}", f"tmp/{name}/section_data.txt"),
+        (f"avr-readelf -x .bss {elf}", f"tmp/{name}/section_bss.txt"),
+        (f"avr-readelf -x .noinit {elf}", f"tmp/{name}/section_noinit.txt"),
+        (f"avr-readelf -x .text {elf}", f"tmp/{name}/section_text.txt"),
         (f"avr-nm --print-size --size-sort --radix=x {elf}", f"tmp/{name}/nm-size.txt"),
         (f"avr-nm {elf}", f"tmp/{name}/nm.txt"),
         # (f"grep -E '([a-f0-9]*)\s([a-f0-9]*)\s([^tT])' tmp/{name}/nm-size.txt", f"tmp/{name}/nm-size-sram.txt"),
