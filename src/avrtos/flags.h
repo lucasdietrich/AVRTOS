@@ -18,15 +18,15 @@ struct k_flags
 	uint8_t reset_value;
 };
 
-#define K_FLAGS_INIT(initial_value) 			\
+#define K_FLAGS_INIT(flags_name, initial_value) 			\
     {                                                   \
 	.flags = initial_value,                         \
 	.reset_value = initial_value,                   \
-	._waitqueue = DLIST_INIT(flags._waitqueue)      \
+	._waitqueue = DLIST_INIT(flags_name._waitqueue)      \
     }
 
 #define K_FLAGS_DEFINE(flags_name, initial_value) \
-    struct k_flags flags_name = K_FLAGS_INIT(initial_value)
+    struct k_flags flags_name = K_FLAGS_INIT(flags_name, initial_value)
 
 
 typedef enum {
