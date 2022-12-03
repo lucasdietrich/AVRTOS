@@ -11,10 +11,6 @@
 #include <avr/io.h>
 
 /* same for all USARTs */
-#define UDRIEn UDRIE0
-#define TXCIEn TXCIE0
-#define RXCIEn RXCIE0
-
 #define TXENn TXEN0
 #define RXENn RXEN0
 #define UDREn UDRE0
@@ -74,11 +70,11 @@ void usart_ll_drv_init(UART_Device *dev,
 	if (config->receiver)
 		SET_BIT(ucsrnb, BIT(RXENn));
 
-	/* enable interrupt */
-	if (DRIVERS_UART_ASYNC) {
+#if DRIVERS_UART_ASYNC
+		/* enable interrupt */
 		SET_BIT(ucsrnb, BIT(RXCIEn));
 		SET_BIT(ucsrnb, BIT(TXCIEn));
-	}
+#endif
 
 	dev->UCSRnB = ucsrnb;
 

@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+#define UDRIEn UDRIE0
+#define TXCIEn TXCIE0
+#define RXCIEn RXCIE0
+
 // AVR_USART_BASE_ADDR is actually UCSR0A
 #define AVR_USART_BASE_ADDR (AVR_IO_BASE_ADDR + 0x00C0U)
 
@@ -183,6 +187,16 @@ K_NOINLINE int usart_drv_deinit(UART_Device *dev);
 K_NOINLINE void usart_ll_drv_sync_putc(UART_Device *dev, char c);
 
 K_NOINLINE int usart_ll_drv_sync_getc(UART_Device *dev);
+
+static inline void usart_ll_enable_rx_isr(UART_Device *dev)
+{
+	SET_BIT(dev->UCSRnB, BIT(RXCIEn));
+}
+
+static inline void usart_ll_disable_rx_isr(UART_Device *dev)
+{
+	CLR_BIT(dev->UCSRnB, BIT(RXCIEn));
+}
 
 K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
 
