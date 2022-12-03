@@ -2,7 +2,7 @@
 generator="Unix Makefiles"
 sample="isr-unpend"
 
-all: mega2560 build_all
+all: atmega328p build_all
 
 mega2560:
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \

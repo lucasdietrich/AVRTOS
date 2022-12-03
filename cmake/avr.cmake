@@ -118,6 +118,7 @@ function(target_prepare_env target)
 		COMMAND avr-readelf -a ${output_name} > readelf.txt VERBATIM
 		COMMAND avr-readelf -x .data ${output_name} > section_data.txt VERBATIM
 		COMMAND avr-readelf -x .bss ${output_name} > section_bss.txt VERBATIM
+		COMMAND avr-readelf -x .noinit ${output_name} > section_noinit.txt VERBATIM
 		COMMAND avr-readelf -x .text ${output_name} > section_text.txt VERBATIM
 		COMMAND avr-nm --print-size --size-sort --radix=x ${output_name} > nm.txt VERBATIM
 		DEPENDS ${output_name}

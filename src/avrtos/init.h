@@ -18,7 +18,7 @@ extern "C" {
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK
 
-#error "(TODO) INVESTIGATE SP PROBLEM with THREAD_EXPLICIT_MAIN_STACK=1"
+// #error "(TODO) INVESTIGATE SP PROBLEM with THREAD_EXPLICIT_MAIN_STACK=1"
 #define K_KERNEL_LINK_SP_INIT() \
 	__attribute__((naked, used, section(".init3"))) void _k_kernel_sp(void) \
 	{ \

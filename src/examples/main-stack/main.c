@@ -9,6 +9,8 @@
 #include <avrtos/kernel.h>
 #include <avrtos/drivers/usart.h>
 
+NOINIT char c;
+
 extern char inc(char c);
 
 int main(void)
@@ -26,7 +28,7 @@ int main(void)
 	usart_ll_drv_init(USART0_DEVICE, &usart_config);
 
 	for (;;) {
-		usart_ll_drv_sync_putc(USART0_DEVICE, inc('a'));
+		usart_ll_drv_sync_putc(USART0_DEVICE, inc(c));
 		k_block(K_MSEC(1000u));
 	}
 }

@@ -16,7 +16,7 @@ extern int main(void);
 
 #if THREAD_EXPLICIT_MAIN_STACK == 1
 
-char _k_main_stack[THREAD_MAIN_STACK_SIZE];
+NOINIT char _k_main_stack[THREAD_MAIN_STACK_SIZE];
 
 _K_STACK_SENTINEL_REGISTER(_k_main_stack);
 
