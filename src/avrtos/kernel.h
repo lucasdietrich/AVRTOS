@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+/*___________________________________________________________________________*/
+
 extern bool __k_interrupts(void);
 
 /*___________________________________________________________________________*/
@@ -262,9 +264,9 @@ void yield(void);
  * @brief Yield the thread interrupted by the current interrupt, 
  * give CPU to the next thread in the runqueue.
  * 
- * Should be called from interrupt routine ONLY.
+ * Note: Should be called from interrupt routine ONLY.
  * 
- * Should be the call instruction called from interrupt routine. 
+ * Should be the last instruction of the interrupt routine. 
  * Because everything after will be delayed.
  * 
  * Use this function in ISR after having unpend a thread (e.g. k_sem_give). This
@@ -273,14 +275,41 @@ void yield(void);
  * Inlining this function decrease the required stack size by 2 (o 3) bytes,
  * when interrupt is called.
  */
-static inline void k_yield_from_isr(struct k_thread *thread)
+static inline void k_yield_from_isr(void)
 {
-	// __ASSERT_NOINTERRUPT();
+	// ASSERT NOT ISR CONTEXT
+	// ASSERT IRQ LOCKED
 	
-	if (thread) {
-		if ((_current->flags & K_MASK_PRIO_COOP) == K_FLAG_PREEMPT) {
-			_k_yield();
-		}
+	/* Check whether current thread can be preempted */
+	if ((_current->flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) == 0u) {
+		_k_yield();
+	}
+}
+
+/**
+ * @brief Yield the thread interrupted by the current interrupt, 
+ * give CPU to the next thread in the runqueue.
+ * 
+ * Note: Should be called from interrupt routine ONLY.
+ * 
+ * Should be the last instruction of the interrupt routine. 
+ * Because everything after will be delayed.
+ * 
+ * Use this function in ISR after having unpend a thread (e.g. k_sem_give). This
+ * allow to immediately give CPU to woke up thread.
+ * 
+ * Inlining this function decrease the required stack size by 2 (o 3) bytes,
+ * when interrupt is called.
+ * 
+ * @see k_yield_from_isr
+ * @param thread Thread that is ready to be scheduled. If thread is NULL,
+ * this function do nothing.
+ */
+
+static inline void k_yield_from_isr_cond(struct k_thread *thread)
+{
+	if (thread != NULL) {
+		k_yield_from_isr();
 	}
 }
 

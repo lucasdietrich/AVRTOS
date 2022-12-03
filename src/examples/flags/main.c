@@ -52,7 +52,11 @@ ISR(USART0_RX_vect)
 		break;
 	}
 
-	k_flags_notify(&flags, notify, K_FLAGS_SET);
+	int ret = k_flags_notify(&flags, notify, K_FLAGS_SET);
+
+	if (ret > 0) {
+		k_yield_from_isr();
+	}
 }
 
 int main(void)
@@ -79,6 +83,8 @@ int main(void)
 		printf_P(PSTR("<main> ret: %d\n"), ret);
 
 		k_sleep(K_SECONDS(5u));
+
+		dump_stack_canaries();
 	}
 }
 

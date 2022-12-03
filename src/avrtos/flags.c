@@ -143,6 +143,12 @@ int k_flags_notify(struct k_flags *flags,
 				notify_value = 0u;
 			}
 		} while (notify_value != 0u);
+
+		if (options & K_FLAGS_SCHED) {
+			if (ret != 0) {
+				_k_yield();
+			}
+		}
 	}
 
 exit:
@@ -161,10 +167,10 @@ int k_flags_reset(struct k_flags *flags)
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
 		ret = _k_cancel_all_pending(&flags->_waitqueue);
-
 		flags->flags = flags->reset_value;
 	}
-
+#if KERNEL_CHECKS
 exit:
+#endif
 	return ret;
 }

@@ -142,7 +142,7 @@ static K_NOINLINE void _k_schedule(struct k_thread *thread)
 		/* Wokek up threads should be executed before any 
 		 * already running premptive thread, so prepend
 		 *
-		 * Call k_yield_from_isr() to switch to woke up thread
+		 * Call k_yield_from_isr_cond() to switch to woke up thread
 		 * if called from ISR
 		 */
 		dlist_prepend(_k_runq, &thread->tie.runqueue);
@@ -557,12 +557,7 @@ void k_sched_unlock(void)
 
 static uint8_t _cur_get_flags(void)
 {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{
-		return _current->flags;
-	}
-
-	__builtin_unreachable();
+	return _current->flags;
 }
 
 bool k_sched_locked(void)

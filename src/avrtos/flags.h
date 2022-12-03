@@ -96,7 +96,7 @@ int k_flags_poll(struct k_flags *flags,
  * 		K_FLAGS_SCHED: Call the scheduler if task have been wake up after notify()
  * 
  * Note: K_FLAGS_SCHED SHOULD NOT be used in ISR context. Use return value to check 
- * if a task have been wake up. Call k_yield_from_isr() if return value is strictly
+ * if a task have been wake up. Call k_yield_from_isr_cond() if return value is strictly
  * positive.
  * 
  * @return int Number of tasks that have been wake up, negative value on error

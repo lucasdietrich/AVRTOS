@@ -23,7 +23,7 @@ ISR(TIMER3_COMPA_vect)
 
 	struct k_thread *unpend = k_sem_give(&sem);
 	
-	k_yield_from_isr(unpend);
+	k_yield_from_isr_cond(unpend);
 }
 
 int main(void)

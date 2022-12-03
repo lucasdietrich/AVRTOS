@@ -61,7 +61,7 @@ static void _k_idle_entry(void *context)
 {
 	for (;;) {
 #if THREAD_IDLE_COOPERATIVE
-#warning "THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr() instead"
+#warning "THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
 		k_yield();
 		// _k_yield_from_idle_thread();
 #endif /* THREAD_IDLE_COOPERATIVE */

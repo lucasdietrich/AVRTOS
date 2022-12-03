@@ -36,7 +36,7 @@ void push(struct in **mem)
 {
 	struct k_thread *thread = k_fifo_put(&myfifo, *(void **)mem);
 	*mem = NULL;
-	k_yield_from_isr(thread);
+	k_yield_from_isr_cond(thread);
 }
 
 int8_t alloc_in(struct in **mem)
