@@ -244,7 +244,7 @@ static K_NOINLINE void _k_suspend(void)
  *
  * @param th thread to wake up
  */
-static K_NOINLINE void _k_wake_up(struct k_thread *th)
+K_NOINLINE void _k_wake_up(struct k_thread *th)
 {
 	__ASSERT_NOTNULL(th);
 	__ASSERT_NOINTERRUPT();
@@ -420,9 +420,9 @@ K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue,
 		 */
 		if (_current->timer_expired) {
 			dlist_remove(&_current->wany);
-			err = -ETIMEOUT;
+			err = -ETIMEDOUT;
 		} else if (_current->pend_canceled) {
-			err = -ECANCEL;
+			err = -ECANCELED;
 		} else {
 			err = 0;
 		}

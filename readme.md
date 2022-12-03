@@ -45,7 +45,7 @@ Minor features:
   - tqueue : scheduling singly linked list for time-sorted items
 - I/O : leds, uart
 - Kernel Assertions (__ASSERT)
-- Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEOUT
+- Custom errors code: e.g. : EAGAIN, EINVAL, ETIMEDOUT
 - Efficient pending feature, allowing to pass directly an object (mutex, semaphore, mem slab bloc, fifo item) to a pending thread. No need to do the whole process : unlock/lock for a mutex or free/allocate for a memory block if a thread is pending for the object being available.
 - Mutex thread owner
 - Fully C/C++ compliant

@@ -50,7 +50,8 @@
 		"semaphore.h": "c",
 		"kernel_internals.h": "c",
 		"drivers.h": "c",
-		"gpio.h": "c"
+		"gpio.h": "c",
+		"flags.h": "c"
 	},
 	"editor.rulers": [80]
 }

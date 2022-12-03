@@ -23,7 +23,7 @@
  *
  * @param waitqueue
  * @param timeout
- * @return 0 on success (object available), ETIMEOUT on timeout, negative error
+ * @return 0 on success (object available), ETIMEDOUT on timeout, negative error
  *  in other cases.
  */
 K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue,
@@ -66,5 +66,7 @@ K_NOINLINE struct k_thread *_k_unpend_first_and_swap(struct ditem *waitqueue,
 K_NOINLINE void _k_cancel_first_pending(struct ditem *waitqueue);
 
 K_NOINLINE uint8_t _k_cancel_all_pending(struct ditem *waitqueue);
+
+K_NOINLINE void _k_wake_up(struct k_thread *th);
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

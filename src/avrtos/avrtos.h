@@ -25,6 +25,7 @@
 #include "dstruct/debug.h"
 
 #include "atomic.h"
+#include "flags.h"
 #include "fault.h"
 #include "kernel.h"
 #include "idle.h"

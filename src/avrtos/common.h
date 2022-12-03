@@ -9,12 +9,6 @@
 
 /*___________________________________________________________________________*/
 
-/* non standard */
-#define ENOERROR        0
-#define EERROR          1
-#define ETIMEOUT        2
-#define ECANCEL         3
-
 /* standard */
 #define EINTR 4
 #define EIO 5
@@ -27,8 +21,9 @@
 #define EINVAL 22
 #define ENFILE 23
 #define ENOMSG 35
-
 #define ENOTSUP 95
+#define ETIMEDOUT 110
+#define ECANCELED 125
 
 
 #define EWOULDBLOCK EAGAIN

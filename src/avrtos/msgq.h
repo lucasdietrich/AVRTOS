@@ -83,7 +83,7 @@ K_NOINLINE int8_t k_msgq_cleanup(struct k_msgq *msgq);
  * @param msgq 
  * @param data 
  * @param timeout 
- * @return K_NOINLINE 0 on success (ETIMEOUT on timeout, ECANCEL on canceled
+ * @return K_NOINLINE 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
  *      ENOMSG on MsgQ full)
  */
 K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq,
@@ -100,7 +100,7 @@ K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq,
  * @param msgq 
  * @param data 
  * @param timeout 
- * @return K_NOINLINE  0 on success (ETIMEOUT on timeout, ECANCEL on canceled
+ * @return K_NOINLINE  0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
  *      ENOMSG on no message)
  */
 K_NOINLINE int8_t k_msgq_get(struct k_msgq *msgq,

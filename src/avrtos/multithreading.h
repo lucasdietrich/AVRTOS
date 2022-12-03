@@ -213,6 +213,7 @@ struct k_thread
                 struct ditem wsig;              // represent the thread pending on an signal
                 struct ditem wfifo;             // represent the thread pending on a fifo item
                 struct ditem wmsgq;             // represent the thread pending on a msgq item
+                struct ditem wflags;            // represent the thread pending on a flags item
         };
         void *swap_data;                        // data returned by kernel API's when calling _k_unpend_first_thread
 
