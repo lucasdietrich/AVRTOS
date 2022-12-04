@@ -36,11 +36,26 @@
 // Tells if the main stack location and size must be defined at compilation time (1)
 // or if the default main stack behaviour (stack at RAMEND) should be kept (0)
 //
-#define DEFAULT_THREAD_EXPLICIT_MAIN_STACK          	1
+// IMPORTANT NOTE: If you're using the heap, you must set this to 0 as stdlib
+// malloc use the stack pointer to make checks on the remaining heap size.
+//
+#define DEFAULT_THREAD_EXPLICIT_MAIN_STACK          	0
 
 //
-// In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option
-// defines the size of the main stack
+// Tells whether malloc is expected to be used in main thread or not
+//
+#define DEFAULT_USE_STDLIB_HEAP_MALLOC_MAIN		0
+
+//
+// Tells whether malloc is expected to be used in other threads or not
+//
+#define DEFAULT_USE_STDLIB_HEAP_MALLOC_THREAD		0
+
+//
+// This configuration option defines the size of the main stack. 
+// If canaries are enabled, the total stack will be filled with the canary value
+// If THREAD_EXPLICIT_MAIN_STACK is enabled, the main stack is  allocated in a 
+// dedicated buffer in the .data section.
 //
 #define DEFAULT_THREAD_MAIN_STACK_SIZE              	0x200
 

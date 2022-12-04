@@ -33,6 +33,24 @@
 #   define THREAD_EXPLICIT_MAIN_STACK DEFAULT_THREAD_EXPLICIT_MAIN_STACK
 #endif
 
+// heap usage checks
+#if defined(CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN)
+#   define USE_STDLIB_HEAP_MALLOC_MAIN CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN
+#else
+#   define USE_STDLIB_HEAP_MALLOC_MAIN DEFAULT_USE_STDLIB_HEAP_MALLOC_MAIN
+#endif
+
+#if USE_STDLIB_HEAP_MALLOC_MAIN && THREAD_EXPLICIT_MAIN_STACK
+#   error "USE_STDLIB_HEAP_MALLOC_MAIN and THREAD_EXPLICIT_MAIN_STACK are incompatible"
+#endif
+
+#if defined(CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD)
+#   define USE_STDLIB_HEAP_MALLOC_THREAD CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD
+#else
+#   define USE_STDLIB_HEAP_MALLOC_THREAD DEFAULT_USE_STDLIB_HEAP_MALLOC_THREAD
+#endif
+
+
 // main stack size (if explicit)
 #if defined(CONFIG_THREAD_MAIN_STACK_SIZE)
 #   define THREAD_MAIN_STACK_SIZE CONFIG_THREAD_MAIN_STACK_SIZE
@@ -652,15 +670,27 @@ typedef struct
         .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(_name), stack_size), .size = (stack_size)}, \
         .symbol = sym}
 
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)                  \
+#if USE_STDLIB_HEAP_MALLOC_THREAD == 0u
+
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol) \
     __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
     __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol); \
     _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
 
-#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)                  \
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol) \
     __attribute__((used)) _K_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
     __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flag, symbol); \
     _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
+
+#else
+
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol) \
+    __STATIC_ASSERT(0u, "K_THREAD_DEFINE is not supported when USE_STDLIB_HEAP_MALLOC_THREAD is enabled");
+
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol) \
+    __STATIC_ASSERT(0u, "K_THREAD_DEFINE is not supported when USE_STDLIB_HEAP_MALLOC_THREAD is enabled");
+
+#endif 
 
 /*___________________________________________________________________________*/
 
