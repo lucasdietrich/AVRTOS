@@ -37,13 +37,14 @@ extern "C" {
 #define K_MODULE_EVENT          18
 
 #define K_MODULE_DRIVERS_USART  19
-#define K_MODULE_DRIVERS_TIMERS  20
+#define K_MODULE_DRIVERS_TIMERS 20
 
-#define K_MODULE_APPLICATION    0x20
+#define K_MODULE_APPLICATION    32
 
 /*___________________________________________________________________________*/
 
 #define K_ASSERT_UNDEFINED              0
+#define K_ASSERT_ANY              	0
 
 #define K_ASSERT_INTERRUPT              1
 #define K_ASSERT_NOINTERRUPT            2
@@ -67,17 +68,24 @@ extern "C" {
 
 // move to assert.h
 #if KERNEL_ASSERT
-#   	define __ASSERT(acode, assertion) __assert((uint8_t) (assertion), K_MODULE, acode, __LINE__)
+#   	define __ASSERT(_acode, _assertion) \
+	__assert((uint8_t) (_assertion), K_MODULE, _acode, __LINE__)
+#	define __ASSERT_APP(_assertion) \
+	__assert((uint8_t) (_assertion), K_MODULE_APPLICATION, K_ASSERT_ANY, __LINE__)
 #else
-#   	define __ASSERT(acode, assertion) 
+#   	define __ASSERT(_acode, _assertion) 
+#	define __ASSERT_APP(_assertion)
 #endif
 
 #define K_ASSERT __ASSERT
+#define K_ASSERT_APP __ASSERT_APP
 
 /*___________________________________________________________________________*/
 
-#define __STATIC_ASSERT(test_for_true, msg) _Static_assert(test_for_true, msg)
-#define __STATIC_ASSERT_AUTOMSG(test_for_true) _Static_assert(test_for_true, "(" #test_for_true ") failed")
+#define __STATIC_ASSERT(test_for_true, msg) \
+	_Static_assert(test_for_true, msg)
+#define __STATIC_ASSERT_AUTOMSG(test_for_true) \
+	_Static_assert(test_for_true, "(" #test_for_true ") failed")
 
 #define K_STATIC_ASSERT __STATIC_ASSERT_AUTOMSG
 

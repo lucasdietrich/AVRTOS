@@ -46,7 +46,7 @@ int8_t alloc(struct in **mem)
 	return k_mem_slab_alloc(&myslab, (void **)mem, K_NO_WAIT);
 }
 
-void free(struct in *mem)
+void free_mem(struct in *mem)
 {
 	k_mem_slab_free(&myslab, mem);
 }
