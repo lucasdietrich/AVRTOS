@@ -22,6 +22,7 @@ upload:
 	make -C build upload --no-print-directory
 
 monitor:
+	echo "Press Ctrl-T + Q to exit"
 	python3 -m serial.tools.miniterm /dev/ttyACM0 500000
 
 clean:

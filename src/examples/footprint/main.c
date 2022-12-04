@@ -9,9 +9,10 @@
 #include <avrtos/misc/uart.h>
 #include <avrtos/kernel.h>
 
-/* Minimum footprint (ATmega2560)
-RAM:   [          ]   0.4% (used 31 bytes from 8192 bytes)
-Flash: [          ]   0.8% (used 1948 bytes from 253952 bytes)
+/* Minimum footprint (Release for ATmega2560)
+	Memory region         Used Size  Region Size  %age Used
+		text:        1452 B       256 KB      0.55%
+		data:          31 B         8 KB      0.38%
 */
 int main(void)
 {
