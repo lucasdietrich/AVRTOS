@@ -39,8 +39,10 @@ int main(void)
 	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, GPIO_OUTPUT);
 	gpio_write_pin_state(GPIOD_DEVICE, PIN1, STATE_LOW);
 
+#if defined(GPIOH_DEVICE)
 	/* Unecessary, just to have clean signals on my lines */
 	gpio_init(GPIOH_DEVICE, 0xFF, 0x00);
+#endif
 
 	/* Configure INT0 */
 	exti_configure(INT0, ISC_EDGE);
@@ -52,8 +54,10 @@ int main(void)
 	exti_clear_flag(INT1);
 	exti_enable(INT1);
 
+#if defined(GPIOK)
 	/* Configure GPIOK */
 	gpio_init(GPIOK, 0xFF, 0x00);
+#endif
 
 	/* Configure PCINT16-23 */
 	pci_configure(PCINT_16_23, 0xFFu);

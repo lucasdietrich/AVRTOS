@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// For ATmega328PB or ATmega2560
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

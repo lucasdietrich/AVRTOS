@@ -15,7 +15,6 @@
 
 #include <avrtos/misc/uart.h>
 #include <avrtos/misc/led.h>
-#include <avrtos/misc/utils.h>
 
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>

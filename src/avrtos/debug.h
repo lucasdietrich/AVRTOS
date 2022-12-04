@@ -8,7 +8,6 @@
 #define _AVRTOS_DEBUG_H
 
 #include "misc/uart.h"
-#include "misc/utils.h"
 
 #include "avrtos.h"
 
