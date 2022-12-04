@@ -51,7 +51,8 @@
 		"kernel_internals.h": "c",
 		"drivers.h": "c",
 		"gpio.h": "c",
-		"flags.h": "c"
+		"flags.h": "c",
+		"logging.h": "c"
 	},
 	"editor.rulers": [80]
 }

@@ -283,6 +283,16 @@
 #   define STDIO_PRINTF_TO_USART DEFAULT_STDIO_PRINTF_TO_USART
 #endif
 
+#if defined(CONFIG_LOGGING_SUBSYSTEM)
+#	define LOGGING_SUBSYSTEM CONFIG_LOGGING_SUBSYSTEM
+#else
+#	define LOGGING_SUBSYSTEM DEFAULT_LOGGING_SUBSYSTEM
+#endif /* CONFIG_LOGGING_SUBSYSTEM */
+
+#if LOGGING_SUBSYSTEM && (STDIO_PRINTF_TO_USART < 0)
+#	error "Logging subsystem requires STDIO_PRINTF_TO_USART to be defined"
+#endif
+
 #if defined(CONFIG_FD_MAX_COUNT)
 #   define FD_MAX_COUNT CONFIG_FD_MAX_COUNT
 #else
@@ -414,6 +424,7 @@
 #else
 #	define KERNEL_CHECKS DEFAULT_KERNEL_CHECKS
 #endif /* CONFIG_KERNEL_CHECKS */
+
 
 /*___________________________________________________________________________*/
 

@@ -218,6 +218,11 @@
 #define DEFAULT_STDIO_PRINTF_TO_USART			-1
 
 /**
+ * @brief Enable logging subsystem
+ */
+#define DEFAULT_LOGGING_SUBSYSTEM			1u
+
+/**
  * @brief Enable uptime counter in milliseconds
  */
 #define DEFAULT_KERNEL_UPTIME				0
