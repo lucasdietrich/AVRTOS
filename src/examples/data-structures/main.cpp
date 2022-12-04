@@ -8,7 +8,7 @@
 
 #include <avr/io.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 
 #include <avrtos/dstruct/dlist.h>
 #include <avrtos/dstruct/queue.h>
@@ -35,20 +35,20 @@ void test_tqueue(void);
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 #if TESTS & FLAG_QUEUE
-	usart_printl_p(PSTR("queue"));
+	serial_printl_p(PSTR("queue"));
 	test_queue();
 #endif
 
 #if TESTS & FLAG_OQUEUE
-	usart_printl_p(PSTR("oqueue"));
+	serial_printl_p(PSTR("oqueue"));
 	test_oqueue();
 #endif
 
 #if TESTS & FLAG_DLIST
-	usart_printl_p(PSTR("queue/dequeue dlist"));
+	serial_printl_p(PSTR("queue/dequeue dlist"));
 	test_queue_dlist();
 #endif
 
@@ -57,7 +57,7 @@ int main(void)
   // todo cdlist
 
 #if TESTS & FLAG_TQUEUE
-	usart_printl_p(PSTR("tqueue"));
+	serial_printl_p(PSTR("tqueue"));
 	test_tqueue();
 #endif
 }
@@ -95,7 +95,7 @@ inline struct item *dequeue(void)
 		return ITEM_OF(item);
 	}
 }
-void print_queue_item(struct qitem *item) { usart_transmit(NAME_OF(item)); }
+void print_queue_item(struct qitem *item) { serial_transmit(NAME_OF(item)); }
 inline void print_queue(void) { print_queue(myqueue, print_queue_item); }
 
 void test_queue(void)
@@ -109,18 +109,18 @@ void test_queue(void)
 	print_queue();
 	dequeued = dequeue();
 	print_queue();
-	usart_print_p(PSTR("queue "));
+	serial_print_p(PSTR("queue "));
 	print_queue_item(&dequeued->i);
-	usart_transmit('\n');
+	serial_transmit('\n');
 	queue(dequeued);
 	print_queue();
 	dequeued = dequeue();
 	print_queue();
 	dequeued = dequeue();
 	print_queue();
-	usart_print_p(PSTR("queue "));
+	serial_print_p(PSTR("queue "));
 	print_queue_item(&dequeued->i);
-	usart_transmit('\n');
+	serial_transmit('\n');
 	queue(dequeued);
 	print_queue();
 	dequeued = dequeue();
@@ -137,11 +137,11 @@ void print_odequeue(void)
 {
 	struct qitem *dequeued = odequeue(&oref);
 	if (dequeued != NULL) {
-		usart_print_p(PSTR("dequeued : "));
+		serial_print_p(PSTR("dequeued : "));
 		print_queue_item(dequeued);
-		usart_transmit('\n');
+		serial_transmit('\n');
 	} else {
-		usart_printl_p(PSTR("dequeued NULL"));
+		serial_printl_p(PSTR("dequeued NULL"));
 	}
 	print_oqueue();
 }
@@ -187,7 +187,7 @@ struct item2 ditems[] = {
 
 DEFINE_DLIST(dlist);
 
-void print_dlist_item(struct ditem *item) { usart_transmit(DNAME_OF(item)); }
+void print_dlist_item(struct ditem *item) { serial_transmit(DNAME_OF(item)); }
 inline void print_dlist(void) { print_dlist(&dlist, print_dlist_item); }
 
 static void test_dlist_dequeue(struct ditem *dlist)
@@ -195,9 +195,9 @@ static void test_dlist_dequeue(struct ditem *dlist)
 	struct ditem *out = dlist_get(dlist);
 	if (DITEM_VALID(dlist, out)) {
 		print_dlist_item(out);
-		usart_transmit('\n');
+		serial_transmit('\n');
 		print_dlist(dlist, print_dlist_item);
-	} else { usart_print_p(PSTR("dlist empty=")); usart_u8(dlist_is_empty(dlist)); }
+	} else { serial_print_p(PSTR("dlist empty=")); serial_u8(dlist_is_empty(dlist)); }
 }
 
 
@@ -239,10 +239,10 @@ struct item3 titems[] = {
 void print_titem(struct titem *item)
 {
 	struct item3 *i = CONTAINER_OF(item, struct item3, tie);
-	usart_transmit(i->chr);
-	usart_transmit('[');
-	usart_u16(i->tie.delay_shift);
-	usart_transmit(']');
+	serial_transmit(i->chr);
+	serial_transmit('[');
+	serial_u16(i->tie.delay_shift);
+	serial_transmit(']');
 }
 
 void print_tqueue(struct titem *root)
@@ -270,10 +270,10 @@ void test_tqueue(void)
 
 	struct titem *pop = tqueue_pop(&root);
 	print_titem(pop);
-	usart_transmit('\n');
+	serial_transmit('\n');
 	pop = tqueue_pop(&root);
 	print_titem(pop);
-	usart_transmit('\n');
+	serial_transmit('\n');
 
 	tqueue_shift(&root, 20);
 

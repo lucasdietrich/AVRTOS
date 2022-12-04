@@ -9,7 +9,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
@@ -59,7 +59,7 @@ static inline void input(const char rx)
 	if (mem == NULL) {
 		if (alloc(&mem) != 0) {
 			__ASSERT_NULL(mem);
-			usart_transmit('!');
+			serial_transmit('!');
 			return;
 		}
 		mem->len = 0;
@@ -75,7 +75,7 @@ static inline void input(const char rx)
 	case 0x08: /* backspace */
 		if (mem->len > 0) {
 			mem->len--;
-			usart_transmit(rx);
+			serial_transmit(rx);
 		}
 		break;
 	default:
@@ -85,7 +85,7 @@ static inline void input(const char rx)
 		} else {
 			mem->buffer[mem->len++] = rx;
 		}
-		usart_transmit(rx);
+		serial_transmit(rx);
 		break;
 	}
 }
@@ -105,20 +105,20 @@ ISR(board_USART_RX_vect)
 void consumer(void *context)
 {
 	for (;;) {
-		usart_print_p(PSTR("\n# "));
+		serial_print_p(PSTR("\n# "));
 		struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
 		__ASSERT_NOTNULL(mem);
 		if (mem->len == 0) {
-			usart_print_p(PSTR("\nCOMMAND DROPPED !"));
+			serial_print_p(PSTR("\nCOMMAND DROPPED !"));
 		} else {
 			/* process/parsed the command */
-			usart_print_p(PSTR("CMD received ! len = "));
-			usart_u8(mem->len);
-			usart_print_p(PSTR(" : "));
+			serial_print_p(PSTR("CMD received ! len = "));
+			serial_u8(mem->len);
+			serial_print_p(PSTR(" : "));
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
 			     c < mem->buffer + mem->len; c++) {
-				usart_transmit(*c);
+				serial_transmit(*c);
 			}
 		}
 		k_mem_slab_free(&myslab, mem);
@@ -170,13 +170,13 @@ int main(void)
 	irq_enable();
 
 	// initialize shell uart
-	usart_init();
+	serial_init();
 	SET_BIT(UCSR0B, 1 << RXCIE0); // enable RX interrupt for shell uart
 
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
-	usart_drv_init(USART1_DEVICE, &cfg);
+	usart_init(USART1_DEVICE, &cfg);
 
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));

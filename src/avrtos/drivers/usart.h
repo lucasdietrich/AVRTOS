@@ -176,31 +176,31 @@ struct usart_config
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
 
 // drivers API
-K_NOINLINE void usart_ll_drv_init(UART_Device *dev,
+K_NOINLINE void ll_usart_init(UART_Device *dev,
 				  const struct usart_config *config);
 
-K_NOINLINE int usart_drv_init(UART_Device *dev,
+K_NOINLINE int usart_init(UART_Device *dev,
 			      const struct usart_config *config);
 
-K_NOINLINE int usart_drv_deinit(UART_Device *dev);
+K_NOINLINE int usart_deinit(UART_Device *dev);
 
-K_NOINLINE void usart_ll_drv_sync_putc(UART_Device *dev, char c);
+K_NOINLINE void ll_usart_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE int usart_ll_drv_sync_getc(UART_Device *dev);
+K_NOINLINE int ll_usart_sync_getc(UART_Device *dev);
 
-static inline void usart_ll_enable_rx_isr(UART_Device *dev)
+static inline void ll_usart_enable_rx_isr(UART_Device *dev)
 {
 	SET_BIT(dev->UCSRnB, BIT(RXCIEn));
 }
 
-static inline void usart_ll_disable_rx_isr(UART_Device *dev)
+static inline void ll_usart_disable_rx_isr(UART_Device *dev)
 {
 	CLR_BIT(dev->UCSRnB, BIT(RXCIEn));
 }
 
-K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
+K_NOINLINE int usart_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE int usart_drv_getc(UART_Device *dev);
+K_NOINLINE int usart_getc(UART_Device *dev);
 
 K_NOINLINE void usart0_drv_sync_putc(char c);
 

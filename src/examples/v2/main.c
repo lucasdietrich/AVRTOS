@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -25,7 +25,7 @@ K_THREAD_DEFINE(t3, canariesthread, 0x80, K_COOPERATIVE, NULL, 'C');
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -33,7 +33,7 @@ int main(void)
 
 	while (1) {
 		k_show_uptime();
-		usart_transmit('\n');
+		serial_transmit('\n');
 		printf_P(PSTR("%lu ticks : %lu ms\n"), k_ticks_get_32(), k_uptime_get_ms32());
 		k_sleep(K_SECONDS(1));
 	}
@@ -45,7 +45,7 @@ void mythread(char *ctx)
 
 	while (1) {
 		i++;
-		usart_transmit(*ctx);
+		serial_transmit(*ctx);
 		k_sleep(K_SECONDS(1));
 	}
 }

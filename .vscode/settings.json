@@ -8,7 +8,7 @@
 	"files.associations": {
 		"*.asm": "avr",
 		"multithreading_debug.h": "c",
-		"uart.h": "c",
+		"serial.h": "c",
 		"multithreading.h": "c",
 		"multithreading_defines.h": "c",
 		"schedules_items.h": "c",

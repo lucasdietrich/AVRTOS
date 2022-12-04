@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
@@ -88,9 +88,9 @@ int main(void)
 {
 	irq_enable();
 
-	usart_init();
+	serial_init();
 
-	usart_drv_init(USART1_DEVICE, &usart_ipc_cfg);
+	usart_init(USART1_DEVICE, &usart_ipc_cfg);
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 
 	// usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));

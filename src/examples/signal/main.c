@@ -7,7 +7,7 @@
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 void waiter(void *context);
@@ -25,7 +25,7 @@ K_SIGNAL_DEFINE(sig);
 ISR(board_USART_RX_vect)
 {
 	const char rx = UDR0;
-	usart_transmit(rx);
+	serial_transmit(rx);
 
 	k_signal_raise(&sig, rx);
 }
@@ -33,7 +33,7 @@ ISR(board_USART_RX_vect)
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	/* enable RX interrupt */
 	SET_BIT(UCSR0B, 1 << RXCIE0);
@@ -54,10 +54,10 @@ void waiter(void *context)
 	for (;;) {
 		int8_t err = k_poll_signal(&sig, K_SECONDS(3));
 		sprintf(buffer, "k_poll_signal returned err = %d\n", err);
-		usart_print(buffer);
+		serial_print(buffer);
 		if (err == 0) {
 			sprintf(buffer, "signal value = %d\n", sig.signal);
-			usart_print(buffer);
+			serial_print(buffer);
 
 			sig.flags = K_POLL_STATE_NOT_READY;
 		}

@@ -47,64 +47,64 @@ extern struct k_thread __k_threads_end;
 
 void k_thread_dbg_count(void)
 {
-	usart_print_p(PSTR("THREADS COUNT :"));
-        usart_u8(&__k_threads_end - &__k_threads_start);
-        usart_transmit('\n');
+	serial_print_p(PSTR("THREADS COUNT :"));
+        serial_u8(&__k_threads_end - &__k_threads_start);
+        serial_transmit('\n');
 }
 
 void k_thread_dump_hex(struct k_thread *th)
 {
-        usart_send_hex((const uint8_t *)th, sizeof(struct k_thread));
+        serial_send_hex((const uint8_t *)th, sizeof(struct k_thread));
 }
 
 void k_thread_dump(struct k_thread *th)
 {
-        usart_transmit(th->symbol);
-        usart_print_p(PSTR(" 0x"));
-        usart_hex16((const uint16_t)th);
+        serial_transmit(th->symbol);
+        serial_print_p(PSTR(" 0x"));
+        serial_hex16((const uint16_t)th);
 
-	usart_transmit(' ');
+	serial_transmit(' ');
 
 	switch (th->state) {
 		case K_READY:
-			usart_print_p(PSTR("READY  "));
+			serial_print_p(PSTR("READY  "));
 			break;
 		case K_STOPPED:
-			usart_print_p(PSTR("STOPPED"));
+			serial_print_p(PSTR("STOPPED"));
 			break;
 		case K_PENDING:
-			usart_print_p(PSTR("PENDING"));
+			serial_print_p(PSTR("PENDING"));
 			break;
 		case K_IDLE:
-			usart_print_p(PSTR("IDLE   "));
+			serial_print_p(PSTR("IDLE   "));
 			break;
 		default:
 			break;
 	}
 	
-	usart_transmit(' ');
+	serial_transmit(' ');
 
-	usart_transmit((th->flags & K_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
-	usart_transmit(' ');
-	usart_transmit((th->flags & K_MASK_PRIO) == K_FLAG_PRIO_HIGH ? '0' : '1');
-	usart_transmit(' ');
-	usart_transmit(th->sched_lock ? 'S' : '_');
-	usart_transmit(th->timer_expired ? 'X' : '_');
-	usart_transmit(th->pend_canceled ? 'Y' : '_');
-	usart_transmit(th->wakeup_schd ? 'W' : '_');
+	serial_transmit((th->flags & K_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
+	serial_transmit(' ');
+	serial_transmit((th->flags & K_MASK_PRIO) == K_FLAG_PRIO_HIGH ? '0' : '1');
+	serial_transmit(' ');
+	serial_transmit(th->sched_lock ? 'S' : '_');
+	serial_transmit(th->timer_expired ? 'X' : '_');
+	serial_transmit(th->pend_canceled ? 'Y' : '_');
+	serial_transmit(th->wakeup_schd ? 'W' : '_');
 
-        usart_print_p(PSTR(" : SP "));
-        usart_u16(k_thread_usage(th));
-        usart_transmit('/');
-        usart_u16(th->stack.size);
-        usart_print_p(PSTR(":0x"));
-        usart_hex16((uint16_t)th->stack.end);
-        usart_transmit('\n');
+        serial_print_p(PSTR(" : SP "));
+        serial_u16(k_thread_usage(th));
+        serial_transmit('/');
+        serial_u16(th->stack.size);
+        serial_print_p(PSTR(":0x"));
+        serial_hex16((uint16_t)th->stack.end);
+        serial_transmit('\n');
 }
 
 void k_thread_dump_all(void)
 {
-        usart_print_p(PSTR("===== k_thread =====\n"));
+        serial_print_p(PSTR("===== k_thread =====\n"));
 
         for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
                 k_thread_dump(&(&__k_threads_start)[i]);
@@ -144,12 +144,12 @@ void *k_thread_get_return_addr(struct k_thread *th)
 
 void _thread_symbol_runqueue(struct ditem *item)
 {
-        usart_transmit(CONTAINER_OF(item, struct k_thread, tie.runqueue)->symbol);
+        serial_transmit(CONTAINER_OF(item, struct k_thread, tie.runqueue)->symbol);
 }
 
 void _thread_symbol_events_queue(struct titem *item)
 {
-        usart_transmit(CONTAINER_OF(item, struct k_thread, tie.event)->symbol);
+        serial_transmit(CONTAINER_OF(item, struct k_thread, tie.event)->symbol);
 }
 
 void print_runqueue(void)
@@ -175,11 +175,11 @@ void k_sem_debug(struct k_sem *sem)
                 limit = sem->limit;
         }
 
-        usart_print_p(PSTR("K_SEM "));
-        usart_u8(count);
-        usart_transmit('/');
-        usart_u8(limit);
-        usart_transmit('\n');
+        serial_print_p(PSTR("K_SEM "));
+        serial_u8(count);
+        serial_transmit('/');
+        serial_u8(limit);
+        serial_transmit('\n');
 }
 
 /*___________________________________________________________________________*/

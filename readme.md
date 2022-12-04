@@ -186,7 +186,7 @@ Configuration option : `CONFIG_KERNEL_TIME_SLICE_US=10000`
 ```cpp
 #include <avr/io.h>
 #include <util/delay.h>
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
@@ -205,7 +205,7 @@ K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PREEMPTIVE, NULL, 'C');
 int main(void)
 {
   led_init();
-  usart_init();
+  serial_init();
   k_thread_dump_all();
   sei();
   k_sleep(K_FOREVER);
@@ -217,7 +217,7 @@ void thread_led(void* context)
   while (1)   {
     k_mutex_lock(&mymutex, K_FOREVER);
     led_set(thread_led_state);
-    usart_transmit(thread_led_state ? 'o' : 'f');
+    serial_transmit(thread_led_state ? 'o' : 'f');
     k_sleep(K_MSEC(100));
     k_mutex_unlock(&mymutex);
   }
@@ -227,7 +227,7 @@ void thread_coop(void* context)
 {
   while (1)   {
     k_sleep(K_MSEC(2000));
-    usart_transmit('_');
+    serial_transmit('_');
     _delay_ms(500); // blocking all threads for 500ms
   }
 }
@@ -583,7 +583,7 @@ Priority *COOPERATIVE* :
 - Extend drivers support
 - Exceptions
 - Add a logging system !
-- Find a way to not use the usart_print*() function anymore and to use the UART drivers instead
+- Find a way to not use the serial_print*() function anymore and to use the UART drivers instead
 - Get rid of the AVR startup code : [AVR Freaks : Custom Startup Code](https://www.avrfreaks.net/forum/custom-startup-code)
   - Small overhead
 - Merge `KERNEL_UPTIME` and `KERNEL_TIME`

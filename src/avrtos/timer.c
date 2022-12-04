@@ -10,7 +10,7 @@
 
 #include "kernel.h"
 
-#include "misc/uart.h"
+#include "misc/serial.h"
 
 #if KERNEL_TIMERS
 

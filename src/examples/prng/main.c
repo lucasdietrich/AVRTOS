@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -35,18 +35,18 @@ uint8_t buffer[256];
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
 	k_prng_get_buffer(&p4, buffer, sizeof(buffer));
 	for (uint16_t i = 0; i < sizeof(buffer); i++) {
-		usart_hex(buffer[i]);
-		usart_transmit(' ');
+		serial_hex(buffer[i]);
+		serial_transmit(' ');
 		if ((i & 0xF) == 0xF)
-			usart_transmit('\n');
+			serial_transmit('\n');
 	}
-	usart_transmit('\n');
+	serial_transmit('\n');
 
 	k_sleep(K_FOREVER);
 }
@@ -58,10 +58,10 @@ void thread(struct k_prng *prng)
 	for (;;) {
 		number = k_prng_get(prng);
 
-		usart_transmit(_current->symbol);
-		usart_print_p(PSTR(" : "));
-		usart_hex16(number);
-		usart_transmit('\n');
+		serial_transmit(_current->symbol);
+		serial_print_p(PSTR(" : "));
+		serial_hex16(number);
+		serial_transmit('\n');
 
 		k_sleep(K_MSEC(500));
 	}

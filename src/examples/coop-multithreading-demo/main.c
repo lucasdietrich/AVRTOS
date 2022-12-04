@@ -13,7 +13,7 @@
 
 /*___________________________________________________________________________*/
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -48,7 +48,7 @@ static char stack3[0x100u];
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 
 #if !THREAD_PREPROCESSOR  
@@ -69,7 +69,7 @@ int main(void)
 	sei();
 
 	while (1) {
-		usart_printl_p(PSTR("::main"));
+		serial_printl_p(PSTR("::main"));
 
 		k_yield();
 	}
@@ -82,10 +82,10 @@ void inthread_setled(uint8_t state)
 {
 	if (state == 0) {
 		led_off();
-		usart_printl_p(PSTR("::thread off"));
+		serial_printl_p(PSTR("::thread off"));
 	} else {
 		led_on();
-		usart_printl_p(PSTR("::thread on"));
+		serial_printl_p(PSTR("::thread on"));
 	}
 }
 
@@ -103,7 +103,7 @@ void thread_led(void *p)
 void thread_monitor(void *p)
 {
 	while (1) {
-		usart_printl_p(PSTR("::monitoring"));
+		serial_printl_p(PSTR("::monitoring"));
 
 		k_yield();
 	}

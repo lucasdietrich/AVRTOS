@@ -6,13 +6,13 @@
 
 #include "io.h"
 
-#include "misc/uart.h"
+#include "misc/serial.h"
 
 #if STDIO_PRINTF_TO_USART == 0
 
 static int uart_putchar(char c, FILE *stream)
 {
-        usart_transmit(c);
+        serial_transmit(c);
         return 0;
 }
 

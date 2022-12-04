@@ -32,9 +32,9 @@ Use provided macros to minimize code generated, only a small overhead is introdu
 	ll_timer16_set_tcnt(TIMER4_DEVICE,
 			    TIMER_GET_MAX_COUNTER(4) -
 			    TIMER_CALC_COUNTER_VALUE(250U * USEC_PER_MSEC, 1024));
-	usart_transmit('4');
+	serial_transmit('4');
      3d8:	84 e3       	ldi	r24, 0x34	; 52
-     3da:	0e 94 d5 04 	call	0x9aa	; 0x9aa <usart_transmit>
+     3da:	0e 94 d5 04 	call	0x9aa	; 0x9aa <serial_transmit>
 ```
 
 Expected result:

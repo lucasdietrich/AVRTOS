@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -34,7 +34,7 @@ K_MUTEX_DEFINE(mymutex);
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -51,16 +51,16 @@ int main(void)
 
 void waiting_thread(k_timeout_t *timeout)
 {
-	usart_transmit(_current->symbol);
-	usart_printl_p(PSTR(": starting"));
+	serial_transmit(_current->symbol);
+	serial_printl_p(PSTR(": starting"));
 
 	uint8_t locked = k_mutex_lock(&mymutex, *timeout);
 
-	usart_transmit(_current->symbol);
+	serial_transmit(_current->symbol);
 	if (locked == 0) {
-		usart_printl_p(PSTR(": locked the mutex !"));
+		serial_printl_p(PSTR(": locked the mutex !"));
 	} else {
-		usart_printl_p(PSTR(": didn't get the mutex !"));
+		serial_printl_p(PSTR(": didn't get the mutex !"));
 	}
 
 	k_sleep(K_FOREVER);

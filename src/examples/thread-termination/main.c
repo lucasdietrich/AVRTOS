@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <util/delay.h>
@@ -27,16 +27,16 @@ K_SEM_DEFINE(mysem, 0, 1);
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	irq_enable();
 
 	for (;;) {
 		k_sem_take(&mysem, K_FOREVER);
 
-		usart_print_p(PSTR("Thread terminated : "));
-		usart_hex16(s_thread->symbol);
-		usart_transmit('\n');
+		serial_print_p(PSTR("Thread terminated : "));
+		serial_hex16(s_thread->symbol);
+		serial_transmit('\n');
 
 		/* rebuild stack */
 		k_thread_create(s_thread, thread_entry,
@@ -44,7 +44,7 @@ int main(void)
 					      s_thread->stack.size),
 				s_thread->stack.size,
 				K_PREEMPTIVE, NULL, 'T');
-		usart_printl_p(PSTR("Thread started again"));
+		serial_printl_p(PSTR("Thread started again"));
 		k_thread_start(s_thread);
 	}
 
@@ -56,7 +56,7 @@ void thread_entry(void *_c)
 	s_thread = _current;
 
 	for (uint_fast8_t i = 0; i < 5; i++) {
-		usart_printl_p(PSTR("Hello !"));
+		serial_printl_p(PSTR("Hello !"));
 		k_sleep(K_MSEC(250));
 	}
 

@@ -85,7 +85,7 @@ static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t ent
 	th->sp--;
 }
 
-#include "misc/uart.h"
+#include "misc/serial.h"
 
 int k_thread_create(struct k_thread *const th, thread_entry_t entry,
         void *const stack, const size_t stack_size,

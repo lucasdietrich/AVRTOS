@@ -31,7 +31,7 @@ public:
 
 	void start(void) { k_thread_start(&_ctx); }
 	void sleep(k_timeout_t timeout) { k_sleep(timeout); }
-	void print_name(void) { usart_print(_name); usart_transmit('\n'); }
+	void print_name(void) { serial_print(_name); serial_transmit('\n'); }
 
 private:
 	static uint8_t cnt;
@@ -59,7 +59,7 @@ void func(Task &task)
 
 int main()
 {
-	usart_init();
+	serial_init();
 	k_thread_dump_all();
 
 	Task task1 = Task("task1", func);

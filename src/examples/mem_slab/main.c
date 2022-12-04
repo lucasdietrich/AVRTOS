@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -91,7 +91,7 @@ int main(void)
 	/* interrupts are disabled in this thread */
 
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 

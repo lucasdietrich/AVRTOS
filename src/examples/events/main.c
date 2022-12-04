@@ -5,7 +5,7 @@
  */
 
 #include <avrtos/kernel.h>
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/debug.h>
 
 #include <util/delay.h>
@@ -30,7 +30,7 @@ struct mystruct threads[THREADS_COUNT];
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 

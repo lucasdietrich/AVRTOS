@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_DEBUG_H
 #define _AVRTOS_DEBUG_H
 
-#include "misc/uart.h"
+#include "misc/serial.h"
 
 #include "avrtos.h"
 
@@ -23,22 +23,22 @@ extern "C" {
 //
 
 #define __K_DBG_HELPER_TH(th, chr) \
-    usart_transmit(chr);           \
-    usart_transmit(th->symbol)
+    serial_transmit(chr);           \
+    serial_transmit(th->symbol)
 
 #define __K_DBG_HELPER_TH_R(th, chr) \
-    usart_transmit(th->symbol);      \
-    usart_transmit(chr)
+    serial_transmit(th->symbol);      \
+    serial_transmit(chr)
 
 #if KERNEL_SCHEDULER_DEBUG
 
 #define __K_DBG_SCHED_LOCK(th)      __K_DBG_HELPER_TH(th, '[')
-#define __K_DBG_SCHED_UNLOCK()      usart_transmit(']')
+#define __K_DBG_SCHED_UNLOCK()      serial_transmit(']')
 #define __K_DBG_SCHED_EVENT(th)     __K_DBG_HELPER_TH(th, '!')
-#define __K_DBG_SCHED_SUSPENDED(th)     usart_transmit('~')
-#define __K_DBG_SCHED_NEXT_THREAD()     usart_transmit('>')
-#define __K_DBG_SCHED_SKIP_IDLE()   usart_print_p(PSTR("p"))
-#define __K_DBG_SCHED_NEXT(th)      usart_transmit(th->symbol)
+#define __K_DBG_SCHED_SUSPENDED(th)     serial_transmit('~')
+#define __K_DBG_SCHED_NEXT_THREAD()     serial_transmit('>')
+#define __K_DBG_SCHED_SKIP_IDLE()   serial_print_p(PSTR("p"))
+#define __K_DBG_SCHED_NEXT(th)      serial_transmit(th->symbol)
 #define __K_DBG_WAKEUP(th)          __K_DBG_HELPER_TH(th, '@')
 
 #define __K_DBG_MUTEX_LOCKED(th)    __K_DBG_HELPER_TH(th, '}')
@@ -190,9 +190,9 @@ void set_stack_pointer(struct k_thread *th);
  */
 uint8_t read_sreg(void);
 
-#define LOG_SREG() usart_u8(SREG); usart_transmit(';');
-#define LOG_SREG2() usart_u8(read_sreg()); usart_transmit(';');
-#define LOG_SREG_I() usart_transmit('['); usart_u8(SREG >> 7); usart_transmit(']');
+#define LOG_SREG() serial_u8(SREG); serial_transmit(';');
+#define LOG_SREG2() serial_u8(read_sreg()); serial_transmit(';');
+#define LOG_SREG_I() serial_transmit('['); serial_u8(SREG >> 7); serial_transmit(']');
 
 /*___________________________________________________________________________*/
 

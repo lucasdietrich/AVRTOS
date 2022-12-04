@@ -5,7 +5,7 @@
  */
 
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 #include <avr/sleep.h>
@@ -14,7 +14,7 @@ void thread(void *p);
 
 // ISR(USART_RX_vect) {
 // 	char c = UDR0;
-// 	usart_transmit('n');
+// 	serial_transmit('n');
 // }
 
 
@@ -22,7 +22,7 @@ K_THREAD_DEFINE(t1, thread, K_THREAD_STACK_MIN_SIZE + 0x100 - 237 - 2, K_PREEMPT
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	// UCSR0B = 1 << RXCIE0;
 

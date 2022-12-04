@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
@@ -58,13 +58,13 @@ static inline void input(const char rx)
 	if (mem == NULL) {
 		if (alloc_in(&mem) != 0) {
 			__ASSERT_NULL(mem);
-			usart_transmit('!');
+			serial_transmit('!');
 			return;
 		}
 		mem->len = 0;
 	}
 
-	// usart_hex(rx);
+	// serial_hex(rx);
 
 	switch (rx) {
 	case 0x1A: /* Ctrl + Z -> drop */
@@ -78,7 +78,7 @@ static inline void input(const char rx)
 	case '\b': /* backspace */
 		if (mem->len > 0) {
 			mem->len--;
-			usart_transmit(rx);
+			serial_transmit(rx);
 		}
 		break;
 	default:
@@ -88,7 +88,7 @@ static inline void input(const char rx)
 		} else {
 			mem->buffer[mem->len++] = rx;
 		}
-		usart_transmit(rx);
+		serial_transmit(rx);
 		break;
 	}
 }
@@ -108,19 +108,19 @@ ISR(board_USART_RX_vect)
 void consumer(void *context)
 {
 	for (;;) {
-		usart_print_p(PSTR("\n# "));
+		serial_print_p(PSTR("\n# "));
 
 		struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
 
 		if (mem->len != 0) {
 			/* process/parsed the command */
-			usart_print_p(PSTR("\nlen="));
-			usart_u8(mem->len);
-			usart_print_p(PSTR(" : "));
+			serial_print_p(PSTR("\nlen="));
+			serial_u8(mem->len);
+			serial_print_p(PSTR(" : "));
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
 			     c < mem->buffer + mem->len; c++) {
-				usart_transmit(*c);
+				serial_transmit(*c);
 			}
 		}
 		free_in(mem);
@@ -129,7 +129,7 @@ void consumer(void *context)
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 

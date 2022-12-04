@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -46,7 +46,7 @@ K_THREAD_DEFINE(th2, thread2, 0x100, K_PREEMPTIVE, NULL, 'A');
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -56,9 +56,9 @@ int main(void)
 
 	for (;;) {
 		irq_disable();
-		usart_print_p(PSTR("MAIN : "));
-		usart_u16(counter);
-		usart_transmit('\n');
+		serial_print_p(PSTR("MAIN : "));
+		serial_u16(counter);
+		serial_transmit('\n');
 		irq_enable();
 
 		k_sleep(K_MSEC(1000));
@@ -82,9 +82,9 @@ void work_handler(struct k_work *work)
 {
 	k_sleep(K_MSEC(200));
 
-	usart_print_p(PSTR("WORKQUEUE : "));
-	usart_u16(counter2);
-	usart_transmit('\n');
+	serial_print_p(PSTR("WORKQUEUE : "));
+	serial_u16(counter2);
+	serial_transmit('\n');
 }
 
 void thread2(void *context)

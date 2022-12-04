@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <util/delay.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
@@ -23,7 +23,7 @@
 int main(void)
 {
 	static uint32_t counter = 0;
-	usart_init();
+	serial_init();
 
 	irq_enable();
 

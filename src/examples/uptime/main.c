@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -20,7 +20,7 @@ K_TIMER_DEFINE(mstimer, timer_handler, K_MSEC(1000), 1000);
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 

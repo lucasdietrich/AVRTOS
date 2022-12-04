@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "uart.h"
+#include "serial.h"
 
 #include <avrtos/drivers/usart.h>
 #include <avr/pgmspace.h>
 
 #define USART_DEVICE USART0_DEVICE
 
-void usart_init()
+void serial_init()
 {
 	/* UART initialisation */
 	const struct usart_config usart_config = {
@@ -24,18 +24,18 @@ void usart_init()
 		.databits = USART_DATA_BITS_8,
 		.speed_mode = USART_SPEED_MODE_NORMAL
 	};
-	usart_ll_drv_init(USART_DEVICE, &usart_config);
+	ll_usart_init(USART_DEVICE, &usart_config);
 }
 
-void usart_transmit(char data)
+void serial_transmit(char data)
 {
-	usart_ll_drv_sync_putc(USART_DEVICE, data);
+	ll_usart_sync_putc(USART_DEVICE, data);
 }
 
-void usart_send(const char *buffer, size_t len)
+void serial_send(const char *buffer, size_t len)
 {
         for (uint_fast8_t i = 0; i < len; i++) {
-                usart_transmit(buffer[i]);
+                serial_transmit(buffer[i]);
         }
 }
 
@@ -44,23 +44,23 @@ static char figure2hex(uint8_t value)
 	return (value < 10) ? value + '0' : value + 'A' - 10;
 }
 
-void usart_u8(const uint8_t val)
+void serial_u8(const uint8_t val)
 {
         const char hundred = figure2hex(val / 100);
         const char ten = figure2hex((val / 10) % 10);
         const char unit = figure2hex(val % 10);
 
         if (val >= 100) {
-                usart_transmit(hundred);
+                serial_transmit(hundred);
         }
         if (val >= 10) {
-                usart_transmit(ten);
+                serial_transmit(ten);
         }
 
-        usart_transmit(unit);
+        serial_transmit(unit);
 }
 
-void  usart_u16(uint16_t val)
+void  serial_u16(uint16_t val)
 {
         char digits[5];
 
@@ -78,79 +78,79 @@ void  usart_u16(uint16_t val)
                 }
         }
 
-        usart_send(&digits[first_digit], 5 - first_digit);
+        serial_send(&digits[first_digit], 5 - first_digit);
 }
 
-void usart_s8(const int8_t val)
+void serial_s8(const int8_t val)
 {
         uint8_t u8_val;
 
         if (val == 0) {
-                usart_transmit('0');
+                serial_transmit('0');
 
                 return;
         } else if (val < 0) {
                 u8_val = (uint8_t)(-val);
-                usart_transmit('-');
+                serial_transmit('-');
         } else {
                 u8_val = (uint8_t)(val);
         }
-        usart_u8(u8_val);
+        serial_u8(u8_val);
 }
 
-void usart_hex(const uint8_t val)
+void serial_hex(const uint8_t val)
 {
         const char high = figure2hex(val >> 4);
         const char low = figure2hex(val & 0xF);
 
-        usart_transmit(high);
-        usart_transmit(low);
+        serial_transmit(high);
+        serial_transmit(low);
 }
 
-void usart_hex16(const uint16_t val)
+void serial_hex16(const uint16_t val)
 {
-        usart_hex((uint8_t)(val >> 8));
-        usart_hex((uint8_t)val);
+        serial_hex((uint8_t)(val >> 8));
+        serial_hex((uint8_t)val);
 }
 
-void usart_send_hex(const uint8_t *buffer, size_t len)
+void serial_send_hex(const uint8_t *buffer, size_t len)
 {
         for (uint_fast8_t i = 0; i < len; i++) {
-                usart_hex(buffer[i]);
+                serial_hex(buffer[i]);
 
                 if (0xF == (i & 0xF)) {
-                        usart_transmit('\n'); // EOL every 16 chars
+                        serial_transmit('\n'); // EOL every 16 chars
                 } else {
-                        usart_transmit(' ');
+                        serial_transmit(' ');
                 }
         }
 }
 
-void usart_print(const char *text)
+void serial_print(const char *text)
 {
-        usart_send(text, strlen(text));
+        serial_send(text, strlen(text));
 }
 
-void usart_printl(const char *text)
+void serial_printl(const char *text)
 {
-        usart_print(text);
-        usart_transmit('\n');
+        serial_print(text);
+        serial_transmit('\n');
 }
 
-void usart_send_p(const char *buffer, size_t len)
+void serial_send_p(const char *buffer, size_t len)
 {
         for (uint_fast16_t i = 0; i < len; i++) {
-                usart_transmit(pgm_read_byte(&buffer[i]));
+                serial_transmit(pgm_read_byte(&buffer[i]));
         }
 }
 
-void usart_print_p(const char *text)
+void serial_print_p(const char *text)
 {
-        usart_send_p(text, strlen_P(text));
+        serial_send_p(text, strlen_P(text));
 }
 
-void usart_printl_p(const char *text)
+void serial_printl_p(const char *text)
 {
-        usart_print_p(text);
-        usart_transmit('\n');
+        serial_print_p(text);
+        serial_transmit('\n');
 }

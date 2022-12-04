@@ -8,25 +8,25 @@
 
 void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item))
 {
-        usart_transmit('|');
+        serial_transmit('|');
         while (root != NULL) {
-                usart_print_p(PSTR(" - "));
+                serial_print_p(PSTR(" - "));
                 qitem_printer(root);
                 root = root->next;
         }
-        usart_transmit('\n');
+        serial_transmit('\n');
 }
 
 void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item))
 {
         struct qitem *item = oref->head;
-        usart_print_p(PSTR("[H]"));
+        serial_print_p(PSTR("[H]"));
         while (item != NULL) {
-                usart_print_p(PSTR(" > "));
+                serial_print_p(PSTR(" > "));
                 qitem_printer(item);
                 item = item->next;
         }
-        usart_printl_p(PSTR(" > [T]"));
+        serial_printl_p(PSTR(" > [T]"));
 }
 
 //
@@ -34,33 +34,33 @@ void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item))
 //
 void print_tqueue(struct titem *root, void (*titem_printer)(struct titem *item))
 {
-        usart_print_p(PSTR("| "));
+        serial_print_p(PSTR("| "));
         struct titem *current = root;
         while (current != NULL) {
-                usart_print_p(PSTR("- "));
+                serial_print_p(PSTR("- "));
                 titem_printer(current);
-                usart_transmit('(');
-                usart_u16(current->delay_shift);
-                usart_transmit(')');
+                serial_transmit('(');
+                serial_u16(current->delay_shift);
+                serial_transmit(')');
 
                 current = current->next;
         }
-        usart_transmit('\n');
+        serial_transmit('\n');
 }
 
 void print_dlist(struct ditem *list, void (*ditem_printer)(struct ditem *item))
 {
 	struct ditem *tmp, *node;
 
-	usart_hex16((uint16_t) list);
+	serial_hex16((uint16_t) list);
 
 	DLIST_FOREACH_SAFE(list, tmp, node) {
-		usart_print_p(PSTR(" - "));
+		serial_print_p(PSTR(" - "));
 		ditem_printer(node);
 		(void) tmp;
 	}
 
-	usart_print_p(PSTR(" - "));
-	usart_hex16((uint16_t) list);
-	usart_transmit('\n');
+	serial_print_p(PSTR(" - "));
+	serial_hex16((uint16_t) list);
+	serial_transmit('\n');
 }

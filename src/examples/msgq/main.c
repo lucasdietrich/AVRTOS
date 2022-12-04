@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -53,18 +53,18 @@ void writer(struct k_msgq *msgq)
 		(*(uint16_t *)buf)++;
 
 		ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
-		usart_transmit(_current->symbol);
+		serial_transmit(_current->symbol);
 
 		if (ret == 0) {
-			usart_transmit(' ');
-			usart_u16(*(uint16_t *)buf);
-			usart_transmit('\n');
+			serial_transmit(' ');
+			serial_u16(*(uint16_t *)buf);
+			serial_transmit('\n');
 
 			k_sleep(K_MSEC(WRITER_DELAY));
 		} else if (ret == -ECANCELED) {
-			usart_print_p(PSTR(" canceled\n"));
+			serial_print_p(PSTR(" canceled\n"));
 		} else {
-			usart_print_p(PSTR(" !\n"));
+			serial_print_p(PSTR(" !\n"));
 		}
 	}
 }
@@ -76,18 +76,18 @@ void reader(struct k_msgq *msgq)
 
 	for (;;) {
 		ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
-		usart_transmit(_current->symbol);
+		serial_transmit(_current->symbol);
 		if (ret == 0) {
 
-			usart_transmit(' ');
-			usart_u16(*(uint16_t *)buf);
-			usart_transmit('\n');
+			serial_transmit(' ');
+			serial_u16(*(uint16_t *)buf);
+			serial_transmit('\n');
 
 			k_sleep(K_MSEC(READER_DELAY));
 		} else if (ret == -ECANCELED) {
-			usart_print_p(PSTR(" canceled\n"));
+			serial_print_p(PSTR(" canceled\n"));
 		} else {
-			usart_print_p(PSTR(" !\n"));
+			serial_print_p(PSTR(" !\n"));
 		}
 	}
 }
@@ -97,7 +97,7 @@ int main(void)
 	/* interrupts are disabled in this thread */
 
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 

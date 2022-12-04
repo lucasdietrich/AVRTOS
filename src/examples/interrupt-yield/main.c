@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -38,7 +38,7 @@ static uint8_t usart_read_rx(void)
 	uint8_t resl = UDR0;
 
 	if (status & ((1 << FE0) | (1 << DOR0) | (1 << UPE0))) {
-		usart_transmit('x');
+		serial_transmit('x');
 		resl = 0;
 	}
 
@@ -63,14 +63,14 @@ ISR(USART0_RX_vect)
 		k_fifo_put(&myfifo, mem);
 	} else {
 	  /* no memory slab available */
-		usart_transmit('X');
+		serial_transmit('X');
 	}
 }
 
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -87,9 +87,9 @@ void waiting_thread(void *p)
 	while (1) {
 		void *mem = k_fifo_get(&myfifo, K_SECONDS(5));
 		if (mem != NULL) {
-			usart_print_p(PSTR("Got a letter from the UART : "));
-			usart_transmit(*(char *)(mem + 2u));
-			usart_transmit('\n');
+			serial_print_p(PSTR("Got a letter from the UART : "));
+			serial_transmit(*(char *)(mem + 2u));
+			serial_transmit('\n');
 
 			/* This delay emulates a delay in the process of the input letter.
 			 * If you send letters faster than you process them, there will be
@@ -98,7 +98,7 @@ void waiting_thread(void *p)
 
 			k_mem_slab_free(&myslab, mem);
 		} else {
-			usart_printl_p(PSTR("Didn't get a letter from the UART in time."));
+			serial_printl_p(PSTR("Didn't get a letter from the UART in time."));
 		}
 	}
 }

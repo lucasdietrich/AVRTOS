@@ -6,7 +6,7 @@
 
 #include "fault.h"
 
-#include "misc/uart.h"
+#include "misc/serial.h"
 
 #include <avr/pgmspace.h>
 
@@ -14,11 +14,11 @@ void __fault(uint8_t reason)
 {
 	cli();
 
-	usart_print_p(PSTR("***** Kernel Fault *****"));
-	usart_print_p(PSTR("\r\nreason="));
-	usart_hex(reason);
-	usart_print_p(PSTR("\tth: 0x"));
-	usart_hex16((const uint16_t) _current);
+	serial_print_p(PSTR("***** Kernel Fault *****"));
+	serial_print_p(PSTR("\r\nreason="));
+	serial_hex(reason);
+	serial_print_p(PSTR("\tth: 0x"));
+	serial_hex16((const uint16_t) _current);
 
 	asm("call __debug");
 

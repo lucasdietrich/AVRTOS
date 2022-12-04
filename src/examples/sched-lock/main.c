@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -31,7 +31,7 @@ K_THREAD_DEFINE(coop, thread_coop, 0x100, K_COOPERATIVE, NULL, 'C');
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -47,11 +47,11 @@ int main(void)
 	    #else
 		  k_sched_lock();
 	    #endif
-		  usart_printl_p(PSTR("k_sched_lock()"));
+		  serial_printl_p(PSTR("k_sched_lock()"));
 
 		  _delay_ms(500);
 
-		  usart_printl_p(PSTR("k_sched_unlock()"));
+		  serial_printl_p(PSTR("k_sched_unlock()"));
 
 	    #if USE_SCHED_LOCK_TRICK == 0
 		  k_sched_unlock();
@@ -66,12 +66,12 @@ int main(void)
 void thread_blink(void *p)
 {
 	while (1) {
-		usart_transmit('o');
+		serial_transmit('o');
 		led_on();
 
 		k_sleep(K_MSEC(100));
 
-		usart_transmit('f');
+		serial_transmit('f');
 		led_off();
 
 		k_sleep(K_MSEC(100));
@@ -83,11 +83,11 @@ void thread_coop(void *p)
 	while (1) {
 		k_sleep(K_MSEC(5000));
 
-		usart_printl_p(PSTR("<<<< full cooperative thread"));
+		serial_printl_p(PSTR("<<<< full cooperative thread"));
 
 		_delay_ms(1000);
 
-		usart_printl_p(PSTR(">>>>\n"));
+		serial_printl_p(PSTR(">>>>\n"));
 	}
 }
 

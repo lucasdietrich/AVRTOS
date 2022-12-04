@@ -6,7 +6,7 @@
 
 #include <avr/pgmspace.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/kernel.h>
 
 /* Minimum footprint (Release for ATmega2560)
@@ -16,10 +16,10 @@
 */
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	for (;;) {
-		usart_print_p(PSTR("Hello\n"));
+		serial_print_p(PSTR("Hello\n"));
 		k_wait(K_SECONDS(1));
 	}
 }

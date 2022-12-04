@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -36,10 +36,10 @@ struct block
 void block_read(uint8_t *buffer, uint16_t size)
 {
 	for (uint16_t i = 0u; i < size; i++) {
-		usart_hex(buffer[i]);
-		usart_transmit(' ');
+		serial_hex(buffer[i]);
+		serial_transmit(' ');
 	}
-	usart_transmit('\n');
+	serial_transmit('\n');
 }
 
 void block_write(uint8_t *buffer, uint16_t size, uint8_t symb)
@@ -68,7 +68,7 @@ struct k_mem_slab myslab;
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 #if !MEM_SLAB_COMPILATION_TIME
 	k_mem_slab_init(&myslab, buffer, BLOCK_SIZE, BLOCK_COUNT);
@@ -84,9 +84,9 @@ int main(void)
 		int8_t ret = k_mem_slab_alloc(&myslab, (void **)&mem, K_FOREVER);
 		if (ret == 0) {
 			k_sched_lock();
-			usart_print_p(PSTR("Allocated : "));
-			usart_hex16((uint16_t)mem);
-			usart_transmit('\n');
+			serial_print_p(PSTR("Allocated : "));
+			serial_hex16((uint16_t)mem);
+			serial_transmit('\n');
 			k_sched_unlock();
 
 			block_write(mem->data, sizeof(mem->data), x++);
@@ -101,9 +101,9 @@ void consumer_thread(void *context)
 		struct block *mem = (struct block *)k_fifo_get(&fifo, K_FOREVER);
 		if (mem != NULL) {
 			k_sched_lock();
-			usart_print_p(PSTR("Received mem slab at address "));
-			usart_hex16((uint16_t)mem);
-			usart_print_p(PSTR(" data = "));
+			serial_print_p(PSTR("Received mem slab at address "));
+			serial_hex16((uint16_t)mem);
+			serial_print_p(PSTR(" data = "));
 			block_read(mem->data, sizeof(mem->data));
 			k_sched_unlock();
 

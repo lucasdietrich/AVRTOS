@@ -26,7 +26,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -46,12 +46,12 @@ K_THREAD_DEFINE(task2, thread_processing, 0x100, K_COOPERATIVE, NULL, 'B');
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
 #if KERNEL_DEBUG_PREEMPT_UART
-	usart_printl_p(PSTR(" Send a char over the UART to switch thread !"));
+	serial_printl_p(PSTR(" Send a char over the UART to switch thread !"));
 #endif
 
 	k_sleep(K_FOREVER);
@@ -80,10 +80,10 @@ void thread_processing(void *p)
 
 		if ((counter & 0xFFFFF) == 0) {
 			k_sched_lock();
-			usart_transmit(_current->symbol);
-			usart_print_p(PSTR(": "));
-			usart_hex16(counter >> 16);
-			usart_print_p(PSTR("0000\n"));
+			serial_transmit(_current->symbol);
+			serial_print_p(PSTR(": "));
+			serial_hex16(counter >> 16);
+			serial_print_p(PSTR("0000\n"));
 			k_sched_unlock();
 		}
 	}

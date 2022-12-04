@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -31,7 +31,7 @@ K_MUTEX_DEFINE(mymutex);
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -52,12 +52,12 @@ void thread(void *p)
 {
 	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5));  // change this timeout
 
-	usart_transmit(_current->symbol);
+	serial_transmit(_current->symbol);
 
 	if (lock) {
-		usart_printl_p(PSTR(" : Didn't get the mutex ..."));
+		serial_printl_p(PSTR(" : Didn't get the mutex ..."));
 	} else {
-		usart_printl_p(PSTR(" : Got the mutex !"));
+		serial_printl_p(PSTR(" : Got the mutex !"));
 
 		k_sleep(K_SECONDS(1));
 
@@ -71,12 +71,12 @@ void threadp(void *p)
 {
 	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9));  // change this timeout
 
-	usart_transmit(_current->symbol);
+	serial_transmit(_current->symbol);
 
 	if (lock) {
-		usart_printl_p(PSTR(" : Didn't get the mutex ..."));
+		serial_printl_p(PSTR(" : Didn't get the mutex ..."));
 	} else {
-		usart_printl_p(PSTR(" : Got the mutex !"));
+		serial_printl_p(PSTR(" : Got the mutex !"));
 
 		k_sleep(K_SECONDS(1));
 

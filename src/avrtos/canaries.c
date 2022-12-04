@@ -36,31 +36,31 @@ void *_k_stack_canaries(struct k_thread *th)
 
 /*___________________________________________________________________________*/
 
-#include "misc/uart.h"
+#include "misc/serial.h"
 
 void print_stack_canaries(struct k_thread *th)
 {
         uint8_t *addr = (uint8_t *)_k_stack_canaries(th);
         size_t canaries_found = addr - (uint8_t *)K_THREAD_STACK_START_USABLE(th);
 
-        usart_transmit('[');
-        usart_transmit(th->symbol);
-        usart_print_p(PSTR("] CANARIES until @"));
-        usart_hex16((uint16_t)addr);
-        usart_print_p(PSTR(" [found "));
-        usart_u16(canaries_found);
-        usart_print_p(PSTR("], MAX usage = "));
-        usart_u16(K_STACK_SIZE_USABLE(th->stack.size) - canaries_found);
-        usart_print_p(PSTR(" / "));
-        usart_u16(K_STACK_SIZE_USABLE(th->stack.size));
+        serial_transmit('[');
+        serial_transmit(th->symbol);
+        serial_print_p(PSTR("] CANARIES until @"));
+        serial_hex16((uint16_t)addr);
+        serial_print_p(PSTR(" [found "));
+        serial_u16(canaries_found);
+        serial_print_p(PSTR("], MAX usage = "));
+        serial_u16(K_STACK_SIZE_USABLE(th->stack.size) - canaries_found);
+        serial_print_p(PSTR(" / "));
+        serial_u16(K_STACK_SIZE_USABLE(th->stack.size));
 
 #if THREAD_STACK_SENTINEL
-	usart_print_p(PSTR(" + "));
-	usart_u8(THREAD_STACK_SENTINEL_SIZE);
-	usart_print_p(PSTR(" (sentinel)"));
+	serial_print_p(PSTR(" + "));
+	serial_u8(THREAD_STACK_SENTINEL_SIZE);
+	serial_print_p(PSTR(" (sentinel)"));
 #endif /* THREAD_STACK_SENTINEL */
 
-        usart_transmit('\n');
+        serial_transmit('\n');
 }
 
 void print_current_canaries(void)
@@ -70,7 +70,7 @@ void print_current_canaries(void)
 
 void dump_stack_canaries(void)
 {
-	usart_transmit('\n');
+	serial_transmit('\n');
 	
         for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
                 print_stack_canaries(&(&__k_threads_start)[i]);

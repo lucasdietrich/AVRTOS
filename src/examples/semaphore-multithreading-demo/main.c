@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -46,7 +46,7 @@ K_THREAD_DEFINE(waiter5, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'E');
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -57,7 +57,7 @@ int main(void)
 
 		k_sched_lock();
 #if !KERNEL_SCHEDULER_DEBUG
-		usart_print_p(PSTR("M: giving a semaphore "));
+		serial_print_p(PSTR("M: giving a semaphore "));
 #endif
     // k_sem_debug(&mysem);
 		k_sched_unlock();
@@ -74,14 +74,14 @@ void waiter_entry(void *context)
 		if (dbg_sem == 0) {
 			k_sched_lock();
 #if !KERNEL_SCHEDULER_DEBUG
-			usart_transmit(_current->symbol);
-			usart_printl_p(PSTR(": got a semaphore !"));
+			serial_transmit(_current->symbol);
+			serial_printl_p(PSTR(": got a semaphore !"));
 #endif
 			k_sched_unlock();
 
 			k_sleep(K_MSEC(PERIOD_SEM_TAKE));
 		} else {
-			usart_printl_p(PSTR("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM"));
+			serial_printl_p(PSTR("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM"));
 		}
 	}
 }

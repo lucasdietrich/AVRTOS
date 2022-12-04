@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -37,12 +37,12 @@ ISR(TIMER1_COMPA_vect)
 	} else {
 		LED_PORT &= ~_BV(LED_PIN);
 	}
-	usart_transmit('1');
+	serial_transmit('1');
 }
 
 ISR(TIMER2_COMPA_vect)
 {
-	usart_transmit('2');
+	serial_transmit('2');
 }
 
 #if defined(__AVR_ATmega2560__)
@@ -52,13 +52,13 @@ ISR(TIMER4_OVF_vect)
 	ll_timer16_set_tcnt(TIMER4_DEVICE,
 			    TIMER_GET_MAX_COUNTER(4) + 1LU -
 			    TIMER_CALC_COUNTER_VALUE(250U * USEC_PER_MSEC, 1024));
-	usart_transmit('4');
+	serial_transmit('4');
 }
 #endif
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	/* Initialize LED */
 	LED_DDR |= _BV(LED_PIN);

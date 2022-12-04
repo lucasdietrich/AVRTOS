@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -45,8 +45,8 @@ void task_handler(struct k_work *self)
 	k_sleep(K_MSEC((k_delta_t)task->input));
 
 	k_sched_lock();
-	usart_hex16((uint16_t)self);
-	usart_printl_p(PSTR(" finished"));
+	serial_hex16((uint16_t)self);
+	serial_printl_p(PSTR(" finished"));
 	k_sched_unlock();
 
 	k_sem_give(&task->sem);
@@ -60,7 +60,7 @@ struct task_t tasks[TASKS_COUNT];
 int main(void)
 {
 	led_init();
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 
@@ -80,8 +80,8 @@ void tasks_generator(void *p)
 	uint8_t i = 0;
 	while (1) {
 		if (k_sem_take(&tasks[i].sem, K_NO_WAIT) == 0) {
-			usart_hex16((uint16_t)&tasks[i]);
-			usart_printl_p(PSTR(" submitted"));
+			serial_hex16((uint16_t)&tasks[i]);
+			serial_printl_p(PSTR(" submitted"));
 			k_work_submit(&workqueue, &tasks[i].work);
 		}
 

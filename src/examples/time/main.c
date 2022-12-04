@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/misc/uart.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avrtos/kernel.h>
@@ -22,7 +22,7 @@ K_THREAD_DEFINE(t2, processing, 0x100, K_PREEMPTIVE, NULL, '1');
 
 int main(void)
 {
-	usart_init();
+	serial_init();
 
 	k_thread_dump_all();
 

@@ -97,7 +97,7 @@ TIMERn_COMPA_vect:
 
 #if KERNEL_DEBUG
 	ldi r24, 0x2e           ; '.'
-	call usart_transmit
+	call serial_transmit
 #endif
 ; KERNEL_DEBUG
 
@@ -130,7 +130,7 @@ TIMERn_COMPA_vect:
 __sched_locked:
 #if KERNEL_PREEMPTIVE_THREADS && KERNEL_SCHEDULER_DEBUG
 	ldi r24, 0x63	    ; 'c'
-	call usart_transmit
+	call serial_transmit
 #endif
 
 __intctx_restore:
@@ -334,7 +334,7 @@ USART0_RX_vect:
 	push	r31
 
 	lds r24, UDR0
-	call usart_transmit
+	call serial_transmit
 
 	ldi r24, pm_lo8(__intctx_restore)
 	ldi r25, pm_hi8(__intctx_restore)
