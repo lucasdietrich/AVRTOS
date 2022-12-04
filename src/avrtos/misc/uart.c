@@ -6,40 +6,30 @@
 
 #include "uart.h"
 
+#include <avrtos/drivers/usart.h>
 #include <avr/pgmspace.h>
 
-inline void _usart_init(const uint16_t baudrate_ubrr)
-{
-  // set baud rate (function of oscillator frequency)
-        UBRR0H = (uint8_t)(baudrate_ubrr >> 8) & 0xF;
-        UBRR0L = (uint8_t)baudrate_ubrr;
-
-        // enable receiver and transmitter
-        UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (0 << RXCIE0);
-
-        // USART Control and Status Register n C
-        //  - set Asynchronous USART : UMSEL01 = UMSEL00 = 0
-        //  - 8 bit format : (3 << UCSZ00)
-        //  - configure stop 1 bit : (0<<USBS0)
-        //  - parity none (0 << UPM01) (if EVEN .pio monitor_flags = --parity E) : 
-        // https://docs.platformio.org/en/latest/core/userguide/device/cmd_monitor.html#cmd-device-monitor
-        UCSR0C = (0 << UPM01) | (0 << USBS0) | (1 << UCSZ01) | (1 << UCSZ00);
-}
+#define USART_DEVICE USART0_DEVICE
 
 void usart_init()
 {
-        _usart_init(UBRR);
+	/* UART initialisation */
+	const struct usart_config usart_config = {
+		.baudrate = USART_BAUD_500000,
+		.receiver = 1u,
+		.transmitter = 1u,
+		.mode = USART_MODE_ASYNCHRONOUS,
+		.parity = USART_PARITY_NONE,
+		.stopbits = USART_STOP_BITS_1,
+		.databits = USART_DATA_BITS_8,
+		.speed_mode = USART_SPEED_MODE_NORMAL
+	};
+	usart_ll_drv_init(USART_DEVICE, &usart_config);
 }
 
 void usart_transmit(char data)
 {
-  // see datasheet : wait for empty transmit buffer
-  // - UCSR0A – USART Control and Status Register n A
-  // - UDRE0: USART Data Register Empty
-        while (!(UCSR0A & (1 << UDRE0))); // while flag UDRE0 of UCSR0A is not set
-
-        // put data into buffer
-        UDR0 = data;
+	usart_ll_drv_sync_putc(USART_DEVICE, data);
 }
 
 void usart_send(const char *buffer, size_t len)

@@ -16,38 +16,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// see datasheet
-// adviced (for 16Mhz): 9600, 38400, 76800, 250k, 500k, 1M
-// not recommended (for 16Mhz) (error rate) : 115200, 230400, 57.6
-
-#define BAUD_9600       9600
-#define BAUD_19200      19200
-#define BAUD_14400      14400
-#define BAUD_19200      19200
-#define BAUD_28800      28800
-#define BAUD_38400      38400
-#define BAUD_57600      57600
-#define BAUD_76800      76800
-#define BAUD_115200     115200
-#define BAUD_230400     230400 
-#define BAUD_250000     250000
-#define BAUD_500000     500000
-#define BAUD_1000000    1000000
-
-#define UBRR_BAUDRATE(baudrate) (((F_CPU >> 4) / baudrate) - 1)
-
-#define UBRR UBRR_BAUDRATE(BAUD_500000)
+	
 
 /**
- * @brief Initiliaze the USART with the baudrate specified as argument
- * 
- * @param baudrate_ubrr 
- */
-void _usart_init(const uint16_t baudrate_ubrr);
-
-/**
- * @brief Initialize the USART at 115200 bauds/s
+ * @brief Initialize the USART at 500000 bauds/s
  */
 void usart_init(void);
 

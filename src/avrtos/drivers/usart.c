@@ -139,7 +139,6 @@ void usart_ll_drv_sync_putc(UART_Device *dev, char c)
 	dev->UDRn = c;
 }
 
-
 int usart_ll_drv_sync_getc(UART_Device *dev)
 {
 	int ret = -EAGAIN;
