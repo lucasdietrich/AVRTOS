@@ -176,7 +176,7 @@ int main(void)
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
-	usart_init(USART1_DEVICE, &cfg);
+	usart_drv_init(USART1_DEVICE, &cfg);
 
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));
