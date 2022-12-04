@@ -1,15 +1,13 @@
 # Unix Makefiles or Ninja
 generator="Unix Makefiles"
-sample="isr-unpend"
 
-all: atmega328p build_all
+all: mega2560 build_all
 
 mega2560:
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/avr6-atmega2560.cmake \
 		-DCMAKE_GENERATOR=$(generator) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-		-DENABLE_SINGLE_SAMPLE=$(sample)
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 build_all:
 	make -C build --no-print-directory

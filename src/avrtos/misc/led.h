@@ -7,33 +7,36 @@
 #ifndef _LED_H
 #define _LED_H
 
-#include <avr/io.h>
-
-#include "board.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Init LED on PORTB IO 5
+ * @brief Init LED
  */
 void led_init(void);
 
 /**
- * @brief Set LED on PORTB IO 5 to ON
+ * @brief Set LED
  */
 void led_on(void);
 
 /**
- * @brief Set LED on PORTB IO 5 to OFF
+ * @brief Set LED
  */
 void led_off(void);
 
 /**
- * @brief Set LED on PORTB IO 5 to state
+ * @brief Set LED 
  */
 void led_set(uint8_t state);
+
+/**
+ * @brief Toggle LED
+ */
+void led_toggle(void);
 
 #ifdef __cplusplus
 }
