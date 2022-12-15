@@ -42,9 +42,10 @@ bool k_verify_stack_sentinel(struct k_thread *th)
 	}
 #endif
 
-	uint8_t *const stack = K_STACK_START(th->stack.end, th->stack.size);
-	for (uint8_t *addr = stack;
-	     addr < stack + THREAD_STACK_SENTINEL_SIZE; addr++) {
+	uint8_t *const stack_sent = K_STACK_START(th->stack.end, th->stack.size);
+	for (uint8_t *addr = stack_sent;
+	     addr < stack_sent + THREAD_STACK_SENTINEL_SIZE;
+	     addr++) {
 		if (*addr != THREAD_STACK_SENTINEL_SYMBOL) {
 			return false;
 		}

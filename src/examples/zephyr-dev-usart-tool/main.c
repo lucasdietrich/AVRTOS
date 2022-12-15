@@ -90,7 +90,7 @@ int main(void)
 
 	serial_init();
 
-	usart_drv_init(USART1_DEVICE, &usart_ipc_cfg);
+	usart_init(USART1_DEVICE, &usart_ipc_cfg);
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 
 	// usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));

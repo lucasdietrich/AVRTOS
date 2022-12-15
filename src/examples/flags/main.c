@@ -19,7 +19,7 @@ K_THREAD_DEFINE(thread1, thread, 128u, K_PREEMPTIVE, NULL, 't');
 ISR(USART0_RX_vect)
 {
 	const char chr = USART0_DEVICE->UDRn;
-	ll_usart_drv_sync_putc(USART0_DEVICE, chr);
+	ll_usart_sync_putc(USART0_DEVICE, chr);
 
 	uint8_t notify = 0u;
 
@@ -71,7 +71,7 @@ int main(void)
 		.databits = USART_DATA_BITS_8,
 		.speed_mode = USART_SPEED_MODE_NORMAL
 	};
-	ll_usart_drv_init(USART0_DEVICE, &usart_config);
+	ll_usart_init(USART0_DEVICE, &usart_config);
 	ll_usart_enable_rx_isr(USART0_DEVICE);
 
 	for (;;) {

@@ -34,22 +34,26 @@ typedef struct {
 	__IO uint8_t _reserved2;
 } UART_Device;
 
+#define AVR_USARTn_BASE(n) ((UART_Device*) (AVR_USART_BASE_ADDR + (n)*sizeof(UART_Device)))
+#define AVR_USARTn_INDEX(usart_dev) (usart_dev - AVR_USARTn_BASE(0))
 
-/* TODO make universal */
-#if defined(__AVR_ATmega328P__)
-#	define ARCH_USART_COUNT 1
-#elif defined(__AVR_ATmega328PB__)
-#	define ARCH_USART_COUNT 2
-#elif defined(__AVR_ATmega2560__)
+#if defined (UDR5)
+#	define ARCH_USART_COUNT 6
+#elif defined (UDR4)
+#	define ARCH_USART_COUNT 5
+#elif defined (UDR3)
 #	define ARCH_USART_COUNT 4
+#elif defined (UDR2)
+#	define ARCH_USART_COUNT 3
+#elif defined (UDR1)
+#	define ARCH_USART_COUNT 2
+#elif defined (UDR0)
+#	define ARCH_USART_COUNT 1
 #else
 #	warning "Unsupported MCU"
+#	define ARCH_USART_COUNT 0
 #endif
 
-
-#define AVR_USARTn_BASE(n) ((UART_Device*) (AVR_USART_BASE_ADDR + (n)*sizeof(UART_Device)))
-
-#define AVR_USARTn_INDEX(usart_dev) (usart_dev - AVR_USARTn_BASE(0))
 
 #if ARCH_USART_COUNT > 0
 #	define USART0_DEVICE AVR_USARTn_BASE(0)
@@ -176,17 +180,17 @@ struct usart_config
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
 
 // drivers API
-K_NOINLINE void ll_usart_drv_init(UART_Device *dev,
+K_NOINLINE void ll_usart_init(UART_Device *dev,
 				  const struct usart_config *config);
 
-K_NOINLINE int usart_drv_init(UART_Device *dev,
+K_NOINLINE int usart_init(UART_Device *dev,
 			      const struct usart_config *config);
 
-K_NOINLINE int usart_drv_deinit(UART_Device *dev);
+K_NOINLINE int usart_deinit(UART_Device *dev);
 
-K_NOINLINE void ll_usart_drv_sync_putc(UART_Device *dev, char c);
+K_NOINLINE void ll_usart_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE int ll_usart_drv_sync_getc(UART_Device *dev);
+K_NOINLINE int ll_usart_sync_getc(UART_Device *dev);
 
 static inline void ll_usart_enable_rx_isr(UART_Device *dev)
 {
@@ -198,13 +202,13 @@ static inline void ll_usart_disable_rx_isr(UART_Device *dev)
 	CLR_BIT(dev->UCSRnB, BIT(RXCIEn));
 }
 
-K_NOINLINE int usart_drv_sync_putc(UART_Device *dev, char c);
+K_NOINLINE int usart_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE int usart_drv_getc(UART_Device *dev);
+K_NOINLINE int usart_getc(UART_Device *dev);
 
-K_NOINLINE void usart0_drv_sync_putc(char c);
+K_NOINLINE void usart0_sync_putc(char c);
 
-K_NOINLINE int usart0_drv_getc(void);
+K_NOINLINE int usart0_getc(void);
 
 // ASYNC API
 

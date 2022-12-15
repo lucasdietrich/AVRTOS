@@ -12,11 +12,6 @@
 
 void thread(void *p);
 
-// ISR(USART_RX_vect) {
-// 	char c = UDR0;
-// 	serial_transmit('n');
-// }
-
 
 K_THREAD_DEFINE(t1, thread, K_THREAD_STACK_MIN_SIZE + 0x100 - 237 - 2, K_PREEMPTIVE, NULL, '1');
 
@@ -24,16 +19,16 @@ int main(void)
 {
 	serial_init();
 
-	// UCSR0B = 1 << RXCIE0;
-
 	k_thread_dump_all();
+
+	uint32_t counter = 0u;
 
 	for (;;) {
 		bool success = k_verify_stack_sentinel(&t1);
 
 		k_show_uptime();
 
-		printf_P(PSTR("Sentinel status = %d\n"), success ? 1 : 0);
+		printf_P(PSTR("%lu: Sentinel status = %d\n"), counter++, success ? 1 : 0);
 
 		dump_stack_canaries();
 

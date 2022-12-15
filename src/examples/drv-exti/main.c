@@ -10,20 +10,20 @@
 
 ISR(INT0_vect) {
 	/* Generate signal on measurement line */
-	gpio_toggle_pin(GPIOB_DEVICE, PIN7);
+	gpio_pin_toggle(GPIOB_DEVICE, PIN7);
 
 	/* Generate a soft int on INT1 */
-	gpio_toggle_pin(GPIOD_DEVICE, PIN1);
+	gpio_pin_toggle(GPIOD_DEVICE, PIN1);
 }
 
 ISR(INT1_vect) {
 	/* Generate signal on measurement line */
-	gpio_toggle_pin(GPIOB_DEVICE, PIN6);
+	gpio_pin_toggle(GPIOB_DEVICE, PIN6);
 }
 
 ISR(PCINT2_vect) {
 	/* Generate signal on measurement line */
-	gpio_toggle_pin(GPIOB_DEVICE, PIN5);
+	gpio_pin_toggle(GPIOB_DEVICE, PIN5);
 }
 
 
@@ -34,10 +34,10 @@ int main(void)
 
 	/* Init measurements gpios */
 	gpio_init(GPIOD_DEVICE, 0xFF, 0x00);
-	gpio_set_pin_direction(GPIOD_DEVICE, PIN0, GPIO_OUTPUT);
-	gpio_write_pin_state(GPIOD_DEVICE, PIN0, STATE_LOW);
-	gpio_set_pin_direction(GPIOD_DEVICE, PIN1, GPIO_OUTPUT);
-	gpio_write_pin_state(GPIOD_DEVICE, PIN1, STATE_LOW);
+	gpio_pin_set_direction(GPIOD_DEVICE, PIN0, GPIO_OUTPUT);
+	gpio_pin_write_state(GPIOD_DEVICE, PIN0, STATE_LOW);
+	gpio_pin_set_direction(GPIOD_DEVICE, PIN1, GPIO_OUTPUT);
+	gpio_pin_write_state(GPIOD_DEVICE, PIN1, STATE_LOW);
 
 #if defined(GPIOH_DEVICE)
 	/* Unecessary, just to have clean signals on my lines */
@@ -69,7 +69,7 @@ int main(void)
 
 	for (;;) {
 		/* Generate a soft int on INT0 */
-		gpio_toggle_pin(GPIOD_DEVICE, PIN0);
+		gpio_pin_toggle(GPIOD_DEVICE, PIN0);
 		k_sleep(K_MSEC(1u));
 	}
 }

@@ -97,9 +97,9 @@ void _k_init_sysclock(void)
 	};
 
 #if IS_TIMER_INDEX_16BIT(KERNEL_SYSLOCK_HW_TIMER)
-	ll_timer16_drv_init(dev, KERNEL_SYSLOCK_HW_TIMER, &cfg);
+	ll_timer16_init(dev, KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #elif IS_TIMER_INDEX_8BIT(KERNEL_SYSLOCK_HW_TIMER)
-	ll_timer8_drv_init(dev, KERNEL_SYSLOCK_HW_TIMER, &cfg);
+	ll_timer8_init(dev, KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #else
 #	error "invalid timer type"
 #endif

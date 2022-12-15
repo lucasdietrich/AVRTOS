@@ -57,8 +57,8 @@ static void set_baudrate(UART_Device *dev,
 	dev->UBRRnL = (uint8_t)ubrr;
 }
 
-void ll_usart_drv_init(UART_Device *dev,
-		 const struct usart_config *config)
+void ll_usart_init(UART_Device *dev,
+		   const struct usart_config *config)
 {
 	/* set baudrate */
 	set_baudrate(dev, config->baudrate, config->speed_mode);
@@ -72,8 +72,8 @@ void ll_usart_drv_init(UART_Device *dev,
 
 #if DRIVERS_UART_ASYNC
 		/* enable interrupt */
-		SET_BIT(ucsrnb, BIT(RXCIEn));
-		SET_BIT(ucsrnb, BIT(TXCIEn));
+	SET_BIT(ucsrnb, BIT(RXCIEn));
+	SET_BIT(ucsrnb, BIT(TXCIEn));
 #endif
 
 	dev->UCSRnB = ucsrnb;
@@ -90,8 +90,8 @@ void ll_usart_drv_init(UART_Device *dev,
 	dev->UCSRnC = ucsrc;
 }
 
-int usart_drv_init(UART_Device *dev,
-		   const struct usart_config *config)
+int usart_init(UART_Device *dev,
+	       const struct usart_config *config)
 {
 	if ((dev == NULL) || (config == NULL)) {
 		return -EINVAL;
@@ -112,12 +112,12 @@ int usart_drv_init(UART_Device *dev,
 		return -EINVAL;
 	}
 
-	ll_usart_drv_init(dev, config);
+	ll_usart_init(dev, config);
 
 	return 0;
 }
 
-int usart_drv_deinit(UART_Device *dev)
+int usart_deinit(UART_Device *dev)
 {
 	if (dev == NULL) {
 		return -EINVAL;
@@ -130,7 +130,7 @@ int usart_drv_deinit(UART_Device *dev)
 	return 0;
 }
 
-void ll_usart_drv_sync_putc(UART_Device *dev, char c)
+void ll_usart_sync_putc(UART_Device *dev, char c)
 {
 	/* wait for empty transmit buffer */
 	while (!(dev->UCSRnA & BIT(UDREn)));
@@ -139,7 +139,7 @@ void ll_usart_drv_sync_putc(UART_Device *dev, char c)
 	dev->UDRn = c;
 }
 
-int ll_usart_drv_sync_getc(UART_Device *dev)
+int ll_usart_sync_getc(UART_Device *dev)
 {
 	int ret = -EAGAIN;
 
@@ -156,39 +156,39 @@ int ll_usart_drv_sync_getc(UART_Device *dev)
  * because of fetch IO address for the proper USART from flash.
  */
 
-int usart_drv_sync_putc(UART_Device *dev, char c)
+int usart_sync_putc(UART_Device *dev, char c)
 {
 	if (dev == NULL) {
 		return -EINVAL;
 	}
 
-	ll_usart_drv_sync_putc(dev, c);
+	ll_usart_sync_putc(dev, c);
 
 	return 0;
 }
 
-K_NOINLINE int usart_drv_getc(UART_Device *dev)
+K_NOINLINE int usart_getc(UART_Device *dev)
 {
 	if (dev == NULL) {
 		return -EINVAL;
 	}
 
-	return ll_usart_drv_sync_getc(dev);
+	return ll_usart_sync_getc(dev);
 }
 
 /* as fast as serial_transmit */
-void usart0_drv_sync_putc(char c)
+void usart0_sync_putc(char c)
 {
 	while (!(USART0_DEVICE->UCSRnA & BIT(UDREn)));
 	UDR0 = c;
 }
 
-K_NOINLINE int usart0_drv_getc(void)
+K_NOINLINE int usart0_getc(void)
 {
 	if (!(USART0_DEVICE->UCSRnA & BIT(RXCn))) {
 		return -EAGAIN;
 	}
-	
+
 	return UDR0;
 }
 

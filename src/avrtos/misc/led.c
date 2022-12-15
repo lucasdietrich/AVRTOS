@@ -25,20 +25,20 @@ void led_init(void)
 
 void led_on(void)
 {
-	gpio_write_pin_state(PORT, BUILTIN_LED_PIN, STATE_HIGH);
+	gpio_pin_write_state(PORT, BUILTIN_LED_PIN, STATE_HIGH);
 }
 
 void led_off(void)
 {
-	gpio_write_pin_state(PORT, BUILTIN_LED_PIN, STATE_LOW);
+	gpio_pin_write_state(PORT, BUILTIN_LED_PIN, STATE_LOW);
 }
 
 void led_set(uint8_t state)
 {
-	gpio_write_pin_state(PORT, BUILTIN_LED_PIN, state);
+	gpio_pin_write_state(PORT, BUILTIN_LED_PIN, state);
 }
 
 void led_toggle(void)
 {
-	gpio_toggle_pin(PORT, BUILTIN_LED_PIN);
+	gpio_pin_toggle(PORT, BUILTIN_LED_PIN);
 }

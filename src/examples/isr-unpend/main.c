@@ -36,10 +36,10 @@ int main(void)
 		.prescaler = TIMER_PRESCALER_1024,
 		.timsk = BIT(OCIEnA),
 	};
-	ll_timer16_drv_init(TIMER3_DEVICE, timer_get_index(TIMER3_DEVICE), &timer_cfg);
+	ll_timer16_init(TIMER3_DEVICE, timer_get_index(TIMER3_DEVICE), &timer_cfg);
 
 	const struct usart_config usart_cfg = USART_CONFIG_DEFAULT_500000();
-	ll_usart_drv_init(USART0_DEVICE, &usart_cfg);
+	ll_usart_init(USART0_DEVICE, &usart_cfg);
 
 	for (;;) {
 		k_sem_take(&sem, K_FOREVER);

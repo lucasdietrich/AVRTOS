@@ -27,7 +27,7 @@ void thread(void *arg)
 		if (chr >= 0) {
 			rcvd++;
 			
-			// ll_usart_drv_sync_putc(USART0_DEVICE, chr);
+			// ll_usart_sync_putc(USART0_DEVICE, chr);
 
 			if (rcvd % 100u == 0u) {
 				printf_P(PSTR("rcvd=%lu\n"), rcvd);
@@ -54,15 +54,15 @@ int main(void)
 		.databits = USART_DATA_BITS_8,
 		.speed_mode = USART_SPEED_MODE_NORMAL
 	};
-	ll_usart_drv_init(USART0_DEVICE, &usart_config);
+	ll_usart_init(USART0_DEVICE, &usart_config);
 	ll_usart_enable_rx_isr(USART0_DEVICE);
 
 	// for (;;) {
 	// 	const int chr = k_ring_pop(&ring);
 	// 	if (chr >= 0) {
-	// 		ll_usart_drv_sync_putc(USART0_DEVICE, chr);
+	// 		ll_usart_sync_putc(USART0_DEVICE, chr);
 	// 	} else {
-	// 		ll_usart_drv_sync_putc(USART0_DEVICE, '\n');
+	// 		ll_usart_sync_putc(USART0_DEVICE, '\n');
 	// 		k_sleep(K_MSEC(1000u));
 	// 	}
 	// }

@@ -1,29 +1,41 @@
-# Unix Makefiles or Ninja
-generator="Unix Makefiles"
+# "Unix Makefiles" or "Ninja"
+GENERATOR="Unix Makefiles"
 
-all: mega2560 build_all
+DEVICE=/dev/ttyACM0
+SINGLE_SAMPLE=shell
+TOOLCHAIN_FILE=cmake/avr6-atmega2560.cmake
+BAUDRATE=500000
+QEMU=OFF
 
-mega2560:
+all: single
+
+.PHONY: single
+
+multiple:
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/avr6-atmega2560.cmake \
-		-DCMAKE_GENERATOR=$(generator) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-build_all:
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+		-DCMAKE_GENERATOR=$(GENERATOR) \
+		-DPROG_DEV=$(DEVICE) \
+		-DQEMU=$(QEMU)
 	make -C build --no-print-directory
 
-atmega328p:
+single:
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \
-	-DCMAKE_TOOLCHAIN_FILE=cmake/avr5-atmega328p.cmake \
-	-DCMAKE_GENERATOR=$(generator) \
-	-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+		-DCMAKE_GENERATOR=$(GENERATOR) \
+		-DENABLE_SINGLE_SAMPLE=$(SINGLE_SAMPLE) \
+		-DPROG_DEV=$(DEVICE) \
+		-DQEMU=$(QEMU)
+	make -C build --no-print-directory
 
 upload:
 	make -C build upload --no-print-directory
 
 monitor:
 	echo "Press Ctrl-T + Q to exit"
-	python3 -m serial.tools.miniterm /dev/ttyACM0 500000
+	python3 -m serial.tools.miniterm $(DEVICE) $(BAUDRATE)
 
 clean:
 	rm -rf build

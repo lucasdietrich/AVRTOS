@@ -24,12 +24,12 @@ void serial_init()
 		.databits = USART_DATA_BITS_8,
 		.speed_mode = USART_SPEED_MODE_NORMAL
 	};
-	ll_usart_drv_init(USART_DEVICE, &usart_config);
+	ll_usart_init(USART_DEVICE, &usart_config);
 }
 
 void serial_transmit(char data)
 {
-	ll_usart_drv_sync_putc(USART_DEVICE, data);
+	ll_usart_sync_putc(USART_DEVICE, data);
 }
 
 void serial_send(const char *buffer, size_t len)

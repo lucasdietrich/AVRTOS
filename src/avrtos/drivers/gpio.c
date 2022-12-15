@@ -20,6 +20,7 @@ void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup)
 		gpio->DDR = gpio->DDR | BIT(pin);
 	}
 
+	/* represent either pullup (if input) or output level (if output)*/
 	if (pullup == GPIO_INPUT_NO_PULLUP) {
 		gpio->PORT = gpio->PORT & ~BIT(pin);
 	} else {

@@ -29,7 +29,7 @@ static uint8_t stacks[THREADS_COUNT][THREAD_STACK_SIZE];
 int main(void)
 {
 	struct usart_config cfg = USART_CONFIG_DEFAULT_500000();
-	usart_drv_init(USART0_DEVICE, &cfg);
+	usart_init(USART0_DEVICE, &cfg);
 
 	printf_P(PSTR("Many threads sample\n"));
 

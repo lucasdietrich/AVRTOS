@@ -53,6 +53,7 @@ uint8_t k_ready_count(void)
  * Should never be NULL.
  */
 #if TREAD_PRIO_MULTIQ
+#error "TREAD_PRIO_MULTIQ not supported yet"
 dlist_t _k_runqs[4u] = {
 	DLIST_INIT(_k_runqs[K_PRIO_HIGHEST]),
 	DLIST_INIT(_k_runqs[K_PRIO_HIGH]),

@@ -25,10 +25,10 @@ int main(void)
 		.databits = USART_DATA_BITS_8,
 		.speed_mode = USART_SPEED_MODE_NORMAL
 	};
-	ll_usart_drv_init(USART0_DEVICE, &usart_config);
+	ll_usart_init(USART0_DEVICE, &usart_config);
 
 	for (;;) {
-		ll_usart_drv_sync_putc(USART0_DEVICE, inc(c));
+		ll_usart_sync_putc(USART0_DEVICE, inc(c));
 		k_block(K_MSEC(1000u));
 	}
 }

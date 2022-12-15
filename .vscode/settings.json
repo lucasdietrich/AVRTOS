@@ -52,7 +52,9 @@
 		"drivers.h": "c",
 		"gpio.h": "c",
 		"flags.h": "c",
-		"logging.h": "c"
+		"logging.h": "c",
+		"iom2560.h": "c",
+		"iomxx0_1.h": "c"
 	},
 	"editor.rulers": [80]
 }

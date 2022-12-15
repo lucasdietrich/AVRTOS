@@ -11,7 +11,7 @@
 int main(void)
 {
 	const struct usart_config cfg = USART_CONFIG_DEFAULT_500000();
-	usart_drv_init(USART0_DEVICE, &cfg);
+	usart_init(USART0_DEVICE, &cfg);
 
 	uint32_t u = 0u;
 	for (;;) {

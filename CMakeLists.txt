@@ -13,10 +13,4 @@ enable_language(C CXX ASM)
 
 # set( CMAKE_VERBOSE_MAKEFILE on )
 
-set(CMAKE_BUILD_TYPE Debug)
-set(QEMU OFF)
-set(PROG_DEV "/dev/ttyACM2")
-# SET(ENABLE_SINGLE_SAMPLE "blinking-led")
-# SET(ENABLE_SINGLE_SAMPLE "drv-gpio")
-
 add_subdirectory(src/examples)

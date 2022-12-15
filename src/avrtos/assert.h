@@ -17,6 +17,7 @@ extern "C" {
 #include <avr/io.h>
 #include <util/atomic.h>
 
+// #include <avrtos/avrtos.h>
 
 /*___________________________________________________________________________*/
 
@@ -77,8 +78,8 @@ extern "C" {
 #	define __ASSERT_APP(_assertion)
 #endif
 
-#define K_ASSERT __ASSERT
-#define K_ASSERT_APP __ASSERT_APP
+#define K_ASSERT(_acode, _assertion) 	__ASSERT(_acode, _assertion) 
+#define K_ASSERT_APP(_assertion) 	__ASSERT_APP(_assertion)
 
 /*___________________________________________________________________________*/
 

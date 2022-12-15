@@ -15,19 +15,14 @@ void waiter(void *context);
 K_THREAD_DEFINE(w1, waiter, 0x100, K_PREEMPTIVE, NULL, 'W');
 K_SIGNAL_DEFINE(sig);
 
-
-#if defined(__AVR_ATmega328P__)
-#	define board_USART_RX_vect  USART_RX_vect
-#elif defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
-#	define board_USART_RX_vect  USART0_RX_vect
-#endif /* __AVR_ATmega328P__ */
-
-ISR(board_USART_RX_vect)
+ISR(USART0_RX_vect)
 {
 	const char rx = UDR0;
 	serial_transmit(rx);
 
-	k_signal_raise(&sig, rx);
+	struct k_thread *thread = k_signal_raise(&sig, rx);
+
+	k_yield_from_isr_cond(thread);
 }
 
 int main(void)

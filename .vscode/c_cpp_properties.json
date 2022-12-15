@@ -4,58 +4,45 @@
 // https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
 //
 {
-	"configurations": [
-		{
-			"name": "AVR",
-			"compileCommands": "${workspaceRoot}/build/compile_commands.json",
-			"intelliSenseMode": "gcc-avr",
-			"browse": {
-				"path": [
-					"${workspaceFolder}"
-				]
-			},
-			"cStandard": "c11",
-			"cppStandard": "c++17",
-			"configurationProvider": "ms-vscode.cmake-tools"
-		},
-		{
-			"name": "PlatformIO",
-			"includePath": [
-				"/home/lucas/AVRTOS/src",
-				""
-			],
-			"browse": {
-				"limitSymbolsToIncludedHeaders": true,
-				"path": [
-					"/home/lucas/AVRTOS/src",
-					""
-				]
-			},
-			"defines": [
-				"F_CPU=16000000L",
-				"PLATFORMIO=60103",
-				"ARDUINO_AVR_MEGA2560",
-				"CONFIG_THREAD_EXPLICIT_MAIN_STACK=0",
-				"CONFIG_KERNEL_PREEMPTIVE_THREADS=1",
-				"CONFIG_KERNEL_SYSLOCK_HW_TIMER=1",
-				"CONFIG_KERNEL_TIME_SLICE_US=1000",
-				"CONFIG_KERNEL_TIME_SLICE_US=1000",
-				"CONFIG_KERNEL_DEBUG=0",
-				"CONFIG_KERNEL_SCHEDULER_DEBUG=0",
-				"CONFIG_KERNEL_THREAD_IDLE=1",
-				"CONFIG_KERNEL_THREAD_IDLE_ADD_STACK=0",
-				"__PLATFORMIO_BUILD_DEBUG__",
-				"__AVR_ATmega2560__",
-				""
-			],
-			"cStandard": "c11",
-			"cppStandard": "c++11",
-			"compilerPath": "/home/lucas/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
-			"compilerArgs": [
-				"-mmcu=atmega2560",
-				""
-			]
-		}
-	],
-	"version": 4
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/lucas/AVRTOS/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/lucas/AVRTOS/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "F_CPU=16000000L",
+                "PLATFORMIO=60105",
+                "ARDUINO_AVR_MEGA2560",
+                "CONFIG_THREAD_EXPLICIT_MAIN_STACK=0",
+                "CONFIG_KERNEL_PREEMPTIVE_THREADS=1",
+                "CONFIG_KERNEL_SYSLOCK_HW_TIMER=1",
+                "CONFIG_KERNEL_TIME_SLICE_US=1000",
+                "CONFIG_KERNEL_TIME_SLICE_US=1000",
+                "CONFIG_KERNEL_DEBUG=0",
+                "CONFIG_KERNEL_SCHEDULER_DEBUG=0",
+                "CONFIG_KERNEL_THREAD_IDLE=1",
+                "CONFIG_KERNEL_THREAD_IDLE_ADD_STACK=0",
+                "__PLATFORMIO_BUILD_DEBUG__",
+                "__AVR_ATmega2560__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "/home/lucas/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega2560",
+                ""
+            ]
+        }
+    ],
+    "version": 4
 }

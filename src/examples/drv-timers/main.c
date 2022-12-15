@@ -45,7 +45,7 @@ ISR(TIMER2_COMPA_vect)
 	serial_transmit('2');
 }
 
-#if defined(__AVR_ATmega2560__)
+#if defined(TIMER4_DEVICE)
 ISR(TIMER4_OVF_vect)
 {
 	/* Set counter to a value to have a 250ms period after first overflow */
@@ -70,20 +70,20 @@ int main(void)
 		.counter = TIMER_CALC_COUNTER_VALUE(100000LU, 256U),
 		.timsk = BIT(OCIEnA),
 	};
-	ll_timer16_drv_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &cfg);
+	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &cfg);
 
 	cfg.prescaler = 0; /* Delay the start of the timer 2 */
 	cfg.counter = 0xFFU;
 
-	ll_timer8_drv_init(TIMER2_DEVICE, timer_get_index(TIMER2_DEVICE), &cfg);
+	ll_timer8_init(TIMER2_DEVICE, timer_get_index(TIMER2_DEVICE), &cfg);
 
-#if defined(__AVR_ATmega2560__)
+#if defined(TIMER4_DEVICE)
 	cfg.counter = 0U; /* First overflow will be after ~4seconds */
 	cfg.mode = TIMER_MODE_NORMAL;
 	cfg.prescaler = TIMER_PRESCALER_1024; /* Delay the start of the timer 2 */
 	cfg.timsk = BIT(TOIEn);
 
-	ll_timer16_drv_init(TIMER4_DEVICE, timer_get_index(TIMER4_DEVICE), &cfg);
+	ll_timer16_init(TIMER4_DEVICE, timer_get_index(TIMER4_DEVICE), &cfg);
 #endif
 
 	uint32_t i = 0;

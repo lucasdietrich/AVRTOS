@@ -41,22 +41,45 @@ typedef struct  {
 		struct {
 			__IO uint16_t TCNTn; /* Timer/Counter - Counter Register */
 			__IO uint16_t IRCN; /* Timer/Counter - Input Capture Register */
-			__IO uint16_t OCRnA; /* Timer/Counter - Output Compare Register A */
-			__IO uint16_t OCRnB; /* Timer/Counter - Output Compare Register B */
-			__IO uint16_t OCRnC; /* Timer/Counter - Output Compare Register C */
+
+			union {
+				struct {
+					__IO uint16_t OCRnA; /* Timer/Counter - Output Compare Register A */
+					__IO uint16_t OCRnB; /* Timer/Counter - Output Compare Register B */
+					__IO uint16_t OCRnC; /* Timer/Counter - Output Compare Register C */
+				};
+				__IO uint16_t OCRnx[3]; /* Timer/Counter - Output Compare Register */
+			};
 		};
 	};
 } TIMER16_Device;
 
+#if defined(TCCR1A)
 #define TIMER1_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x80U))
+#define TIMER1 TIMER1_DEVICE
+#define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
+#define TIMER1_INDEX 1u
+#endif
 
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
+#if defined(TCCR3A)
 #define TIMER3_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x90U))
-#define TIMER4_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0xA0U))
-#endif 
+#define TIMER3 TIMER3_DEVICE
+#define IS_TIMER3_DEVICE(dev) ((void *)dev == (void *)TIMER3_DEVICE)
+#define TIMER3_INDEX 3u
+#endif
 
-#if defined(__AVR_ATmega2560__)
+#if defined(TCCR4A)
+#define TIMER4_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0xA0U))
+#define TIMER4 TIMER4_DEVICE
+#define IS_TIMER4_DEVICE(dev) ((void *)dev == (void *)TIMER4_DEVICE)
+#define TIMER4_INDEX 4u
+#endif
+
+#if defined(TCCR5A)
 #define TIMER5_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x120U))
+#define TIMER5 TIMER5_DEVICE
+#define IS_TIMER5_DEVICE(dev) ((void *)dev == (void *)TIMER5_DEVICE)
+#define TIMER5_INDEX 5u
 #endif
 
 /**
@@ -71,8 +94,19 @@ typedef struct {
 	__IO uint8_t OCRnB; /* Timer/Counter Output Compare Register B */
 } TIMER8_Device;
  
+#if defined(TCCR0A)
 #define TIMER0_DEVICE ((TIMER8_Device *)(AVR_IO_BASE_ADDR + 0x44U))
+#define TIMER0 TIMER0_DEVICE
+#define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
+#define TIMER0_INDEX 0u
+#endif
+
+#if defined(TCCR2A)
 #define TIMER2_DEVICE ((TIMER8_Device *)(AVR_IO_BASE_ADDR + 0xB0U))
+#define TIMER2 TIMER2_DEVICE
+#define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
+#define TIMER2_INDEX 2u
+#endif
 
 /**
  * @brief Timer/Counter Interrupt Flag Register
@@ -113,44 +147,55 @@ typedef struct {
 #define FOCnA FOC0A
 #define FOCnB FOC0B
 
-#define WGMn0 WGM00
-#define WGMn1 WGM01
-#define WGMn2 WGM02
+// TCCRnA
+#define WGMn0 WGM10
+#define WGMn1 WGM11
 
-#define CSn0 CS00
-#define CSn1 CS01
-#define CSn2 CS02
+#define COMnA0 COM1A0
+#define COMnA1 COM1A1
+#define COMnB0 COM1B0
+#define COMnB1 COM1B1
+#define COMnC0 COM1C0
+#define COMnC1 COM1C1
 
-#define COMnA1 COM0A0
-#define COMnA0 COM0A1
-#define COMnB1 COM0B0
-#define COMnB0 COM0B1
+// TCCRnB
+#define WGMn2 WGM12
+#define WGMn3 WGM13
 
-#define OCIEnA OCIE0A
-#define OCIEnB OCIE0B
-#define TOIEn TOIE0
+#define CSn0 CS10
+#define CSn1 CS11
+#define CSn2 CS12
 
-/* 16 bits timers only */
+/* Interrupt mask register */
+// 8 & 16 bits timers
+#define TOIEn 	TOIE1
+#define OCIEnA 	OCIE1A
+#define OCIEnB 	OCIE1B
+// 16 bits timers
+#define OCIEnC 	OCIE1C
+#define ICIEn 	ICIE1
+
 #define FOCnC FOC1C
 
 #define ICNCn ICNC1
 #define ICESn ICES1
 
-#define WGMn3 WGM13
-
-#define COMnC0 COM1C0
-#define COMnC1 COM1C1
-
-#define OCIEnC OCIE1C
-#define ICIEn ICIE1
-
 /* macros */
-#if defined(__AVR_ATmega2560__)
+#if defined(TCCR5A)
 #	define TIMERS_COUNT 6
-#elif defined(__AVR_ATmega328PB__)
+#elif defined(TCCR4A)
 #	define TIMERS_COUNT 5
-#else
+#elif defined(TCCR3A)
+#	define TIMERS_COUNT 4
+#elif defined(TCCR2A)
 #	define TIMERS_COUNT 3
+#elif defined(TCCR1A)
+#	define TIMERS_COUNT 2
+#elif defined(TCCR0A)
+#	define TIMERS_COUNT 1
+#else
+#	define TIMERS_COUNT 0
+#	warning "Unsupported MCU"
 #endif
 
 #define TIMER_INDEX_EXISTS(tim_idx) ((tim_idx) < TIMERS_COUNT)
@@ -165,23 +210,6 @@ typedef struct {
 #define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
 #define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
 #define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
-#if defined(TIMSK3)
-#	define IS_TIMER3_DEVICE(dev) ((void *)dev == (void *)TIMER3_DEVICE)
-#else
-#	define IS_TIMER3_DEVICE(dev) (0)
-#endif 
-
-#if defined(TIMSK4)
-#	define IS_TIMER4_DEVICE(dev) ((void *)dev == (void *)TIMER4_DEVICE)
-#else
-#	define IS_TIMER4_DEVICE(dev) (0)
-#endif 
-
-#if defined(TIMSK5)
-#	define IS_TIMER5_DEVICE(dev) ((void *)dev == (void *)TIMER5_DEVICE)
-#else
-#	define IS_TIMER5_DEVICE(dev) (0)
-#endif 
 
 #define IS_TIMER_16BITS(dev) \
 	(IS_TIMER1_DEVICE(dev) || IS_TIMER3_DEVICE(dev) \
@@ -192,15 +220,28 @@ typedef struct {
 #define IS_TIMER_IDX_8BITS(idx) ((idx == 0) || (idx == 2))
 #define IS_TIMER_IDX_16BITS(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
 
-// #define IS_TIMER8(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER8_Device))
-// #define IS_TIMER16(tim_dev) (sizeof(*tim_dev) == sizeof(TIMER16_Device))
-
 typedef enum {
-	TIMER_MODE_NORMAL = 0x00,
-	TIMER_MODE_CTC = 0x01,
-	TIMER_MODE_FAST_PWM = 0x02,
-	TIMER_MODE_PHASE_CORRECT_PWM = 0x03,
+	TIMER_MODE_NORMAL = 0x00, /* 8bit timer */
+	TIMER_MODE_PWM_PC_8bit,
+	TIMER_MODE_PWM_PC_9bit, /* 8bit timer */
+	TIMER_MODE_PWM_PC_10bit,
+	TIMER_MODE_CTC, /* OCR1A - timer */
+	TIMER_MODE_FAST_PWM_8bit,
+	TIMER_MODE_FAST_PWM_9bit, /* 8bit timer */
+	TIMER_MODE_FAST_PWM_10bit,
+	TIMER_MODE_PWM_PHASE_FREQUENCY_CORRECT_ICRn,
+	TIMER_MODE_PWM_PHASE_FREQUENCY_CORRECT_OCRnA, /* 8bit timer */
+	TIMER_MODE_PWM_PHASE_CORRECT_ICRn,
+	TIMER_MODE_PWM_PHASE_CORRECT_OCRnA,
+	TIMER_MODE_CTC_ICRn,
+	TIMER_MODE_RESERVED,
+	TIMER_MODE_FAST_PWM_ICR1,
+	TIMER_MODE_FAST_PWM_OCR1A,	/* 8bit timer */
 } timer_mode_t;
+
+/* 8 bits */
+#define TIMER_MODE_PWM_PC TIMER_MODE_PWM_PC_9bit
+#define TIMER_MODE_FAST_PWM_PC TIMER_MODE_FAST_PWM_9bit
 
 /* prescalers for timer 2 only */
 typedef enum {
@@ -227,6 +268,33 @@ typedef enum {
 	TIMER_EXT_FALLING = 0x06,
 	TIMER_EXT_RISING = 0x07,
 } timer_prescaler_t;
+
+typedef enum {
+	TIMER16_OVERFLOW_INTERRUPT = 0u,
+	TIMER16_OUTPUT_COMPARE_MATCH_A_INTERRUPT = 1u,
+	TIMER16_OUTPUT_COMPARE_MATCH_B_INTERRUPT = 2u,
+	TIMER16_OUTPUT_COMPARE_MATCH_C_INTERRUPT = 3u,
+	TIMER16_INPUT_CAPTURE_INTERRUPT = 5u,
+} timer16_interrupt_t;
+
+typedef enum {
+	TIMER_CHANNEL_COMP_MODE_NORMAL = 0u, /* Normal port operation, OCnA/OCnB/OCnC disconnected */
+	TIMER_CHANNEL_COMP_MODE_TOGGLE = 1u, /* Toggle OCnA/OCnB/OCnC on compare match */
+	TIMER_CHANNEL_COMP_MODE_CLEAR = 2u, /* Clear OCnA/OCnB/OCnC on compare match (set output to low level) */
+	TIMER_CHANNEL_COMP_MODE_SET = 3u, /* Set OCnA/OCnB/OCnC on compare match (set output to high level */
+} timer_channel_com_t; /* Timer Channel Compare Output Mode */
+
+typedef enum {
+	TIMER_CHANNEL_A = 0u,
+	TIMER_CHANNEL_B = 1u,
+	TIMER_CHANNEL_C = 2u,
+} timer_channel_t;
+
+struct timer_channel_compare_config
+{
+	timer_channel_com_t mode;
+	uint16_t value;
+};
 
 struct timer_config
 {
@@ -268,30 +336,34 @@ struct timer_config
  */
 static inline int timer_get_index(void *dev)
 {
-	int ret = -EINVAL;
-
-	if (IS_TIMER0_DEVICE(dev)) {
-		ret = 0;
-	}
-	else if (IS_TIMER1_DEVICE(dev)) {
-		ret = 1;
-	}
-	else if (IS_TIMER2_DEVICE(dev)) {
-		ret = 2;
-	}
-#if defined(__AVR_ATmega2560__)
-	else if (IS_TIMER3_DEVICE(dev)) {
-		ret = 3;
-	}
-	else if (IS_TIMER4_DEVICE(dev)) {
-		ret = 4;
-	}
-	else if (IS_TIMER5_DEVICE(dev)) {
-		ret = 5;
-	}
+	switch ((uint16_t)dev) {
+#if defined(TIMER0_DEVICE)
+	case (uint16_t)TIMER0_DEVICE:
+		return 0;
 #endif
-
-	return  ret;
+#if defined(TIMER1_DEVICE)
+	case (uint16_t)TIMER1_DEVICE:
+		return 1;
+#endif
+#if defined(TIMER2_DEVICE)
+	case (uint16_t)TIMER2_DEVICE:
+		return 2;
+#endif
+#if defined(TIMER3_DEVICE)
+	case (uint16_t)TIMER3_DEVICE:
+		return 3;
+#endif
+#if defined(TIMER4_DEVICE)
+	case (uint16_t)TIMER4_DEVICE:
+		return 4;
+#endif
+#if defined(TIMER5_DEVICE)
+	case (uint16_t)TIMER5_DEVICE:
+		return 5;
+#endif
+	default:
+		return -EINVAL;
+	}
 }
 
 /**
@@ -309,42 +381,42 @@ static inline int timer_get_index(void *dev)
  */
 static inline void *timer_get_device(uint8_t idx)
 {
-	void *dev = NULL;
-
 	switch (idx) {
+#if defined(TIMER0_DEVICE)
 	case 0:
-		dev = TIMER0_DEVICE;
-		break;
+		return TIMER0_DEVICE;
+#endif
+#if defined(TIMER1_DEVICE)
 	case 1:
-		dev = TIMER1_DEVICE;
-		break;
+		return TIMER1_DEVICE;
+#endif
+#if defined(TIMER2_DEVICE)
 	case 2:
-		dev = TIMER2_DEVICE;
-		break;
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
+		return TIMER2_DEVICE;
+#endif
+#if defined(TIMER3_DEVICE)
 	case 3:
-		dev = TIMER3_DEVICE;
-		break;
+		return TIMER3_DEVICE;
+#endif
+#if defined(TIMER4_DEVICE)
 	case 4:
-		dev = TIMER4_DEVICE;
-		break;
+		return TIMER4_DEVICE;
 #endif
-#if defined(__AVR_ATmega2560__)
+#if defined(TIMER5_DEVICE)
 	case 5:
-		dev = TIMER5_DEVICE;
-		break;
+		return TIMER5_DEVICE;
 #endif
+	default:
+		return NULL;
 	}
-
-	return dev;
 }
 
-static inline void ll_timer_clear_int_mask(uint8_t tim_idx)
+static inline void ll_timer_clear_enable_int_mask(uint8_t tim_idx)
 {
 	TIMSKn[tim_idx] = 0U;
 }
 
-static inline void ll_timer_set_int_mask(uint8_t tim_idx, uint8_t mask)
+static inline void ll_timer_set_enable_int_mask(uint8_t tim_idx, uint8_t mask)
 {
 	TIMSKn[tim_idx] = mask;
 }
@@ -375,6 +447,17 @@ static inline void ll_timer8_start(TIMER8_Device *dev,
 {
 	/* timer starts counting at the timer prescaler is set*/
 	dev->TCCRnB |= prescaler << CSn0;
+}
+
+static inline void ll_timer16_write_reg16(__IO uint16_t *reg,
+					  uint16_t val)
+{
+	/**
+	 * To do a 16-bit write, the high byte must be written before the low byte.
+	 *  For a 16-bit read, the low byte must be read before the high byte.
+	 */
+	*((__IO uint8_t *)reg + 1u) = val >> 8u;
+	*((__IO uint8_t *)reg) = val & 0xffu;
 }
 
 static inline void ll_timer16_set_tcnt(TIMER16_Device *dev,
@@ -419,23 +502,45 @@ static inline void ll_timer_start(void *dev, uint8_t prescaler)
 	ll_timer8_start((TIMER8_Device *)dev, prescaler);
 }
 
-void ll_timer8_drv_init(TIMER8_Device *dev,
-			uint8_t tim_idx,
-			const struct timer_config *config);
+static inline void ll_timer16_enable_interrupt(uint8_t tim_idx, timer16_interrupt_t n)
+{
+	TIMSKn[tim_idx] |= BIT(n);
+}
 
-void ll_timer16_drv_init(TIMER16_Device *dev,
-			 uint8_t tim_idx,
-			 const struct timer_config *config);
+static inline void ll_timer16_disable_interrupt(uint8_t tim_idx, timer16_interrupt_t n)
+{
+	TIMSKn[tim_idx] &= ~BIT(n);
+}
 
-int timer8_drv_init(TIMER8_Device *dev,
+void ll_timer8_init(TIMER8_Device *dev,
+		    uint8_t tim_idx,
 		    const struct timer_config *config);
 
-int timer16_drv_init(TIMER16_Device *dev,
+void ll_timer16_init(TIMER16_Device *dev,
+		     uint8_t tim_idx,
 		     const struct timer_config *config);
 
-int timer8_drv_deinit(TIMER8_Device *dev);
+void ll_timer16_channel_configure(TIMER16_Device *dev,
+				  timer_channel_t channel,
+				  const struct timer_channel_compare_config *config);
 
-int timer16_drv_deinit(TIMER16_Device *dev);
+void ll_timer8_deinit(TIMER8_Device *dev,
+		      uint8_t tim_idx);
+
+void ll_timer16_deinit(TIMER16_Device *dev,
+		       uint8_t tim_idx);
+
+int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter);
+
+int timer8_init(TIMER8_Device *dev,
+		const struct timer_config *config);
+
+int timer16_init(TIMER16_Device *dev,
+		 const struct timer_config *config);
+
+int timer8_deinit(TIMER8_Device *dev);
+
+int timer16_deinit(TIMER16_Device *dev);
 
 #define TIMER_API_FLAG_AUTOSTART		(1 << 0)
 

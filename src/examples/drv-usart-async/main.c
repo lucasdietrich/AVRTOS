@@ -90,13 +90,7 @@ static inline void input(const char rx)
 	}
 }
 
-#if defined(__AVR_ATmega328P__)
-#	define board_USART_RX_vect  USART_RX_vect
-#elif defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328PB__)
-#	define board_USART_RX_vect  USART0_RX_vect
-#endif /* __AVR_ATmega328P__ */
-
-ISR(board_USART_RX_vect)
+ISR(USART0_RX_vect)
 {
 	const char rx = UDR0;
 	input(rx);
@@ -176,7 +170,7 @@ int main(void)
 	// initialize IPC uart
 	struct usart_config cfg;
 	memcpy_P(&cfg, &usart_ipc_cfg, sizeof(struct usart_config));
-	usart_drv_init(USART1_DEVICE, &cfg);
+	usart_init(USART1_DEVICE, &cfg);
 
 	usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 	usart_rx_enable(USART1_DEVICE, rx_buffer, sizeof(rx_buffer));

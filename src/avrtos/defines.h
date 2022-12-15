@@ -546,7 +546,7 @@ typedef struct
 
 // arch specific fixups
 
-#if defined(__AVR_ATmega328P__)
+#if !defined(USART0_RX_vect) && defined(USART_RX_vect)
 #define USART0_RX_vect USART_RX_vect
 #define USART0_RX_vect_num USART_RX_vect_num
 #define USART0_TX_vect USART_TX_vect
