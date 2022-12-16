@@ -52,6 +52,18 @@ K_NOINLINE void irq_enable(void);
 
 #endif /* KERNEL_IRQ_LOCK_COUNTER */
 
+static inline uint8_t irq_lock(void)
+{
+	const uint8_t sreg = SREG;
+	irq_disable();
+	return sreg;
+}
+
+static inline void irq_unlock(uint8_t sreg)
+{
+	SREG = sreg;
+}
+
 
 #define CRITICAL_SECTION_BEGIN()    irq_disable()
 #define CRITICAL_SECTION_END()      irq_enable()
