@@ -132,7 +132,7 @@ void ll_timer16_channel_configure(TIMER16_Device *dev,
 				  timer_channel_t channel,
 				  const struct timer_channel_compare_config *config)
 {
-	const uint8_t group_shift = (2 * (2 - channel) + COMnC0);
+	const uint8_t group_shift = (2 * (2 - channel) + 2u);
 	const uint8_t reg_val = dev->TCCRnA & ~(0x03u << group_shift);
 	dev->TCCRnA = reg_val | (config->mode << group_shift);
 	ll_timer16_write_reg16(&dev->OCRnx[channel], config->value);

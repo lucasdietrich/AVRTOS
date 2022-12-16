@@ -55,19 +55,19 @@ int main(void)
 	gpio_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 	gpio_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 
-	ll_timer16_init(TIMER1, timer_get_index(TIMER1), &config);
+	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
 
 	struct timer_channel_compare_config comp_conf = {
 		.mode = TIMER_CHANNEL_COMP_MODE_SET,
 		.value = 0x1ffu,
 	};
-	ll_timer16_channel_configure(TIMER1, TIMER_CHANNEL_A, &comp_conf);
+	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_A, &comp_conf);
 	comp_conf.value = 100u;
-	ll_timer16_channel_configure(TIMER1, TIMER_CHANNEL_B, &comp_conf);
+	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_B, &comp_conf);
 	comp_conf.mode = TIMER_CHANNEL_COMP_MODE_NORMAL;
-	ll_timer16_channel_configure(TIMER1, TIMER_CHANNEL_C, &comp_conf);
+	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_C, &comp_conf);
 
-	ll_timer_set_enable_int_mask(timer_get_index(TIMER1), 0x2Fu); /* Enable all interupts */
+	ll_timer_set_enable_int_mask(timer_get_index(TIMER1_DEVICE), 0x2Fu); /* Enable all interupts */
 	
 	for (;;) {
 		led_toggle();

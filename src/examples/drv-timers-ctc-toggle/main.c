@@ -39,15 +39,15 @@ int main(void)
 	gpio_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 	gpio_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 
-	ll_timer16_init(TIMER1, timer_get_index(TIMER1), &config);
+	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
 
 	struct timer_channel_compare_config comp_conf = {
 		.mode = TIMER_CHANNEL_COMP_MODE_TOGGLE,
 		.value = TIMER_CALC_COUNTER_VALUE(PERIOD_US >> 1u, 1024u),
 	};
-	ll_timer16_channel_configure(TIMER1, TIMER_CHANNEL_A, &comp_conf);
-	ll_timer16_channel_configure(TIMER1, TIMER_CHANNEL_B, &comp_conf);
-	ll_timer16_channel_configure(TIMER1, TIMER_CHANNEL_C, &comp_conf);
+	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_A, &comp_conf);
+	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_B, &comp_conf);
+	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_C, &comp_conf);
 	
 	k_sleep(K_FOREVER);
 }

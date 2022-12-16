@@ -55,29 +55,29 @@ typedef struct  {
 } TIMER16_Device;
 
 #if defined(TCCR1A)
-#define TIMER1_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x80U))
-#define TIMER1 TIMER1_DEVICE
+#define TIMER1_DEVICE_ADDR (AVR_IO_BASE_ADDR + 0x80u)
+#define TIMER1_DEVICE ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
 #define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
 #define TIMER1_INDEX 1u
 #endif
 
 #if defined(TCCR3A)
-#define TIMER3_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x90U))
-#define TIMER3 TIMER3_DEVICE
+#define TIMER3_DEVICE_ADDR (AVR_IO_BASE_ADDR + 0x90u)
+#define TIMER3_DEVICE ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
 #define IS_TIMER3_DEVICE(dev) ((void *)dev == (void *)TIMER3_DEVICE)
 #define TIMER3_INDEX 3u
 #endif
 
 #if defined(TCCR4A)
-#define TIMER4_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0xA0U))
-#define TIMER4 TIMER4_DEVICE
+#define TIMER4_DEVICE_ADDR (AVR_IO_BASE_ADDR + 0xA0u)
+#define TIMER4_DEVICE ((TIMER16_Device *)(TIMER4_DEVICE_ADDR))
 #define IS_TIMER4_DEVICE(dev) ((void *)dev == (void *)TIMER4_DEVICE)
 #define TIMER4_INDEX 4u
 #endif
 
 #if defined(TCCR5A)
-#define TIMER5_DEVICE ((TIMER16_Device *)(AVR_IO_BASE_ADDR + 0x120U))
-#define TIMER5 TIMER5_DEVICE
+#define TIMER5_DEVICE_ADDR (AVR_IO_BASE_ADDR + 0x120u)
+#define TIMER5_DEVICE ((TIMER16_Device *)(TIMER5_DEVICE_ADDR))
 #define IS_TIMER5_DEVICE(dev) ((void *)dev == (void *)TIMER5_DEVICE)
 #define TIMER5_INDEX 5u
 #endif
@@ -95,15 +95,15 @@ typedef struct {
 } TIMER8_Device;
  
 #if defined(TCCR0A)
-#define TIMER0_DEVICE ((TIMER8_Device *)(AVR_IO_BASE_ADDR + 0x44U))
-#define TIMER0 TIMER0_DEVICE
+#define TIMER0_DEVICE_ADDR (AVR_IO_BASE_ADDR + 0x44U)
+#define TIMER0_DEVICE ((TIMER8_Device *)(TIMER0_DEVICE_ADDR))
 #define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
 #define TIMER0_INDEX 0u
 #endif
 
 #if defined(TCCR2A)
-#define TIMER2_DEVICE ((TIMER8_Device *)(AVR_IO_BASE_ADDR + 0xB0U))
-#define TIMER2 TIMER2_DEVICE
+#define TIMER2_DEVICE_ADDR (AVR_IO_BASE_ADDR + 0xB0U)
+#define TIMER2_DEVICE ((TIMER8_Device *)(TIMER2_DEVICE_ADDR))
 #define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
 #define TIMER2_INDEX 2u
 #endif
@@ -153,10 +153,23 @@ typedef struct {
 
 #define COMnA0 COM1A0
 #define COMnA1 COM1A1
+
 #define COMnB0 COM1B0
 #define COMnB1 COM1B1
+
+#if defined(COM1C0)
 #define COMnC0 COM1C0
 #define COMnC1 COM1C1
+#endif
+
+#if defined(COMnC0)
+#	define TIMER_HAS_CHANNEL_C 	1u
+#	define TIMER_CHANNELS_COUNT 	3u
+#else
+#	define TIMER_HAS_CHANNEL_C 	0u
+#	define TIMER_CHANNELS_COUNT 	2u
+#endif
+
 
 // TCCRnB
 #define WGMn2 WGM12
@@ -338,27 +351,27 @@ static inline int timer_get_index(void *dev)
 {
 	switch ((uint16_t)dev) {
 #if defined(TIMER0_DEVICE)
-	case (uint16_t)TIMER0_DEVICE:
+	case TIMER0_DEVICE_ADDR:
 		return 0;
 #endif
 #if defined(TIMER1_DEVICE)
-	case (uint16_t)TIMER1_DEVICE:
+	case TIMER1_DEVICE_ADDR:
 		return 1;
 #endif
 #if defined(TIMER2_DEVICE)
-	case (uint16_t)TIMER2_DEVICE:
+	case TIMER2_DEVICE_ADDR:
 		return 2;
 #endif
 #if defined(TIMER3_DEVICE)
-	case (uint16_t)TIMER3_DEVICE:
+	case TIMER3_DEVICE_ADDR:
 		return 3;
 #endif
 #if defined(TIMER4_DEVICE)
-	case (uint16_t)TIMER4_DEVICE:
+	case TIMER4_DEVICE_ADDR:
 		return 4;
 #endif
 #if defined(TIMER5_DEVICE)
-	case (uint16_t)TIMER5_DEVICE:
+	case TIMER5_DEVICE_ADDR:
 		return 5;
 #endif
 	default:
