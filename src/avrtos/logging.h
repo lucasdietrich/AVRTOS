@@ -6,11 +6,16 @@
 #include <stdio.h>
 #include <avr/pgmspace.h>
 
-#define LOG_LEVEL_NONE 0
-#define LOG_LEVEL_ERR 1
-#define LOG_LEVEL_WRN 2
-#define LOG_LEVEL_INF 3
-#define LOG_LEVEL_DBG 4
+#define LOG_LEVEL_NONE 0u
+#define LOG_LEVEL_ERROR 1u
+#define LOG_LEVEL_WARNING 2u
+#define LOG_LEVEL_INFO 3u
+#define LOG_LEVEL_DEBUG 4u
+
+#define LOG_LEVEL_ERR LOG_LEVEL_ERROR
+#define LOG_LEVEL_WRN LOG_LEVEL_WARNING
+#define LOG_LEVEL_INF LOG_LEVEL_INFO
+#define LOG_LEVEL_DBG LOG_LEVEL_DEBUG
 
 #if LOGGING_SUBSYSTEM
 
