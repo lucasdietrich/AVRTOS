@@ -30,9 +30,9 @@
 #define GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev) ((_dev) == GPIOC)
 #define GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ((_dev) == GPIOD)
 
-#define GPIO_PCINT_GROUP(_dev) ((_dev) == GPIOB ? PCINT_0_7 : \
-			        (_dev) == GPIOC ? PCINT_8_15 : \
-			        (_dev) == GPIOD ? PCINT_16_23 : \
+#define GPIO_PCINT_GROUP(_dev) (GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev) ? PCINT_0_7 : \
+			        GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev) ? PCINT_8_15 : \
+			        GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ? PCINT_16_23 : \
 			        0xFFu)
 
 #if defined(__AVR_ATmega2560__)
