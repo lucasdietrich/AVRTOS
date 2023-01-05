@@ -144,7 +144,7 @@ What enhancements/features are not planned :
 | ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE_US but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE_US). |
 | KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
 | KERNEL_TIME_SLICE_US | Time slice in milliseconds |
-| KERNEL_TIME | Enable system time API |
+| ~~KERNEL_TIME~~ | Enable system time API |
 | KERNEL_ATOMIC_API | Enable atomic API |
 | THREAD_TERMINATION_TYPE | Allow, or not thread termination. 0 : not allowed (need less stack). 1 : allowed (need more stack) . -1 : not allow but fault (need more stack but fault if terminate) |
 | KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
@@ -183,66 +183,130 @@ Configuration option : `CONFIG_KERNEL_TIME_SLICE_US=10000`
 
 ### Code
 
+Configuration:
+
+```
+CONFIG_KERNEL_PREEMPTIVE_THREADS=1
+CONFIG_KERNEL_TIME_SLICE_US=1000
+CONFIG_INTERRUPT_POLICY=1
+CONFIG_KERNEL_THREAD_TERMINATION_TYPE=-1
+CONFIG_THREAD_MAIN_COOPERATIVE=1
+CONFIG_STDIO_PRINTF_TO_USART=0
+CONFIG_KERNEL_UPTIME=1
+```
+
+Code:
 ```cpp
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
-void thread_led(void* context);
-void thread_coop(void* context);
+#include <avrtos/drivers/usart.h>
+#include <avrtos/drivers/gpio.h>
 
-uint8_t on = 1u;
-uint8_t off = 0u;
+#include <avrtos/logging.h>
+#define LOG_LEVEL 	LOG_LEVEL_DBG
 
-K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
-K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PREEMPTIVE, (void*)&on, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PREEMPTIVE, (void*)&off, 'F');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PREEMPTIVE, NULL, 'C');
+#define BUILTIN_LED_PORT 	GPIOB_DEVICE
+#define BUILTIN_LED_PIN 	(5u)
+
+static char usart_msgq_buf[16u];
+K_MSGQ_DEFINE(usart_msgq, usart_msgq_buf, 1u, 16u);
+
+static void thread_usart(void *arg);
+static void thread_led(void *arg);
+
+K_THREAD_DEFINE(th_usart, thread_usart, 164u, K_COOPERATIVE, NULL, 'X');
+K_THREAD_DEFINE(th_led, thread_led, 164u, K_COOPERATIVE, NULL, 'L');
+
+ISR(USART0_RX_vect)
+{
+	const char c = USART0_DEVICE->UDRn;
+
+	k_msgq_put(&usart_msgq, &c, K_NO_WAIT);
+}
 
 int main(void)
 {
-  led_init();
-  serial_init();
-  k_thread_dump_all();
-  sei();
-  k_sleep(K_FOREVER);
+	const struct usart_config usart_config = {
+		.baudrate = USART_BAUD_115200,
+		.receiver = 1u,
+		.transmitter = 1u,
+		.mode = USART_MODE_ASYNCHRONOUS,
+		.parity = USART_PARITY_NONE,
+		.stopbits = USART_STOP_BITS_1,
+		.databits = USART_DATA_BITS_8,
+		.speed_mode = USART_SPEED_MODE_NORMAL
+	};
+	ll_usart_init(USART0_DEVICE, &usart_config);
+	ll_usart_enable_rx_isr(USART0_DEVICE);
+
+	gpio_pin_init(BUILTIN_LED_PORT, BUILTIN_LED_PIN, GPIO_OUTPUT, 0u);
+
+	LOG_INF("Application started");
+
+	k_thread_dump_all();
+
+	k_stop();
 }
 
-void thread_led(void* context)
+static void thread_usart(void *arg)
 {
-  const uint8_t thread_led_state = *(uint8_t*)context;
-  while (1)   {
-    k_mutex_lock(&mymutex, K_FOREVER);
-    led_set(thread_led_state);
-    serial_transmit(thread_led_state ? 'o' : 'f');
-    k_sleep(K_MSEC(100));
-    k_mutex_unlock(&mymutex);
-  }
+	char c;
+	for (;;) {
+		if (k_msgq_get(&usart_msgq, &c, K_FOREVER) >= 0) {
+			k_show_uptime();
+			LOG_INF("<inf> Received: %c", c);
+		}
+	}
 }
 
-void thread_coop(void* context)
+static void thread_led(void *arg)
 {
-  while (1)   {
-    k_sleep(K_MSEC(2000));
-    serial_transmit('_');
-    _delay_ms(500); // blocking all threads for 500ms
-  }
+	for (;;) {
+		k_show_uptime();
+		gpio_pin_toggle(BUILTIN_LED_PORT, BUILTIN_LED_PIN);
+		LOG_DBG("<dbg> toggled LED");
+		k_sleep(K_MSEC(500u));
+	}
 }
 ```
 
 ### Logs
 
 ```
+Application started
 ===== k_thread =====
-M 031C [PREE 0] RUNNING : SP 0/512 -| END @056E
-C 032C [COOP 1] READY   : SP 35/256 -| END @0207
-F 033C [PREE 1] READY   : SP 35/80 -| END @0257
-O 034C [PREE 1] READY   : SP 35/80 -| END @02A7
-K 035C [PREE 3] READY   : SP 35/62 -| END @02E6
-fofofofofofofofofofo_fofofofofofofofofofo_fofofofofofofofofofo_fofof
+L 0x0200 READY   C 1 ____ : SP 22/164:0x0363
+X 0x0212 READY   C 1 ____ : SP 22/164:0x0407
+M 0x0224 READY   C 1 ____ : SP 0/512:0x21FF
+I 0x0236 IDLE    P 1 ____ : SP 22/120:0x02BF
+00:00:00 [0.002 s] : <dbg> toggled LED
+00:00:00 [0.240 s] : <inf> Received: h
+00:00:00 [0.332 s] : <inf> Received: e
+00:00:00 [0.431 s] : <inf> Received: l
+00:00:00 [0.503 s] : <dbg> toggled LED
+00:00:00 [0.532 s] : <inf> Received: l
+00:00:00 [0.657 s] : <inf> Received: o
+00:00:00 [0.822 s] : <inf> Received:  
+00:00:00 [0.915 s] : <inf> Received: w
+00:00:01 [1.003 s] : <dbg> toggled LED
+00:00:01 [1.055 s] : <inf> Received: o
+00:00:01 [1.144 s] : <inf> Received: r
+00:00:01 [1.229 s] : <inf> Received: l
+00:00:01 [1.312 s] : <inf> Received: d
+00:00:01 [1.468 s] : <inf> Received:  
+00:00:01 [1.503 s] : <dbg> toggled LED
+00:00:01 [1.574 s] : <inf> Received: !
+00:00:01 [1.664 s] : <inf> Received: !
+00:00:01 [1.756 s] : <inf> Received: !
+00:00:02 [2.003 s] : <dbg> toggled LED
+00:00:02 [2.503 s] : <dbg> toggled LED
 ```
 
 ## All Examples

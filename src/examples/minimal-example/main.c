@@ -4,50 +4,75 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
 #include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 
-void thread_led(void *context);
-void thread_coop(void *context);
+#include <avrtos/drivers/usart.h>
+#include <avrtos/drivers/gpio.h>
 
-uint8_t on = 1u;
-uint8_t off = 0u;
+#include <avrtos/logging.h>
+#define LOG_LEVEL 	LOG_LEVEL_DBG
 
-K_MUTEX_DEFINE(mymutex);  // mutex protecting LED access
-K_THREAD_DEFINE(ledon, thread_led, 0x50, K_PREEMPTIVE, (void *)&on, 'O');
-K_THREAD_DEFINE(ledoff, thread_led, 0x50, K_PREEMPTIVE, (void *)&off, 'F');
-K_THREAD_DEFINE(coop, thread_coop, 0x100, K_PREEMPTIVE, NULL, 'C');
+#define BUILTIN_LED_PORT 	GPIOB_DEVICE
+#define BUILTIN_LED_PIN 	(5u)
+
+static char usart_msgq_buf[16u];
+K_MSGQ_DEFINE(usart_msgq, usart_msgq_buf, 1u, 16u);
+
+static void thread_usart(void *arg);
+static void thread_led(void *arg);
+
+K_THREAD_DEFINE(th_usart, thread_usart, 164u, K_COOPERATIVE, NULL, 'X');
+K_THREAD_DEFINE(th_led, thread_led, 164u, K_COOPERATIVE, NULL, 'L');
+
+ISR(USART0_RX_vect)
+{
+	const char c = USART0_DEVICE->UDRn;
+
+	k_msgq_put(&usart_msgq, &c, K_NO_WAIT);
+}
 
 int main(void)
 {
-	led_init();
-	serial_init();
+	const struct usart_config usart_config = {
+		.baudrate = USART_BAUD_115200,
+		.receiver = 1u,
+		.transmitter = 1u,
+		.mode = USART_MODE_ASYNCHRONOUS,
+		.parity = USART_PARITY_NONE,
+		.stopbits = USART_STOP_BITS_1,
+		.databits = USART_DATA_BITS_8,
+		.speed_mode = USART_SPEED_MODE_NORMAL
+	};
+	ll_usart_init(USART0_DEVICE, &usart_config);
+	ll_usart_enable_rx_isr(USART0_DEVICE);
+
+	gpio_pin_init(BUILTIN_LED_PORT, BUILTIN_LED_PIN, GPIO_OUTPUT, 0u);
+
+	LOG_INF("Application started");
+
 	k_thread_dump_all();
-	sei();
-	k_sleep(K_FOREVER);
+
+	k_stop();
 }
 
-void thread_led(void *context)
+static void thread_usart(void *arg)
 {
-	const uint8_t thread_led_state = *(uint8_t *)context;
-	while (1) {
-		k_mutex_lock(&mymutex, K_FOREVER);
-		led_set(thread_led_state);
-		serial_transmit(thread_led_state ? 'o' : 'f');
-		k_sleep(K_MSEC(100));
-		k_mutex_unlock(&mymutex);
+	char c;
+	for (;;) {
+		if (k_msgq_get(&usart_msgq, &c, K_FOREVER) >= 0) {
+			k_show_uptime();
+			LOG_INF("<inf> Received: %c", c);
+		}
 	}
 }
 
-void thread_coop(void *context)
+static void thread_led(void *arg)
 {
-	while (1) {
-		k_sleep(K_MSEC(2000));
-		serial_transmit('_');
-		_delay_ms(500); // blocking all threads for 500ms
+	for (;;) {
+		k_show_uptime();
+		gpio_pin_toggle(BUILTIN_LED_PORT, BUILTIN_LED_PIN);
+		LOG_DBG("<dbg> toggled LED");
+		k_sleep(K_MSEC(500u));
 	}
 }
