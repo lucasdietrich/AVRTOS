@@ -55,16 +55,17 @@ bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit)
 
 bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val)
 {
+	bool ret = false;
 	const uint8_t key = irq_lock();
 
 	if (*target == cmd) {
 		*target = val;
-		return true;
+		ret = true;
 	}
 
 	irq_unlock(key);
 
-	return false;
+	return ret;
 }
 
 #endif /* CONFIG_KERNEL_ATOMIC_API */
