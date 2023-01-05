@@ -13,7 +13,7 @@ extern struct k_thread __k_threads_end;
 
 void _k_init_thread_stack_sentinel(struct k_thread *th)
 {
-#if THREAD_EXPLICIT_MAIN_STACK == 0
+#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 0
 	if (th == &_k_thread_main) {
 		return;
 	}
@@ -21,8 +21,8 @@ void _k_init_thread_stack_sentinel(struct k_thread *th)
 
 	uint8_t *const stack = K_STACK_START(th->stack.end, th->stack.size);
 	for (uint8_t *addr = stack;
-	     addr < stack + THREAD_STACK_SENTINEL_SIZE; addr++) {
-		*addr = THREAD_STACK_SENTINEL_SYMBOL;
+	     addr < stack + CONFIG_THREAD_STACK_SENTINEL_SIZE; addr++) {
+		*addr = CONFIG_THREAD_STACK_SENTINEL_SYMBOL;
 	}
 }
 
@@ -36,7 +36,7 @@ void _k_init_stacks_sentinel(void)
 
 bool k_verify_stack_sentinel(struct k_thread *th)
 {
-#if THREAD_EXPLICIT_MAIN_STACK == 0
+#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 0
 	if (th == &_k_thread_main) {
 		return true;
 	}
@@ -44,9 +44,9 @@ bool k_verify_stack_sentinel(struct k_thread *th)
 
 	uint8_t *const stack_sent = K_STACK_START(th->stack.end, th->stack.size);
 	for (uint8_t *addr = stack_sent;
-	     addr < stack_sent + THREAD_STACK_SENTINEL_SIZE;
+	     addr < stack_sent + CONFIG_THREAD_STACK_SENTINEL_SIZE;
 	     addr++) {
-		if (*addr != THREAD_STACK_SENTINEL_SYMBOL) {
+		if (*addr != CONFIG_THREAD_STACK_SENTINEL_SYMBOL) {
 			return false;
 		}
 	}
@@ -61,8 +61,8 @@ void k_assert_registered_stack_sentinel(void)
 	for (void **loc = &__k_sent_start; loc < &__k_sent_end; loc++) {
 		void *sent = pgm_read_ptr(loc);
 
-		for (void *p = sent; p < sent + THREAD_STACK_SENTINEL_SIZE; p++) {
-			if (*(uint8_t *)p != THREAD_STACK_SENTINEL_SYMBOL) {
+		for (void *p = sent; p < sent + CONFIG_THREAD_STACK_SENTINEL_SIZE; p++) {
+			if (*(uint8_t *)p != CONFIG_THREAD_STACK_SENTINEL_SYMBOL) {
 				__fault(K_FAULT_SENTINEL);
 			}
 		}

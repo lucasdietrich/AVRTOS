@@ -18,7 +18,7 @@
 int k_flags_init(struct k_flags *flags,
 		 uint8_t value)
 {
-#if KERNEL_ARGS_CHECKS
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (flags == NULL) {
 		return -EINVAL;
 	}
@@ -38,7 +38,7 @@ int k_flags_poll(struct k_flags *flags,
 {
 	int ret = -EAGAIN;
 
-#if KERNEL_ARGS_CHECKS
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (flags == NULL) {
 		return -EINVAL;
 	}
@@ -88,7 +88,7 @@ int k_flags_notify(struct k_flags *flags,
 {
 	int ret = 0;
 
-#if KERNEL_ARGS_CHECKS
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (flags == NULL) {
 		return -EINVAL;
 	}
@@ -148,7 +148,7 @@ int k_flags_notify(struct k_flags *flags,
 
 int k_flags_reset(struct k_flags *flags)
 {
-#if KERNEL_ARGS_CHECKS
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (flags == NULL) {
 		return -EINVAL;
 	}

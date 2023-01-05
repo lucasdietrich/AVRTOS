@@ -19,9 +19,9 @@ def gen_preproc_pres_selection_to_c(timer: Timer):
         max_us = timer.max_period_us(prescaler)
         
 
-        c += f"#{ifelif} KERNEL_SYSCLOCK_PERIOD_US <= {max_us}\n"
+        c += f"#{ifelif} CONFIG_KERNEL_SYSCLOCK_PERIOD_US <= {max_us}\n"
         c += f"#\tdefine K_SYSCLOCK_TIMER_PRESCALER K_SYSCLOCK_TIMER_PRESCALER_{prescaler}\n"
-        c += f"#\tdefine K_SYSCLOCK_TIMER_TCNT \\\n\t\t((1LLU + {timer.max_tcnt}LLU) - (((uint64_t)F_CPU)*KERNEL_SYSCLOCK_PERIOD_US)/({prescaler}000000LLU))\n"
+        c += f"#\tdefine K_SYSCLOCK_TIMER_TCNT \\\n\t\t((1LLU + {timer.max_tcnt}LLU) - (((uint64_t)F_CPU)*CONFIG_KERNEL_SYSCLOCK_PERIOD_US)/({prescaler}000000LLU))\n"
         c += f"#\tdefine K_SYSCLOCK_TIMER_TCNTL ((uint8_t) K_SYSCLOCK_TIMER_TCNT)\n"
         c += f"#\tdefine K_SYSCLOCK_TIMER_TCNTH ((uint8_t) (K_SYSCLOCK_TIMER_TCNT >> 8))\n"
 

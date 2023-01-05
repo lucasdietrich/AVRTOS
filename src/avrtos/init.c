@@ -32,7 +32,7 @@ void _k_avrtos_init(void)
 	// 	WDTCSR = 0x00;
 	// }
 
-#if KERNEL_DEBUG_PREEMPT_UART
+#if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif
 
@@ -42,25 +42,25 @@ void _k_avrtos_init(void)
         _k_kernel_init();
         _k_mem_slab_init_module();
 
-#if KERNEL_TIMERS
+#if CONFIG_KERNEL_TIMERS
         _k_timer_init_module();
 #endif
 
-#if THREAD_CANARIES
+#if CONFIG_THREAD_CANARIES
         _k_init_stacks_canaries();
 #endif
 
-#if THREAD_STACK_SENTINEL
+#if CONFIG_THREAD_STACK_SENTINEL
         _k_init_stacks_sentinel();
 #endif
 
 	_k_init_sysclock();
 
-#if (INTERRUPT_POLICY == 2) && (THREAD_MAIN_COOPERATIVE == 0)
+#if (CONFIG_INTERRUPT_POLICY == 2) && (CONFIG_THREAD_MAIN_COOPERATIVE == 0)
 	k_sched_lock();
 #endif
 
-#if INTERRUPT_POLICY > 0
+#if CONFIG_INTERRUPT_POLICY > 0
 	sei();
 #endif 
 }

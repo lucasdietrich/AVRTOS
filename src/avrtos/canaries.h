@@ -24,9 +24,9 @@ void _k_init_thread_stack_canaries(struct k_thread *th);
 
 /**
  * @brief Automatically initialize thread canaries in stack 
- * if configuration option THREAD_CANARIES is enabled.
+ * if configuration option CONFIG_THREAD_CANARIES is enabled.
  * 
- * Stack is filled with symbol THREAD_CANARIES_SYMBOL 
+ * Stack is filled with symbol CONFIG_THREAD_CANARIES_SYMBOL 
  * 
  * Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010
  */

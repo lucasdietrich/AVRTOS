@@ -91,7 +91,7 @@ K_NOINLINE bool k_event_pending(struct k_event *event);
  * @brief Internal function shifting the event queue and executing the handlers
  * for the events that have expired.
  * 
- * The call periodicity is constant and equals KERNEL_TIME_SLICE_US.
+ * The call periodicity is constant and equals CONFIG_KERNEL_TIME_SLICE_US.
  */
 K_NOINLINE void _k_event_q_process(void);
 

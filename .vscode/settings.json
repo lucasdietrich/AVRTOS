@@ -37,7 +37,7 @@
 		"delay.h": "c",
 		"cpufunc.h": "c",
 		"stdint.h": "c",
-		"default_config.h": "c",
+		"avrtos_conf.h": "c",
 		"time.h": "c",
 		"event.h": "c",
 		"atomic.h": "c",

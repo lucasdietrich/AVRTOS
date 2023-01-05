@@ -8,7 +8,7 @@
 
 #include <avrtos/defines.h>
 
-#if KERNEL_ATOMIC_API == 1
+#if CONFIG_KERNEL_ATOMIC_API == 1
 
 .global atomic_get
 .global atomic_clear
@@ -121,4 +121,4 @@ __atomic_cas_ret:
 	sts     SREG, r18
 	ret
 
-#endif /* KERNEL_ATOMIC_API */
+#endif /* CONFIG_KERNEL_ATOMIC_API */

@@ -23,7 +23,7 @@ extern bool __k_interrupts(void);
 // Kernel Public API
 //
 
-#if KERNEL_IRQ_LOCK_COUNTER == 0
+#if CONFIG_KERNEL_IRQ_LOCK_COUNTER == 0
 /**
  * @brief Disable interrupts in the current thread
  */
@@ -50,7 +50,7 @@ K_NOINLINE void irq_disable(void);
  */
 K_NOINLINE void irq_enable(void);
 
-#endif /* KERNEL_IRQ_LOCK_COUNTER */
+#endif /* CONFIG_KERNEL_IRQ_LOCK_COUNTER */
 
 static inline uint8_t irq_lock(void)
 {
@@ -193,7 +193,7 @@ K_NOINLINE void k_sleep(k_timeout_t timeout);
  * 
  * Note: Can be used in the case there is no IDLE thread.
  * 
- * Note: Require KERNEL_UPTIME to be set.
+ * Note: Require CONFIG_KERNEL_UPTIME to be set.
  * 
  * @param timeout 
  * @return K_NOINLINE 
@@ -337,28 +337,28 @@ static inline void k_yield_from_isr_cond(struct k_thread *thread)
 K_NOINLINE void _k_system_shift(void);
 
 /**
- * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
+ * @brief Get uptime in ticks (32 bit), if CONFIG_KERNEL_TICKS_COUNTER is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_ticks_get_32(void);
 
 /**
- * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled
+ * @brief Get uptime in ticks (64 bits), if CONFIG_KERNEL_TICKS_COUNTER is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint64_t k_ticks_get_64(void);
 
 /**
- * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled
+ * @brief Get uptime in milliseconds, if CONFIG_KERNEL_UPTIME is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_uptime_get_ms32(void);
 
 /**
- * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
+ * @brief Get uptime in milliseconds, if CONFIG_KERNEL_UPTIME is enabled.
  * 
  * Should be used if KERNEL_UPTIME_40BITS is enabled.
  * 
@@ -367,7 +367,7 @@ K_NOINLINE uint32_t k_uptime_get_ms32(void);
 K_NOINLINE uint64_t k_uptime_get_ms64(void);
 
 /**
- * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled
+ * @brief Get uptime in seconds, if CONFIG_KERNEL_UPTIME is enabled
  * 
  * @return K_NOINLINE 
  */

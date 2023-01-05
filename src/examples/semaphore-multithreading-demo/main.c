@@ -56,7 +56,7 @@ int main(void)
 		k_sleep(K_MSEC(PERIOD_SEM_GIVE));
 
 		k_sched_lock();
-#if !KERNEL_SCHEDULER_DEBUG
+#if !CONFIG_KERNEL_SCHEDULER_DEBUG
 		serial_print_p(PSTR("M: giving a semaphore "));
 #endif
     // k_sem_debug(&mysem);
@@ -73,7 +73,7 @@ void waiter_entry(void *context)
 
 		if (dbg_sem == 0) {
 			k_sched_lock();
-#if !KERNEL_SCHEDULER_DEBUG
+#if !CONFIG_KERNEL_SCHEDULER_DEBUG
 			serial_transmit(_current->symbol);
 			serial_printl_p(PSTR(": got a semaphore !"));
 #endif

@@ -27,7 +27,7 @@ void yield(void)
 
 /*___________________________________________________________________________*/
 
-#if KERNEL_THREAD_IDLE
+#if CONFIG_KERNEL_THREAD_IDLE
 #	define THREAD_IS_IDLE(_thread) (_thread == &_k_idle)
 #else
 #	define THREAD_IS_IDLE(_thread) (0)
@@ -52,8 +52,8 @@ uint8_t k_ready_count(void)
  * @brief Runqueue containing the queue of all ready threads.
  * Should never be NULL.
  */
-#if TREAD_PRIO_MULTIQ
-#error "TREAD_PRIO_MULTIQ not supported yet"
+#if CONFIG_TREAD_PRIO_MULTIQ
+#error "CONFIG_TREAD_PRIO_MULTIQ not supported yet"
 dlist_t _k_runqs[4u] = {
 	DLIST_INIT(_k_runqs[K_PRIO_HIGHEST]),
 	DLIST_INIT(_k_runqs[K_PRIO_HIGH]),
@@ -70,18 +70,18 @@ struct ditem *_k_runq = &_k_thread_main.tie.runqueue;
 
 struct titem *_k_events_queue = NULL;
 
-#if KERNEL_TIME_SLICE_MULTIPLE_TICKS
-uint8_t _k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
-#endif /* KERNEL_TIME_SLICE_MULTIPLE_TICKS */
+#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+uint8_t _k_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
+#endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
-#if KERNEL_TICKS
+#if CONFIG_KERNEL_TICKS_COUNTER
 // necessary ?
 union {
-	uint8_t bytes[KERNEL_TICKS_SIZE];
+	uint8_t bytes[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
 	struct {
 		uint32_t u32;
 
-#if KERNEL_TICKS_40BITS
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 		uint8_t u40_byte;
 #endif
 	};
@@ -92,12 +92,12 @@ union {
 		0,
 		0,
 		0,
-#if KERNEL_TICKS_40BITS == 5
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS == 5
 		0,
 #endif
 	}
 };
-#endif /* KERNEL_TICKS */
+#endif /* CONFIG_KERNEL_TICKS_COUNTER */
 
 /*___________________________________________________________________________*/
 
@@ -124,7 +124,7 @@ static K_NOINLINE void _k_schedule(struct k_thread *thread)
 {
 	__ASSERT_NOINTERRUPT();
 
-#if THREAD_STACK_SENTINEL && KERNEL_ASSERT
+#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_KERNEL_ASSERT
 	/* check that stack sentinel is still valid before switching to thread */
 	if (k_verify_stack_sentinel(thread) == false) {
 		__fault(K_FAULT_SENTINEL);
@@ -218,7 +218,7 @@ static K_NOINLINE void _k_suspend(void)
 	_k_ready_count--;
 
 	if (_k_ready_count == 0) {
-#if KERNEL_THREAD_IDLE == 0u
+#if CONFIG_KERNEL_THREAD_IDLE == 0u
 		/* Assert*/
 		__ASSERT_LEASTONE_RUNNING();
 
@@ -273,7 +273,7 @@ inline static void swap_endianness(void **addr)
  */
 void _k_kernel_init(void)
 {
-#if KERNEL_THREAD_IDLE
+#if CONFIG_KERNEL_THREAD_IDLE
 	/* Mark idle thread */
 	_k_idle.state = K_IDLE;
 #endif
@@ -311,7 +311,7 @@ void _k_kernel_init(void)
 	}
 }
 
-/* If KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the 
+/* If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the 
  * IDLE thread. The expired thread will be rescheduled only after
  * the current time slice interval finishes. So we lose few ticks in the 
  * IDLE thread.
@@ -323,13 +323,13 @@ void _k_system_shift(void)
 {
 
 	__ASSERT_NOINTERRUPT();
-	__STATIC_ASSERT_NOMSG(KERNEL_TIME_SLICE_TICKS != 0);
+	__STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
 
-	tqueue_shift(&_k_events_queue, KERNEL_TIME_SLICE_TICKS);
+	tqueue_shift(&_k_events_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
 
-#if KERNEL_TIME_SLICE_MULTIPLE_TICKS
-	_k_sched_ticks_remaining = KERNEL_TIME_SLICE_TICKS;
-#endif /* KERNEL_TIME_SLICE_MULTIPLE_TICKS */
+#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+	_k_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
+#endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
 	struct titem *ready;
 	while ((ready = tqueue_pop(&_k_events_queue)) != NULL) {
@@ -344,13 +344,13 @@ void _k_system_shift(void)
 		_k_schedule(thread);
 	}
 
-#if KERNEL_TIMERS
+#if CONFIG_KERNEL_TIMERS
 	_k_timers_process();
 #endif
 
-#if KERNEL_EVENTS
+#if CONFIG_KERNEL_EVENTS
 	_k_event_q_process();
-#endif /* KERNEL_EVENTS */
+#endif /* CONFIG_KERNEL_EVENTS */
 }
 
 
@@ -367,7 +367,7 @@ struct k_thread *_k_scheduler(void)
 {
 	__ASSERT_NOINTERRUPT();
 
-#if THREAD_STACK_SENTINEL && KERNEL_ASSERT
+#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_KERNEL_ASSERT
 	k_assert_registered_stack_sentinel();
 #endif
 
@@ -500,7 +500,7 @@ K_NOINLINE uint8_t _k_cancel_all_pending(struct ditem *waitqueue)
 // Kernel Public API
 //
 
-#if KERNEL_IRQ_LOCK_COUNTER
+#if CONFIG_KERNEL_IRQ_LOCK_COUNTER
 void irq_disable(void)
 {
 	cli();
@@ -529,16 +529,16 @@ void k_sched_lock(void)
 		_current->sched_lock = 1;
 	}
 
-#if KERNEL_SCHED_LOCK_COUNTER
+#if CONFIG_KERNEL_SCHED_LOCK_COUNTER
 	_current->sched_lock_cnt++;
-#endif /* KERNEL_SCHED_LOCK_COUNTER */
+#endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
 	__K_DBG_SCHED_LOCK(_current);
 }
 
 void k_sched_unlock(void)
 {
-#if KERNEL_SCHED_LOCK_COUNTER
+#if CONFIG_KERNEL_SCHED_LOCK_COUNTER
 	if (_current->sched_lock_cnt == 0) {
 		return;
 	} else if (_current->sched_lock_cnt == 1) {
@@ -547,7 +547,7 @@ void k_sched_unlock(void)
 		_current->sched_lock_cnt--;
 		return;
 	}
-#endif /* KERNEL_SCHED_LOCK_COUNTER */
+#endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		_current->sched_lock = 0;
@@ -596,7 +596,7 @@ void k_sleep(k_timeout_t timeout)
 	}
 }
 
-#if KERNEL_UPTIME
+#if CONFIG_KERNEL_UPTIME
 void k_wait(k_timeout_t timeout)
 {
 	__ASSERT_INTERRUPT();
@@ -610,7 +610,7 @@ void k_wait(k_timeout_t timeout)
 		now = k_ticks_get_64();
 	} while (now - ticks < K_TIMEOUT_TICKS(timeout));
 }
-#endif /* KERNEL_UPTIME */
+#endif /* CONFIG_KERNEL_UPTIME */
 
 void k_block(k_timeout_t timeout)
 {
@@ -679,38 +679,38 @@ void k_stop()
 
 /*___________________________________________________________________________*/
 
-#if KERNEL_UPTIME
+#if CONFIG_KERNEL_UPTIME
 
 uint32_t k_uptime_get(void)
 {
-#if KERNEL_TICKS_40BITS
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 	return k_ticks_get_64() / K_TICKS_PER_SECOND;
 #else
 	return k_ticks_get_32() / K_TICKS_PER_SECOND;
 	return 0;
-#endif /* KERNEL_UPTIME */
+#endif /* CONFIG_KERNEL_UPTIME */
 }
 
 uint32_t k_uptime_get_ms32(void)
 {
-#if KERNEL_TICKS
+#if CONFIG_KERNEL_TICKS_COUNTER
 	return k_ticks_get_32() / K_TICKS_PER_MS;
 #else
 	return 0;
-#endif /* KERNEL_UPTIME */
+#endif /* CONFIG_KERNEL_UPTIME */
 }
 
 uint64_t k_uptime_get_ms64(void)
 {
-#if KERNEL_TICKS_40BITS
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 	return k_ticks_get_64() / K_TICKS_PER_MS;
-#elif KERNEL_TICKS
+#elif CONFIG_KERNEL_TICKS_COUNTER
 	return k_ticks_get_32() / K_TICKS_PER_MS;
 #else
 	return 0;
-#endif /* KERNEL_UPTIME */
+#endif /* CONFIG_KERNEL_UPTIME */
 }
 
-#endif /* KERNEL_UPTIME */
+#endif /* CONFIG_KERNEL_UPTIME */
 
 /*___________________________________________________________________________*/

@@ -6,15 +6,15 @@
 
 #include "fd.h"
 
-#if FD_MAX_COUNT
+#if CONFIG_FD_MAX_COUNT
 
 K_MUTEX_DEFINE(fd_table_mutex);
 
-static struct fd fd_table[FD_MAX_COUNT];
+static struct fd fd_table[CONFIG_FD_MAX_COUNT];
 
 static int fd_check(int fd)
 {
-        if (fd < 0 || fd >= FD_MAX_COUNT) {
+        if (fd < 0 || fd >= CONFIG_FD_MAX_COUNT) {
                 return -EBADF;
         }
 
@@ -42,7 +42,7 @@ static int fd_unref(int fd)
 
 static int find_entry(void)
 {
-        for (struct fd *p = fd_table; p < &fd_table[FD_MAX_COUNT]; p++) {
+        for (struct fd *p = fd_table; p < &fd_table[CONFIG_FD_MAX_COUNT]; p++) {
                 if (atomic_get(&p->refcnt) == 0) {
                         return p - fd_table;
                 }

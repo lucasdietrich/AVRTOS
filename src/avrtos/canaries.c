@@ -11,7 +11,7 @@ void _k_init_thread_stack_canaries(struct k_thread *th)
 	for (uint8_t *addr = K_THREAD_STACK_START_USABLE(th);
 	     addr < (uint8_t *)th->stack.end - K_THREAD_STACK_VOID_SIZE;
 	     addr++) {
-		*addr = THREAD_CANARIES_SYMBOL;
+		*addr = CONFIG_THREAD_CANARIES_SYMBOL;
 	}
 }
 
@@ -30,7 +30,7 @@ void _k_init_stacks_canaries(void)
 void *_k_stack_canaries(struct k_thread *th)
 {
         uint8_t *preserved = K_STACK_START_USABLE(th->stack.end, th->stack.size) - 1u;
-        while (*(++preserved) == THREAD_CANARIES_SYMBOL) {}
+        while (*(++preserved) == CONFIG_THREAD_CANARIES_SYMBOL) {}
         return preserved;
 }
 
@@ -54,11 +54,11 @@ void print_stack_canaries(struct k_thread *th)
         serial_print_p(PSTR(" / "));
         serial_u16(K_STACK_SIZE_USABLE(th->stack.size));
 
-#if THREAD_STACK_SENTINEL
+#if CONFIG_THREAD_STACK_SENTINEL
 	serial_print_p(PSTR(" + "));
-	serial_u8(THREAD_STACK_SENTINEL_SIZE);
+	serial_u8(CONFIG_THREAD_STACK_SENTINEL_SIZE);
 	serial_print_p(PSTR(" (sentinel)"));
-#endif /* THREAD_STACK_SENTINEL */
+#endif /* CONFIG_THREAD_STACK_SENTINEL */
 
         serial_transmit('\n');
 }

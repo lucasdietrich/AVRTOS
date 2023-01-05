@@ -14,7 +14,7 @@
 
 #define CONFIG_EVENT_ALLOW_NO_WAIT 1u
 
-#if KERNEL_EVENTS
+#if CONFIG_KERNEL_EVENTS
 
 struct k_event_q
 {
@@ -114,4 +114,4 @@ void _k_event_q_process(void)
 	}
 }
 
-#endif /* KERNEL_EVENTS */
+#endif /* CONFIG_KERNEL_EVENTS */

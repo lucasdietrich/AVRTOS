@@ -16,18 +16,18 @@ extern struct ditem *_k_runqueue;
 
 extern bool _k_runqueue_single(void);
 
-#if KERNEL_THREAD_IDLE
+#if CONFIG_KERNEL_THREAD_IDLE
 
 static void _k_idle_entry(void *context);
 
-#if defined(__QEMU__) && (THREAD_IDLE_COOPERATIVE != 0)
+#if defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE != 0)
 #	warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
 #endif
 
 /*
  * K_THREAD_STACK_MIN_SIZE would be enough
  */
-#if THREAD_IDLE_COOPERATIVE
+#if CONFIG_THREAD_IDLE_COOPERATIVE
 
 /* TODO, cannot exaplin why it needs 22B instead of 21B ??? */
 /* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue function ?*/
@@ -35,7 +35,7 @@ static void _k_idle_entry(void *context);
 // K_THREAD_MINIMAL_DEFINE(_k_idle, _k_idle_entry, K_COOPERATIVE, NULL, 'I');
 K_THREAD_DEFINE(_k_idle,
 		_k_idle_entry,
-		K_THREAD_STACK_MIN_SIZE + KERNEL_THREAD_IDLE_ADD_STACK,
+		K_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_COOPERATIVE | K_FLAG_PRIO_LOW,
 		NULL,
 		'I');
@@ -46,7 +46,7 @@ K_THREAD_DEFINE(_k_idle,
  */
 K_THREAD_DEFINE(_k_idle,
 		_k_idle_entry,
-		K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE + KERNEL_THREAD_IDLE_ADD_STACK,
+		K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_PREEMPTIVE | K_FLAG_PRIO_LOW,
 		NULL,
 		'I');
@@ -60,14 +60,14 @@ K_THREAD_DEFINE(_k_idle,
 static void _k_idle_entry(void *context)
 {
 	for (;;) {
-#if THREAD_IDLE_COOPERATIVE
-#warning "THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
+#if CONFIG_THREAD_IDLE_COOPERATIVE
+#warning "CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
 		k_yield();
 		// _k_yield_from_idle_thread();
-#endif /* THREAD_IDLE_COOPERATIVE */
+#endif /* CONFIG_THREAD_IDLE_COOPERATIVE */
 
 		/* A bit buggy on QEMU but normally works fine */
-#if !defined(__QEMU__) && (THREAD_IDLE_COOPERATIVE == 0)
+#if !defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE == 0)
 		/* only an interrupt can wake up the CPU after this instruction */
 		sleep_cpu();
 #endif /* __QEMU__ */
@@ -75,15 +75,15 @@ static void _k_idle_entry(void *context)
 	}
 }
 
-#endif /* KERNEL_THREAD_IDLE */
+#endif /* CONFIG_KERNEL_THREAD_IDLE */
 
 bool k_is_cpu_idle(void)
 {
-#if KERNEL_THREAD_IDLE
+#if CONFIG_KERNEL_THREAD_IDLE
 	return _k_ready_count == 0;
 #else 
 	return false;
-#endif /* KERNEL_THREAD_IDLE */
+#endif /* CONFIG_KERNEL_THREAD_IDLE */
 }
 
 void k_idle(void)

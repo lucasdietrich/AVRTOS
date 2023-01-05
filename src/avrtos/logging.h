@@ -17,7 +17,7 @@
 #define LOG_LEVEL_INF LOG_LEVEL_INFO
 #define LOG_LEVEL_DBG LOG_LEVEL_DEBUG
 
-#if LOGGING_SUBSYSTEM
+#if CONFIG_LOGGING_SUBSYSTEM
 
 #define _LOG(level, fmt, ...) \
     do { \

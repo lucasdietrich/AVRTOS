@@ -100,9 +100,9 @@ void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue)
 
 /*___________________________________________________________________________*/
 
-#if SYSTEM_WORKQUEUE_ENABLE
+#if CONFIG_SYSTEM_WORKQUEUE_ENABLE
 
-K_WORKQUEUE_DEFINE(_k_system_workqueue, SYSTEM_WORKQUEUE_STACK_SIZE, SYSTEM_WORKQUEUE_PRIORITY, 'W');
+K_WORKQUEUE_DEFINE(_k_system_workqueue, CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE, CONFIG_SYSTEM_WORKQUEUE_PRIORITY, 'W');
 
 bool k_system_workqueue_submit(struct k_work *work)
 {

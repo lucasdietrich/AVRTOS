@@ -107,58 +107,58 @@ What enhancements/features are not planned :
 ## All onfiguration options
 | Configuration option | Description |
 | --- | --- |
-| THREAD_MAIN_COOPERATIVE   | Define main thread as cooperative (default prempt) |
-| THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
-| THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
+| CONFIG_THREAD_MAIN_COOPERATIVE   | Define main thread as cooperative (default prempt) |
+| CONFIG_THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
+| CONFIG_THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
 | ~~THREAD_USE_INIT_STACK_ASM~~ | Tells if we should use the C or the Assembler function to define our threads at runtime |
 | ~~KERNEL_HIGH_RANGE_TIME_OBJECT_U32~~ | ~~Configure to use uint32_t as k_delta_t ~= 50 days or keep (uint16_t) ~= 65seconds~~ |
-| THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
-| KERNEL_DEBUG | Enable Kernel Debug features |
-| KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
-| KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
-| KERNEL_COOPERATIVE_THREADS | Enable preemtive threads feature |
-| KERNEL_SYSCLOCK_PERIOD_US | Sysclock period when precision mode is disabled (LLU is important) |
+| CONFIG_THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
+| CONFIG_KERNEL_DEBUG | Enable Kernel Debug features |
+| CONFIG_KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
+| CONFIG_KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
+| CONFIG_KERNEL_COOPERATIVE_THREADS | Enable preemtive threads feature |
+| CONFIG_KERNEL_SYSCLOCK_PERIOD_US | Sysclock period when precision mode is disabled (LLU is important) |
 | ~~KERNEL_SYSCLOCK_AUTO_START~~ | Auto start kernel sysclock |
-| KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
-| ~~KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
-| KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
-| KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
+| CONFIG_KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
+| ~~CONFIG_KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
+| CONFIG_KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
+| CONFIG_KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
 | ~~KERNEL_ALLOW_INTERRUPT_YIELD~~ |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
-| THREAD_IDLE_COOPERATIVE | Tell if IDLE thread is preemptive or cooperative |
-| THREAD_CANARIES | Enable thread canaries |
-| THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
-| SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
-| SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
-| ~~SYSTEM_WORKQUEUE_PRIORITY~~ | Define system workqueue thread priority |
-| SYSTEM_WORKQUEUE_COOPERATIVE | Tell if the system workqueue should be executed cooperatively |
-| KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
+| CONFIG_THREAD_IDLE_COOPERATIVE | Tell if IDLE thread is preemptive or cooperative |
+| CONFIG_THREAD_CANARIES | Enable thread canaries |
+| CONFIG_THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
+| CONFIG_SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
+| CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
+| ~~CONFIG_SYSTEM_WORKQUEUE_PRIORITY~~ | Define system workqueue thread priority |
+| CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE | Tell if the system workqueue should be executed cooperatively |
+| CONFIG_KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
 | **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
 | ~~THREAD_ALLOW_RETURN~~ | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
-| KERNEL_TIMERS | Enables timers |
-| KERNEL_EVENTS | Enables kernel events |
-| KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
-| KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
-| STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART (0, 1, 2, ..), "-1" to disable.  |
-| KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
+| CONFIG_KERNEL_TIMERS | Enables timers |
+| CONFIG_KERNEL_EVENTS | Enables kernel events |
+| CONFIG_KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
+| CONFIG_KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
+| CONFIG_STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART (0, 1, 2, ..), "-1" to disable.  |
+| CONFIG_KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
 | ~~KERNEL_UPTIME_40BITS~~ | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
-| ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from KERNEL_TIME_SLICE_US but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (KERNEL_TIME_SLICE_US). |
-| KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
-| KERNEL_TIME_SLICE_US | Time slice in milliseconds |
+| ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from CONFIG_KERNEL_TIME_SLICE_US but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (CONFIG_KERNEL_TIME_SLICE_US). |
+| CONFIG_KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
+| CONFIG_KERNEL_TIME_SLICE_US | Time slice in milliseconds |
 | ~~KERNEL_TIME~~ | Enable system time API |
-| KERNEL_ATOMIC_API | Enable atomic API |
+| CONFIG_KERNEL_ATOMIC_API | Enable atomic API |
 | THREAD_TERMINATION_TYPE | Allow, or not thread termination. 0 : not allowed (need less stack). 1 : allowed (need more stack) . -1 : not allow but fault (need more stack but fault if terminate) |
-| KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
-| KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH | Compare threads addresses after scheduler call to prevent thread switch to the same thread |
-| KERNEL_TICKS_40BITS | Use 40 bits for ticks counter size (instead of 32 bits) |
-| THREAD_STACK_SENTINEL | Define thread sentinel size |
-| THREAD_STACK_SENTINEL_SIZE  | Define thread sentinel size |
-| THREAD_STACK_SENTINEL_SYMBOL | Define thread sentinel symbol |
-| FD_MAX_COUNT | **UNUSED** |
-| DRIVERS_USART0_ASYNC | Enable USART0 driver |
-| DRIVERS_USART1_ASYNC | Enable USART1 driver |
-| DRIVERS_USART2_ASYNC | Enable USART2 driver |
-| DRIVERS_USART3_ASYNC | Enable USART3 driver |
-| INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
+| CONFIG_KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
+| CONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH | Compare threads addresses after scheduler call to prevent thread switch to the same thread |
+| CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS | Use 40 bits for ticks counter size (instead of 32 bits) |
+| CONFIG_THREAD_STACK_SENTINEL | Define thread sentinel size |
+| CONFIG_THREAD_STACK_SENTINEL_SIZE  | Define thread sentinel size |
+| CONFIG_THREAD_STACK_SENTINEL_SYMBOL | Define thread sentinel symbol |
+| CONFIG_FD_MAX_COUNT | **UNUSED** |
+| CONFIG_DRIVERS_USART0_ASYNC | Enable USART0 driver |
+| CONFIG_DRIVERS_USART1_ASYNC | Enable USART1 driver |
+| CONFIG_DRIVERS_USART2_ASYNC | Enable USART2 driver |
+| CONFIG_DRIVERS_USART3_ASYNC | Enable USART3 driver |
+| CONFIG_INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
 | DEFAULT_DRIVERS_TIMER0_API | Enable TIMER0 API | 
 | DEFAULT_DRIVERS_TIMER1_API | Enable TIMER1 API |
 | DEFAULT_DRIVERS_TIMER2_API | Enable TIMER2 API |
@@ -373,7 +373,7 @@ Use of `_delay_ms`, `sleep_cpu` is deprecated in QEMU.
     - a fifo item is at least 2B
   - a memory slab is 11B + allocated buffer
   - a timer is 8B (or 12B with high precision)
-    - timer timeout queue is 2B (enabled via KERNEL_TIMERS)
+    - timer timeout queue is 2B (enabled via CONFIG_KERNEL_TIMERS)
   - a msgq is 15B + allocated buffer
 - In term of time, thread switch is between 26µs and 30µs on an 16MHz AVR (will be measured more precisely)
 - Plan additionnal stack for every thread that have their interrupt flag set, whose the stack could be used during interrupt handlers calls.
@@ -558,7 +558,7 @@ sudo apt install gdb-avr
 
 ### Console debug
 
-Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
+Enabling configuration option `CONFIG_KERNEL_SCHEDULER_DEBUG` enables following logs :
 - Before scheduler call :
     - `c` : Meaning that an interrupt planned to call the scheduler but the current thread is in cooperative mode. We restore the current thread same context that was only partially saved.
     - `s` : Afther the scheduler get called, there is still only one thread that is ready to be executed, and we restore the context that was partially saved.
@@ -578,7 +578,7 @@ Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
     - `)T` : current thread `T` took a semaphore
     - `T(` : current thread `T` gave a semaphore
 
-Enabling configuration option `KERNEL_SCHEDULER_DEBUG` enables following logs :
+Enabling configuration option `CONFIG_KERNEL_SCHEDULER_DEBUG` enables following logs :
 - `.` : Each time the syslock timer expires, we check if the current thread can be preempted and then the scheduler is called in.
 
 #### Example with the getting-started example 
@@ -596,8 +596,8 @@ K 034E [PREE 3] READY   : SP 35/62 -| END @02E6
 ## Optimization
 
 Stacks sizes are tricky to size. Depending when the threads are interrupted, the stack usage can be different and reach high usage very quickly. However following things can help to prevent stack overflow or identify leaks :
-- Enable stack canaries (`THREAD_CANARIES`) to have a precise idea of stack usage.
-- Enable stack sentinel(`THREAD_STACK_SENTINEL`) to detect stack overflow.
+- Enable stack canaries (`CONFIG_THREAD_CANARIES`) to have a precise idea of stack usage.
+- Enable stack sentinel(`CONFIG_THREAD_STACK_SENTINEL`) to detect stack overflow.
 - Using k_sched_lock() arround stack consuming functions.
 - Declare thread as COOPERATIVE instead of PREEMPTIVE.
 - Use static variables
@@ -650,7 +650,7 @@ Priority *COOPERATIVE* :
 - Find a way to not use the serial_print*() function anymore and to use the UART drivers instead
 - Get rid of the AVR startup code : [AVR Freaks : Custom Startup Code](https://www.avrfreaks.net/forum/custom-startup-code)
   - Small overhead
-- Merge `KERNEL_UPTIME` and `KERNEL_TIME`
+- Merge `CONFIG_KERNEL_UPTIME` and `KERNEL_TIME`
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
@@ -663,8 +663,8 @@ Priority *COOPERATIVE* :
 
 ## Troubleshooting
 
-- If your program crashes/restart/gets stuck, just increase all stack sizes, just in case (especially with `KERNEL_TIMERS`, `KERNEL_EVENTS`).
-  - Note: Also increase IDLE stack size with `KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
+- If your program crashes/restart/gets stuck, just increase all stack sizes, just in case (especially with `CONFIG_KERNEL_TIMERS`, `CONFIG_KERNEL_EVENTS`).
+  - Note: Also increase IDLE stack size with `CONFIG_KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
   - Note: function call with ATmge2560 for example are stack consuming (because of the 3B return addresses)
 
 ## CMake

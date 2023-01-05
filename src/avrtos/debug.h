@@ -30,7 +30,7 @@ extern "C" {
     serial_transmit(th->symbol);      \
     serial_transmit(chr)
 
-#if KERNEL_SCHEDULER_DEBUG
+#if CONFIG_KERNEL_SCHEDULER_DEBUG
 
 #define __K_DBG_SCHED_LOCK(th)      __K_DBG_HELPER_TH(th, '[')
 #define __K_DBG_SCHED_UNLOCK()      serial_transmit(']')
@@ -76,7 +76,7 @@ extern "C" {
 /**
  * @brief Current thread stack usage
  * 
- * Getting the stack usage of the main thread if THREAD_EXPLICIT_MAIN_STACK is not set will return 0 by default :
+ * Getting the stack usage of the main thread if CONFIG_THREAD_EXPLICIT_MAIN_STACK is not set will return 0 by default :
  *  
  * @param th
  * @return uint16_t 

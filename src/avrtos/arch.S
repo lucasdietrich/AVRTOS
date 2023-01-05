@@ -18,17 +18,17 @@
 .extern _k_sched_ticks_remaining 	; u8
 .extern _k_system_shift
 
-#if KERNEL_SYSLOCK_HW_TIMER == 0
+#if CONFIG_KERNEL_SYSLOCK_HW_TIMER == 0
 #define TIMERn_COMPA_vect TIMER0_COMPA_vect
-#elif KERNEL_SYSLOCK_HW_TIMER == 1
+#elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 1
 #define TIMERn_COMPA_vect TIMER1_COMPA_vect
-#elif KERNEL_SYSLOCK_HW_TIMER == 2
+#elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2
 #define TIMERn_COMPA_vect TIMER2_COMPA_vect
-#elif KERNEL_SYSLOCK_HW_TIMER == 3
+#elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 3
 #define TIMERn_COMPA_vect TIMER3_COMPA_vect
-#elif KERNEL_SYSLOCK_HW_TIMER == 4
+#elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 4
 #define TIMERn_COMPA_vect TIMER4_COMPA_vect
-#elif KERNEL_SYSLOCK_HW_TIMER == 5
+#elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 5
 #define TIMERn_COMPA_vect TIMER5_COMPA_vect
 #endif
 
@@ -42,12 +42,12 @@ TIMERn_COMPA_vect:
 	eor	r1, r1
 	push	r18
 
-#if KERNEL_SYSTICK_GPIOB_DEBUG
-	ldi 	r18, KERNEL_SYSTICK_GPIOB_DEBUG
+#if CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	ldi 	r18, CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
 	sts 	PINB, r18
-#endif /* KERNEL_SYSTICK_GPIOB_DEBUG */
+#endif /* CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG */
 
-#if KERNEL_TICKS
+#if CONFIG_KERNEL_TICKS_COUNTER
 	ldi r18, 0x01			; 1 cycle
 
 	lds r0, _k_ticks		; 2 cycles
@@ -66,22 +66,22 @@ TIMERn_COMPA_vect:
 	adc r0, r1			; 1 cycle
 	sts _k_ticks + 3, r0		; 2 cycles
 
-#if KERNEL_TICKS_40BITS
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 	lds r0, _k_ticks + 4		; 2 cycles
 	adc r0, r1			; 1 cycle
 	sts _k_ticks + 4, r0		; 2 cycles
 #endif
-; KERNEL_TICKS_40BITS
+; CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 #endif
-; KERNEL_TICKS
+; CONFIG_KERNEL_TICKS_COUNTER
 
-#if KERNEL_TIME_SLICE_MULTIPLE_TICKS
+#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	lds r18, _k_sched_ticks_remaining
 	subi r18, 0x01
 	sts _k_sched_ticks_remaining, r18
 	brne __intctx_restore_minimal
 #endif 
-;KERNEL_TIME_SLICE_MULTIPLE_TICKS
+;CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 
 	push	r19
 	push	r20
@@ -95,16 +95,16 @@ TIMERn_COMPA_vect:
 	push	r30
 	push	r31
 
-#if KERNEL_DEBUG
+#if CONFIG_KERNEL_DEBUG
 	ldi r24, 0x2e           ; '.'
 	call serial_transmit
 #endif
-; KERNEL_DEBUG
+; CONFIG_KERNEL_DEBUG
 
 	call _k_system_shift
 
 ; check if scheduler is locked (cooperative thread or temporarely locked)
-#if KERNEL_COOPERATIVE_THREADS
+#if CONFIG_KERNEL_COOPERATIVE_THREADS
 	lds ZL, _current           ; load current thread addr in Z
 	lds ZH, _current + 1
 
@@ -125,10 +125,10 @@ TIMERn_COMPA_vect:
 #endif 
 	jmp _k_yield
 #endif
-; KERNEL_COOPERATIVE_THREADS
+; CONFIG_KERNEL_COOPERATIVE_THREADS
 
 __sched_locked:
-#if KERNEL_COOPERATIVE_THREADS && KERNEL_SCHEDULER_DEBUG
+#if CONFIG_KERNEL_COOPERATIVE_THREADS && CONFIG_KERNEL_SCHEDULER_DEBUG
 	ldi r24, 0x63	    ; 'c'
 	call serial_transmit
 #endif
@@ -147,10 +147,10 @@ __intctx_restore:
 	pop	r19
 
 __intctx_restore_minimal:
-#if KERNEL_SYSTICK_GPIOB_DEBUG
-	ldi 	r18, KERNEL_SYSTICK_GPIOB_DEBUG
+#if CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	ldi 	r18, CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
 	sts 	PINB, r18
-#endif /* KERNEL_SYSTICK_GPIOB_DEBUG */
+#endif /* CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG */
 	pop	r18
 	pop	r0
 	sts	SREG, r0
@@ -170,7 +170,7 @@ _k_yield:
 	lds r30, _current
 	lds r31, _current + 1
 
-#if KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH
+#if CONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH
 	; Compare threads addresses after scheduler call to prevent thread switch to the same thread
 	; - i.e.thread switch only if "previous" and "_current" threads are different
 	; - inefficient if at least two threads are always ready
@@ -225,10 +225,10 @@ _k_thread_switch:
 	pop r28
 	pop r17
 
-#if KERNEL_SYSTICK_GPIOB_DEBUG
-	ldi 	r16, KERNEL_SYSTICK_GPIOB_DEBUG
+#if CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	ldi 	r16, CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
 	sts 	PINB, r16
-#endif /* KERNEL_SYSTICK_GPIOB_DEBUG */
+#endif /* CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG */
 
 	pop r16
 	pop r15
@@ -255,9 +255,9 @@ _k_thread_entry:
 	movw r30, r4
 	sts SREG, r6
 	
-#if KERNEL_THREAD_TERMINATION_TYPE == 0
+#if CONFIG_KERNEL_THREAD_TERMINATION_TYPE == 0
 	ijmp
-#elif KERNEL_THREAD_TERMINATION_TYPE == -1
+#elif CONFIG_KERNEL_THREAD_TERMINATION_TYPE == -1
 	icall
 	ldi r24, 0x03 ; K_THREAD_TERMINATED
 	call __fault
@@ -276,7 +276,7 @@ __k_interrupts:
     ret
 
 
-#if KERNEL_TICKS
+#if CONFIG_KERNEL_TICKS_COUNTER
 .global k_ticks_get_32
 .global k_ticks_get_64
 k_ticks_get_32:
@@ -297,22 +297,22 @@ k_ticks_get_64:
 	lds 	r20, _k_ticks + 2
 	lds 	r21, _k_ticks + 3
 	sts	SREG, r26
-#if KERNEL_TICKS_40BITS
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 	lds	r22, _k_ticks + 4
 #else
 	ldi	r22, 0x00
-#endif /* KERNEL_TICKS_40BITS */
+#endif /* CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS */
 	ldi	r23, 0x00
 	ldi	r24, 0x00
 	ldi	r25, 0x00
 	ret
-#endif /* KERNEL_TICKS */
+#endif /* CONFIG_KERNEL_TICKS_COUNTER */
 
 .global __debug
 __debug:
 	ret
 
-#if KERNEL_DEBUG_PREEMPT_UART
+#if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 .global USART0_RX_vect
 USART0_RX_vect:
 	push	r1
@@ -346,4 +346,4 @@ USART0_RX_vect:
 
 	jmp _k_yield
 #endif
-; KERNEL_DEBUG_PREEMPT_UART
+; CONFIG_KERNEL_DEBUG_PREEMPT_UART

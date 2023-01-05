@@ -12,7 +12,7 @@
 
 #include "misc/serial.h"
 
-#if KERNEL_TIMERS
+#if CONFIG_KERNEL_TIMERS
 
 #define K_MODULE    K_MODULE_TIMER
 

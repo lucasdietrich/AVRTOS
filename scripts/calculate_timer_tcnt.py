@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
             ifelif = "if" if first else "elif"
 
-            ret += f"#{ifelif} KERNEL_SYSCLOCK_PERIOD_US == {period_us}\n"
+            ret += f"#{ifelif} CONFIG_KERNEL_SYSCLOCK_PERIOD_US == {period_us}\n"
             ret += f"#\tdefine K_SYSCLOCK_TIMER_PRESCALER    K_SYSCLOCK_TIMER_PRESCALER_{p}\n"
             
             ret += f"#\tdefine K_SYSCLOCK_TIMER_TCNT         {t}\n"

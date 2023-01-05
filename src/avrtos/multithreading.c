@@ -14,9 +14,9 @@
 
 extern int main(void);
 
-#if THREAD_EXPLICIT_MAIN_STACK == 1
+#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 
-__noinit char _k_main_stack[THREAD_MAIN_STACK_SIZE];
+__noinit char _k_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
 
 _K_STACK_SENTINEL_REGISTER(_k_main_stack);
 
@@ -25,7 +25,7 @@ _K_STACK_SENTINEL_REGISTER(_k_main_stack);
 K_THREAD struct k_thread _k_thread_main = {
     .sp = 0, // main thread is running, context already "restored"
     {
-#if THREAD_MAIN_COOPERATIVE == 1
+#if CONFIG_THREAD_MAIN_COOPERATIVE == 1
         .flags = K_READY | K_COOPERATIVE | K_FLAG_PRIO_LOW,
 #else
         .flags = K_READY | K_PREEMPTIVE | K_FLAG_PRIO_LOW,
@@ -39,15 +39,15 @@ K_THREAD struct k_thread _k_thread_main = {
     },
     .wany = DITEM_INIT_NULL(),   // the thread isn't pending on any events
     .swap_data = NULL,
-#if THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
+#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
     .stack = {
-        .end = (void *)_K_STACK_END(_k_main_stack, THREAD_MAIN_STACK_SIZE),
-        .size = THREAD_MAIN_STACK_SIZE,
+        .end = (void *)_K_STACK_END(_k_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE),
+        .size = CONFIG_THREAD_MAIN_STACK_SIZE,
     },
 #else
     .stack = {          // implicit stack, we set the main thread stack end at the end of the RAM
         .end = (void *)RAMEND,
-        .size = THREAD_MAIN_STACK_SIZE, /* Used as indication only */
+        .size = CONFIG_THREAD_MAIN_STACK_SIZE, /* Used as indication only */
     },
 #endif
     .symbol = 'M'           // default main thread sumbol
@@ -69,7 +69,7 @@ static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t ent
 	}
 
 	ctx->sreg = 0U;
-	ctx->init_sreg = THREAD_DEFAULT_SREG;
+	ctx->init_sreg = CONFIG_THREAD_DEFAULT_SREG;
 	ctx->thread_context = (void*) K_SWAP_ENDIANNESS(context_p);
 	ctx->thread_entry = (void*) K_SWAP_ENDIANNESS(entry);
 	ctx->pc = (void*) K_SWAP_ENDIANNESS(_k_thread_entry);
@@ -100,13 +100,13 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
 
         _k_thread_stack_create(th, entry, context_p);
 
-#if THREAD_STACK_SENTINEL
+#if CONFIG_THREAD_STACK_SENTINEL
 	_k_init_thread_stack_sentinel(th);
-#endif /* THREAD_STACK_SENTINEL */
+#endif /* CONFIG_THREAD_STACK_SENTINEL */
 
-#if THREAD_CANARIES
+#if CONFIG_THREAD_CANARIES
 	_k_init_thread_stack_canaries(th);
-#endif /* THREAD_CANARIES */
+#endif /* CONFIG_THREAD_CANARIES */
 
         /* clear internal flags */
         th->flags = 0;

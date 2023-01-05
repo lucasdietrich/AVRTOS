@@ -8,7 +8,7 @@
 
 #include "misc/serial.h"
 
-#if STDIO_PRINTF_TO_USART == 0
+#if CONFIG_STDIO_PRINTF_TO_USART == 0
 
 static int uart_putchar(char c, FILE *stream)
 {
@@ -30,4 +30,4 @@ void k_set_stdio_usart0(void)
 	/* Nothing to do */
 }
 
-#endif /* STDIO_PRINTF_TO_USART */
+#endif /* CONFIG_STDIO_PRINTF_TO_USART */

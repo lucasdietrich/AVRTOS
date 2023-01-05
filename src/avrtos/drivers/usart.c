@@ -10,6 +10,11 @@
 #include <avr/pgmspace.h>
 #include <avr/io.h>
 
+#define DRIVERS_UART_ASYNC ((CONFIG_DRIVERS_USART0_ASYNC) || \
+	(CONFIG_DRIVERS_USART1_ASYNC) || \
+	(CONFIG_DRIVERS_USART2_ASYNC) || \
+	(CONFIG_DRIVERS_USART3_ASYNC))	
+
 /* same for all USARTs */
 #define TXENn TXEN0
 #define RXENn RXEN0
@@ -243,7 +248,7 @@ static void udre_interrupt(UART_Device *dev)
 	}
 }
 
-#if DRIVERS_USART0_ASYNC
+#if CONFIG_DRIVERS_USART0_ASYNC
 ISR(USART0_RX_vect)
 {
 	rx_interrupt(USART0_DEVICE);
@@ -258,9 +263,9 @@ ISR(USART0_UDRE_vect)
 {
 	udre_interrupt(USART0_DEVICE);
 }
-#endif /* DRIVERS_USART0_ASYNC */
+#endif /* CONFIG_DRIVERS_USART0_ASYNC */
 
-#if DRIVERS_USART1_ASYNC
+#if CONFIG_DRIVERS_USART1_ASYNC
 ISR(USART1_RX_vect)
 {
 	rx_interrupt(USART1_DEVICE);
@@ -275,9 +280,9 @@ ISR(USART1_UDRE_vect)
 {
 	udre_interrupt(USART1_DEVICE);
 }
-#endif /* DRIVERS_USART1_ASYNC */
+#endif /* CONFIG_DRIVERS_USART1_ASYNC */
 
-#if DRIVERS_USART2_ASYNC
+#if CONFIG_DRIVERS_USART2_ASYNC
 ISR(USART2_RX_vect)
 {
 	rx_interrupt(USART2_DEVICE);
@@ -292,9 +297,9 @@ ISR(USART2_UDRE_vect)
 {
 	udre_interrupt(USART2_DEVICE);
 }
-#endif /* DRIVERS_USART2_ASYNC */
+#endif /* CONFIG_DRIVERS_USART2_ASYNC */
 
-#if DRIVERS_USART3_ASYNC
+#if CONFIG_DRIVERS_USART3_ASYNC
 ISR(USART3_RX_vect)
 {
 	rx_interrupt(USART3_DEVICE);
@@ -309,7 +314,7 @@ ISR(USART3_UDRE_vect)
 {
 	udre_interrupt(USART3_DEVICE);
 }
-#endif /* DRIVERS_USART3_ASYNC */
+#endif /* CONFIG_DRIVERS_USART3_ASYNC */
 
 int usart_set_callback(UART_Device *dev, usart_async_callback_t cb)
 {

@@ -6,7 +6,7 @@
 
 #include "time.h"
 
-#if KERNEL_UPTIME
+#if CONFIG_KERNEL_UPTIME
 
 void k_timespec_get(struct timespec *ts)
 {
