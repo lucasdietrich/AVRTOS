@@ -20,62 +20,66 @@ void k_fifo_init(struct k_fifo *fifo)
 
 struct k_thread *_k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 {
-        __ASSERT_NOTNULL(fifo);
-        __ASSERT_NOTNULL(item);
-        __ASSERT_NOINTERRUPT();
+	__ASSERT_NOINTERRUPT();
 
-        /* If there is a thread pending on a fifo item,
-        * we to give the item directly to the thread
-        * (using thread->swap_data)
-        */
-	struct k_thread *const thread = 
+	/* If there is a thread pending on a fifo item,
+	* we to give the item directly to the thread
+	* (using thread->swap_data)
+	*/
+	struct k_thread *const thread =
 		_k_unpend_first_and_swap(&fifo->waitqueue, (void *)item);
 
-        if (thread == NULL) {
-                        /* otherwise we queue the item to the fifo */
-                oqueue(&fifo->queue, item);
-        }
+	if (thread == NULL) {
+			/* otherwise we queue the item to the fifo */
+		oqueue(&fifo->queue, item);
+	}
 
 	return thread;
 }
 
 struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                return _k_fifo_put(fifo, item);
-        }
+	__ASSERT_NOTNULL(fifo);
+	__ASSERT_NOTNULL(item);
 
-	CODE_UNREACHABLE;
+	const uint8_t lock = irq_lock();
+
+	struct k_thread *const thread = _k_fifo_put(fifo, item);
+
+	irq_unlock(lock);
+
+	return thread;
 }
 
 struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 {
-        __ASSERT_NOTNULL(fifo);
+	__ASSERT_NOTNULL(fifo);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                struct qitem *item = odequeue(&fifo->queue);
-                if (item == NULL) {
-                        if (_k_pend_current(&fifo->waitqueue, timeout) == 0) {
-                                item = (struct qitem *)_current->swap_data;
-                        }
-                }
-                return item;
-        }
+	const uint8_t lock = irq_lock();
+	struct qitem *item = odequeue(&fifo->queue);
 
-        __builtin_unreachable();
+	if (item == NULL) {
+		if (_k_pend_current(&fifo->waitqueue, timeout) == 0) {
+			item = (struct qitem *)_current->swap_data;
+		}
+	}
+
+	irq_unlock(lock);
+
+	return item;
 }
 
 uint8_t k_fifo_cancel_wait(struct k_fifo *fifo)
 {
-        __ASSERT_NOTNULL(fifo);
+	__ASSERT_NOTNULL(fifo);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                return _k_cancel_all_pending(&fifo->waitqueue);
-        }
+	const uint8_t lock = irq_lock();
 
-        __builtin_unreachable();
+	const uint8_t ret = _k_cancel_all_pending(&fifo->waitqueue);
+
+	irq_unlock(lock);
+
+	return ret;
 }
 
 bool k_fifo_is_empty(struct k_fifo *fifo)
@@ -85,20 +89,22 @@ bool k_fifo_is_empty(struct k_fifo *fifo)
 
 struct qitem *k_fifo_peek_head(struct k_fifo *fifo)
 {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                return opeek_head(&fifo->queue);
-        }
+	const uint8_t lock = irq_lock();
 
-        __builtin_unreachable();
+	struct qitem *const item = opeek_head(&fifo->queue);
+
+	irq_unlock(lock);
+
+	return item;
 }
 
 struct qitem *k_fifo_peek_tail(struct k_fifo *fifo)
 {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                return opeek_tail(&fifo->queue);
-        }
+	const uint8_t lock = irq_lock();
 
-        __builtin_unreachable();
+	struct qitem *const item = opeek_tail(&fifo->queue);
+
+	irq_unlock(lock);
+
+	return item;
 }

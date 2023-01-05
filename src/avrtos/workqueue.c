@@ -38,9 +38,9 @@ void _k_workqueue_entry(struct k_workqueue *const workqueue)
 		 * 
 		 * However, we can't do any assumption regarding the context of the work item
 		 **/
-                ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                        item->next = NULL;
-                }
+                const uint8_t key = irq_lock();
+		item->next = NULL;
+		irq_unlock(key);
 
                 handler(work);
 		
@@ -65,37 +65,38 @@ inline bool k_work_submittable(struct k_work *work)
 
 bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
-        __ASSERT_NOTNULL(workqueue);
-        __ASSERT_NOTNULL(work);
-        __ASSERT_NOTNULL(work->handler);
+	__ASSERT_NOTNULL(workqueue);
+	__ASSERT_NOTNULL(work);
+	__ASSERT_NOTNULL(work->handler);
 
-        /* if item not already in queue */
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                if (k_work_submittable(work)) {
-                        _k_fifo_put(&workqueue->q, &work->_tie);
+	bool ret = false;
 
-			return true;
-                }
-        }
-	return false;
+	/* if item not already in queue */
+	const uint8_t key = irq_lock();
+	if (k_work_submittable(work)) {
+		_k_fifo_put(&workqueue->q, &work->_tie);
+		ret = true;
+	}
+	irq_unlock(key);
+	return ret;
 }
 
 void k_workqueue_set_yieldeach(struct k_workqueue *workqueue)
 {
-        __ASSERT_NOTNULL(workqueue);
+	__ASSERT_NOTNULL(workqueue);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                workqueue->yieldeach = 1u;
-        }
+	const uint8_t key = irq_lock();
+	workqueue->yieldeach = 1u;
+	irq_unlock(key);
 }
 
 void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue)
 {
-        __ASSERT_NOTNULL(workqueue);
+	__ASSERT_NOTNULL(workqueue);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                workqueue->yieldeach = 0u;
-        }
+	const uint8_t key = irq_lock();
+	workqueue->yieldeach = 0u;
+	irq_unlock(key);
 }
 
 /*___________________________________________________________________________*/

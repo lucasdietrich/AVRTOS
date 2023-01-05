@@ -10,6 +10,7 @@
 
 #include "avrtos_conf.h"
 #include "common.h"
+#include "errno.h"
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN && CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #   error "CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN and CONFIG_THREAD_EXPLICIT_MAIN_STACK are incompatible"

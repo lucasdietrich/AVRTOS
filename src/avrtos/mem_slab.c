@@ -80,10 +80,6 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
  */
 __always_inline static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
-        __ASSERT_NOTNULL(slab);
-        __ASSERT_NOTNULL(mem);
-        __ASSERT_NOTNULL(slab->free_list);
-
         *mem = (uint8_t *)slab->free_list;
         slab->free_list = slab->free_list->next;
 
@@ -92,30 +88,33 @@ __always_inline static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **
 
 int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout)
 {
-        __ASSERT_NOTNULL(slab);
-        __ASSERT_NOTNULL(mem);
+	__ASSERT_NOTNULL(slab);
+	__ASSERT_NOTNULL(mem);
 
-        int8_t ret;
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                if (slab->free_list != NULL) {
-                        /* there are fre memory blocks, 
-                         * so we allocate one directly */
-                        ret = _k_mem_slab_alloc(slab, mem);
-                } else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-                        /* we don't wait for a block to available and there no
-                         * one left, we return an error */
-                        ret = -ENOMEM;
-                } else {
-                        /* we wait for a block being available */
-                        ret = _k_pend_current(&slab->waitqueue, timeout);
-                        if (ret == 0) {
-                                /* we retrieve the memory block available */
-                                *mem = _current->swap_data;
-                        }
-                }
-        }
-        return ret;
+	int8_t ret;
+
+	const uint8_t key = irq_lock();
+
+	if (slab->free_list != NULL) {
+		/* there are fre memory blocks,
+		 * so we allocate one directly */
+		ret = _k_mem_slab_alloc(slab, mem);
+	} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+		/* we don't wait for a block to available and there no
+		 * one left, we return an error */
+		ret = -ENOMEM;
+	} else {
+		/* we wait for a block being available */
+		ret = _k_pend_current(&slab->waitqueue, timeout);
+		if (ret == 0) {
+			/* we retrieve the memory block available */
+			*mem = _current->swap_data;
+		}
+	}
+
+	irq_unlock(key);
+
+	return ret;
 }
 
 /**
@@ -154,18 +153,19 @@ struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem)
                 goto ret;
         }
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                /* if a thread is pending on a memory slab we give the block
-                 * directly to the thread (using thread->swap_data)
-                 */
-		thread = _k_unpend_first_and_swap(&slab->waitqueue, mem);
-		
-                if (thread == NULL) {
-                        /* otherwise we free the block */
-                        _k_mem_slab_free(slab, mem);
-                }
-        }
+	const uint8_t key = irq_lock();
+
+	/* if a thread is pending on a memory slab we give the block
+	 * directly to the thread (using thread->swap_data)
+	 */
+	thread = _k_unpend_first_and_swap(&slab->waitqueue, mem);
+
+	if (thread == NULL) {
+		/* otherwise we free the block */
+		_k_mem_slab_free(slab, mem);
+	}
+
+	irq_unlock(key);
 
 ret:
 	return thread;

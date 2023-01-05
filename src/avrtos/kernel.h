@@ -193,7 +193,7 @@ K_NOINLINE void k_sleep(k_timeout_t timeout);
  * 
  * Note: Can be used in the case there is no IDLE thread.
  * 
- * Note: Require CONFIG_KERNEL_UPTIME to be set.
+ * Note: Require KERNEL_UPTIME to be set.
  * 
  * @param timeout 
  * @return K_NOINLINE 
@@ -265,9 +265,9 @@ void _k_yield(void);
  */
 static inline void k_yield(void)
 {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		_k_yield();
-	}
+	const uint8_t key = irq_lock();
+	_k_yield();
+	irq_unlock(key);
 }
 
 void yield(void);
@@ -337,28 +337,28 @@ static inline void k_yield_from_isr_cond(struct k_thread *thread)
 K_NOINLINE void _k_system_shift(void);
 
 /**
- * @brief Get uptime in ticks (32 bit), if CONFIG_KERNEL_TICKS_COUNTER is enabled
+ * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_ticks_get_32(void);
 
 /**
- * @brief Get uptime in ticks (64 bits), if CONFIG_KERNEL_TICKS_COUNTER is enabled
+ * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint64_t k_ticks_get_64(void);
 
 /**
- * @brief Get uptime in milliseconds, if CONFIG_KERNEL_UPTIME is enabled
+ * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled
  * 
  * @return K_NOINLINE 
  */
 K_NOINLINE uint32_t k_uptime_get_ms32(void);
 
 /**
- * @brief Get uptime in milliseconds, if CONFIG_KERNEL_UPTIME is enabled.
+ * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
  * 
  * Should be used if KERNEL_UPTIME_40BITS is enabled.
  * 
@@ -367,7 +367,7 @@ K_NOINLINE uint32_t k_uptime_get_ms32(void);
 K_NOINLINE uint64_t k_uptime_get_ms64(void);
 
 /**
- * @brief Get uptime in seconds, if CONFIG_KERNEL_UPTIME is enabled
+ * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled
  * 
  * @return K_NOINLINE 
  */

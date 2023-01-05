@@ -525,9 +525,11 @@ void irq_enable(void)
 
 void k_sched_lock(void)
 {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		_current->sched_lock = 1;
-	}
+	const uint8_t key = irq_lock();
+
+	_current->sched_lock = 1;
+
+	irq_unlock(key);
 
 #if CONFIG_KERNEL_SCHED_LOCK_COUNTER
 	_current->sched_lock_cnt++;
@@ -549,9 +551,10 @@ void k_sched_unlock(void)
 	}
 #endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		_current->sched_lock = 0;
-	}
+
+	const uint8_t key = irq_lock();
+	_current->sched_lock = 0;
+	irq_unlock(key);
 
 	__K_DBG_SCHED_UNLOCK();
 }
@@ -582,17 +585,18 @@ bool k_cur_is_coop(void)
 void k_sleep(k_timeout_t timeout)
 {
 	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-		{
-			/* Suspend the thread */
-			_k_suspend();
+		const uint8_t key = irq_lock();
 
-			/* schedule thread wake up if timeout is set */
-			_k_schedule_wake_up(timeout);
+		/* Suspend the thread */
+		_k_suspend();
 
-			/* Call scheduler */
-			_k_yield();
-		}
+		/* schedule thread wake up if timeout is set */
+		_k_schedule_wake_up(timeout);
+
+		/* Call scheduler */
+		_k_yield();
+
+		irq_unlock(key);
 	}
 }
 
@@ -614,31 +618,34 @@ void k_wait(k_timeout_t timeout)
 
 void k_block(k_timeout_t timeout)
 {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{
-		k_ticks_t ticks = K_TIMEOUT_TICKS(timeout);
-		while (ticks != 0) {
-			_delay_us(K_TICKS_US);
-			ticks--;
-		}
+	const uint8_t key = irq_lock();
+	
+	k_ticks_t ticks = K_TIMEOUT_TICKS(timeout);
+	while (ticks != 0) {
+		_delay_us(K_TICKS_US);
+		ticks--;
 	}
+
+	irq_unlock(key);
 }
 
 void k_suspend(void)
 {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{
-		_k_suspend();
-	}
+	const uint8_t key = irq_lock();
+
+	_k_suspend();
+
+	irq_unlock(key);
 }
 
 void k_resume(struct k_thread *th)
 {
 	if (th->state == K_PENDING) {
-		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-		{
-			_k_schedule(th);
-		}
+		const uint8_t key = irq_lock();
+
+		_k_schedule(th);
+
+		irq_unlock(key);
 	} else {
 		/* thread pending, ready of running and then already started */
 	}
@@ -647,10 +654,11 @@ void k_resume(struct k_thread *th)
 void k_thread_start(struct k_thread *th)
 {
 	if (th->state == K_STOPPED) {
-		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-		{
-			_k_schedule(th);
-		}
+		const uint8_t key = irq_lock();
+
+		_k_schedule(th);
+
+		irq_unlock(key);
 	}
 }
 

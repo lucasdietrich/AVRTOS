@@ -7,24 +7,25 @@
 #ifndef _AVRTOS_EVENT_H_
 #define _AVRTOS_EVENT_H_
 
-#include <avrtos/multithreading.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <avrtos/avrtos.h>
 #include <avrtos/dstruct/tqueue.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// TODO
-// #define K_EVENTS_OPTIMIZED	1
-
 /*___________________________________________________________________________*/
 
 struct k_event;
 
+/**
+ * @brief Event handler function.
+ * 
+ * @param event Event that triggered the handler.
+ */
 typedef void (*k_event_handler_t)(struct k_event *);
 
 struct k_event

@@ -63,9 +63,9 @@ int main(void)
 					printf_P(PSTR("Uptime : %lu (ms)\n"), now);
 				}
 
-					ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-					_delay_ms(2000);
-				}
+				const uint8_t key = irq_lock();
+				_delay_ms(2000);
+				irq_unlock(key);
 			}
 
 		k_wait(K_SECONDS(10));

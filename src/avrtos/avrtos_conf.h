@@ -32,7 +32,7 @@
 // 1: Main thread is cooperative
 //
 #ifndef CONFIG_THREAD_MAIN_COOPERATIVE
-#define CONFIG_THREAD_MAIN_COOPERATIVE         	0
+#define CONFIG_THREAD_MAIN_COOPERATIVE         			0
 #endif
 
 //
@@ -43,7 +43,7 @@
 // 2: Interrupts are enabled but scheduler is locked
 //
 #ifndef CONFIG_INTERRUPT_POLICY
-#define CONFIG_INTERRUPT_POLICY			0
+#define CONFIG_INTERRUPT_POLICY					0
 #endif
 
 //
@@ -57,7 +57,7 @@
 // malloc use the stack pointer to make checks on the remaining heap size.
 //
 #ifndef CONFIG_THREAD_EXPLICIT_MAIN_STACK
-#define CONFIG_THREAD_EXPLICIT_MAIN_STACK          	0
+#define CONFIG_THREAD_EXPLICIT_MAIN_STACK          		0
 #endif
 
 //
@@ -74,7 +74,7 @@
 // too big.
 //
 #ifndef CONFIG_THREAD_MAIN_STACK_SIZE
-#define CONFIG_THREAD_MAIN_STACK_SIZE              	0x200
+#define CONFIG_THREAD_MAIN_STACK_SIZE              		0x200
 #endif
 
 //
@@ -86,7 +86,7 @@
 // 1: malloc is used in main thread
 //
 #ifndef CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN
-#define CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN		0
+#define CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN			0
 #endif
 
 //
@@ -96,7 +96,7 @@
 // 1: malloc is used in other threads
 //
 #ifndef CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD
-#define CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD		0
+#define CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD			0
 #endif
 
 //
@@ -117,7 +117,7 @@
 // (1 << SREG_I): Interrupts enabled when threads starts (other than main thread)
 //
 #ifndef CONFIG_THREAD_DEFAULT_SREG
-#define CONFIG_THREAD_DEFAULT_SREG             	(1 << SREG_I)
+#define CONFIG_THREAD_DEFAULT_SREG             			(1 << SREG_I)
 #endif
 
 
@@ -131,7 +131,7 @@
 // -1: Thread termination is not permitted (kernel panic)
 //
 #ifndef CONFIG_KERNEL_THREAD_TERMINATION_TYPE
-#define CONFIG_KERNEL_THREAD_TERMINATION_TYPE		0
+#define CONFIG_KERNEL_THREAD_TERMINATION_TYPE			0
 #endif
 
 //
@@ -141,7 +141,7 @@
 // 1: Thread priorities are supported
 //
 #ifndef CONFIG_TREAD_PRIO_MULTIQ
-#define CONFIG_TREAD_PRIO_MULTIQ 		       	0
+#define CONFIG_TREAD_PRIO_MULTIQ 		       		0
 #endif
 
 //
@@ -165,7 +165,7 @@
 // 1: Cooperative threads are enabled
 //
 #ifndef CONFIG_KERNEL_COOPERATIVE_THREADS
-#define CONFIG_KERNEL_COOPERATIVE_THREADS		1
+#define CONFIG_KERNEL_COOPERATIVE_THREADS			1
 #endif
 
 //
@@ -178,7 +178,7 @@
 // Usually 1ms is a good value
 //
 #ifndef CONFIG_KERNEL_SYSCLOCK_PERIOD_US
-#define CONFIG_KERNEL_SYSCLOCK_PERIOD_US       	1000llu
+#define CONFIG_KERNEL_SYSCLOCK_PERIOD_US       			1000llu
 #endif
 
 //
@@ -190,7 +190,7 @@
 // Usually using CONFIG_KERNEL_SYSCLOCK_PERIOD_US value is a good choice
 //
 #ifndef CONFIG_KERNEL_TIME_SLICE_US
-#define CONFIG_KERNEL_TIME_SLICE_US               	1000llu
+#define CONFIG_KERNEL_TIME_SLICE_US               		1000llu
 #endif
 
 //
@@ -207,7 +207,7 @@
 // 5: Timer 5 (16 bits)
 //
 #ifndef CONFIG_KERNEL_SYSLOCK_HW_TIMER
-#define CONFIG_KERNEL_SYSLOCK_HW_TIMER         	1
+#define CONFIG_KERNEL_SYSLOCK_HW_TIMER         			1
 #endif
 
 //
@@ -221,7 +221,7 @@
 // 1: 40 bits counter size
 //
 #ifndef CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-#define CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS   			1
+#define CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS   		1
 #endif
 
 //
@@ -240,7 +240,7 @@
 // 1: Delay objects are 32 bits
 //
 #ifndef CONFIG_KERNEL_DELAY_OBJECT_U32
-#define CONFIG_KERNEL_DELAY_OBJECT_U32			0
+#define CONFIG_KERNEL_DELAY_OBJECT_U32				0
 #endif
 
 //
@@ -255,7 +255,7 @@
 // 1: Kernel auto initialisation is enabled
 //
 #ifndef CONFIG_KERNEL_AUTO_INIT
-#define CONFIG_KERNEL_AUTO_INIT                	1
+#define CONFIG_KERNEL_AUTO_INIT                			1
 #endif
 
 //
@@ -267,7 +267,7 @@
 // 1: Kernel idle thread is enabled
 //
 #ifndef CONFIG_KERNEL_THREAD_IDLE
-#define CONFIG_KERNEL_THREAD_IDLE              	1
+#define CONFIG_KERNEL_THREAD_IDLE              			1
 #endif
 
 //
@@ -278,7 +278,7 @@
 // Minimum advised value is 0x50
 //
 #ifndef CONFIG_KERNEL_THREAD_IDLE_ADD_STACK
-#define CONFIG_KERNEL_THREAD_IDLE_ADD_STACK    	0x50
+#define CONFIG_KERNEL_THREAD_IDLE_ADD_STACK    			0x50
 #endif
 
 //
@@ -289,7 +289,7 @@
 // 1: Kernel idle thread is cooperative
 //
 #ifndef CONFIG_THREAD_IDLE_COOPERATIVE
-#define CONFIG_THREAD_IDLE_COOPERATIVE			0
+#define CONFIG_THREAD_IDLE_COOPERATIVE				0
 #endif
 
 //
@@ -303,7 +303,7 @@
 // 1: Thread canaries are enabled
 //
 #ifndef CONFIG_THREAD_CANARIES
-#define CONFIG_THREAD_CANARIES                 	0
+#define CONFIG_THREAD_CANARIES                 			0
 #endif
 
 //
@@ -312,7 +312,7 @@
 // 0xAA or 0x55 are good values
 //
 #ifndef CONFIG_THREAD_CANARIES_SYMBOL
-#define CONFIG_THREAD_CANARIES_SYMBOL          	0xAA
+#define CONFIG_THREAD_CANARIES_SYMBOL          			0xAA
 #endif
 
 //
@@ -323,7 +323,7 @@
 // 1: Thread sentinel is enabled
 //
 #ifndef CONFIG_THREAD_STACK_SENTINEL
-#define CONFIG_THREAD_STACK_SENTINEL          		0
+#define CONFIG_THREAD_STACK_SENTINEL          			0
 #endif
 
 //
@@ -332,7 +332,7 @@
 // 1 is a good value
 //
 #ifndef CONFIG_THREAD_STACK_SENTINEL_SIZE
-#define CONFIG_THREAD_STACK_SENTINEL_SIZE      	1
+#define CONFIG_THREAD_STACK_SENTINEL_SIZE      			1
 #endif
 
 //
@@ -341,7 +341,7 @@
 // 0xAA or 0x55 are good values
 //
 #ifndef CONFIG_THREAD_STACK_SENTINEL_SYMBOL
-#define CONFIG_THREAD_STACK_SENTINEL_SYMBOL    	0xAA
+#define CONFIG_THREAD_STACK_SENTINEL_SYMBOL    			0xAA
 #endif
 
 //
@@ -351,7 +351,7 @@
 // 1: System workqueue is enabled
 //
 #ifndef CONFIG_SYSTEM_WORKQUEUE_ENABLE
-#define CONFIG_SYSTEM_WORKQUEUE_ENABLE         	0
+#define CONFIG_SYSTEM_WORKQUEUE_ENABLE         			0
 #endif
 
 //
@@ -360,7 +360,7 @@
 // when executed.
 //
 #ifndef CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE
-#define CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE     	0x200
+#define CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE     			0x200
 #endif
 
 //
@@ -370,7 +370,7 @@
 // 1: System workqueue is cooperative
 //
 #ifndef CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE
-#define CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE       	0
+#define CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE       		0
 #endif
 
 //
@@ -380,7 +380,7 @@
 // 1: Kernel assertion is enabled
 //
 #ifndef CONFIG_KERNEL_ASSERT
-#define CONFIG_KERNEL_ASSERT                   	0
+#define CONFIG_KERNEL_ASSERT                   			0
 #endif
 
 //
@@ -390,7 +390,7 @@
 // 1: Kernel arguments checks are enabled
 //
 #ifndef CONFIG_KERNEL_ARGS_CHECKS
-#define CONFIG_KERNEL_ARGS_CHECKS			0
+#define CONFIG_KERNEL_ARGS_CHECKS				0
 #endif
 
 //
@@ -401,7 +401,7 @@
 // 1: Kernel timers are enabled
 //
 #ifndef CONFIG_KERNEL_TIMERS
-#define CONFIG_KERNEL_TIMERS                   	0
+#define CONFIG_KERNEL_TIMERS                   			0
 #endif
 
 //
@@ -412,8 +412,20 @@
 // 1: Kernel events are enabled
 //
 #ifndef CONFIG_KERNEL_EVENTS
-#define CONFIG_KERNEL_EVENTS                   	0
+#define CONFIG_KERNEL_EVENTS                   			0
 #endif
+
+//
+// Allow to schedule an events with K_NO_WAIT
+// This will cause the event callback to be executed immediately
+//
+// 0: Require a non-zero timeout to schedule an event
+// 1: Allow to schedule an event with K_NO_WAIT
+//
+#ifndef CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT
+#define CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT			1
+#endif
+
 
 //
 // Enabled thread errno
@@ -422,7 +434,7 @@
 // 1: Thread errno is enabled
 //
 #ifndef CONFIG_THREAD_ERRNO
-#define CONFIG_THREAD_ERRNO                    	0
+#define CONFIG_THREAD_ERRNO                    			0
 #endif
 
 //
@@ -436,7 +448,7 @@
 // 1: Scheduler lock counter is enabled
 //
 #ifndef CONFIG_KERNEL_SCHED_LOCK_COUNTER
-#define CONFIG_KERNEL_SCHED_LOCK_COUNTER       	0
+#define CONFIG_KERNEL_SCHED_LOCK_COUNTER       			0
 #endif
 
 //
@@ -453,7 +465,7 @@
 // 1: IRQ lock counter is enabled
 //
 #ifndef CONFIG_KERNEL_IRQ_LOCK_COUNTER
-#define CONFIG_KERNEL_IRQ_LOCK_COUNTER       		0
+#define CONFIG_KERNEL_IRQ_LOCK_COUNTER       			0
 #endif
 
 //
@@ -470,7 +482,7 @@
 // 6: printf is redirected to USART6 if exists
 //
 #ifndef CONFIG_STDIO_PRINTF_TO_USART
-#define CONFIG_STDIO_PRINTF_TO_USART			-1
+#define CONFIG_STDIO_PRINTF_TO_USART				-1
 #endif
 
 //
@@ -480,7 +492,7 @@
 // 1: Logging subsystem is enabled
 //
 #ifndef CONFIG_LOGGING_SUBSYSTEM
-#define CONFIG_LOGGING_SUBSYSTEM			1
+#define CONFIG_LOGGING_SUBSYSTEM				1
 #endif
 
 //
@@ -490,7 +502,7 @@
 // 1: Uptime counter is enabled
 //
 #ifndef CONFIG_KERNEL_UPTIME
-#define CONFIG_KERNEL_UPTIME				0
+#define CONFIG_KERNEL_UPTIME					0
 #endif
 
 //
@@ -500,7 +512,7 @@
 // 1: Atomic API is enabled
 //
 #ifndef CONFIG_KERNEL_ATOMIC_API
-#define CONFIG_KERNEL_ATOMIC_API			0
+#define CONFIG_KERNEL_ATOMIC_API				0
 #endif
 
 //
@@ -511,7 +523,7 @@
 // 1: UART0 RX interrupt is used as preemptive signal
 // 
 #ifndef CONFIG_KERNEL_DEBUG_PREEMPT_UART
-#define CONFIG_KERNEL_DEBUG_PREEMPT_UART		0
+#define CONFIG_KERNEL_DEBUG_PREEMPT_UART			0
 #endif
 
 
@@ -522,7 +534,7 @@
 // 1: Kernel function inlining is enabled
 //
 #ifndef CONFIG_KERNEL_API_NOINLINE
-#define CONFIG_KERNEL_API_NOINLINE             	0
+#define CONFIG_KERNEL_API_NOINLINE             			0
 #endif
 
 //
@@ -532,7 +544,7 @@
 // 1: Kernel Debug is enabled
 //
 #ifndef CONFIG_KERNEL_DEBUG
-#define CONFIG_KERNEL_DEBUG                    	0
+#define CONFIG_KERNEL_DEBUG                    			0
 #endif
 
 //
@@ -542,7 +554,7 @@
 // 1: Kernel Debug in scheduler is enabled
 //
 #ifndef CONFIG_KERNEL_SCHEDULER_DEBUG
-#define CONFIG_KERNEL_SCHEDULER_DEBUG          	0
+#define CONFIG_KERNEL_SCHEDULER_DEBUG          			0
 #endif
 
 //
@@ -552,7 +564,7 @@
 // n: Maximum number of file descriptors
 //
 #ifndef CONFIG_FD_MAX_COUNT
-#define CONFIG_FD_MAX_COUNT                  		0
+#define CONFIG_FD_MAX_COUNT                  			0
 #endif
 
 //
@@ -562,7 +574,7 @@
 // 1: USART0 asynchronous support is enabled
 //
 #ifndef CONFIG_DRIVERS_USART0_ASYNC
-#define CONFIG_DRIVERS_USART0_ASYNC			0
+#define CONFIG_DRIVERS_USART0_ASYNC				0
 #endif
 
 //
@@ -572,7 +584,7 @@
 // 1: USART1 asynchronous support is enabled
 //
 #ifndef CONFIG_DRIVERS_USART1_ASYNC
-#define CONFIG_DRIVERS_USART1_ASYNC			0
+#define CONFIG_DRIVERS_USART1_ASYNC				0
 #endif
 
 //
@@ -582,7 +594,7 @@
 // 1: USART2 asynchronous support is enabled
 //
 #ifndef CONFIG_DRIVERS_USART2_ASYNC
-#define CONFIG_DRIVERS_USART2_ASYNC			0
+#define CONFIG_DRIVERS_USART2_ASYNC				0
 #endif
 
 //
@@ -592,7 +604,7 @@
 // 1: USART3 asynchronous support is enabled
 //
 #ifndef CONFIG_DRIVERS_USART3_ASYNC
-#define CONFIG_DRIVERS_USART3_ASYNC			0
+#define CONFIG_DRIVERS_USART3_ASYNC				0
 #endif
 
 //
@@ -602,7 +614,7 @@
 // 1: High level support for timer0 is enabled
 //
 #ifndef CONFIG_DRIVERS_TIMER0_API
-#define CONFIG_DRIVERS_TIMER0_API			0
+#define CONFIG_DRIVERS_TIMER0_API				0
 #endif
 
 //
@@ -612,7 +624,7 @@
 // 1: High level support for timer1 is enabled
 //
 #ifndef CONFIG_DRIVERS_TIMER1_API
-#define CONFIG_DRIVERS_TIMER1_API			0
+#define CONFIG_DRIVERS_TIMER1_API				0
 #endif
 
 //
@@ -622,7 +634,7 @@
 // 1: High level support for timer2 is enabled
 //
 #ifndef CONFIG_DRIVERS_TIMER2_API
-#define CONFIG_DRIVERS_TIMER2_API			0
+#define CONFIG_DRIVERS_TIMER2_API				0
 #endif
 
 //
@@ -632,7 +644,7 @@
 // 1: High level support for timer3 is enabled
 //
 #ifndef CONFIG_DRIVERS_TIMER3_API
-#define CONFIG_DRIVERS_TIMER3_API			0
+#define CONFIG_DRIVERS_TIMER3_API				0
 #endif
 
 //
@@ -642,7 +654,7 @@
 // 1: High level support for timer4 is enabled
 //
 #ifndef CONFIG_DRIVERS_TIMER4_API
-#define CONFIG_DRIVERS_TIMER4_API			0
+#define CONFIG_DRIVERS_TIMER4_API				0
 #endif
 
 //
@@ -652,7 +664,7 @@
 // 1: High level support for timer5 is enabled
 //
 #ifndef CONFIG_DRIVERS_TIMER5_API
-#define CONFIG_DRIVERS_TIMER5_API			0
+#define CONFIG_DRIVERS_TIMER5_API				0
 #endif
 
 //
@@ -662,7 +674,7 @@
 // n: Systick debug is enabled on given GPIO pin of PORTB
 //
 #ifndef CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
-#define CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG		0
+#define CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG			0
 #endif
 
 #endif

@@ -89,16 +89,14 @@ bool k_is_cpu_idle(void)
 void k_idle(void)
 {
 	/* if others thread are ready, yield the CPU */
-	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		if (_k_ready_count != 0u) {
-			return _k_yield();
-		}
-	}
-
+	if (_k_ready_count != 0u) {
+		k_yield();
+	} else {
 #ifndef __QEMU__
-	/* A bit buggy on QEMU but normally works fine */
-	sleep_cpu();
+		/* A bit buggy on QEMU but normally works fine */
+		sleep_cpu();
 #endif /* __QEMU__ */
+	}
 }
 
 /*___________________________________________________________________________*/

@@ -6,7 +6,7 @@
 
 #include "fd.h"
 
-#if CONFIG_FD_MAX_COUNT
+#if CONFIG_FD_MAX_COUNT > 0
 
 K_MUTEX_DEFINE(fd_table_mutex);
 

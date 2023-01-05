@@ -7,10 +7,13 @@
 #ifndef _AVRTOS_ATOMIC_H_
 #define _AVRTOS_ATOMIC_H_
 
-#include <avrtos/multithreading.h>
+#include <stdbool.h>
+
 #include <avr/io.h>
-#include <util/atomic.h>
 #include <avr/cpufunc.h>
+#include <util/atomic.h>
+
+#include <avrtos/defines.h>
 
 
 #ifdef __cplusplus

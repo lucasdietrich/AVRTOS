@@ -66,14 +66,6 @@ K_NOINLINE void k_msgq_init(struct k_msgq *msgq, char *buffer,
                             size_t msg_size, uint32_t max_msgs);
 
 /**
- * @brief Not implemented !
- * 
- * @param msgq 
- * @return K_NOINLINE 
- */
-K_NOINLINE int8_t k_msgq_cleanup(struct k_msgq *msgq);
-
-/**
  * @brief Try to append the message @a data to the MsgQ @a msgq.
  * 
  * Try until timeout.

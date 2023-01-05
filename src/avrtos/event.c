@@ -12,8 +12,6 @@
 
 #define K_MODULE K_MODULE_EVENT
 
-#define CONFIG_EVENT_ALLOW_NO_WAIT 1u
-
 #if CONFIG_KERNEL_EVENTS
 
 struct k_event_q
@@ -48,25 +46,27 @@ int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 		return -EINVAL;
 	}
 
-#if !CONFIG_EVENT_ALLOW_NO_WAIT
+#if !CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT
 	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		return -EINVAL;
 	}
 #endif
 
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		if (CONFIG_EVENT_ALLOW_NO_WAIT && K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-			/* If no wait is requested, execute the handler immediately 
-			 * without scheduling it */
-			event->handler(event);
-		} else {
-			event->scheduled = 1u;
-			event->tie.next = NULL;
-			event->tie.timeout = K_TIMEOUT_TICKS(timeout);
+	const uint8_t lock = irq_lock();
 
-			_tqueue_schedule(&_k_event_q.first, &event->tie);
-		}
+	if (CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT && K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+		/* If no wait is requested, execute the handler immediately
+		 * without scheduling it */
+		event->handler(event);
+	} else {
+		event->scheduled = 1u;
+		event->tie.next = NULL;
+		event->tie.timeout = K_TIMEOUT_TICKS(timeout);
+
+		_tqueue_schedule(&_k_event_q.first, &event->tie);
 	}
+
+	irq_unlock(lock);
 
 	return 0;
 }
@@ -77,11 +77,12 @@ int k_event_cancel(struct k_event *event)
 		return -EINVAL;
 	}
 
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		tqueue_remove(&_k_event_q.first, &event->tie);
-		
-		event->scheduled = 0;
-	}
+	const uint8_t lock = irq_lock();
+
+	tqueue_remove(&_k_event_q.first, &event->tie);
+	event->scheduled = 0;
+
+	irq_unlock(lock);
 
 	return 0;
 }

@@ -25,45 +25,55 @@ void k_signal_init(struct k_signal *sig)
 
 struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value)
 {
-        __ASSERT_NOTNULL(sig);
+	__ASSERT_NOTNULL(sig);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                sig->signal = value;
-                sig->flags |= K_POLL_STATE_SIGNALED;
+	struct k_thread *thread;
 
-                /* TODO: unpend all threads */
-                return _k_unpend_first_thread(&sig->waitqueue);
-        }
+	const uint8_t key = irq_lock();
 
-	CODE_UNREACHABLE;
+	sig->signal = value;
+	sig->flags |= K_POLL_STATE_SIGNALED;
+
+	/* TODO: unpend all threads */
+	thread = _k_unpend_first_thread(&sig->waitqueue);
+
+	irq_unlock(key);
+
+	return thread;
 }
 
 int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 {
-        __ASSERT_NOTNULL(sig);
+	__ASSERT_NOTNULL(sig);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
-                        return 0;
-                } else {
-                        return _k_pend_current(&sig->waitqueue, timeout);
-                }
-        }
+	int8_t ret;
 
-        __builtin_unreachable();
+	const uint8_t key = irq_lock();
+
+	if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
+		ret = 0;
+	} else {
+		ret = _k_pend_current(&sig->waitqueue, timeout);
+	}
+
+	irq_unlock(key);
+
+	return ret;
 }
 
 uint8_t k_poll_cancel_wait(struct k_signal *sig)
 {
-        __ASSERT_NOTNULL(sig);
+	__ASSERT_NOTNULL(sig);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                return _k_cancel_all_pending(&sig->waitqueue);
-        }
+	int8_t ret;
 
-        __builtin_unreachable();
+	const uint8_t key = irq_lock();
+
+	ret = _k_cancel_all_pending(&sig->waitqueue);
+
+	irq_unlock(key);
+
+	return ret;
 }
 
 /*___________________________________________________________________________*/

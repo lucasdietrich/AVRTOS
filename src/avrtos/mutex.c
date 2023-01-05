@@ -29,19 +29,20 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	__ASSERT_NOTNULL(mutex);
 
 	int8_t lock = 0;
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{
-		if (mutex->lock != 0x00) {
-			mutex->lock = 0x00;
-		} else {
-			lock = _k_pend_current(&mutex->waitqueue, timeout);
-		}
+	const uint8_t key = irq_lock();
 
-		if (lock == 0) {
-			__K_DBG_MUTEX_LOCKED(_current);    // }
-			mutex->owner = _current;
-		}
+	if (mutex->lock != 0x00) {
+		mutex->lock = 0x00;
+	} else {
+		lock = _k_pend_current(&mutex->waitqueue, timeout);
 	}
+
+	if (lock == 0) {
+		__K_DBG_MUTEX_LOCKED(_current);    // }
+		mutex->owner = _current;
+	}
+
+	irq_unlock(key);
 	return lock;
 }
 
@@ -51,41 +52,45 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 
 	struct k_thread *thread = NULL;
 
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{
-		/* we check if the current thread actually owns the mutex */
-		if (mutex->owner != _current) {
-			goto ret;
-		}
+	const uint8_t key = irq_lock();
 
-		__K_DBG_MUTEX_UNLOCKED(_current); // {
+	/* we check if the current thread actually owns the mutex */
+	if (mutex->owner != _current) {
+		goto ret;
+	}
 
-		/* there is a new owner, we don't need to unlock the mutex
-		 * The mutex owner is changed when returning to the
-		 * k_mutex_lock function.
-		 */
-		thread = _k_unpend_first_thread(&mutex->waitqueue);
+	__K_DBG_MUTEX_UNLOCKED(_current); // {
 
-		if (thread == NULL) {
-		    /* no new owner, we need to unlock
-		     * the mutex and remove the owner
-		     */
-			mutex->lock = 0xFFu;
-			mutex->owner = NULL;
-		}
+	/* there is a new owner, we don't need to unlock the mutex
+	 * The mutex owner is changed when returning to the
+	 * k_mutex_lock function.
+	 */
+	thread = _k_unpend_first_thread(&mutex->waitqueue);
+
+	if (thread == NULL) {
+	    /* no new owner, we need to unlock
+	     * the mutex and remove the owner
+	     */
+		mutex->lock = 0xFFu;
+		mutex->owner = NULL;
 	}
 
 ret:
+	irq_unlock(key);
 	return thread;
 }
 
 int8_t k_mutex_cancel_wait(struct k_mutex *mutex)
 {
-        __ASSERT_NOTNULL(mutex);
+	__ASSERT_NOTNULL(mutex);
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-                return _k_cancel_all_pending(&mutex->waitqueue);
-        }
+	uint8_t ret;
 
-        __builtin_unreachable();
+	const uint8_t key = irq_lock();
+
+	ret = _k_cancel_all_pending(&mutex->waitqueue);
+
+	irq_unlock(key);
+
+	return (int8_t)ret;
 }

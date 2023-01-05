@@ -9,26 +9,6 @@
 
 /*___________________________________________________________________________*/
 
-/* standard */
-#define EINTR 4
-#define EIO 5
-#define EBADF 9
-#define EAGAIN 11
-#define ENOMEM 12
-#define EACCES 13
-#define EFAULT 14
-#define EBUSY 16
-#define EINVAL 22
-#define ENFILE 23
-#define ENOMSG 35
-#define ENOTSUP 95
-#define ETIMEDOUT 110
-#define ECANCELED 125
-
-#define EWOULDBLOCK EAGAIN
-
-/*___________________________________________________________________________*/
-
 /* Compiler specific */
 
 #define __noinline            	__attribute__((noinline))

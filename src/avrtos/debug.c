@@ -31,9 +31,9 @@ uint16_t k_thread_usage(struct k_thread *th)
                 // stack pointer refers to the first empty addr (from end)
                 // empty stack : th->stack.end == th->sp
 		uint16_t sp;
-		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-			sp = SP;
-		}
+		const uint8_t lock = irq_lock();
+		sp = SP;
+		irq_unlock(lock);
                 return ((uint16_t)th->stack.end) - sp;
         } else {
                 // stack pointer points to the top of the stack
@@ -153,11 +153,10 @@ void k_sem_debug(struct k_sem *sem)
         uint8_t count = sem->count;
         uint8_t limit = sem->limit;
 
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-        {
-                count = sem->count;
-                limit = sem->limit;
-        }
+	const uint8_t lock = irq_lock();
+	count = sem->count;
+	limit = sem->limit;
+	irq_unlock(lock);
 
         serial_print_p(PSTR("K_SEM "));
         serial_u8(count);
