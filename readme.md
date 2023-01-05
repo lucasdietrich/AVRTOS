@@ -8,6 +8,8 @@ Following avr architectures are supported/tested :
 - avr5, especially ATmega328p : tested with an Arduino PRO
 - avr6, especially ATmega2560 : tested with an Arduino Mega2560
 
+## Features
+
 Following features are supported:
 - Cooperative threads
 - Highly configurable sysclock, all hardware timers can be used (from 0 to 2 for the ATmega328p and 0 to 5 for the ATmega2560)
@@ -28,8 +30,14 @@ Following features are supported:
 - Signals (poll on a single signal)
 - Messages Queues (msgq)
 - System uptime in ms and seconds (32bits or 40bits ms counter)
-- Atomic operations on 8bits variables
+- Atomic API for 8bits variables
 - Events scheduling 
+- Drivers
+  - UART
+  - Timers
+  - GPIO
+  - External interrupts
+- Highly configurable
 
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
@@ -53,9 +61,6 @@ Minor features:
 - Project fully PlatformIO compatible for Windows and Linux
 - Redirection of stdout to USART0 (e.g. printf)
 - Stack sentinels
-- Drivers
-  - UART
-  - Timers
 
 What paradigms/concepts are not supported:
 - Nested interrupts
@@ -104,73 +109,16 @@ What enhancements/features are not planned :
 - Saving thread errno
 - Cancel submitted item
 
-## All onfiguration options
-| Configuration option | Description |
-| --- | --- |
-| CONFIG_THREAD_MAIN_COOPERATIVE   | Define main thread as cooperative (default prempt) |
-| CONFIG_THREAD_EXPLICIT_MAIN_STACK    | Tells if the main stack location and size must be defined at compilation time (1), or if the default main stack behaviour (stack at RAMEND) should be kept (0).
-| CONFIG_THREAD_MAIN_STACK_SIZE | In the case we defined (EXPLICIT_MAIN_STACK == 1), this configuration option defines the size of the main stack |
-| ~~THREAD_USE_INIT_STACK_ASM~~ | Tells if we should use the C or the Assembler function to define our threads at runtime |
-| ~~KERNEL_HIGH_RANGE_TIME_OBJECT_U32~~ | ~~Configure to use uint32_t as k_delta_t ~= 50 days or keep (uint16_t) ~= 65seconds~~ |
-| CONFIG_THREAD_DEFAULT_SREG | Default SREG value for other thread on stack creation. Main thread default SREG is always 0 |
-| CONFIG_KERNEL_DEBUG | Enable Kernel Debug features |
-| CONFIG_KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
-| CONFIG_KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
-| CONFIG_KERNEL_COOPERATIVE_THREADS | Enable preemtive threads feature |
-| CONFIG_KERNEL_SYSCLOCK_PERIOD_US | Sysclock period when precision mode is disabled (LLU is important) |
-| ~~KERNEL_SYSCLOCK_AUTO_START~~ | Auto start kernel sysclock |
-| CONFIG_KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
-| ~~CONFIG_KERNEL_DEBUG_PREEMPT_UART~~ | Use uart rx interrupt as preempt signal |
-| CONFIG_KERNEL_THREAD_IDLE | Tells if the kernel should define a idle thread to permit all user defined threads to be in waiting/pending status |
-| CONFIG_KERNEL_THREAD_IDLE_ADD_STACK | Kernel thread idle addtionnal stack |
-| ~~KERNEL_ALLOW_INTERRUPT_YIELD~~ |  Allow interrupt yield, this forces to add more stack to idle thread, since it is possible to save the current interrupt context while being in idle thread this happens often. |
-| CONFIG_THREAD_IDLE_COOPERATIVE | Tell if IDLE thread is preemptive or cooperative |
-| CONFIG_THREAD_CANARIES | Enable thread canaries |
-| CONFIG_THREAD_CANARIES_SYMBOL | Define thread canaries symbol |
-| CONFIG_SYSTEM_WORKQUEUE_ENABLE | Enable system workqueue |
-| CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE | Define system workqueue stack size |
-| ~~CONFIG_SYSTEM_WORKQUEUE_PRIORITY~~ | Define system workqueue thread priority |
-| CONFIG_SYSTEM_WORKQUEUE_COOPERATIVE | Tell if the system workqueue should be executed cooperatively |
-| CONFIG_KERNEL_ASSERT | Enable kernel assertion test for debug purpose |
-| **~~KERNEL_YIELD_ON_UNPEND~~** | Tells if function _k_unpend_first_thread should immediately switch to the first waiting thread when the object become  available. | 
-| ~~THREAD_ALLOW_RETURN~~ | Tells if thread can terminate (need additionnal 2 or 3 bytes per stacks) |
-| CONFIG_KERNEL_TIMERS | Enables timers |
-| CONFIG_KERNEL_EVENTS | Enables kernel events |
-| CONFIG_KERNEL_SCHED_LOCK_COUNTER | Enable scheduler lock counter for each thread. |
-| CONFIG_KERNEL_IRQ_LOCK_COUNTER | Enable interrupt lock counter for each thread. |
-| CONFIG_STDIO_PRINTF_TO_USART | Redirect STDIO output to specified USART (0, 1, 2, ..), "-1" to disable.  |
-| CONFIG_KERNEL_UPTIME | Enable uptime counter (ms) feature. **Require interrupts to be enabled in all threads !** |
-| ~~KERNEL_UPTIME_40BITS~~ | Enable 40 bits timer counter (ms), extends maximum uptime to ~35 years instead of ~47days with the 32bits counter. |
-| ~~KERNEL_MAX_SYSCLOCK_PERIOD_MS~~ | Define the maximum period of the sysclock in ms. Normally, the period is automatically calculated from CONFIG_KERNEL_TIME_SLICE_US but if a higher precision is required for the uptime (in ms). The syslock period can be adjusted independently from thread switch period (CONFIG_KERNEL_TIME_SLICE_US). |
-| CONFIG_KERNEL_SYSLOCK_HW_TIMER | Select Hardware timer among 8 bits timers : timer0 (0) and timer2 (2) and 16 bit timer : timer1 (1) |
-| CONFIG_KERNEL_TIME_SLICE_US | Time slice in milliseconds |
-| ~~KERNEL_TIME~~ | Enable system time API |
-| CONFIG_KERNEL_ATOMIC_API | Enable atomic API |
-| THREAD_TERMINATION_TYPE | Allow, or not thread termination. 0 : not allowed (need less stack). 1 : allowed (need more stack) . -1 : not allow but fault (need more stack but fault if terminate) |
-| CONFIG_KERNEL_DELAY_OBJECT_U32 | Enable 32bits delay object |
-| CONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH | Compare threads addresses after scheduler call to prevent thread switch to the same thread |
-| CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS | Use 40 bits for ticks counter size (instead of 32 bits) |
-| CONFIG_THREAD_STACK_SENTINEL | Define thread sentinel size |
-| CONFIG_THREAD_STACK_SENTINEL_SIZE  | Define thread sentinel size |
-| CONFIG_THREAD_STACK_SENTINEL_SYMBOL | Define thread sentinel symbol |
-| CONFIG_FD_MAX_COUNT | **UNUSED** |
-| CONFIG_DRIVERS_USART0_ASYNC | Enable USART0 driver |
-| CONFIG_DRIVERS_USART1_ASYNC | Enable USART1 driver |
-| CONFIG_DRIVERS_USART2_ASYNC | Enable USART2 driver |
-| CONFIG_DRIVERS_USART3_ASYNC | Enable USART3 driver |
-| CONFIG_INTERRUPT_POLICY | Interrupt policy on main startup. 0 : interrupts are disabled. 1 : interrupts enabled. 2 : interrupts enabled but scheduler is locked if thread is preemptive.  | 
-| DEFAULT_DRIVERS_TIMER0_API | Enable TIMER0 API | 
-| DEFAULT_DRIVERS_TIMER1_API | Enable TIMER1 API |
-| DEFAULT_DRIVERS_TIMER2_API | Enable TIMER2 API |
-| DEFAULT_DRIVERS_TIMER3_API | Enable TIMER3 API |
-| DEFAULT_DRIVERS_TIMER4_API | Enable TIMER4 API |
-| DEFAULT_DRIVERS_TIMER5_API | Enable TIMER5 API |
+## Configuration
+
+This RTOS is highly configurable, see [src/avrtos/avrtos_conf.h](./src/avrtos/avrtos_conf.h) file.
 
 ## Getting started example :
 
 ### Description
 
-TODO document
+Following code configures an usart, and blink a led at a frequency of 1Hz.
+Morover, typing a character on the serial console will wake up a thread.
 
 ### Code
 
