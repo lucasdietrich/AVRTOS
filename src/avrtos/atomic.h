@@ -17,8 +17,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief There are very few (or none) atomic instructions in AVR 
  * architectures 5 and 6.
@@ -196,8 +194,6 @@ K_NOINLINE bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val)
  * @return K_NOINLINE 
  */
 K_NOINLINE bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

@@ -78,7 +78,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
  * @param mem 
  * @return K_NOINLINE 
  */
-ALWAYS_INLINE static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
+__always_inline static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
         __ASSERT_NOTNULL(slab);
         __ASSERT_NOTNULL(mem);

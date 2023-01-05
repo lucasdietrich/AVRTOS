@@ -13,8 +13,6 @@
 .global set_stack_pointer
 .global read_sreg
 
-;_____________________________________________________________________________;
-
 ; return the return address of when ther caller calls it
 read_ra:
     pop r25
@@ -67,5 +65,3 @@ set_stack_pointer:
 read_sreg:
     lds r24, SREG
     ret
-
-;_____________________________________________________________________________;

@@ -39,7 +39,7 @@ void k_msgq_init(struct k_msgq *msgq, char *buffer,
 
 int8_t k_msgq_cleanup(struct k_msgq *msgq);
 
-ALWAYS_INLINE static int8_t _k_msgq_put(struct k_msgq *msgq, const void *data,
+__always_inline static int8_t _k_msgq_put(struct k_msgq *msgq, const void *data,
                           k_timeout_t timeout)
 {
         __ASSERT_NOINTERRUPT();
@@ -88,7 +88,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
         __builtin_unreachable();
 }
 
-ALWAYS_INLINE static int8_t _k_msgq_get(struct k_msgq *msgq, void *data,
+__always_inline static int8_t _k_msgq_get(struct k_msgq *msgq, void *data,
                           k_timeout_t timeout)
 {
         __ASSERT_NOINTERRUPT();

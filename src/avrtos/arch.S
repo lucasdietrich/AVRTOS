@@ -104,7 +104,7 @@ TIMERn_COMPA_vect:
 	call _k_system_shift
 
 ; check if scheduler is locked (cooperative thread or temporarely locked)
-#if KERNEL_PREEMPTIVE_THREADS
+#if KERNEL_COOPERATIVE_THREADS
 	lds ZL, _current           ; load current thread addr in Z
 	lds ZH, _current + 1
 
@@ -125,10 +125,10 @@ TIMERn_COMPA_vect:
 #endif 
 	jmp _k_yield
 #endif
-; KERNEL_PREEMPTIVE_THREADS
+; KERNEL_COOPERATIVE_THREADS
 
 __sched_locked:
-#if KERNEL_PREEMPTIVE_THREADS && KERNEL_SCHEDULER_DEBUG
+#if KERNEL_COOPERATIVE_THREADS && KERNEL_SCHEDULER_DEBUG
 	ldi r24, 0x63	    ; 'c'
 	call serial_transmit
 #endif

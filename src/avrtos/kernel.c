@@ -323,7 +323,7 @@ void _k_system_shift(void)
 {
 
 	__ASSERT_NOINTERRUPT();
-	__STATIC_ASSERT_AUTOMSG(KERNEL_TIME_SLICE_TICKS != 0);
+	__STATIC_ASSERT_NOMSG(KERNEL_TIME_SLICE_TICKS != 0);
 
 	tqueue_shift(&_k_events_queue, KERNEL_TIME_SLICE_TICKS);
 

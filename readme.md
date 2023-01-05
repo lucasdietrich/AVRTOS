@@ -116,7 +116,7 @@ What enhancements/features are not planned :
 | KERNEL_DEBUG | Enable Kernel Debug features |
 | KERNEL_API_NOINLINE | Enable Kernel debug for function, that set some of them noinline |
 | KERNEL_SCHEDULER_DEBUG | Enable Kernel Debug in scheduler |
-| KERNEL_PREEMPTIVE_THREADS | Enable preemtive threads feature |
+| KERNEL_COOPERATIVE_THREADS | Enable preemtive threads feature |
 | KERNEL_SYSCLOCK_PERIOD_US | Sysclock period when precision mode is disabled (LLU is important) |
 | ~~KERNEL_SYSCLOCK_AUTO_START~~ | Auto start kernel sysclock |
 | KERNEL_AUTO_INIT | Kernel auto init, if possible (i.e. not in *.a* lib) |
@@ -170,23 +170,14 @@ What enhancements/features are not planned :
 
 ### Description
 
-In this example, we spawn three threads (+ main thread + idle thread) :
-- Two preemptive threads : one set the led ON for 100ms and the other to OFF for the same duration
-    - A mutex is protecting the LED access, and both threads keeps the mutex locked while waiting for 100ms.
-    - both threads use the same reentrant function
-- One cooperative threads blocks the execution of all threads for 500ms every 2 seconds.
-- The main thread releases the CPU forever when initialization finished
-
-On an Arduino Pro (or Arduino Pro Mini), based on an ATmega328p (avr5) the led should be blinking at the frequency of 5Hz and then block for 500ms every 2 seconds.
-
-Configuration option : `CONFIG_KERNEL_TIME_SLICE_US=10000`
+TODO document
 
 ### Code
 
 Configuration:
 
 ```
-CONFIG_KERNEL_PREEMPTIVE_THREADS=1
+CONFIG_KERNEL_COOPERATIVE_THREADS=1
 CONFIG_KERNEL_TIME_SLICE_US=1000
 CONFIG_INTERRUPT_POLICY=1
 CONFIG_KERNEL_THREAD_TERMINATION_TYPE=-1
@@ -307,6 +298,15 @@ I 0x0236 IDLE    P 1 ____ : SP 22/120:0x02BF
 00:00:01 [1.756 s] : <inf> Received: !
 00:00:02 [2.003 s] : <dbg> toggled LED
 00:00:02 [2.503 s] : <dbg> toggled LED
+```
+
+Footprint on ATmega2560
+
+```
+Memory region         Used Size  Region Size  %age Used
+            text:        7574 B       256 KB      2.89%
+            data:         591 B         8 KB      7.21%
+          eeprom:          0 GB         4 KB      0.00%
 ```
 
 ## All Examples

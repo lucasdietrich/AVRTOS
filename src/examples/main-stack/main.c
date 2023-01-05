@@ -9,7 +9,7 @@
 #include <avrtos/kernel.h>
 #include <avrtos/drivers/usart.h>
 
-NOINIT char c;
+__noinit char c;
 
 extern char inc(char c);
 

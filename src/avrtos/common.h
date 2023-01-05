@@ -25,18 +25,23 @@
 #define ETIMEDOUT 110
 #define ECANCELED 125
 
-
 #define EWOULDBLOCK EAGAIN
 
 /*___________________________________________________________________________*/
 
-/* arch */
-#define NOINLINE            __attribute__((noinline))
-#define NORETURN            __attribute__((__noreturn__))
-#define CODE_UNREACHABLE    __builtin_unreachable();
-#define ALWAYS_INLINE 	    __attribute__((always_inline)) inline
-#define NOINIT 	    	    __attribute__((section(".noinit")))
-#define SECTION_BSS 	    __attribute__((section(".bss")))
+/* Compiler specific */
+
+#define __noinline            	__attribute__((noinline))
+#define __noreturn            	__attribute__((__noreturn__))
+#define CODE_UNREACHABLE    	__builtin_unreachable();
+#define __always_inline 	__attribute__((always_inline)) inline
+#define __noinit 	    	__attribute__((section(".noinit")))
+#define __bss 	    		__attribute__((section(".bss")))
+
+#define __STATIC_ASSERT(test_for_true, msg) \
+	_Static_assert(test_for_true, msg)
+#define __STATIC_ASSERT_NOMSG(test_for_true) \
+	_Static_assert(test_for_true, "(" #test_for_true ") failed")
 
 /*___________________________________________________________________________*/
 
@@ -67,7 +72,8 @@
 /*___________________________________________________________________________*/
 
 /* Note: Willingly not adding unsigned "u" suffix to numbers
- * because these flags are used in assembly code. */
+ * because these flags are used in assembly code
+ */
 
 #define K_FLAG_STATE_POS		0
 #define K_FLAG_STOPPED			(0 << K_FLAG_STATE_POS)

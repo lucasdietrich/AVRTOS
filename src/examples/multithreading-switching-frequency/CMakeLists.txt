@@ -3,7 +3,7 @@ add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-	CONFIG_KERNEL_PREEMPTIVE_THREADS=0
+	CONFIG_KERNEL_COOPERATIVE_THREADS=0
 
 )
 

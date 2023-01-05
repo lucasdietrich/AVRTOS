@@ -17,9 +17,7 @@ extern "C" {
 #include <avr/io.h>
 #include <util/atomic.h>
 
-// #include <avrtos/avrtos.h>
-
-/*___________________________________________________________________________*/
+#include <avrtos/common.h>
 
 #define K_MODULE_KERNEL         1
 #define K_MODULE_ARCH           2
@@ -42,7 +40,6 @@ extern "C" {
 
 #define K_MODULE_APPLICATION    32
 
-/*___________________________________________________________________________*/
 
 #define K_ASSERT_UNDEFINED              0
 #define K_ASSERT_ANY              	0
@@ -65,9 +62,7 @@ extern "C" {
 
 #define K_ASSERT_ISTHREADIDLE	     	20
 
-/*___________________________________________________________________________*/
 
-// move to assert.h
 #if KERNEL_ASSERT
 #   	define __ASSERT(_acode, _assertion) \
 	__assert((uint8_t) (_assertion), K_MODULE, _acode, __LINE__)
@@ -81,16 +76,6 @@ extern "C" {
 #define K_ASSERT(_acode, _assertion) 	__ASSERT(_acode, _assertion) 
 #define K_ASSERT_APP(_assertion) 	__ASSERT_APP(_assertion)
 
-/*___________________________________________________________________________*/
-
-#define __STATIC_ASSERT(test_for_true, msg) \
-	_Static_assert(test_for_true, msg)
-#define __STATIC_ASSERT_AUTOMSG(test_for_true) \
-	_Static_assert(test_for_true, "(" #test_for_true ") failed")
-
-#define K_STATIC_ASSERT __STATIC_ASSERT_AUTOMSG
-
-/*___________________________________________________________________________*/
 
 extern bool __k_interrupts(void);
 
@@ -113,11 +98,18 @@ extern bool __k_interrupts(void);
 #define __ASSERT_ISR_CONTEXT()
 #define __ASSERT_THREAD_CONTEXT()
 
-/*___________________________________________________________________________*/
-
-void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line);
-
-/*___________________________________________________________________________*/
+/**
+ * @brief Assert evaluated expression is not zero
+ * 
+ * @param expression Expression to evaluate
+ * @param module Module whithin the assertion is made (K_MODULE_*)
+ * @param acode Assertion code (K_ASSERT_*)
+ * @param line Line number of the assertion within the source file
+ */
+void __assert(uint8_t expression,
+	      uint8_t module,
+	      uint8_t acode,
+	      uint16_t line);
 
 #ifdef __cplusplus
 }
