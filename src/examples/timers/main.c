@@ -61,6 +61,8 @@ int main(void)
 		serial_transmit('\n');
 		irq_enable();
 
+		led_toggle();
+
 		k_sleep(K_MSEC(1000));
 	}
 }

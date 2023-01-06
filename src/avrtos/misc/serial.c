@@ -34,9 +34,7 @@ void serial_transmit(char data)
 
 void serial_send(const char *buffer, size_t len)
 {
-        for (uint_fast8_t i = 0; i < len; i++) {
-                serial_transmit(buffer[i]);
-        }
+	usart_send(USART_DEVICE, buffer, len);
 }
 
 static char figure2hex(uint8_t value)

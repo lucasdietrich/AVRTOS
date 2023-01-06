@@ -222,6 +222,8 @@ static inline void ll_usart_disable_udre_isr(UART_Device *dev)
 	CLR_BIT(dev->UCSRnB, BIT(UDRIEn));
 }
 
+K_NOINLINE int usart_send(UART_Device *dev, const char *buf, int len);
+
 K_NOINLINE int usart_sync_putc(UART_Device *dev, char c);
 
 K_NOINLINE int usart_getc(UART_Device *dev);

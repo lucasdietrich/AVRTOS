@@ -19,19 +19,16 @@ K_TIMER_DEFINE(mstimer, timer_handler, K_MSEC(1000), 1000);
 
 int main(void)
 {
-	led_init();
 	serial_init();
 
-	k_thread_dump_all();
+	led_init();
 
-	irq_enable();
+	k_thread_dump_all();
 
 	uint8_t state = 0;
 
 	for (;;) {
-
-		led_set(state);
-		state = 1 - state;
+		led_toggle();
 
 		k_sleep(K_MSEC(5000));
 

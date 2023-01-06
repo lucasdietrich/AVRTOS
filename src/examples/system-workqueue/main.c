@@ -33,7 +33,8 @@ void task_handler(struct k_work *self)
 	serial_transmit('\n');
 
 	/* Work item submits itself.
-	 * Work item is now submittable because it started being.
+	 * Work item is now submittable because its handler already
+	 * started being executed.
 	 */
 	k_system_workqueue_submit(self);
 }

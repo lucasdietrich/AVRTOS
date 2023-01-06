@@ -41,15 +41,27 @@
 
 #define K_MODULE K_MODULE_DRIVERS_USART
 
+#define CONFIG_USART_BAUDRATE_CALC_ROUNDING 1
+
 /* check U2Xn bit which allow to double the speed */
 static uint16_t calculate_ubrr(uint32_t baudrate, bool speed_mode)
 {
-	/* TODO use switch case or array ? */
+#if CONFIG_USART_BAUDRATE_CALC_ROUNDING
+	const uint8_t q = (speed_mode) ? 2u : 3u;
+	uint16_t div = ((F_CPU >> q) / baudrate);
+
+	if (div & 1u) {
+		div += 2u;
+	}
+
+	return (div >> 1u) - 1u;
+#else
 	if (speed_mode) {
 		return USART_CALC_SPEED_MODE_UBRRn(baudrate);
 	} else {
 		return USART_CALC_UBRRn(baudrate);
 	}
+#endif
 }
 
 static void set_baudrate(UART_Device *dev,
@@ -156,6 +168,21 @@ int ll_usart_sync_getc(UART_Device *dev)
 	return ret;
 }
 
+int usart_send(UART_Device *dev, const char *buf, int len)
+{
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (dev == NULL) {
+		return -EINVAL;
+	}
+#endif
+
+	for (int i = 0; i < len; i++) {
+		ll_usart_sync_putc(dev, buf[i]);
+	}
+
+	return len;
+}
+
 /*
  * Problem is that execution time is much longer than the old "serial_transmit",
  * because of fetch IO address for the proper USART from flash.
@@ -163,9 +190,11 @@ int ll_usart_sync_getc(UART_Device *dev)
 
 int usart_sync_putc(UART_Device *dev, char c)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (dev == NULL) {
 		return -EINVAL;
 	}
+#endif
 
 	ll_usart_sync_putc(dev, c);
 
@@ -174,9 +203,11 @@ int usart_sync_putc(UART_Device *dev, char c)
 
 K_NOINLINE int usart_getc(UART_Device *dev)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (dev == NULL) {
 		return -EINVAL;
 	}
+#endif
 
 	return ll_usart_sync_getc(dev);
 }

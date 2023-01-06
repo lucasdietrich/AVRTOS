@@ -132,10 +132,10 @@ int8_t k_msgq_get(struct k_msgq *msgq,
 {
 	int8_t ret;
 
-	const uint8_t key = irq_lock();
-
 	__ASSERT_NOTNULL(msgq);
 	__ASSERT_NOTNULL(data);
+	
+	const uint8_t key = irq_lock();
 
 	if (msgq->used_msgs > 0) {
 
