@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
-#include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/exti.h>
+#include <avrtos/drivers/gpio.h>
+#include <avrtos/kernel.h>
 
-ISR(INT0_vect) {
+ISR(INT0_vect)
+{
 	/* Generate signal on measurement line */
 	gpio_pin_toggle(GPIOB_DEVICE, PIN7);
 
@@ -16,16 +17,17 @@ ISR(INT0_vect) {
 	gpio_pin_toggle(GPIOD_DEVICE, PIN1);
 }
 
-ISR(INT1_vect) {
+ISR(INT1_vect)
+{
 	/* Generate signal on measurement line */
 	gpio_pin_toggle(GPIOB_DEVICE, PIN6);
 }
 
-ISR(PCINT2_vect) {
+ISR(PCINT2_vect)
+{
 	/* Generate signal on measurement line */
 	gpio_pin_toggle(GPIOB_DEVICE, PIN5);
 }
-
 
 int main(void)
 {

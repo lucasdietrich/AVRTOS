@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
-#include <avrtos/drivers/usart.h>
 #include <avrtos/drivers/gpio.h>
+#include <avrtos/drivers/usart.h>
+#include <avrtos/kernel.h>
 
 #define PINn PIN7
 #define GPIO GPIOB_DEVICE
@@ -25,7 +25,7 @@ int main(void)
 void thread(void *arg)
 {
 	for (;;) {
-		/* Writing a logic one to PINxn toggles the value of PORTxn, 
+		/* Writing a logic one to PINxn toggles the value of PORTxn,
 		 * independent on the value of DDRxn. Note that the SBI
 		 * instruction can be used to toggle one single bit in a port.
 		 */

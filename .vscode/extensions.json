@@ -4,9 +4,11 @@
     "recommendations": [
         "ms-vscode.cmake-tools",
         "platformio.platformio-ide",
-        "rockcat.avr-support"
+        "rockcat.avr-support",
+	"mitaki28.vscode-clang",
+	"ms-vscode.cpptools-extension-pack",
     ],
     "unwantedRecommendations": [
-        "ms-vscode.cpptools-extension-pack"
+        
     ]
 }

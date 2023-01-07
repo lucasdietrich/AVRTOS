@@ -4,19 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "kernel_internals.h"
-#include "kernel.h"
-
-#include "idle.h"
-
-#include <util/delay.h>
-#include <util/atomic.h>
-
 #include "debug.h"
+#include "idle.h"
+#include "kernel.h"
+#include "kernel_internals.h"
+
+#include <util/atomic.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
-#define K_MODULE    K_MODULE_KERNEL
+#define K_MODULE K_MODULE_KERNEL
 
 /*___________________________________________________________________________*/
 
@@ -28,9 +26,9 @@ void yield(void)
 /*___________________________________________________________________________*/
 
 #if CONFIG_KERNEL_THREAD_IDLE
-#	define THREAD_IS_IDLE(_thread) (_thread == &z_idle)
+#define THREAD_IS_IDLE(_thread) (_thread == &z_idle)
 #else
-#	define THREAD_IS_IDLE(_thread) (0)
+#define THREAD_IS_IDLE(_thread) (0)
 #endif
 
 #define THREAD_IS_MAIN(_thread) (_thread == &z_thread_main)
@@ -54,12 +52,10 @@ uint8_t k_ready_count(void)
  */
 #if CONFIG_TREAD_PRIO_MULTIQ
 #error "CONFIG_TREAD_PRIO_MULTIQ not supported yet"
-dlist_t z_runqs[4u] = {
-	DLIST_INIT(z_runqs[K_PRIO_HIGHEST]),
-	DLIST_INIT(z_runqs[K_PRIO_HIGH]),
-	DLIST_INIT(z_runqs[K_PRIO_LOW]),
-	DLIST_INIT(z_runqs[K_PRIO_LOWEST])
-};
+dlist_t z_runqs[4u] = {DLIST_INIT(z_runqs[K_PRIO_HIGHEST]),
+		       DLIST_INIT(z_runqs[K_PRIO_HIGH]),
+		       DLIST_INIT(z_runqs[K_PRIO_LOW]),
+		       DLIST_INIT(z_runqs[K_PRIO_LOWEST])};
 #define THREAD_GET_RUNQ(thread) (&z_runqs[thread->priority])
 #else
 // struct ditem z_runq = DLIST_INIT(z_runq);
@@ -86,17 +82,15 @@ union {
 #endif
 	};
 
-} z_ticks = {
-	.bytes = {
-		0,
-		0,
-		0,
-		0,
+} z_ticks = {.bytes = {
+		     0,
+		     0,
+		     0,
+		     0,
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS == 5
-		0,
+		     0,
 #endif
-	}
-};
+	     }};
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
 
 /*___________________________________________________________________________*/
@@ -112,8 +106,9 @@ extern struct k_thread z_idle;
 
 /**
  * @brief Schedule the thread to be executed.
- * If the IDLE thread is in the runqueue (it is removed), the scheduled thread become the only thread in the runqueue.
- * Thread is added to the top of the runqueue.
+ * If the IDLE thread is in the runqueue (it is removed), the scheduled thread
+ * become the only thread in the runqueue. Thread is added to the top of the
+ * runqueue.
  * - Assume that the thread is K_READY
  * - Assume that the thread is not in the runqueue
  *
@@ -125,7 +120,8 @@ static K_NOINLINE void z_schedule(struct k_thread *thread)
 	__ASSERT_NOINTERRUPT();
 
 #if CONFIG_THREAD_STACK_SENTINEL && CONFIG_KERNEL_ASSERT
-	/* check that stack sentinel is still valid before switching to thread */
+	/* check that stack sentinel is still valid before switching to thread
+	 */
 	if (k_verify_stack_sentinel(thread) == false) {
 		__fault(K_FAULT_SENTINEL);
 	}
@@ -140,7 +136,7 @@ static K_NOINLINE void z_schedule(struct k_thread *thread)
 
 		z_runq = &thread->tie.runqueue;
 	} else {
-		/* Wokek up threads should be executed before any 
+		/* Wokek up threads should be executed before any
 		 * already running premptive thread, so prepend
 		 *
 		 * Call k_yield_from_isr_cond() to switch to woke up thread
@@ -148,7 +144,7 @@ static K_NOINLINE void z_schedule(struct k_thread *thread)
 		 */
 		dlist_prepend(z_runq, &thread->tie.runqueue);
 	}
-	
+
 	z_ready_count++;
 }
 
@@ -162,8 +158,7 @@ static K_NOINLINE void z_schedule(struct k_thread *thread)
  * @param from
  * @param to
  */
-extern void z_thread_switch(struct k_thread *from,
-			     struct k_thread *to);
+extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
 
 /**
  * @brief Schedule current thread wake up.
@@ -182,17 +177,18 @@ static K_NOINLINE void z_schedule_wake_up(k_timeout_t timeout)
 	__ASSERT_TRUE(z_current->wakeup_schd == 0);
 
 	if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
-		z_current->wakeup_schd = 1;
+		z_current->wakeup_schd	     = 1;
 		z_current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
-		z_current->tie.event.next = NULL;
+		z_current->tie.event.next    = NULL;
 		_tqueue_schedule(&z_events_queue, &z_current->tie.event);
 	}
 }
 
 /**
  * @brief Remove the current thread from the runqueue.
- * Stop the execution of the current thread (until it is scheduled again with function z_schedule or z_schedule_wake_up)
- * State flag is changed to K_PENDING.
+ * Stop the execution of the current thread (until it is scheduled again with
+ * function z_schedule or z_schedule_wake_up) State flag is changed to
+ * K_PENDING.
  *
  * Assumptions:
  * - interrupt flag is cleared when called.
@@ -295,12 +291,13 @@ void z_kernel_init(void)
 			dlist_append(z_runq, &thread->tie.runqueue);
 		}
 
-		/* Swap endianness of addresses in compilation-time built stacks.
-		* We cannot change the endianness of addresses determined by the
-		* linker at compilation time. So we need to do it here.
-		*/
-		struct z_callsaved_ctx *ctx = thread->stack.end -
-			Z_CALLSAVED_CTX_SIZE + 1u;
+		/* Swap endianness of addresses in compilation-time built
+		 * stacks. We cannot change the endianness of addresses
+		 * determined by the linker at compilation time. So we need to
+		 * do it here.
+		 */
+		struct z_callsaved_ctx *ctx =
+			thread->stack.end - Z_CALLSAVED_CTX_SIZE + 1u;
 		swap_endianness(&ctx->thread_context);
 		swap_endianness((void *)&ctx->thread_entry);
 		swap_endianness(&ctx->pc);
@@ -311,11 +308,11 @@ void z_kernel_init(void)
 	}
 }
 
-/* If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the 
+/* If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the
  * IDLE thread. The expired thread will be rescheduled only after
- * the current time slice interval finishes. So we lose few ticks in the 
+ * the current time slice interval finishes. So we lose few ticks in the
  * IDLE thread.
- * 
+ *
  * TODO Improve this by checking for expired threads more often when
  *  we are in the IDLE thread.
  */
@@ -335,11 +332,11 @@ void z_system_shift(void)
 	while ((ready = tqueue_pop(&z_events_queue)) != NULL) {
 		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
 
-		__K_DBG_SCHED_EVENT(thread);  // !
+		__K_DBG_SCHED_EVENT(thread); // !
 
 		/* set ready thread expired flag */
 		thread->timer_expired = 1u;
-		thread->wakeup_schd = 0;
+		thread->wakeup_schd   = 0;
 
 		z_schedule(thread);
 	}
@@ -352,7 +349,6 @@ void z_system_shift(void)
 	z_event_q_process();
 #endif /* CONFIG_KERNEL_EVENTS */
 }
-
 
 /**
  * @brief Choose the next thread to be executed.
@@ -379,7 +375,7 @@ struct k_thread *z_scheduler(void)
 
 	/* If previous thread put itself in pending state,
 	 * it already removed itself from the runqueue, so we don't need
-	 * to do it here 
+	 * to do it here
 	 */
 	if (z_current->state == K_READY) {
 		/* Rotate the runqueue, set next thread to first position */
@@ -395,8 +391,7 @@ struct k_thread *z_scheduler(void)
 	return prev;
 }
 
-K_NOINLINE int8_t z_pend_current(struct ditem *waitqueue,
-				  k_timeout_t timeout)
+K_NOINLINE int8_t z_pend_current(struct ditem *waitqueue, k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 
@@ -454,7 +449,7 @@ K_NOINLINE struct k_thread *z_unpend_first_thread(struct ditem *waitqueue)
 }
 
 K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct ditem *waitqueue,
-						     void *set_swap_data)
+						    void *set_swap_data)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
@@ -551,8 +546,7 @@ void k_sched_unlock(void)
 	}
 #endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
-
-	const uint8_t key = irq_lock();
+	const uint8_t key     = irq_lock();
 	z_current->sched_lock = 0;
 	irq_unlock(key);
 
@@ -570,7 +564,6 @@ bool k_sched_locked(void)
 
 	return (flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) != 0;
 }
-
 
 bool k_cur_is_preempt(void)
 {
@@ -619,7 +612,7 @@ void k_wait(k_timeout_t timeout)
 void k_block(k_timeout_t timeout)
 {
 	const uint8_t key = irq_lock();
-	
+
 	k_ticks_t ticks = K_TIMEOUT_TICKS(timeout);
 	while (ticks != 0) {
 		_delay_us(K_TICKS_US);

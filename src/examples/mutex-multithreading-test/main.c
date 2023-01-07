@@ -4,15 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 void thread(void *p);
 void threadp(void *p);
@@ -50,7 +49,7 @@ int main(void)
 
 void thread(void *p)
 {
-	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5));  // change this timeout
+	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5)); // change this timeout
 
 	serial_transmit(z_current->symbol);
 
@@ -69,7 +68,7 @@ void thread(void *p)
 
 void threadp(void *p)
 {
-	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9));  // change this timeout
+	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9)); // change this timeout
 
 	serial_transmit(z_current->symbol);
 
@@ -82,7 +81,6 @@ void threadp(void *p)
 
 		k_mutex_unlock(&mymutex);
 	}
-
 
 	k_sleep(K_FOREVER);
 }

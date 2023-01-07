@@ -8,13 +8,11 @@
 
 #include <avrtos/assert.h>
 
-#define DRIVERS_TIMERS_API ((CONFIG_DRIVERS_TIMER0_API) || \
-	(CONFIG_DRIVERS_TIMER1_API) || \
-	(CONFIG_DRIVERS_TIMER2_API) || \
-	(CONFIG_DRIVERS_TIMER3_API) || \
-	(CONFIG_DRIVERS_TIMER4_API) || \
-	(CONFIG_DRIVERS_TIMER5_API))
-	
+#define DRIVERS_TIMERS_API                                                               \
+	((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) ||                   \
+	 (CONFIG_DRIVERS_TIMER2_API) || (CONFIG_DRIVERS_TIMER3_API) ||                   \
+	 (CONFIG_DRIVERS_TIMER4_API) || (CONFIG_DRIVERS_TIMER5_API))
+
 #define K_MODULE K_MODULE_DRIVERS_TIMERS
 
 /* not static inline version of timer_get_index */
@@ -33,8 +31,7 @@ static bool _is_16bits(uint8_t tim_idx)
 	return IS_TIMER_IDX_16BITS(tim_idx);
 }
 
-void ll_timer8_deinit(TIMER8_Device *dev,
-		      uint8_t tim_idx)
+void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx)
 {
 	dev->TCCRnA = 0u;
 	dev->TCCRnB = 0u;
@@ -67,8 +64,7 @@ void ll_timer8_init(TIMER8_Device *dev,
 	dev->TCCRnB = (config->prescaler << CSn0);
 }
 
-int timer8_init(TIMER8_Device *dev,
-		const struct timer_config *config)
+int timer8_init(TIMER8_Device *dev, const struct timer_config *config)
 {
 	if (config == NULL) {
 		return -EINVAL;
@@ -93,14 +89,11 @@ int timer8_init(TIMER8_Device *dev,
 	return 0;
 }
 
-
-void ll_timer16_deinit(TIMER16_Device *dev,
-		       uint8_t tim_idx)
+void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
 {
 	dev->TCCRnA = 0u;
 	dev->TCCRnB = 0u;
 	dev->TCCRnC = 0u;
-
 }
 
 void ll_timer16_init(TIMER16_Device *dev,
@@ -119,8 +112,8 @@ void ll_timer16_init(TIMER16_Device *dev,
 		/* read 16.9.2 Clear Timer on Compare Match (CTC) Mode */
 		dev->OCRnA = config->counter;
 		break;
-	case TIMER_MODE_FAST_PWM_8bit: /* TOP 0x00FF */
-	case TIMER_MODE_FAST_PWM_9bit: /* TOP 0x01FF */
+	case TIMER_MODE_FAST_PWM_8bit:	/* TOP 0x00FF */
+	case TIMER_MODE_FAST_PWM_9bit:	/* TOP 0x01FF */
 	case TIMER_MODE_FAST_PWM_10bit: /* TOP 0x03FF */
 		/* update of OCRnx on BOTTOM */
 
@@ -140,13 +133,12 @@ void ll_timer16_channel_configure(TIMER16_Device *dev,
 				  const struct timer_channel_compare_config *config)
 {
 	const uint8_t group_shift = (2 * (2 - channel) + 2u);
-	const uint8_t reg_val = dev->TCCRnA & ~(0x03u << group_shift);
-	dev->TCCRnA = reg_val | (config->mode << group_shift);
+	const uint8_t reg_val	  = dev->TCCRnA & ~(0x03u << group_shift);
+	dev->TCCRnA		  = reg_val | (config->mode << group_shift);
 	ll_timer16_write_reg16(&dev->OCRnx[channel], config->value);
 }
 
-int timer16_init(TIMER16_Device *dev,
-		 const struct timer_config *config)
+int timer16_init(TIMER16_Device *dev, const struct timer_config *config)
 {
 	if (config == NULL) {
 		return -EINVAL;
@@ -165,7 +157,6 @@ int timer16_init(TIMER16_Device *dev,
 
 	return 0;
 }
-
 
 int timer8_deinit(TIMER8_Device *dev)
 {
@@ -197,7 +188,7 @@ int timer16_deinit(TIMER16_Device *dev)
 	ll_timer_clear_enable_int_mask(tim_idx);
 	ll_timer_clear_irq_flags(tim_idx);
 
-		/* disable interrupts first */
+	/* disable interrupts first */
 	dev->TCCRnA = 0U;
 	dev->TCCRnB = 0U;
 	dev->TCCRnC = 0U;
@@ -205,7 +196,7 @@ int timer16_deinit(TIMER16_Device *dev)
 	dev->OCRnA = 0U;
 	dev->OCRnB = 0U;
 	dev->OCRnC = 0U;
-	dev->IRCN = 0U;
+	dev->IRCN  = 0U;
 	dev->TCNTn = 0U;
 
 	return 0;
@@ -253,7 +244,7 @@ static int timer2_get_presc_value(timer2_prescaler_t prescaler)
 
 int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter)
 {
-	const bool is_16bit = _is_16bits(timer_index);
+	const bool is_16bit	   = _is_16bits(timer_index);
 	const uint16_t max_counter = is_16bit ? 0xFFFFu : 0xFFu;
 	const bool is_timer2 = timer_index == 2; /* timer2 has more prescaler values */
 
@@ -264,9 +255,8 @@ int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *coun
 
 	do {
 		prescaler_id++; /* fetch next prescaler */
-		int prescaler_val = is_timer2 ?
-			timer2_get_presc_value(prescaler_id) :
-			timer_get_prescaler_value(prescaler_id);
+		int prescaler_val = is_timer2 ? timer2_get_presc_value(prescaler_id)
+					      : timer_get_prescaler_value(prescaler_id);
 		if (prescaler_val < 0) {
 			return -1;
 		}
@@ -294,16 +284,15 @@ struct timer_api_ctx {
 
 __attribute__((section(".bss"))) struct timer_api_ctx tim_ctx[TIMERS_COUNT];
 
-#define __DECL_TIMER_COMPA_ISR(n) \
-	ISR(TIMER##n##_COMPA_vect) \
-	{ \
-		struct timer_api_ctx *const ctx = &tim_ctx[n]; \
-		void *const dev = timer_get_device(n); \
-		if (ctx->cb != NULL) { \
-			ctx->cb(dev, n, ctx->user_data); \
-		} \
+#define __DECL_TIMER_COMPA_ISR(n)                                                        \
+	ISR(TIMER##n##_COMPA_vect)                                                       \
+	{                                                                                \
+		struct timer_api_ctx *const ctx = &tim_ctx[n];                           \
+		void *const dev			= timer_get_device(n);                   \
+		if (ctx->cb != NULL) {                                                   \
+			ctx->cb(dev, n, ctx->user_data);                                 \
+		}                                                                        \
 	}
-
 
 #if CONFIG_DRIVERS_TIMER0_API && TIMER_INDEX_EXISTS(0)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 0,
@@ -363,16 +352,15 @@ int timer_init(uint8_t tim_idx,
 		return -ENOTSUP;
 	}
 
-	tim_ctx[tim_idx].cb = cb;
+	tim_ctx[tim_idx].cb	   = cb;
 	tim_ctx[tim_idx].user_data = user_data;
 	tim_ctx[tim_idx].prescaler = prescaler_id;
 
 	const struct timer_config cfg = {
-		.mode = TIMER_MODE_CTC,
+		.mode	   = TIMER_MODE_CTC,
 		.prescaler = (flags & TIMER_API_FLAG_AUTOSTART) ? prescaler_id : 0U,
-		.counter = counter,
-		.timsk = BIT(OCIEnA)
-	};
+		.counter   = counter,
+		.timsk	   = BIT(OCIEnA)};
 
 	const bool is_16bit_timer = _is_16bits(tim_idx);
 	if (is_16bit_timer) {

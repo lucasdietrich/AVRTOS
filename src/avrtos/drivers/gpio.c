@@ -8,7 +8,7 @@
 
 void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
 {
-	gpio->DDR = dir_mask;
+	gpio->DDR  = dir_mask;
 	gpio->PORT = pullup_mask;
 }
 

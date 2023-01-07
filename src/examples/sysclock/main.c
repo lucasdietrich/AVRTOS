@@ -4,17 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
-#define PERIOD  1000
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
+
+#define PERIOD 1000
 
 void thread_led(void *p);
 

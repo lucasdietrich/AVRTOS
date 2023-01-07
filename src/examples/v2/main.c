@@ -4,17 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
-char chrs[2] = { 'a', 'b' };
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
+
+char chrs[2] = {'a', 'b'};
 void mythread(char *ctx);
 void canariesthread(void *ctx);
 
@@ -34,7 +33,9 @@ int main(void)
 	while (1) {
 		k_show_uptime();
 		serial_transmit('\n');
-		printf_P(PSTR("%lu ticks : %lu ms\n"), k_ticks_get_32(), k_uptime_get_ms32());
+		printf_P(PSTR("%lu ticks : %lu ms\n"),
+			 k_ticks_get_32(),
+			 k_uptime_get_ms32());
 		k_sleep(K_SECONDS(1));
 	}
 }

@@ -6,15 +6,14 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
@@ -23,7 +22,7 @@
 void thread(void *p);
 void thread_time(void *ctx);
 
-#define STACK_SIZE 0x80
+#define STACK_SIZE  0x80
 #define THREAD_PRIO K_PREEMPTIVE
 
 K_THREAD_DEFINE(w0, thread, STACK_SIZE, THREAD_PRIO, NULL, '0');
@@ -38,7 +37,6 @@ K_THREAD_DEFINE(w8, thread, STACK_SIZE, THREAD_PRIO, NULL, '8');
 // K_THREAD_DEFINE(w9, thread, STACK_SIZE, THREAD_PRIO, NULL, '9');
 K_THREAD_DEFINE(time, thread_time, 0x80, K_COOPERATIVE, NULL, 'T');
 
-
 K_MEM_SLAB_DEFINE(myslab, 0x10, BLOCKS);
 
 /*___________________________________________________________________________*/
@@ -51,7 +49,9 @@ static uint8_t ms(struct k_prng *prng)
 static void debug(void *mem, int8_t rc)
 {
 	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"),
-		 z_current->symbol, (unsigned int)mem, rc);
+		 z_current->symbol,
+		 (unsigned int)mem,
+		 rc);
 }
 
 static void *alloc(k_timeout_t timeout)

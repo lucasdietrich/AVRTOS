@@ -6,25 +6,23 @@
 
 /*___________________________________________________________________________*/
 
-#include <avr/io.h>
-
-#include <avrtos/misc/serial.h>
-
+#include <avrtos/defines.h>
+#include <avrtos/dstruct/debug.h>
 #include <avrtos/dstruct/dlist.h>
 #include <avrtos/dstruct/queue.h>
 #include <avrtos/dstruct/tqueue.h>
-#include <avrtos/dstruct/debug.h>
+#include <avrtos/misc/serial.h>
 
-#include <avrtos/defines.h>
+#include <avr/io.h>
 
 /*___________________________________________________________________________*/
 
-#define FLAG_QUEUE        1
-#define FLAG_OQUEUE       2
-#define FLAG_DLIST        4
-#define FLAG_TQUEUE       8
+#define FLAG_QUEUE  1
+#define FLAG_OQUEUE 2
+#define FLAG_DLIST  4
+#define FLAG_TQUEUE 8
 
-#define TESTS             FLAG_QUEUE | FLAG_OQUEUE | FLAG_DLIST | FLAG_TQUEUE
+#define TESTS FLAG_QUEUE | FLAG_OQUEUE | FLAG_DLIST | FLAG_TQUEUE
 
 void test_queue(void);
 void test_oqueue(void);
@@ -52,9 +50,9 @@ int main(void)
 	test_queue_dlist();
 #endif
 
-  // todo raw api
+	// todo raw api
 
-  // todo cdlist
+	// todo cdlist
 
 #if TESTS & FLAG_TQUEUE
 	serial_printl_p(PSTR("tqueue"));
@@ -68,24 +66,29 @@ int main(void)
 // QUEUE
 //
 
-struct item
-{
+struct item {
 	const char name;
 	struct qitem i;
 };
 
-#define ITEM(name) {name, {0}}
-#define ITEM_OF(qitem) ((struct item*) CONTAINER_OF(qitem, struct item, i))
+#define ITEM(name)                                                                       \
+	{                                                                                \
+		name,                                                                    \
+		{                                                                        \
+			0                                                                \
+		}                                                                        \
+	}
+#define ITEM_OF(qitem) ((struct item *)CONTAINER_OF(qitem, struct item, i))
 #define NAME_OF(qitem) ITEM_OF(qitem)->name
 
-
-struct item items[] = {
-  ITEM('A'), ITEM('B'), ITEM('C'), ITEM('D'), ITEM('E')
-};
+struct item items[] = {ITEM('A'), ITEM('B'), ITEM('C'), ITEM('D'), ITEM('E')};
 
 DEFINE_QUEUE(myqueue);
 
-inline void queue(struct item *item) { return queue(&myqueue, &item->i); }
+inline void queue(struct item *item)
+{
+	return queue(&myqueue, &item->i);
+}
 inline struct item *dequeue(void)
 {
 	struct qitem *item = dequeue(&myqueue);
@@ -95,8 +98,14 @@ inline struct item *dequeue(void)
 		return ITEM_OF(item);
 	}
 }
-void print_queue_item(struct qitem *item) { serial_transmit(NAME_OF(item)); }
-inline void print_queue(void) { print_queue(myqueue, print_queue_item); }
+void print_queue_item(struct qitem *item)
+{
+	serial_transmit(NAME_OF(item));
+}
+inline void print_queue(void)
+{
+	print_queue(myqueue, print_queue_item);
+}
 
 void test_queue(void)
 {
@@ -131,7 +140,10 @@ void test_queue(void)
 
 DEFINE_OQREF(oref);
 
-inline void print_oqueue(void) { print_oqueue(&oref, print_queue_item); }
+inline void print_oqueue(void)
+{
+	print_oqueue(&oref, print_queue_item);
+}
 
 void print_odequeue(void)
 {
@@ -170,25 +182,35 @@ void test_oqueue(void)
 // DLIST
 //
 
-struct item2
-{
+struct item2 {
 	const char name;
 	struct ditem i;
 };
 
-#define DITEM(name) {name, {0, 0}}
-#define DITEM_OF(item) ((struct item2*) CONTAINER_OF(item, struct item2, i))
+#define DITEM(name)                                                                      \
+	{                                                                                \
+		name,                                                                    \
+		{                                                                        \
+			0, 0                                                             \
+		}                                                                        \
+	}
+#define DITEM_OF(item) ((struct item2 *)CONTAINER_OF(item, struct item2, i))
 #define DNAME_OF(item) DITEM_OF(item)->name
-#define DEFINE_DLIST_ITEM(dlist_item) struct item2 dlist_item = {'*', {&dlist_item.i, &dlist_item.i} }
+#define DEFINE_DLIST_ITEM(dlist_item)                                                    \
+	struct item2 dlist_item = {'*', {&dlist_item.i, &dlist_item.i}}
 
-struct item2 ditems[] = {
-  DITEM('A'), DITEM('B'), DITEM('C'), DITEM('D'), DITEM('E')
-};
+struct item2 ditems[] = {DITEM('A'), DITEM('B'), DITEM('C'), DITEM('D'), DITEM('E')};
 
 DEFINE_DLIST(dlist);
 
-void print_dlist_item(struct ditem *item) { serial_transmit(DNAME_OF(item)); }
-inline void print_dlist(void) { print_dlist(&dlist, print_dlist_item); }
+void print_dlist_item(struct ditem *item)
+{
+	serial_transmit(DNAME_OF(item));
+}
+inline void print_dlist(void)
+{
+	print_dlist(&dlist, print_dlist_item);
+}
 
 static void test_dlist_dequeue(struct ditem *dlist)
 {
@@ -197,9 +219,11 @@ static void test_dlist_dequeue(struct ditem *dlist)
 		print_dlist_item(out);
 		serial_transmit('\n');
 		print_dlist(dlist, print_dlist_item);
-	} else { serial_print_p(PSTR("dlist empty=")); serial_u8(dlist_is_empty(dlist)); }
+	} else {
+		serial_print_p(PSTR("dlist empty="));
+		serial_u8(dlist_is_empty(dlist));
+	}
 }
-
 
 void test_queue_dlist(void)
 {
@@ -229,12 +253,7 @@ struct item3 {
 };
 
 struct item3 titems[] = {
-    {'A', {100}},
-    {'B', {25}},
-    {'C', {35}},
-    {'D', {35}},
-    {'E', {25}}
-};
+	{'A', {100}}, {'B', {25}}, {'C', {35}}, {'D', {35}}, {'E', {25}}};
 
 void print_titem(struct titem *item)
 {

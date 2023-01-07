@@ -6,15 +6,14 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
@@ -26,8 +25,7 @@ K_WORKQUEUE_DEFINE(workqueue, 0x200, K_PREEMPTIVE, 'W');
 
 /*___________________________________________________________________________*/
 
-struct task_t
-{
+struct task_t {
 	struct k_work work;
 	struct k_sem sem; /* we need a signal here ! semaphores are inefficient */
 
@@ -52,7 +50,7 @@ void task_handler(struct k_work *self)
 	k_sem_give(&task->sem);
 }
 
-#define TASKS_COUNT   15
+#define TASKS_COUNT 15
 struct task_t tasks[TASKS_COUNT];
 
 /*___________________________________________________________________________*/

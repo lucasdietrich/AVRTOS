@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/io.h>
-
-#include <avrtos/kernel.h>
-#include <avrtos/drivers/timer.h>
 #include <avrtos/drivers/gpio.h>
+#include <avrtos/drivers/timer.h>
+#include <avrtos/kernel.h>
+#include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 
-#include <avrtos/logging.h>
+#include <avr/io.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
 
 ISR(TIMER1_COMPA_vect)
@@ -44,10 +43,10 @@ int main(void)
 	serial_init();
 
 	const struct timer_config config = {
-		.mode = TIMER_MODE_FAST_PWM_10bit,
-		.counter = 0u,
+		.mode	   = TIMER_MODE_FAST_PWM_10bit,
+		.counter   = 0u,
 		.prescaler = TIMER_PRESCALER_1024,
-		.timsk = 0u,
+		.timsk	   = 0u,
 	};
 
 	/* Configure timer1 pins as output */
@@ -58,7 +57,7 @@ int main(void)
 	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
 
 	struct timer_channel_compare_config comp_conf = {
-		.mode = TIMER_CHANNEL_COMP_MODE_SET,
+		.mode  = TIMER_CHANNEL_COMP_MODE_SET,
 		.value = 0x1ffu,
 	};
 	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_A, &comp_conf);
@@ -67,8 +66,9 @@ int main(void)
 	comp_conf.mode = TIMER_CHANNEL_COMP_MODE_NORMAL;
 	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_C, &comp_conf);
 
-	ll_timer_set_enable_int_mask(timer_get_index(TIMER1_DEVICE), 0x2Fu); /* Enable all interupts */
-	
+	ll_timer_set_enable_int_mask(timer_get_index(TIMER1_DEVICE),
+				     0x2Fu); /* Enable all interupts */
+
 	for (;;) {
 		led_toggle();
 		k_sleep(K_MSEC(500u));

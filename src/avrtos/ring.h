@@ -12,11 +12,10 @@
 #include <avrtos/kernel.h>
 
 #define K_RING_CONCURRENT_WRITTERS 0u
-#define K_RING_CONCURRENT_READERS 0u
+#define K_RING_CONCURRENT_READERS  0u
 // #define K_RING_SIZE_POWER_OF_TWO 0u
 
-struct k_ring
-{
+struct k_ring {
 	uint8_t *buffer;
 
 	/* Read cursor */

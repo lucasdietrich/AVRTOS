@@ -4,24 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/misc/serial.h>
+#include <avrtos/debug.h>
+#include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
 #include <util/delay.h>
-
-#include <avrtos/kernel.h>
-#include <avrtos/debug.h>
 
 struct k_thread *volatile s_thread = NULL;
 
 void thread_entry(void *_c);
 void thread_canaries_entry(void *_c);
 
-K_THREAD_DEFINE(thread, thread_entry, 0x100,
-		K_PREEMPTIVE, &s_thread, 'T');
+K_THREAD_DEFINE(thread, thread_entry, 0x100, K_PREEMPTIVE, &s_thread, 'T');
 
-K_THREAD_DEFINE(thread_canaries, thread_canaries_entry, 0x100,
-		K_PREEMPTIVE, &s_thread, 'C');
+K_THREAD_DEFINE(
+	thread_canaries, thread_canaries_entry, 0x100, K_PREEMPTIVE, &s_thread, 'C');
 
 K_SEM_DEFINE(mysem, 0, 1);
 
@@ -39,11 +37,13 @@ int main(void)
 		serial_transmit('\n');
 
 		/* rebuild stack */
-		k_thread_create(s_thread, thread_entry,
-				K_STACK_START(s_thread->stack.end,
-					      s_thread->stack.size),
+		k_thread_create(s_thread,
+				thread_entry,
+				K_STACK_START(s_thread->stack.end, s_thread->stack.size),
 				s_thread->stack.size,
-				K_PREEMPTIVE, NULL, 'T');
+				K_PREEMPTIVE,
+				NULL,
+				'T');
 		serial_printl_p(PSTR("Thread started again"));
 		k_thread_start(s_thread);
 	}

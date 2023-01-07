@@ -17,39 +17,37 @@ extern "C" {
 
 /**
  * @brief Scheduling queue data structure
- * 
+ *
  * - n : number of items in the list
- * 
+ *
  * tqueue_schedule/tqueue_pop are O(1)
  * tqueue_remove is O(n)
  * tqueue_shift is O(n)
- * 
+ *
  * TODO tqueue_remove could be optimized to O(1), using a doubly linked list
  */
 
 /*___________________________________________________________________________*/
 
-struct titem
-{
-        union
-        {
-                k_delta_t delay_shift;
-                k_delta_t abs_delay;
-                k_delta_t timeout;
-        };
-        struct titem* next;
+struct titem {
+	union {
+		k_delta_t delay_shift;
+		k_delta_t abs_delay;
+		k_delta_t timeout;
+	};
+	struct titem *next;
 };
 
 #define tqref titem
 
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
-#define INIT_TITEM(timeout_ms)       \
-    {                                \
-        {                            \
-            .timeout = timeout_ms,   \
-        },                           \
-        .next = NULL                 \
-    }
+#define INIT_TITEM(timeout_ms)                                                           \
+	{                                                                                \
+		{                                                                        \
+			.timeout = timeout_ms,                                           \
+		},                                                                       \
+			.next = NULL                                                     \
+	}
 #define INIT_TITEM_DEFAULT() INIT_TITEM(0)
 
 #define DEFINE_TITEM(name) struct titem name = INIT_TITEM_DEFAULT()
@@ -58,42 +56,41 @@ struct titem
 
 /**
  * @brief Schedule an event by adding it to the list.
- * If the new event has the same timeout as another event 
+ * If the new event has the same timeout as another event
  * already in the list, it will be added after i.
- * 
+ *
  * Assumptions :
  * - root is not null
  * - item is not null
  * - item->next is null
  * - item->timeout is set
- * 
- * @param root 
- * @param item 
+ *
+ * @param root
+ * @param item
  */
 void _tqueue_schedule(struct titem **root, struct titem *item);
 
 /**
  * @see _tqueue_schedule
- * 
+ *
  * Assumptions :
  *  - root is not null
- * 
- * @param root 
- * @param item 
- * @param timeout 
+ *
+ * @param root
+ * @param item
+ * @param timeout
  */
-void tqueue_schedule(struct titem **root,
-        struct titem *item, k_delta_t timeout);
+void tqueue_schedule(struct titem **root, struct titem *item, k_delta_t timeout);
 
 /**
  * @brief Shift the queue time of {time_passed}
- * 
- * Assumptions : 
+ *
+ * Assumptions :
  *  - time_passed is not null
  *  - root is not null
- * 
- * @param root 
- * @param time_passed 
+ *
+ * @param root
+ * @param time_passed
  */
 void tqueue_shift(struct titem **root, k_delta_t time_passed);
 
@@ -111,14 +108,14 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed);
 struct titem *tqueue_pop(struct titem **root);
 
 /**
- * @brief Shift the queue time of {time_passed} 
+ * @brief Shift the queue time of {time_passed}
  * and pop an item from the time queue.
- * 
+ *
  * @see tqueue_shift, tqueue_pop
- * 
- * @param root 
- * @param time_passed 
- * @return struct titem* 
+ *
+ * @param root
+ * @param time_passed
+ * @return struct titem*
  */
 // struct titem *tqueue_shift_pop(struct titem **root, k_delta_t time_passed);
 

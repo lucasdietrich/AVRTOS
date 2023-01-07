@@ -6,15 +6,14 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
@@ -41,7 +40,8 @@ int main(void)
 
 	sei();
 
-	for (;;) { }
+	for (;;) {
+	}
 }
 
 void thread_led_on(void *p)

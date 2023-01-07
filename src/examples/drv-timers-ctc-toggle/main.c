@@ -4,17 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/* This example demonstrates how to periodically toggle pins PB5, PB6, PB7 at a 
+/* This example demonstrates how to periodically toggle pins PB5, PB6, PB7 at a
  * certain frequency using the CTC mode of the timer 1 */
 
-#include <avr/io.h>
-
-#include <avrtos/kernel.h>
-#include <avrtos/drivers/timer.h>
 #include <avrtos/drivers/gpio.h>
+#include <avrtos/drivers/timer.h>
+#include <avrtos/kernel.h>
+#include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 
-#include <avrtos/logging.h>
+#include <avr/io.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
 
 /* Period range is [256us to 8.388sec] */
@@ -29,10 +28,10 @@ int main(void)
 	serial_init();
 
 	const struct timer_config config = {
-		.mode = TIMER_MODE_CTC,
-		.counter = 0u,
+		.mode	   = TIMER_MODE_CTC,
+		.counter   = 0u,
 		.prescaler = TIMER_PRESCALER_1024,
-		.timsk = 0u,
+		.timsk	   = 0u,
 	};
 
 	gpio_pin_init(GPIOB, 5u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
@@ -42,12 +41,12 @@ int main(void)
 	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
 
 	struct timer_channel_compare_config comp_conf = {
-		.mode = TIMER_CHANNEL_COMP_MODE_TOGGLE,
+		.mode  = TIMER_CHANNEL_COMP_MODE_TOGGLE,
 		.value = TIMER_CALC_COUNTER_VALUE(PERIOD_US >> 1u, 1024u),
 	};
 	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_A, &comp_conf);
 	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_B, &comp_conf);
 	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_C, &comp_conf);
-	
+
 	k_sleep(K_FOREVER);
 }

@@ -4,25 +4,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 #define K_MODULE K_MODULE_APPLICATION
 
 #define IPC_MAX_DATA_SIZE 0x10U
 
-#define IPC_START_FRAME_DELIMITER ((uint32_t) 0xAAAAAAAALU)
+#define IPC_START_FRAME_DELIMITER      ((uint32_t)0xAAAAAAAALU)
 #define IPC_START_FRAME_DELIMITER_SIZE 4U
-#define IPC_END_FRAME_DELIMITER ((uint32_t) 0x55555555LU)
-#define IPC_END_FRAME_DELIMITER_SIZE 4U
+#define IPC_END_FRAME_DELIMITER	       ((uint32_t)0x55555555LU)
+#define IPC_END_FRAME_DELIMITER_SIZE   4U
 
-#define IPC_FRAME_SIZE ((size_t) sizeof(ipc_frame_t))
+#define IPC_FRAME_SIZE ((size_t)sizeof(ipc_frame_t))
 
 typedef struct {
 	uint16_t size;
@@ -38,14 +37,14 @@ typedef struct {
 } __attribute__((packed)) ipc_frame_t;
 
 const struct usart_config usart_ipc_cfg = {
-	.baudrate = USART_BAUD_500000,
-	.receiver = 1,
+	.baudrate    = USART_BAUD_500000,
+	.receiver    = 1,
 	.transmitter = 1,
-	.mode = USART_MODE_ASYNCHRONOUS,
-	.parity = USART_PARITY_NONE,
-	.stopbits = USART_STOP_BITS_1,
-	.databits = USART_DATA_BITS_8,
-	.speed_mode = USART_SPEED_MODE_NORMAL
+	.mode	     = USART_MODE_ASYNCHRONOUS,
+	.parity	     = USART_PARITY_NONE,
+	.stopbits    = USART_STOP_BITS_1,
+	.databits    = USART_DATA_BITS_8,
+	.speed_mode  = USART_SPEED_MODE_NORMAL,
 };
 
 uint8_t rx_buffer[IPC_FRAME_SIZE];
@@ -71,17 +70,18 @@ K_PRNG_DEFINE_DEFAULT(prng);
 static void build_tx_frame(ipc_frame_t *frame)
 {
 	frame->start_delimiter = IPC_START_FRAME_DELIMITER;
-	frame->seq = 0U;
-	frame->data.size = IPC_MAX_DATA_SIZE;
-	frame->crc32 = 0xBBBBBBBBLU;
-	frame->end_delimiter = IPC_END_FRAME_DELIMITER;
+	frame->seq	       = 0U;
+	frame->data.size       = IPC_MAX_DATA_SIZE;
+	frame->crc32	       = 0xBBBBBBBBLU;
+	frame->end_delimiter   = IPC_END_FRAME_DELIMITER;
 
 	for (uint32_t i = 0; i < IPC_MAX_DATA_SIZE; i++) {
 		frame->data.buf[i] = i;
 	}
 
 	// tx_frame.data.size = IPC_MAX_DATA_SIZE;
-	// k_prng_get_buffer(&prng, (uint8_t *)&tx_frame.data.buf, IPC_MAX_DATA_SIZE);
+	// k_prng_get_buffer(&prng, (uint8_t *)&tx_frame.data.buf,
+	// IPC_MAX_DATA_SIZE);
 }
 
 int main(void)
@@ -112,7 +112,6 @@ int main(void)
 		k_sleep(K_MSEC(5000));
 	}
 }
-
 
 static void usart_rx_thread(struct k_msgq *msgq)
 {

@@ -10,7 +10,7 @@
 #include "avrtos.h"
 
 #include <stdbool.h>
-    
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,32 +19,32 @@ extern "C" {
 
 /**
  * @brief Initialize stack sentinel byte(s) for all threads.
- * 
+ *
  */
 K_NOINLINE void z_init_stacks_sentinel(void);
 
 /**
  * @brief Initialize stack sentinel byte(s) for specified thread.
- * 
- * @param th 
+ *
+ * @param th
  */
 void z_init_thread_stack_sentinel(struct k_thread *th);
 
 /**
  * @brief Verify if stack sentinel byte(s) is(are) still intact.
- * 
- * @param th 
- * @return true 
- * @return false 
+ *
+ * @param th
+ * @return true
+ * @return false
  */
 bool k_verify_stack_sentinel(struct k_thread *th);
 
 /**
  * @brief Check all registered stack sentinel bytes and fault on error.
- * 
- * @param th 
- * @return true 
- * @return false 
+ *
+ * @param th
+ * @return true
+ * @return false
  */
 void k_assert_registered_stack_sentinel(void);
 /*___________________________________________________________________________*/

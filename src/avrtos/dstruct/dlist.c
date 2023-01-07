@@ -10,14 +10,14 @@
 
 void dlist_init(struct ditem *list)
 {
-        list->head = list;
-        list->tail = list;
+	list->head = list;
+	list->tail = list;
 }
 
 void dlist_append(struct ditem *list, struct ditem *node)
 {
 	struct ditem *const tail = list->tail;
-	
+
 	tail->next = node;
 	node->prev = tail;
 
@@ -31,7 +31,7 @@ void dlist_prepend(struct ditem *list, struct ditem *node)
 
 	node->prev = list;
 	node->next = head;
-	
+
 	head->prev = node;
 	list->head = node;
 }
@@ -39,11 +39,11 @@ void dlist_prepend(struct ditem *list, struct ditem *node)
 void dlist_insert(struct ditem *successor, struct ditem *node)
 {
 	struct ditem *const prev = successor->prev;
-	
+
 	prev->next = node;
 	node->prev = prev;
-	
-	node->next = successor;
+
+	node->next	= successor;
 	successor->prev = node;
 }
 
@@ -51,7 +51,7 @@ void dlist_remove(struct ditem *node)
 {
 	struct ditem *const prev = node->prev;
 	struct ditem *const next = node->next;
-	
+
 	prev->next = next;
 	next->prev = prev;
 }
@@ -72,7 +72,7 @@ bool dlist_is_empty(struct ditem *list)
 
 uint8_t dlist_count(struct ditem *list)
 {
-	uint8_t count = 0u;
+	uint8_t count	  = 0u;
 	struct ditem *cur = list->head;
 	while (cur != list) {
 		count++;

@@ -5,17 +5,19 @@
  */
 
 #include <stdio.h>
-#include <util/delay.h>
 
-#include <avrtos/misc/serial.h>
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/serial.h>
+
+#include <util/delay.h>
 
 /**
  * @brief Example showing show what happens when IDLE thread is
  * disabled and all thread are sleeping.
  *
- * Enable option CONFIG_KERNEL_THREAD_IDLE or make sure at least one thread is always running.
+ * Enable option CONFIG_KERNEL_THREAD_IDLE or make sure at least one thread is
+ * always running.
  *
  * @return int
  */

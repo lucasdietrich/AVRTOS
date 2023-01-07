@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/pgmspace.h>
-
-#include <avrtos/misc/serial.h>
 #include <avrtos/kernel.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/pgmspace.h>
 
 /* Minimum footprint (Release for ATmega2560)
 	Memory region         Used Size  Region Size  %age Used

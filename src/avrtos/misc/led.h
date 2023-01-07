@@ -29,7 +29,7 @@ void led_on(void);
 void led_off(void);
 
 /**
- * @brief Set LED 
+ * @brief Set LED
  */
 void led_set(uint8_t state);
 

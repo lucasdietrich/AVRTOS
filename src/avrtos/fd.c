@@ -14,134 +14,134 @@ static struct fd fd_table[CONFIG_FD_MAX_COUNT];
 
 static int fd_check(int fd)
 {
-        if (fd < 0 || fd >= CONFIG_FD_MAX_COUNT) {
-                return -EBADF;
-        }
+	if (fd < 0 || fd >= CONFIG_FD_MAX_COUNT) {
+		return -EBADF;
+	}
 
-        if (atomic_get(&fd_table[fd].refcnt) != 0) {
-                return -EBADF;
-        }
+	if (atomic_get(&fd_table[fd].refcnt) != 0) {
+		return -EBADF;
+	}
 
-        return 0;
+	return 0;
 }
 
 static int fd_ref(int fd)
 {
-        return atomic_inc(&fd_table[fd].refcnt);
+	return atomic_inc(&fd_table[fd].refcnt);
 }
 
 static int fd_unref(int fd)
 {
-        /* naively set refcounter to 0 */
-        if (atomic_clear(&fd_table[fd].refcnt) != 0) {
-                fd_table[fd].obj = NULL;
-                fd_table[fd].vtable = NULL;
-        }
-        return 0;
+	/* naively set refcounter to 0 */
+	if (atomic_clear(&fd_table[fd].refcnt) != 0) {
+		fd_table[fd].obj    = NULL;
+		fd_table[fd].vtable = NULL;
+	}
+	return 0;
 }
 
 static int find_entry(void)
 {
-        for (struct fd *p = fd_table; p < &fd_table[CONFIG_FD_MAX_COUNT]; p++) {
-                if (atomic_get(&p->refcnt) == 0) {
-                        return p - fd_table;
-                }
-        }
-        return -ENFILE;
+	for (struct fd *p = fd_table; p < &fd_table[CONFIG_FD_MAX_COUNT]; p++) {
+		if (atomic_get(&p->refcnt) == 0) {
+			return p - fd_table;
+		}
+	}
+	return -ENFILE;
 }
 
 static int z_fd_reserve(void)
 {
-        k_mutex_lock(&fd_table_mutex, K_FOREVER);
+	k_mutex_lock(&fd_table_mutex, K_FOREVER);
 
-        int fd = find_entry();
-        if (fd >= 0) {
-                fd_table[fd].obj = NULL;
-                fd_table[fd].vtable = NULL;
+	int fd = find_entry();
+	if (fd >= 0) {
+		fd_table[fd].obj    = NULL;
+		fd_table[fd].vtable = NULL;
 
-                fd_ref(fd);
-        }
+		fd_ref(fd);
+	}
 
-        k_mutex_unlock(&fd_table_mutex);
+	k_mutex_unlock(&fd_table_mutex);
 
-        return fd;
+	return fd;
 }
 
 static void z_fd_finalize(int fd, void *obj, const struct fd_op_vtable *vtable)
 {
-        fd_table[fd].obj = obj;
-        fd_table[fd].vtable = vtable;
+	fd_table[fd].obj    = obj;
+	fd_table[fd].vtable = vtable;
 
-        k_mutex_init(&fd_table[fd].mutex);
+	k_mutex_init(&fd_table[fd].mutex);
 }
 
 static int z_fd_alloc(void *obj, const struct fd_op_vtable *vtable)
 {
-        int fd = z_fd_reserve();
-        if (fd >= 0) {
-                z_fd_finalize(fd, obj, vtable);
-        }
+	int fd = z_fd_reserve();
+	if (fd >= 0) {
+		z_fd_finalize(fd, obj, vtable);
+	}
 
-        return fd;
+	return fd;
 }
 
 static void z_fd_free(int fd)
 {
-        fd_unref(fd);
+	fd_unref(fd);
 }
 
 /*___________________________________________________________________________*/
 
 int read(int fd, void *buf, int len)
 {
-        int ret;
+	int ret;
 
-        ret = fd_check(fd);
-        if (ret < 0) {
-                return ret;
-        }
+	ret = fd_check(fd);
+	if (ret < 0) {
+		return ret;
+	}
 
-        return fd_table[fd].vtable->read(fd_table[fd].obj, buf, len);
+	return fd_table[fd].vtable->read(fd_table[fd].obj, buf, len);
 }
 
 int write(int fd, const void *buf, int len)
 {
-        int ret;
+	int ret;
 
-        ret = fd_check(fd);
-        if (ret < 0) {
-                return ret;
-        }
+	ret = fd_check(fd);
+	if (ret < 0) {
+		return ret;
+	}
 
-        return fd_table[fd].vtable->write(fd_table[fd].obj, buf, len);
+	return fd_table[fd].vtable->write(fd_table[fd].obj, buf, len);
 }
 
 int close(int fd)
 {
-        int ret;
+	int ret;
 
-        ret = fd_check(fd);
-        if (ret < 0) {
-                return ret;
-        }
+	ret = fd_check(fd);
+	if (ret < 0) {
+		return ret;
+	}
 
-        ret = fd_table[fd].vtable->close(fd_table[fd].obj);
+	ret = fd_table[fd].vtable->close(fd_table[fd].obj);
 
-        fd_unref(fd);
+	fd_unref(fd);
 
-        return ret;
+	return ret;
 }
 
 int ioctl(int fd, int req, void *arg)
 {
-        int ret;
+	int ret;
 
-        ret = fd_check(fd);
-        if (ret < 0) {
-                return ret;
-        }
+	ret = fd_check(fd);
+	if (ret < 0) {
+		return ret;
+	}
 
-        return fd_table[fd].vtable->ioctl(fd_table[fd].obj, req, arg);
+	return fd_table[fd].vtable->ioctl(fd_table[fd].obj, req, arg);
 }
 
 #endif

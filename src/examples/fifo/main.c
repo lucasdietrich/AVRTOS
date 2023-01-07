@@ -6,21 +6,20 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
 k_timeout_t timeouts[2] = {
-  K_FOREVER, // K_MSEC(2000)
-  K_FOREVER, // K_MSEC(1500)
+	K_FOREVER, // K_MSEC(2000)
+	K_FOREVER, // K_MSEC(1500)
 };
 
 void consumer_thread(k_timeout_t *p_timeout);
@@ -31,15 +30,12 @@ K_THREAD_DEFINE(consumer2, consumer_thread, 0x50, K_PREEMPTIVE, &timeouts[1], 'B
 
 /*___________________________________________________________________________*/
 
-struct item
-{
+struct item {
 	char chr;
 	struct qitem tie;
 };
 
-struct item letters[] = {
-  {'1'}, {'2'}, {'3'}, {'4'}, {'5'}
-};
+struct item letters[] = {{'1'}, {'2'}, {'3'}, {'4'}, {'5'}};
 
 /*___________________________________________________________________________*/
 

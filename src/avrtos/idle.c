@@ -8,7 +8,6 @@
 
 #include <avr/sleep.h>
 
-
 #define K_MODULE K_MODULE_IDLE
 
 extern uint8_t z_ready_count;
@@ -21,7 +20,7 @@ extern bool z_runqueue_single(void);
 static void z_idle_entry(void *context);
 
 #if defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE != 0)
-#	warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
+#warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
 #endif
 
 /*
@@ -30,7 +29,8 @@ static void z_idle_entry(void *context);
 #if CONFIG_THREAD_IDLE_COOPERATIVE
 
 /* TODO, cannot exaplin why it needs 22B instead of 21B ??? */
-/* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue function ?*/
+/* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue
+ * function ?*/
 
 // K_THREAD_MINIMAL_DEFINE(z_idle, z_idle_entry, K_COOPERATIVE, NULL, 'I');
 K_THREAD_DEFINE(z_idle,
@@ -46,7 +46,8 @@ K_THREAD_DEFINE(z_idle,
  */
 K_THREAD_DEFINE(z_idle,
 		z_idle_entry,
-		K_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
+		K_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE +
+			CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_PREEMPTIVE | K_FLAG_PRIO_LOW,
 		NULL,
 		'I');
@@ -54,24 +55,25 @@ K_THREAD_DEFINE(z_idle,
 
 /**
  * @brief Idle thread entry function
- * 
+ *
  * @param context : ignored for now
  */
 static void z_idle_entry(void *context)
 {
 	for (;;) {
 #if CONFIG_THREAD_IDLE_COOPERATIVE
-#warning "CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
+#warning                                                                                 \
+	"CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
 		k_yield();
 		// z_yield_from_idle_thread();
 #endif /* CONFIG_THREAD_IDLE_COOPERATIVE */
 
 		/* A bit buggy on QEMU but normally works fine */
 #if !defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE == 0)
-		/* only an interrupt can wake up the CPU after this instruction */
+		/* only an interrupt can wake up the CPU after this instruction
+		 */
 		sleep_cpu();
 #endif /* __QEMU__ */
-		
 	}
 }
 
@@ -81,7 +83,7 @@ bool k_is_cpu_idle(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
 	return z_ready_count == 0;
-#else 
+#else
 	return false;
 #endif /* CONFIG_KERNEL_THREAD_IDLE */
 }

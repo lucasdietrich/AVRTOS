@@ -6,26 +6,25 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
-#define CRASH_TEST  1
+#define CRASH_TEST 1
 
 #if CRASH_TEST
 #define PERIOD_SEM_GIVE 1000
 #define PERIOD_SEM_TAKE PERIOD_SEM_GIVE
 #else
-#define PERIOD_SEM_GIVE   1000
-#define PERIOD_SEM_TAKE   1000
+#define PERIOD_SEM_GIVE 1000
+#define PERIOD_SEM_TAKE 1000
 #endif
 
 /*___________________________________________________________________________*/
@@ -59,7 +58,7 @@ int main(void)
 #if !CONFIG_KERNEL_SCHEDULER_DEBUG
 		serial_print_p(PSTR("M: giving a semaphore "));
 #endif
-    // z_sem_debug(&mysem);
+		// z_sem_debug(&mysem);
 		k_sched_unlock();
 
 		k_sem_give(&mysem);

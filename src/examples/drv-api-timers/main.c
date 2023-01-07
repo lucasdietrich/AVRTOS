@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
-
 #include <avrtos/drivers/timer.h>
+#include <avrtos/kernel.h>
 #include <avrtos/misc/serial.h>
 
 void callback(void *dev, uint8_t tim_idx, void *arg)
@@ -18,11 +17,11 @@ void callback(void *dev, uint8_t tim_idx, void *arg)
 		ll_timer_stop(dev);
 
 		/* if callback takes more time than the timer period,
-		* the interrupt flag will be set again by the peripheral and the callback
-		* will be called a last time after this one.
-		*
-		* To avoid this, clear all interrupt flags.
-		*/
+		 * the interrupt flag will be set again by the peripheral and
+		 * the callback will be called a last time after this one.
+		 *
+		 * To avoid this, clear all interrupt flags.
+		 */
 		ll_timer_clear_irq_flags(tim_idx);
 	}
 }
@@ -32,7 +31,12 @@ static void app_init_timer(uint8_t tim_idx, uint32_t period_us, uint8_t flags)
 	int ret = timer_init(tim_idx, period_us, callback, NULL, flags);
 	if (ret < 0) {
 		printf_P(PSTR("timer_init(%d, %lu, %p, %p, %u) err = %d\n"),
-			 tim_idx, period_us, callback, NULL, flags, ret);
+			 tim_idx,
+			 period_us,
+			 callback,
+			 NULL,
+			 flags,
+			 ret);
 	}
 }
 

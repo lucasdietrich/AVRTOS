@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
-#include <avrtos/drivers/usart.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
+#include <avrtos/drivers/usart.h>
+#include <avrtos/kernel.h>
 
 K_SEM_DEFINE(sem, 0, 1);
 
@@ -22,19 +22,19 @@ ISR(TIMER3_COMPA_vect)
 	GPIOB->PIN = BIT(5u);
 
 	struct k_thread *unpend = k_sem_give(&sem);
-	
+
 	k_yield_from_isr_cond(unpend);
 }
 
 int main(void)
 {
 	gpio_init(GPIOB, 0xF0u, 0x00u);
-	
+
 	const struct timer_config timer_cfg = {
-		.counter = TIMER_CALC_COUNTER_VALUE(500000u, 1024u),
-		.mode = TIMER_MODE_CTC,
+		.counter   = TIMER_CALC_COUNTER_VALUE(500000u, 1024u),
+		.mode	   = TIMER_MODE_CTC,
 		.prescaler = TIMER_PRESCALER_1024,
-		.timsk = BIT(OCIEnA),
+		.timsk	   = BIT(OCIEnA),
 	};
 	ll_timer16_init(TIMER3_DEVICE, timer_get_index(TIMER3_DEVICE), &timer_cfg);
 

@@ -6,25 +6,20 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
 void waiting_thread(k_timeout_t *timeout);
 
-k_timeout_t timeouts[3] = {
-  K_SECONDS(2),
-  K_SECONDS(1),
-  K_SECONDS(1)
-};
+k_timeout_t timeouts[3] = {K_SECONDS(2), K_SECONDS(1), K_SECONDS(1)};
 
 K_THREAD_DEFINE(waiter1, waiting_thread, 0x100, K_PREEMPTIVE, &timeouts[0], 'A');
 K_THREAD_DEFINE(waiter2, waiting_thread, 0x100, K_PREEMPTIVE, &timeouts[1], 'B');

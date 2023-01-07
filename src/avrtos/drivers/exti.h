@@ -7,40 +7,41 @@
 #ifndef _AVRTOS_DRIVER_EXTI_H_
 #define _AVRTOS_DRIVER_EXTI_H_
 
-#include <avrtos/kernel.h>
 #include <avrtos/drivers.h>
+#include <avrtos/kernel.h>
 
-#define ISCn0 		0u
-#define ISCn1 		1u
+#define ISCn0 0u
+#define ISCn1 1u
 
-#define ISC_LOW_LEVEL 	0u
-#define ISC_EDGE 	1u
-#define ISC_FALLING 	2u
-#define ISC_RISING 	3u
+#define ISC_LOW_LEVEL 0u
+#define ISC_EDGE      1u
+#define ISC_FALLING   2u
+#define ISC_RISING    3u
 
-#define PCINT_0_7 	0u
-#define PCINT_8_15 	1u
-#define PCINT_16_23 	2u
+#define PCINT_0_7   0u
+#define PCINT_8_15  1u
+#define PCINT_16_23 2u
 
-#define PCINT_0_7_vect 		PCINT0_vect
-#define PCINT_8_15_vect 	PCINT1_vect
-#define PCINT_16_23_vect 	PCINT2_vect
+#define PCINT_0_7_vect	 PCINT0_vect
+#define PCINT_8_15_vect	 PCINT1_vect
+#define PCINT_16_23_vect PCINT2_vect
 
-#define GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev) ((_dev) == GPIOB)
-#define GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev) ((_dev) == GPIOC)
+#define GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev)	 ((_dev) == GPIOB)
+#define GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev)	 ((_dev) == GPIOC)
 #define GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ((_dev) == GPIOD)
 
-#define GPIO_PCINT_GROUP(_dev) (GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev) ? PCINT_0_7 : \
-			        GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev) ? PCINT_8_15 : \
-			        GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ? PCINT_16_23 : \
-			        0xFFu)
+#define GPIO_PCINT_GROUP(_dev)                                                           \
+	(GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev)	    ? PCINT_0_7                          \
+	 : GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev)  ? PCINT_8_15                         \
+	 : GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ? PCINT_16_23                        \
+						    : 0xFFu)
 
 #if defined(__AVR_ATmega2560__)
-#define EXTI_COUNT	 8u
-#define PCI_COUNT	 24u
+#define EXTI_COUNT 8u
+#define PCI_COUNT  24u
 #elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__)
-#define EXTI_COUNT 	 2u
-#define PCI_COUNT	 24u
+#define EXTI_COUNT 2u
+#define PCI_COUNT  24u
 #endif
 
 #define PCI_GROUPS_COUNT (PCI_COUNT >> 3u)
@@ -54,7 +55,7 @@ typedef struct {
 } PCI_Ctrl_Device;
 
 #define EXTI_CTRL_DEVICE ((EXTI_Ctrl_Device *)(AVR_IO_BASE_ADDR + 0x69u))
-#define PCI_CTRL_DEVICE ((PCI_Ctrl_Device *)(AVR_IO_BASE_ADDR + 0x6Bu))
+#define PCI_CTRL_DEVICE	 ((PCI_Ctrl_Device *)(AVR_IO_BASE_ADDR + 0x6Bu))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -120,6 +121,5 @@ static inline void pci_disable(uint8_t pci)
 #if defined(__cplusplus)
 }
 #endif
-
 
 #endif /* _AVRTOS_DRIVER_EXTI_H_ */

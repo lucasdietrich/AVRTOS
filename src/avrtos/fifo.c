@@ -6,16 +6,16 @@
 
 #include "fifo.h"
 
+#include <avrtos/dstruct/oqueue.h>
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
-#include <avrtos/dstruct/oqueue.h>
 
-#define K_MODULE    K_MODULE_FIFO
+#define K_MODULE K_MODULE_FIFO
 
 void k_fifo_init(struct k_fifo *fifo)
 {
-        oqref_init(&fifo->queue);
-        dlist_init(&fifo->waitqueue);
+	oqref_init(&fifo->queue);
+	dlist_init(&fifo->waitqueue);
 }
 
 struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item)
@@ -23,14 +23,14 @@ struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item)
 	__ASSERT_NOINTERRUPT();
 
 	/* If there is a thread pending on a fifo item,
-	* we to give the item directly to the thread
-	* (using thread->swap_data)
-	*/
+	 * we to give the item directly to the thread
+	 * (using thread->swap_data)
+	 */
 	struct k_thread *const thread =
 		z_unpend_first_and_swap(&fifo->waitqueue, (void *)item);
 
 	if (thread == NULL) {
-			/* otherwise we queue the item to the fifo */
+		/* otherwise we queue the item to the fifo */
 		oqueue(&fifo->queue, item);
 	}
 
@@ -84,7 +84,7 @@ uint8_t k_fifo_cancel_wait(struct k_fifo *fifo)
 
 bool k_fifo_is_empty(struct k_fifo *fifo)
 {
-        return k_fifo_peek_head(fifo) == NULL;
+	return k_fifo_peek_head(fifo) == NULL;
 }
 
 struct qitem *k_fifo_peek_head(struct k_fifo *fifo)

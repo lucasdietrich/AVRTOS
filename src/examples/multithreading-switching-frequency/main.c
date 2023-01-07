@@ -7,7 +7,8 @@
 /**
  * @file main.cpp
  * @author Dietrich Lucas (ld.adecy@gmail.com)
- * @brief Measurement frequency of the led in order to know at whch frequency does the kernel switch thread
+ * @brief Measurement frequency of the led in order to know at whch frequency
+ * does the kernel switch thread
  * @version 0.1
  * @date 2021-07-04
  *
@@ -29,18 +30,17 @@
 
 // set to 0 to have maximum switching frequency
 // set to 1 to have 10kHz switching frequency
-#define SET_10kHz_SWITCHING_FREQUENCY   0
+#define SET_10kHz_SWITCHING_FREQUENCY 0
 
 // precize calculation : cycles, etc...
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
 #include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 

@@ -7,6 +7,8 @@
 #ifndef _AVRTOS_H
 #define _AVRTOS_H
 
+// clang-format off
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -48,5 +50,7 @@
 #include "msgq.h"
 
 #include "io.h"
+
+// clang-format on
 
 #endif

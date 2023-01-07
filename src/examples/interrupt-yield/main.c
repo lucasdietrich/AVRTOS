@@ -6,15 +6,14 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
@@ -48,17 +47,17 @@ static uint8_t usart_read_rx(void)
 // atmega2560
 ISR(USART0_RX_vect)
 {
-  // UART0 RX buffer must be read before enabling interrupts again
+	// UART0 RX buffer must be read before enabling interrupts again
 	char recv = usart_read_rx();
 
 	void *mem;
 	if (k_mem_slab_alloc(&myslab, &mem, K_NO_WAIT) == 0) {
 
-	  /* first two bytes are use by the fifo */
+		/* first two bytes are use by the fifo */
 		*(char *)(mem + 2u) = recv;
 		k_fifo_put(&myfifo, mem);
 	} else {
-	  /* no memory slab available */
+		/* no memory slab available */
 		serial_transmit('X');
 	}
 }
@@ -87,14 +86,16 @@ void waiting_thread(void *p)
 			serial_transmit(*(char *)(mem + 2u));
 			serial_transmit('\n');
 
-			/* This delay emulates a delay in the process of the input letter.
-			 * If you send letters faster than you process them, there will be
-			 * not enough memory blocks and 'X' will appear in the UART.*/
+			/* This delay emulates a delay in the process of the
+			 * input letter. If you send letters faster than you
+			 * process them, there will be not enough memory blocks
+			 * and 'X' will appear in the UART.*/
 			k_sleep(K_MSEC(200));
 
 			k_mem_slab_free(&myslab, mem);
 		} else {
-			serial_printl_p(PSTR("Didn't get a letter from the UART in time."));
+			serial_printl_p(
+				PSTR("Didn't get a letter from the UART in time."));
 		}
 	}
 }

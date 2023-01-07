@@ -6,10 +6,9 @@
 
 #include "mutex.h"
 
+#include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
-
-#include <avrtos/debug.h>
 
 #include <util/atomic.h>
 
@@ -17,18 +16,18 @@
 
 void k_mutex_init(struct k_mutex *mutex)
 {
-        __ASSERT_NOTNULL(mutex);
+	__ASSERT_NOTNULL(mutex);
 
-        mutex->lock = 0xFFu;
-        mutex->owner = NULL;
-        dlist_init(&mutex->waitqueue);
+	mutex->lock  = 0xFFu;
+	mutex->owner = NULL;
+	dlist_init(&mutex->waitqueue);
 }
 
 int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 {
 	__ASSERT_NOTNULL(mutex);
 
-	int8_t lock = 0;
+	int8_t lock	  = 0;
 	const uint8_t key = irq_lock();
 
 	if (mutex->lock != 0x00) {
@@ -38,7 +37,7 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	}
 
 	if (lock == 0) {
-		__K_DBG_MUTEX_LOCKED(z_current);    // }
+		__K_DBG_MUTEX_LOCKED(z_current); // }
 		mutex->owner = z_current;
 	}
 
@@ -68,10 +67,10 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 	thread = z_unpend_first_thread(&mutex->waitqueue);
 
 	if (thread == NULL) {
-	    /* no new owner, we need to unlock
-	     * the mutex and remove the owner
-	     */
-		mutex->lock = 0xFFu;
+		/* no new owner, we need to unlock
+		 * the mutex and remove the owner
+		 */
+		mutex->lock  = 0xFFu;
 		mutex->owner = NULL;
 	}
 

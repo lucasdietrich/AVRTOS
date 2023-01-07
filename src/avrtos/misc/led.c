@@ -9,14 +9,14 @@
 #include <avrtos/drivers/gpio.h>
 
 #if defined(__AVR_ATmega328P__)
-#	define BUILTIN_LED_PORT GPIOB_DEVICE
-#	define BUILTIN_LED_PIN (5u)
+#define BUILTIN_LED_PORT GPIOB_DEVICE
+#define BUILTIN_LED_PIN	 (5u)
 #elif defined(__AVR_ATmega2560__)
-#	define BUILTIN_LED_PORT GPIOB_DEVICE
-#       define BUILTIN_LED_PIN (7u)	
+#define BUILTIN_LED_PORT GPIOB_DEVICE
+#define BUILTIN_LED_PIN	 (7u)
 #else
-#	define BUILTIN_LED_PORT GPIOB_DEVICE
-#	define BUILTIN_LED_PIN 0
+#define BUILTIN_LED_PORT GPIOB_DEVICE
+#define BUILTIN_LED_PIN	 0
 #endif
 
 void led_init(void)

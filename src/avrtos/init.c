@@ -5,11 +5,9 @@
  */
 
 #include "init.h"
-
-#include <avrtos/kernel.h>
-
 #include "io.h"
 
+#include <avrtos/kernel.h>
 
 extern void z_init_sysclock(void);
 
@@ -18,11 +16,14 @@ extern void z_kernel_init(void);
 void z_avrtos_init(void)
 {
 	/* Page 52 (ATmega328p datasheet) :
-	 *	Note: If the Watchdog is accidentally enabled, for example by a runaway pointer or brown-out condition, the
-	 * device will be reset and the Watchdog Timer will stay enabled. If the code is not set up to handle the Watchdog,
-	 * this might lead to an eternal loop of time-out resets. To avoid this situation, the application software should
-	 * always clear the Watchdog System Reset Flag (WDRF) and the WDE control bit in the initialization routine,
-	 * even if the Watchdog is not in use.
+	 *	Note: If the Watchdog is accidentally enabled, for example by a
+	 *runaway pointer or brown-out condition, the device will be reset and
+	 *the Watchdog Timer will stay enabled. If the code is not set up to
+	 *handle the Watchdog, this might lead to an eternal loop of time-out
+	 *resets. To avoid this situation, the application software should
+	 * always clear the Watchdog System Reset Flag (WDRF) and the WDE
+	 *control bit in the initialization routine, even if the Watchdog is not
+	 *in use.
 	 */
 
 	/* If the watchdog caused the reset, clear the flag */
@@ -39,19 +40,19 @@ void z_avrtos_init(void)
 	/* Send output stream to usart0 */
 	k_set_stdio_usart0();
 
-        z_kernel_init();
-        z_mem_slab_init_module();
+	z_kernel_init();
+	z_mem_slab_init_module();
 
 #if CONFIG_KERNEL_TIMERS
-        z_timer_init_module();
+	z_timer_init_module();
 #endif
 
 #if CONFIG_THREAD_CANARIES
-        z_init_stacks_canaries();
+	z_init_stacks_canaries();
 #endif
 
 #if CONFIG_THREAD_STACK_SENTINEL
-        z_init_stacks_sentinel();
+	z_init_stacks_sentinel();
 #endif
 
 	z_init_sysclock();
@@ -62,5 +63,5 @@ void z_avrtos_init(void)
 
 #if CONFIG_INTERRUPT_POLICY > 0
 	sei();
-#endif 
+#endif
 }

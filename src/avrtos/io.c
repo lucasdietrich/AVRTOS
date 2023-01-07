@@ -5,15 +5,14 @@
  */
 
 #include "io.h"
-
 #include "misc/serial.h"
 
 #if CONFIG_STDIO_PRINTF_TO_USART == 0
 
 static int uart_putchar(char c, FILE *stream)
 {
-        serial_transmit(c);
-        return 0;
+	serial_transmit(c);
+	return 0;
 }
 
 static FILE z_stdout_usart = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);

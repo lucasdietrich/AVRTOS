@@ -6,15 +6,14 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
@@ -54,17 +53,17 @@ int main(void)
 
 	K_SCHED_LOCK_CONTEXT
 	{
-	  /* schedule the work item */
-	  k_system_workqueue_submit(&work);
+		/* schedule the work item */
+		k_system_workqueue_submit(&work);
 
-	  /* scheduling the work item before it
-	   * started being process have no effect
-	   */
-	  k_system_workqueue_submit(&work);
+		/* scheduling the work item before it
+		 * started being process have no effect
+		 */
+		k_system_workqueue_submit(&work);
 	}
 
 	for (;;) {
-	  /* some processing */
+		/* some processing */
 	}
 }
 

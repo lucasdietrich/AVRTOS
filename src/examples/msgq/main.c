@@ -6,33 +6,32 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
-#define BLOCKS_COUNT    10
-#define BLOCK_SIZE      0x20
+#define BLOCKS_COUNT 10
+#define BLOCK_SIZE   0x20
 
 char buffer[BLOCKS_COUNT * BLOCK_SIZE];
 K_MSGQ_DEFINE(msgq, buffer, BLOCK_SIZE, BLOCKS_COUNT);
 
 /*___________________________________________________________________________*/
 
-#define WRITER_TIMEOUT  500
-#define WRITER_DELAY    250
+#define WRITER_TIMEOUT 500
+#define WRITER_DELAY   250
 
-#define READER_TIMEOUT  1000
-#define READER_DELAY    1000
+#define READER_TIMEOUT 1000
+#define READER_DELAY   1000
 
-#define PURGE_PERIOD    10000
+#define PURGE_PERIOD 10000
 
 void writer(struct k_msgq *msgq);
 void reader(struct k_msgq *msgq);

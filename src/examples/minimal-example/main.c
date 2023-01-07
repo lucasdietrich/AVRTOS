@@ -4,17 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
-
-#include <avrtos/drivers/usart.h>
 #include <avrtos/drivers/gpio.h>
-
+#include <avrtos/drivers/usart.h>
+#include <avrtos/kernel.h>
 #include <avrtos/logging.h>
-#define LOG_LEVEL 	LOG_LEVEL_DBG
+#define LOG_LEVEL LOG_LEVEL_DBG
 
-#define BUILTIN_LED_PORT 	GPIOB_DEVICE
-#define BUILTIN_LED_PIN 	(5u)
+#define BUILTIN_LED_PORT GPIOB_DEVICE
+#define BUILTIN_LED_PIN	 (5u)
 
 static char usart_msgq_buf[16u];
 K_MSGQ_DEFINE(usart_msgq, usart_msgq_buf, 1u, 16u);
@@ -34,16 +32,14 @@ ISR(USART0_RX_vect)
 
 int main(void)
 {
-	const struct usart_config usart_config = {
-		.baudrate = USART_BAUD_500000,
-		.receiver = 1u,
-		.transmitter = 1u,
-		.mode = USART_MODE_ASYNCHRONOUS,
-		.parity = USART_PARITY_NONE,
-		.stopbits = USART_STOP_BITS_1,
-		.databits = USART_DATA_BITS_8,
-		.speed_mode = USART_SPEED_MODE_NORMAL
-	};
+	const struct usart_config usart_config = {.baudrate    = USART_BAUD_500000,
+						  .receiver    = 1u,
+						  .transmitter = 1u,
+						  .mode	       = USART_MODE_ASYNCHRONOUS,
+						  .parity      = USART_PARITY_NONE,
+						  .stopbits    = USART_STOP_BITS_1,
+						  .databits    = USART_DATA_BITS_8,
+						  .speed_mode  = USART_SPEED_MODE_NORMAL};
 	ll_usart_init(USART0_DEVICE, &usart_config);
 	ll_usart_enable_rx_isr(USART0_DEVICE);
 

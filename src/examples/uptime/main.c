@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
 void timer_handler(struct k_timer *timer)
 {
@@ -41,7 +40,7 @@ K_THREAD_DEFINE(ta, thread, 0x200, K_PREEMPTIVE, NULL, 'A');
 void thread(void *ctx)
 {
 	uint64_t last = 0L;
-	uint64_t now = 0L;
+	uint64_t now  = 0L;
 
 	const uint32_t period = 1000LLU;
 

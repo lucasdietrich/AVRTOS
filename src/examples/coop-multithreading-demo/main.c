@@ -4,24 +4,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/io.h>
+#include <stdio.h>
+#include <string.h>
+
 #include <avr/interrupt.h>
+#include <avr/io.h>
 #include <util/delay.h>
 
-#include <string.h>
-#include <stdio.h>
-
 /*___________________________________________________________________________*/
 
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
 /*___________________________________________________________________________*/
 
-uint8_t on = 1u;
+uint8_t on  = 1u;
 uint8_t off = 0u;
 
 void thread_led(void *p);
@@ -50,11 +49,18 @@ int main(void)
 	led_init();
 	serial_init();
 
-
-#if !THREAD_PREPROCESSOR  
-	k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, 'O');
-	k_thread_create(&F, thread_led, stack2, sizeof(stack2), K_PRIO_DEFAULT, (void *)&off, 'F');
-	k_thread_create(&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, NULL, 'R');
+#if !THREAD_PREPROCESSOR
+	k_thread_create(
+		&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on, 'O');
+	k_thread_create(&F,
+			thread_led,
+			stack2,
+			sizeof(stack2),
+			K_PRIO_DEFAULT,
+			(void *)&off,
+			'F');
+	k_thread_create(
+		&R, thread_monitor, stack3, sizeof(stack3), K_PRIO_DEFAULT, NULL, 'R');
 
 	k_thread_start(&O);
 	k_thread_start(&F);

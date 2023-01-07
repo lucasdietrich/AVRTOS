@@ -6,32 +6,29 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
-
 #include <avrtos/dstruct/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
-#define MEM_SLAB_COMPILATION_TIME   1
+#define MEM_SLAB_COMPILATION_TIME 1
 
 /*___________________________________________________________________________*/
 
-struct block
-{
+struct block {
 	struct qitem tie;
 	uint8_t data[0x20];
 };
 
-#define BLOCK_COUNT   10u
-#define BLOCK_SIZE    sizeof(struct block)
+#define BLOCK_COUNT 10u
+#define BLOCK_SIZE  sizeof(struct block)
 
 void block_read(uint8_t *buffer, uint16_t size)
 {

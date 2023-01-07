@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
-
-#include <avrtos/misc/serial.h>
+#include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
 void waiter(void *context);
 

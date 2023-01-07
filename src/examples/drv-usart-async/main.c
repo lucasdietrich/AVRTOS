@@ -6,14 +6,13 @@
 
 // For ATmega328PB or ATmega2560
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 /*___________________________________________________________________________*/
 
@@ -25,8 +24,7 @@ void consumer(void *context);
 
 K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 
-struct in
-{
+struct in {
 	struct qitem tie;
 	uint8_t buffer[20];
 	uint8_t len;
@@ -111,7 +109,8 @@ void consumer(void *context)
 			serial_print_p(PSTR(" : "));
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
-			     c < mem->buffer + mem->len; c++) {
+			     c < mem->buffer + mem->len;
+			     c++) {
 				serial_transmit(*c);
 			}
 		}
@@ -122,16 +121,14 @@ void consumer(void *context)
 /*___________________________________________________________________________*/
 
 // IPC uart
-const struct usart_config usart_ipc_cfg PROGMEM = {
-	.baudrate = USART_BAUD_1000000,
-	.receiver = 1,
-	.transmitter = 1,
-	.mode = USART_MODE_ASYNCHRONOUS,
-	.parity = USART_PARITY_NONE,
-	.stopbits = USART_STOP_BITS_1,
-	.databits = USART_DATA_BITS_8,
-	.speed_mode = USART_SPEED_MODE_NORMAL
-};
+const struct usart_config usart_ipc_cfg PROGMEM = {.baudrate	= USART_BAUD_1000000,
+						   .receiver	= 1,
+						   .transmitter = 1,
+						   .mode	= USART_MODE_ASYNCHRONOUS,
+						   .parity	= USART_PARITY_NONE,
+						   .stopbits	= USART_STOP_BITS_1,
+						   .databits	= USART_DATA_BITS_8,
+						   .speed_mode = USART_SPEED_MODE_NORMAL};
 
 #define BUFFER_SIZE 16
 
@@ -179,7 +176,6 @@ int main(void)
 
 	k_sleep(K_FOREVER);
 }
-
 
 static void usart_rx_thread(struct k_msgq *msgq)
 {

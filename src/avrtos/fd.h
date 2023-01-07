@@ -7,30 +7,27 @@
 #ifndef _AVRTOS_FD_H
 #define _AVRTOS_FD_H
 
-#include <avrtos/kernel.h>
 #include <avrtos/dstruct/dlist.h>
+#include <avrtos/kernel.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 /*___________________________________________________________________________*/
 
-struct fd_op_vtable
-{
-        int (*read)(void *obj, void *buf, int len);
-        int (*write)(void *obj, const void *buf, int len);
-        int (*close)(void *obj);
-        int (*ioctl)(void *obj, int req, void *arg);
+struct fd_op_vtable {
+	int (*read)(void *obj, void *buf, int len);
+	int (*write)(void *obj, const void *buf, int len);
+	int (*close)(void *obj);
+	int (*ioctl)(void *obj, int req, void *arg);
 };
 
-struct fd
-{
-        void *obj;
-        atomic_t refcnt;
-        const struct fd_op_vtable *vtable;
-        struct k_mutex mutex;
+struct fd {
+	void *obj;
+	atomic_t refcnt;
+	const struct fd_op_vtable *vtable;
+	struct k_mutex mutex;
 };
 
 /*___________________________________________________________________________*/

@@ -7,11 +7,13 @@
 /**
  * @file main.cpp
  * @author Dietrich Lucas (ld.adecy@gmail.com)
- * @brief Two thread increment two counters. Threads are preempted by the system clock.
- * If configuration option CONFIG_KERNEL_DEBUG_PREEMPT_UART=1 is enabled :
- * send a character over the UART to preempt the thread currently running and switch to the other.
+ * @brief Two thread increment two counters. Threads are preempted by the system
+ * clock. If configuration option CONFIG_KERNEL_DEBUG_PREEMPT_UART=1 is enabled
+ * : send a character over the UART to preempt the thread currently running and
+ * switch to the other.
  *
- * if CONFIG_KERNEL_DEBUG_PREEMPT_UART is enabled and DCONFIG_KERNEL_TIME_SLICE_US=250000 :
+ * if CONFIG_KERNEL_DEBUG_PREEMPT_UART is enabled and
+ * DCONFIG_KERNEL_TIME_SLICE_US=250000 :
  * - on every 4 chars sent on the UART, the led is toggled
  * @version 0.1
  * @date 2021-08-21
@@ -22,15 +24,14 @@
 
 /*___________________________________________________________________________*/
 
-#include <util/delay.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <avrtos/misc/serial.h>
-#include <avrtos/misc/led.h>
-
-#include <avrtos/kernel.h>
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
+#include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 /*___________________________________________________________________________*/
 
@@ -63,7 +64,8 @@ void thread_led_toggle(void *p)
 		led_on();
 
 		k_sleep(K_MSEC(1000));
-		// if CONFIG_KERNEL_DEBUG_PREEMPT_UART is enabled and DCONFIG_KERNEL_TIME_SLICE_US=250000 :
+		// if CONFIG_KERNEL_DEBUG_PREEMPT_UART is enabled and
+		// DCONFIG_KERNEL_TIME_SLICE_US=250000 :
 		// - on every 4 chars sent on the UART, the led is toggled
 
 		led_off();

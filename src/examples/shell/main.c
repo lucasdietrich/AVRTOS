@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
+#include <avrtos/debug.h>
+#include <avrtos/kernel.h>
 #include <avrtos/misc/serial.h>
 
-#include <avrtos/kernel.h>
-#include <avrtos/debug.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 /*___________________________________________________________________________*/
 
@@ -22,8 +21,7 @@ void consumer(void *context);
 
 K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 
-struct in
-{
+struct in {
 	struct qitem tie;
 	uint8_t buffer[20];
 	uint8_t len;
@@ -35,7 +33,7 @@ K_FIFO_DEFINE(myfifo);
 void push(struct in **mem)
 {
 	struct k_thread *thread = k_fifo_put(&myfifo, *(void **)mem);
-	*mem = NULL;
+	*mem			= NULL;
 	k_yield_from_isr_cond(thread);
 }
 
@@ -113,7 +111,8 @@ void consumer(void *context)
 			serial_print_p(PSTR(" : "));
 
 			for (uint8_t *c = (uint8_t *)mem->buffer;
-			     c < mem->buffer + mem->len; c++) {
+			     c < mem->buffer + mem->len;
+			     c++) {
 				serial_transmit(*c);
 			}
 		}

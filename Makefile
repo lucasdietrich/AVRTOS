@@ -37,5 +37,8 @@ monitor:
 	echo "Press Ctrl-T + Q to exit"
 	python3 -m serial.tools.miniterm $(DEVICE) $(BAUDRATE)
 
+format:
+	find src -iname *.h -o -iname *.c -o -iname *.cpp | xargs clang-format -i
+
 clean:
 	rm -rf build

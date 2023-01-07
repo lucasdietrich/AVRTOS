@@ -615,6 +615,12 @@ Priority *COOPERATIVE* :
   - Note: Also increase IDLE stack size with `CONFIG_KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
   - Note: function call with ATmge2560 for example are stack consuming (because of the 3B return addresses)
 
+## clang-format
+
+- Install clang-format, and run `make format` to format all files
+- Or install `xaver.clang-format` extension for VS Code, and format on save or
+format using `Ctrl + K, Ctrl + F`
+
 ## CMake
 
 It's now possible to build the project with CMake.
