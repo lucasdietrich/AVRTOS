@@ -270,6 +270,11 @@ static inline void k_yield(void)
 	irq_unlock(key);
 }
 
+/**
+ * @brief Yield function for Arduino compatibility. 
+ * 
+ * @see k_yield
+ */
 void yield(void);
 
 /**

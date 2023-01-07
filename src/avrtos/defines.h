@@ -266,7 +266,7 @@ typedef struct
             .flags = K_FLAG_READY | prio_flag,                                                               \
         },                                                                                                   \
         .tie = {.runqueue = DITEM_INIT(NULL)},                                                               \
-        {.wmutex = DITEM_INIT(NULL)},                                                                        \
+        {.wany = DITEM_INIT(NULL)},                                                                        \
         .swap_data = NULL,                                                                                   \
         .stack = {.end = (void *)Z_STACK_END(Z_THREAD_STACK_START(_name), stack_size), .size = (stack_size)}, \
         .symbol = sym}

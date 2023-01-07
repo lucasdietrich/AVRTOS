@@ -16,12 +16,16 @@ static int uart_putchar(char c, FILE *stream)
         return 0;
 }
 
-static FILE k_stdout_usart0 = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
+static FILE z_stdout_usart = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
 void k_set_stdio_usart0(void)
 {
-	stdout = &k_stdout_usart0;
+	stdout = &z_stdout_usart;
 }
+
+#elif CONFIG_STDIO_PRINTF_TO_USART > 0
+
+#warning "CONFIG_STDIO_PRINTF_TO_USART > 0 not supported"
 
 #else
 

@@ -11,7 +11,7 @@
 
 #define USART_DEVICE USART0_DEVICE
 
-void serial_init()
+void serial_init(void)
 {
 	/* UART initialisation */
 	const struct usart_config usart_config = {
