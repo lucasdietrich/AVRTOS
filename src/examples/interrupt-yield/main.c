@@ -104,9 +104,9 @@ void monitoring_thread(void *p)
 	while (1) {
 		k_sleep(K_MSEC(30000));
 
-		print_runqueue();
-		print_events_queue();
-		dump_stack_canaries();
+		z_print_runqueue();
+		z_print_events_queue();
+		k_dump_stack_canaries();
 	}
 }
 

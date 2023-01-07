@@ -51,7 +51,7 @@ int main(void)
 static void monitor(void *arg)
 {
 	for (;;) {
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 
 		k_sleep(K_SECONDS(1));
 	}

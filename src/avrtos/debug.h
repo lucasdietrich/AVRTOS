@@ -125,7 +125,7 @@ void k_thread_dump_all(void);
  * @param th 
  * @return void* 
  */
-void *k_thread_get_return_addr(struct k_thread *th);
+void *z_thread_get_return_addr(struct k_thread *th);
 
 /**
  * @brief Copy in buffer the 32 registers (stored in stack) of a suspended thread
@@ -153,17 +153,17 @@ void *k_thread_get_return_addr(struct k_thread *th);
  * @brief Return the stack pointer value (after CALL)
  * 
  */
-uint16_t read_sp(void);
+uint16_t z_read_sp(void);
 
 /**
- * @brief Return the return addr value of itself (read_ra), helps to determine current running thread
+ * @brief Return the return addr value of itself (z_read_ra), helps to determine current running thread
  * 
  * Depends on arch (PC can be 2 or 3 bytes)
  */
 #if defined(__AVR_3_BYTE_PC__)
-uint32_t read_ra(void);
+uint32_t z_read_ra(void);
 #else
-uint16_t read_ra(void);
+uint16_t z_read_ra(void);
 #endif
 
 /**
@@ -171,7 +171,7 @@ uint16_t read_ra(void);
  * 
  * @param th 
  */
-void set_stack_pointer(struct k_thread *th);
+void z_set_stack_pointer(struct k_thread *th);
 
 /**
  * @brief Read SREG register
@@ -188,29 +188,21 @@ void set_stack_pointer(struct k_thread *th);
  * 
  * @return uint8_t 
  */
-uint8_t read_sreg(void);
+uint8_t z_read_sreg(void);
 
-#define LOG_SREG() serial_u8(SREG); serial_transmit(';');
-#define LOG_SREG2() serial_u8(read_sreg()); serial_transmit(';');
-#define LOG_SREG_I() serial_transmit('['); serial_u8(SREG >> 7); serial_transmit(']');
-
-/*___________________________________________________________________________*/
-
-void _thread_symbol_runqueue(struct ditem * item);
-
-void _thread_symbol_events_queue(struct titem * item);
-
-void print_events_queue(void);
-
-void print_runqueue(void);
+#define Z_LOG_SREG() serial_u8(SREG); serial_transmit(';');
+#define Z_LOG_SREG2() serial_u8(z_read_sreg()); serial_transmit(';');
+#define Z_LOG_SREG_I() serial_transmit('['); serial_u8(SREG >> 7); serial_transmit(']');
 
 /*___________________________________________________________________________*/
 
-//
-// Debug mutex
-//
+void z_thread_symbol_runqueue(struct ditem * item);
 
-void k_mutex_debug(struct k_mutex *mutex);
+void z_thread_symbol_events_queue(struct titem * item);
+
+void z_print_events_queue(void);
+
+void z_print_runqueue(void);
 
 /*___________________________________________________________________________*/
 
@@ -218,7 +210,15 @@ void k_mutex_debug(struct k_mutex *mutex);
 // Debug mutex
 //
 
-void k_sem_debug(struct k_sem *sem);
+void z_mutex_debug(struct k_mutex *mutex);
+
+/*___________________________________________________________________________*/
+
+//
+// Debug mutex
+//
+
+void z_sem_debug(struct k_sem *sem);
 
 /*___________________________________________________________________________*/
 

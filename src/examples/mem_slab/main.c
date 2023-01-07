@@ -110,7 +110,7 @@ int main(void)
 			debug(blocks[i], 0);
 		}
 
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 
 		_delay_ms(15000);
 

@@ -42,7 +42,7 @@ Following features are supported:
 Minor features:
 - thread naming with a symbol, e.g. 'M' for the main thread 'I' for the idle thread 
 - thread context passing
-- debug/utils functions : RAM_DUMP, CORE_DUMP, read_ra (read return address)
+- debug/utils functions : RAM_DUMP, CORE_DUMP, z_read_ra (read return address)
 - data structures : 
   - dlist : doubly linked list
     - raw API

@@ -61,7 +61,7 @@ int main(void)
 	k_thread_start(&R);
 #endif
 
-	print_runqueue();
+	z_print_runqueue();
 
 	// USART_DUMP_RAM_ALL();
 	k_thread_dump_all();

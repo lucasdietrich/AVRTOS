@@ -84,7 +84,7 @@ int main(void)
 
 		k_sleep(K_SECONDS(5u));
 
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 	}
 }
 

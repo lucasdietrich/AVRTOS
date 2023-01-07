@@ -59,7 +59,7 @@ int main(void)
 #if !CONFIG_KERNEL_SCHEDULER_DEBUG
 		serial_print_p(PSTR("M: giving a semaphore "));
 #endif
-    // k_sem_debug(&mysem);
+    // z_sem_debug(&mysem);
 		k_sched_unlock();
 
 		k_sem_give(&mysem);

@@ -8,13 +8,13 @@
 
 #include <avrtos/defines.h>
 
-.global read_sp
-.global read_ra
-.global set_stack_pointer
-.global read_sreg
+.global z_read_sp
+.global z_read_ra
+.global z_set_stack_pointer
+.global z_read_sreg
 
 ; return the return address of when ther caller calls it
-read_ra:
+z_read_ra:
     pop r25
     pop r24
 #if defined(__AVR_3_BYTE_PC__)
@@ -36,7 +36,7 @@ read_ra:
 
     ret
 
-read_sp:
+z_read_sp:
     lds r20, SREG
     cli
     lds r24, SPL
@@ -45,7 +45,7 @@ read_sp:
     ret
 
 ; structure address in r24, r25
-set_stack_pointer:
+z_set_stack_pointer:
     push r26
     push r27
 
@@ -62,6 +62,6 @@ set_stack_pointer:
 
     ret
 
-read_sreg:
+z_read_sreg:
     lds r24, SREG
     ret

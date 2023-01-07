@@ -51,7 +51,7 @@ int main(void)
 
 	k_thread_dump_all();
 
-	dump_stack_canaries();
+	k_dump_stack_canaries();
 
 	k_sleep(K_FOREVER);
 }
@@ -70,7 +70,7 @@ void thread_led(void *p)
 void thread_task1(void *p)
 {
 	while (1) {
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 
 		k_sleep(K_MSEC(1000));
 

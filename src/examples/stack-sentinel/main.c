@@ -30,7 +30,7 @@ int main(void)
 
 		printf_P(PSTR("%lu: Sentinel status = %d\n"), counter++, success ? 1 : 0);
 
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 
 		k_thread_dump_all();
 

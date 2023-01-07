@@ -62,9 +62,9 @@ void stats(void *arg)
 	for (;;)
 	{
 		printf_P(PSTR("\n\n"));
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 		for (uint8_t i = 0u; i < THREADS_COUNT; i++) {
-			print_stack_canaries(&threads[i]);
+			k_print_stack_canaries(&threads[i]);
 		}
 		k_sleep(K_SECONDS(10));
 	}

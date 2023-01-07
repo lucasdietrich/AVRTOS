@@ -25,14 +25,12 @@ int main(void)
 
 	k_thread_dump_all();
 
-	uint8_t state = 0;
-
 	for (;;) {
 		led_toggle();
 
 		k_sleep(K_MSEC(5000));
 
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 	}
 }
 

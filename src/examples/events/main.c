@@ -52,7 +52,7 @@ int main(void)
 	for (;;) {
 		K_SCHED_LOCK_CONTEXT{
 			for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
-				print_stack_canaries(&ms->thread);
+				k_print_stack_canaries(&ms->thread);
 			}
 		}
 

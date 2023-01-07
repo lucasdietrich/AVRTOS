@@ -27,7 +27,7 @@ void thread2(void *context);
 void thread_canaries(void *ctx)
 {
 	for (;;) {
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 		k_sleep(K_SECONDS(10));
 	}
 }

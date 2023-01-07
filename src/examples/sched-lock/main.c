@@ -35,7 +35,7 @@ int main(void)
 
 	k_thread_dump_all();
 
-	print_runqueue();
+	z_print_runqueue();
 
 	sei();
 

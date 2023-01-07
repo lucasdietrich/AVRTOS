@@ -112,7 +112,7 @@ void k_thread_dump_all(void)
 }
 
 
-void *k_thread_get_return_addr(struct k_thread *th)
+void *z_thread_get_return_addr(struct k_thread *th)
 {
         if (th == z_current) {
                 uint16_t return_addr_reverted = *((uint16_t *)
@@ -126,29 +126,29 @@ void *k_thread_get_return_addr(struct k_thread *th)
 /*___________________________________________________________________________*/
 
 
-void _thread_symbol_runqueue(struct ditem *item)
+void z_thread_symbol_runqueue(struct ditem *item)
 {
         serial_transmit(CONTAINER_OF(item, struct k_thread, tie.runqueue)->symbol);
 }
 
-void _thread_symbol_events_queue(struct titem *item)
+void z_thread_symbol_events_queue(struct titem *item)
 {
         serial_transmit(CONTAINER_OF(item, struct k_thread, tie.event)->symbol);
 }
 
-void print_runqueue(void)
+void z_print_runqueue(void)
 {
         /* TODO */
 }
 
-void print_events_queue(void)
+void z_print_events_queue(void)
 {
-        print_tqueue(z_events_queue, _thread_symbol_events_queue);
+        print_tqueue(z_events_queue, z_thread_symbol_events_queue);
 }
 
 /*___________________________________________________________________________*/
 
-void k_sem_debug(struct k_sem *sem)
+void z_sem_debug(struct k_sem *sem)
 {
         uint8_t count = sem->count;
         uint8_t limit = sem->limit;

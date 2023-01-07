@@ -201,7 +201,7 @@ K_THREAD_DEFINE(rx_thread, usart_rx_thread, 0x100, K_COOPERATIVE, &ipc_msgq, 'X'
 static void thread_canaries(void *arg)
 {
 	for (;;) {
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 		k_sleep(K_SECONDS(30));
 	}
 }

@@ -70,7 +70,7 @@ void thread_canaries_entry(void *_c)
 {
 	for (;;) {
 		k_thread_dump_all();
-		dump_stack_canaries();
+		k_dump_stack_canaries();
 
 		k_sleep(K_SECONDS(30));
 	}

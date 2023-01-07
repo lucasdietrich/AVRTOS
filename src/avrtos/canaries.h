@@ -49,14 +49,14 @@ void* z_stack_canaries(struct k_thread *th);
  * 
  * @param th thread to check
  */
-void print_stack_canaries(struct k_thread *th);
+void k_print_stack_canaries(struct k_thread *th);
 
 /**
  * @brief Pretty print found canaries in the current thread
  * 
  * [M] CANARIES until @07CE [found 468], MAX usage = 44 / 512
  */
-void print_current_canaries(void);
+void k_print_current_canaries(void);
 
 /**
  * @brief Pretty print found canaries in all threads
@@ -68,7 +68,7 @@ void print_current_canaries(void);
  * [K] CANARIES until @051F [found 26], MAX usage = 36 / 62
  * 
  */
-void dump_stack_canaries(void);
+void k_dump_stack_canaries(void);
 
 /*___________________________________________________________________________*/
 
