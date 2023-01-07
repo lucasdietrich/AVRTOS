@@ -46,6 +46,12 @@ struct k_signal
 
 /*___________________________________________________________________________*/
 
+/**
+ * @brief Initialize a signal object.
+ * 
+ * @param sig 
+ * @return K_NOINLINE 
+ */
 K_NOINLINE void k_signal_init(struct k_signal *sig);
 
 /**
@@ -57,12 +63,25 @@ K_NOINLINE void k_signal_init(struct k_signal *sig);
  */
 K_NOINLINE struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value);
 
-// poll a single signal, thread "tie" is enough
+/**
+ * @brief Poll on a signal.
+ * 
+ * Signal must be cleared manually with K_SIGNAL_SET_UNREADY.
+ * 
+ * TODO: Return the signal value that made the thread ready.
+ * 
+ * @param sig 
+ * @param timeout 
+ * @return K_NOINLINE 
+ */
 K_NOINLINE int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
 
-// to poll several signal we need as many "tie" (to an event queue) as signals we have
-// void k_poll(struct k_signal *signals[], uint8_t size, k_timeout_t timeout);
-
+/**
+ * @brief Cancel the wait of all threads polling on the signal.
+ * 
+ * @param sig 
+ * @return K_NOINLINE 
+ */
 K_NOINLINE uint8_t k_poll_cancel_wait(struct k_signal *sig);
 
 /*___________________________________________________________________________*/
