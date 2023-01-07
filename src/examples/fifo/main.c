@@ -54,7 +54,7 @@ int main(void)
 
 	uint8_t pos = 0u;
 	while (1) {
-		serial_transmit(_current->symbol);
+		serial_transmit(z_current->symbol);
 		serial_print_p(PSTR(" : Send = "));
 		serial_transmit(letters[pos].chr);
 		serial_transmit('\n');
@@ -71,7 +71,7 @@ void consumer_thread(k_timeout_t *p_timeout)
 {
 	while (1) {
 		struct qitem *tie = k_fifo_get(&fifo, *p_timeout);
-		serial_transmit(_current->symbol);
+		serial_transmit(z_current->symbol);
 		if (tie != NULL) {
 			serial_print_p(PSTR(" : Received = "));
 			serial_transmit(CONTAINER_OF(tie, struct item, tie)->chr);

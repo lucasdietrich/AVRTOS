@@ -48,7 +48,7 @@ enum thread_state_t {
 	K_READY = 1, 
 
 	/* The thread is pending for an event, it may be in the time queue (events_queue) 
-	 * but it is not in the runqueue. It can be wake up with function _k_wake_up()
+	 * but it is not in the runqueue. It can be wake up with function z_wake_up()
 	 */
 	K_PENDING = 2, 
 
@@ -59,7 +59,7 @@ enum thread_state_t {
 };
 
 /* size 19B */
-struct _k_callsaved_ctx {
+struct z_callsaved_ctx {
 	uint8_t sreg;
 
 	union {
@@ -107,15 +107,15 @@ struct _k_callsaved_ctx {
 	 */
 
 	struct {
-#if _K_ARCH_PC_SIZE == 3
+#if Z_ARCH_PC_SIZE == 3
 		uint8_t pch;
-#endif /* _K_ARCH_PC_SIZE == 3 */
+#endif /* Z_ARCH_PC_SIZE == 3 */
 
 		void *pc;
 	};
 };
 
-struct _k_callused_ctx
+struct z_callused_ctx
 {
 	uint8_t r18;
 	uint8_t r19;
@@ -131,12 +131,12 @@ struct _k_callused_ctx
 	uint8_t r31;
 };
 
-struct _k_intctx
+struct z_intctx
 {
 	struct {
-#if _K_ARCH_PC_SIZE == 3
+#if Z_ARCH_PC_SIZE == 3
 		uint8_t pch;
-#endif /* _K_ARCH_PC_SIZE == 3 */
+#endif /* Z_ARCH_PC_SIZE == 3 */
 		void *pc;
 	};
 
@@ -144,7 +144,7 @@ struct _k_intctx
 	uint8_t r0;
 	uint8_t sreg;
 
-	struct _k_callused_ctx callused_reg;
+	struct z_callused_ctx callused_reg;
 };
 
 /**
@@ -215,7 +215,7 @@ struct k_thread
                 struct ditem wmsgq;             // represent the thread pending on a msgq item
                 struct ditem wflags;            // represent the thread pending on a flags item
         };
-        void *swap_data;                        // data returned by kernel API's when calling _k_unpend_first_thread
+        void *swap_data;                        // data returned by kernel API's when calling z_unpend_first_thread
 
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER
         /**
@@ -244,14 +244,14 @@ struct k_thread
 };
 
 /**
- * @brief Main thread structure, defined in _k_threads section
+ * @brief Main thread structure, defined in z_threads section
  */
-extern struct k_thread _k_thread_main;
+extern struct k_thread z_thread_main;
 
 /**
  * @brief Get the address of the thread currently running.
  */
-extern struct k_thread * _current;
+extern struct k_thread * z_current;
 
 /*___________________________________________________________________________*/
 
@@ -274,14 +274,14 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
 
 /*___________________________________________________________________________*/
 
-void _k_thread_entry(void);
+void z_thread_entry(void);
 
 /*___________________________________________________________________________*/
 
 /**
  * @brief Get current thread
  * 
- * @see struct k_thread * _current
+ * @see struct k_thread * z_current
  * 
  * @return thread_t* 
  */

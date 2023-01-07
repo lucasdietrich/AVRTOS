@@ -74,7 +74,7 @@ void waiter_entry(void *context)
 		if (dbg_sem == 0) {
 			k_sched_lock();
 #if !CONFIG_KERNEL_SCHEDULER_DEBUG
-			serial_transmit(_current->symbol);
+			serial_transmit(z_current->symbol);
 			serial_printl_p(PSTR(": got a semaphore !"));
 #endif
 			k_sched_unlock();

@@ -16,7 +16,7 @@
 
 /*___________________________________________________________________________*/
 
-void _k_workqueue_entry(struct k_workqueue *const workqueue)
+void z_workqueue_entry(struct k_workqueue *const workqueue)
 {
         struct qitem *item;
         struct k_work *work;
@@ -74,7 +74,7 @@ bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 	/* if item not already in queue */
 	const uint8_t key = irq_lock();
 	if (k_work_submittable(work)) {
-		_k_fifo_put(&workqueue->q, &work->_tie);
+		z_fifo_put(&workqueue->q, &work->_tie);
 		ret = true;
 	}
 	irq_unlock(key);
@@ -103,11 +103,11 @@ void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue)
 
 #if CONFIG_SYSTEM_WORKQUEUE_ENABLE
 
-K_WORKQUEUE_DEFINE(_k_system_workqueue, CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE, CONFIG_SYSTEM_WORKQUEUE_PRIORITY, 'W');
+K_WORKQUEUE_DEFINE(z_system_workqueue, CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE, CONFIG_SYSTEM_WORKQUEUE_PRIORITY, 'W');
 
 bool k_system_workqueue_submit(struct k_work *work)
 {
-	return k_work_submit(&_k_system_workqueue, work);
+	return k_work_submit(&z_system_workqueue, work);
 }
 
 #endif

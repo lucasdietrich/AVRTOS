@@ -9,14 +9,14 @@
 
 #include <avrtos/defines.h>
 
-.global _k_thread_switch
-.global _k_thread_entry
+.global z_thread_switch
+.global z_thread_entry
 
-.extern _k_scheduler
-.extern _current
-.extern _k_ticks 			; u32/u40
-.extern _k_sched_ticks_remaining 	; u8
-.extern _k_system_shift
+.extern z_scheduler
+.extern z_current
+.extern z_ticks 			; u32/u40
+.extern z_sched_ticks_remaining 	; u8
+.extern z_system_shift
 
 #if CONFIG_KERNEL_SYSLOCK_HW_TIMER == 0
 #define TIMERn_COMPA_vect TIMER0_COMPA_vect
@@ -50,35 +50,35 @@ TIMERn_COMPA_vect:
 #if CONFIG_KERNEL_TICKS_COUNTER
 	ldi r18, 0x01			; 1 cycle
 
-	lds r0, _k_ticks		; 2 cycles
+	lds r0, z_ticks		; 2 cycles
 	add r0, r18			; 1 cycle
-	sts _k_ticks, r0		; 2 cycles
+	sts z_ticks, r0		; 2 cycles
 
-	lds r0, _k_ticks + 1		; 2 cycles
+	lds r0, z_ticks + 1		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts _k_ticks + 1, r0		; 2 cycles
+	sts z_ticks + 1, r0		; 2 cycles
 	
-	lds r0, _k_ticks + 2		; 2 cycles
+	lds r0, z_ticks + 2		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts _k_ticks + 2, r0		; 2 cycles
+	sts z_ticks + 2, r0		; 2 cycles
 
-	lds r0, _k_ticks + 3		; 2 cycles
+	lds r0, z_ticks + 3		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts _k_ticks + 3, r0		; 2 cycles
+	sts z_ticks + 3, r0		; 2 cycles
 
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-	lds r0, _k_ticks + 4		; 2 cycles
+	lds r0, z_ticks + 4		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts _k_ticks + 4, r0		; 2 cycles
+	sts z_ticks + 4, r0		; 2 cycles
 #endif
 ; CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 #endif
 ; CONFIG_KERNEL_TICKS_COUNTER
 
 #if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
-	lds r18, _k_sched_ticks_remaining
+	lds r18, z_sched_ticks_remaining
 	subi r18, 0x01
-	sts _k_sched_ticks_remaining, r18
+	sts z_sched_ticks_remaining, r18
 	brne __intctx_restore_minimal
 #endif 
 ;CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
@@ -101,12 +101,12 @@ TIMERn_COMPA_vect:
 #endif
 ; CONFIG_KERNEL_DEBUG
 
-	call _k_system_shift
+	call z_system_shift
 
 ; check if scheduler is locked (cooperative thread or temporarely locked)
 #if CONFIG_KERNEL_COOPERATIVE_THREADS
-	lds ZL, _current           ; load current thread addr in Z
-	lds ZH, _current + 1
+	lds ZL, z_current           ; load current thread addr in Z
+	lds ZH, z_current + 1
 
 	ldd r18, Z + 2      ; read flag
 	andi r18, K_FLAG_COOP | K_FLAG_SCHED_LOCKED
@@ -115,7 +115,7 @@ TIMERn_COMPA_vect:
 	brne __sched_locked
 
 	; prepare return context for preempted thread
-	; so that __intctx_restore is called when returning from _k_yield
+	; so that __intctx_restore is called when returning from z_yield
 	ldi r24, pm_lo8(__intctx_restore)
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
@@ -123,7 +123,7 @@ TIMERn_COMPA_vect:
 #if defined(__AVR_3_BYTE_PC__)
 	push r1
 #endif 
-	jmp _k_yield
+	jmp z_yield
 #endif
 ; CONFIG_KERNEL_COOPERATIVE_THREADS
 
@@ -158,34 +158,34 @@ __intctx_restore_minimal:
 	pop	r1
 	reti
 
-.global _k_yield
-_k_yield:
+.global z_yield
+z_yield:
 	; call scheduler to determine which thread is next
-	call _k_scheduler
+	call z_scheduler
 
 	; r24 contain previous thread
 	movw r26, r24
 	
 	; current thread
-	lds r30, _current
-	lds r31, _current + 1
+	lds r30, z_current
+	lds r31, z_current + 1
 
 #if CONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH
 	; Compare threads addresses after scheduler call to prevent thread switch to the same thread
-	; - i.e.thread switch only if "previous" and "_current" threads are different
+	; - i.e.thread switch only if "previous" and "z_current" threads are different
 	; - inefficient if at least two threads are always ready
 	; - compare low bytes before high bytes because 
 	;     they have a higher probability to be different
 	cp r26, r30
-	brne _k_thread_switch
+	brne z_thread_switch
 	cp r27, r31
-	brne _k_thread_switch
+	brne z_thread_switch
 	ret
 #endif
 
 ; "from" thread addr is in r24, r25
 ; "to" thread  addr in in r22, r23
-_k_thread_switch:
+z_thread_switch:
 	push r2
 	push r3
 	push r4
@@ -250,7 +250,7 @@ _k_thread_switch:
 
 .extern k_stop
 .extern __fault
-_k_thread_entry:
+z_thread_entry:
 	movw r24, r2
 	movw r30, r4
 	sts SREG, r6
@@ -282,23 +282,23 @@ __k_interrupts:
 k_ticks_get_32:
 	lds	r26, SREG
 	cli
-	lds 	r22, _k_ticks
-	lds 	r23, _k_ticks + 1
-	lds 	r24, _k_ticks + 2
+	lds 	r22, z_ticks
+	lds 	r23, z_ticks + 1
+	lds 	r24, z_ticks + 2
 	sts	SREG, r26
-	lds 	r25, _k_ticks + 3
+	lds 	r25, z_ticks + 3
 	ret
 
 k_ticks_get_64:
 	lds	r26, SREG
 	cli
-	lds 	r18, _k_ticks
-	lds 	r19, _k_ticks + 1
-	lds 	r20, _k_ticks + 2
-	lds 	r21, _k_ticks + 3
+	lds 	r18, z_ticks
+	lds 	r19, z_ticks + 1
+	lds 	r20, z_ticks + 2
+	lds 	r21, z_ticks + 3
 	sts	SREG, r26
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-	lds	r22, _k_ticks + 4
+	lds	r22, z_ticks + 4
 #else
 	ldi	r22, 0x00
 #endif /* CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS */
@@ -344,6 +344,6 @@ USART0_RX_vect:
 	push r1
 #endif 
 
-	jmp _k_yield
+	jmp z_yield
 #endif
 ; CONFIG_KERNEL_DEBUG_PREEMPT_UART

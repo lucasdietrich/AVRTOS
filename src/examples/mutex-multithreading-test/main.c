@@ -52,7 +52,7 @@ void thread(void *p)
 {
 	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5));  // change this timeout
 
-	serial_transmit(_current->symbol);
+	serial_transmit(z_current->symbol);
 
 	if (lock) {
 		serial_printl_p(PSTR(" : Didn't get the mutex ..."));
@@ -71,7 +71,7 @@ void threadp(void *p)
 {
 	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9));  // change this timeout
 
-	serial_transmit(_current->symbol);
+	serial_transmit(z_current->symbol);
 
 	if (lock) {
 		serial_printl_p(PSTR(" : Didn't get the mutex ..."));

@@ -61,12 +61,12 @@ int k_flags_poll(struct k_flags *flags,
 	if (trig == 0u) {
 		/* Set into swap_data flags the thread in pending on and
 		 * K_FLAGS_CONSUME option */
-		_current->swap_data = SWAP_DATA_INIT_OPT_N_MASK(options, mask);
+		z_current->swap_data = SWAP_DATA_INIT_OPT_N_MASK(options, mask);
 
-		ret = _k_pend_current(&flags->_waitqueue, timeout);
+		ret = z_pend_current(&flags->_waitqueue, timeout);
 		if (ret == 0) {
 			/* Bits that made the thread ready are stored in swap_data */
-			ret = SWAP_DATA_GET_TRIG_MASK(_current->swap_data);
+			ret = SWAP_DATA_GET_TRIG_MASK(z_current->swap_data);
 		}
 	} else {
 		if ((options & K_FLAGS_CONSUME) != 0u) {
@@ -118,7 +118,7 @@ int k_flags_notify(struct k_flags *flags,
 
 				/* Unpend thread */
 				dlist_remove(thread_item);
-				_k_wake_up(thread);
+				z_wake_up(thread);
 
 				if (SWAP_DATA_GET_OPTIONS(swap_data) & K_FLAGS_CONSUME) {
 					notify_value &= ~trig;
@@ -138,7 +138,7 @@ int k_flags_notify(struct k_flags *flags,
 	}
 
 	if ((ret > 0) && (options & K_FLAGS_SCHED)) {
-		_k_yield();
+		z_yield();
 	}
 
 	irq_unlock(lock);
@@ -156,7 +156,7 @@ int k_flags_reset(struct k_flags *flags)
 
 	const uint8_t lock = irq_lock();
 
-	int ret = _k_cancel_all_pending(&flags->_waitqueue);
+	int ret = z_cancel_all_pending(&flags->_waitqueue);
 	flags->flags = flags->reset_value;
 
 	irq_unlock(lock);

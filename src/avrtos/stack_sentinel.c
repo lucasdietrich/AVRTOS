@@ -11,10 +11,10 @@
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
-void _k_init_thread_stack_sentinel(struct k_thread *th)
+void z_init_thread_stack_sentinel(struct k_thread *th)
 {
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 0
-	if (th == &_k_thread_main) {
+	if (th == &z_thread_main) {
 		return;
 	}
 #endif
@@ -26,18 +26,18 @@ void _k_init_thread_stack_sentinel(struct k_thread *th)
 	}
 }
 
-void _k_init_stacks_sentinel(void)
+void z_init_stacks_sentinel(void)
 {
 	for (struct k_thread *thread = &__k_threads_start;
 	     thread < &__k_threads_end; thread++) {
-		_k_init_thread_stack_sentinel(thread);
+		z_init_thread_stack_sentinel(thread);
 	}
 }
 
 bool k_verify_stack_sentinel(struct k_thread *th)
 {
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 0
-	if (th == &_k_thread_main) {
+	if (th == &z_thread_main) {
 		return true;
 	}
 #endif

@@ -28,13 +28,13 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 	if (sem->count != 0) {
 		sem->count--;
 	} else {
-		get = _k_pend_current(&sem->waitqueue, timeout);
+		get = z_pend_current(&sem->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
 
 	if (get == 0) {
-		__K_DBG_SEM_TAKE(_current);
+		__K_DBG_SEM_TAKE(z_current);
 	}
 
 	return get;
@@ -46,14 +46,14 @@ struct k_thread *k_sem_give(struct k_sem *sem)
 
 	const uint8_t key = irq_lock();
 
-	__K_DBG_SEM_GIVE(_current);
+	__K_DBG_SEM_GIVE(z_current);
 
 	/* if a thread is thread is pending on a semaphore
 	 * it means that its count is necessary 0. So we don't
 	 * need to check if we reached the limit.
 	 */
 
-	thread = _k_unpend_first_thread(&sem->waitqueue);
+	thread = z_unpend_first_thread(&sem->waitqueue);
 
 	/* If there is a thread pending on a semaphore,
 	 * we to give the semaphore directly to the thread

@@ -134,7 +134,7 @@ void *k_thread_get_return_addr(struct k_thread *th);
  * buffer[6], buffer[7] = r24, r25
  * buffer[8] > buffer[31] : r23 > r0
  * 
- * @see k_yield, _k_thread_stack_create, _K_STACK_INITIALIZER
+ * @see k_yield, z_thread_stack_create, Z_STACK_INITIALIZER
  * 
  * @warning r24, r25 are not pushed in the same way as other registers
  * 

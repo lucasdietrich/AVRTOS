@@ -35,7 +35,7 @@ struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value)
 	sig->flags |= K_POLL_STATE_SIGNALED;
 
 	/* TODO: unpend all threads */
-	thread = _k_unpend_first_thread(&sig->waitqueue);
+	thread = z_unpend_first_thread(&sig->waitqueue);
 
 	irq_unlock(key);
 
@@ -53,7 +53,7 @@ int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 	if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
 		ret = 0;
 	} else {
-		ret = _k_pend_current(&sig->waitqueue, timeout);
+		ret = z_pend_current(&sig->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
@@ -69,7 +69,7 @@ uint8_t k_poll_cancel_wait(struct k_signal *sig)
 
 	const uint8_t key = irq_lock();
 
-	ret = _k_cancel_all_pending(&sig->waitqueue);
+	ret = z_cancel_all_pending(&sig->waitqueue);
 
 	irq_unlock(key);
 

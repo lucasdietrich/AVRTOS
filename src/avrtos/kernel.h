@@ -254,7 +254,7 @@ K_NOINLINE void k_stop(void);
 uint8_t k_ready_count(void);
 
 /* @see k_yield but suppose interrupts are disabled */
-void _k_yield(void);
+void z_yield(void);
 
 /**
  * @brief Release the CPU: Stop the execution of the current thread and set it at the end of the runqueue 
@@ -266,7 +266,7 @@ void _k_yield(void);
 static inline void k_yield(void)
 {
 	const uint8_t key = irq_lock();
-	_k_yield();
+	z_yield();
 	irq_unlock(key);
 }
 
@@ -293,8 +293,8 @@ static inline void k_yield_from_isr(void)
 	// ASSERT IRQ LOCKED
 	
 	/* Check whether current thread can be preempted */
-	if ((_current->flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) == 0u) {
-		_k_yield();
+	if ((z_current->flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) == 0u) {
+		z_yield();
 	}
 }
 
@@ -328,13 +328,13 @@ static inline void k_yield_from_isr_cond(struct k_thread *thread)
 /*___________________________________________________________________________*/
 
 /**
- * @brief Shift time in kernel time queue list (_k_events_queue) 
+ * @brief Shift time in kernel time queue list (z_events_queue) 
  * and process timers if any
  * 
  * Assumptions :
  *  - interrupt flag is cleared when called.
  */
-K_NOINLINE void _k_system_shift(void);
+K_NOINLINE void z_system_shift(void);
 
 /**
  * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled

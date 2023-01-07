@@ -17,7 +17,7 @@ K_THREAD_DEFINE(tc, calc, 0x60, K_PREEMPTIVE, NULL, 'c');
 
 #define AVAILABLE_SRAM (RAMEND - RAMSTART - \
 	CONFIG_THREAD_MAIN_STACK_SIZE - \
-	_K_THREAD_STACK_SIZE(ts) - _K_THREAD_STACK_SIZE(tc) - 100)
+	Z_THREAD_STACK_SIZE(ts) - Z_THREAD_STACK_SIZE(tc) - 100)
 
 #define THREAD_STACK_SIZE 	0x60
 #define THREADS_COUNT 		(AVAILABLE_SRAM / (sizeof(struct k_thread) + THREAD_STACK_SIZE))
@@ -50,7 +50,7 @@ void task(void *arg)
 	ARG_UNUSED(arg);
 
 	for (;;) {
-		printf_P(PSTR("%c"), _current->symbol);
+		printf_P(PSTR("%c"), z_current->symbol);
 		k_sleep(K_MSEC(1000u));
 	}
 }

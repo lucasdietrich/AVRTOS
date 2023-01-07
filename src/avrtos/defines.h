@@ -161,25 +161,25 @@ typedef struct
 // https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html#AVR-Built-in-Macros
 
 #if defined(__AVR_3_BYTE_PC__)
-#   define _K_ARCH_STACK_SIZE_FIXUP         1
-#   define _K_ARCH_PC_SIZE                  3
+#   define Z_ARCH_STACK_SIZE_FIXUP         1
+#   define Z_ARCH_PC_SIZE                  3
 #else
 #   if defined(__AVR_2_BYTE_PC__) 
-#       define _K_ARCH_STACK_SIZE_FIXUP     0
-#       define _K_ARCH_PC_SIZE              2
+#       define Z_ARCH_STACK_SIZE_FIXUP     0
+#       define Z_ARCH_PC_SIZE              2
 #   else
 #       error unsupported PC size
-#       define _K_ARCH_STACK_SIZE_FIXUP     0
-#       define _K_ARCH_PC_SIZE              0
+#       define Z_ARCH_STACK_SIZE_FIXUP     0
+#       define Z_ARCH_PC_SIZE              0
 # endif
 #endif
 
 /* stack sentinel */
 
 #if CONFIG_THREAD_STACK_SENTINEL
-#	define _K_STACK_SENTINEL_REGISTER(stack_symb)	__attribute__((used, section(".k_sentinels"))) void *_k_sent_##stack_symb = (void *)(&stack_symb)
+#	define Z_STACK_SENTINEL_REGISTER(stack_symb)	__attribute__((used, section(".k_sentinels"))) void *z_sent_##stack_symb = (void *)(&stack_symb)
 #else
-#	define _K_STACK_SENTINEL_REGISTER(stack_symb)
+#	define Z_STACK_SENTINEL_REGISTER(stack_symb)
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
 
 /*___________________________________________________________________________*/
@@ -188,19 +188,19 @@ typedef struct
 
 
 #if !defined(__ASSEMBLER__)
-#define _K_CALLSAVED_CTX_SIZE	  sizeof(struct _k_callsaved_ctx)
+#define Z_CALLSAVED_CTX_SIZE	  sizeof(struct z_callsaved_ctx)
 #else 
-#define _K_CALLSAVED_CTX_SIZE	  (19U + _K_ARCH_PC_SIZE)
+#define Z_CALLSAVED_CTX_SIZE	  (19U + Z_ARCH_PC_SIZE)
 #endif 
 
 // call-clobbered (or call-used) registers
-#define _K_CALLUSED_CTX_SIZE	  sizeof(struct _k_callused_ctx)
+#define Z_CALLUSED_CTX_SIZE	  sizeof(struct z_callused_ctx)
 
 // interrupt context
-#define _K_INTCTX_SIZE		  sizeof(struct _k_intctx)
+#define Z_INTCTX_SIZE		  sizeof(struct z_intctx)
 
-#define K_THREAD_STACK_VOID_SIZE 	_K_CALLSAVED_CTX_SIZE
-#define K_THREAD_CTX_START(stack_end)	((struct _k_callsaved_ctx *)((uint8_t*)stack_end - _K_CALLSAVED_CTX_SIZE + 1U))
+#define K_THREAD_STACK_VOID_SIZE 	Z_CALLSAVED_CTX_SIZE
+#define K_THREAD_CTX_START(stack_end)	((struct z_callsaved_ctx *)((uint8_t*)stack_end - Z_CALLSAVED_CTX_SIZE + 1U))
 
 #define K_THREAD_STACK_MIN_SIZE (K_THREAD_STACK_VOID_SIZE + CONFIG_THREAD_STACK_SENTINEL_SIZE)
 
@@ -217,18 +217,18 @@ typedef struct
 #define K_STACK_SIZE_USABLE(size) (size - CONFIG_THREAD_STACK_SENTINEL_SIZE)
 #define K_THREAD_STACK_START_USABLE(th) K_STACK_START_USABLE(th->stack.end, th->stack.size)
 
-#define _K_STACK_END(stack_start, size) ((stack_start) + (size) - 1)
+#define Z_STACK_END(stack_start, size) ((stack_start) + (size) - 1)
 
-#define _K_STACK_END_ASM(stack_start, size) _K_STACK_END(stack_start, size)
+#define Z_STACK_END_ASM(stack_start, size) Z_STACK_END(stack_start, size)
 
-#define _K_STACK_INIT_SP(stack_end) (stack_end - _K_CALLSAVED_CTX_SIZE)
+#define Z_STACK_INIT_SP(stack_end) (stack_end - Z_CALLSAVED_CTX_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly set
-#define _K_THREAD_STACK_START(name) ((uint8_t*)(&_k_stack_buf_##name))
+#define Z_THREAD_STACK_START(name) ((uint8_t*)(&z_stack_buf_##name))
 
-#define _K_THREAD_STACK_SIZE(name) (sizeof(_k_stack_buf_##name))
+#define Z_THREAD_STACK_SIZE(name) (sizeof(z_stack_buf_##name))
 
-#define _K_STACK_INIT_SP_FROM_NAME(name, stack_size) _K_STACK_INIT_SP(_K_STACK_END(_K_THREAD_STACK_START(name), stack_size))
+#define Z_STACK_INIT_SP_FROM_NAME(name, stack_size) Z_STACK_INIT_SP(Z_STACK_END(Z_THREAD_STACK_START(name), stack_size))
 
 #define K_THREAD        __attribute__((used, section(".k_threads")))
 
@@ -236,8 +236,8 @@ typedef struct
 #define THREAD_FROM_WAITQUEUE(item) CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item) CONTAINER_OF(item, struct k_thread, tie.event)
 
-#define _K_CORE_CONTEXT_INIT(entry, ctx, __entry) \
-(struct _k_callsaved_ctx) { \
+#define Z_CORE_CONTEXT_INIT(entry, ctx, __entry) \
+(struct z_callsaved_ctx) { \
 	.sreg = 0x00, \
 	{ .regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U} }, \
 	{ .init_sreg = CONFIG_THREAD_DEFAULT_SREG }, \
@@ -246,42 +246,42 @@ typedef struct
 	{ .pc = (void*) __entry } \
 }
 
-#define _K_STACK_INITIALIZER(name, stack_size, entry, ctx) \
+#define Z_STACK_INITIALIZER(name, stack_size, entry, ctx) \
     struct \
     { \
-        uint8_t empty[(stack_size) - _K_CALLSAVED_CTX_SIZE]; \
-        struct _k_callsaved_ctx core; \
-    } _k_stack_buf_##name = { \
+        uint8_t empty[(stack_size) - Z_CALLSAVED_CTX_SIZE]; \
+        struct z_callsaved_ctx core; \
+    } z_stack_buf_##name = { \
         {0x00}, \
-       _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry), \
+       Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry), \
     }
 
-#define _K_STACK_MINIMAL_INITIALIZER(name, entry, ctx) \
-    struct _k_callsaved_ctx _k_stack_buf_##name = _K_CORE_CONTEXT_INIT(entry, ctx, _k_thread_entry)
+#define Z_STACK_MINIMAL_INITIALIZER(name, entry, ctx) \
+    struct z_callsaved_ctx z_stack_buf_##name = Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry)
 
-#define _K_THREAD_INITIALIZER(_name, stack_size, prio_flag, sym)                                              \
+#define Z_THREAD_INITIALIZER(_name, stack_size, prio_flag, sym)                                              \
     struct k_thread _name = {                                                                                 \
-        .sp = (void *)_K_STACK_INIT_SP_FROM_NAME(_name, stack_size),                                          \
+        .sp = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),                                          \
         {                                                                                                    \
             .flags = K_FLAG_READY | prio_flag,                                                               \
         },                                                                                                   \
         .tie = {.runqueue = DITEM_INIT(NULL)},                                                               \
         {.wmutex = DITEM_INIT(NULL)},                                                                        \
         .swap_data = NULL,                                                                                   \
-        .stack = {.end = (void *)_K_STACK_END(_K_THREAD_STACK_START(_name), stack_size), .size = (stack_size)}, \
+        .stack = {.end = (void *)Z_STACK_END(Z_THREAD_STACK_START(_name), stack_size), .size = (stack_size)}, \
         .symbol = sym}
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD == 0u
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol) \
-    __attribute__((used)) _K_STACK_INITIALIZER(name, stack_size, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol); \
-    _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
+    __attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p); \
+    __attribute__((used, section(".k_threads"))) Z_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol); \
+    Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name);
 
 #define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol) \
-    __attribute__((used)) _K_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
-    __attribute__((used, section(".k_threads"))) _K_THREAD_INITIALIZER(name, _K_CALLSAVED_CTX_SIZE, prio_flag, symbol); \
-    _K_STACK_SENTINEL_REGISTER(_k_stack_buf_##name);
+    __attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
+    __attribute__((used, section(".k_threads"))) Z_THREAD_INITIALIZER(name, Z_CALLSAVED_CTX_SIZE, prio_flag, symbol); \
+    Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name);
 
 #else
 

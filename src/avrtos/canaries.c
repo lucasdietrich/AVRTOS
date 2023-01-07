@@ -6,7 +6,7 @@
 
 #include "canaries.h"
 
-void _k_init_thread_stack_canaries(struct k_thread *th)
+void z_init_thread_stack_canaries(struct k_thread *th)
 {
 	for (uint8_t *addr = K_THREAD_STACK_START_USABLE(th);
 	     addr < (uint8_t *)th->stack.end - K_THREAD_STACK_VOID_SIZE;
@@ -18,16 +18,16 @@ void _k_init_thread_stack_canaries(struct k_thread *th)
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
-void _k_init_stacks_canaries(void)
+void z_init_stacks_canaries(void)
 {
 	struct k_thread *thread;
 
 	for (thread = &__k_threads_start; thread < &__k_threads_end; thread++) {
-		_k_init_thread_stack_canaries(thread);
+		z_init_thread_stack_canaries(thread);
 	}
 }
 
-void *_k_stack_canaries(struct k_thread *th)
+void *z_stack_canaries(struct k_thread *th)
 {
         uint8_t *preserved = K_STACK_START_USABLE(th->stack.end, th->stack.size) - 1u;
         while (*(++preserved) == CONFIG_THREAD_CANARIES_SYMBOL) {}
@@ -40,7 +40,7 @@ void *_k_stack_canaries(struct k_thread *th)
 
 void print_stack_canaries(struct k_thread *th)
 {
-        uint8_t *addr = (uint8_t *)_k_stack_canaries(th);
+        uint8_t *addr = (uint8_t *)z_stack_canaries(th);
         size_t canaries_found = addr - (uint8_t *)K_THREAD_STACK_START_USABLE(th);
 
         serial_transmit('[');
@@ -65,7 +65,7 @@ void print_stack_canaries(struct k_thread *th)
 
 void print_current_canaries(void)
 {
-        print_stack_canaries(_current);
+        print_stack_canaries(z_current);
 }
 
 void dump_stack_canaries(void)

@@ -104,7 +104,7 @@ K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item_t
  * @param item 
  * @return K_NOINLINE 
  */
-K_NOINLINE struct k_thread *_k_fifo_put(struct k_fifo *fifo, struct qitem *item);
+K_NOINLINE struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item);
 
 /**
  * @brief Get and remove an item from the fifo. 

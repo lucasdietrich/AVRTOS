@@ -21,14 +21,14 @@ extern "C" {
  * @brief Initialize stack sentinel byte(s) for all threads.
  * 
  */
-K_NOINLINE void _k_init_stacks_sentinel(void);
+K_NOINLINE void z_init_stacks_sentinel(void);
 
 /**
  * @brief Initialize stack sentinel byte(s) for specified thread.
  * 
  * @param th 
  */
-void _k_init_thread_stack_sentinel(struct k_thread *th);
+void z_init_thread_stack_sentinel(struct k_thread *th);
 
 /**
  * @brief Verify if stack sentinel byte(s) is(are) still intact.

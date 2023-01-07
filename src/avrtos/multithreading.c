@@ -16,13 +16,13 @@ extern int main(void);
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 
-__noinit char _k_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
+__noinit char z_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
 
-_K_STACK_SENTINEL_REGISTER(_k_main_stack);
+Z_STACK_SENTINEL_REGISTER(z_main_stack);
 
 #endif
 
-K_THREAD struct k_thread _k_thread_main = {
+K_THREAD struct k_thread z_thread_main = {
     .sp = 0, // main thread is running, context already "restored"
     {
 #if CONFIG_THREAD_MAIN_COOPERATIVE == 1
@@ -33,15 +33,15 @@ K_THREAD struct k_thread _k_thread_main = {
     },
     .tie = {
         .runqueue = {   // thread in before initialisation at the top of the runqueue (is actually the reference element)
-            .prev = &_k_thread_main.tie.runqueue,
-            .next = &_k_thread_main.tie.runqueue
+            .prev = &z_thread_main.tie.runqueue,
+            .next = &z_thread_main.tie.runqueue
         }
     },
     .wany = DITEM_INIT_NULL(),   // the thread isn't pending on any events
     .swap_data = NULL,
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1 // explicit stack defined, we set the main thread stack at the end of the defined buffer
     .stack = {
-        .end = (void *)_K_STACK_END(_k_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE),
+        .end = (void *)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE),
         .size = CONFIG_THREAD_MAIN_STACK_SIZE,
     },
 #else
@@ -53,15 +53,15 @@ K_THREAD struct k_thread _k_thread_main = {
     .symbol = 'M'           // default main thread sumbol
 };
 
-struct k_thread *_current = &_k_thread_main;
+struct k_thread *z_current = &z_thread_main;
 
 
 /*___________________________________________________________________________*/
 
-static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
+static void z_thread_stack_create(struct k_thread *const th, thread_entry_t entry,
 				   void *const context_p)
 {
-	struct _k_callsaved_ctx *const ctx = K_THREAD_CTX_START(th->stack.end);
+	struct z_callsaved_ctx *const ctx = K_THREAD_CTX_START(th->stack.end);
 
 	/* initialize unused registers with default value */
 	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
@@ -72,7 +72,7 @@ static void _k_thread_stack_create(struct k_thread *const th, thread_entry_t ent
 	ctx->init_sreg = CONFIG_THREAD_DEFAULT_SREG;
 	ctx->thread_context = (void*) K_SWAP_ENDIANNESS(context_p);
 	ctx->thread_entry = (void*) K_SWAP_ENDIANNESS(entry);
-	ctx->pc = (void*) K_SWAP_ENDIANNESS(_k_thread_entry);
+	ctx->pc = (void*) K_SWAP_ENDIANNESS(z_thread_entry);
 
 #if defined(__AVR_3_BYTE_PC__)
 	ctx->pch = 0;
@@ -95,17 +95,17 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
                 return -1;
         }
 
-        th->stack.end = (void *)_K_STACK_END(stack, stack_size);
+        th->stack.end = (void *)Z_STACK_END(stack, stack_size);
 	th->stack.size = stack_size;
 
-        _k_thread_stack_create(th, entry, context_p);
+        z_thread_stack_create(th, entry, context_p);
 
 #if CONFIG_THREAD_STACK_SENTINEL
-	_k_init_thread_stack_sentinel(th);
+	z_init_thread_stack_sentinel(th);
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
 
 #if CONFIG_THREAD_CANARIES
-	_k_init_thread_stack_canaries(th);
+	z_init_thread_stack_canaries(th);
 #endif /* CONFIG_THREAD_CANARIES */
 
         /* clear internal flags */
@@ -122,7 +122,7 @@ int k_thread_create(struct k_thread *const th, thread_entry_t entry,
 
 inline struct k_thread *k_thread_current(void)
 {
-        return _current;
+        return z_current;
 }
 
 /*___________________________________________________________________________*/

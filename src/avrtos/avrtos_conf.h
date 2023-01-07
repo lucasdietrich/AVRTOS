@@ -248,7 +248,7 @@
 // 
 // This option might not work if the avrtos is linked as a library in some
 // environments (e.g. PlatformIO). In this case you should either call
-// kernel_init() manually or use the _k_avrtos_init() function manually.
+// kernel_init() manually or use the z_avrtos_init() function manually.
 // Or link auto initialization function with K_KERNEL_LINK_AVRTOS_INIT() macro.
 //
 // 0: Kernel auto initialisation is disabled

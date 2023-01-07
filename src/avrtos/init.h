@@ -20,10 +20,10 @@ extern "C" {
 
 // #error "(TODO) INVESTIGATE SP PROBLEM with CONFIG_THREAD_EXPLICIT_MAIN_STACK=1"
 #define K_KERNEL_LINK_SP_INIT() \
-	__attribute__((naked, used, section(".init3"))) void _k_kernel_sp(void) \
+	__attribute__((naked, used, section(".init3"))) void z_kernel_sp(void) \
 	{ \
-		extern char _k_main_stack[]; \
-		SP = (uint16_t)_K_STACK_END_ASM(_k_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE); \
+		extern char z_main_stack[]; \
+		SP = (uint16_t)Z_STACK_END_ASM(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE); \
 	}
 #else
 
@@ -35,7 +35,7 @@ extern "C" {
 #define K_KERNEL_LINK_AVRTOS_INIT() \
 	__attribute__((naked, used, section(".init8"))) void k_avrtos_init(void) \
 	{ \
-		_k_avrtos_init(); \
+		z_avrtos_init(); \
 	}
 
 #define K_KERNEL_LINK_INIT() \
@@ -49,7 +49,7 @@ extern "C" {
 /**
  * @brief Manual user AVRTOS init
  */
-void _k_avrtos_init(void);
+void z_avrtos_init(void);
 
 /*___________________________________________________________________________*/
 

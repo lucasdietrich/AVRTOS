@@ -26,7 +26,7 @@
  * @return 0 on success (object available), ETIMEDOUT on timeout, negative error
  *  in other cases.
  */
-K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue,
+K_NOINLINE int8_t z_pend_current(struct ditem *waitqueue,
 				  k_timeout_t timeout);
 
 /**
@@ -42,14 +42,14 @@ K_NOINLINE int8_t _k_pend_current(struct ditem *waitqueue,
  * @param swap_data : available object information
  * @return uint8_t return 0 if a thread got the object, any other value otherwise
  */
-K_NOINLINE struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue);
+K_NOINLINE struct k_thread *z_unpend_first_thread(struct ditem *waitqueue);
 
 /**
  * @brief Wake up the first thread pending on an object.
  * Set the first pending thread swap_data parameter if set.
  * Switch thread before returning.
  *
- * @see _k_unpend_first_thread
+ * @see z_unpend_first_thread
  *
  * Assumptions :
  * - interrupt flag is cleared when called
@@ -60,13 +60,13 @@ K_NOINLINE struct k_thread *_k_unpend_first_thread(struct ditem *waitqueue);
  * @param set_swap_data
  * @return K_NOINLINE struct*
  */
-K_NOINLINE struct k_thread *_k_unpend_first_and_swap(struct ditem *waitqueue,
+K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct ditem *waitqueue,
 						     void *set_swap_data);
 
-K_NOINLINE void _k_cancel_first_pending(struct ditem *waitqueue);
+K_NOINLINE void z_cancel_first_pending(struct ditem *waitqueue);
 
-K_NOINLINE uint8_t _k_cancel_all_pending(struct ditem *waitqueue);
+K_NOINLINE uint8_t z_cancel_all_pending(struct ditem *waitqueue);
 
-K_NOINLINE void _k_wake_up(struct k_thread *th);
+K_NOINLINE void z_wake_up(struct k_thread *th);
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

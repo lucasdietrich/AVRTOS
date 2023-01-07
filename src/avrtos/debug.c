@@ -18,8 +18,8 @@
 
 /*___________________________________________________________________________*/
 
-extern struct ditem *_k_runqueue; 
-extern struct titem *_k_events_queue;
+extern struct ditem *z_runqueue; 
+extern struct titem *z_events_queue;
 
 /*___________________________________________________________________________*/
 
@@ -27,7 +27,7 @@ uint16_t k_thread_usage(struct k_thread *th)
 {
         if (NULL == th->sp) {
                 return 0u;
-        } else if (th == _current) {
+        } else if (th == z_current) {
                 // stack pointer refers to the first empty addr (from end)
                 // empty stack : th->stack.end == th->sp
 		uint16_t sp;
@@ -114,7 +114,7 @@ void k_thread_dump_all(void)
 
 void *k_thread_get_return_addr(struct k_thread *th)
 {
-        if (th == _current) {
+        if (th == z_current) {
                 uint16_t return_addr_reverted = *((uint16_t *)
                         ((uint16_t)th->stack.end - 2u));
 
@@ -143,7 +143,7 @@ void print_runqueue(void)
 
 void print_events_queue(void)
 {
-        print_tqueue(_k_events_queue, _thread_symbol_events_queue);
+        print_tqueue(z_events_queue, _thread_symbol_events_queue);
 }
 
 /*___________________________________________________________________________*/

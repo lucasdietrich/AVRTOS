@@ -71,12 +71,12 @@ struct k_mem_slab
         .waitqueue = DLIST_INIT(slab.waitqueue)      \
     }
 
-#define _K_MEM_SLAB_BUF_NAME(slab_name) _k_mem_slab_buf_##slab_name
+#define Z_MEM_SLAB_BUF_NAME(slab_name) z_mem_slab_buf_##slab_name
 
 #define K_MEM_SLAB_DEFINE(slab_name, size, num_blocks)                                  \
-    uint8_t _k_mem_slab_buf_##slab_name[(size)*(num_blocks)];                           \
+    uint8_t z_mem_slab_buf_##slab_name[(size)*(num_blocks)];                           \
     __attribute__((used, section(".k_mem_slabs"))) static struct k_mem_slab slab_name = \
-        K_MEM_SLAB_INIT(slab_name, _k_mem_slab_buf_##slab_name, size, num_blocks)
+        K_MEM_SLAB_INIT(slab_name, z_mem_slab_buf_##slab_name, size, num_blocks)
 
 /*___________________________________________________________________________*/
 
@@ -84,7 +84,7 @@ struct k_mem_slab
  * @brief This function is called on start up to initialize all memory
  * slabs defined at runtime using the macro K_MEM_SLAB_DEFINE
  */
-K_NOINLINE void _k_mem_slab_init_module(void);
+K_NOINLINE void z_mem_slab_init_module(void);
 
 /**
  * @brief Initialize a memory slab at runtime

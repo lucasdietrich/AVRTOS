@@ -11,11 +11,11 @@
 #include "io.h"
 
 
-extern void _k_init_sysclock(void);
+extern void z_init_sysclock(void);
 
-extern void _k_kernel_init(void);
+extern void z_kernel_init(void);
 
-void _k_avrtos_init(void)
+void z_avrtos_init(void)
 {
 	/* Page 52 (ATmega328p datasheet) :
 	 *	Note: If the Watchdog is accidentally enabled, for example by a runaway pointer or brown-out condition, the
@@ -39,22 +39,22 @@ void _k_avrtos_init(void)
 	/* Send output stream to usart0 */
 	k_set_stdio_usart0();
 
-        _k_kernel_init();
-        _k_mem_slab_init_module();
+        z_kernel_init();
+        z_mem_slab_init_module();
 
 #if CONFIG_KERNEL_TIMERS
-        _k_timer_init_module();
+        z_timer_init_module();
 #endif
 
 #if CONFIG_THREAD_CANARIES
-        _k_init_stacks_canaries();
+        z_init_stacks_canaries();
 #endif
 
 #if CONFIG_THREAD_STACK_SENTINEL
-        _k_init_stacks_sentinel();
+        z_init_stacks_sentinel();
 #endif
 
-	_k_init_sysclock();
+	z_init_sysclock();
 
 #if (CONFIG_INTERRUPT_POLICY == 2) && (CONFIG_THREAD_MAIN_COOPERATIVE == 0)
 	k_sched_lock();

@@ -106,14 +106,14 @@ K_NOINLINE int8_t k_mutex_cancel_wait(struct k_mutex *mutex);
  * @param mutex address of the mutex structure
  * @return uint8_t 0 if mutex locked any other value otherwise
  */
-uint8_t _k_mutex_lock(struct k_mutex *mutex);
+uint8_t z_mutex_lock(struct k_mutex *mutex);
 
 /**
  * @brief Arch unlock a mutex, don't need the interrupt flag to be disabled
  * 
  * @param mutex 
  */
-struct k_thread *_k_mutex_unlock(struct k_mutex *mutex);
+struct k_thread *z_mutex_unlock(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 

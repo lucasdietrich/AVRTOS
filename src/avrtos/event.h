@@ -94,7 +94,7 @@ K_NOINLINE bool k_event_pending(struct k_event *event);
  * 
  * The call periodicity is constant and equals CONFIG_KERNEL_TIME_SLICE_US.
  */
-K_NOINLINE void _k_event_q_process(void);
+K_NOINLINE void z_event_q_process(void);
 
 /*___________________________________________________________________________*/
 

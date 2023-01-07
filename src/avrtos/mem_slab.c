@@ -30,7 +30,7 @@ extern struct k_mem_slab __k_mem_slabs_start;
 extern struct k_mem_slab __k_mem_slabs_end;
 
 /* TODO Set always inline */
-void _k_mem_slab_init_module(void)
+void z_mem_slab_init_module(void)
 {
         /* must be called during MCU initialization, in order to initialize
         * known memory slabs using the linker section defined
@@ -78,7 +78,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
  * @param mem 
  * @return K_NOINLINE 
  */
-__always_inline static int8_t _k_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
+__always_inline static int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
         *mem = (uint8_t *)slab->free_list;
         slab->free_list = slab->free_list->next;
@@ -98,17 +98,17 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 	if (slab->free_list != NULL) {
 		/* there are fre memory blocks,
 		 * so we allocate one directly */
-		ret = _k_mem_slab_alloc(slab, mem);
+		ret = z_mem_slab_alloc(slab, mem);
 	} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		/* we don't wait for a block to available and there no
 		 * one left, we return an error */
 		ret = -ENOMEM;
 	} else {
 		/* we wait for a block being available */
-		ret = _k_pend_current(&slab->waitqueue, timeout);
+		ret = z_pend_current(&slab->waitqueue, timeout);
 		if (ret == 0) {
 			/* we retrieve the memory block available */
-			*mem = _current->swap_data;
+			*mem = z_current->swap_data;
 		}
 	}
 
@@ -130,7 +130,7 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
  * @param mem 
  * @return K_NOINLINE 
  */
-K_NOINLINE static int8_t _k_mem_slab_free(struct k_mem_slab *slab, void *mem)
+K_NOINLINE static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
         __ASSERT_NOTNULL(slab);
         __ASSERT_NOTNULL(mem);
@@ -158,11 +158,11 @@ struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 	/* if a thread is pending on a memory slab we give the block
 	 * directly to the thread (using thread->swap_data)
 	 */
-	thread = _k_unpend_first_and_swap(&slab->waitqueue, mem);
+	thread = z_unpend_first_and_swap(&slab->waitqueue, mem);
 
 	if (thread == NULL) {
 		/* otherwise we free the block */
-		_k_mem_slab_free(slab, mem);
+		z_mem_slab_free(slab, mem);
 	}
 
 	irq_unlock(key);

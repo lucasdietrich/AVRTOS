@@ -61,8 +61,8 @@ struct k_workqueue
             .flags = 0u,                                         \
         };                                                       \
     K_THREAD_DEFINE(                                             \
-        _k_workq_##name,                                         \
-        _k_workqueue_entry, stack_size,                          \
+        z_workq_##name,                                         \
+        z_workqueue_entry, stack_size,                          \
         prio_flags,                                              \
         &name,                                                   \
         symbol)                                                  \
@@ -74,7 +74,7 @@ struct k_workqueue
 // Workqueue internal
 //
 
-K_NOINLINE void _k_workqueue_entry(struct k_workqueue *const workqueue);
+K_NOINLINE void z_workqueue_entry(struct k_workqueue *const workqueue);
 
 /*___________________________________________________________________________*/
 

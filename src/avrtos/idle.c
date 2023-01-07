@@ -11,14 +11,14 @@
 
 #define K_MODULE K_MODULE_IDLE
 
-extern uint8_t _k_ready_count;
-extern struct ditem *_k_runqueue;
+extern uint8_t z_ready_count;
+extern struct ditem *z_runqueue;
 
-extern bool _k_runqueue_single(void);
+extern bool z_runqueue_single(void);
 
 #if CONFIG_KERNEL_THREAD_IDLE
 
-static void _k_idle_entry(void *context);
+static void z_idle_entry(void *context);
 
 #if defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE != 0)
 #	warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
@@ -32,9 +32,9 @@ static void _k_idle_entry(void *context);
 /* TODO, cannot exaplin why it needs 22B instead of 21B ??? */
 /* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue function ?*/
 
-// K_THREAD_MINIMAL_DEFINE(_k_idle, _k_idle_entry, K_COOPERATIVE, NULL, 'I');
-K_THREAD_DEFINE(_k_idle,
-		_k_idle_entry,
+// K_THREAD_MINIMAL_DEFINE(z_idle, z_idle_entry, K_COOPERATIVE, NULL, 'I');
+K_THREAD_DEFINE(z_idle,
+		z_idle_entry,
 		K_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_COOPERATIVE | K_FLAG_PRIO_LOW,
 		NULL,
@@ -44,9 +44,9 @@ K_THREAD_DEFINE(_k_idle,
 /**
  * @brief If IDLE thread can be preempted, plan additionnal stack
  */
-K_THREAD_DEFINE(_k_idle,
-		_k_idle_entry,
-		K_THREAD_STACK_MIN_SIZE + _K_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
+K_THREAD_DEFINE(z_idle,
+		z_idle_entry,
+		K_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_PREEMPTIVE | K_FLAG_PRIO_LOW,
 		NULL,
 		'I');
@@ -57,13 +57,13 @@ K_THREAD_DEFINE(_k_idle,
  * 
  * @param context : ignored for now
  */
-static void _k_idle_entry(void *context)
+static void z_idle_entry(void *context)
 {
 	for (;;) {
 #if CONFIG_THREAD_IDLE_COOPERATIVE
 #warning "CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
 		k_yield();
-		// _k_yield_from_idle_thread();
+		// z_yield_from_idle_thread();
 #endif /* CONFIG_THREAD_IDLE_COOPERATIVE */
 
 		/* A bit buggy on QEMU but normally works fine */
@@ -80,7 +80,7 @@ static void _k_idle_entry(void *context)
 bool k_is_cpu_idle(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
-	return _k_ready_count == 0;
+	return z_ready_count == 0;
 #else 
 	return false;
 #endif /* CONFIG_KERNEL_THREAD_IDLE */
@@ -89,7 +89,7 @@ bool k_is_cpu_idle(void)
 void k_idle(void)
 {
 	/* if others thread are ready, yield the CPU */
-	if (_k_ready_count != 0u) {
+	if (z_ready_count != 0u) {
 		k_yield();
 	} else {
 #ifndef __QEMU__

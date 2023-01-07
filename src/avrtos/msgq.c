@@ -49,7 +49,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
 
 	if (msgq->used_msgs < msgq->max_msgs) {
 		struct k_thread *pending_thread =
-			_k_unpend_first_thread(&msgq->waitqueue);
+			z_unpend_first_thread(&msgq->waitqueue);
 		if (pending_thread != NULL) {
 			/* a thread is waiting to get a msg, we write directly the
 			 * data to the thread buffer. Passed through swap_data
@@ -72,9 +72,9 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
 		/* tells from were the data should be copied
 		* where there will be space in the msgq
 		 */
-		_current->swap_data = (void *)data;
+		z_current->swap_data = (void *)data;
 
-		ret = _k_pend_current(&msgq->waitqueue, timeout);
+		ret = z_pend_current(&msgq->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
@@ -82,7 +82,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data,
 	return ret;
 }
 
-__always_inline static int8_t _k_msgq_get(struct k_msgq *msgq,
+__always_inline static int8_t z_msgq_get(struct k_msgq *msgq,
 					  void *data,
 					  k_timeout_t timeout)
 {
@@ -101,7 +101,7 @@ __always_inline static int8_t _k_msgq_get(struct k_msgq *msgq,
 		msgq->used_msgs--;
 
 		struct k_thread *pending_thread =
-			_k_unpend_first_thread(&msgq->waitqueue);
+			z_unpend_first_thread(&msgq->waitqueue);
 		if (pending_thread != NULL) {
 			/* a thread is waiting to write a msg,
 			 * we copy the data from the thread to the msgq
@@ -120,9 +120,9 @@ __always_inline static int8_t _k_msgq_get(struct k_msgq *msgq,
 		/* tells were the data should be copied
 		 * where there will be a new message in the msgq
 		 */
-		_current->swap_data = data;
+		z_current->swap_data = data;
 
-		return _k_pend_current(&msgq->waitqueue, timeout);
+		return z_pend_current(&msgq->waitqueue, timeout);
 	}
 }
 
@@ -148,7 +148,7 @@ int8_t k_msgq_get(struct k_msgq *msgq,
 		msgq->used_msgs--;
 
 		struct k_thread *pending_thread =
-			_k_unpend_first_thread(&msgq->waitqueue);
+			z_unpend_first_thread(&msgq->waitqueue);
 		if (pending_thread != NULL) {
 			/* a thread is waiting to write a msg,
 			 * we copy the data from the thread to the msgq
@@ -167,9 +167,9 @@ int8_t k_msgq_get(struct k_msgq *msgq,
 		/* tells were the data should be copied
 		 * where there will be a new message in the msgq
 		 */
-		_current->swap_data = data;
+		z_current->swap_data = data;
 
-		ret = _k_pend_current(&msgq->waitqueue, timeout);
+		ret = z_pend_current(&msgq->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
@@ -189,7 +189,7 @@ uint8_t k_msgq_purge(struct k_msgq *msgq)
 	msgq->write_cursor = msgq->read_cursor;
 	msgq->used_msgs = 0;
 
-	ret = _k_cancel_all_pending(&msgq->waitqueue);
+	ret = z_cancel_all_pending(&msgq->waitqueue);
 
 	irq_unlock(key);
 

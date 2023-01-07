@@ -20,7 +20,7 @@ extern "C" {
  * 
  * @param th 
  */
-void _k_init_thread_stack_canaries(struct k_thread *th);
+void z_init_thread_stack_canaries(struct k_thread *th);
 
 /**
  * @brief Automatically initialize thread canaries in stack 
@@ -30,7 +30,7 @@ void _k_init_thread_stack_canaries(struct k_thread *th);
  * 
  * Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010
  */
-K_NOINLINE void _k_init_stacks_canaries(void);
+K_NOINLINE void z_init_stacks_canaries(void);
 
 /**
  * @brief Get the address of the furthest stack location used by the thread.
@@ -40,7 +40,7 @@ K_NOINLINE void _k_init_stacks_canaries(void);
  * @return void* Address of byte following the last found canary. 
  * (Address of the furthest stack location used by the thread.)
  */
-void* _k_stack_canaries(struct k_thread *th);
+void* z_stack_canaries(struct k_thread *th);
 
 /*___________________________________________________________________________*/
 

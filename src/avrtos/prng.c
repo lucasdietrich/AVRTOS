@@ -6,7 +6,7 @@
 
 #include "prng.h"
 
-K_NOINLINE uint32_t _k_shift_lfsr(uint32_t *lfsr, uint32_t poly_mask)
+K_NOINLINE uint32_t z_shift_lfsr(uint32_t *lfsr, uint32_t poly_mask)
 {
         uint32_t feedback = *lfsr & 1;
         *lfsr >>= 1u;
@@ -18,10 +18,10 @@ K_NOINLINE uint32_t _k_shift_lfsr(uint32_t *lfsr, uint32_t poly_mask)
 
 uint16_t k_prng_get(struct k_prng *prng)
 {
-        _k_shift_lfsr(&prng->lfsr32, K_PRNG_POLY_MASK_32);
+        z_shift_lfsr(&prng->lfsr32, K_PRNG_POLY_MASK_32);
 
-        const uint16_t lfsr32 = _k_shift_lfsr(&prng->lfsr32, K_PRNG_POLY_MASK_32);
-        const uint16_t lfsr31 = _k_shift_lfsr(&prng->lfsr31, K_PRNG_POLY_MASK_31);
+        const uint16_t lfsr32 = z_shift_lfsr(&prng->lfsr32, K_PRNG_POLY_MASK_32);
+        const uint16_t lfsr31 = z_shift_lfsr(&prng->lfsr31, K_PRNG_POLY_MASK_31);
 
         return lfsr32 ^ lfsr31;
 }

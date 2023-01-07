@@ -31,7 +31,7 @@ int main(void)
 void thread_led(void *p)
 {
 	while (1) {
-		k_thread_dump(_current);
+		k_thread_dump(z_current);
 
 		led_on();
 		k_sleep(K_MSEC(PERIOD));

@@ -34,12 +34,12 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	if (mutex->lock != 0x00) {
 		mutex->lock = 0x00;
 	} else {
-		lock = _k_pend_current(&mutex->waitqueue, timeout);
+		lock = z_pend_current(&mutex->waitqueue, timeout);
 	}
 
 	if (lock == 0) {
-		__K_DBG_MUTEX_LOCKED(_current);    // }
-		mutex->owner = _current;
+		__K_DBG_MUTEX_LOCKED(z_current);    // }
+		mutex->owner = z_current;
 	}
 
 	irq_unlock(key);
@@ -55,17 +55,17 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 	const uint8_t key = irq_lock();
 
 	/* we check if the current thread actually owns the mutex */
-	if (mutex->owner != _current) {
+	if (mutex->owner != z_current) {
 		goto ret;
 	}
 
-	__K_DBG_MUTEX_UNLOCKED(_current); // {
+	__K_DBG_MUTEX_UNLOCKED(z_current); // {
 
 	/* there is a new owner, we don't need to unlock the mutex
 	 * The mutex owner is changed when returning to the
 	 * k_mutex_lock function.
 	 */
-	thread = _k_unpend_first_thread(&mutex->waitqueue);
+	thread = z_unpend_first_thread(&mutex->waitqueue);
 
 	if (thread == NULL) {
 	    /* no new owner, we need to unlock
@@ -88,7 +88,7 @@ int8_t k_mutex_cancel_wait(struct k_mutex *mutex)
 
 	const uint8_t key = irq_lock();
 
-	ret = _k_cancel_all_pending(&mutex->waitqueue);
+	ret = z_cancel_all_pending(&mutex->waitqueue);
 
 	irq_unlock(key);
 

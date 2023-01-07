@@ -18,7 +18,7 @@ void k_fifo_init(struct k_fifo *fifo)
         dlist_init(&fifo->waitqueue);
 }
 
-struct k_thread *_k_fifo_put(struct k_fifo *fifo, struct qitem *item)
+struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item)
 {
 	__ASSERT_NOINTERRUPT();
 
@@ -27,7 +27,7 @@ struct k_thread *_k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 	* (using thread->swap_data)
 	*/
 	struct k_thread *const thread =
-		_k_unpend_first_and_swap(&fifo->waitqueue, (void *)item);
+		z_unpend_first_and_swap(&fifo->waitqueue, (void *)item);
 
 	if (thread == NULL) {
 			/* otherwise we queue the item to the fifo */
@@ -44,7 +44,7 @@ struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 
 	const uint8_t lock = irq_lock();
 
-	struct k_thread *const thread = _k_fifo_put(fifo, item);
+	struct k_thread *const thread = z_fifo_put(fifo, item);
 
 	irq_unlock(lock);
 
@@ -59,8 +59,8 @@ struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 	struct qitem *item = odequeue(&fifo->queue);
 
 	if (item == NULL) {
-		if (_k_pend_current(&fifo->waitqueue, timeout) == 0) {
-			item = (struct qitem *)_current->swap_data;
+		if (z_pend_current(&fifo->waitqueue, timeout) == 0) {
+			item = (struct qitem *)z_current->swap_data;
 		}
 	}
 
@@ -75,7 +75,7 @@ uint8_t k_fifo_cancel_wait(struct k_fifo *fifo)
 
 	const uint8_t lock = irq_lock();
 
-	const uint8_t ret = _k_cancel_all_pending(&fifo->waitqueue);
+	const uint8_t ret = z_cancel_all_pending(&fifo->waitqueue);
 
 	irq_unlock(lock);
 

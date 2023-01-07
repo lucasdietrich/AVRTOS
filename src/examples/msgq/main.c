@@ -53,7 +53,7 @@ void writer(struct k_msgq *msgq)
 		(*(uint16_t *)buf)++;
 
 		ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
-		serial_transmit(_current->symbol);
+		serial_transmit(z_current->symbol);
 
 		if (ret == 0) {
 			serial_transmit(' ');
@@ -76,7 +76,7 @@ void reader(struct k_msgq *msgq)
 
 	for (;;) {
 		ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
-		serial_transmit(_current->symbol);
+		serial_transmit(z_current->symbol);
 		if (ret == 0) {
 
 			serial_transmit(' ');
