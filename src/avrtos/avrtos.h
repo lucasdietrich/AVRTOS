@@ -31,7 +31,6 @@
 #include "assert.h"
 #include "kernel.h"
 #include "idle.h"
-#include "heap.h"
 
 #include "canaries.h"
 #include "stack_sentinel.h"
