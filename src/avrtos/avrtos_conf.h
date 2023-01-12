@@ -53,6 +53,10 @@
 //
 // IMPORTANT NOTE: If you're using the heap, you must set this to 0 as stdlib
 // malloc use the stack pointer to make checks on the remaining heap size.
+// i.e. : With explicit main stack, a buffer is allocated (for main thread stack), 
+// before the heap. stdlib malloc() will then constantly fails while stack pointer
+// is beyond the limit (actually on the other side of the heap).
+// The checker, expect main stack to be near to RAMEND, in upper memory regions.
 //
 #ifndef CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define CONFIG_THREAD_EXPLICIT_MAIN_STACK 0
