@@ -19,8 +19,7 @@
 #include "multithreading.h"
 #include "init.h"
 
-#include "dstruct/queue.h"
-#include "dstruct/oqueue.h"
+#include "dstruct/slist.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
 #include "dstruct/debug.h"
@@ -32,6 +31,7 @@
 #include "assert.h"
 #include "kernel.h"
 #include "idle.h"
+#include "heap.h"
 
 #include "canaries.h"
 #include "stack_sentinel.h"

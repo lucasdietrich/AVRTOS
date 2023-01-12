@@ -26,7 +26,7 @@
  * @return 0 on success (object available), ETIMEDOUT on timeout, negative error
  *  in other cases.
  */
-K_NOINLINE int8_t z_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
+K_NOINLINE int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
 
 /**
  * @brief Wake up the first thread pending on an object.
@@ -42,7 +42,7 @@ K_NOINLINE int8_t z_pend_current(struct ditem *waitqueue, k_timeout_t timeout);
  * @return uint8_t return 0 if a thread got the object, any other value
  * otherwise
  */
-K_NOINLINE struct k_thread *z_unpend_first_thread(struct ditem *waitqueue);
+K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
 
 /**
  * @brief Wake up the first thread pending on an object.
@@ -60,12 +60,12 @@ K_NOINLINE struct k_thread *z_unpend_first_thread(struct ditem *waitqueue);
  * @param set_swap_data
  * @return K_NOINLINE struct*
  */
-K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct ditem *waitqueue,
+K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
 						    void *set_swap_data);
 
-K_NOINLINE void z_cancel_first_pending(struct ditem *waitqueue);
+K_NOINLINE void z_cancel_first_pending(struct dnode *waitqueue);
 
-K_NOINLINE uint8_t z_cancel_all_pending(struct ditem *waitqueue);
+K_NOINLINE uint8_t z_cancel_all_pending(struct dnode *waitqueue);
 
 K_NOINLINE void z_wake_up(struct k_thread *th);
 

@@ -55,8 +55,8 @@ struct k_mem_slab {
 	void *buffer;
 	uint8_t count;
 	uint16_t block_size;
-	struct qitem *free_list;
-	struct ditem waitqueue;
+	struct snode *free_list;
+	struct dnode waitqueue;
 };
 
 /*___________________________________________________________________________*/

@@ -19,7 +19,7 @@ extern "C" {
 /*___________________________________________________________________________*/
 
 struct k_msgq {
-	struct ditem waitqueue;
+	struct dnode waitqueue;
 
 	size_t msg_size;
 	uint8_t max_msgs;

@@ -204,7 +204,7 @@ uint8_t z_read_sreg(void);
 
 /*___________________________________________________________________________*/
 
-void z_thread_symbol_runqueue(struct ditem *item);
+void z_thread_symbol_runqueue(struct dnode *item);
 
 void z_thread_symbol_events_queue(struct titem *item);
 

@@ -203,20 +203,20 @@ struct k_thread {
 	};
 
 	union {
-		struct ditem runqueue; // represent the thread in the runqueue (4B)
+		struct dnode runqueue; // represent the thread in the runqueue (4B)
 		struct titem event;    // represent the thread in the events queue (4B)
 	} tie; // the thread cannot be in the events_queue and the runqueue at
 	       // the same time
 
 	union {
-		struct ditem wany;   // represent the thread pending on a generic
+		struct dnode wany;   // represent the thread pending on a generic
 				     // object
-		struct ditem wmutex; // represent the thread pending on an mutex
-		struct ditem wsem;   // represent the thread pending on an semaphore
-		struct ditem wsig;   // represent the thread pending on an signal
-		struct ditem wfifo;  // represent the thread pending on a fifo item
-		struct ditem wmsgq;  // represent the thread pending on a msgq item
-		struct ditem wflags; // represent the thread pending on a flags item
+		struct dnode wmutex; // represent the thread pending on an mutex
+		struct dnode wsem;   // represent the thread pending on an semaphore
+		struct dnode wsig;   // represent the thread pending on an signal
+		struct dnode wfifo;  // represent the thread pending on a fifo item
+		struct dnode wmsgq;  // represent the thread pending on a msgq item
+		struct dnode wflags; // represent the thread pending on a flags item
 	};
 	void *swap_data; // data returned by kernel API's when calling
 			 // z_unpend_first_thread
@@ -240,7 +240,7 @@ struct k_thread {
 		size_t size; // stack size
 	} stack;	     // thread stack definition
 	char symbol;	     // 1-letter symbol to name the thread, reserver M (main),
-		     // idle : I (idle)
+			     // idle : I (idle)
 
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno; // Thread errno

@@ -7,7 +7,6 @@
 #include "debug.h"
 #include "dstruct/debug.h"
 #include "dstruct/dlist.h"
-#include "dstruct/queue.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +17,7 @@
 
 /*___________________________________________________________________________*/
 
-extern struct ditem *z_runqueue;
+extern struct dnode *z_runqueue;
 extern struct titem *z_events_queue;
 
 /*___________________________________________________________________________*/
@@ -124,7 +123,7 @@ void *z_thread_get_return_addr(struct k_thread *th)
 
 /*___________________________________________________________________________*/
 
-void z_thread_symbol_runqueue(struct ditem *item)
+void z_thread_symbol_runqueue(struct dnode *item)
 {
 	serial_transmit(CONTAINER_OF(item, struct k_thread, tie.runqueue)->symbol);
 }

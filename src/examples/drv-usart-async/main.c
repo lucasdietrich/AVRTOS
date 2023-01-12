@@ -25,7 +25,7 @@ void consumer(void *context);
 K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 
 struct in {
-	struct qitem tie;
+	struct snode tie;
 	uint8_t buffer[20];
 	uint8_t len;
 };

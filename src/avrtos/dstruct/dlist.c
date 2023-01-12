@@ -8,15 +8,15 @@
 
 /*___________________________________________________________________________*/
 
-void dlist_init(struct ditem *list)
+void dlist_init(struct dnode *list)
 {
 	list->head = list;
 	list->tail = list;
 }
 
-void dlist_append(struct ditem *list, struct ditem *node)
+void dlist_append(struct dnode *list, struct dnode *node)
 {
-	struct ditem *const tail = list->tail;
+	struct dnode *const tail = list->tail;
 
 	tail->next = node;
 	node->prev = tail;
@@ -25,9 +25,9 @@ void dlist_append(struct ditem *list, struct ditem *node)
 	node->next = list;
 }
 
-void dlist_prepend(struct ditem *list, struct ditem *node)
+void dlist_prepend(struct dnode *list, struct dnode *node)
 {
-	struct ditem *const head = list->head;
+	struct dnode *const head = list->head;
 
 	node->prev = list;
 	node->next = head;
@@ -36,9 +36,9 @@ void dlist_prepend(struct ditem *list, struct ditem *node)
 	list->head = node;
 }
 
-void dlist_insert(struct ditem *successor, struct ditem *node)
+void dlist_insert(struct dnode *successor, struct dnode *node)
 {
-	struct ditem *const prev = successor->prev;
+	struct dnode *const prev = successor->prev;
 
 	prev->next = node;
 	node->prev = prev;
@@ -47,33 +47,33 @@ void dlist_insert(struct ditem *successor, struct ditem *node)
 	successor->prev = node;
 }
 
-void dlist_remove(struct ditem *node)
+void dlist_remove(struct dnode *node)
 {
-	struct ditem *const prev = node->prev;
-	struct ditem *const next = node->next;
+	struct dnode *const prev = node->prev;
+	struct dnode *const next = node->next;
 
 	prev->next = next;
 	next->prev = prev;
 }
 
-struct ditem *dlist_get(struct ditem *list)
+struct dnode *dlist_get(struct dnode *list)
 {
-	struct ditem *const item = list->head;
+	struct dnode *const item = list->head;
 
 	dlist_remove(item);
 
 	return item;
 }
 
-bool dlist_is_empty(struct ditem *list)
+bool dlist_is_empty(struct dnode *list)
 {
 	return DLIST_EMPTY(list);
 }
 
-uint8_t dlist_count(struct ditem *list)
+uint8_t dlist_count(struct dnode *list)
 {
 	uint8_t count	  = 0u;
-	struct ditem *cur = list->head;
+	struct dnode *cur = list->head;
 	while (cur != list) {
 		count++;
 		cur = cur->next;

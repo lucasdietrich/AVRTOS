@@ -28,7 +28,7 @@ extern "C" {
  */
 struct k_mutex {
 	uint8_t lock;
-	struct ditem waitqueue;
+	struct dnode waitqueue;
 	struct k_thread *owner;
 };
 

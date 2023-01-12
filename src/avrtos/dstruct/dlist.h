@@ -25,26 +25,26 @@ extern "C" {
  */
 
 /**
- * - a ditem is already in the list if next != null and prev != null
- * - a ditem is not in the list if next == null && prev == null
+ * - a dnode is already in the list if next != null and prev != null
+ * - a dnode is not in the list if next == null && prev == null
  * - poping the last element of the runqueue doesn't have no any effect
  */
 
 /*___________________________________________________________________________*/
 
-struct ditem {
+struct dnode {
 	union {
-		struct ditem *next;
-		struct ditem *head;
+		struct dnode *next;
+		struct dnode *head;
 	};
 	union {
-		struct ditem *prev;
-		struct ditem *tail;
+		struct dnode *prev;
+		struct dnode *tail;
 	};
 };
 
-typedef struct ditem ditem_t;
-typedef struct ditem dlist_t;
+typedef struct dnode ditem_t;
+typedef struct dnode dlist_t;
 
 #define DITEM_INIT(self)                                                                 \
 	{                                                                                \
@@ -68,7 +68,7 @@ typedef struct ditem dlist_t;
 
 #define DITEM_INIT_NULL() DITEM_INIT(NULL)
 
-#define DEFINE_DLIST(list_name) struct ditem list_name = DLIST_INIT(list_name)
+#define DEFINE_DLIST(list_name) struct dnode list_name = DLIST_INIT(list_name)
 
 #define DLIST_EMPTY(_list) (_list->head == _list)
 
@@ -92,7 +92,7 @@ typedef struct ditem dlist_t;
  *
  * @param list
  */
-void dlist_init(struct ditem *list);
+void dlist_init(struct dnode *list);
 
 /**
  * @brief Add (queue) a node to the end of a doubly linked list
@@ -100,7 +100,7 @@ void dlist_init(struct ditem *list);
  * @param list
  * @param node
  */
-void dlist_append(struct ditem *list, struct ditem *node);
+void dlist_append(struct dnode *list, struct dnode *node);
 
 /**
  * @brief Add (queue) a node to the beginning of a doubly linked list
@@ -108,7 +108,7 @@ void dlist_append(struct ditem *list, struct ditem *node);
  * @param list
  * @param node
  */
-void dlist_prepend(struct ditem *list, struct ditem *node);
+void dlist_prepend(struct dnode *list, struct dnode *node);
 
 /**
  * @brief Insert a node before a given node
@@ -116,22 +116,22 @@ void dlist_prepend(struct ditem *list, struct ditem *node);
  * @param successor
  * @param node
  */
-void dlist_insert(struct ditem *successor, struct ditem *node);
+void dlist_insert(struct dnode *successor, struct dnode *node);
 
 /**
  * @brief Remove a node from a doubly linked list
  *
  * @param node
  */
-void dlist_remove(struct ditem *node);
+void dlist_remove(struct dnode *node);
 
 /**
  * @brief Get the first node of a doubly linked list (dequeue)
  *
  * @param list
- * @return struct ditem*
+ * @return struct dnode*
  */
-struct ditem *dlist_get(struct ditem *list);
+struct dnode *dlist_get(struct dnode *list);
 
 /**
  * @brief Check if a doubly linked list is empty
@@ -140,7 +140,7 @@ struct ditem *dlist_get(struct ditem *list);
  * @return true
  * @return false
  */
-bool dlist_is_empty(struct ditem *list);
+bool dlist_is_empty(struct dnode *list);
 
 /**
  * @brief Calculate the number of items in a doubly linked list
@@ -148,7 +148,7 @@ bool dlist_is_empty(struct ditem *list);
  * @param list
  * @return uint8_t
  */
-uint8_t dlist_count(struct ditem *list);
+uint8_t dlist_count(struct dnode *list);
 
 /*___________________________________________________________________________*/
 

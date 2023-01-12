@@ -30,7 +30,7 @@ extern "C" {
 struct k_sem {
 	uint8_t count;
 	uint8_t limit;
-	struct ditem waitqueue;
+	struct dnode waitqueue;
 };
 
 /*___________________________________________________________________________*/

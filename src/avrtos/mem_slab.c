@@ -6,7 +6,6 @@
 
 #include "mem_slab.h"
 
-#include <avrtos/dstruct/queue.h>
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
 
@@ -19,9 +18,9 @@ static void create_free_list(struct k_mem_slab *slab)
 
 	for (uint8_t i = 0u; i < slab->count; i++) {
 		/* equivalent to "*(void**) p = slab->free_list;" */
-		((struct qitem *)p)->next = slab->free_list;
+		((struct snode *)p)->next = slab->free_list;
 
-		slab->free_list = (struct qitem *)p;
+		slab->free_list = (struct snode *)p;
 		p += slab->block_size;
 	}
 }
@@ -136,10 +135,10 @@ K_NOINLINE static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
 	__ASSERT_NOTNULL(slab);
 	__ASSERT_NOTNULL(mem);
 
-	/* eq to "**(struct qitem***)mem = slab->free_list;" */
+	/* eq to "**(struct snode***)mem = slab->free_list;" */
 
-	((struct qitem *)mem)->next = slab->free_list;
-	slab->free_list		    = (struct qitem *)mem;
+	((struct snode *)mem)->next = slab->free_list;
+	slab->free_list		    = (struct snode *)mem;
 
 	return 0;
 }

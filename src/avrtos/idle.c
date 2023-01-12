@@ -11,7 +11,7 @@
 #define K_MODULE K_MODULE_IDLE
 
 extern uint8_t z_ready_count;
-extern struct ditem *z_runqueue;
+extern struct dnode *z_runqueue;
 
 extern bool z_runqueue_single(void);
 

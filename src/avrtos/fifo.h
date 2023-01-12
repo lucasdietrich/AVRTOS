@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <avrtos/dstruct/oqueue.h>
+#include <avrtos/dstruct/slist.h>
 #include <avrtos/multithreading.h>
 
 #ifdef __cplusplus
@@ -27,15 +27,15 @@ extern "C" {
  * Waitqueue list contains all threads pending for a fifo item.
  */
 struct k_fifo {
-	struct oqref queue;	// fifo reference to head item
-	struct ditem waitqueue; // waitqueue of thread pending to get an item
+	struct slist queue;	// fifo reference to head item
+	struct dnode waitqueue; // waitqueue of thread pending to get an item
 };
 
 /*___________________________________________________________________________*/
 
 #define K_FIFO_INIT(fifo)                                                                \
 	{                                                                                \
-		.queue = INIT_OQREF(), .waitqueue = DLIST_INIT(fifo.waitqueue)           \
+		.queue = SLIST_INIT(), .waitqueue = DLIST_INIT(fifo.waitqueue)           \
 	}
 
 #define K_FIFO_DEFINE(fifo_name) struct k_fifo fifo_name = K_FIFO_INIT(fifo_name)
@@ -73,7 +73,7 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  *
  * struct
  * {
- *  struct qitem tie;
+ *  struct snode tie;
  *  uint8_t value;
  * } block1;
  * block1.data = 17u;
@@ -92,7 +92,7 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  * @param item_tie
  * @return K_NOINLINE
  */
-K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item_tie);
+K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item_tie);
 
 /**
  * @brief @see k_fifo_put
@@ -103,7 +103,7 @@ K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item_t
  * @param item
  * @return K_NOINLINE
  */
-K_NOINLINE struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item);
+K_NOINLINE struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item);
 
 /**
  * @brief Get and remove an item from the fifo.
@@ -118,7 +118,7 @@ K_NOINLINE struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item);
  * @param timeout
  * @return K_NOINLINE struct* not null if success
  */
-K_NOINLINE struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
+K_NOINLINE struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
 
 /**
  * @brief Cancel pending on a fifo queue.
@@ -144,7 +144,7 @@ K_NOINLINE bool k_fifo_is_empty(struct k_fifo *fifo);
  * @param fifo
  * @return K_NOINLINE struct*
  */
-K_NOINLINE struct qitem *k_fifo_peek_head(struct k_fifo *fifo);
+K_NOINLINE struct snode *k_fifo_peek_head(struct k_fifo *fifo);
 
 /**
  * @brief Get without removing the last item in the fifo.
@@ -152,7 +152,7 @@ K_NOINLINE struct qitem *k_fifo_peek_head(struct k_fifo *fifo);
  * @param fifo
  * @return K_NOINLINE struct*
  */
-K_NOINLINE struct qitem *k_fifo_peek_tail(struct k_fifo *fifo);
+K_NOINLINE struct snode *k_fifo_peek_tail(struct k_fifo *fifo);
 
 /*___________________________________________________________________________*/
 

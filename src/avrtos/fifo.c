@@ -6,7 +6,7 @@
 
 #include "fifo.h"
 
-#include <avrtos/dstruct/oqueue.h>
+#include <avrtos/dstruct/slist.h>
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
 
@@ -14,11 +14,11 @@
 
 void k_fifo_init(struct k_fifo *fifo)
 {
-	oqref_init(&fifo->queue);
+	slist_init(&fifo->queue);
 	dlist_init(&fifo->waitqueue);
 }
 
-struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item)
+struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item)
 {
 	__ASSERT_NOINTERRUPT();
 
@@ -31,13 +31,13 @@ struct k_thread *z_fifo_put(struct k_fifo *fifo, struct qitem *item)
 
 	if (thread == NULL) {
 		/* otherwise we queue the item to the fifo */
-		oqueue(&fifo->queue, item);
+		slist_append(&fifo->queue, item);
 	}
 
 	return thread;
 }
 
-struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item)
+struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item)
 {
 	__ASSERT_NOTNULL(fifo);
 	__ASSERT_NOTNULL(item);
@@ -51,16 +51,16 @@ struct k_thread *k_fifo_put(struct k_fifo *fifo, struct qitem *item)
 	return thread;
 }
 
-struct qitem *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
+struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 {
 	__ASSERT_NOTNULL(fifo);
 
 	const uint8_t lock = irq_lock();
-	struct qitem *item = odequeue(&fifo->queue);
+	struct snode *item = slist_get(&fifo->queue);
 
 	if (item == NULL) {
 		if (z_pend_current(&fifo->waitqueue, timeout) == 0) {
-			item = (struct qitem *)z_current->swap_data;
+			item = (struct snode *)z_current->swap_data;
 		}
 	}
 
@@ -87,22 +87,22 @@ bool k_fifo_is_empty(struct k_fifo *fifo)
 	return k_fifo_peek_head(fifo) == NULL;
 }
 
-struct qitem *k_fifo_peek_head(struct k_fifo *fifo)
+struct snode *k_fifo_peek_head(struct k_fifo *fifo)
 {
 	const uint8_t lock = irq_lock();
 
-	struct qitem *const item = opeek_head(&fifo->queue);
+	struct snode *const item = slist_peek_head(&fifo->queue);
 
 	irq_unlock(lock);
 
 	return item;
 }
 
-struct qitem *k_fifo_peek_tail(struct k_fifo *fifo)
+struct snode *k_fifo_peek_tail(struct k_fifo *fifo)
 {
 	const uint8_t lock = irq_lock();
 
-	struct qitem *const item = opeek_tail(&fifo->queue);
+	struct snode *const item = slist_peek_tail(&fifo->queue);
 
 	irq_unlock(lock);
 

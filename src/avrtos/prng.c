@@ -40,6 +40,5 @@ void k_prng_get_buffer(struct k_prng *prng, uint8_t *buffer, uint16_t len)
 		((uint16_t *)buffer)[i] = k_prng_get(prng);
 	}
 
-	if (len & 1)
-		buffer[len - 1] = (uint8_t)k_prng_get(prng);
+	if (len & 1) buffer[len - 1] = (uint8_t)k_prng_get(prng);
 }

@@ -23,13 +23,13 @@ struct k_work;
 typedef void (*k_work_handler_t)(struct k_work *);
 
 struct k_work {
-	struct qitem _tie;
+	struct snode _tie;
 	k_work_handler_t handler;
 };
 
 #define K_WORK_INIT(work_handler)                                                        \
 	{                                                                                \
-		._tie = INIT_QITEM(), .handler = work_handler,                           \
+		._tie = SNODE_INIT(), .handler = work_handler,                           \
 	}
 #define K_WORK_INITIALIZER(work_handler) K_WORK_INIT(work_handler)
 

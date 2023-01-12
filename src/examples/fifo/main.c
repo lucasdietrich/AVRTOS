@@ -32,7 +32,7 @@ K_THREAD_DEFINE(consumer2, consumer_thread, 0x50, K_PREEMPTIVE, &timeouts[1], 'B
 
 struct item {
 	char chr;
-	struct qitem tie;
+	struct snode tie;
 };
 
 struct item letters[] = {{'1'}, {'2'}, {'3'}, {'4'}, {'5'}};
@@ -66,7 +66,7 @@ int main(void)
 void consumer_thread(k_timeout_t *p_timeout)
 {
 	while (1) {
-		struct qitem *tie = k_fifo_get(&fifo, *p_timeout);
+		struct snode *tie = k_fifo_get(&fifo, *p_timeout);
 		serial_transmit(z_current->symbol);
 		if (tie != NULL) {
 			serial_print_p(PSTR(" : Received = "));

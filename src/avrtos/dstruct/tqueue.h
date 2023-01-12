@@ -68,10 +68,10 @@ struct titem {
  * @param root
  * @param item
  */
-void _tqueue_schedule(struct titem **root, struct titem *item);
+void z_tqueue_schedule(struct titem **root, struct titem *item);
 
 /**
- * @see _tqueue_schedule
+ * @see z_tqueue_schedule
  *
  * Assumptions :
  *  - root is not null

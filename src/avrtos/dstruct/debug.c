@@ -6,27 +6,17 @@
 
 #include "debug.h"
 
-void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item))
+void print_slist(struct slist *list, void (*qitem_printer)(struct snode *item))
 {
-	serial_transmit('|');
-	while (root != NULL) {
-		serial_print_p(PSTR(" - "));
-		qitem_printer(root);
-		root = root->next;
-	}
-	serial_transmit('\n');
-}
+	struct snode *item = list->head;
 
-void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item))
-{
-	struct qitem *item = oref->head;
-	serial_print_p(PSTR("[H]"));
+	serial_transmit('|');
 	while (item != NULL) {
-		serial_print_p(PSTR(" > "));
+		serial_print_p(PSTR(" - "));
 		qitem_printer(item);
 		item = item->next;
 	}
-	serial_printl_p(PSTR(" > [T]"));
+	serial_transmit('\n');
 }
 
 //
@@ -48,9 +38,9 @@ void print_tqueue(struct titem *root, void (*titem_printer)(struct titem *item))
 	serial_transmit('\n');
 }
 
-void print_dlist(struct ditem *list, void (*ditem_printer)(struct ditem *item))
+void print_dlist(struct dnode *list, void (*ditem_printer)(struct dnode *item))
 {
-	struct ditem *tmp, *node;
+	struct dnode *tmp, *node;
 
 	serial_hex16((uint16_t)list);
 

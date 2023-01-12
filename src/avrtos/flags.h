@@ -13,7 +13,7 @@
 #include <avrtos/kernel.h>
 
 struct k_flags {
-	struct ditem _waitqueue;
+	struct dnode _waitqueue;
 	uint8_t flags;
 	uint8_t reset_value;
 };

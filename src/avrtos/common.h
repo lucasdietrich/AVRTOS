@@ -47,6 +47,29 @@
 
 #define IN_RANGE(x, a, b) ((x >= a) && (x <= b))
 
+#define sys_read_le16(addr)	  (*(uint16_t *)(addr))
+#define sys_write_le16(addr, val) (*(uint16_t *)(addr) = (val))
+#define sys_read_le32(addr)	  (*(uint32_t *)(addr))
+#define sys_write_le32(addr, val) (*(uint32_t *)(addr) = (val))
+
+#define sys_read_be16(addr)                                                              \
+	((uint16_t)(*(uint8_t *)(addr) << 8) | *(uint8_t *)((addr) + 1))
+#define sys_write_be16(addr, val)                                                        \
+	(*(uint8_t *)(addr)	  = (uint8_t)((val) >> 8),                               \
+	 *(uint8_t *)((addr) + 1) = (uint8_t)(val))
+#define sys_read_be32(addr)                                                              \
+	((uint32_t)(*(uint8_t *)(addr) << 24) | (*(uint8_t *)((addr) + 1) << 16) |       \
+	 (*(uint8_t *)((addr) + 2) << 8) | *(uint8_t *)((addr) + 3))
+#define sys_write_be32(addr, val)                                                        \
+	(*(uint8_t *)(addr)	  = (uint8_t)((val) >> 24),                              \
+	 *(uint8_t *)((addr) + 1) = (uint8_t)((val) >> 16),                              \
+	 *(uint8_t *)((addr) + 2) = (uint8_t)((val) >> 8),                               \
+	 *(uint8_t *)((addr) + 3) = (uint8_t)(val))
+
+#define sys_ptr_diff(a, b)	     ((uint16_t)((char *)(a) - (char *)(b)))
+#define sys_ptr_add(ptr, offset)     ((void *)((char *)(ptr) + (offset)))
+#define sys_ptr_shift(ptr_p, offset) (*(ptr_p) = sys_ptr_add(*(ptr_p), offset))
+
 /*___________________________________________________________________________*/
 
 /* Note: Willingly not adding unsigned "u" suffix to numbers

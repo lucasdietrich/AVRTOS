@@ -49,7 +49,7 @@ Minor features:
     - dlist API : queue
     - cdlist API : circular dlist
   - queue : singly linked list
-  - oqueue : optimized singly linked list
+  - slist_append : optimized singly linked list
   - tqueue : scheduling singly linked list for time-sorted items
 - I/O : leds, uart
 - Kernel Assertions (__ASSERT)

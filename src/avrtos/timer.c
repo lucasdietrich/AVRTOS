@@ -56,7 +56,7 @@ void z_timers_process(void)
 
 			timer->tie.next	   = NULL;
 			timer->tie.timeout = timer->timeout.value;
-			_tqueue_schedule(&z_timers_runqueue, &timer->tie);
+			z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
 		} else {
 			return;
 		}

@@ -17,21 +17,12 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-#include "queue.h"
+#include "slist.h"
 
 //
-// Queue
+// SList
 //
-void print_queue(struct qitem *root, void (*qitem_printer)(struct qitem *item));
-
-/*___________________________________________________________________________*/
-
-#include "oqueue.h"
-
-//
-// OQueue
-//
-void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item));
+void print_slist(struct slist *list, void (*qitem_printer)(struct snode *item));
 
 /*___________________________________________________________________________*/
 
@@ -40,7 +31,7 @@ void print_oqueue(struct oqref *oref, void (*qitem_printer)(struct qitem *item))
 //
 // DList
 //
-void print_dlist(struct ditem *dlist, void (*ditem_printer)(struct ditem *item));
+void print_dlist(struct dnode *dlist, void (*ditem_printer)(struct dnode *item));
 
 /*___________________________________________________________________________*/
 

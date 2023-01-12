@@ -87,7 +87,7 @@ int k_flags_notify(struct k_flags *flags, uint8_t mask, k_flags_options options)
 {
 	int ret = 0;
 	uint8_t notify_value;
-	struct ditem *thread_handle;
+	struct dnode *thread_handle;
 
 #if CONFIG_KERNEL_ARGS_CHECKS
 	if (flags == NULL) {

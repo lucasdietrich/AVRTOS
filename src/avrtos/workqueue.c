@@ -17,7 +17,7 @@
 
 void z_workqueue_entry(struct k_workqueue *const workqueue)
 {
-	struct qitem *item;
+	struct snode *item;
 	struct k_work *work;
 
 	for (;;) {

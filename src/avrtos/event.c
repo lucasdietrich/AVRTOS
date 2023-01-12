@@ -62,7 +62,7 @@ int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 		event->tie.next	   = NULL;
 		event->tie.timeout = K_TIMEOUT_TICKS(timeout);
 
-		_tqueue_schedule(&z_event_q.first, &event->tie);
+		z_tqueue_schedule(&z_event_q.first, &event->tie);
 	}
 
 	irq_unlock(lock);

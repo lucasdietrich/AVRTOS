@@ -23,7 +23,7 @@
 /*___________________________________________________________________________*/
 
 struct block {
-	struct qitem tie;
+	struct snode tie;
 	uint8_t data[0x20];
 };
 
