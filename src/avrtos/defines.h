@@ -139,8 +139,11 @@ typedef struct {
 #define K_MSEC(milliseconds)                                                             \
 	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_MS * milliseconds)})
 #define K_NO_WAIT      ((k_timeout_t){.value = (k_ticks_t)0})
+#define K_NEXT_TICK    ((k_timeout_t){.value = (k_ticks_t)1})
 #define K_FOREVER      ((k_timeout_t){.value = (k_ticks_t)-1})
 #define K_UNTIL_WAKEUP K_FOREVER
+
+#define K_IMMEDIATE K_NEXT_TICK
 
 #endif /* __cplusplus */
 /*___________________________________________________________________________*/
@@ -243,7 +246,20 @@ typedef struct {
 #define THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
 #define THREAD_OF_TITEM(item)	     CONTAINER_OF(item, struct k_thread, tie.event)
 
-#define Z_CORE_CONTEXT_INIT(entry, ctx, __entry)                                         \
+#if Z_ARCH_PC_SIZE == 3
+#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry) \
+	{ \
+	.pch = 0x00u, \
+	.pc = (void *)_entry, \
+	}
+#else
+#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry) \
+	{ \
+	.pc = (void *)_entry, \
+	}
+#endif
+
+#define Z_CORE_CONTEXT_INIT(entry, ctx, _entry)                                         \
 	(struct z_callsaved_ctx)                                                         \
 	{                                                                                \
 		.sreg = 0x00,                                                            \
@@ -251,9 +267,7 @@ typedef struct {
 		{.init_sreg = CONFIG_THREAD_DEFAULT_SREG},                               \
 		{.thread_entry = (thread_entry_t)entry},                                 \
 		{.thread_context = (void *)ctx},                                         \
-		{                                                                        \
-			.pc = (void *)__entry                                            \
-		}                                                                        \
+		Z_CORE_CONTEXT_ARCH_PC_INIT(_entry), \
 	}
 
 #define Z_STACK_INITIALIZER(name, stack_size, entry, ctx)                                \

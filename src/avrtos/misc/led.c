@@ -11,7 +11,7 @@
 #if defined(__AVR_ATmega328P__)
 #define BUILTIN_LED_PORT GPIOB_DEVICE
 #define BUILTIN_LED_PIN	 (5u)
-#elif defined(__AVR_ATmega2560__)
+#elif ARDUINO_AVR_MEGA2560 || defined(__AVR_ATmega2560__)
 #define BUILTIN_LED_PORT GPIOB_DEVICE
 #define BUILTIN_LED_PIN	 (7u)
 #else
