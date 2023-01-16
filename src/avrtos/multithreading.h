@@ -240,7 +240,7 @@ struct k_thread {
 		size_t size; // stack size
 	} stack;	     // thread stack definition
 	char symbol;	     // 1-letter symbol to name the thread, reserver M (main),
-			     // idle : I (idle)
+		     // idle : I (idle)
 
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno; // Thread errno

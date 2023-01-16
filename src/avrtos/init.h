@@ -25,8 +25,7 @@ extern "C" {
 	__attribute__((naked, used, section(".init3"))) void z_kernel_sp(void)           \
 	{                                                                                \
 		extern char z_main_stack[];                                              \
-		SP = (uint16_t)Z_STACK_END(z_main_stack,                             \
-					       CONFIG_THREAD_MAIN_STACK_SIZE);           \
+		SP = (uint16_t)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE); \
 	}
 #else
 

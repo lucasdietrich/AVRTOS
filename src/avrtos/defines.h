@@ -244,30 +244,28 @@ typedef struct {
 
 #define Z_THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
 #define Z_THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
-#define Z_THREAD_OF_TITEM(item)	     CONTAINER_OF(item, struct k_thread, tie.event)
+#define Z_THREAD_OF_TITEM(item)	       CONTAINER_OF(item, struct k_thread, tie.event)
 
 #if Z_ARCH_PC_SIZE == 3
-#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry) \
-	{ \
-	.pch = 0x00u, \
-	.pc = (void *)_entry, \
+#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)                                              \
+	{                                                                                \
+		.pch = 0x00u, .pc = (void *)_entry,                                      \
 	}
 #else
-#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry) \
-	{ \
-	.pc = (void *)_entry, \
+#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)                                              \
+	{                                                                                \
+		.pc = (void *)_entry,                                                    \
 	}
 #endif
 
-#define Z_CORE_CONTEXT_INIT(entry, ctx, _entry)                                         \
+#define Z_CORE_CONTEXT_INIT(entry, ctx, _entry)                                          \
 	(struct z_callsaved_ctx)                                                         \
 	{                                                                                \
 		.sreg = 0x00,                                                            \
 		{.regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U}},          \
 		{.init_sreg = CONFIG_THREAD_DEFAULT_SREG},                               \
 		{.thread_entry = (thread_entry_t)entry},                                 \
-		{.thread_context = (void *)ctx},                                         \
-		Z_CORE_CONTEXT_ARCH_PC_INIT(_entry), \
+		{.thread_context = (void *)ctx}, Z_CORE_CONTEXT_ARCH_PC_INIT(_entry),    \
 	}
 
 #define Z_STACK_INITIALIZER(name, stack_size, entry, ctx)                                \
