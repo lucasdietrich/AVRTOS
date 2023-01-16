@@ -42,23 +42,23 @@ enum thread_state_t {
 	/* the thread is not running and is not in the runqueue,
 	 * it can be resumed/started with k_resume/k_thread_start functions.
 	 */
-	K_STOPPED = 0,
+	Z_STOPPED = 0,
 
 	/* the thread is (yet/still) ready for execution and is the runqueue
 	 */
-	K_READY = 1,
+	Z_READY = 1,
 
 	/* The thread is pending for an event, it may be in the time queue
 	 * (events_queue) but it is not in the runqueue. It can be wake up with
 	 * function z_wake_up()
 	 */
-	K_PENDING = 2,
+	Z_PENDING = 2,
 
 	/* This flag is reserved for IDLE thread only (if enabled),
 	 * it is used to know whether the thread being evaluated is the IDLE
 	 * thread
 	 */
-	K_IDLE = 3
+	Z_IDLE = 3
 };
 
 /* size 19B */

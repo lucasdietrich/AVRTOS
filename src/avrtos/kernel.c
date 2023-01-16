@@ -109,7 +109,7 @@ extern struct k_thread z_idle;
  * If the IDLE thread is in the runqueue (it is removed), the scheduled thread
  * become the only thread in the runqueue. Thread is added to the top of the
  * runqueue.
- * - Assume that the thread is K_READY
+ * - Assume that the thread is Z_READY
  * - Assume that the thread is not in the runqueue
  *
  * @param thread_tie thread.tie.runqueue item
@@ -128,7 +128,7 @@ static K_NOINLINE void z_schedule(struct k_thread *thread)
 #endif
 
 	/* Mark this thread as READY */
-	thread->state = K_READY;
+	thread->state = Z_READY;
 
 	if (z_ready_count == 0) {
 		/* Resume from IDLE */
@@ -164,7 +164,7 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  * @brief Schedule current thread wake up.
  *
  * Assumptions:
- * - thread is suspended (K_PENDING)
+ * - thread is suspended (Z_PENDING)
  * - thread is not in the runqueue
  *
  * @param thread
@@ -188,7 +188,7 @@ static K_NOINLINE void z_schedule_wake_up(k_timeout_t timeout)
  * @brief Remove the current thread from the runqueue.
  * Stop the execution of the current thread (until it is scheduled again with
  * function z_schedule or z_schedule_wake_up) State flag is changed to
- * K_PENDING.
+ * Z_PENDING.
  *
  * Assumptions:
  * - interrupt flag is cleared when called.
@@ -202,7 +202,7 @@ static K_NOINLINE void z_suspend(void)
 	__ASSERT_TRUE(&z_current->tie.runqueue == z_runq);
 
 	/* Mark this thread as pending */
-	z_current->state = K_PENDING;
+	z_current->state = Z_PENDING;
 
 	/* Remove thread from runqueue */
 	dlist_remove(z_runq);
@@ -233,7 +233,7 @@ static K_NOINLINE void z_suspend(void)
  * @brief Wake up a thread that is pending for an event.
  *
  * Assumptions:
- *  - thread is in K_PENDING mode
+ *  - thread is in Z_PENDING mode
  *  - thread is not in the runqueue
  *  - thread may be in the events queue
  *  - interrupt flag is cleared when called.
@@ -245,7 +245,7 @@ K_NOINLINE void z_wake_up(struct k_thread *th)
 {
 	__ASSERT_NOTNULL(th);
 	__ASSERT_NOINTERRUPT();
-	__ASSERT_THREAD_STATE(th, K_PENDING);
+	__ASSERT_THREAD_STATE(th, Z_PENDING);
 
 	__K_DBG_WAKEUP(th); // @
 
@@ -271,7 +271,7 @@ void z_kernel_init(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
 	/* Mark idle thread */
-	z_idle.state = K_IDLE;
+	z_idle.state = Z_IDLE;
 #endif
 
 	/* main thread is the first running (ready or not),
@@ -286,7 +286,7 @@ void z_kernel_init(void)
 
 		/* idle thread must not be added to the
 		 * runqueue as the main thread is running */
-		if (!THREAD_IS_IDLE(thread) && (thread->state == K_READY)) {
+		if (!THREAD_IS_IDLE(thread) && (thread->state == Z_READY)) {
 			z_ready_count++;
 			dlist_append(z_runq, &thread->tie.runqueue);
 		}
@@ -330,7 +330,7 @@ void z_system_shift(void)
 
 	struct titem *ready;
 	while ((ready = tqueue_pop(&z_events_queue)) != NULL) {
-		struct k_thread *const thread = THREAD_FROM_EVENTQUEUE(ready);
+		struct k_thread *const thread = Z_THREAD_FROM_EVENTQUEUE(ready);
 
 		__K_DBG_SCHED_EVENT(thread); // !
 
@@ -377,7 +377,7 @@ struct k_thread *z_scheduler(void)
 	 * it already removed itself from the runqueue, so we don't need
 	 * to do it here
 	 */
-	if (z_current->state == K_READY) {
+	if (z_current->state == Z_READY) {
 		/* Rotate the runqueue, set next thread to first position */
 		z_runq = z_runq->next;
 	}
@@ -433,7 +433,7 @@ K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 
 	struct dnode *tie = dlist_get(waitqueue);
 	if (DITEM_VALID(waitqueue, tie)) {
-		struct k_thread *pending_thread = THREAD_FROM_WAITQUEUE(tie);
+		struct k_thread *pending_thread = Z_THREAD_FROM_WAITQUEUE(tie);
 
 		/* immediate wake up is not more required because
 		 * with the swap model, the object is already reserved for the
@@ -633,7 +633,7 @@ void k_suspend(void)
 
 void k_resume(struct k_thread *th)
 {
-	if (th->state == K_PENDING) {
+	if (th->state == Z_PENDING) {
 		const uint8_t key = irq_lock();
 
 		z_schedule(th);
@@ -646,7 +646,7 @@ void k_resume(struct k_thread *th)
 
 void k_thread_start(struct k_thread *th)
 {
-	if (th->state == K_STOPPED) {
+	if (th->state == Z_STOPPED) {
 		const uint8_t key = irq_lock();
 
 		z_schedule(th);
@@ -666,7 +666,7 @@ static K_NOINLINE void z_stop(void)
 
 	z_suspend();
 
-	z_current->state = K_STOPPED;
+	z_current->state = Z_STOPPED;
 }
 
 void k_stop()

@@ -65,16 +65,16 @@ void k_thread_dump(struct k_thread *th)
 	serial_transmit(' ');
 
 	switch (th->state) {
-	case K_READY:
+	case Z_READY:
 		serial_print_p(PSTR("READY  "));
 		break;
-	case K_STOPPED:
+	case Z_STOPPED:
 		serial_print_p(PSTR("STOPPED"));
 		break;
-	case K_PENDING:
+	case Z_PENDING:
 		serial_print_p(PSTR("PENDING"));
 		break;
-	case K_IDLE:
+	case Z_IDLE:
 		serial_print_p(PSTR("IDLE   "));
 		break;
 	default:

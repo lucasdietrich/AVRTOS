@@ -25,9 +25,9 @@ K_THREAD struct k_thread z_thread_main = {
 	.sp = 0, // main thread is running, context already "restored"
 	{
 #if CONFIG_THREAD_MAIN_COOPERATIVE == 1
-		.flags = K_READY | K_COOPERATIVE | Z_FLAG_PRIO_LOW,
+		.flags = Z_READY | K_COOPERATIVE | Z_FLAG_PRIO_LOW,
 #else
-		.flags = K_READY | K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
+		.flags = Z_READY | K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
 #endif
 	},
 	.tie	   = {.runqueue =
@@ -68,7 +68,7 @@ static void z_thread_stack_create(struct k_thread *const th,
 				  thread_entry_t entry,
 				  void *const context_p)
 {
-	struct z_callsaved_ctx *const ctx = K_THREAD_CTX_START(th->stack.end);
+	struct z_callsaved_ctx *const ctx = Z_THREAD_CTX_START(th->stack.end);
 
 	/* initialize unused registers with default value */
 	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
@@ -102,7 +102,7 @@ int k_thread_create(struct k_thread *const th,
 		    void *const context_p,
 		    const char symbol)
 {
-	if (stack_size < K_THREAD_STACK_MIN_SIZE) {
+	if (stack_size < Z_THREAD_STACK_MIN_SIZE) {
 		return -1;
 	}
 
@@ -121,7 +121,7 @@ int k_thread_create(struct k_thread *const th,
 
 	/* clear internal flags */
 	th->flags     = 0;
-	th->state     = K_STOPPED;
+	th->state     = Z_STOPPED;
 	th->symbol    = symbol;
 	th->swap_data = NULL;
 	th->state     = prio & Z_MASK_PRIO;

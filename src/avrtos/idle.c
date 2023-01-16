@@ -24,7 +24,7 @@ static void z_idle_entry(void *context);
 #endif
 
 /*
- * K_THREAD_STACK_MIN_SIZE would be enough
+ * Z_THREAD_STACK_MIN_SIZE would be enough
  */
 #if CONFIG_THREAD_IDLE_COOPERATIVE
 
@@ -35,7 +35,7 @@ static void z_idle_entry(void *context);
 // K_THREAD_MINIMAL_DEFINE(z_idle, z_idle_entry, K_COOPERATIVE, NULL, 'I');
 K_THREAD_DEFINE(z_idle,
 		z_idle_entry,
-		K_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
+		Z_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_COOPERATIVE | Z_FLAG_PRIO_LOW,
 		NULL,
 		'I');
@@ -46,7 +46,7 @@ K_THREAD_DEFINE(z_idle,
  */
 K_THREAD_DEFINE(z_idle,
 		z_idle_entry,
-		K_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE +
+		Z_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE +
 			CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
 		K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
 		NULL,

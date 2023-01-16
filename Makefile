@@ -9,7 +9,15 @@ QEMU=OFF
 
 all: single
 
-.PHONY: single
+.PHONY: single cmake
+
+cmake:
+	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+		-DCMAKE_GENERATOR=$(GENERATOR) \
+		-DPROG_DEV=$(DEVICE) \
+		-DQEMU=$(QEMU)
 
 multiple:
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \

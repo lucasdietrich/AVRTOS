@@ -8,8 +8,8 @@
 
 void z_init_thread_stack_canaries(struct k_thread *th)
 {
-	for (uint8_t *addr = K_THREAD_STACK_START_USABLE(th);
-	     addr < (uint8_t *)th->stack.end - K_THREAD_STACK_VOID_SIZE;
+	for (uint8_t *addr = Z_THREAD_STACK_START_USABLE(th);
+	     addr < (uint8_t *)th->stack.end - Z_THREAD_STACK_VOID_SIZE;
 	     addr++) {
 		*addr = CONFIG_THREAD_CANARIES_SYMBOL;
 	}
@@ -29,7 +29,7 @@ void z_init_stacks_canaries(void)
 
 void *z_stack_canaries(struct k_thread *th)
 {
-	uint8_t *preserved = K_STACK_START_USABLE(th->stack.end, th->stack.size) - 1u;
+	uint8_t *preserved = Z_STACK_START_USABLE(th->stack.end, th->stack.size) - 1u;
 	while (*(++preserved) == CONFIG_THREAD_CANARIES_SYMBOL) {
 	}
 	return preserved;
@@ -42,7 +42,7 @@ void *z_stack_canaries(struct k_thread *th)
 void k_print_stack_canaries(struct k_thread *th)
 {
 	uint8_t *addr	      = (uint8_t *)z_stack_canaries(th);
-	size_t canaries_found = addr - (uint8_t *)K_THREAD_STACK_START_USABLE(th);
+	size_t canaries_found = addr - (uint8_t *)Z_THREAD_STACK_START_USABLE(th);
 
 	serial_transmit('[');
 	serial_transmit(th->symbol);
@@ -51,9 +51,9 @@ void k_print_stack_canaries(struct k_thread *th)
 	serial_print_p(PSTR(" [found "));
 	serial_u16(canaries_found);
 	serial_print_p(PSTR("], MAX usage = "));
-	serial_u16(K_STACK_SIZE_USABLE(th->stack.size) - canaries_found);
+	serial_u16(Z_STACK_SIZE_USABLE(th->stack.size) - canaries_found);
 	serial_print_p(PSTR(" / "));
-	serial_u16(K_STACK_SIZE_USABLE(th->stack.size));
+	serial_u16(Z_STACK_SIZE_USABLE(th->stack.size));
 
 #if CONFIG_THREAD_STACK_SENTINEL
 	serial_print_p(PSTR(" + "));

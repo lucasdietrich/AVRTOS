@@ -202,12 +202,12 @@ typedef struct {
 // interrupt context
 #define Z_INTCTX_SIZE sizeof(struct z_intctx)
 
-#define K_THREAD_STACK_VOID_SIZE Z_CALLSAVED_CTX_SIZE
-#define K_THREAD_CTX_START(stack_end)                                                    \
+#define Z_THREAD_STACK_VOID_SIZE Z_CALLSAVED_CTX_SIZE
+#define Z_THREAD_CTX_START(stack_end)                                                    \
 	((struct z_callsaved_ctx *)((uint8_t *)stack_end - Z_CALLSAVED_CTX_SIZE + 1U))
 
-#define K_THREAD_STACK_MIN_SIZE                                                          \
-	(K_THREAD_STACK_VOID_SIZE + CONFIG_THREAD_STACK_SENTINEL_SIZE)
+#define Z_THREAD_STACK_MIN_SIZE                                                          \
+	(Z_THREAD_STACK_VOID_SIZE + CONFIG_THREAD_STACK_SENTINEL_SIZE)
 
 // some of following macros need to be differenciate for c or asm :
 // - in c files the compiler needs to know the type of stack_start in order to
@@ -219,11 +219,11 @@ typedef struct {
 #define K_THREAD_STACK_END(th)	       (th->stack.end)
 
 /* real stack start and size without counting sentinel */
-#define K_STACK_START_USABLE(stack_end, size)                                            \
+#define Z_STACK_START_USABLE(stack_end, size)                                            \
 	(K_STACK_START(stack_end, size) + CONFIG_THREAD_STACK_SENTINEL_SIZE)
-#define K_STACK_SIZE_USABLE(size) (size - CONFIG_THREAD_STACK_SENTINEL_SIZE)
-#define K_THREAD_STACK_START_USABLE(th)                                                  \
-	K_STACK_START_USABLE(th->stack.end, th->stack.size)
+#define Z_STACK_SIZE_USABLE(size) (size - CONFIG_THREAD_STACK_SENTINEL_SIZE)
+#define Z_THREAD_STACK_START_USABLE(th)                                                  \
+	Z_STACK_START_USABLE(th->stack.end, th->stack.size)
 
 #define Z_STACK_END(stack_start, size) ((stack_start) + (size)-1)
 
@@ -242,9 +242,9 @@ typedef struct {
 
 #define K_THREAD __attribute__((used, section(".k_threads")))
 
-#define THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
-#define THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
-#define THREAD_OF_TITEM(item)	     CONTAINER_OF(item, struct k_thread, tie.event)
+#define Z_THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
+#define Z_THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
+#define Z_THREAD_OF_TITEM(item)	     CONTAINER_OF(item, struct k_thread, tie.event)
 
 #if Z_ARCH_PC_SIZE == 3
 #define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry) \

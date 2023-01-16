@@ -89,7 +89,7 @@ What enhancements are planned :
 - Measure the execution time for thread switch and all kernel functions calls (k_mutex_lock, k_work_schedule, ...)
 - Remove RUNNING state which is implicitely represented by the position of the current thread in the runqueue.
   - A thread is running if it is at the top on the runqueue
-  - Also optimize the use of K_READY
+  - Also optimize the use of Z_READY
 - Optimizing `tqueue_remove` function from O(n) to O(1) where `n` is the number of items in the time queue
   - Optimizing corresponding code in the kernel
 - Optimizing timers code
