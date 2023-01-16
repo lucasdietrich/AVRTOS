@@ -553,26 +553,26 @@ void k_sched_unlock(void)
 	__K_DBG_SCHED_UNLOCK();
 }
 
-static uint8_t _cur_get_flags(void)
+static inline uint8_t z_current_flags_get(void)
 {
 	return z_current->flags;
 }
 
 bool k_sched_locked(void)
 {
-	const uint8_t flags = _cur_get_flags();
+	const uint8_t flags = z_current_flags_get();
 
 	return (flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) != 0;
 }
 
 bool k_cur_is_preempt(void)
 {
-	return (_cur_get_flags() & K_FLAG_COOP) == 0;
+	return (z_current_flags_get() & K_FLAG_COOP) == 0;
 }
 
 bool k_cur_is_coop(void)
 {
-	return (_cur_get_flags() & K_FLAG_COOP) != 0;
+	return (z_current_flags_get() & K_FLAG_COOP) != 0;
 }
 
 void k_sleep(k_timeout_t timeout)
