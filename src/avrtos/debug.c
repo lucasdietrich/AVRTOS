@@ -83,9 +83,9 @@ void k_thread_dump(struct k_thread *th)
 
 	serial_transmit(' ');
 
-	serial_transmit((th->flags & K_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
+	serial_transmit((th->flags & Z_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
 	serial_transmit(' ');
-	serial_transmit((th->flags & K_MASK_PRIO) == K_FLAG_PRIO_HIGH ? '0' : '1');
+	serial_transmit((th->flags & Z_MASK_PRIO) == Z_FLAG_PRIO_HIGH ? '0' : '1');
 	serial_transmit(' ');
 	serial_transmit(th->sched_lock ? 'S' : '_');
 	serial_transmit(th->timer_expired ? 'X' : '_');

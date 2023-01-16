@@ -309,7 +309,7 @@ static inline void k_yield_from_isr(void)
 	// ASSERT IRQ LOCKED
 
 	/* Check whether current thread can be preempted */
-	if ((z_current->flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) == 0u) {
+	if ((z_current->flags & (Z_FLAG_SCHED_LOCKED | Z_FLAG_COOP)) == 0u) {
 		z_yield();
 	}
 }

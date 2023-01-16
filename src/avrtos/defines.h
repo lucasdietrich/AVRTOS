@@ -287,7 +287,7 @@ typedef struct {
 	struct k_thread _name = {                                                        \
 		.sp = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),              \
 		{                                                                        \
-			.flags = K_FLAG_READY | prio_flag,                               \
+			.flags = Z_FLAG_READY | prio_flag,                               \
 		},                                                                       \
 		.tie = {.runqueue = DITEM_INIT(NULL)},                                   \
 		{.wany = DITEM_INIT(NULL)},                                              \

@@ -25,9 +25,9 @@ K_THREAD struct k_thread z_thread_main = {
 	.sp = 0, // main thread is running, context already "restored"
 	{
 #if CONFIG_THREAD_MAIN_COOPERATIVE == 1
-		.flags = K_READY | K_COOPERATIVE | K_FLAG_PRIO_LOW,
+		.flags = K_READY | K_COOPERATIVE | Z_FLAG_PRIO_LOW,
 #else
-		.flags = K_READY | K_PREEMPTIVE | K_FLAG_PRIO_LOW,
+		.flags = K_READY | K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
 #endif
 	},
 	.tie	   = {.runqueue =
@@ -124,7 +124,7 @@ int k_thread_create(struct k_thread *const th,
 	th->state     = K_STOPPED;
 	th->symbol    = symbol;
 	th->swap_data = NULL;
-	th->state     = prio & K_MASK_PRIO;
+	th->state     = prio & Z_MASK_PRIO;
 
 	return 0;
 }

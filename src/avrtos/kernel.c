@@ -562,17 +562,17 @@ bool k_sched_locked(void)
 {
 	const uint8_t flags = z_current_flags_get();
 
-	return (flags & (K_FLAG_SCHED_LOCKED | K_FLAG_COOP)) != 0;
+	return (flags & (Z_FLAG_SCHED_LOCKED | Z_FLAG_COOP)) != 0;
 }
 
 bool k_cur_is_preempt(void)
 {
-	return (z_current_flags_get() & K_FLAG_COOP) == 0;
+	return (z_current_flags_get() & Z_FLAG_COOP) == 0;
 }
 
 bool k_cur_is_coop(void)
 {
-	return (z_current_flags_get() & K_FLAG_COOP) != 0;
+	return (z_current_flags_get() & Z_FLAG_COOP) != 0;
 }
 
 void k_sleep(k_timeout_t timeout)
