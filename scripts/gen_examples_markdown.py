@@ -1,3 +1,5 @@
+# Generate a markdown list of the examples
+
 import os
 import os.path
 

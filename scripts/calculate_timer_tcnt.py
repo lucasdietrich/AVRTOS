@@ -29,10 +29,10 @@ class Timer:
 
     def max_period_of_all(self, f_cpu: int = F_CPU):
         return self.max_period_us(max(self.prescalers), f_cpu)
-        
+
     def max_period_us(self, prescaler: int, f_cpu: int = F_CPU) -> int:
         return self.period_us(0, prescaler, f_cpu)
-    
+
     def min_period_us(self, prescaler: int, f_cpu: int = F_CPU) -> int:
         return self.period_us(self.max_tcnt, prescaler, f_cpu)
 
@@ -61,7 +61,8 @@ class Timer:
         return tcnt
 
     def tcnt_from_period(self, period_us: int, prescaler: int = 256, f_cpu: int = F_CPU):
-        tcnt = (1 + self.max_tcnt) - f_cpu * period_us / (prescaler * 1_000_000)
+        tcnt = (1 + self.max_tcnt) - f_cpu * \
+            period_us / (prescaler * 1_000_000)
 
         if self.valid_tcnt(tcnt):
             return tcnt
@@ -104,7 +105,6 @@ class Timer:
         return sorted(l)
 
 
-
 timers = [
     Timer(0, [1, 8, 64, 256, 1024], 8),
     Timer(1, [1, 8, 64, 256, 1024], 16),
@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
             ret += f"#{ifelif} CONFIG_KERNEL_SYSCLOCK_PERIOD_US == {period_us}\n"
             ret += f"#\tdefine K_SYSCLOCK_TIMER_PRESCALER    K_SYSCLOCK_TIMER_PRESCALER_{p}\n"
-            
+
             ret += f"#\tdefine K_SYSCLOCK_TIMER_TCNT         {t}\n"
             ret += f"#\tdefine K_SYSCLOCK_TIMER_TCNTL        {hex(t & 0xFF)}\n"
             ret += f"#\tdefine K_SYSCLOCK_TIMER_TCNTH        {hex(t >> 8)}\n"
@@ -153,9 +153,12 @@ if __name__ == "__main__":
     for tim in timers:
         print(tim.max_period_of_all())
 
-    t0r = sorted(set(timers[0].get_special_periods() + list(range(100, 16384, 100))))
-    t1r = sorted(set(timers[1].get_special_periods() + list(range(100, 10000, 100)) + list(range(10000, 100000, 1000)) + list(range(100000, 4194304, 10000))))
-    t2r = sorted(set(timers[2].get_special_periods() + list(range(100, 16384, 100))))
+    t0r = sorted(set(timers[0].get_special_periods() +
+                 list(range(100, 16384, 100))))
+    t1r = sorted(set(timers[1].get_special_periods() + list(range(100, 10000, 100)) +
+                 list(range(10000, 100000, 1000)) + list(range(100000, 4194304, 10000))))
+    t2r = sorted(set(timers[2].get_special_periods() +
+                 list(range(100, 16384, 100))))
 
     ret0 = defines_for(timers[0], t0r)
     with open("./tmp/t0.txt", "w+") as fp:
