@@ -117,7 +117,8 @@ This RTOS is highly configurable, see [src/avrtos/avrtos_conf.h](./src/avrtos/av
 
 ### Description
 
-Following code configures an usart, and blink a led at a frequency of 1Hz.
+Example [minimal-example](src/examples/minimal-example/main.c) configures an usart, 
+and blink a led at a frequency of 1Hz.
 Morover, typing a character on the serial console will wake up a thread.
 
 ### Code
@@ -135,7 +136,7 @@ CONFIG_KERNEL_UPTIME=1
 ```
 
 Code:
-```cpp
+```c
 /*
  * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
  *
@@ -216,6 +217,16 @@ static void thread_led(void *arg)
 }
 ```
 
+### Build
+
+- You can either use PlatformIO or CMake to build the project.
+  - PlatformIO requires the extensio to be installed in VSCode.
+  - For Cmake, you will need to install avr-gcc toolchain, use Makefile commands
+  to build the project.
+  Moreover, with CMake, `.vscode/launch.json` is automatically generated when building
+  for a single example. Moreover, `qemu` can be easily used to run the example.
+
+
 ### Logs
 
 ```
@@ -259,46 +270,65 @@ Memory region         Used Size  Region Size  %age Used
 
 ## All Examples
 
-### Demo
 - [shell](./src/examples/shell/main.c)
-
-### Main Features
-- [mutex-multithreading-demo](./src/examples/mutex-multithreading-demo/main.c)
-- [semaphore-multithreading-demo](./src/examples/semaphore-multithreading-demo/main.c)
-- [fifo](./src/examples/fifo/main.c)
-- [fifo-slab](./src/examples/fifo-slab/main.c)
-- [mem_slab](./src/examples/mem_slab/main.c)
-- [msgq](./src/examples/msgq/main.c)
-- [signal](./src/examples/signal/main.c)
-- [timers](./src/examples/timers/main.c)
-- [events](./src/examples/events/main.c)
-- [workqueue](./src/examples/workqueue/main.c)
-- [prng](./src/examples/prng/main.c)
-- [data-structures](./src/examples/data-structures/main.cpp)
+- [blinking-led](./src/examples/blinking-led/main.c)
+- [data-structures](./src/examples/data-structures/main.c)
+- [cpp](./src/examples/cpp/main.c)
 - [atomic](./src/examples/atomic/main.c)
-- [sched-lock](./src/examples/sched-lock/main.c)
-- [sysclock](./src/examples/sysclock/main.c)
-- [system-workqueue](./src/examples/system-workqueue/main.c)
-- [uptime](./src/examples/uptime/main.c)
 - [canaries](./src/examples/canaries/main.c)
-
-### Minor features
-- [minimal-example](./src/examples/minimal-example/main.c)
-- [prempt-multithreading-demo](./src/examples/prempt-multithreading-demo/main.c)
 - [coop-multithreading-demo](./src/examples/coop-multithreading-demo/main.c)
+- [drv-api-timers](./src/examples/drv-api-timers/main.c)
+- [drv-timers](./src/examples/drv-timers/main.c)
+- [drv-usart-async](./src/examples/drv-usart-async/main.c)
+- [events](./src/examples/events/main.c)
+- [fifo-slab](./src/examples/fifo-slab/main.c)
+- [fifo](./src/examples/fifo/main.c)
+- [footprint](./src/examples/footprint/main.c)
+- [idle](./src/examples/idle/main.c)
+- [interrupt-yield](./src/examples/interrupt-yield/main.c)
+- [mem_slab](./src/examples/mem_slab/main.c)
+- [minimal-example](./src/examples/minimal-example/main.c)
+- [msgq](./src/examples/msgq/main.c)
 - [multithreading-switching-frequency](./src/examples/multithreading-switching-frequency/main.c)
+- [mutex-multithreading-demo](./src/examples/mutex-multithreading-demo/main.c)
 - [mutex-multithreading-test](./src/examples/mutex-multithreading-test/main.c)
 - [object-reservation](./src/examples/object-reservation/main.c)
-- [cpp](./src/examples/cpp/main.cpp)
+- [prempt-multithreading-demo](./src/examples/prempt-multithreading-demo/main.c)
+- [prng](./src/examples/prng/main.c)
+- [sched-lock](./src/examples/sched-lock/main.c)
+- [semaphore-multithreading-demo](./src/examples/semaphore-multithreading-demo/main.c)
+- [signal](./src/examples/signal/main.c)
+- [stack-sentinel](./src/examples/stack-sentinel/main.c)
+- [sysclock](./src/examples/sysclock/main.c)
+- [system-workqueue](./src/examples/system-workqueue/main.c)
 - [thread-termination](./src/examples/thread-termination/main.c)
-- [interrupt-yield](./src/examples/interrupt-yield/main.c)
-- [idle](./src/examples/idle/main.c)
-
-## Note
+- [time](./src/examples/time/main.c)
+- [timers](./src/examples/timers/main.c)
+- [uptime](./src/examples/uptime/main.c)
+- [v2](./src/examples/v2/main.c)
+- [workqueue](./src/examples/workqueue/main.c)
+- [zephyr-dev-usart-tool](./src/examples/zephyr-dev-usart-tool/main.c)
+- [CMakeLists.txt](./src/examples/CMakeLists.txt/main.c)
+- [thread-prio-multiq](./src/examples/thread-prio-multiq/main.c)
+- [rt](./src/examples/rt/main.c)
+- [many-threads](./src/examples/many-threads/main.c)
+- [drv-gpio](./src/examples/drv-gpio/main.c)
+- [drv-exti](./src/examples/drv-exti/main.c)
+- [isr-unpend](./src/examples/isr-unpend/main.c)
+- [main-stack](./src/examples/main-stack/main.c)
+- [flags](./src/examples/flags/main.c)
+- [ring](./src/examples/ring/main.c)
+- [logging](./src/examples/logging/main.c)
+- [drv-timers-pwm](./src/examples/drv-timers-pwm/main.c)
+- [drv-timers-pwm-icrn](./src/examples/drv-timers-pwm-icrn/main.c)
+- [drv-timers-ctc-toggle](./src/examples/drv-timers-ctc-toggle/main.c)
+- [drv-usart](./src/examples/drv-usart/main.c)
+## Notes
 
 ### qemu
 
 As [qemu](https://github.com/qemu/qemu) support [avr architecture](https://github.com/qemu/qemu/tree/master/target/avr), any program built using this RTOS can be emulated in qemu and debugged using GDB.
+However, Cmake is required to build the project instead of PlatformIO.
 
 Use of `_delay_ms`, `sleep_cpu` is deprecated in QEMU.
 
@@ -374,137 +404,12 @@ monitor_port = COM3
 monitor_speed = 500000
 ```
 
-## Known issues
-
-- Set stack pointer only one time, remove instructions `b4` to `ba` (.init2):
-  - See linker script
-```s
-000000b0 <__ctors_end>:
-  b0:	11 24       	eor	r1, r1    ; clear r1
-  b2:	1f be       	out	0x3f, r1	; clear SREG
-
-  b4:	cf ef       	ldi	r28, 0xFF	; SPL
-  b6:	d8 e0       	ldi	r29, 0x08	; SPH
-  b8:	de bf       	out	0x3e, r29	; set SPH
-  ba:	cd bf       	out	0x3d, r28	; set SPL
-
-  bc:	ce ea       	ldi	r28, 0xAE	; SPL
-  be:	d7 e0       	ldi	r29, 0x07	; SPH
-  c0:	cd bf       	out	0x3d, r28	; set SPL
-  c2:	de bf       	out	0x3e, r29	; set SPH
-```
+## Advices
 
 - In order to have a reliable uptime value, interrupts should be enabled in all threads.
   - Disabling interrupt for too long, breaks the uptime accuracy.
 
 ## Debugging
-
-### Emulate with QEMU and debug
-
-[qemu](https://www.qemu.org/) implements an emulator for AVR architectures.
-
-My install :
-- Environnement : Windows 10
-- Ubuntu 20.04 (WSL)
-- [qemu v6.1.0](https://github.com/qemu/qemu/tree/v6.1.0)
-
-Steps : 
-1. Building project in debug mode : 
-  - `build_type = debug`
-  - Make sure to use timer1 as syslock as it's the only hardware timer supported for now !
-
-2. Change program location in `launch.json`
-
-3. Emulate on qemu : Run command from WSL :
-  `~/qemu/qemu/build/avr-softmmu/qemu-system-avr -M mega2560 -bios .pio/build/Sysclock-qemu-ATmega2560/firmware.elf -s -S -nographic -serial tcp::5678,server=on,wait=off`
-
-4. Attach serial :
-  - From WSL : `telnet localhost 5678`
-  - From Visual Studio Code IDE : Serial Monitor : `Ctrl + Alt + S`
-
-5. Attach debugger in VSC environnement :
-  - `Ctrl + F5`
-
-6. Exit qemu with `Ctrl + A` then `X`
-
-Note that only few peripherals are supported on avr architecture (https://qemu-project.gitlab.io/qemu/system/target-avr.html) :
-  - `timer1` : 
-    - https://github.com/qemu/qemu/blob/master/hw/timer/avr_timer16.c
-    - https://github.com/qemu/qemu/blob/master/include/hw/timer/avr_timer16.h
-  - `usart0` :
-    - https://github.com/qemu/qemu/blob/master/hw/char/avr_usart.c
-    - https://github.com/qemu/qemu/blob/master/include/hw/char/avr_usart.h
-
-But these two peripherals are enough to fully run/debug the kernel with output in console.
-
-Debugging in QEMU : `Sysclock-qemu-ATmega328p` : [sysclock/main.cpp](./src/examples/sysclock/main.cpp) :
-![avrtos_qemu1.png](./pics/avrtos_qemu1.png)
-
-Debugging in QEMU : `MutexMultithreadingDemo-qemu-ATmega328p` : [mutex-multithreading-demo/main.cpp](./src/examples/mutex-multithreading-demo/main.cpp) :
-![avrtos_qemu2.png](./pics/avrtos_qemu2.png)
-
-If you want to create your own application I advice to define two environnements in `platformio.ini` :
-
-Release env for real board Arduino Pro (ATmega328p): 
-```ini
-[env:MutexMultithreadingDemo]
-src_filter =
-    ${env.src_filter}
-    +<examples/mutex-multithreading-demo/>
-
-build_flags = 
-    ${env.build_flags}
-    -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
-    -DCONFIG_KERNEL_TIME_SLICE_US=16000
-    -DCONFIG_KERNEL_DEBUG=0
-    -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
-    -DCONFIG_KERNEL_THREAD_IDLE=1
-```
-
-Debug mode for QEMU (ATmega328p)
-
-```ini
-[env:MutexMultithreadingDemo-qemu-ATmega328p]
-build_type = debug
-
-src_filter =
-    ${env.src_filter}
-    +<examples/mutex-multithreading-demo/>
-
-build_flags = 
-    ${env.build_flags}
-    -DCONFIG_KERNEL_SYSLOCK_HW_TIMER=1
-    -DCONFIG_KERNEL_TIME_SLICE_US=40000
-    -DCONFIG_KERNEL_PREEMPTIVE_THREADS=1
-    -DCONFIG_KERNEL_DEBUG=0
-    -DCONFIG_KERNEL_SCHEDULER_DEBUG=0
-    -DCONFIG_KERNEL_THREAD_IDLE=1
-
-debug_tool = custom
-debug_port = :1234
-debug_load_mode = manual
-monitor_port = socket://localhost:5678
-debug_extra_cmds =
-    tbreak main
-```
-
-## QEMU installation :
-
-- https://www.qemu.org/download/#source
-
-Prerequisites :
-```
-sudo apt install make, ninja-build, pkg-config, libglib2.0-dev
-sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-```
-
-Install
-```
-sudo apt install gdb-avr
-```
-
-
-### Console debug
 
 Enabling configuration option `CONFIG_KERNEL_SCHEDULER_DEBUG` enables following logs :
 - Before scheduler call :
@@ -528,18 +433,6 @@ Enabling configuration option `CONFIG_KERNEL_SCHEDULER_DEBUG` enables following 
 
 Enabling configuration option `CONFIG_KERNEL_SCHEDULER_DEBUG` enables following logs :
 - `.` : Each time the syslock timer expires, we check if the current thread can be preempted and then the scheduler is called in.
-
-#### Example with the getting-started example 
-
-```
-===== k_thread =====
-M 030E [PREE 0] RUNNING : SP 0/512 -| END @0560
-C 031E [COOP 1] READY   : SP 35/256 -| END @0207
-F 032E [PREE 1] READY   : SP 35/80 -| END @0257
-O 033E [PREE 1] READY   : SP 35/80 -| END @02A7
-K 034E [PREE 3] READY   : SP 35/62 -| END @02E6
-~C~F}Ff~O#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!FF{@O>O}Oo~pF#F~K.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.>Ks.!C_.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c.c!OO{@F>F}Ff~pO#O~K.>Ks.>Ks.>Ks.>K
-```
 
 ## Optimization
 
