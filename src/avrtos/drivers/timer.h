@@ -79,7 +79,7 @@ typedef struct {
 
 #if defined(TCCR3A)
 #define TIMER3_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0x90u)
-#define TIMER3_DEVICE	      ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
+#define TIMER3_DEVICE	      ((TIMER16_Device *)(TIMER3_DEVICE_ADDR))
 #define IS_TIMER3_DEVICE(dev) ((void *)dev == (void *)TIMER3_DEVICE)
 #define TIMER3_INDEX	      3u
 #endif

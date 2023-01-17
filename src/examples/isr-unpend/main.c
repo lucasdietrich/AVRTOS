@@ -12,10 +12,8 @@
 K_SEM_DEFINE(sem, 0, 1);
 
 static void monitor(void *arg);
-static void work(void *arg);
 
 K_THREAD_DEFINE(mid, monitor, 0x100, K_PREEMPTIVE, NULL, 'm');
-K_THREAD_DEFINE(wid, work, 0x100, K_COOPERATIVE, NULL, 'm');
 
 ISR(TIMER3_COMPA_vect)
 {
@@ -45,6 +43,8 @@ int main(void)
 		k_sem_take(&sem, K_FOREVER);
 
 		GPIOB->PIN = BIT(7u);
+
+		serial_printl("IRQ !");
 	}
 }
 
@@ -53,16 +53,6 @@ static void monitor(void *arg)
 	for (;;) {
 		k_dump_stack_canaries();
 
-		k_sleep(K_SECONDS(1));
-	}
-}
-
-static void work(void *arg)
-{
-	for (;;) {
-		GPIOB->PIN = BIT(4u);
-		_delay_ms(175u);
-		GPIOB->PIN = BIT(4u);
-		k_yield();
+		k_sleep(K_SECONDS(20u));
 	}
 }
