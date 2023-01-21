@@ -9,14 +9,24 @@
 
 /*___________________________________________________________________________*/
 
+#define Z_STRINGIFY(x) #x
+#define STRINGIFY(s)   Z_STRINGIFY(s)
+
+#define _DO_CONCAT(x, y) x##y
+#define _CONCAT(x, y)	 _DO_CONCAT(x, y)
+
+/*___________________________________________________________________________*/
+
 /* Compiler specific */
+
+#define Z_LINK_SECTION(_section) __attribute__((section(Z_STRINGIFY(_section))))
 
 #define __noinline	 __attribute__((noinline))
 #define __noreturn	 __attribute__((__noreturn__))
 #define CODE_UNREACHABLE __builtin_unreachable();
 #define __always_inline	 __attribute__((always_inline)) inline
-#define __noinit	 __attribute__((section(".noinit")))
-#define __bss		 __attribute__((section(".bss")))
+#define __noinit	 Z_LINK_SECTION(.noinit)
+#define __bss		 Z_LINK_SECTION(.bss)
 
 #define __STATIC_ASSERT(test_for_true, msg) _Static_assert(test_for_true, msg)
 #define __STATIC_ASSERT_NOMSG(test_for_true)                                             \

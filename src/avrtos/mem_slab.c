@@ -11,7 +11,7 @@
 
 #define K_MODULE K_MODULE_MEMSLAB
 
-static void create_free_list(struct k_mem_slab *slab)
+static void z_create_free_list(struct k_mem_slab *slab)
 {
 	slab->free_list = NULL;
 	uint8_t *p	= slab->buffer;
@@ -25,20 +25,28 @@ static void create_free_list(struct k_mem_slab *slab)
 	}
 }
 
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
+
 extern struct k_mem_slab __k_mem_slabs_start;
 extern struct k_mem_slab __k_mem_slabs_end;
 
 /* TODO Set always inline */
 void z_mem_slab_init_module(void)
 {
+
 	/* must be called during MCU initialization, in order to initialize
 	 * known memory slabs using the linker section defined
 	 */
 	const uint8_t mem_slabs_count = &__k_mem_slabs_end - &__k_mem_slabs_start;
 	for (uint8_t i = 0; i < mem_slabs_count; i++) {
-		create_free_list(&(&__k_mem_slabs_start)[i]);
+		z_create_free_list(&(&__k_mem_slabs_start)[i]);
 	}
 }
+#else
+void z_mem_slab_init_module(void)
+{
+}
+#endif
 
 int8_t k_mem_slab_init(struct k_mem_slab *slab,
 		       void *buffer,
@@ -56,15 +64,23 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 		return -EINVAL;
 	}
 
+	dlist_init(&slab->waitqueue);
+
 	slab->block_size = block_size;
 	slab->count	 = num_blocks;
 	slab->buffer	 = buffer;
-	create_free_list(slab);
 
-	dlist_init(&slab->waitqueue);
+	z_create_free_list(slab);
 
 	return 0;
 }
+
+#if !CONFIG_AVRTOS_KERNEL_SECTIONS
+K_NOINLINE void z_mem_slab_finalize_init(struct k_mem_slab *slab)
+{
+	z_create_free_list(slab);
+}
+#endif
 
 /**
  * @brief Internal function to allocate a block

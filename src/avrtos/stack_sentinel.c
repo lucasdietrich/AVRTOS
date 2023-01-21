@@ -7,6 +7,7 @@
 #include "fault.h"
 #include "stack_sentinel.h"
 
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
@@ -32,6 +33,13 @@ void z_init_stacks_sentinel(void)
 		z_init_thread_stack_sentinel(thread);
 	}
 }
+#else
+
+void z_init_thread_stack_sentinel(struct k_thread *th)
+{
+}
+
+#endif
 
 bool k_verify_stack_sentinel(struct k_thread *th)
 {

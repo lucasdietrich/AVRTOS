@@ -88,8 +88,8 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  *  -
  * https://github.com/zephyrproject-rtos/zephyr/blob/main/include/kernel.h#L2095-L2111
  *
- * @param fifo
- * @param item_tie
+ * @param fifo pointer to the fifo
+ * @param item_tie pointer to the "tie" member of the item to add
  * @return K_NOINLINE
  */
 K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item_tie);

@@ -36,9 +36,12 @@ struct k_timer {
 		.handler = timer_handler,                                                \
 	}
 
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
 #define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay)                  \
-	__attribute__((used, section(".k_timers"))) static struct k_timer timer_name =   \
+	Z_LINK_KERNEL_SECTION(.k_timers)                                                 \
+	static struct k_timer timer_name =                                               \
 		K_TIMER_INIT(handler, timeout_ms, starting_delay)
+#endif
 
 #define K_TIMER_STOPPED ((k_delta_t)-1)
 

@@ -74,13 +74,13 @@ extern "C" {
 #define K_ASSERT(_acode, _assertion) __ASSERT(_acode, _assertion)
 #define K_ASSERT_APP(_assertion)     __ASSERT_APP(_assertion)
 
-extern bool __k_interrupts(void);
+extern bool z_interrupts(void);
 
 #define __ASSERT_TRUE(test)  __ASSERT(K_ASSERT_TRUE, (test) != 0)
 #define __ASSERT_FALSE(test) __ASSERT(K_ASSERT_FALSE, (test) == 0)
 
-#define __ASSERT_INTERRUPT()   __ASSERT(K_ASSERT_INTERRUPT, __k_interrupts() != 0)
-#define __ASSERT_NOINTERRUPT() __ASSERT(K_ASSERT_NOINTERRUPT, __k_interrupts() == 0)
+#define __ASSERT_INTERRUPT()   __ASSERT(K_ASSERT_INTERRUPT, z_interrupts() != 0)
+#define __ASSERT_NOINTERRUPT() __ASSERT(K_ASSERT_NOINTERRUPT, z_interrupts() == 0)
 
 #define __ASSERT_NOTNULL(var) __ASSERT(K_ASSERT_NOTNULL, (var) != NULL)
 #define __ASSERT_NULL(var)    __ASSERT(K_ASSERT_NULL, (var) == NULL)

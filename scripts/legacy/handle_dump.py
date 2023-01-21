@@ -4,8 +4,8 @@ import datetime
 import os
 import re
 
-from parse_ramdump import parse_ram
-from parse_coredump_bin import parse_core
+from scripts.legacy.parse_ramdump import parse_ram
+from scripts.legacy.parse_coredump_bin import parse_core
 
 # todo handle several ramdump in the same run
 

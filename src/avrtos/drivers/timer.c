@@ -282,7 +282,7 @@ struct timer_api_ctx {
 	uint8_t prescaler : 3U;
 };
 
-__attribute__((section(".bss"))) struct timer_api_ctx tim_ctx[TIMERS_COUNT];
+__bss struct timer_api_ctx tim_ctx[TIMERS_COUNT];
 
 #define __DECL_TIMER_COMPA_ISR(n)                                                        \
 	ISR(TIMER##n##_COMPA_vect)                                                       \

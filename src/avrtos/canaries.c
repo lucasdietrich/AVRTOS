@@ -15,6 +15,7 @@ void z_init_thread_stack_canaries(struct k_thread *th)
 	}
 }
 
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
@@ -26,6 +27,19 @@ void z_init_stacks_canaries(void)
 		z_init_thread_stack_canaries(thread);
 	}
 }
+void k_dump_stack_canaries(void)
+{
+	serial_transmit('\n');
+
+	for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
+		k_print_stack_canaries(&(&__k_threads_start)[i]);
+	}
+}
+#else
+void z_init_stacks_canaries(void)
+{
+}
+#endif
 
 void *z_stack_canaries(struct k_thread *th)
 {
@@ -67,13 +81,4 @@ void k_print_stack_canaries(struct k_thread *th)
 void k_print_current_canaries(void)
 {
 	k_print_stack_canaries(z_current);
-}
-
-void k_dump_stack_canaries(void)
-{
-	serial_transmit('\n');
-
-	for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
-		k_print_stack_canaries(&(&__k_threads_start)[i]);
-	}
 }

@@ -54,7 +54,8 @@
 		"flags.h": "c",
 		"logging.h": "c",
 		"iom2560.h": "c",
-		"iomxx0_1.h": "c"
+		"iomxx0_1.h": "c",
+		"typeinfo": "c"
 	},
 	"editor.rulers": [80]
 }

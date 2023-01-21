@@ -71,8 +71,8 @@ struct k_mem_slab {
 
 #define K_MEM_SLAB_DEFINE(slab_name, size, num_blocks)                                   \
 	uint8_t z_mem_slab_buf_##slab_name[(size) * (num_blocks)];                       \
-	__attribute__((used,                                                             \
-		       section(".k_mem_slabs"))) static struct k_mem_slab slab_name =    \
+	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                              \
+	static struct k_mem_slab slab_name =                                             \
 		K_MEM_SLAB_INIT(slab_name, z_mem_slab_buf_##slab_name, size, num_blocks)
 
 /*___________________________________________________________________________*/
@@ -96,6 +96,15 @@ K_NOINLINE int8_t k_mem_slab_init(struct k_mem_slab *slab,
 				  void *buffer,
 				  size_t block_size,
 				  uint8_t num_blocks);
+
+/**
+ * @brief Finalize the initialization of a memory slab when declared using
+ * K_MEM_SLAB_DEFINE and CONFIG_AVRTOS_KERNEL_SECTIONS is disabled.
+ *
+ * @param slab
+ * @return K_NOINLINE
+ */
+K_NOINLINE void z_mem_slab_finalize_init(struct k_mem_slab *slab);
 
 /**
  * @brief Allocate a memory block.

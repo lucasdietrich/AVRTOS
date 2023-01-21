@@ -267,8 +267,8 @@ z_thread_entry:
 #endif
 
 
-.global __k_interrupts
-__k_interrupts:
+.global z_interrupts
+z_interrupts:
     ldi r24, 0x00
     lds r25, SREG
     sbrc r25, SREG_I

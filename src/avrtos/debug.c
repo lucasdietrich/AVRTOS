@@ -41,6 +41,8 @@ uint16_t k_thread_usage(struct k_thread *th)
 	}
 }
 
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
+
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
@@ -50,6 +52,17 @@ void k_thread_dbg_count(void)
 	serial_u8(&__k_threads_end - &__k_threads_start);
 	serial_transmit('\n');
 }
+
+void k_thread_dump_all(void)
+{
+	serial_print_p(PSTR("===== k_thread =====\n"));
+
+	for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
+		k_thread_dump(&(&__k_threads_start)[i]);
+	}
+}
+
+#endif
 
 void k_thread_dump_hex(struct k_thread *th)
 {
@@ -99,15 +112,6 @@ void k_thread_dump(struct k_thread *th)
 	serial_print_p(PSTR(":0x"));
 	serial_hex16((uint16_t)th->stack.end);
 	serial_transmit('\n');
-}
-
-void k_thread_dump_all(void)
-{
-	serial_print_p(PSTR("===== k_thread =====\n"));
-
-	for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
-		k_thread_dump(&(&__k_threads_start)[i]);
-	}
 }
 
 void *z_thread_get_return_addr(struct k_thread *th)

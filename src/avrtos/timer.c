@@ -14,10 +14,11 @@
 
 #define K_MODULE K_MODULE_TIMER
 
+static struct titem *z_timers_runqueue = NULL;
+
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
 extern struct k_timer __k_timers_start;
 extern struct k_timer __k_timers_end;
-
-static struct titem *z_timers_runqueue = NULL;
 
 void z_timer_init_module(void)
 {
@@ -29,6 +30,11 @@ void z_timer_init_module(void)
 		}
 	}
 }
+#else
+void z_timer_init_module(void)
+{
+}
+#endif
 
 void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
 {
@@ -43,23 +49,19 @@ void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
 
 void z_timers_process(void)
 {
+	struct titem *item;
+	struct k_timer *timer;
+
 	__ASSERT_NOINTERRUPT();
 
 	tqueue_shift(&z_timers_runqueue, K_TIMERS_PERIOD_TICKS);
 
-	for (;;) {
-		struct titem *item = tqueue_pop(&z_timers_runqueue);
-		if (item != NULL) {
-			struct k_timer *timer = CONTAINER_OF(item, struct k_timer, tie);
-
-			timer->handler(timer);
-
-			timer->tie.next	   = NULL;
-			timer->tie.timeout = timer->timeout.value;
-			z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
-		} else {
-			return;
-		}
+	while (!!(item = tqueue_pop(&z_timers_runqueue))) {
+		timer = CONTAINER_OF(item, struct k_timer, tie);
+		timer->handler(timer);
+		timer->tie.next	   = NULL;
+		timer->tie.timeout = timer->timeout.value;
+		z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
 	}
 }
 

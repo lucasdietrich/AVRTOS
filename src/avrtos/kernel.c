@@ -26,7 +26,7 @@ void yield(void)
 /*___________________________________________________________________________*/
 
 #if CONFIG_KERNEL_THREAD_IDLE
-#define THREAD_IS_IDLE(_thread) (_thread == &z_idle)
+#define THREAD_IS_IDLE(_thread) (_thread == &z_thread_idle)
 #else
 #define THREAD_IS_IDLE(_thread) (0)
 #endif
@@ -102,7 +102,7 @@ union {
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
-extern struct k_thread z_idle;
+extern struct k_thread z_thread_idle;
 
 /**
  * @brief Schedule the thread to be executed.
@@ -222,7 +222,7 @@ static K_NOINLINE void z_suspend(void)
 		__fault(K_FAULT_KERNEL_HALT);
 #else
 		/* Switch to IDLE thread */
-		z_runq = &z_idle.tie.runqueue;
+		z_runq = &z_thread_idle.tie.runqueue;
 #endif
 	}
 
@@ -263,6 +263,25 @@ inline static void swap_endianness(void **addr)
 	*addr = (void *)HTONS(*addr);
 }
 
+static inline void z_thread_finalize_stack_init(struct k_thread *const thread)
+{
+	/* Swap endianness of addresses in compilation-time built
+	 * stacks. We cannot change the endianness of addresses
+	 * determined by the linker at compilation time. So we need to
+	 * do it here.
+	 */
+	struct z_callsaved_ctx *ctx = thread->stack.end - Z_CALLSAVED_CTX_SIZE + 1u;
+	swap_endianness(&ctx->thread_context);
+	swap_endianness((void *)&ctx->thread_entry);
+	swap_endianness(&ctx->pc);
+
+#if defined(__AVR_3_BYTE_PC__)
+	ctx->pch = 0;
+#endif /* __AVR_3_BYTE_PC__ */
+}
+
+extern void z_thread_idle_create(void);
+
 /**
  * @brief Initialize the runqueue with all threads ready to be executed.
  * Assume that the interrupt flag is cleared when called.
@@ -270,9 +289,13 @@ inline static void swap_endianness(void **addr)
 void z_kernel_init(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
+	z_thread_idle_create();
+
 	/* Mark idle thread */
-	z_idle.state = Z_IDLE;
+	z_thread_idle.state = Z_IDLE;
 #endif
+
+#if CONFIG_AVRTOS_LINKER_SCRIPT
 
 	/* main thread is the first running (ready or not),
 	 * and it is already in queue */
@@ -291,21 +314,9 @@ void z_kernel_init(void)
 			dlist_append(z_runq, &thread->tie.runqueue);
 		}
 
-		/* Swap endianness of addresses in compilation-time built
-		 * stacks. We cannot change the endianness of addresses
-		 * determined by the linker at compilation time. So we need to
-		 * do it here.
-		 */
-		struct z_callsaved_ctx *ctx =
-			thread->stack.end - Z_CALLSAVED_CTX_SIZE + 1u;
-		swap_endianness(&ctx->thread_context);
-		swap_endianness((void *)&ctx->thread_entry);
-		swap_endianness(&ctx->pc);
-
-#if defined(__AVR_3_BYTE_PC__)
-		ctx->pch = 0;
-#endif /* __AVR_3_BYTE_PC__ */
+		z_thread_finalize_stack_init(thread);
 	}
+#endif
 }
 
 /* If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the

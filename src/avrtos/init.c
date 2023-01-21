@@ -41,6 +41,7 @@ void z_avrtos_init(void)
 	k_set_stdio_usart0();
 
 	z_kernel_init();
+
 	z_mem_slab_init_module();
 
 #if CONFIG_KERNEL_TIMERS

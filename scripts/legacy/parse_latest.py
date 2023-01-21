@@ -1,8 +1,8 @@
 import glob
 import os
 
-from parse_coredump_hex import parse_core
-from parse_ramdump import parse_ram
+from scripts.legacy.parse_coredump_hex import parse_core
+from scripts.legacy.parse_ramdump import parse_ram
 
 list_of_files = glob.glob('../*.log') # * means all if need specific format then *.csv
 

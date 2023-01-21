@@ -21,6 +21,15 @@
 #define K_NOINLINE
 #endif
 
+#define CONFIG_AVRTOS_KERNEL_SECTIONS CONFIG_AVRTOS_LINKER_SCRIPT
+
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
+#define Z_LINK_KERNEL_SECTION(_section)                                                  \
+	__attribute__((used, section(Z_STRINGIFY(_section))))
+#else
+#define Z_LINK_KERNEL_SECTION(_section) __attribute__((used))
+#endif
+
 // in case of qemu emulator, check if the timer is available
 #if defined(__QEMU__) && (CONFIG_KERNEL_SYSLOCK_HW_TIMER != 1U)
 #warning "QEMU emulator detected, only timer 1 is supported (forced)"
@@ -180,8 +189,8 @@ typedef struct {
 
 #if CONFIG_THREAD_STACK_SENTINEL
 #define Z_STACK_SENTINEL_REGISTER(stack_symb)                                            \
-	__attribute__((used, section(".k_sentinels"))) void *z_sent_##stack_symb =       \
-		(void *)(&stack_symb)
+	Z_LINK_KERNEL_SECTION(.k_sentinels)                                              \
+	void *z_sent_##stack_symb = (void *)(&stack_symb)
 #else
 #define Z_STACK_SENTINEL_REGISTER(stack_symb)
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
@@ -240,7 +249,7 @@ typedef struct {
 #define Z_STACK_INIT_SP_FROM_NAME(name, stack_size)                                      \
 	Z_STACK_INIT_SP(Z_STACK_END(Z_THREAD_STACK_START(name), stack_size))
 
-#define K_THREAD __attribute__((used, section(".k_threads")))
+#define K_THREAD Z_LINK_KERNEL_SECTION(.k_threads)
 
 #define Z_THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
 #define Z_THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
@@ -295,17 +304,18 @@ typedef struct {
 			      .size = (stack_size)},                                     \
 		.symbol	   = sym}
 
+#if CONFIG_AVRTOS_KERNEL_SECTIONS
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD == 0u
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
 	__attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p);   \
-	__attribute__((used, section(".k_threads")))                                     \
+	Z_LINK_KERNEL_SECTION(.k_threads)                                                \
 	Z_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol);                       \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name);
 
 #define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)               \
 	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p);       \
-	__attribute__((used, section(".k_threads")))                                     \
+	Z_LINK_KERNEL_SECTION(.k_threads)                                                \
 	Z_THREAD_INITIALIZER(name, Z_CALLSAVED_CTX_SIZE, prio_flag, symbol);             \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name);
 
@@ -321,6 +331,7 @@ typedef struct {
 			"K_THREAD_DEFINE is not supported when "                         \
 			"CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD is enabled");
 
+#endif
 #endif
 
 /*___________________________________________________________________________*/

@@ -24,6 +24,29 @@
 //
 
 //
+// Tells whether AVRTOS linker script was provided, so that kernel sections can
+//  be used to reference and initialize kernel objects during RTOS initialization.
+//
+// Note: If disabled,  All kernel objects must be initialized manually.
+// - K_THREAD_DEFINE() is disabled and must be replaced by K_THREAD_DEFINE_STATIC()
+// and should be initialized manually using k_thread_static_create_and_schedule()
+// - Following macros are still usable but manual initialization should be performed
+// K_TIMER_DEFINE(), K_MEM_SLAB_DEFINE()
+// - Disables functions: k_dump_stack_canaries(), k_thread_dump_all()
+//
+// Note: Arduino framework requires this option to be disabled, because it is not
+// possible to provide a custom linker script.
+//
+// 0: AVRTOS Linker script is not provided. Do not use kernel sections. Kernel
+// objects must be initialized manually.
+// 1: AVRTOS Linker script is provided. Use kernel sections. Kernel objects are
+// initialized automatically.
+//
+#ifndef CONFIG_AVRTOS_LINKER_SCRIPT
+#define CONFIG_AVRTOS_LINKER_SCRIPT 1u
+#endif
+
+//
 // Define the main thread type (coop/prempt) and priority
 //
 // 0: Main thread is preemptive
@@ -41,7 +64,7 @@
 // 2: Interrupts are enabled but scheduler is locked
 //
 #ifndef CONFIG_INTERRUPT_POLICY
-#define CONFIG_INTERRUPT_POLICY 0
+#define CONFIG_INTERRUPT_POLICY 1
 #endif
 
 //
@@ -529,7 +552,7 @@
 #endif
 
 //
-//  Enable Kernel debug for function, that set some of them noinline
+//  Force inlining of kernel functions, reserved for debug purpose
 //
 // 0: Kernel function inlining is disabled
 // 1: Kernel function inlining is enabled

@@ -17,40 +17,47 @@ extern bool z_runqueue_single(void);
 
 #if CONFIG_KERNEL_THREAD_IDLE
 
-static void z_idle_entry(void *context);
+static void z_thread_idle_entry(void *context);
 
 #if defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE != 0)
 #warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
 #endif
 
-/*
- * Z_THREAD_STACK_MIN_SIZE would be enough
- */
 #if CONFIG_THREAD_IDLE_COOPERATIVE
-
-/* TODO, cannot exaplin why it needs 22B instead of 21B ??? */
-/* 2B yield+ 19B ctx + ? slight overflow due to scheduler + tqueue/duqueue
- * function ?*/
-
-// K_THREAD_MINIMAL_DEFINE(z_idle, z_idle_entry, K_COOPERATIVE, NULL, 'I');
-K_THREAD_DEFINE(z_idle,
-		z_idle_entry,
-		Z_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
-		K_COOPERATIVE | Z_FLAG_PRIO_LOW,
-		NULL,
-		'I');
+/* Z_THREAD_STACK_MIN_SIZE without interrupts */
+#define Z_THREAD_IDLE_STACK_SIZE                                                         \
+	(Z_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
+#define Z_THREAD_IDLE_PRIORITY (K_COOPERATIVE | Z_FLAG_PRIO_LOW)
 #else
+/* If IDLE thread can be preempted, plan additionnal stack */
+#define Z_THREAD_IDLE_STACK_SIZE                                                         \
+	(Z_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
+#define Z_THREAD_IDLE_PRIORITY (K_PREEMPTIVE | Z_FLAG_PRIO_LOW)
+#endif
 
-/**
- * @brief If IDLE thread can be preempted, plan additionnal stack
- */
-K_THREAD_DEFINE(z_idle,
-		z_idle_entry,
-		Z_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE +
-			CONFIG_KERNEL_THREAD_IDLE_ADD_STACK,
-		K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
+#if CONFIG_AVRTOS_LINKER_SCRIPT
+K_THREAD_DEFINE(z_thread_idle,
+		z_thread_idle_entry,
+		Z_THREAD_IDLE_STACK_SIZE,
+		Z_THREAD_IDLE_PRIORITY,
 		NULL,
 		'I');
+void z_thread_idle_create(void)
+{
+}
+#else
+__noinit uint8_t z_thread_idle_stack[Z_THREAD_IDLE_STACK_SIZE];
+__noinit struct k_thread z_thread_idle;
+void z_thread_idle_create(void)
+{
+	k_thread_create(&z_thread_idle,
+			z_thread_idle_entry,
+			z_thread_idle_stack,
+			Z_THREAD_IDLE_STACK_SIZE,
+			Z_THREAD_IDLE_PRIORITY,
+			NULL,
+			'I');
+}
 #endif
 
 /**
@@ -58,7 +65,7 @@ K_THREAD_DEFINE(z_idle,
  *
  * @param context : ignored for now
  */
-static void z_idle_entry(void *context)
+static void z_thread_idle_entry(void *context)
 {
 	for (;;) {
 #if CONFIG_THREAD_IDLE_COOPERATIVE

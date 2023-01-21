@@ -15,7 +15,7 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
-extern bool __k_interrupts(void);
+extern bool z_interrupts(void);
 
 /*___________________________________________________________________________*/
 
@@ -145,7 +145,7 @@ K_NOINLINE bool k_cur_is_coop(void);
  * @param __s
  * @return __inline__
  */
-static __inline__ void __k_sched_restore(const uint8_t *__s)
+static __inline__ void z_sched_restore(const uint8_t *__s)
 {
 	k_sched_unlock();
 	__asm__ volatile("" ::: "memory");
@@ -157,7 +157,7 @@ static __inline__ void __k_sched_restore(const uint8_t *__s)
  *
  * @return __inline__
  */
-static __inline__ uint8_t __k_sched_lock_ret(void)
+static __inline__ uint8_t z_sched_lock_ret(void)
 {
 	k_sched_lock();
 
@@ -174,8 +174,8 @@ static __inline__ uint8_t __k_sched_lock_ret(void)
  *    ATOMIC_BLOCK(ATOMIC_FORCEON) { } macro from <avr/atomic.h>
  */
 #define K_SCHED_LOCK_CONTEXT                                                             \
-	for (uint8_t __k_schedl_x __attribute__((__cleanup__(__k_sched_restore))) = 0u,  \
-				  __k_todo = __k_sched_lock_ret();                       \
+	for (uint8_t __k_schedl_x __attribute__((__cleanup__(z_sched_restore))) = 0u,    \
+				  __k_todo = z_sched_lock_ret();                         \
 	     __k_todo;                                                                   \
 	     __k_todo = 0)
 

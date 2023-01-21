@@ -39,19 +39,15 @@ int main(void)
 
 void waiter(void *context)
 {
-	char buffer[128];
-
 	printf_P(PSTR("Press any key: "));
 
-	k_sleep(K_SECONDS(5));
+	k_sleep(K_SECONDS(1));
 
 	for (;;) {
 		int8_t err = k_poll_signal(&sig, K_SECONDS(3));
-		sprintf(buffer, "k_poll_signal returned err = %d\n", err);
-		serial_print(buffer);
+		printf("k_poll_signal returned err = %d\n", err);
 		if (err == 0) {
-			sprintf(buffer, "signal value = %d\n", sig.signal);
-			serial_print(buffer);
+			printf("signal value = %d\n", sig.signal);
 
 			sig.flags = K_POLL_STATE_NOT_READY;
 		}
