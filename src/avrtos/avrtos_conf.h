@@ -47,6 +47,16 @@
 #endif
 
 //
+// Tells whether the kernel is compiled for Arduino framework
+//
+// 0: Kernel is not compiled for Arduino framework
+// 1: Kernel is compiled for Arduino framework
+//
+#ifndef CONFIG_ARDUINO
+#define CONFIG_ARDUINO 0u
+#endif
+
+//
 // Define the main thread type (coop/prempt) and priority
 //
 // 0: Main thread is preemptive
