@@ -224,15 +224,15 @@ typedef struct {
 // - in asm files types are not understood by compiler
 #define K_STACK_END(stack_start, size) (uint8_t *)((uint8_t *)(stack_start) + (size)-1)
 #define K_STACK_START(stack_end, size) (uint8_t *)((uint8_t *)(stack_end) - (size) + 1)
-#define K_THREAD_STACK_START(th)       K_STACK_START(th->stack.end, th->stack.size)
-#define K_THREAD_STACK_END(th)	       (th->stack.end)
+#define K_THREAD_STACK_START(thread)   K_STACK_START(thread->stack.end, thread->stack.size)
+#define K_THREAD_STACK_END(thread)     (thread->stack.end)
 
 /* real stack start and size without counting sentinel */
 #define Z_STACK_START_USABLE(stack_end, size)                                            \
 	(K_STACK_START(stack_end, size) + CONFIG_THREAD_STACK_SENTINEL_SIZE)
 #define Z_STACK_SIZE_USABLE(size) (size - CONFIG_THREAD_STACK_SENTINEL_SIZE)
-#define Z_THREAD_STACK_START_USABLE(th)                                                  \
-	Z_STACK_START_USABLE(th->stack.end, th->stack.size)
+#define Z_THREAD_STACK_START_USABLE(thread)                                              \
+	Z_STACK_START_USABLE(thread->stack.end, thread->stack.size)
 
 #define Z_STACK_END(stack_start, size) ((stack_start) + (size)-1)
 

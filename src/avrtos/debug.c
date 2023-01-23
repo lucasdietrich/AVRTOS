@@ -22,22 +22,22 @@ extern struct titem *z_events_queue;
 
 /*___________________________________________________________________________*/
 
-uint16_t k_thread_usage(struct k_thread *th)
+uint16_t k_thread_usage(struct k_thread *thread)
 {
-	if (NULL == th->sp) {
+	if (NULL == thread->sp) {
 		return 0u;
-	} else if (th == z_current) {
+	} else if (thread == z_current) {
 		// stack pointer refers to the first empty addr (from end)
-		// empty stack : th->stack.end == th->sp
+		// empty stack : thread->stack.end == thread->sp
 		uint16_t sp;
 		const uint8_t lock = irq_lock();
 		sp		   = SP;
 		irq_unlock(lock);
-		return ((uint16_t)th->stack.end) - sp;
+		return ((uint16_t)thread->stack.end) - sp;
 	} else {
 		// stack pointer points to the top of the stack
-		// empty stack : th->stack.end == th->sp
-		return ((uint16_t)th->stack.end) - ((uint16_t)th->sp);
+		// empty stack : thread->stack.end == thread->sp
+		return ((uint16_t)thread->stack.end) - ((uint16_t)thread->sp);
 	}
 }
 
@@ -64,20 +64,20 @@ void k_thread_dump_all(void)
 
 #endif
 
-void k_thread_dump_hex(struct k_thread *th)
+void k_thread_dump_hex(struct k_thread *thread)
 {
-	serial_send_hex((const uint8_t *)th, sizeof(struct k_thread));
+	serial_send_hex((const uint8_t *)thread, sizeof(struct k_thread));
 }
 
-void k_thread_dump(struct k_thread *th)
+void k_thread_dump(struct k_thread *thread)
 {
-	serial_transmit(th->symbol);
+	serial_transmit(thread->symbol);
 	serial_print_p(PSTR(" 0x"));
-	serial_hex16((const uint16_t)th);
+	serial_hex16((const uint16_t)thread);
 
 	serial_transmit(' ');
 
-	switch (th->state) {
+	switch (thread->state) {
 	case Z_READY:
 		serial_print_p(PSTR("READY  "));
 		break;
@@ -87,7 +87,7 @@ void k_thread_dump(struct k_thread *th)
 	case Z_PENDING:
 		serial_print_p(PSTR("PENDING"));
 		break;
-	case Z_IDLE:
+	case Z_IDLE_THREAD:
 		serial_print_p(PSTR("IDLE   "));
 		break;
 	default:
@@ -96,29 +96,29 @@ void k_thread_dump(struct k_thread *th)
 
 	serial_transmit(' ');
 
-	serial_transmit((th->flags & Z_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
+	serial_transmit((thread->flags & Z_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
 	serial_transmit(' ');
-	serial_transmit((th->flags & Z_MASK_PRIO) == Z_FLAG_PRIO_HIGH ? '0' : '1');
+	serial_transmit((thread->flags & Z_MASK_PRIO) == Z_FLAG_PRIO_HIGH ? '0' : '1');
 	serial_transmit(' ');
-	serial_transmit(th->sched_lock ? 'S' : '_');
-	serial_transmit(th->timer_expired ? 'X' : '_');
-	serial_transmit(th->pend_canceled ? 'Y' : '_');
-	serial_transmit(th->wakeup_schd ? 'W' : '_');
+	serial_transmit(thread->sched_lock ? 'S' : '_');
+	serial_transmit(thread->timer_expired ? 'X' : '_');
+	serial_transmit(thread->pend_canceled ? 'Y' : '_');
+	serial_transmit(thread->wakeup_schd ? 'W' : '_');
 
 	serial_print_p(PSTR(" : SP "));
-	serial_u16(k_thread_usage(th));
+	serial_u16(k_thread_usage(thread));
 	serial_transmit('/');
-	serial_u16(th->stack.size);
+	serial_u16(thread->stack.size);
 	serial_print_p(PSTR(":0x"));
-	serial_hex16((uint16_t)th->stack.end);
+	serial_hex16((uint16_t)thread->stack.end);
 	serial_transmit('\n');
 }
 
-void *z_thread_get_return_addr(struct k_thread *th)
+void *z_thread_get_return_addr(struct k_thread *thread)
 {
-	if (th == z_current) {
+	if (thread == z_current) {
 		uint16_t return_addr_reverted =
-			*((uint16_t *)((uint16_t)th->stack.end - 2u));
+			*((uint16_t *)((uint16_t)thread->stack.end - 2u));
 
 		return (void *)K_SWAP_ENDIANNESS(return_addr_reverted);
 	}

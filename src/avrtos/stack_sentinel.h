@@ -26,23 +26,23 @@ K_NOINLINE void z_init_stacks_sentinel(void);
 /**
  * @brief Initialize stack sentinel byte(s) for specified thread.
  *
- * @param th
+ * @param thread
  */
-void z_init_thread_stack_sentinel(struct k_thread *th);
+void z_init_thread_stack_sentinel(struct k_thread *thread);
 
 /**
  * @brief Verify if stack sentinel byte(s) is(are) still intact.
  *
- * @param th
+ * @param thread
  * @return true
  * @return false
  */
-bool k_verify_stack_sentinel(struct k_thread *th);
+bool k_verify_stack_sentinel(struct k_thread *thread);
 
 /**
  * @brief Check all registered stack sentinel bytes and fault on error.
  *
- * @param th
+ * @param thread
  * @return true
  * @return false
  */

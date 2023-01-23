@@ -219,34 +219,24 @@ void k_block(k_timeout_t timeout);
 
 /*___________________________________________________________________________*/
 
-//
-// Not tested
-//
-
 /**
- * @brief Stop the execution of the current thread until it is resumed with
- * function k_resume.
- */
-K_NOINLINE void k_suspend(void);
-
-/**
- * @brief Resume suspended thread.
+ * @brief Start the execution the given thread.
  *
- * @param th : suspended thread to resume.
+ * @param thread : stopped thread to start.
  */
-K_NOINLINE void k_resume(struct k_thread *th);
+K_NOINLINE int8_t k_thread_start(struct k_thread *thread);
 
 /**
- * @brief Start the thread
+ * @brief Stop the execution of the current thread.
  *
- * @param th : stopped thread to start.
+ * @param thread : started thread to stop.
  */
-K_NOINLINE void k_thread_start(struct k_thread *th);
+K_NOINLINE int8_t k_thread_stop(struct k_thread *thread);
 
 /**
- * @brief Stop the thread
+ * @brief Stop current thread
  *
- * @param th : ready/pending thread to start.
+ * @param thread : ready/pending thread to start.
  */
 K_NOINLINE void k_stop(void);
 

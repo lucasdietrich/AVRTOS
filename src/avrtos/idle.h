@@ -19,6 +19,11 @@ extern "C" {
 /*___________________________________________________________________________*/
 
 /**
+ * @brief Idle thread structure
+ */
+extern struct k_thread z_thread_idle;
+
+/**
  * @brief Tells if the runqueue contains the thread IDLE
  *
  * @return true

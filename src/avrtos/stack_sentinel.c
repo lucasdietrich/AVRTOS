@@ -11,15 +11,15 @@
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 
-void z_init_thread_stack_sentinel(struct k_thread *th)
+void z_init_thread_stack_sentinel(struct k_thread *thread)
 {
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 0
-	if (th == &z_thread_main) {
+	if (thread == &z_thread_main) {
 		return;
 	}
 #endif
 
-	uint8_t *const stack = K_STACK_START(th->stack.end, th->stack.size);
+	uint8_t *const stack = K_STACK_START(thread->stack.end, thread->stack.size);
 	for (uint8_t *addr = stack; addr < stack + CONFIG_THREAD_STACK_SENTINEL_SIZE;
 	     addr++) {
 		*addr = CONFIG_THREAD_STACK_SENTINEL_SYMBOL;
@@ -35,21 +35,21 @@ void z_init_stacks_sentinel(void)
 }
 #else
 
-void z_init_thread_stack_sentinel(struct k_thread *th)
+void z_init_thread_stack_sentinel(struct k_thread *thread)
 {
 }
 
 #endif
 
-bool k_verify_stack_sentinel(struct k_thread *th)
+bool k_verify_stack_sentinel(struct k_thread *thread)
 {
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 0
-	if (th == &z_thread_main) {
+	if (thread == &z_thread_main) {
 		return true;
 	}
 #endif
 
-	uint8_t *const stack_sent = K_STACK_START(th->stack.end, th->stack.size);
+	uint8_t *const stack_sent = K_STACK_START(thread->stack.end, thread->stack.size);
 	for (uint8_t *addr = stack_sent;
 	     addr < stack_sent + CONFIG_THREAD_STACK_SENTINEL_SIZE;
 	     addr++) {

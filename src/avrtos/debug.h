@@ -20,51 +20,51 @@ extern "C" {
 // Kernel Debug Macros
 //
 
-#define __K_DBG_HELPER_TH(th, chr)                                                       \
+#define __K_DBG_HELPER_TH(thread, chr)                                                   \
 	serial_transmit(chr);                                                            \
-	serial_transmit(th->symbol)
+	serial_transmit(thread->symbol)
 
-#define __K_DBG_HELPER_TH_R(th, chr)                                                     \
-	serial_transmit(th->symbol);                                                     \
+#define __K_DBG_HELPER_TH_R(thread, chr)                                                 \
+	serial_transmit(thread->symbol);                                                 \
 	serial_transmit(chr)
 
 #if CONFIG_KERNEL_SCHEDULER_DEBUG
 
-#define __K_DBG_SCHED_LOCK(th)	    __K_DBG_HELPER_TH(th, '[')
-#define __K_DBG_SCHED_UNLOCK()	    serial_transmit(']')
-#define __K_DBG_SCHED_EVENT(th)	    __K_DBG_HELPER_TH(th, '!')
-#define __K_DBG_SCHED_SUSPENDED(th) serial_transmit('~')
-#define __K_DBG_SCHED_NEXT_THREAD() serial_transmit('>')
-#define __K_DBG_SCHED_SKIP_IDLE()   serial_print_p(PSTR("p"))
-#define __K_DBG_SCHED_NEXT(th)	    serial_transmit(th->symbol)
-#define __K_DBG_WAKEUP(th)	    __K_DBG_HELPER_TH(th, '@')
+#define __K_DBG_SCHED_LOCK(thread)	__K_DBG_HELPER_TH(thread, '[')
+#define __K_DBG_SCHED_UNLOCK()		serial_transmit(']')
+#define __K_DBG_SCHED_EVENT(thread)	__K_DBG_HELPER_TH(thread, '!')
+#define __K_DBG_SCHED_SUSPENDED(thread) serial_transmit('~')
+#define __K_DBG_SCHED_NEXT_THREAD()	serial_transmit('>')
+#define __K_DBG_SCHED_SKIP_IDLE()	serial_print_p(PSTR("p"))
+#define __K_DBG_SCHED_NEXT(thread)	serial_transmit(thread->symbol)
+#define __K_DBG_WAKEUP(thread)		__K_DBG_HELPER_TH(thread, '@')
 
-#define __K_DBG_MUTEX_LOCKED(th)   __K_DBG_HELPER_TH(th, '}')
-#define __K_DBG_MUTEX_UNLOCKED(th) __K_DBG_HELPER_TH_R(th, '{')
-#define __K_DBG_MUTEX_WAIT(th)	   __K_DBG_HELPER_TH(th, '#')
+#define __K_DBG_MUTEX_LOCKED(thread)   __K_DBG_HELPER_TH(thread, '}')
+#define __K_DBG_MUTEX_UNLOCKED(thread) __K_DBG_HELPER_TH_R(thread, '{')
+#define __K_DBG_MUTEX_WAIT(thread)     __K_DBG_HELPER_TH(thread, '#')
 
-#define __K_DBG_SEM_TAKE(th) __K_DBG_HELPER_TH(th, ')')
-#define __K_DBG_SEM_GIVE(th) __K_DBG_HELPER_TH_R(th, '(')
-#define __K_DBG_SEM_WAIT(th) __K_DBG_HELPER_TH(th, '$')
+#define __K_DBG_SEM_TAKE(thread) __K_DBG_HELPER_TH(thread, ')')
+#define __K_DBG_SEM_GIVE(thread) __K_DBG_HELPER_TH_R(thread, '(')
+#define __K_DBG_SEM_WAIT(thread) __K_DBG_HELPER_TH(thread, '$')
 
 #else
 
-#define __K_DBG_SCHED_LOCK(th)
+#define __K_DBG_SCHED_LOCK(thread)
 #define __K_DBG_SCHED_UNLOCK()
-#define __K_DBG_SCHED_EVENT(th)
-#define __K_DBG_SCHED_SUSPENDED(th)
+#define __K_DBG_SCHED_EVENT(thread)
+#define __K_DBG_SCHED_SUSPENDED(thread)
 #define __K_DBG_SCHED_NEXT_THREAD()
 #define __K_DBG_SCHED_SKIP_IDLE()
-#define __K_DBG_SCHED_NEXT(th)
-#define __K_DBG_WAKEUP(th)
+#define __K_DBG_SCHED_NEXT(thread)
+#define __K_DBG_WAKEUP(thread)
 
-#define __K_DBG_MUTEX_LOCKED(th)
-#define __K_DBG_MUTEX_UNLOCKED(th)
-#define __K_DBG_MUTEX_WAIT(th)
+#define __K_DBG_MUTEX_LOCKED(thread)
+#define __K_DBG_MUTEX_UNLOCKED(thread)
+#define __K_DBG_MUTEX_WAIT(thread)
 
-#define __K_DBG_SEM_TAKE(th)
-#define __K_DBG_SEM_GIVE(th)
-#define __K_DBG_SEM_WAIT(th)
+#define __K_DBG_SEM_TAKE(thread)
+#define __K_DBG_SEM_GIVE(thread)
+#define __K_DBG_SEM_WAIT(thread)
 
 #endif
 
@@ -76,10 +76,10 @@ extern "C" {
  * Getting the stack usage of the main thread if
  * CONFIG_THREAD_EXPLICIT_MAIN_STACK is not set will return 0 by default :
  *
- * @param th
+ * @param thread
  * @return uint16_t
  */
-uint16_t k_thread_usage(struct k_thread *th);
+uint16_t k_thread_usage(struct k_thread *thread);
 
 /**
  * @brief Print the current number of threads
@@ -89,9 +89,9 @@ void k_thread_dbg_count(void);
 /**
  * @brief Dump the thread structure content as hexadecimal
  *
- * @param th
+ * @param thread
  */
-void k_thread_dump_hex(struct k_thread *th);
+void k_thread_dump_hex(struct k_thread *thread);
 
 /**
  * @brief Pretty print the thread structure content :
@@ -101,9 +101,9 @@ void k_thread_dump_hex(struct k_thread *th);
  * e.g:
  * M 0614 [PREE 0] RUNNING : SP 0/512 -| END @0856
  *
- * @param th
+ * @param thread
  */
-void k_thread_dump(struct k_thread *th);
+void k_thread_dump(struct k_thread *thread);
 
 /**
  * @brief Pretty print all threads contains
@@ -120,10 +120,10 @@ void k_thread_dump_all(void);
  *
  * @warning NOT TESTED
  *
- * @param th
+ * @param thread
  * @return void*
  */
-void *z_thread_get_return_addr(struct k_thread *th);
+void *z_thread_get_return_addr(struct k_thread *thread);
 
 /**
  * @brief Copy in buffer the 32 registers (stored in stack) of a suspended
@@ -139,12 +139,12 @@ void *z_thread_get_return_addr(struct k_thread *th);
  *
  * @warning NOT TESTED
  *
- * @param th
+ * @param thread
  * @param buffer
  * @param size
  * @return int
  */
-// int k_thread_copy_registers(struct k_thread *th, uint8_t * buffer, const
+// int k_thread_copy_registers(struct k_thread *thread, uint8_t * buffer, const
 // size_t size);
 
 /*___________________________________________________________________________*/
@@ -170,9 +170,9 @@ uint16_t z_read_ra(void);
 /**
  * @brief Set the stack pointer object
  *
- * @param th
+ * @param thread
  */
-void z_set_stack_pointer(struct k_thread *th);
+void z_set_stack_pointer(struct k_thread *thread);
 
 /**
  * @brief Read SREG register

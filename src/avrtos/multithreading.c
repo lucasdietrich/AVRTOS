@@ -64,11 +64,11 @@ struct k_thread *z_current = &z_thread_main;
 
 /*___________________________________________________________________________*/
 
-static void z_thread_stack_create(struct k_thread *const th,
+static void z_thread_stack_create(struct k_thread *const thread,
 				  thread_entry_t entry,
 				  void *const context_p)
 {
-	struct z_callsaved_ctx *const ctx = Z_THREAD_CTX_START(th->stack.end);
+	struct z_callsaved_ctx *const ctx = Z_THREAD_CTX_START(thread->stack.end);
 
 	/* initialize unused registers with default value */
 	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
@@ -86,15 +86,15 @@ static void z_thread_stack_create(struct k_thread *const th,
 #endif
 
 	/* save SP in thread structure */
-	th->sp = ctx;
+	thread->sp = ctx;
 
 	/* adjust pointer to the top of the stack */
-	th->sp--;
+	thread->sp--;
 }
 
 #include "misc/serial.h"
 
-int k_thread_create(struct k_thread *const th,
+int k_thread_create(struct k_thread *const thread,
 		    thread_entry_t entry,
 		    void *const stack,
 		    const size_t stack_size,
@@ -106,25 +106,25 @@ int k_thread_create(struct k_thread *const th,
 		return -1;
 	}
 
-	th->stack.end  = (void *)Z_STACK_END(stack, stack_size);
-	th->stack.size = stack_size;
+	thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
+	thread->stack.size = stack_size;
 
-	z_thread_stack_create(th, entry, context_p);
+	z_thread_stack_create(thread, entry, context_p);
 
 #if CONFIG_THREAD_STACK_SENTINEL
-	z_init_thread_stack_sentinel(th);
+	z_init_thread_stack_sentinel(thread);
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
 
 #if CONFIG_THREAD_CANARIES
-	z_init_thread_stack_canaries(th);
+	z_init_thread_stack_canaries(thread);
 #endif /* CONFIG_THREAD_CANARIES */
 
 	/* clear internal flags */
-	th->flags     = 0;
-	th->state     = Z_STOPPED;
-	th->symbol    = symbol;
-	th->swap_data = NULL;
-	th->state     = prio & Z_MASK_PRIO;
+	thread->flags	  = 0;
+	thread->state	  = Z_STOPPED;
+	thread->symbol	  = symbol;
+	thread->swap_data = NULL;
+	thread->state	  = prio & Z_MASK_PRIO;
 
 	return 0;
 }

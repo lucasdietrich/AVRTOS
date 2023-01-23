@@ -87,8 +87,10 @@ extern bool z_interrupts(void);
 
 #define __ASSERT_LEASTONE_RUNNING()                                                      \
 	__ASSERT(K_ASSERT_LEASTONE_RUNNING, k_ready_count() != 0u)
-#define __ASSERT_THREAD_STATE(th, th_state)                                              \
-	__ASSERT(K_ASSERT_THREAD_STATE, th->state == th_state)
+#define __ASSERT_THREAD_STATE(thread, th_state)                                          \
+	__ASSERT(K_ASSERT_THREAD_STATE, thread->state == th_state)
+#define __ASSERT_THREAD_NOT_STATE(thread, th_state)                                      \
+	__ASSERT(K_ASSERT_THREAD_STATE, thread->state != th_state)
 
 #define __ASSERT_PREEMPTIVE()	__ASSERT(K_ASSERT_PREEMPTIVE, k_cur_is_preempt())
 #define __ASSERT_COOPERATIVE()	__ASSERT(K_ASSERT_COOPERATIVE, k_cur_is_coop())

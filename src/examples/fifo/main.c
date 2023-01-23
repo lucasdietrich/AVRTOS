@@ -17,8 +17,9 @@
 
 /*___________________________________________________________________________*/
 
-k_timeout_t timeouts[2] = {
+k_timeout_t timeouts[] = {
 	K_FOREVER, // K_MSEC(2000)
+	K_FOREVER, // K_MSEC(1500)
 	K_FOREVER, // K_MSEC(1500)
 };
 
@@ -27,6 +28,7 @@ void consumer_thread(k_timeout_t *p_timeout);
 K_FIFO_DEFINE(fifo);
 K_THREAD_DEFINE(consumer1, consumer_thread, 0x50, K_PREEMPTIVE, &timeouts[0], 'A');
 K_THREAD_DEFINE(consumer2, consumer_thread, 0x50, K_PREEMPTIVE, &timeouts[1], 'B');
+K_THREAD_DEFINE(consumer3, consumer_thread, 0x50, K_PREEMPTIVE, &timeouts[2], 'C');
 
 /*___________________________________________________________________________*/
 
@@ -59,7 +61,7 @@ int main(void)
 
 		pos = (pos + 1) % ARRAY_SIZE(letters);
 
-		k_sleep(K_SECONDS(3));
+		k_sleep(K_MSEC(500u));
 	}
 }
 

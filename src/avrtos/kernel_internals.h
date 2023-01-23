@@ -63,10 +63,36 @@ K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
 K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
 						    void *set_swap_data);
 
+/**
+ * @brief Cancel the first pending thread on a waitqueue.
+ * 
+ * Raise "pend_canceled" flag on the thread, any wait function will return
+ * with -ECANCELED.
+ * 
+ * @param waitqueue 
+ * @return K_NOINLINE 
+ */
 K_NOINLINE void z_cancel_first_pending(struct dnode *waitqueue);
 
+/**
+ * @brief Cancel all pending threads on a waitqueue.
+ * 
+ * Raise "pend_canceled" flag on the thread, any wait function will return
+ * with -ECANCELED.
+ * 
+ * @param waitqueue 
+ * @return K_NOINLINE 
+ */
 K_NOINLINE uint8_t z_cancel_all_pending(struct dnode *waitqueue);
 
-K_NOINLINE void z_wake_up(struct k_thread *th);
+/**
+ * @brief Wake up a thread.
+ * 
+ * Cancel scheduled wake up if any and add the thread to the runqueue.
+ * 
+ * @param thread 
+ * @return K_NOINLINE 
+ */
+K_NOINLINE void z_wake_up(struct k_thread *thread);
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

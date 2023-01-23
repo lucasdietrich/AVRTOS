@@ -21,10 +21,10 @@ ISR(USART0_RX_vect)
 
 void thread(void *arg)
 {
+	char chr;
 	uint32_t rcvd = 0u;
 	for (;;) {
-		const int chr = k_ring_pop(&ring);
-		if (chr >= 0) {
+		if (k_ring_pop(&ring, &chr) == 0) {
 			rcvd++;
 
 			// ll_usart_sync_putc(USART0_DEVICE, chr);

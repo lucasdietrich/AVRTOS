@@ -18,9 +18,9 @@ extern "C" {
 /**
  * @brief Initialize canaries in thread stack.
  *
- * @param th
+ * @param thread
  */
-void z_init_thread_stack_canaries(struct k_thread *th);
+void z_init_thread_stack_canaries(struct k_thread *thread);
 
 /**
  * @brief Automatically initialize thread canaries in stack
@@ -34,22 +34,22 @@ K_NOINLINE void z_init_stacks_canaries(void);
 
 /**
  * @brief Get the address of the furthest stack location used by the thread.
- * i.e. We loop until we found canaries for the thread {th}.
+ * i.e. We loop until we found canaries for the thread {thread}.
  *
- * @param th
+ * @param thread
  * @return void* Address of byte following the last found canary.
  * (Address of the furthest stack location used by the thread.)
  */
-void *z_stack_canaries(struct k_thread *th);
+void *z_stack_canaries(struct k_thread *thread);
 
 /*___________________________________________________________________________*/
 
 /**
- * @brief Pretty print found canaries in thread {th}
+ * @brief Pretty print found canaries in thread {thread}
  *
- * @param th thread to check
+ * @param thread thread to check
  */
-void k_print_stack_canaries(struct k_thread *th);
+void k_print_stack_canaries(struct k_thread *thread);
 
 /**
  * @brief Pretty print found canaries in the current thread

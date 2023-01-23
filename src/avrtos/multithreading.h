@@ -40,7 +40,7 @@ typedef void (*thread_entry_t)(void *);
  */
 enum thread_state_t {
 	/* the thread is not running and is not in the runqueue,
-	 * it can be resumed/started with k_resume/k_thread_start functions.
+	 * it can be stopped/started with k_thread_stop/k_thread_start functions.
 	 */
 	Z_STOPPED = 0,
 
@@ -58,7 +58,7 @@ enum thread_state_t {
 	 * it is used to know whether the thread being evaluated is the IDLE
 	 * thread
 	 */
-	Z_IDLE = 3
+	Z_IDLE_THREAD = 3
 };
 
 /* size 19B */
@@ -262,7 +262,7 @@ extern struct k_thread *z_current;
 /**
  * @brief Define a new thread at runtime and initialize its stack
  *
- * @param th hread structure pointer
+ * @param thread hread structure pointer
  * @param entry thread entry function
  * @param stack thread stack start location
  * @param stack_size thread stack size
@@ -271,7 +271,7 @@ extern struct k_thread *z_current;
  * @param symbol thread symbol letter
  * @return int 0 on success
  */
-int k_thread_create(struct k_thread *const th,
+int k_thread_create(struct k_thread *const thread,
 		    thread_entry_t entry,
 		    void *const stack,
 		    const size_t stack_size,

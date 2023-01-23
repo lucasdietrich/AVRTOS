@@ -1,6 +1,6 @@
 #include "ring.h"
 
-int k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
+int8_t k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
 {
 	ring->buffer = buffer;
 	ring->size   = size;
@@ -10,24 +10,30 @@ int k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
 	return 0;
 }
 
-int k_ring_push(struct k_ring *ring, char data)
+int8_t k_ring_push(struct k_ring *ring, char data)
 {
-	const uint8_t r = ring->r;
-	uint8_t w	= ring->w + 1u;
+	const uint8_t r	  = ring->r;
+	uint8_t w	  = ring->w;
+	const uint8_t rem = ring->size - (w - r) - 1u;
 
-	if (w == r) {
+	if (!rem) {
 		return -EAGAIN;
-	} else if (w == ring->size) {
-		w = 0u;
 	}
 
 	ring->buffer[w] = data;
-	ring->w		= w;
+
+	w++;
+
+	if (w == ring->size) {
+		w = 0u;
+	}
+
+	ring->w = w;
 
 	return 0;
 }
 
-int k_ring_pop(struct k_ring *ring)
+int8_t k_ring_pop(struct k_ring *ring, char *data)
 {
 	const uint8_t w = ring->w;
 	uint8_t r	= ring->r;
@@ -36,19 +42,20 @@ int k_ring_pop(struct k_ring *ring)
 		return -EAGAIN;
 	}
 
-	const char data = ring->buffer[r];
+	*data = ring->buffer[r];
 
 	r++;
+
 	if (r == ring->size) {
 		r = 0u;
 	}
 
 	ring->r = r;
 
-	return data;
+	return 0;
 }
 
-int k_ring_reset(struct k_ring *ring)
+int8_t k_ring_reset(struct k_ring *ring)
 {
-	return 0;
+	return -ENOTSUP;
 }
