@@ -86,11 +86,12 @@
  * because these flags are used in assembly code
  */
 
-#define Z_FLAG_STATE_POS 0
-#define Z_FLAG_STOPPED	 (0 << Z_FLAG_STATE_POS)
-#define Z_FLAG_READY	 (1 << Z_FLAG_STATE_POS)
-#define Z_FLAG_PENDING	 (2 << Z_FLAG_STATE_POS)
-#define Z_FLAG_IDLE	 (3 << Z_FLAG_STATE_POS)
+#define Z_FLAG_STATE_POS  0
+#define Z_MASK_STATE	  (3 << Z_FLAG_STATE_POS)
+#define Z_FLAG_STOPPED	  (0 << Z_FLAG_STATE_POS)
+#define Z_FLAG_READY	  (1 << Z_FLAG_STATE_POS)
+#define Z_FLAG_PENDING	  (2 << Z_FLAG_STATE_POS)
+#define Z_FLAG_IDLE	  (3 << Z_FLAG_STATE_POS)
 
 #define Z_FLAG_SCHED_LOCKED_POS 2
 #define Z_FLAG_SCHED_LOCKED	(1 << Z_FLAG_SCHED_LOCKED_POS)

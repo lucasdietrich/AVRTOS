@@ -120,11 +120,9 @@ int k_thread_create(struct k_thread *const thread,
 #endif /* CONFIG_THREAD_CANARIES */
 
 	/* clear internal flags */
-	thread->flags	  = 0;
-	thread->state	  = Z_STOPPED;
+	thread->flags	  = Z_STOPPED | (prio & Z_MASK_PRIO);
 	thread->symbol	  = symbol;
 	thread->swap_data = NULL;
-	thread->state	  = prio & Z_MASK_PRIO;
 
 	return 0;
 }

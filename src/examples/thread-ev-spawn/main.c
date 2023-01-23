@@ -89,7 +89,7 @@ static void handle_data(char data)
 					thread_entry,
 					task->stack,
 					STACK_SIZE,
-					K_COOPERATIVE,
+					K_PREEMPTIVE,
 					task,
 					't');
 			slist_append(&allocated_threads, &task->_handle);

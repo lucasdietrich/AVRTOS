@@ -63,7 +63,7 @@
 // 1: Main thread is cooperative
 //
 #ifndef CONFIG_THREAD_MAIN_COOPERATIVE
-#define CONFIG_THREAD_MAIN_COOPERATIVE 0
+#define CONFIG_THREAD_MAIN_COOPERATIVE 1
 #endif
 
 //
