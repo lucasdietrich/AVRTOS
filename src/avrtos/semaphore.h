@@ -76,7 +76,7 @@ void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
  * K_FOREVER)
  * @return uint8_t 0 if a semaphore is taken any other value otherwise
  */
-K_NOINLINE int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
+__kernel int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
  * @brief Give a semaphore, wake up the first pending thread if the pending
@@ -94,7 +94,7 @@ K_NOINLINE int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
  *
  * @return thread that was woken up, NULL otherwise
  */
-K_NOINLINE struct k_thread *k_sem_give(struct k_sem *sem);
+__kernel struct k_thread *k_sem_give(struct k_sem *sem);
 
 /*___________________________________________________________________________*/
 

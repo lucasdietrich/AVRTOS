@@ -167,15 +167,15 @@ struct usart_config {
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
 
 // drivers API
-K_NOINLINE void ll_usart_init(UART_Device *dev, const struct usart_config *config);
+__kernel void ll_usart_init(UART_Device *dev, const struct usart_config *config);
 
-K_NOINLINE int usart_init(UART_Device *dev, const struct usart_config *config);
+__kernel int usart_init(UART_Device *dev, const struct usart_config *config);
 
-K_NOINLINE int usart_deinit(UART_Device *dev);
+__kernel int usart_deinit(UART_Device *dev);
 
-K_NOINLINE void ll_usart_sync_putc(UART_Device *dev, char c);
+__kernel void ll_usart_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE int ll_usart_sync_getc(UART_Device *dev);
+__kernel int ll_usart_sync_getc(UART_Device *dev);
 
 static inline void ll_usart_enable_rx_isr(UART_Device *dev)
 {
@@ -207,15 +207,15 @@ static inline void ll_usart_disable_udre_isr(UART_Device *dev)
 	CLR_BIT(dev->UCSRnB, BIT(UDRIEn));
 }
 
-K_NOINLINE int usart_send(UART_Device *dev, const char *buf, int len);
+__kernel int usart_send(UART_Device *dev, const char *buf, int len);
 
-K_NOINLINE int usart_sync_putc(UART_Device *dev, char c);
+__kernel int usart_sync_putc(UART_Device *dev, char c);
 
-K_NOINLINE int usart_getc(UART_Device *dev);
+__kernel int usart_getc(UART_Device *dev);
 
-K_NOINLINE void usart0_sync_putc(char c);
+__kernel void usart0_sync_putc(char c);
 
-K_NOINLINE int usart0_getc(void);
+__kernel int usart0_getc(void);
 
 // ASYNC API
 
@@ -248,13 +248,13 @@ struct usart_async_context {
 };
 // typedef struct usart_event_t;
 
-K_NOINLINE int usart_set_callback(UART_Device *dev, usart_async_callback_t cb);
+__kernel int usart_set_callback(UART_Device *dev, usart_async_callback_t cb);
 
-K_NOINLINE int usart_rx_disable(UART_Device *dev);
+__kernel int usart_rx_disable(UART_Device *dev);
 
-K_NOINLINE int usart_rx_enable(UART_Device *dev, void *buf, size_t size);
+__kernel int usart_rx_enable(UART_Device *dev, void *buf, size_t size);
 
-K_NOINLINE int usart_tx(UART_Device *dev, const void *buf, size_t size);
+__kernel int usart_tx(UART_Device *dev, const void *buf, size_t size);
 
 #ifdef __cplusplus
 }

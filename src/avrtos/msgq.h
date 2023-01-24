@@ -54,9 +54,8 @@ struct k_msgq {
  * @param buffer
  * @param msg_size
  * @param max_msgs
- * @return K_NOINLINE
  */
-K_NOINLINE void
+__kernel void
 k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint32_t max_msgs);
 
 /**
@@ -69,10 +68,10 @@ k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint32_t max_msg
  * @param msgq
  * @param data
  * @param timeout
- * @return K_NOINLINE 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
+ * @return 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
  *      ENOMSG on MsgQ full)
  */
-K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout);
+__kernel int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout);
 
 /**
  * @brief Try to get a message @a data to the MsgQ @a msgq.
@@ -84,44 +83,44 @@ K_NOINLINE int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t 
  * @param msgq
  * @param data
  * @param timeout
- * @return K_NOINLINE  0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
+ * @return 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
  *      ENOMSG on no message)
  */
-K_NOINLINE int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout);
+__kernel int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout);
 
 /**
  * @brief Cancel all thread pending on the MsgQ (reading or writing).
  * And reset the MsgQ state
  *
  * @param msgq
- * @return K_NOINLINE
+ * @return Number of canceled threads
  */
-K_NOINLINE uint8_t k_msgq_purge(struct k_msgq *msgq);
+__kernel uint8_t k_msgq_purge(struct k_msgq *msgq);
 
 /**
  * @brief Peek the first message of the MsgQ without removing it.
  *
  * @param msgq
  * @param data
- * @return K_NOINLINE 0 on success (ENOMSG on no message)
+ * @return 0 on success (ENOMSG on no message)
  */
-K_NOINLINE int8_t k_msgq_peek(struct k_msgq *msgq, void *data);
+__kernel int8_t k_msgq_peek(struct k_msgq *msgq, void *data);
 
 /**
  * @brief Get number of free messages in the MsgQ
  *
  * @param msgq
- * @return K_NOINLINE
+ * @return Number of free messages in the MsgQ
  */
-K_NOINLINE uint8_t k_msgq_num_free_get(struct k_msgq *msgq);
+__kernel uint8_t k_msgq_num_free_get(struct k_msgq *msgq);
 
 /**
  * @brief Get the number of used messages in the MsgQ
  *
  * @param msgq
- * @return K_NOINLINE
+ * @return Number of used messages in the MsgQ
  */
-K_NOINLINE uint8_t k_msgq_num_used_get(struct k_msgq *msgq);
+__kernel uint8_t k_msgq_num_used_get(struct k_msgq *msgq);
 
 /*___________________________________________________________________________*/
 

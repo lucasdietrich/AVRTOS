@@ -30,7 +30,7 @@ extern struct k_thread z_thread_idle;
  * @return false
  */
 
-K_NOINLINE bool k_is_cpu_idle(void);
+__kernel bool k_is_cpu_idle(void);
 
 /**
  * @brief IDLE the CPU.
@@ -43,7 +43,7 @@ K_NOINLINE bool k_is_cpu_idle(void);
  *
  * Note: This function forces interrupts to be enabled.
  */
-K_NOINLINE void k_idle(void);
+__kernel void k_idle(void);
 
 /*___________________________________________________________________________*/
 

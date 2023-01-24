@@ -196,7 +196,7 @@ int usart_sync_putc(UART_Device *dev, char c)
 	return 0;
 }
 
-K_NOINLINE int usart_getc(UART_Device *dev)
+__kernel int usart_getc(UART_Device *dev)
 {
 #if CONFIG_KERNEL_ARGS_CHECKS
 	if (dev == NULL) {
@@ -215,7 +215,7 @@ void usart0_sync_putc(char c)
 	UDR0 = c;
 }
 
-K_NOINLINE int usart0_getc(void)
+__kernel int usart0_getc(void)
 {
 	if (!(USART0_DEVICE->UCSRnA & BIT(RXCn))) {
 		return -EAGAIN;

@@ -22,15 +22,15 @@ struct timespec {
 
 /*___________________________________________________________________________*/
 
-K_NOINLINE void k_timespec_get(struct timespec *ts);
+__kernel void k_timespec_get(struct timespec *ts);
 
-K_NOINLINE void k_time_set(uint32_t sec);
+__kernel void k_time_set(uint32_t sec);
 
-K_NOINLINE bool k_time_is_set(void);
+__kernel bool k_time_is_set(void);
 
-K_NOINLINE uint32_t k_time_get(void);
+__kernel uint32_t k_time_get(void);
 
-K_NOINLINE void k_time_unset(void);
+__kernel void k_time_unset(void);
 
 void k_show_uptime(void);
 

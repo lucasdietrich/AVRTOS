@@ -51,7 +51,7 @@ struct k_event {
  * @param handler
  * @return int
  */
-K_NOINLINE int k_event_init(struct k_event *event, k_event_handler_t handler);
+__kernel int8_t k_event_init(struct k_event *event, k_event_handler_t handler);
 
 /**
  * @brief Schedule the event to be triggered after timeout (in ms).
@@ -62,7 +62,7 @@ K_NOINLINE int k_event_init(struct k_event *event, k_event_handler_t handler);
  * @param timeout
  * @return int
  */
-K_NOINLINE int k_event_schedule(struct k_event *event, k_timeout_t timeout);
+__kernel int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout);
 
 /**
  * @brief Unschedule the event.
@@ -72,7 +72,7 @@ K_NOINLINE int k_event_schedule(struct k_event *event, k_timeout_t timeout);
  * @param event
  * @return int
  */
-K_NOINLINE int k_event_cancel(struct k_event *event);
+__kernel int8_t k_event_cancel(struct k_event *event);
 
 /**
  * @brief Unschedule the event.
@@ -82,7 +82,7 @@ K_NOINLINE int k_event_cancel(struct k_event *event);
  * @param event
  * @return int
  */
-K_NOINLINE bool k_event_pending(struct k_event *event);
+__kernel bool k_event_pending(struct k_event *event);
 
 /**
  * @brief Internal function shifting the event queue and executing the handlers
@@ -90,7 +90,7 @@ K_NOINLINE bool k_event_pending(struct k_event *event);
  *
  * The call periodicity is constant and equals CONFIG_KERNEL_TIME_SLICE_US.
  */
-K_NOINLINE void z_event_q_process(void);
+__kernel void z_event_q_process(void);
 
 /*___________________________________________________________________________*/
 

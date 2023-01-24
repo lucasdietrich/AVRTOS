@@ -76,7 +76,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 }
 
 #if !CONFIG_AVRTOS_KERNEL_SECTIONS
-K_NOINLINE void z_mem_slab_finalize_init(struct k_mem_slab *slab)
+__kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab)
 {
 	z_create_free_list(slab);
 }
@@ -92,7 +92,7 @@ K_NOINLINE void z_mem_slab_finalize_init(struct k_mem_slab *slab)
  *
  * @param slab
  * @param mem
- * @return K_NOINLINE
+ * @return 0
  */
 __always_inline static int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
@@ -144,9 +144,9 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
  *
  * @param slab
  * @param mem
- * @return K_NOINLINE
+ * @return 0
  */
-K_NOINLINE static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
+__kernel static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
 	__ASSERT_NOTNULL(slab);
 	__ASSERT_NOTNULL(mem);

@@ -41,14 +41,14 @@ extern bool z_interrupts(void);
  *
  * Can be called recursively.
  */
-K_NOINLINE void irq_disable(void);
+__kernel void irq_disable(void);
 
 /**
  * @brief Enable interrupts in the current thread
  *
  * Can be called recursively.
  */
-K_NOINLINE void irq_enable(void);
+__kernel void irq_enable(void);
 
 #endif /* CONFIG_KERNEL_IRQ_LOCK_COUNTER */
 
@@ -100,7 +100,7 @@ static inline void k_sys_sw_reset(void)
  *  like k_yield(), k_sleep() or any kernel function waiting for an
  *  event to be signaled (e.g. k_sem_take(), k_mutex_lock() with delay)
  */
-K_NOINLINE void k_sched_lock(void);
+__kernel void k_sched_lock(void);
 
 /**
  * @brief Unlock the CPU for the current thread being executed @see
@@ -111,7 +111,7 @@ K_NOINLINE void k_sched_lock(void);
  *
  * @see k_sched_lock()
  */
-K_NOINLINE void k_sched_unlock(void);
+__kernel void k_sched_unlock(void);
 
 /**
  * @brief Tells if the scheduler is locked by the current thread or not.
@@ -121,21 +121,21 @@ K_NOINLINE void k_sched_unlock(void);
  * cooperative
  * @return false    if not
  */
-K_NOINLINE bool k_sched_locked(void);
+__kernel bool k_sched_locked(void);
 
 /**
- * @brief Tells if current thread is preemptive.
+ * @brief Tells whether current current thread is preemptive.
  *
- * @return K_NOINLINE
+ * @return True if current thread is preemptive
  */
-K_NOINLINE bool k_cur_is_preempt(void);
+__kernel bool k_cur_is_preempt(void);
 
 /**
- * @brief Tells if current thread is cooperative
+ * @brief Tells whether current thread is cooperative
  *
- * @return K_NOINLINE
+ * @return  True if current thread is cooperative
  */
-K_NOINLINE bool k_cur_is_coop(void);
+__kernel bool k_cur_is_coop(void);
 
 /**
  * @brief used in K_SCHED_LOCK_CONTEXT macro
@@ -143,7 +143,6 @@ K_NOINLINE bool k_cur_is_coop(void);
  * @see k_sched_unlock
  *
  * @param __s
- * @return __inline__
  */
 static __inline__ void z_sched_restore(const uint8_t *__s)
 {
@@ -155,7 +154,7 @@ static __inline__ void z_sched_restore(const uint8_t *__s)
 /**
  * @brief used in K_SCHED_LOCK_CONTEXT macro
  *
- * @return __inline__
+ * @return 1
  */
 static __inline__ uint8_t z_sched_lock_ret(void)
 {
@@ -192,7 +191,7 @@ static __inline__ uint8_t z_sched_lock_ret(void)
  *
  * @param timeout pending timeout
  */
-K_NOINLINE void k_sleep(k_timeout_t timeout);
+__kernel void k_sleep(k_timeout_t timeout);
 
 /**
  * @brief Make the thread waiting for timeout milliseconds.
@@ -205,15 +204,13 @@ K_NOINLINE void k_sleep(k_timeout_t timeout);
  * Note: Require KERNEL_UPTIME to be set.
  *
  * @param timeout
- * @return K_NOINLINE
  */
-K_NOINLINE void k_wait(k_timeout_t timeout);
+__kernel void k_wait(k_timeout_t timeout);
 
 /**
  * @brief Block the RTOS for a specified amount of time.
  *
  * @param timeout
- * @return K_NOINLINE
  */
 void k_block(k_timeout_t timeout);
 
@@ -224,21 +221,21 @@ void k_block(k_timeout_t timeout);
  *
  * @param thread : stopped thread to start.
  */
-K_NOINLINE int8_t k_thread_start(struct k_thread *thread);
+__kernel int8_t k_thread_start(struct k_thread *thread);
 
 /**
  * @brief Stop the execution of the current thread.
  *
  * @param thread : started thread to stop.
  */
-K_NOINLINE int8_t k_thread_stop(struct k_thread *thread);
+__kernel int8_t k_thread_stop(struct k_thread *thread);
 
 /**
  * @brief Stop current thread
  *
  * @param thread : ready/pending thread to start.
  */
-K_NOINLINE void k_stop(void);
+__kernel void k_stop(void);
 
 /*___________________________________________________________________________*/
 
@@ -253,7 +250,7 @@ K_NOINLINE void k_stop(void);
  */
 uint8_t k_ready_count(void);
 
-/* @see k_yield but suppose interrupts are disabled */
+/* @see k_yield but assume interrupts are disabled */
 void z_yield(void);
 
 /**
@@ -340,44 +337,44 @@ static inline void k_yield_from_isr_cond(struct k_thread *thread)
  * Assumptions :
  *  - interrupt flag is cleared when called.
  */
-K_NOINLINE void z_system_shift(void);
+__kernel void z_system_shift(void);
 
 /**
  * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
  *
- * @return K_NOINLINE
+ * @return Kernel ticks value (32 bits)
  */
-K_NOINLINE uint32_t k_ticks_get_32(void);
+__kernel uint32_t k_ticks_get_32(void);
 
 /**
  * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled
  *
- * @return K_NOINLINE
+ * @return Kernel ticks value (64 bits)
  */
-K_NOINLINE uint64_t k_ticks_get_64(void);
+__kernel uint64_t k_ticks_get_64(void);
 
 /**
  * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled
  *
- * @return K_NOINLINE
+ * @return Uptime in milliseconds
  */
-K_NOINLINE uint32_t k_uptime_get_ms32(void);
+__kernel uint32_t k_uptime_get_ms32(void);
 
 /**
  * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
  *
  * Should be used if KERNEL_UPTIME_40BITS is enabled.
  *
- * @return K_NOINLINE
+ * @return Uptime in milliseconds (64 bits)
  */
-K_NOINLINE uint64_t k_uptime_get_ms64(void);
+__kernel uint64_t k_uptime_get_ms64(void);
 
 /**
  * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled
  *
- * @return K_NOINLINE
+ * @return Uptime in seconds
  */
-K_NOINLINE uint32_t k_uptime_get(void);
+__kernel uint32_t k_uptime_get(void);
 
 /*___________________________________________________________________________*/
 

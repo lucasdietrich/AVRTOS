@@ -94,7 +94,7 @@ static void z_thread_stack_create(struct k_thread *const thread,
 
 #include "misc/serial.h"
 
-int k_thread_create(struct k_thread *const thread,
+int8_t k_thread_create(struct k_thread *const thread,
 		    thread_entry_t entry,
 		    void *const stack,
 		    const size_t stack_size,

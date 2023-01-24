@@ -81,7 +81,7 @@ struct k_mem_slab {
  * @brief This function is called on start up to initialize all memory
  * slabs defined at runtime using the macro K_MEM_SLAB_DEFINE
  */
-K_NOINLINE void z_mem_slab_init_module(void);
+__kernel void z_mem_slab_init_module(void);
 
 /**
  * @brief Initialize a memory slab at runtime
@@ -90,21 +90,20 @@ K_NOINLINE void z_mem_slab_init_module(void);
  * @param buffer address of the buffer
  * @param block_size
  * @param num_blocks
- * @return K_NOINLINE return 0 on success else error code
+ * @return return 0 on success else error code
  */
-K_NOINLINE int8_t k_mem_slab_init(struct k_mem_slab *slab,
-				  void *buffer,
-				  size_t block_size,
-				  uint8_t num_blocks);
+__kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
+				void *buffer,
+				size_t block_size,
+				uint8_t num_blocks);
 
 /**
  * @brief Finalize the initialization of a memory slab when declared using
  * K_MEM_SLAB_DEFINE and CONFIG_AVRTOS_KERNEL_SECTIONS is disabled.
  *
  * @param slab
- * @return K_NOINLINE
  */
-K_NOINLINE void z_mem_slab_finalize_init(struct k_mem_slab *slab);
+__kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
 
 /**
  * @brief Allocate a memory block.
@@ -121,11 +120,15 @@ K_NOINLINE void z_mem_slab_finalize_init(struct k_mem_slab *slab);
  * @param slab
  * @param mem
  * @param timeout
- * @return K_NOINLINE
+ * @return 0 on success else error code
+ * - ENOMEM : no block available
+ * - ETIMEDOUT : timeout expired
+ * - EINTR : interrupted by a signal
+ * - ECANCELED : wait aborted
  */
-K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
-				   void **mem,
-				   k_timeout_t timeout);
+__kernel int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
+				 void **mem,
+				 k_timeout_t timeout);
 
 /**
  * @brief Free a memory block and notify the first pending thread that
@@ -143,9 +146,9 @@ K_NOINLINE int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
  *
  * @param slab
  * @param mem
- * @return K_NOINLINE
+ * @return The thread that was woken up or NULL if no thread was woken up.
  */
-K_NOINLINE struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem);
+__kernel struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem);
 
 /*___________________________________________________________________________*/
 

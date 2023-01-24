@@ -46,9 +46,8 @@ struct k_fifo {
  * @brief Initialize a fifo if it wasn't defined using the macro K_FIFO_DEFINE.
  *
  * @param fifo
- * @return K_NOINLINE
  */
-K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
+__kernel void k_fifo_init(struct k_fifo *fifo);
 
 /**
  * @brief Add an item to the fifo.
@@ -90,9 +89,9 @@ K_NOINLINE void k_fifo_init(struct k_fifo *fifo);
  *
  * @param fifo pointer to the fifo
  * @param item_tie pointer to the "tie" member of the item to add
- * @return K_NOINLINE
+ * @return Thread that was woken up or NULL if no thread was pending
  */
-K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item_tie);
+__kernel struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item_tie);
 
 /**
  * @brief @see k_fifo_put
@@ -101,9 +100,9 @@ K_NOINLINE struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item_t
  *
  * @param fifo
  * @param item
- * @return K_NOINLINE
+ * @return Thread that was woken up or NULL if no thread was pending
  */
-K_NOINLINE struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item);
+__kernel struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item);
 
 /**
  * @brief Get and remove an item from the fifo.
@@ -116,9 +115,9 @@ K_NOINLINE struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item);
  *
  * @param fifo
  * @param timeout
- * @return K_NOINLINE struct* not null if success
+ * @return struct* not null if success
  */
-K_NOINLINE struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
+__kernel struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
 
 /**
  * @brief Cancel pending on a fifo queue.
@@ -126,33 +125,33 @@ K_NOINLINE struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout);
  * to return from k_fifo_get() call with NULL value (as if timeout expired).
  *
  * @param fifo
- * @return K_NOINLINE
+ * @return Number of threads woken up
  */
-K_NOINLINE uint8_t k_fifo_cancel_wait(struct k_fifo *fifo);
+__kernel uint8_t k_fifo_cancel_wait(struct k_fifo *fifo);
 
 /**
  * @brief Tells if the fifo is empty.
  *
  * @param fifo
- * @return K_NOINLINE
+ * @return True if empty, false otherwise
  */
-K_NOINLINE bool k_fifo_is_empty(struct k_fifo *fifo);
+__kernel bool k_fifo_is_empty(struct k_fifo *fifo);
 
 /**
  * @brief Get without removing the first item in the fifo.
  *
  * @param fifo
- * @return K_NOINLINE struct*
+ * @return struct* head item, NULL if empty
  */
-K_NOINLINE struct snode *k_fifo_peek_head(struct k_fifo *fifo);
+__kernel struct snode *k_fifo_peek_head(struct k_fifo *fifo);
 
 /**
  * @brief Get without removing the last item in the fifo.
  *
  * @param fifo
- * @return K_NOINLINE struct*
+ * @return  struct* tail item, NULL if empty
  */
-K_NOINLINE struct snode *k_fifo_peek_tail(struct k_fifo *fifo);
+__kernel struct snode *k_fifo_peek_tail(struct k_fifo *fifo);
 
 /*___________________________________________________________________________*/
 

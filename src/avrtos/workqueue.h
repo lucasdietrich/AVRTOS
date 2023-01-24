@@ -68,7 +68,7 @@ struct k_workqueue {
 // Workqueue internal
 //
 
-K_NOINLINE void z_workqueue_entry(struct k_workqueue *const workqueue);
+__kernel void z_workqueue_entry(struct k_workqueue *const workqueue);
 
 /*___________________________________________________________________________*/
 
@@ -79,7 +79,7 @@ K_NOINLINE void z_workqueue_entry(struct k_workqueue *const workqueue);
  * @param work work item
  * @param handler handler
  */
-K_NOINLINE void k_work_init(struct k_work *work, k_work_handler_t handler);
+__kernel void k_work_init(struct k_work *work, k_work_handler_t handler);
 
 /**
  * @brief Tells if the work item is submittable or not.
@@ -109,7 +109,7 @@ bool k_work_submittable(struct k_work *work);
  * @param workqueue
  * @param work
  */
-K_NOINLINE bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
+__kernel bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
 
 /**
  * @brief Configure the workqueue to release the cpu after each work item
@@ -120,7 +120,7 @@ K_NOINLINE bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work
  *
  * @param workqueue
  */
-K_NOINLINE void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
+__kernel void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
 
 /**
  * @brief Configure the workqueue to not release the cpu after each work
@@ -134,7 +134,7 @@ K_NOINLINE void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
  *
  * @param workqueue
  */
-K_NOINLINE void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
+__kernel void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
 
 /*___________________________________________________________________________*/
 

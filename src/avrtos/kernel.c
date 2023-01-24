@@ -115,7 +115,7 @@ extern struct k_thread z_thread_idle;
  * @param thread_tie thread.tie.runqueue item
  * @return __attribute__((noinline))
  */
-static K_NOINLINE void z_schedule(struct k_thread *thread)
+static __kernel void z_schedule(struct k_thread *thread)
 {
 	__ASSERT_NOINTERRUPT();
 
@@ -169,9 +169,8 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  *
  * @param thread
  * @param timeout
- * @return K_NOINLINE
  */
-static K_NOINLINE void z_schedule_wake_up(k_timeout_t timeout)
+static __kernel void z_schedule_wake_up(k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_TRUE(z_current->wakeup_schd == 0);
@@ -210,7 +209,7 @@ static void z_cancel_scheduled_wake_up(struct k_thread *thread)
  *
  * @param thread thread to wake up
  */
-K_NOINLINE void z_wake_up(struct k_thread *thread)
+__kernel void z_wake_up(struct k_thread *thread)
 {
 	__ASSERT_NOTNULL(thread);
 	__ASSERT_NOINTERRUPT();
@@ -414,7 +413,7 @@ static void z_suspend(struct k_thread *thread)
 	}
 }
 
-K_NOINLINE int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
+__kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 
@@ -452,7 +451,7 @@ K_NOINLINE int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 	return err;
 }
 
-K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
+__kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
@@ -474,7 +473,7 @@ K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 	return NULL;
 }
 
-K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
+__kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
 						    void *set_swap_data)
 {
 	__ASSERT_NOINTERRUPT();
@@ -487,7 +486,7 @@ K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
 	return pending_thread;
 }
 
-K_NOINLINE void z_cancel_first_pending(struct dnode *waitqueue)
+__kernel void z_cancel_first_pending(struct dnode *waitqueue)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
@@ -499,7 +498,7 @@ K_NOINLINE void z_cancel_first_pending(struct dnode *waitqueue)
 	}
 }
 
-K_NOINLINE uint8_t z_cancel_all_pending(struct dnode *waitqueue)
+__kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
@@ -668,7 +667,7 @@ int8_t k_thread_start(struct k_thread *thread)
 	return ret;
 }
 
-K_NOINLINE int8_t k_thread_stop(struct k_thread *thread)
+__kernel int8_t k_thread_stop(struct k_thread *thread)
 {
 	if (thread->state == Z_STOPPED) return -EINVAL;
 

@@ -26,7 +26,7 @@ struct k_event_q {
 
 K_EVENT_Q_DEFINE(z_event_q);
 
-int k_event_init(struct k_event *event, k_event_handler_t handler)
+int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
 {
 	if (!event || !handler) {
 		return -EINVAL;
@@ -39,7 +39,7 @@ int k_event_init(struct k_event *event, k_event_handler_t handler)
 	return 0;
 }
 
-int k_event_schedule(struct k_event *event, k_timeout_t timeout)
+int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
 	if (!event || event->scheduled) {
 		return -EINVAL;
@@ -70,7 +70,7 @@ int k_event_schedule(struct k_event *event, k_timeout_t timeout)
 	return 0;
 }
 
-int k_event_cancel(struct k_event *event)
+int8_t k_event_cancel(struct k_event *event)
 {
 	if (!event || !event->scheduled) {
 		return -EINVAL;

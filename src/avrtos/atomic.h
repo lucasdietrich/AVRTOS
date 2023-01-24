@@ -43,59 +43,54 @@ typedef uint8_t atomic_t;
  * @brief Get the current value of an atomic variable.
  *
  * @param target
- * @return K_NOINLINE
+ * @return Value of the atomic variable.
  */
-K_NOINLINE atomic_val_t atomic_get(atomic_t *target);
+__kernel atomic_val_t atomic_get(atomic_t *target);
 
 /**
  * @brief Clear the value of an atomic variable but do not return the old value.
  *
  * @param target
- * @return K_NOINLINE
  */
-K_NOINLINE void atomic_blind_clear(atomic_t *target);
+__kernel void atomic_blind_clear(atomic_t *target);
 
 /**
  * @brief Clear the value of an atomic variable.
- *  Return the old value.
  *
  * @param target
- * @return K_NOINLINE
+ * @return Return the old value.
  */
-K_NOINLINE atomic_val_t atomic_clear(atomic_t *target);
+__kernel atomic_val_t atomic_clear(atomic_t *target);
 
 /**
  * @brief Calculate the OR of value and the atomic variable,
  *  and store the result in the atomic variable.
- *  Return the old value.
  *
  * @param target
  * @param value
- * @return K_NOINLINE
+ * @return Return the old value.
  */
-K_NOINLINE atomic_val_t atomic_or(atomic_t *target, atomic_val_t value);
+__kernel atomic_val_t atomic_or(atomic_t *target, atomic_val_t value);
 
 /**
  * @brief Calculate the XOR of value and the atomic variable,
  *  and store the result in the atomic variable.
- *  Return the old value.
  *
  * @param target
  * @param value
- * @return K_NOINLINE
+ * @return Return the old value.
  */
-K_NOINLINE atomic_val_t atomic_xor(atomic_t *target, atomic_val_t value);
+__kernel atomic_val_t atomic_xor(atomic_t *target, atomic_val_t value);
 
 /**
  * @brief Calculate the AND of value and the atomic variable,
  *  and store the result in the atomic variable.
- *  Return the old value.
  *
  * @param target
  * @param value
- * @return K_NOINLINE
+ * @return Return the old value.
  */
-K_NOINLINE atomic_val_t atomic_and(atomic_t *target, atomic_val_t value);
+__kernel atomic_val_t atomic_and(atomic_t *target, atomic_val_t value);
 
 /**
  * @brief Increment the atomic variable by one.
@@ -104,9 +99,9 @@ K_NOINLINE atomic_val_t atomic_and(atomic_t *target, atomic_val_t value);
  * Note: return value is not the old value.
  *
  * @param target
- * @return K_NOINLINE
+ * @return Return the new value.
  */
-K_NOINLINE atomic_val_t atomic_inc(atomic_t *target);
+__kernel atomic_val_t atomic_inc(atomic_t *target);
 
 /**
  * @brief Decrement the atomic variable by one.
@@ -115,27 +110,25 @@ K_NOINLINE atomic_val_t atomic_inc(atomic_t *target);
  * Note: return value is not the old value.
  *
  * @param target
- * @return K_NOINLINE
+ * @return Return the new value.
  */
-K_NOINLINE atomic_val_t atomic_dec(atomic_t *target);
+__kernel atomic_val_t atomic_dec(atomic_t *target);
 
 /**
  * @brief Clear the bit at position @p bit in the atomic variable.
  *
  * @param target
  * @param bit
- * @return K_NOINLINE
  */
-K_NOINLINE void atomic_clear_bit(atomic_t *target, uint8_t bit);
+__kernel void atomic_clear_bit(atomic_t *target, uint8_t bit);
 
 /**
  * @brief Set the bit at position @p bit in the atomic variable.
  *
  * @param target
  * @param bit
- * @return K_NOINLINE
  */
-K_NOINLINE void atomic_set_bit(atomic_t *target, uint8_t bit);
+__kernel void atomic_set_bit(atomic_t *target, uint8_t bit);
 
 /**
  * @brief Set the bit at position @p bit to value @p val in the atomic variable.
@@ -143,49 +136,46 @@ K_NOINLINE void atomic_set_bit(atomic_t *target, uint8_t bit);
  * @param target
  * @param bit
  * @param val
- * @return K_NOINLINE
  */
-K_NOINLINE void atomic_set_bit_to(atomic_t *target, uint8_t bit, bool val);
+__kernel void atomic_set_bit_to(atomic_t *target, uint8_t bit, bool val);
 
 /**
  * @brief Test the bit at position @p bit in the atomic variable.
  *
  * @param target
  * @param bit
- * @return K_NOINLINE
+ * @return Return true if the bit is set, false otherwise.
  */
-K_NOINLINE bool atomic_test_bit(atomic_t *target, uint8_t bit);
+__kernel bool atomic_test_bit(atomic_t *target, uint8_t bit);
 
 /**
  * @brief Test the bit at position @p bit in the atomic variable and clear it.
  *
  * @param target
  * @param bit
- * @return K_NOINLINE
+ * @return Return true if the bit was set, false otherwise.
  */
-K_NOINLINE bool atomic_test_and_clear_bit(atomic_t *target, uint8_t bit);
+__kernel bool atomic_test_and_clear_bit(atomic_t *target, uint8_t bit);
 
 /**
  * @brief Test the bit at position @p bit in the atomic variable and set it.
  *
  * @param target
  * @param bit
- * @return K_NOINLINE
+ * @return Return true if the bit was set, false otherwise.
  */
-K_NOINLINE bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit);
+__kernel bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit);
 
 /**
  * @brief Compare and set, Compare the atomic variable value with @p cmd value
  * 	- If equal update the atomic variable value with @p val value
  * 	- Left the atomic variable value unchanged if not equal
  *
- * Return true if the atomic variable value was updated, false otherwise.
- *
  * @param target
  * @param value
- * @return K_NOINLINE
+ * @return Return true if the atomic variable value was updated, false otherwise.
  */
-K_NOINLINE bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
+__kernel bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
 
 /**
  * @brief see atomic_cas
@@ -193,9 +183,9 @@ K_NOINLINE bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val)
  * @param target
  * @param cmd
  * @param val
- * @return K_NOINLINE
+ * @return Return true if the atomic variable value was updated, false otherwise.
  */
-K_NOINLINE bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
+__kernel bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
 
 #ifdef __cplusplus
 }

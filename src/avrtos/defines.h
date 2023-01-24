@@ -16,9 +16,9 @@
 #endif
 
 #if CONFIG_KERNEL_API_NOINLINE
-#define K_NOINLINE __noinline
+#define __kernel __noinline
 #else
-#define K_NOINLINE
+#define __kernel
 #endif
 
 #define CONFIG_AVRTOS_KERNEL_SECTIONS CONFIG_AVRTOS_LINKER_SCRIPT

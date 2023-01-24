@@ -271,7 +271,7 @@ extern struct k_thread *z_current;
  * @param symbol thread symbol letter
  * @return int 0 on success
  */
-int k_thread_create(struct k_thread *const thread,
+int8_t k_thread_create(struct k_thread *const thread,
 		    thread_entry_t entry,
 		    void *const stack,
 		    const size_t stack_size,

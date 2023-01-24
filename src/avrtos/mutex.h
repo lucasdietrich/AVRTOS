@@ -74,7 +74,7 @@ void k_mutex_init(struct k_mutex *mutex);
  * @param timeout time pending the mutex (K_NO_WAIT, K_MSEC(1000), K_FOREVER)
  * @return uint8_t 0 if mutex locked any other value otherwise
  */
-K_NOINLINE int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
+__kernel int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
 
 /**
  * @brief Unlock a mutex, wake up the first pending thread if the pending queue
@@ -89,10 +89,10 @@ K_NOINLINE int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout);
  *
  * @param mutex : address of the mutex structure
  */
-K_NOINLINE struct k_thread *k_mutex_unlock(struct k_mutex *mutex);
+__kernel struct k_thread *k_mutex_unlock(struct k_mutex *mutex);
 
 /* concept */
-K_NOINLINE int8_t k_mutex_cancel_wait(struct k_mutex *mutex);
+__kernel int8_t k_mutex_cancel_wait(struct k_mutex *mutex);
 
 /*___________________________________________________________________________*/
 

@@ -52,11 +52,11 @@ struct k_prng {
 
 /*___________________________________________________________________________*/
 
-K_NOINLINE uint16_t k_prng_get(struct k_prng *prng);
+__kernel uint16_t k_prng_get(struct k_prng *prng);
 
-K_NOINLINE uint32_t k_prng_get_u32(struct k_prng *prng);
+__kernel uint32_t k_prng_get_u32(struct k_prng *prng);
 
-K_NOINLINE void k_prng_get_buffer(struct k_prng *prng, uint8_t *buffer, uint16_t len);
+__kernel void k_prng_get_buffer(struct k_prng *prng, uint8_t *buffer, uint16_t len);
 
 /*___________________________________________________________________________*/
 

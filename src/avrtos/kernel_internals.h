@@ -26,7 +26,7 @@
  * @return 0 on success (object available), ETIMEDOUT on timeout, negative error
  *  in other cases.
  */
-K_NOINLINE int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
+__kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
 
 /**
  * @brief Wake up the first thread pending on an object.
@@ -42,7 +42,7 @@ K_NOINLINE int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
  * @return uint8_t return 0 if a thread got the object, any other value
  * otherwise
  */
-K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
+__kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
 
 /**
  * @brief Wake up the first thread pending on an object.
@@ -58,9 +58,9 @@ K_NOINLINE struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
  *
  * @param waitqueue
  * @param set_swap_data
- * @return K_NOINLINE struct*
+ * @return thread pointer if a thread got the object, NULL otherwise
  */
-K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
+__kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
 						    void *set_swap_data);
 
 /**
@@ -69,10 +69,9 @@ K_NOINLINE struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
  * Raise "pend_canceled" flag on the thread, any wait function will return
  * with -ECANCELED.
  * 
- * @param waitqueue 
- * @return K_NOINLINE 
+ * @param waitqueue  
  */
-K_NOINLINE void z_cancel_first_pending(struct dnode *waitqueue);
+__kernel void z_cancel_first_pending(struct dnode *waitqueue);
 
 /**
  * @brief Cancel all pending threads on a waitqueue.
@@ -81,18 +80,17 @@ K_NOINLINE void z_cancel_first_pending(struct dnode *waitqueue);
  * with -ECANCELED.
  * 
  * @param waitqueue 
- * @return K_NOINLINE 
+ * @return Number of canceled threads 
  */
-K_NOINLINE uint8_t z_cancel_all_pending(struct dnode *waitqueue);
+__kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue);
 
 /**
  * @brief Wake up a thread.
  * 
  * Cancel scheduled wake up if any and add the thread to the runqueue.
  * 
- * @param thread 
- * @return K_NOINLINE 
+ * @param thread  
  */
-K_NOINLINE void z_wake_up(struct k_thread *thread);
+__kernel void z_wake_up(struct k_thread *thread);
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

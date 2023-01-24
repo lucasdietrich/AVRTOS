@@ -49,18 +49,17 @@ struct k_signal {
  * @brief Initialize a signal object.
  *
  * @param sig
- * @return K_NOINLINE
  */
-K_NOINLINE void k_signal_init(struct k_signal *sig);
+__kernel void k_signal_init(struct k_signal *sig);
 
 /**
  * @brief Wake up the first thread (TODO all threads) polling on the signal.
  *
  * @param sig
  * @param value
- * @return K_NOINLINE
+ * @return The thread that was woken up, NULL otherwise.
  */
-K_NOINLINE struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value);
+__kernel struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value);
 
 /**
  * @brief Poll on a signal.
@@ -71,17 +70,17 @@ K_NOINLINE struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value);
  *
  * @param sig
  * @param timeout
- * @return K_NOINLINE
+ * @return 0 on success, negative error code otherwise.
  */
-K_NOINLINE int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
+__kernel int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
 
 /**
  * @brief Cancel the wait of all threads polling on the signal.
  *
  * @param sig
- * @return K_NOINLINE
+ * @return Number of threads that were woken up.
  */
-K_NOINLINE uint8_t k_poll_cancel_wait(struct k_signal *sig);
+__kernel uint8_t k_poll_cancel_wait(struct k_signal *sig);
 
 /*___________________________________________________________________________*/
 

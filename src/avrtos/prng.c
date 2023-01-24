@@ -6,7 +6,7 @@
 
 #include "prng.h"
 
-K_NOINLINE uint32_t z_shift_lfsr(uint32_t *lfsr, uint32_t poly_mask)
+__kernel uint32_t z_shift_lfsr(uint32_t *lfsr, uint32_t poly_mask)
 {
 	uint32_t feedback = *lfsr & 1;
 	*lfsr >>= 1u;
