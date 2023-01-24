@@ -61,35 +61,35 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
  * @return thread pointer if a thread got the object, NULL otherwise
  */
 __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
-						    void *set_swap_data);
+						  void *set_swap_data);
 
 /**
  * @brief Cancel the first pending thread on a waitqueue.
- * 
+ *
  * Raise "pend_canceled" flag on the thread, any wait function will return
  * with -ECANCELED.
- * 
- * @param waitqueue  
+ *
+ * @param waitqueue
  */
 __kernel void z_cancel_first_pending(struct dnode *waitqueue);
 
 /**
  * @brief Cancel all pending threads on a waitqueue.
- * 
+ *
  * Raise "pend_canceled" flag on the thread, any wait function will return
  * with -ECANCELED.
- * 
- * @param waitqueue 
- * @return Number of canceled threads 
+ *
+ * @param waitqueue
+ * @return Number of canceled threads
  */
 __kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue);
 
 /**
  * @brief Wake up a thread.
- * 
+ *
  * Cancel scheduled wake up if any and add the thread to the runqueue.
- * 
- * @param thread  
+ *
+ * @param thread
  */
 __kernel void z_wake_up(struct k_thread *thread);
 

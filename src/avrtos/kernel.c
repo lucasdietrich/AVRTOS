@@ -474,7 +474,7 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 }
 
 __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
-						    void *set_swap_data)
+						  void *set_swap_data)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);

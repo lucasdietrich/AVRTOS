@@ -95,12 +95,12 @@ static void z_thread_stack_create(struct k_thread *const thread,
 #include "misc/serial.h"
 
 int8_t k_thread_create(struct k_thread *const thread,
-		    thread_entry_t entry,
-		    void *const stack,
-		    const size_t stack_size,
-		    const uint8_t prio,
-		    void *const context_p,
-		    const char symbol)
+		       thread_entry_t entry,
+		       void *const stack,
+		       const size_t stack_size,
+		       const uint8_t prio,
+		       void *const context_p,
+		       const char symbol)
 {
 	if (stack_size < Z_THREAD_STACK_MIN_SIZE) {
 		return -1;
