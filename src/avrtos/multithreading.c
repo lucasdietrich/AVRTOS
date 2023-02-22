@@ -30,12 +30,18 @@ K_THREAD struct k_thread z_thread_main = {
 		.flags = Z_READY | K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
 #endif
 	},
-	.tie	   = {.runqueue =
-			      {// thread in before initialisation at the top of the
-			       // runqueue (is actually the reference element)
-			       .prev = &z_thread_main.tie.runqueue,
-			       .next = &z_thread_main.tie.runqueue}},
-	      .wany = DITEM_INIT_NULL(), // the thread isn't pending on any events
+	.tie =
+		{
+			.runqueue =
+				{
+					// thread in before initialisation at the top of
+					// the runqueue (is actually the reference
+					// element)
+					.prev = &z_thread_main.tie.runqueue,
+					.next = &z_thread_main.tie.runqueue,
+				},
+		},
+	.wany	   = DITEM_INIT_NULL(), // the thread isn't pending on any events
 	.swap_data = NULL,
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK ==                                                 \
 	1 // explicit stack defined, we set the main thread stack at the end of
@@ -72,7 +78,7 @@ static void z_thread_stack_create(struct k_thread *const thread,
 
 	/* initialize unused registers with default value */
 	for (uint8_t *reg = ctx->regs; reg < ctx->regs + sizeof(ctx->regs); reg++) {
-		*reg = 0x00U;
+		*reg = 0x00u;
 	}
 
 	ctx->sreg	    = 0U;
@@ -109,15 +115,15 @@ int8_t k_thread_create(struct k_thread *const thread,
 	thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
 	thread->stack.size = stack_size;
 
-	z_thread_stack_create(thread, entry, context_p);
+#if CONFIG_THREAD_CANARIES
+	z_init_thread_stack_canaries(thread);
+#endif /* CONFIG_THREAD_CANARIES */
 
 #if CONFIG_THREAD_STACK_SENTINEL
 	z_init_thread_stack_sentinel(thread);
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
 
-#if CONFIG_THREAD_CANARIES
-	z_init_thread_stack_canaries(thread);
-#endif /* CONFIG_THREAD_CANARIES */
+	z_thread_stack_create(thread, entry, context_p);
 
 	/* clear internal flags */
 	thread->flags	  = Z_STOPPED | (prio & Z_MASK_PRIO);

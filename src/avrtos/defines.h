@@ -228,9 +228,15 @@ typedef struct {
 #define K_THREAD_STACK_END(thread)     (thread->stack.end)
 
 /* real stack start and size without counting sentinel */
+#if CONFIG_THREAD_STACK_SENTINEL
 #define Z_STACK_START_USABLE(stack_end, size)                                            \
 	(K_STACK_START(stack_end, size) + CONFIG_THREAD_STACK_SENTINEL_SIZE)
-#define Z_STACK_SIZE_USABLE(size) (size - CONFIG_THREAD_STACK_SENTINEL_SIZE)
+#define Z_STACK_SIZE_USABLE(size) ((size)-CONFIG_THREAD_STACK_SENTINEL_SIZE)
+#else
+#define Z_STACK_START_USABLE(stack_end, size) K_STACK_START(stack_end, size)
+#define Z_STACK_SIZE_USABLE(size)	      (size)
+#endif
+
 #define Z_THREAD_STACK_START_USABLE(thread)                                              \
 	Z_STACK_START_USABLE(thread->stack.end, thread->stack.size)
 

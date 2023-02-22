@@ -9,7 +9,7 @@
 void z_init_thread_stack_canaries(struct k_thread *thread)
 {
 	for (uint8_t *addr = Z_THREAD_STACK_START_USABLE(thread);
-	     addr < (uint8_t *)thread->stack.end - Z_THREAD_STACK_VOID_SIZE;
+	     addr <= (uint8_t *)thread->stack.end - Z_THREAD_STACK_VOID_SIZE;
 	     addr++) {
 		*addr = CONFIG_THREAD_CANARIES_SYMBOL;
 	}
