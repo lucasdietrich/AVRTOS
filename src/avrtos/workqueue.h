@@ -40,12 +40,7 @@ struct k_work {
 
 struct k_workqueue {
 	struct k_fifo q;
-	union {
-		uint8_t flags;
-		struct {
-			uint8_t yieldeach : 1;
-		};
-	};
+	uint8_t flags;
 };
 
 #define k_workq k_workqueue

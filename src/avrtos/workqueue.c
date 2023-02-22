@@ -13,6 +13,10 @@
 
 #define K_MODULE K_MODULE_WORKQUEUE
 
+#define K_WQ_YIELDEACH_POS 0u
+#define K_WQ_YIELDEACH_MSK (1u << K_WQ_YIELDEACH_POS)
+#define K_WQ_YIELDEACH(_x) (((_x) << K_WQ_YIELDEACH_POS) & K_WQ_YIELDEACH_MSK)
+
 /*___________________________________________________________________________*/
 
 void z_workqueue_entry(struct k_workqueue *const workqueue)
@@ -45,7 +49,7 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		handler(work);
 
 		/* yield if "yieldeach" option is enabled */
-		if (workqueue->yieldeach) {
+		if (workqueue->flags & K_WQ_YIELDEACH_MSK) {
 			k_yield();
 		}
 	}
@@ -86,7 +90,7 @@ void k_workqueue_set_yieldeach(struct k_workqueue *workqueue)
 	__ASSERT_NOTNULL(workqueue);
 
 	const uint8_t key    = irq_lock();
-	workqueue->yieldeach = 1u;
+	workqueue->flags |= K_WQ_YIELDEACH_MSK;
 	irq_unlock(key);
 }
 
@@ -95,7 +99,7 @@ void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue)
 	__ASSERT_NOTNULL(workqueue);
 
 	const uint8_t key    = irq_lock();
-	workqueue->yieldeach = 0u;
+	workqueue->flags &= ~K_WQ_YIELDEACH_MSK;
 	irq_unlock(key);
 }
 
