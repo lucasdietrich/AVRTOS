@@ -73,7 +73,7 @@ void k_print_stack_canaries(struct k_thread *thread)
 #if CONFIG_THREAD_STACK_SENTINEL
 	serial_print_p(PSTR(" + "));
 	serial_u8(CONFIG_THREAD_STACK_SENTINEL_SIZE);
-	serial_print_p(PSTR(" (sentinel)"));
+	serial_print_p(PSTR(" (sent)"));
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
 
 	serial_transmit('\n');
