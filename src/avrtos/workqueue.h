@@ -115,7 +115,7 @@ __kernel bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
  *
  * @param workqueue
  */
-__kernel void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
+__kernel void k_workqueue_enable_yieldeach(struct k_workqueue *workqueue);
 
 /**
  * @brief Configure the workqueue to not release the cpu after each work
@@ -125,11 +125,11 @@ __kernel void k_workqueue_set_yieldeach(struct k_workqueue *workqueue);
  *  - work is not null
  *  - work->handler is not null
  *
- * @see Undo k_workqueue_set_yieldeach
+ * @see Undo k_workqueue_enable_yieldeach
  *
  * @param workqueue
  */
-__kernel void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue);
+__kernel void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue);
 
 /*___________________________________________________________________________*/
 

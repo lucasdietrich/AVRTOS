@@ -85,20 +85,20 @@ bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 	return ret;
 }
 
-void k_workqueue_set_yieldeach(struct k_workqueue *workqueue)
+void k_workqueue_enable_yieldeach(struct k_workqueue *workqueue)
 {
 	__ASSERT_NOTNULL(workqueue);
 
-	const uint8_t key    = irq_lock();
+	const uint8_t key = irq_lock();
 	workqueue->flags |= K_WQ_YIELDEACH_MSK;
 	irq_unlock(key);
 }
 
-void k_workqueue_clr_yieldeach(struct k_workqueue *workqueue)
+void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue)
 {
 	__ASSERT_NOTNULL(workqueue);
 
-	const uint8_t key    = irq_lock();
+	const uint8_t key = irq_lock();
 	workqueue->flags &= ~K_WQ_YIELDEACH_MSK;
 	irq_unlock(key);
 }
