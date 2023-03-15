@@ -6,16 +6,15 @@
 
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
+#include <avrtos/logging.h>
+#include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
-
-/*___________________________________________________________________________*/
+#define LOG_LEVEL LOG_LEVEL_WRN
 
 #define K_MODULE K_MODULE_APPLICATION
-
-/*___________________________________________________________________________*/
 
 void consumer(void *context);
 
@@ -23,7 +22,7 @@ K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 
 struct in {
 	struct snode tie;
-	uint8_t buffer[20];
+	char buffer[20];
 	uint8_t len;
 };
 
@@ -46,8 +45,6 @@ void free_in(struct in *mem)
 {
 	k_mem_slab_free(&myslab, mem);
 }
-
-/*___________________________________________________________________________*/
 
 static inline void input(const char rx)
 {
@@ -97,25 +94,96 @@ ISR(USART0_RX_vect)
 	input(rx);
 }
 
+struct command {
+	char name[10u];
+	uint8_t name_len;
+	void (*func)(void);
+};
+
+static void cmd_help(void);
+static void cmd_version(void);
+static void cmd_reboot(void);
+static void cmd_sleep(void);
+
+#define CMD(_name, _func)                                                                \
+	{                                                                                \
+		.name = _name, .name_len = sizeof(_name) - 1u, .func = _func             \
+	}
+
+const struct command commands[] PROGMEM = {
+	CMD("help", cmd_help),
+	CMD("version", cmd_version),
+	CMD("reboot", cmd_reboot),
+	CMD("uptime", k_show_uptime),
+	CMD("ticks", k_show_ticks),
+	CMD("sleep", cmd_sleep),
+	CMD("canaries", k_dump_stack_canaries),
+	CMD("threads", k_thread_dump_all),
+	CMD("led", led_toggle),
+};
+
+const struct command *find_command(const char *name)
+{
+	for (uint8_t i = 0; i < ARRAY_SIZE(commands); i++) {
+		const struct command *cmd = &commands[i];
+		if (strncmp_P(name, cmd->name, pgm_read_byte(&cmd->name_len)) == 0) {
+			return cmd;
+		}
+	}
+
+	return find_command("help");
+}
+
+void cmd_call(const struct command *cmd)
+{
+	void (*func)(void) = (void (*)(void))pgm_read_word(&cmd->func);
+	func();
+}
+
+static void cmd_help(void)
+{
+	const struct command *cmd;
+
+	for (uint8_t i = 0; i < ARRAY_SIZE(commands); i++) {
+		cmd = &commands[i];
+		printf_P(PSTR("\t"));
+		printf_P(cmd->name);
+		printf_P(PSTR("\n"));
+	};
+}
+
+static void cmd_version(void)
+{
+	printf_P(PSTR("version: %02u.%02u"), AVRTOS_VERSION_MAJOR, AVRTOS_VERSION_MINOR);
+}
+
+static void cmd_reboot(void)
+{
+}
+
+static void cmd_sleep(void)
+{
+	k_sleep(K_SECONDS(1));
+}
+
 void consumer(void *context)
 {
+	const struct command *cmd;
+	struct in *mem;
+
 	for (;;) {
-		serial_print_p(PSTR("\n# "));
+		printf_P(PSTR("\n# "));
 
-		struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
+		mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
 
-		if (mem->len != 0) {
-			/* process/parsed the command */
-			serial_print_p(PSTR("\nlen="));
-			serial_u8(mem->len);
-			serial_print_p(PSTR(" : "));
+		LOG_HEXDUMP_DBG(mem->buffer, mem->len);
 
-			for (uint8_t *c = (uint8_t *)mem->buffer;
-			     c < mem->buffer + mem->len;
-			     c++) {
-				serial_transmit(*c);
-			}
+		cmd = find_command(mem->buffer);
+		if (cmd != NULL) {
+			printf_P(PSTR("\n"));
+			cmd_call(cmd);
 		}
+
 		free_in(mem);
 	}
 }
@@ -123,6 +191,7 @@ void consumer(void *context)
 int main(void)
 {
 	serial_init();
+	led_init();
 
 	k_thread_dump_all();
 

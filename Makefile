@@ -43,7 +43,7 @@ upload:
 
 monitor:
 	echo "Press Ctrl-T + Q to exit"
-	python3 -m serial.tools.miniterm $(DEVICE) $(BAUDRATE)
+	python3 -m serial.tools.miniterm $(DEVICE) $(BAUDRATE) --raw --eol LF
 
 format:
 	find src -iname *.h -o -iname *.c -o -iname *.cpp | xargs clang-format -i

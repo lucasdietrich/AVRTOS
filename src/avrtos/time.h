@@ -34,6 +34,8 @@ __kernel void k_time_unset(void);
 
 void k_show_uptime(void);
 
+void k_show_ticks(void);
+
 /*___________________________________________________________________________*/
 
 #ifdef __cplusplus

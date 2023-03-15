@@ -711,4 +711,14 @@
 #define CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG 0
 #endif
 
+//
+// Enable statistics for kernel
+//
+// 0: Kernel statistics is disabled
+// 1: Kernel statistics is enabled
+//
+#ifndef CONFIG_KERNEL_STATS
+#define CONFIG_KERNEL_STATS 0
+#endif
+
 #endif

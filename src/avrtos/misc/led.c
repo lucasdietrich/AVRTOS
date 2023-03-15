@@ -16,7 +16,7 @@
 #define BUILTIN_LED_PIN	 (7u)
 #else
 #define BUILTIN_LED_PORT GPIOB_DEVICE
-#define BUILTIN_LED_PIN	 0
+#define BUILTIN_LED_PIN	 (0u)
 #endif
 
 void led_init(void)

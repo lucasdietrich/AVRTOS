@@ -37,6 +37,19 @@ void k_show_uptime(void)
 		 ts.tv_msec);
 }
 
+void k_show_ticks(void)
+{
+	const uint64_t ticks = k_ticks_get_64();
+	const uint32_t msb   = (uint32_t)(ticks >> 32llu);
+	const uint32_t lsb   = (uint32_t)ticks;
+
+	if (msb) {
+		printf_P(PSTR("%lu%lu"), msb, lsb);
+	} else {
+		printf_P(PSTR("%lu"), lsb);
+	}
+}
+
 static struct {
 	uint32_t timestamp;
 	uint32_t uptime_sec;
