@@ -25,6 +25,17 @@ void yield(void)
 
 /*___________________________________________________________________________*/
 
+static inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
+{
+	thread->flags =
+		(thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
+}
+
+static inline uint8_t z_get_thread_state(struct k_thread *thread)
+{
+	return thread->flags & Z_THREAD_STATE_MSK;
+}
+
 #if CONFIG_KERNEL_THREAD_IDLE
 #define THREAD_IS_IDLE(_thread) (_thread == &z_thread_idle)
 #else
@@ -128,7 +139,7 @@ static __kernel void z_schedule(struct k_thread *thread)
 #endif
 
 	/* Mark this thread as READY */
-	thread->state = Z_READY;
+	z_set_thread_state(thread, Z_THREAD_STATE_READY);
 
 	if (z_ready_count == 0) {
 		/* Resume from IDLE */
@@ -173,10 +184,10 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
 static __kernel void z_schedule_wake_up(k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
-	__ASSERT_TRUE(z_current->wakeup_schd == 0);
+	__ASSERT_TRUE((z_current->flags & Z_THREAD_WAKEUP_SCHED_MSK) == 0);
 
 	if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
-		z_current->wakeup_schd	     = 1;
+		z_current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
 		z_current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
 		z_current->tie.event.next    = NULL;
 		z_tqueue_schedule(&z_events_queue, &z_current->tie.event);
@@ -191,9 +202,9 @@ static __kernel void z_schedule_wake_up(k_timeout_t timeout)
 static void z_cancel_scheduled_wake_up(struct k_thread *thread)
 {
 	/* Remove the thread from the events queue */
-	if (thread->wakeup_schd) {
+	if (thread->flags & Z_THREAD_WAKEUP_SCHED_MSK) {
+		thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
 		tqueue_remove(&z_events_queue, &thread->tie.event);
-		thread->wakeup_schd = 0;
 	}
 }
 
@@ -213,7 +224,7 @@ __kernel void z_wake_up(struct k_thread *thread)
 {
 	__ASSERT_NOTNULL(thread);
 	__ASSERT_NOINTERRUPT();
-	__ASSERT_THREAD_STATE(thread, Z_PENDING);
+	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
 
 	__K_DBG_WAKEUP(thread); // @
 
@@ -256,7 +267,7 @@ void z_kernel_init(void)
 	z_thread_idle_create();
 
 	/* Mark idle thread */
-	z_thread_idle.state = Z_IDLE_THREAD;
+	z_set_thread_state(&z_thread_idle, Z_THREAD_STATE_IDLE);
 #endif
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
@@ -273,7 +284,8 @@ void z_kernel_init(void)
 
 		/* idle thread must not be added to the
 		 * runqueue as the main thread is running */
-		if (!THREAD_IS_IDLE(thread) && (thread->state == Z_READY)) {
+		if (!THREAD_IS_IDLE(thread) &&
+		    (z_get_thread_state(thread) == Z_THREAD_STATE_READY)) {
 			z_ready_count++;
 			dlist_append(z_runq, &thread->tie.runqueue);
 		}
@@ -310,8 +322,8 @@ void z_system_shift(void)
 		__K_DBG_SCHED_EVENT(thread); // !
 
 		/* set ready thread expired flag */
-		thread->timer_expired = 1u;
-		thread->wakeup_schd   = 0;
+		thread->flags |= Z_THREAD_TIMER_EXPIRED_MSK;
+		thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
 
 		z_schedule(thread);
 	}
@@ -345,14 +357,13 @@ struct k_thread *z_scheduler(void)
 	struct k_thread *const prev = z_current;
 
 	/* reset flags */
-	prev->pend_canceled = 0;
-	prev->timer_expired = 0;
+	prev->flags &= ~(Z_THREAD_TIMER_EXPIRED_MSK | Z_THREAD_PEND_CANCELED_MSK);
 
 	/* If previous thread put itself in pending state,
 	 * it already removed itself from the runqueue, so we don't need
 	 * to do it here
 	 */
-	if (z_current->state == Z_READY) {
+	if (z_get_thread_state(z_current) == Z_THREAD_STATE_READY) {
 		/* Rotate the runqueue, set next thread to first position */
 		z_runq = z_runq->next;
 	}
@@ -379,10 +390,10 @@ struct k_thread *z_scheduler(void)
 static void z_suspend(struct k_thread *thread)
 {
 	__ASSERT_NOINTERRUPT();
-	__ASSERT_THREAD_NOT_STATE(thread, Z_STOPPED);
-	__ASSERT_THREAD_NOT_STATE(thread, Z_IDLE_THREAD);
+	__ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_STOPPED);
+	__ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
 
-	if (thread->state == Z_PENDING) { /* Z_PENDING */
+	if (z_get_thread_state(thread) == Z_THREAD_STATE_PENDING) { /* Z_PENDING */
 		z_cancel_scheduled_wake_up(thread);
 	} else {
 		/* Remove thread from runqueue */
@@ -431,7 +442,7 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 		z_schedule_wake_up(timeout);
 
 		/* Mark this thread as pending */
-		z_current->state = Z_PENDING;
+		z_set_thread_state(z_current, Z_THREAD_STATE_PENDING);
 
 		/* Call scheduler */
 		z_yield();
@@ -439,10 +450,10 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 		/* if timer expired, we manually remove the thread from
 		 * the pending queue
 		 */
-		if (z_current->timer_expired) {
+		if (z_current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
 			dlist_remove(&z_current->wany);
 			err = -ETIMEDOUT;
-		} else if (z_current->pend_canceled) {
+		} else if (z_current->flags & Z_THREAD_PEND_CANCELED_MSK) {
 			err = -ECANCELED;
 		} else {
 			err = 0;
@@ -494,7 +505,7 @@ __kernel void z_cancel_first_pending(struct dnode *waitqueue)
 	struct k_thread *pending_thread = z_unpend_first_thread(waitqueue);
 	if (pending_thread != NULL) {
 		/* tells that we canceled the thread pending on the object */
-		pending_thread->pend_canceled = 1;
+		pending_thread->flags |= Z_THREAD_PEND_CANCELED_MSK;
 	}
 }
 
@@ -507,7 +518,7 @@ __kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue)
 	struct k_thread *pending_thread;
 
 	while ((pending_thread = z_unpend_first_thread(waitqueue)) != NULL) {
-		pending_thread->pend_canceled = 1;
+		pending_thread->flags |= Z_THREAD_PEND_CANCELED_MSK;
 		count++;
 	}
 
@@ -547,7 +558,7 @@ void k_sched_lock(void)
 {
 	const uint8_t key = irq_lock();
 
-	z_current->sched_lock = 1;
+	z_current->flags |= Z_THREAD_SCHED_LOCKED_MSK;
 
 	irq_unlock(key);
 
@@ -571,8 +582,8 @@ void k_sched_unlock(void)
 	}
 #endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
-	const uint8_t key     = irq_lock();
-	z_current->sched_lock = 0;
+	const uint8_t key = irq_lock();
+	z_current->flags &= ~Z_THREAD_SCHED_LOCKED_MSK;
 	irq_unlock(key);
 
 	__K_DBG_SCHED_UNLOCK();
@@ -587,17 +598,17 @@ bool k_sched_locked(void)
 {
 	const uint8_t flags = z_current_flags_get();
 
-	return (flags & (Z_FLAG_SCHED_LOCKED | Z_FLAG_COOP)) != 0;
+	return (flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) != 0;
 }
 
 bool k_cur_is_preempt(void)
 {
-	return (z_current_flags_get() & Z_FLAG_COOP) == 0;
+	return (z_current_flags_get() & Z_THREAD_PRIO_COOP) == 0;
 }
 
 bool k_cur_is_coop(void)
 {
-	return (z_current_flags_get() & Z_FLAG_COOP) != 0;
+	return (z_current_flags_get() & Z_THREAD_PRIO_COOP) != 0;
 }
 
 void k_sleep(k_timeout_t timeout)
@@ -612,7 +623,7 @@ void k_sleep(k_timeout_t timeout)
 		z_schedule_wake_up(timeout);
 
 		/* Mark this thread as pending */
-		z_current->state = Z_PENDING;
+		z_set_thread_state(z_current, Z_THREAD_STATE_PENDING);
 
 		/* Call scheduler */
 		z_yield();
@@ -654,7 +665,7 @@ int8_t k_thread_start(struct k_thread *thread)
 {
 	int8_t ret = -EAGAIN;
 
-	if (thread->state == Z_STOPPED) {
+	if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) {
 		const uint8_t key = irq_lock();
 
 		z_schedule(thread);
@@ -669,17 +680,17 @@ int8_t k_thread_start(struct k_thread *thread)
 
 __kernel int8_t k_thread_stop(struct k_thread *thread)
 {
-	if (thread->state == Z_STOPPED) return -EINVAL;
+	if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) return -EINVAL;
 
 #if CONFIG_KERNEL_THREAD_IDLE
-	if (thread->state == Z_IDLE_THREAD) return -EINVAL;
+	if (z_get_thread_state(thread) == Z_THREAD_STATE_IDLE) return -EINVAL;
 #endif
 
 	const uint8_t key = irq_lock();
 
 	z_suspend(thread);
 
-	thread->state = Z_STOPPED;
+	z_set_thread_state(thread, Z_THREAD_STATE_STOPPED);
 
 	if (thread == z_current)
 		z_yield();

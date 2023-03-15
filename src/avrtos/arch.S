@@ -109,7 +109,7 @@ TIMERn_COMPA_vect:
 	lds ZH, z_current + 1
 
 	ldd r18, Z + 2      ; read flag
-	andi r18, Z_FLAG_COOP | Z_FLAG_SCHED_LOCKED
+	andi r18, Z_THREAD_PRIO_COOP | Z_THREAD_SCHED_LOCKED_MSK
 
 	; scheduler is locked: do not switch thread and exit interrupt
 	brne __sched_locked

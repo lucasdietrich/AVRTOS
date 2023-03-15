@@ -35,32 +35,6 @@ extern "C" {
  */
 typedef void (*thread_entry_t)(void *);
 
-/**
- * @brief Thread state.
- */
-enum thread_state_t {
-	/* the thread is not running and is not in the runqueue,
-	 * it can be stopped/started with k_thread_stop/k_thread_start functions.
-	 */
-	Z_STOPPED = 0,
-
-	/* the thread is (yet/still) ready for execution and is the runqueue
-	 */
-	Z_READY = 1,
-
-	/* The thread is pending for an event, it may be in the time queue
-	 * (events_queue) but it is not in the runqueue. It can be wake up with
-	 * function z_wake_up()
-	 */
-	Z_PENDING = 2,
-
-	/* This flag is reserved for IDLE thread only (if enabled),
-	 * it is used to know whether the thread being evaluated is the IDLE
-	 * thread
-	 */
-	Z_IDLE_THREAD = 3
-};
-
 /* size 19B */
 struct z_callsaved_ctx {
 	uint8_t sreg;
@@ -136,12 +110,10 @@ struct z_callused_ctx {
 };
 
 struct z_intctx {
-	struct {
 #if Z_ARCH_PC_SIZE == 3
-		uint8_t pch;
+	uint8_t pch;
 #endif /* Z_ARCH_PC_SIZE == 3 */
-		void *pc;
-	};
+	void *pc;
 
 	uint8_t r1;
 	uint8_t r0;
@@ -165,42 +137,7 @@ struct z_intctx {
 struct k_thread {
 	void *sp; // stack point, keep it at the beginning of the structure
 
-	union {
-		struct {
-			/* @see thread_state_t */
-			uint8_t state : 2;
-
-			/* tells if scheduler is temporarely locked */
-			uint8_t sched_lock : 1;
-
-			/* Thread priority
-			 * 0 : COOPERATIVE HIGH PRIORITY
-			 * 1 : COOPERATIVE LOW PRIORITY
-			 * 2 : PREEMPTIVE HIGH PRIORITY
-			 * 3 : PREEMPTIVE LOW PRIORITY
-			 *
-			 * Cooperative threads have a higher priority than
-			 * preemptive threads.
-			 */
-			uint8_t priority : 2;
-
-			/* tells if the timer expiration caused
-			 * this thread to be awakened
-			 */
-			uint8_t timer_expired : 1;
-
-			/* tells if the thread pending on
-			 * an object was canceled
-			 */
-			uint8_t pend_canceled : 1;
-
-			/* tells if the thread wake up is scheduled
-			 * in events_queue (flag for optimisation purpose)
-			 */
-			uint8_t wakeup_schd : 1;
-		};
-		uint8_t flags;
-	};
+	uint8_t flags;
 
 	union {
 		struct dnode runqueue; // represent the thread in the runqueue (4B)

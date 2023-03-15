@@ -18,7 +18,7 @@ class Task
       public:
 	Task(const char name[],
 	     task_func_t entry,
-	     uint8_t priority = K_COOPERATIVE | Z_FLAG_PRIO_LOW)
+	     uint8_t priority = Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
 	{
 
 		void *stack;

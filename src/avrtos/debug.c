@@ -77,17 +77,17 @@ void k_thread_dump(struct k_thread *thread)
 
 	serial_transmit(' ');
 
-	switch (thread->state) {
-	case Z_READY:
+	switch (thread->flags & Z_THREAD_STATE_MSK) {
+	case Z_THREAD_STATE_READY:
 		serial_print_p(PSTR("READY  "));
 		break;
-	case Z_STOPPED:
+	case Z_THREAD_STATE_STOPPED:
 		serial_print_p(PSTR("STOPPED"));
 		break;
-	case Z_PENDING:
+	case Z_THREAD_STATE_PENDING:
 		serial_print_p(PSTR("PENDING"));
 		break;
-	case Z_IDLE_THREAD:
+	case Z_THREAD_STATE_IDLE:
 		serial_print_p(PSTR("IDLE   "));
 		break;
 	default:
@@ -96,14 +96,18 @@ void k_thread_dump(struct k_thread *thread)
 
 	serial_transmit(' ');
 
-	serial_transmit((thread->flags & Z_MASK_PRIO) == K_COOPERATIVE ? 'C' : 'P');
+	serial_transmit((thread->flags & Z_THREAD_PRIO_COOP_MSK) == Z_THREAD_PRIO_COOP
+				? 'C'
+				: 'P');
 	serial_transmit(' ');
-	serial_transmit((thread->flags & Z_MASK_PRIO) == Z_FLAG_PRIO_HIGH ? '0' : '1');
+	serial_transmit((thread->flags & Z_THREAD_PRIO_LEVEL_MSK) == Z_THREAD_PRIO_HIGH
+				? '0'
+				: '1');
 	serial_transmit(' ');
-	serial_transmit(thread->sched_lock ? 'S' : '_');
-	serial_transmit(thread->timer_expired ? 'X' : '_');
-	serial_transmit(thread->pend_canceled ? 'Y' : '_');
-	serial_transmit(thread->wakeup_schd ? 'W' : '_');
+	serial_transmit(thread->flags & Z_THREAD_SCHED_LOCKED_MSK ? 'S' : '_');
+	serial_transmit(thread->flags & Z_THREAD_TIMER_EXPIRED_MSK ? 'X' : '_');
+	serial_transmit(thread->flags & Z_THREAD_PEND_CANCELED_MSK ? 'Y' : '_');
+	serial_transmit(thread->flags & Z_THREAD_WAKEUP_SCHED_MSK ? 'W' : '_');
 
 	serial_print_p(PSTR(" : SP "));
 	serial_u16(k_thread_usage(thread));

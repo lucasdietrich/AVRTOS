@@ -86,37 +86,72 @@
  * because these flags are used in assembly code
  */
 
-#define Z_FLAG_STATE_POS 0
-#define Z_MASK_STATE	 (3 << Z_FLAG_STATE_POS)
-#define Z_FLAG_STOPPED	 (0 << Z_FLAG_STATE_POS)
-#define Z_FLAG_READY	 (1 << Z_FLAG_STATE_POS)
-#define Z_FLAG_PENDING	 (2 << Z_FLAG_STATE_POS)
-#define Z_FLAG_IDLE	 (3 << Z_FLAG_STATE_POS)
+#define Z_THREAD_STATE_POS 0
+#define Z_THREAD_STATE_MSK (3 << Z_THREAD_STATE_POS)
 
-#define Z_FLAG_SCHED_LOCKED_POS 2
-#define Z_FLAG_SCHED_LOCKED	(1 << Z_FLAG_SCHED_LOCKED_POS)
+#define Z_THREAD_SCHED_LOCKED_POS 2
+#define Z_THREAD_SCHED_LOCKED_MSK (1 << Z_THREAD_SCHED_LOCKED_POS)
 
-#define Z_FLAG_PRIO_POS	  3
-#define Z_MASK_PRIO	  (3 << Z_FLAG_PRIO_POS)
-#define Z_MASK_PRIO_COOP  (2 << Z_FLAG_PRIO_POS)
-#define Z_MASK_PRIO_LEVEL (1 << Z_FLAG_PRIO_POS)
-#define Z_FLAG_COOP	  (2 << Z_FLAG_PRIO_POS)
-#define Z_FLAG_PREEMPT	  (0 << Z_FLAG_PRIO_POS)
-#define Z_FLAG_PRIO_HIGH  (1 << Z_FLAG_PRIO_POS)
-#define Z_FLAG_PRIO_LOW	  (0 << Z_FLAG_PRIO_POS)
+#define Z_THREAD_PRIO_POS	3
+#define Z_THREAD_PRIO_MSK	(3 << Z_THREAD_PRIO_POS)
+#define Z_THREAD_PRIO_COOP_MSK	(2 << Z_THREAD_PRIO_POS)
+#define Z_THREAD_PRIO_LEVEL_MSK (1 << Z_THREAD_PRIO_POS)
 
-#define Z_FLAG_TIMER_EXPIRED_POS 5
-#define Z_FLAG_TIMER_EXPIRED	 (1 << Z_FLAG_TIMER_EXPIRED_POS)
+#define Z_THREAD_TIMER_EXPIRED_POS 5
+#define Z_THREAD_TIMER_EXPIRED_MSK (1 << Z_THREAD_TIMER_EXPIRED_POS)
 
-#define Z_FLAG_PEND_CANCELED_POS 6
-#define Z_FLAG_PEND_CANCELED	 (1 << Z_FLAG_PEND_CANCELED_POS)
+#define Z_THREAD_PEND_CANCELED_POS 6
+#define Z_THREAD_PEND_CANCELED_MSK (1 << Z_THREAD_PEND_CANCELED_POS)
 
-#define Z_FLAG_WAKEUP_SCHED_POS 7
-#define Z_FLAG_WAKEUP_SCHED	(1 << Z_FLAG_WAKEUP_SCHED_POS)
+#define Z_THREAD_WAKEUP_SCHED_POS 7
+#define Z_THREAD_WAKEUP_SCHED_MSK (1 << Z_THREAD_WAKEUP_SCHED_POS)
 
-#define K_COOPERATIVE  Z_FLAG_COOP
-#define K_PREEMPTIVE   Z_FLAG_PREEMPT
-#define K_PRIO_DEFAULT (K_COOPERATIVE | Z_FLAG_PRIO_LOW)
+/* the thread is not running and is not in the runqueue,
+ * it can be stopped/started with k_thread_stop/k_thread_start functions.
+ */
+#define Z_THREAD_STATE_STOPPED (0 << Z_THREAD_STATE_POS)
+
+/* the thread is (yet/still) ready for execution and is the runqueue
+ */
+#define Z_THREAD_STATE_READY (1 << Z_THREAD_STATE_POS)
+
+/* The thread is pending for an event, it may be in the time queue
+ * (events_queue) but it is not in the runqueue. It can be wake up with
+ * function z_wake_up()
+ */
+#define Z_THREAD_STATE_PENDING (2 << Z_THREAD_STATE_POS)
+
+/* This flag is reserved for IDLE thread only (if enabled),
+ * it is used to know whether the thread being evaluated is the IDLE
+ * thread
+ */
+#define Z_THREAD_STATE_IDLE (3 << Z_THREAD_STATE_POS)
+
+/* Thread is cooperative and cannot be preempted by other threads */
+#define Z_THREAD_PRIO_COOP (2 << Z_THREAD_PRIO_POS)
+
+/* Thread is preemptible and can be preempted by other threads */
+#define Z_THREAD_PRIO_PREEMPT (0 << Z_THREAD_PRIO_POS)
+
+/* Thread priority level is high, it will be scheduled before
+ * threads with low priority
+ */
+#define Z_THREAD_PRIO_HIGH (1 << Z_THREAD_PRIO_POS)
+
+/* Thread priority level is low, it will be scheduled after
+ * threads with high priority
+ */
+#define Z_THREAD_PRIO_LOW (0 << Z_THREAD_PRIO_POS)
+
+/* Default thread priority level for cooperative threads */
+#define K_COOPERATIVE (Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
+
+/* Default thread priority level for preemptible threads */
+#define K_PREEMPTIVE (Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW)
+
+/* Default thread priority level */
+#define K_PRIO_DEFAULT (K_COOPERATIVE | Z_THREAD_PRIO_LOW)
+
 /*___________________________________________________________________________*/
 
 #endif

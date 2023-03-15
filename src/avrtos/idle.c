@@ -27,12 +27,12 @@ static void z_thread_idle_entry(void *context);
 /* Z_THREAD_STACK_MIN_SIZE without interrupts */
 #define Z_THREAD_IDLE_STACK_SIZE                                                         \
 	(Z_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
-#define Z_THREAD_IDLE_PRIORITY (K_COOPERATIVE | Z_FLAG_PRIO_LOW)
+#define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
 #else
 /* If IDLE thread can be preempted, plan additionnal stack */
 #define Z_THREAD_IDLE_STACK_SIZE                                                         \
 	(Z_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
-#define Z_THREAD_IDLE_PRIORITY (K_PREEMPTIVE | Z_FLAG_PRIO_LOW)
+#define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW)
 #endif
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT

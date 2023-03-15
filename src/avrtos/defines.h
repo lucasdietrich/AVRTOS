@@ -298,17 +298,18 @@ typedef struct {
 
 #define Z_THREAD_INITIALIZER(_name, stack_size, prio_flag, sym)                          \
 	struct k_thread _name = {                                                        \
-		.sp = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),              \
-		{                                                                        \
-			.flags = Z_FLAG_READY | prio_flag,                               \
-		},                                                                       \
-		.tie = {.runqueue = DITEM_INIT(NULL)},                                   \
+		.sp    = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),           \
+		.flags = Z_THREAD_STATE_READY | prio_flag,                               \
+		.tie   = {.runqueue = DITEM_INIT(NULL)},                                 \
 		{.wany = DITEM_INIT(NULL)},                                              \
 		.swap_data = NULL,                                                       \
-		.stack	   = {.end  = (void *)Z_STACK_END(Z_THREAD_STACK_START(_name),   \
-							  stack_size),                   \
-			      .size = (stack_size)},                                     \
-		.symbol	   = sym}
+		.stack =                                                                 \
+			{                                                                \
+				.end  = (void *)Z_STACK_END(Z_THREAD_STACK_START(_name), \
+							    stack_size),                 \
+				.size = (stack_size),                                    \
+			},                                                               \
+		.symbol = sym}
 
 #if CONFIG_AVRTOS_KERNEL_SECTIONS
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD == 0u

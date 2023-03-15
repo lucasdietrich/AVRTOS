@@ -23,13 +23,11 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
 
 K_THREAD struct k_thread z_thread_main = {
 	.sp = 0, // main thread is running, context already "restored"
-	{
 #if CONFIG_THREAD_MAIN_COOPERATIVE == 1
-		.flags = Z_READY | K_COOPERATIVE | Z_FLAG_PRIO_LOW,
+	.flags = Z_THREAD_STATE_READY | Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW,
 #else
-		.flags = Z_READY | K_PREEMPTIVE | Z_FLAG_PRIO_LOW,
+	.flags = Z_THREAD_STATE_READY | Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW,
 #endif
-	},
 	.tie =
 		{
 			.runqueue =
@@ -57,7 +55,7 @@ K_THREAD struct k_thread z_thread_main = {
 		{
 			// implicit stack, we set the main thread stack end at
 			// the end of the RAM
-			.end = (void *)RAMEND,
+			.end  = (void *)RAMEND,
 			.size = CONFIG_THREAD_MAIN_STACK_SIZE, /* Used as
 								  indication
 								  only */
@@ -126,7 +124,7 @@ int8_t k_thread_create(struct k_thread *const thread,
 	z_thread_stack_create(thread, entry, context_p);
 
 	/* clear internal flags */
-	thread->flags	  = Z_STOPPED | (prio & Z_MASK_PRIO);
+	thread->flags	  = Z_THREAD_STATE_STOPPED | (prio & Z_THREAD_PRIO_MSK);
 	thread->symbol	  = symbol;
 	thread->swap_data = NULL;
 
