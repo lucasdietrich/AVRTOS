@@ -49,8 +49,7 @@ const struct usart_config usart_ipc_cfg = {
 
 uint8_t rx_buffer[IPC_FRAME_SIZE];
 
-static uint8_t msgq_buffer[2][IPC_FRAME_SIZE];
-K_MSGQ_DEFINE(ipc_msgq, msgq_buffer, IPC_FRAME_SIZE, 2LU);
+K_MSGQ_DEFINE(ipc_msgq, IPC_FRAME_SIZE, 2u);
 
 K_SEM_DEFINE(tx_finished_sem, 1, 1);
 

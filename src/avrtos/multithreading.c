@@ -96,8 +96,6 @@ static void z_thread_stack_create(struct k_thread *const thread,
 	thread->sp--;
 }
 
-#include "misc/serial.h"
-
 int8_t k_thread_create(struct k_thread *const thread,
 		       thread_entry_t entry,
 		       void *const stack,

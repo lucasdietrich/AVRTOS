@@ -1,5 +1,5 @@
 project(sample_arduino)
-add_executable(${PROJECT_NAME} main.c)
+add_executable(${PROJECT_NAME} main.cpp)
 
 # AVRTOS Configuration
 target_compile_definitions(${PROJECT_NAME} PUBLIC

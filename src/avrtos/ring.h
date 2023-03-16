@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_RING_H
 #define _AVRTOS_RING_H
 
-/* Implement an atomic thread/irq-safe ring buffer */
+/* TODO Implement an atomic thread/irq-safe ring buffer */
 
 #include <avrtos/kernel.h>
 

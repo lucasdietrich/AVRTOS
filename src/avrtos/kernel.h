@@ -254,7 +254,7 @@ uint8_t k_ready_count(void);
 void z_yield(void);
 
 /**
- * @brief Release the CPU: Stop the execution of the current thread and set it
+ * @brief Release the CPU : Stop the execution of the current thread and set it
  * at the end of the runqueue (if it's still ready) in order to execute it one
  * "cycle" later. This function call the scheduler that determine which thread
  * is the next on to be executing. This function restore the context of the

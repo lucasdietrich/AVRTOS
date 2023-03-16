@@ -270,7 +270,7 @@ void z_kernel_init(void)
 	z_set_thread_state(&z_thread_idle, Z_THREAD_STATE_IDLE);
 #endif
 
-#if CONFIG_AVRTOS_LINKER_SCRIPT
+#if AVRTOS_KERNEL_SECTIONS
 
 	/* main thread is the first running (ready or not),
 	 * and it is already in queue */

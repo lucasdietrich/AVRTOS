@@ -24,9 +24,19 @@
 #define __kernel
 #endif
 
-#define CONFIG_AVRTOS_KERNEL_SECTIONS CONFIG_AVRTOS_LINKER_SCRIPT
+/* If the AVRTOS linker script is not provided, sections are not availables,
+ * so don't use them.
+ *
+ * If using Arduino framework, the AVRTOS linker will not be used, so
+ * assume that sections are not availables.
+ */
+#if CONFIG_AVRTOS_LINKER_SCRIPT && !CONFIG_ARDUINO_FRAMEWORK
+#define AVRTOS_KERNEL_SECTIONS 1u
+#else
+#define AVRTOS_KERNEL_SECTIONS 0u
+#endif
 
-#if CONFIG_AVRTOS_KERNEL_SECTIONS
+#if AVRTOS_KERNEL_SECTIONS
 #define Z_LINK_KERNEL_SECTION(_section)                                                  \
 	__attribute__((used, section(Z_STRINGIFY(_section))))
 #else
@@ -314,7 +324,7 @@ typedef struct {
 			},                                                               \
 		.symbol = sym}
 
-#if CONFIG_AVRTOS_KERNEL_SECTIONS
+#if AVRTOS_KERNEL_SECTIONS
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD == 0u
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \

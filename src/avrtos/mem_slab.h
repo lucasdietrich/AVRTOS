@@ -35,7 +35,7 @@ extern "C" {
  * - Allocation/free is O(1)
  *
  * Maximum number of blocks is 255
- * Maximum block size is 65535 (but technically impossible on AVR architectures)
+ * Maximum block _block_size is 65535 (but technically impossible on AVR architectures)
  */
 
 /*___________________________________________________________________________*/
@@ -45,7 +45,7 @@ extern "C" {
  *
  * buffer : buffer from which all blocks will be allocated.
  * count : numbers of blocks
- * block_size : size of a block
+ * block_size : _block_size of a block
  * free_list : list of all free blocks
  * waitqueue : list contains all threads pending on a fifo item.
  *
@@ -61,19 +61,19 @@ struct k_mem_slab {
 
 /*___________________________________________________________________________*/
 
-#define K_MEM_SLAB_INIT(slab, buf, size, num_blocks)                                     \
+#define K_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                         \
 	{                                                                                \
-		.buffer = buf, .count = num_blocks, .block_size = size,                  \
-		.free_list = NULL, .waitqueue = DLIST_INIT(slab.waitqueue)               \
+		.buffer = _buf, .count = _blocks_count, .block_size = _block_size,       \
+		.free_list = NULL, .waitqueue = DLIST_INIT(_slab.waitqueue)              \
 	}
 
-#define Z_MEM_SLAB_BUF_NAME(slab_name) z_mem_slab_buf_##slab_name
+#define Z_MEM_SLAB_BUF_NAME(_slab_name) z_mem_slab_buf_##_slab_name
 
-#define K_MEM_SLAB_DEFINE(slab_name, size, num_blocks)                                   \
-	uint8_t z_mem_slab_buf_##slab_name[(size) * (num_blocks)];                       \
+#define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                        \
+	uint8_t z_mem_slab_buf_##_slab_name[(_block_size) * (_blocks_count)];            \
 	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                              \
-	static struct k_mem_slab slab_name =                                             \
-		K_MEM_SLAB_INIT(slab_name, z_mem_slab_buf_##slab_name, size, num_blocks)
+	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                           \
+		_slab_name, z_mem_slab_buf_##_slab_name, _block_size, _blocks_count)
 
 /*___________________________________________________________________________*/
 
@@ -89,17 +89,17 @@ __kernel void z_mem_slab_init_module(void);
  * @param slab address of the slab structure
  * @param buffer address of the buffer
  * @param block_size
- * @param num_blocks
+ * @param _blocks_count
  * @return return 0 on success else error code
  */
 __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
 				void *buffer,
 				size_t block_size,
-				uint8_t num_blocks);
+				uint8_t _blocks_count);
 
 /**
  * @brief Finalize the initialization of a memory slab when declared using
- * K_MEM_SLAB_DEFINE and CONFIG_AVRTOS_KERNEL_SECTIONS is disabled.
+ * K_MEM_SLAB_DEFINE and AVRTOS_KERNEL_SECTIONS is disabled.
  *
  * @param slab
  */

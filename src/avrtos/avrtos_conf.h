@@ -52,8 +52,10 @@
 // 0: Kernel is not compiled for Arduino framework
 // 1: Kernel is compiled for Arduino framework
 //
+// This option to 1 if ARDUINO macro is detected.
+//
 #ifndef CONFIG_ARDUINO_FRAMEWORK
-#define CONFIG_ARDUINO_FRAMEWORK 0u
+#define CONFIG_ARDUINO_FRAMEWORK defined(ARDUINO)
 #endif
 
 //

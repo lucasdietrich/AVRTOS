@@ -11,7 +11,7 @@
 
 /* Minimum footprint (Release for ATmega2560)
 	Memory region         Used Size  Region Size  %age Used
-		text:        1452 B       256 KB      0.55%
+		text:        1448 B       256 KB      0.55%
 		data:          31 B         8 KB      0.38%
 */
 int main(void)

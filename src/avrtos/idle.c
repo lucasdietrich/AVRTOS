@@ -35,7 +35,7 @@ static void z_thread_idle_entry(void *context);
 #define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW)
 #endif
 
-#if CONFIG_AVRTOS_LINKER_SCRIPT
+#if AVRTOS_KERNEL_SECTIONS
 K_THREAD_DEFINE(z_thread_idle,
 		z_thread_idle_entry,
 		Z_THREAD_IDLE_STACK_SIZE,

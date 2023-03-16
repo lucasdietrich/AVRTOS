@@ -25,7 +25,7 @@ static void z_create_free_list(struct k_mem_slab *slab)
 	}
 }
 
-#if CONFIG_AVRTOS_KERNEL_SECTIONS
+#if AVRTOS_KERNEL_SECTIONS
 
 extern struct k_mem_slab __k_mem_slabs_start;
 extern struct k_mem_slab __k_mem_slabs_end;
@@ -75,7 +75,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 	return 0;
 }
 
-#if !CONFIG_AVRTOS_KERNEL_SECTIONS
+#if !AVRTOS_KERNEL_SECTIONS
 __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab)
 {
 	z_create_free_list(slab);

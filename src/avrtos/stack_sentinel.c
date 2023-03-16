@@ -7,7 +7,7 @@
 #include "fault.h"
 #include "stack_sentinel.h"
 
-#if CONFIG_AVRTOS_KERNEL_SECTIONS
+#if AVRTOS_KERNEL_SECTIONS
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
 

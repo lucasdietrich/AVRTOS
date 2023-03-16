@@ -137,7 +137,7 @@ struct z_intctx {
 struct k_thread {
 	void *sp; // stack point, keep it at the beginning of the structure
 
-	uint8_t flags;
+	uint8_t flags; // thread flags
 
 	union {
 		struct dnode runqueue; // represent the thread in the runqueue (4B)
@@ -177,7 +177,7 @@ struct k_thread {
 		size_t size; // stack size
 	} stack;	     // thread stack definition
 	char symbol;	     // 1-letter symbol to name the thread, reserver M (main),
-		     // idle : I (idle)
+			     // idle : I (idle)
 
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno; // Thread errno

@@ -197,5 +197,7 @@ int main(void)
 
 	SET_BIT(UCSR0B, 1 << RXCIE0);
 
-	k_sleep(K_FOREVER);
+	// k_sleep(K_FOREVER);
+
+	k_stop();
 }

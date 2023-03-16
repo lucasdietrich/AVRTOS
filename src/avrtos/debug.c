@@ -41,7 +41,7 @@ uint16_t k_thread_usage(struct k_thread *thread)
 	}
 }
 
-#if CONFIG_AVRTOS_KERNEL_SECTIONS
+#if AVRTOS_KERNEL_SECTIONS
 
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;

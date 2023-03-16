@@ -20,8 +20,7 @@
 #define BLOCKS_COUNT 10
 #define BLOCK_SIZE   0x20
 
-char buffer[BLOCKS_COUNT * BLOCK_SIZE];
-K_MSGQ_DEFINE(msgq, buffer, BLOCK_SIZE, BLOCKS_COUNT);
+K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
 
 /*___________________________________________________________________________*/
 

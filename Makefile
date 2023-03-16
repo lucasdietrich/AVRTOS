@@ -1,5 +1,11 @@
-# "Unix Makefiles" or "Ninja"
+# "Unix Makefiles" / "make" / "--no-print-directory"
+# GENERATOR="Ninja"
+# GENERATOR_COMMAND="ninja"
+# GENERATOR_ARGS=""
 GENERATOR="Unix Makefiles"
+GENERATOR_COMMAND="make"
+GENERATOR_ARGS="--no-print-directory"
+
 
 DEVICE=/dev/ttyACM0
 SINGLE_SAMPLE=shell
@@ -26,7 +32,7 @@ multiple:
 		-DCMAKE_GENERATOR=$(GENERATOR) \
 		-DPROG_DEV=$(DEVICE) \
 		-DQEMU=$(QEMU)
-	make -C build --no-print-directory
+	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
 
 single:
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \
@@ -36,10 +42,10 @@ single:
 		-DENABLE_SINGLE_SAMPLE=$(SINGLE_SAMPLE) \
 		-DPROG_DEV=$(DEVICE) \
 		-DQEMU=$(QEMU)
-	make -C build --no-print-directory
+	$(GENERATOR_COMMAND) -C build $(GENERATOC_ARGS)
 
 upload:
-	make -C build upload --no-print-directory
+	$(GENERATOR_COMMAND) -C build upload $(GENERATOR_ARGS)
 
 monitor:
 	echo "Press Ctrl-T + Q to exit"

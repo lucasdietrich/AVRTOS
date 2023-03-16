@@ -155,8 +155,7 @@ Code:
 #define BUILTIN_LED_PORT 	GPIOB_DEVICE
 #define BUILTIN_LED_PIN 	(5u)
 
-static char usart_msgq_buf[16u];
-K_MSGQ_DEFINE(usart_msgq, usart_msgq_buf, 1u, 16u);
+K_MSGQ_DEFINE(usart_msgq, 1u, 16u);
 
 static void thread_usart(void *arg);
 static void thread_led(void *arg);

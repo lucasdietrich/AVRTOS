@@ -34,16 +34,17 @@ struct k_msgq {
 
 /*___________________________________________________________________________*/
 
-#define K_MSGQ_INIT(msgq, p_buffer, d_msg_size, d_max_msgs)                              \
+#define K_MSGQ_INIT(_name, _buffer, _msg_size, _max_msgs)                                \
 	{                                                                                \
-		.waitqueue = DLIST_INIT(msgq.waitqueue), .msg_size = d_msg_size,         \
-		.max_msgs = d_max_msgs, .used_msgs = 0, .buf_start = p_buffer,           \
-		.buf_end     = p_buffer + (d_msg_size) * (d_max_msgs),                   \
-		.read_cursor = p_buffer, .write_cursor = p_buffer,                       \
+		.waitqueue = DLIST_INIT(_name.waitqueue), .msg_size = _msg_size,         \
+		.max_msgs = _max_msgs, .used_msgs = 0, .buf_start = _buffer,             \
+		.buf_end = _buffer + (_msg_size) * (_max_msgs), .read_cursor = _buffer,  \
+		.write_cursor = _buffer,                                                 \
 	}
 
-#define K_MSGQ_DEFINE(msgq, p_buffer, d_msg_size, d_max_msgs)                            \
-	struct k_msgq msgq = K_MSGQ_INIT(msgq, p_buffer, d_msg_size, d_max_msgs)
+#define K_MSGQ_DEFINE(_name, _msg_size, _max_msgs)                                       \
+	uint8_t z_msgq_buf_##_name[(_msg_size) * (_max_msgs)];                           \
+	struct k_msgq _name = K_MSGQ_INIT(_name, z_msgq_buf_##_name, _msg_size, _max_msgs)
 
 /*___________________________________________________________________________*/
 

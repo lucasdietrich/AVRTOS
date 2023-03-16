@@ -66,3 +66,13 @@ void z_avrtos_init(void)
 	sei();
 #endif
 }
+
+/**
+ * @brief Automatically initialize AVRTOS if Arduino framework is used
+ */
+#if CONFIG_ARDUINO_FRAMEWORK
+void initVariant(void)
+{
+	z_avrtos_init();
+}
+#endif /* ARDUINO */
