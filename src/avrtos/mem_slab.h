@@ -99,7 +99,7 @@ __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
 
 /**
  * @brief Finalize the initialization of a memory slab when declared using
- * K_MEM_SLAB_DEFINE and AVRTOS_KERNEL_SECTIONS is disabled.
+ * K_MEM_SLAB_DEFINE and CONFIG_AVRTOS_LINKER_SCRIPT is disabled.
  *
  * @param slab
  */

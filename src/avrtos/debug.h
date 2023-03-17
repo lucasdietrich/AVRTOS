@@ -159,7 +159,7 @@ uint16_t z_read_sp(void);
  * @brief Return the return addr value of itself (z_read_ra), helps to determine
  * current running thread
  *
- * Depends on arch (PC can be 2 or 3 bytes)
+ * Depends on architecture (PC can be 2 or 3 bytes)
  */
 #if defined(__AVR_3_BYTE_PC__)
 uint32_t z_read_ra(void);

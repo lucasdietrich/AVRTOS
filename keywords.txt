@@ -1,0 +1,303 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+k_timeout_t	KEYWORD1
+k_ticks_t	KEYWORD1
+k_flags_options	KEYWORD1
+thread_entry_t	KEYWORD1
+k_timer_handler_t	KEYWORD1
+k_work_handler_t	KEYWORD1
+ditem_t	KEYWORD1
+dlist_t	KEYWORD1
+slist_t	KEYWORD1
+snode_t	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+k_thread_create KEYWORD2
+k_thread_current    KEYWORD2
+k_timer_init    KEYWORD2
+k_timer_started KEYWORD2
+k_timer_stop    KEYWORD2
+k_timer_start	KEYWORD2
+k_work_init	KEYWORD2
+k_work_submittable	KEYWORD2
+k_work_submit	KEYWORD2
+k_workqueue_enable_yieldeach	KEYWORD2
+k_workqueue_disable_yieldeach	KEYWORD2
+k_system_workqueue_submit	KEYWORD2
+k_timespec_get	KEYWORD2
+k_time_set	KEYWORD2
+k_time_is_set	KEYWORD2
+k_time_get	KEYWORD2
+k_time_unset	KEYWORD2
+k_show_uptime	KEYWORD2
+k_show_ticks	KEYWORD2
+k_verify_stack_sentinel	KEYWORD2
+k_assert_registered_stack_sentinel	KEYWORD2
+k_signal_init	KEYWORD2
+k_signal_raise	KEYWORD2
+k_poll_signal	KEYWORD2
+k_poll_cancel_wait	KEYWORD2
+k_sem_init	KEYWORD2
+k_sem_take	KEYWORD2
+k_sem_give	KEYWORD2
+k_ring_init	KEYWORD2
+k_ring_push	KEYWORD2
+k_ring_pop	KEYWORD2
+k_ring_reset	KEYWORD2
+k_prng_get	KEYWORD2
+k_prng_get_u32	KEYWORD2
+k_prng_get_buffer	KEYWORD2
+k_mutex_init	KEYWORD2
+k_mutex_lock	KEYWORD2
+k_mutex_unlock	KEYWORD2
+k_mutex_cancel_wait	KEYWORD2
+k_msgq_init	KEYWORD2
+k_msgq_put	KEYWORD2
+k_msgq_get	KEYWORD2
+k_msgq_purge	KEYWORD2
+k_msgq_peek	KEYWORD2
+k_msgq_num_free_get	KEYWORD2
+k_msgq_num_used_get	KEYWORD2
+k_mem_slab_init	KEYWORD2
+k_mem_slab_alloc	KEYWORD2
+k_mem_slab_free	KEYWORD2
+k_set_stdio_usart0	KEYWORD2
+k_is_cpu_idle	KEYWORD2
+k_idle	KEYWORD2
+k_flags_init	KEYWORD2
+k_flags_poll	KEYWORD2
+k_flags_notify	KEYWORD2
+k_flags_reset	KEYWORD2
+k_fifo_init	KEYWORD2
+k_fifo_put	KEYWORD2
+k_fifo_get	KEYWORD2
+k_fifo_cancel_wait	KEYWORD2
+k_fifo_is_empty	KEYWORD2
+k_fifo_peek_head	KEYWORD2
+k_fifo_peek_tail	KEYWORD2
+k_event_init	KEYWORD2
+k_event_schedule	KEYWORD2
+k_event_cancel	KEYWORD2
+k_event_pending	KEYWORD2
+k_thread_usage	KEYWORD2
+k_thread_dbg_count	KEYWORD2
+k_thread_dump_hex	KEYWORD2
+k_thread_dump	KEYWORD2
+k_thread_dump_all	KEYWORD2
+k_print_stack_canaries	KEYWORD2
+k_print_current_canaries	KEYWORD2
+k_dump_stack_canaries	KEYWORD2
+atomic_get	KEYWORD2
+atomic_blind_clear	KEYWORD2
+atomic_clear	KEYWORD2
+atomic_or	KEYWORD2
+atomic_xor	KEYWORD2
+atomic_and	KEYWORD2
+atomic_inc	KEYWORD2
+atomic_dec	KEYWORD2
+atomic_clear_bit	KEYWORD2
+atomic_set_bit	KEYWORD2
+atomic_set_bit_to	KEYWORD2
+atomic_test_bit	KEYWORD2
+atomic_test_and_clear_bit	KEYWORD2
+atomic_test_and_set_bit	KEYWORD2
+atomic_cas	KEYWORD2
+atomic_cas2	KEYWORD2
+__assert	KEYWORD2
+serial_init	KEYWORD2
+serial_transmit	KEYWORD2
+serial_send	KEYWORD2
+serial_print	KEYWORD2
+serial_printl	KEYWORD2
+serial_u8	KEYWORD2
+serial_s8	KEYWORD2
+serial_u16	KEYWORD2
+serial_hex	KEYWORD2
+serial_hex16	KEYWORD2
+serial_send_hex	KEYWORD2
+serial_send_p	KEYWORD2
+serial_print_p	KEYWORD2
+serial_printl_p	KEYWORD2
+led_init	KEYWORD2
+led_on	KEYWORD2
+led_off	KEYWORD2
+led_set	KEYWORD2
+led_toggle	KEYWORD2
+
+tqueue_schedule	KEYWORD2
+tqueue_shift	KEYWORD2
+tqueue_pop	KEYWORD2
+tqueue_pop_reschedule	KEYWORD2
+tqueue_remove	KEYWORD2
+
+slist_init	KEYWORD2
+slist_append	KEYWORD2
+slist_get	KEYWORD2
+slist_peek_head	KEYWORD2
+slist_peek_tail	KEYWORD2
+
+dlist_init	KEYWORD2
+dlist_append	KEYWORD2
+dlist_prepend	KEYWORD2
+dlist_insert	KEYWORD2
+dlist_remove	KEYWORD2
+dlist_get	KEYWORD2
+dlist_is_empty	KEYWORD2
+dlist_count	KEYWORD2
+
+irq_disable	KEYWORD2
+irq_enable	KEYWORD2
+irq_lock	KEYWORD2
+irq_unlock	KEYWORD2
+k_sys_sw_reset	KEYWORD2
+k_sched_lock	KEYWORD2
+k_sched_unlock	KEYWORD2
+k_sched_locked	KEYWORD2
+k_cur_is_preempt	KEYWORD2
+k_cur_is_coop	KEYWORD2
+k_sleep	KEYWORD2
+k_wait	KEYWORD2
+k_block	KEYWORD2
+k_thread_start	KEYWORD2
+k_thread_stop	KEYWORD2
+k_stop	KEYWORD2
+k_ready_count	KEYWORD2
+k_yield	KEYWORD2
+yield	KEYWORD2
+k_yield_from_isr	KEYWORD2
+k_yield_from_isr_cond	KEYWORD2
+k_ticks_get_32	KEYWORD2
+k_ticks_get_64	KEYWORD2
+k_uptime_get_ms32	KEYWORD2
+k_uptime_get_ms64	KEYWORD2
+k_uptime_get	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+#######################################
+# Preprocessor (PREPROCESSOR)
+#######################################
+
+K_THREAD_DEFINE  PREPROCESSOR
+K_THREAD_MINIMAL_DEFINE  PREPROCESSOR
+
+K_TIMER_INIT	PREPROCESSOR
+K_TIMER_DEFINE	PREPROCESSOR
+K_WORK_INIT     PREPROCESSOR
+K_WORK_DEFINE	PREPROCESSOR
+K_WORKQUEUE_DEFINE  PREPROCESSOR
+K_SIGNAL_INIT  PREPROCESSOR
+K_SIGNAL_DEFINE  PREPROCESSOR
+K_SIGNAL_SET_UNREADY  PREPROCESSOR
+K_SEM_INIT  PREPROCESSOR
+K_SEM_DEFINE  PREPROCESSOR
+K_RING_INIT  PREPROCESSOR
+K_PRNG_INITIALIZER  PREPROCESSOR
+K_PRNG_DEFINE  PREPROCESSOR
+K_PRNG_DEFINE_DEFAULT  PREPROCESSOR
+K_MUTEX_INIT  PREPROCESSOR
+K_MUTEX_DEFINE  PREPROCESSOR
+K_MSGQ_INIT  PREPROCESSOR
+K_MSGQ_DEFINE  PREPROCESSOR
+K_MEM_SLAB_DEFINE  PREPROCESSOR
+LOG_DBG  PREPROCESSOR
+LOG_INF  PREPROCESSOR
+LOG_WRN  PREPROCESSOR
+LOG_ERR  PREPROCESSOR
+LOG_HEXDUMP_DBG  PREPROCESSOR
+LOG_HEXDUMP_INF  PREPROCESSOR
+LOG_HEXDUMP_WRN  PREPROCESSOR
+LOG_HEXDUMP_ERR  PREPROCESSOR
+LOG_LEVEL_ERR  PREPROCESSOR
+LOG_LEVEL_WRN  PREPROCESSOR
+LOG_LEVEL_INF  PREPROCESSOR
+LOG_LEVEL_DBG  PREPROCESSOR
+K_AVRTOS_INIT  PREPROCESSOR
+K_FLAGS_INIT  PREPROCESSOR
+K_FLAGS_DEFINE  PREPROCESSOR
+K_FIFO_INIT  PREPROCESSOR
+K_FIFO_DEFINE  PREPROCESSOR
+K_EVENT_INIT  PREPROCESSOR
+K_EVENT_DEFINE  PREPROCESSOR
+
+K_TIMEOUT_EQ  PREPROCESSOR
+K_TIMEOUT_MS  PREPROCESSOR
+K_TIMEOUT_SECONDS  PREPROCESSOR
+K_SECONDS  PREPROCESSOR
+K_MSEC  PREPROCESSOR
+K_NO_WAIT  PREPROCESSOR
+K_NEXT_TICK  PREPROCESSOR
+K_FOREVER  PREPROCESSOR
+K_UNTIL_WAKEUP  PREPROCESSOR
+K_IMMEDIATE  PREPROCESSOR
+
+HTONL  PREPROCESSOR
+HTONS  PREPROCESSOR
+K_SWAP_ENDIANNESS  PREPROCESSOR
+MIN  PREPROCESSOR
+MAX  PREPROCESSOR
+ARRAY_SIZE  PREPROCESSOR
+CONTAINER_OF  PREPROCESSOR
+BIT  PREPROCESSOR
+SET_BIT  PREPROCESSOR
+CLR_BIT  PREPROCESSOR
+TEST_BIT  PREPROCESSOR
+ARG_UNUSED  PREPROCESSOR
+IN_RANGE  PREPROCESSOR
+sys_read_le16  PREPROCESSOR
+sys_write_le16  PREPROCESSOR
+sys_read_le32  PREPROCESSOR
+sys_write_le32  PREPROCESSOR
+sys_read_be16  PREPROCESSOR
+sys_write_be16  PREPROCESSOR
+sys_read_be32  PREPROCESSOR
+sys_write_be32  PREPROCESSOR
+sys_ptr_diff  PREPROCESSOR
+sys_ptr_add  PREPROCESSOR
+sys_ptr_shift  PREPROCESSOR
+
+K_COOPERATIVE  PREPROCESSOR
+K_PREEMPTIVE  PREPROCESSOR
+K_PRIO_DEFAULT  PREPROCESSOR
+
+K_ATOMIC_INIT  PREPROCESSOR
+K_ATOMIC_DEFINE  PREPROCESSOR
+
+DEFINE_TQUEUE  PREPROCESSOR
+INIT_TITEM  PREPROCESSOR
+DEFINE_TITEM  PREPROCESSOR
+
+SLIST_INIT  PREPROCESSOR
+SLIST_DEFINE  PREPROCESSOR
+SNODE_INIT  PREPROCESSOR
+
+DITEM_INIT  PREPROCESSOR
+DLIST_INIT  PREPROCESSOR
+DEFINE_DLIST  PREPROCESSOR
+DLIST_EMPTY  PREPROCESSOR
+DITEM_VALID  PREPROCESSOR
+DITEM_NEXT  PREPROCESSOR
+DITEM_PREV  PREPROCESSOR
+DLIST_FOREACH  PREPROCESSOR
+DLIST_FOREACH_SAFE  PREPROCESSOR
+
+CRITICAL_SECTION_BEGIN  PREPROCESSOR
+CRITICAL_SECTION_END  PREPROCESSOR
+
+K_SCHED_LOCK_CONTEXT  PREPROCESSOR
+

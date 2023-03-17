@@ -24,19 +24,7 @@
 #define __kernel
 #endif
 
-/* If the AVRTOS linker script is not provided, sections are not availables,
- * so don't use them.
- *
- * If using Arduino framework, the AVRTOS linker will not be used, so
- * assume that sections are not availables.
- */
-#if CONFIG_AVRTOS_LINKER_SCRIPT && !CONFIG_ARDUINO_FRAMEWORK
-#define AVRTOS_KERNEL_SECTIONS 1u
-#else
-#define AVRTOS_KERNEL_SECTIONS 0u
-#endif
-
-#if AVRTOS_KERNEL_SECTIONS
+#if CONFIG_AVRTOS_LINKER_SCRIPT
 #define Z_LINK_KERNEL_SECTION(_section)                                                  \
 	__attribute__((used, section(Z_STRINGIFY(_section))))
 #else
@@ -170,7 +158,7 @@ typedef struct {
 #endif /* __cplusplus */
 /*___________________________________________________________________________*/
 
-// arch specific fixups
+// MCU specific fixups
 
 #if !defined(USART0_RX_vect) && defined(USART_RX_vect)
 #define USART0_RX_vect	     USART_RX_vect
@@ -324,34 +312,27 @@ typedef struct {
 			},                                                               \
 		.symbol = sym}
 
-#if AVRTOS_KERNEL_SECTIONS
-#if CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD == 0u
+#if CONFIG_AVRTOS_LINKER_SCRIPT
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
 	__attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p);   \
 	Z_LINK_KERNEL_SECTION(.k_threads)                                                \
 	Z_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol);                       \
-	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name);
+	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
 
 #define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)               \
 	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p);       \
 	Z_LINK_KERNEL_SECTION(.k_threads)                                                \
 	Z_THREAD_INITIALIZER(name, Z_CALLSAVED_CTX_SIZE, prio_flag, symbol);             \
-	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name);
+	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
 
 #else
-
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
-	__STATIC_ASSERT(0u,                                                              \
-			"K_THREAD_DEFINE is not supported when "                         \
-			"CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD is enabled");
+	__STATIC_ASSERT(0u, "Static thread (K_THREAD_DEFINE) creation is not supported");
 
 #define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)               \
-	__STATIC_ASSERT(0u,                                                              \
-			"K_THREAD_DEFINE is not supported when "                         \
-			"CONFIG_USE_STDLIB_HEAP_MALLOC_THREAD is enabled");
+	__STATIC_ASSERT(0u, "Static thread (K_THREAD_DEFINE) creation is not supported");
 
-#endif
 #endif
 
 /*___________________________________________________________________________*/

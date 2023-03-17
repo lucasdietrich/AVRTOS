@@ -28,9 +28,10 @@
 #define __noinit	 Z_LINK_SECTION(.noinit)
 #define __bss		 Z_LINK_SECTION(.bss)
 
-#define __STATIC_ASSERT(test_for_true, msg) _Static_assert(test_for_true, msg)
+#define __static_assert			    _Static_assert
+#define __STATIC_ASSERT(test_for_true, msg) __static_assert(test_for_true, msg)
 #define __STATIC_ASSERT_NOMSG(test_for_true)                                             \
-	_Static_assert(test_for_true, "(" #test_for_true ") failed")
+	__static_assert(test_for_true, "(" #test_for_true ") failed")
 
 /*___________________________________________________________________________*/
 

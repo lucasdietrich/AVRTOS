@@ -16,7 +16,7 @@
 
 static struct titem *z_timers_runqueue = NULL;
 
-#if AVRTOS_KERNEL_SECTIONS
+#if CONFIG_AVRTOS_LINKER_SCRIPT
 extern struct k_timer __k_timers_start;
 extern struct k_timer __k_timers_end;
 

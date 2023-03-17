@@ -12,6 +12,39 @@
 #include <avr/io.h>
 
 //
+// Tells whether the kernel is compiled for Arduino framework
+//
+// 0: Kernel is not compiled for Arduino framework
+// 1: Kernel is compiled for Arduino framework
+//
+// This option is set to 1 if ARDUINO macro is detected.
+//
+#ifndef CONFIG_ARDUINO_FRAMEWORK
+#define CONFIG_ARDUINO_FRAMEWORK defined(ARDUINO)
+#endif
+
+//
+// Tells whether the kernel is compiled using the PlatformIO environment
+//
+// 0: Kernel is not compiled using the PlatformIO environment
+// 1: Kernel is compiled using the PlatformIO environment
+//
+// This option is set to 1 if PLATFORM macro is detected.
+//
+#ifndef CONFIG_PLATFORMIO_IDE
+#define CONFIG_PLATFORMIO_IDE defined(PLATFORMIO)
+#endif
+
+/* Include Arduino specific configuration if ARDUINO framework is used
+ * without PlatformIO IDE (e.g. Arduino IDE)
+ *
+ * this configuration is adapted for newcomers
+ */
+#if CONFIG_ARDUINO_FRAMEWORK && !CONFIG_PLATFORMIO_IDE
+#include "avrtos_arduinoide_conf.h"
+#endif
+
+//
 // This file contains all the default configuration options of the kernel
 //
 // You may need to clear the build directory if you modify this configuration
@@ -34,28 +67,26 @@
 // K_TIMER_DEFINE(), K_MEM_SLAB_DEFINE()
 // - Disables functions: k_dump_stack_canaries(), k_thread_dump_all()
 //
-// Note: Arduino framework requires this option to be disabled, because it is not
-// possible to provide a custom linker script.
+// Note: Arduino framework with Arduino IDE requires this option to be disabled,
+// because it is not possible to provide a custom linker script.
 //
 // 0: AVRTOS Linker script is not provided. Do not use kernel sections. Kernel
 // objects must be initialized manually.
 // 1: AVRTOS Linker script is provided. Use kernel sections. Kernel objects are
 // initialized automatically.
 //
+// Additional notes:
+//
+// If CONFIG_AVRTOS_LINKER_SCRIPT is explicitly set by the user, use the value
+// otherwise guess whether the linker script is available or not. This is the
+// purpose of the specific configuration file, like "avrtos_arduinoide_conf.h":
+// - If using Arduino framework with arduino IDE, the AVRTOS linker will not be
+// used, so assume that sections are not availables.
+// - If using Arduino framework with platformio IDE, the AVRTOS linker can and
+// should be used, so assume that sections are availables.
+//
 #ifndef CONFIG_AVRTOS_LINKER_SCRIPT
-#define CONFIG_AVRTOS_LINKER_SCRIPT 1u
-#endif
-
-//
-// Tells whether the kernel is compiled for Arduino framework
-//
-// 0: Kernel is not compiled for Arduino framework
-// 1: Kernel is compiled for Arduino framework
-//
-// This option to 1 if ARDUINO macro is detected.
-//
-#ifndef CONFIG_ARDUINO_FRAMEWORK
-#define CONFIG_ARDUINO_FRAMEWORK defined(ARDUINO)
+#define CONFIG_AVRTOS_LINKER_SCRIPT 1
 #endif
 
 //

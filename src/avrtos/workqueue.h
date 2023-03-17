@@ -31,7 +31,6 @@ struct k_work {
 	{                                                                                \
 		._tie = SNODE_INIT(), .handler = work_handler,                           \
 	}
-#define K_WORK_INITIALIZER(work_handler) K_WORK_INIT(work_handler)
 
 #define K_WORK_DEFINE(work_name, work_handler)                                           \
 	struct k_work work_name = K_WORK_INIT(work_handler)

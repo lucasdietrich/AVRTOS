@@ -270,7 +270,7 @@ void z_kernel_init(void)
 	z_set_thread_state(&z_thread_idle, Z_THREAD_STATE_IDLE);
 #endif
 
-#if AVRTOS_KERNEL_SECTIONS
+#if CONFIG_AVRTOS_LINKER_SCRIPT
 
 	/* main thread is the first running (ready or not),
 	 * and it is already in queue */
@@ -295,6 +295,8 @@ void z_kernel_init(void)
 #endif
 }
 
+__STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
+
 /* If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the
  * IDLE thread. The expired thread will be rescheduled only after
  * the current time slice interval finishes. So we lose few ticks in the
@@ -305,9 +307,7 @@ void z_kernel_init(void)
  */
 void z_system_shift(void)
 {
-
 	__ASSERT_NOINTERRUPT();
-	__STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
 
 	tqueue_shift(&z_events_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
 
