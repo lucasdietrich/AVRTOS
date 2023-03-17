@@ -13,4 +13,4 @@ enable_language(C CXX ASM)
 
 # set( CMAKE_VERBOSE_MAKEFILE on )
 
-add_subdirectory(src/examples)
+add_subdirectory(examples)

@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #endif
 
+#include <avrtos.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/serial.h>
 

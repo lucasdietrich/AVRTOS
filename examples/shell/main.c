@@ -65,6 +65,8 @@ static inline void input(const char rx)
 	case 0x1A: /* Ctrl + Z -> drop */
 		mem->len = 0;
 	case '\r':
+		/* ignore */
+		break;
 	case '\n': /* process the packet */
 		mem->buffer[mem->len] = '\0';
 		push(&mem);
