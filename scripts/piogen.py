@@ -63,8 +63,8 @@ build_flags =
     return ret
 
 if __name__ == "__main__":
-    for example in os.listdir("./src/examples"):
-        env = generate_pio_env("./src/examples/" + example)
+    for example in os.listdir("./examples"):
+        env = generate_pio_env("./examples/" + example)
 
         if env:
             print(env)

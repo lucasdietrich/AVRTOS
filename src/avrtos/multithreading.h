@@ -177,7 +177,7 @@ struct k_thread {
 		size_t size; // stack size
 	} stack;	     // thread stack definition
 	char symbol;	     // 1-letter symbol to name the thread, reserver M (main),
-			     // idle : I (idle)
+		     // idle : I (idle)
 
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno; // Thread errno
@@ -208,13 +208,13 @@ extern struct k_thread *z_current;
  * @param symbol thread symbol letter
  * @return int 0 on success
  */
-int8_t k_thread_create(struct k_thread *const thread,
+int8_t k_thread_create(struct k_thread *thread,
 		       thread_entry_t entry,
-		       void *const stack,
-		       const size_t stack_size,
-		       const uint8_t priority,
-		       void *const context_p,
-		       const char symbol);
+		       void *stack,
+		       size_t stack_size,
+		       uint8_t priority,
+		       void *context_p,
+		       char symbol);
 
 /*___________________________________________________________________________*/
 

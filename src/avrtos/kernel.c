@@ -305,7 +305,7 @@ __STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
  * TODO Improve this by checking for expired threads more often when
  *  we are in the IDLE thread.
  */
-void z_system_shift(void)
+void z_system_tick_inc(void)
 {
 	__ASSERT_NOINTERRUPT();
 

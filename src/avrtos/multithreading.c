@@ -96,13 +96,13 @@ static void z_thread_stack_create(struct k_thread *const thread,
 	thread->sp--;
 }
 
-int8_t k_thread_create(struct k_thread *const thread,
+int8_t k_thread_create(struct k_thread *thread,
 		       thread_entry_t entry,
-		       void *const stack,
-		       const size_t stack_size,
-		       const uint8_t prio,
-		       void *const context_p,
-		       const char symbol)
+		       void *stack,
+		       size_t stack_size,
+		       uint8_t prio,
+		       void *context_p,
+		       char symbol)
 {
 	if (stack_size < Z_THREAD_STACK_MIN_SIZE) {
 		return -1;

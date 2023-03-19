@@ -19,6 +19,32 @@
 
 /*___________________________________________________________________________*/
 
+int8_t k_workqueue_create(struct k_workqueue *workqueue,
+			  struct k_thread *thread,
+			  uint8_t *stack,
+			  size_t stack_size,
+			  uint8_t prio_flags,
+			  char symbol)
+{
+	int8_t ret;
+
+	k_fifo_init(&workqueue->q);
+	workqueue->flags = 0u;
+
+	ret = k_thread_create(thread,
+			      (thread_entry_t)z_workqueue_entry,
+			      stack,
+			      stack_size,
+			      prio_flags,
+			      (void *)workqueue,
+			      symbol);
+	if (ret == 0) {
+		k_thread_start(thread);
+	}
+
+	return ret;
+}
+
 void z_workqueue_entry(struct k_workqueue *const workqueue)
 {
 	struct snode *item;

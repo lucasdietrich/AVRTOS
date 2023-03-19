@@ -45,17 +45,17 @@ struct k_workqueue {
 
 #define k_workq k_workqueue
 
-#define K_WORKQUEUE_DEFINE(name, stack_size, prio_flags, symbol)                         \
-	struct k_workqueue name = {                                                      \
-		.q     = K_FIFO_INIT(name.q),                                            \
+#define K_WORKQUEUE_DEFINE(_name, _stack_size, _prio_flags, _symbol)                     \
+	struct k_workqueue _name = {                                                     \
+		.q     = K_FIFO_INIT(_name.q),                                           \
 		.flags = 0u,                                                             \
 	};                                                                               \
-	K_THREAD_DEFINE(z_workq_##name,                                                  \
+	K_THREAD_DEFINE(z_workq_##_name,                                                 \
 			z_workqueue_entry,                                               \
-			stack_size,                                                      \
-			prio_flags,                                                      \
-			&name,                                                           \
-			symbol)
+			_stack_size,                                                     \
+			_prio_flags,                                                     \
+			&_name,                                                          \
+			_symbol)
 
 /*___________________________________________________________________________*/
 
@@ -66,6 +66,24 @@ struct k_workqueue {
 __kernel void z_workqueue_entry(struct k_workqueue *const workqueue);
 
 /*___________________________________________________________________________*/
+
+/**
+ * @brief Create a workqueue thread at runtime.
+ *
+ * @param workqueue workqueue struct
+ * @param thread thread struct
+ * @param stack stack buffer
+ * @param stack_size stack size
+ * @param prio_flags thread priority and flags
+ * @param symbol thread symbol
+ * @return __kernel 0 if success, negative error code otherwise
+ */
+__kernel int8_t k_workqueue_create(struct k_workqueue *workqueue,
+				   struct k_thread *thread,
+				   uint8_t *stack,
+				   size_t stack_size,
+				   uint8_t prio_flags,
+				   char symbol);
 
 /**
  * @brief Initialize a workqueue item at runtime.
