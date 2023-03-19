@@ -54,8 +54,6 @@ __kernel void k_fifo_init(struct k_fifo *fifo);
  *
  * Wake up the first thread pending on a fifo item.
  *
- * Switch thread before returning if a thread is pending on the item.
- *
  * Can be called from an interrupt routine.
  *
  * IMPORTANT : first two bytes of the memory space {item_tie} are reserved
@@ -75,7 +73,7 @@ __kernel void k_fifo_init(struct k_fifo *fifo);
  *  struct snode tie;
  *  uint8_t value;
  * } block1;
- * block1.data = 17u;
+ * block1.value = 17u;
  * k_fifo_put(&myfifo, &block1);
  *
  * Note : in Zephyr RTOS project, there are two functions :
@@ -83,7 +81,7 @@ __kernel void k_fifo_init(struct k_fifo *fifo);
  *  -
  * https://github.com/zephyrproject-rtos/zephyr/blob/main/include/kernel.h#L2074-L2088
  *
- * - k_fifo_alloc_put : which implicitely allocat this internal "tie" member.
+ * - k_fifo_alloc_put : which implicitely allocate this internal "tie" member.
  *  -
  * https://github.com/zephyrproject-rtos/zephyr/blob/main/include/kernel.h#L2095-L2111
  *

@@ -12,10 +12,18 @@
  * This file is included by avrtos_conf.h
  */
 
+#if !defined(ARDUINO_ARCH_AVR)
+#	error “This library only supports 8bits AVR-based MCU”
+#endif
+
 /* If using Arduino IDE, it's not possible to use a custom linker script
  * so force option to 0 */
 #ifndef CONFIG_AVRTOS_LINKER_SCRIPT
 #define CONFIG_AVRTOS_LINKER_SCRIPT 0
+#endif
+
+#ifndef CONFIG_KERNEL_AUTO_INIT
+#define CONFIG_KERNEL_AUTO_INIT	0
 #endif
 
 /* Features */

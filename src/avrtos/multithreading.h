@@ -30,8 +30,6 @@ extern "C" {
  *
  * The only parameter (void*) is used to pass the thread context when the entry
  * function is called.
- *
- * This function should never end (TODO handle the case when the function ends)
  */
 typedef void (*thread_entry_t)(void *);
 
@@ -190,7 +188,7 @@ struct k_thread {
 extern struct k_thread z_thread_main;
 
 /**
- * @brief Get the address of the thread currently running.
+ * @brief Contain the address of the thread currently running.
  */
 extern struct k_thread *z_current;
 

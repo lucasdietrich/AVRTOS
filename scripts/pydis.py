@@ -1,5 +1,4 @@
-# execute from Ubuntu WSL
-#   python3 ./scripts/pydis.py
+# require avr-gcc toolchain
 
 import os
 import os.path
@@ -44,6 +43,7 @@ if __name__ == "__main__":
     TMP = "./tmp/"
 
     create_dir(TMP)
+
     # list projects
     for name in os.listdir(".pio/build/"):
         elf = os.path.join(DIR, f"{name}/firmware.elf")

@@ -16,7 +16,7 @@ class Timer:
         return 0 <= tcnt <= self.max_tcnt
 
     def frequencies(self):
-	    return [(prescaler, self.frequency(0, prescaler)) for prescaler in self.prescalers]
+        return [(prescaler, self.frequency(0, prescaler)) for prescaler in self.prescalers]
 
     def periods(self):
         return [(prescaler, self.period_us(0, prescaler)) for prescaler in self.prescalers]
