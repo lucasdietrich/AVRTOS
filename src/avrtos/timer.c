@@ -30,10 +30,6 @@ void z_timer_init_module(void)
 		}
 	}
 }
-#else
-void z_timer_init_module(void)
-{
-}
 #endif
 
 void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay)

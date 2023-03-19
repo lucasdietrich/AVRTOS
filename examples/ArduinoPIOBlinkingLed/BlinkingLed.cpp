@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2023 Lucas Dietrich <ld.adecy@gmail.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,11 +12,13 @@
 
 void setup(void)
 {
-	led_init();
+	pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop(void)
 {
-	led_toggle();
+	digitalWrite(LED_BUILTIN, HIGH);
+	k_sleep(K_MSEC(200u));
+	digitalWrite(LED_BUILTIN, LOW);
 	k_sleep(K_MSEC(200u));
 }

@@ -33,12 +33,6 @@ void z_init_stacks_sentinel(void)
 		z_init_thread_stack_sentinel(thread);
 	}
 }
-#else
-
-void z_init_thread_stack_sentinel(struct k_thread *thread)
-{
-}
-
 #endif
 
 bool k_verify_stack_sentinel(struct k_thread *thread)

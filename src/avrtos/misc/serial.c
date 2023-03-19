@@ -12,11 +12,11 @@
 
 #define USART_DEVICE USART0_DEVICE
 
-void serial_init(void)
+void serial_init_baud(uint32_t baud)
 {
 	/* UART initialisation */
 	const struct usart_config usart_config = {
-		.baudrate    = USART_BAUD_500000,
+		.baudrate    = baud,
 		.receiver    = 1u,
 		.transmitter = 1u,
 		.mode	     = USART_MODE_ASYNCHRONOUS,

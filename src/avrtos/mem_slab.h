@@ -70,10 +70,10 @@ struct k_mem_slab {
 #define Z_MEM_SLAB_BUF_NAME(_slab_name) z_mem_slab_buf_##_slab_name
 
 #define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                        \
-	uint8_t z_mem_slab_buf_##_slab_name[(_block_size) * (_blocks_count)];            \
+	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];        \
 	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                              \
 	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                           \
-		_slab_name, z_mem_slab_buf_##_slab_name, _block_size, _blocks_count)
+		_slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
 /*___________________________________________________________________________*/
 
@@ -89,13 +89,13 @@ __kernel void z_mem_slab_init_module(void);
  * @param slab address of the slab structure
  * @param buffer address of the buffer
  * @param block_size
- * @param _blocks_count
+ * @param blocks_count
  * @return return 0 on success else error code
  */
 __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
 				void *buffer,
 				size_t block_size,
-				uint8_t _blocks_count);
+				uint8_t blocks_count);
 
 /**
  * @brief Finalize the initialization of a memory slab when declared using

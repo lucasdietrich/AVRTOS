@@ -195,9 +195,9 @@
 // Disabling the option (0) saves up to 2/3 bytes of stack per thread.
 // (depending on the architecture)
 //
-// 0: Thread termination is not permitted (hardfault)
+// 0: Thread termination is not handled (CPU exception)
 // 1: Thread termination is enabled
-// -1: Thread termination is not permitted (kernel panic)
+// -1: Thread termination is not permitted (kernel fault)
 //
 #ifndef CONFIG_KERNEL_THREAD_TERMINATION_TYPE
 #define CONFIG_KERNEL_THREAD_TERMINATION_TYPE 0
@@ -537,6 +537,16 @@
 #endif
 
 //
+// USART0 (serial console) default baudrate
+//
+// 0: Kernel faults silently
+// 1: Kernel faults with message
+//
+#ifndef CONFIG_SERIAL_USART_BAUDRATE
+#define CONFIG_SERIAL_USART_BAUDRATE 500000lu
+#endif
+
+//
 // Tells to which USART printf function output should be redirected.
 // Disable the option by setting to -1.
 //
@@ -752,6 +762,26 @@
 //
 #ifndef CONFIG_KERNEL_STATS
 #define CONFIG_KERNEL_STATS 0
+#endif
+
+//
+// Enable silent faults for kernel
+//
+// 0: Kernel faults silently
+// 1: Kernel faults with message
+//
+#ifndef CONFIG_KERNEL_SILENT_FAULTS
+#define CONFIG_KERNEL_SILENT_FAULTS 0
+#endif
+
+//
+// Enable kernel debug GPIO
+//
+// 0: Kernel debug GPIO is disabled
+// 1: Kernel debug GPIO is enabled
+//
+#ifndef CONFIG_KERNEL_DEBUG_GPIO
+#define CONFIG_KERNEL_DEBUG_GPIO 0
 #endif
 
 #endif

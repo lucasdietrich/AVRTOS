@@ -10,6 +10,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <avrtos/avrtos.h>
+
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
@@ -18,9 +20,19 @@ extern "C" {
 #endif
 
 /**
- * @brief Initialize the USART at 500000 bauds/s
+ * @brief Initialize the USART with custom baudrate
+ *
+ * @param baud Baudrate
  */
-void serial_init(void);
+void serial_init_baud(uint32_t baud);
+
+/**
+ * @brief Initialize the USART with default baudrate
+ */
+static inline void serial_init(void)
+{
+	serial_init_baud(CONFIG_SERIAL_USART_BAUDRATE);
+}
 
 /**
  * @brief Send a single character over the USART

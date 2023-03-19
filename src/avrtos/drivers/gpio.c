@@ -8,22 +8,35 @@
 
 void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
 {
-	gpio->DDR  = dir_mask;
-	gpio->PORT = pullup_mask;
+	gpiol_init(gpio, dir_mask, pullup_mask);
 }
 
 void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup)
 {
-	if (dir == GPIO_INPUT) {
-		gpio->DDR = gpio->DDR & ~BIT(pin);
-	} else {
-		gpio->DDR = gpio->DDR | BIT(pin);
-	}
+	gpio_pin_init(gpio, pin, dir, pullup);
+}
 
-	/* represent either pullup (if input) or output level (if output)*/
-	if (pullup == GPIO_INPUT_NO_PULLUP) {
-		gpio->PORT = gpio->PORT & ~BIT(pin);
-	} else {
-		gpio->PORT = gpio->PORT | BIT(pin);
-	}
+void gpio_pin_set_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction)
+{
+	gpiol_pin_set_direction(gpio, pin, direction);
+}
+
+void gpio_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)
+{
+	gpiol_pin_set_pullup(gpio, pin, pullup);
+}
+
+void gpio_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state)
+{
+	gpiol_pin_write_state(gpio, pin, state);
+}
+
+void gpio_pin_toggle(GPIO_Device *gpio, uint8_t pin)
+{
+	gpiol_pin_toggle(gpio, pin);
+}
+
+uint8_t gpio_pin_read_state(GPIO_Device *gpio, uint8_t pin)
+{
+	return gpiol_pin_read_state(gpio, pin);
 }

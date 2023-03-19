@@ -14,7 +14,7 @@ int main(void)
 {
 	irq_enable();
 
-	gpio_init(GPIO, 0xFF, 0x00);
+	gpiol_init(GPIO, 0xFF, 0x00);
 
 	for (;;) {
 		GPIO->PIN = BIT(PINn);

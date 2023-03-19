@@ -24,6 +24,8 @@ int main(void)
 	led_init();
 	serial_init();
 
+	k_thread_dump_all();
+
 	k_sleep(K_FOREVER);
 }
 

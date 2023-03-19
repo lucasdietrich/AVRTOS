@@ -35,10 +35,6 @@ void k_dump_stack_canaries(void)
 		k_print_stack_canaries(&(&__k_threads_start)[i]);
 	}
 }
-#else
-void z_init_stacks_canaries(void)
-{
-}
 #endif
 
 void *z_stack_canaries(struct k_thread *thread)

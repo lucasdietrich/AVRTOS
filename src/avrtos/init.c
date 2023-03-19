@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "debug.h"
 #include "init.h"
 #include "io.h"
 
@@ -33,6 +34,12 @@ void z_avrtos_init(void)
 	// 	WDTCSR = 0x00;
 	// }
 
+	/* Debug pins */
+	__Z_DBG_GPIO_INIT_0();
+	__Z_DBG_GPIO_INIT_1();
+	__Z_DBG_GPIO_INIT_2();
+	__Z_DBG_GPIO_INIT_3();
+
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif
@@ -42,13 +49,15 @@ void z_avrtos_init(void)
 
 	z_kernel_init();
 
+#if CONFIG_AVRTOS_LINKER_SCRIPT
 	z_mem_slab_init_module();
+#endif
 
-#if CONFIG_KERNEL_TIMERS
+#if CONFIG_KERNEL_TIMERS && CONFIG_AVRTOS_LINKER_SCRIPT
 	z_timer_init_module();
 #endif
 
-#if CONFIG_THREAD_CANARIES
+#if CONFIG_THREAD_CANARIES && CONFIG_AVRTOS_LINKER_SCRIPT
 	z_init_stacks_canaries();
 #endif
 

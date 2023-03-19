@@ -13,7 +13,7 @@
  */
 
 #if !defined(ARDUINO_ARCH_AVR)
-#	error “This library only supports 8bits AVR-based MCU”
+#error “This library only supports 8bits AVR-based MCU”
 #endif
 
 /* If using Arduino IDE, it's not possible to use a custom linker script
@@ -23,7 +23,7 @@
 #endif
 
 #ifndef CONFIG_KERNEL_AUTO_INIT
-#define CONFIG_KERNEL_AUTO_INIT	0
+#define CONFIG_KERNEL_AUTO_INIT 0
 #endif
 
 /* Features */
@@ -74,12 +74,11 @@
 #define CONFIG_KERNEL_THREAD_TERMINATION_TYPE 1
 #endif
 
-/* Use timer 1 for kernel syslock
+/* Use timer 2 for kernel syslock
  * timer0 is used by Arduino framework for millis() and delay()
- * timer2 is often used by other libraries
  */
 #ifndef CONFIG_KERNEL_SYSLOCK_HW_TIMER
-#define CONFIG_KERNEL_SYSLOCK_HW_TIMER 1
+#define CONFIG_KERNEL_SYSLOCK_HW_TIMER 2
 #endif
 
 /* Allow timeout/delays bigger than 65535ms */
@@ -113,6 +112,28 @@
 
 #ifndef CONFIG_KERNEL_ARGS_CHECKS
 #define CONFIG_KERNEL_ARGS_CHECKS 0
+#endif
+
+/* Default serial baudrate */
+#ifndef CONFIG_SERIAL_USART_BAUDRATE
+#define CONFIG_SERIAL_USART_BAUDRATE 9600lu
+#endif
+
+/* Keep loop() as cooperative thread,
+ * as k_yield() is invoked between each loop iteration
+ */
+#ifndef CONFIG_THREAD_MAIN_COOPERATIVE
+#define CONFIG_THREAD_MAIN_COOPERATIVE 1
+#endif
+
+/* 1ms sysclock period */
+#ifndef CONFIG_KERNEL_SYSCLOCK_PERIOD_US
+#define CONFIG_KERNEL_SYSCLOCK_PERIOD_US 1000llu
+#endif
+
+/* 1ms time slice */
+#ifndef CONFIG_KERNEL_TIME_SLICE_US
+#define CONFIG_KERNEL_TIME_SLICE_US 1000llu
 #endif
 
 #endif /* _AVRTOS_ARDUINO_IDE_DEFAULT_CONFIG_H */

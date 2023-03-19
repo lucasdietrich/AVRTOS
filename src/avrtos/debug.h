@@ -70,6 +70,44 @@ extern "C" {
 
 /*___________________________________________________________________________*/
 
+/* Kernel GPIO Debug */
+
+#if CONFIG_KERNEL_DEBUG_GPIO
+#include "drivers/gpio.h"
+#define __Z_DBG_GPIO_INIT(_port, _pin)                                                   \
+	gpiol_pin_init(_port, _pin, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_HIGH)
+#define __Z_DBG_GPIO_SET(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 1u)
+#define __Z_DBG_GPIO_CLEAR(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 0u)
+#define __Z_DBG_GPIO_TOGGLE(_port, _pin) gpiol_pin_toggle(_port, _pin)
+#else
+#define __Z_DBG_GPIO_INIT(_port, _pin)
+#define __Z_DBG_GPIO_SET(_port, _pin)
+#define __Z_DBG_GPIO_CLEAR(_port, _pin)
+#define __Z_DBG_GPIO_TOGGLE(_port, _pin)
+#endif
+
+#define __Z_DBG_GPIO_INIT_0() __Z_DBG_GPIO_INIT(GPIOB, 7u)
+#define __Z_DBG_GPIO_INIT_1() __Z_DBG_GPIO_INIT(GPIOB, 6u)
+#define __Z_DBG_GPIO_INIT_2() __Z_DBG_GPIO_INIT(GPIOB, 5u)
+#define __Z_DBG_GPIO_INIT_3() __Z_DBG_GPIO_INIT(GPIOB, 4u)
+
+#define __Z_DBG_GPIO_TOGGLE_0() __Z_DBG_GPIO_TOGGLE(GPIOB, 7u)
+#define __Z_DBG_GPIO_TOGGLE_1() __Z_DBG_GPIO_TOGGLE(GPIOB, 6u)
+#define __Z_DBG_GPIO_TOGGLE_2() __Z_DBG_GPIO_TOGGLE(GPIOB, 5u)
+#define __Z_DBG_GPIO_TOGGLE_3() __Z_DBG_GPIO_TOGGLE(GPIOB, 4u)
+
+#define __Z_DBG_GPIO_SET_0() __Z_DBG_GPIO_SET(GPIOB, 7u)
+#define __Z_DBG_GPIO_SET_1() __Z_DBG_GPIO_SET(GPIOB, 6u)
+#define __Z_DBG_GPIO_SET_2() __Z_DBG_GPIO_SET(GPIOB, 5u)
+#define __Z_DBG_GPIO_SET_3() __Z_DBG_GPIO_SET(GPIOB, 4u)
+
+#define __Z_DBG_GPIO_CLEAR_0() __Z_DBG_GPIO_CLEAR(GPIOB, 7u)
+#define __Z_DBG_GPIO_CLEAR_1() __Z_DBG_GPIO_CLEAR(GPIOB, 6u)
+#define __Z_DBG_GPIO_CLEAR_2() __Z_DBG_GPIO_CLEAR(GPIOB, 5u)
+#define __Z_DBG_GPIO_CLEAR_3() __Z_DBG_GPIO_CLEAR(GPIOB, 4u)
+
+/*___________________________________________________________________________*/
+
 /**
  * @brief Current thread stack usage
  *

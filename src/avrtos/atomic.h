@@ -42,10 +42,22 @@ typedef uint8_t atomic_t;
 /**
  * @brief Get the current value of an atomic variable.
  *
+ * Note: This function is equivalent to directly read the 1 byte address
+ *
  * @param target
  * @return Value of the atomic variable.
  */
 __kernel atomic_val_t atomic_get(atomic_t *target);
+
+/**
+ * @brief Set the value of an atomic variable.
+ *
+ * Note: This function is equivalent to directly write the 1 byte address
+ *
+ * @param target
+ * @return Old value of the atomic variable.
+ */
+__kernel atomic_val_t atomic_set(atomic_t *target, uint32_t value);
 
 /**
  * @brief Clear the value of an atomic variable but do not return the old value.

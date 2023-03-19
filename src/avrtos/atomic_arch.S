@@ -28,6 +28,11 @@ atomic_get:
         ld      r24, X
         ret
 
+atomic_set:
+        movw     r26, r24
+        st      X, r22
+        ret
+
 atomic_blind_clear:
         movw     r26, r24
         ; TODO, find a way to use __zero_reg__ instead of r1

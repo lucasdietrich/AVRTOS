@@ -22,6 +22,13 @@ extern "C" {
 
 struct k_timer;
 
+/**
+ * @brief Timer handler function prototype
+ *
+ * @warning Never call any k_yield(), k_yield_from_isr(), k_yield_from_isr_cond()
+ * from a timer handler.
+ *
+ */
 typedef void (*k_timer_handler_t)(struct k_timer *);
 
 struct k_timer {

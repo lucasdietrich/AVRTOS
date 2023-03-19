@@ -50,6 +50,8 @@ TIMERn_COMPA_vect:
 #if CONFIG_KERNEL_TICKS_COUNTER
 	ldi r18, 0x01			; 1 cycle
 
+	; TODO, check for first byte overflow, abd calculate the rest of the bytes
+	; if required
 	lds r0, z_ticks		; 2 cycles
 	add r0, r18			; 1 cycle
 	sts z_ticks, r0		; 2 cycles
@@ -112,7 +114,7 @@ TIMERn_COMPA_vect:
 	andi r18, Z_THREAD_PRIO_COOP | Z_THREAD_SCHED_LOCKED_MSK
 
 	; scheduler is locked: do not switch thread and exit interrupt
-	brne __sched_locked
+	brne __exit_kernel_int
 
 	; prepare return context for preempted thread
 	; so that __intctx_restore is called when returning from z_yield
@@ -127,7 +129,7 @@ TIMERn_COMPA_vect:
 #endif
 ; CONFIG_KERNEL_COOPERATIVE_THREADS
 
-__sched_locked:
+__exit_kernel_int:
 #if CONFIG_KERNEL_COOPERATIVE_THREADS && CONFIG_KERNEL_SCHEDULER_DEBUG
 	ldi r24, 0x63	    ; 'c'
 	call serial_transmit
@@ -251,17 +253,25 @@ z_thread_switch:
 .extern k_stop
 .extern __fault
 z_thread_entry:
+	; get thread context address
 	movw r24, r2
+
+	; get thread_entry function address
 	movw r30, r4
+
+	; get thread flags
 	sts SREG, r6
 	
 #if CONFIG_KERNEL_THREAD_TERMINATION_TYPE == 0
+	; jump to thread entry function
 	ijmp
 #elif CONFIG_KERNEL_THREAD_TERMINATION_TYPE == -1
+	; call thread entry function
 	icall
 	ldi r24, 0x03 ; K_THREAD_TERMINATED
 	call __fault
 #else
+	; call thread entry function
 	icall
 	call k_stop
 #endif
@@ -307,10 +317,6 @@ k_ticks_get_64:
 	ldi	r25, 0x00
 	ret
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
-
-.global __debug
-__debug:
-	ret
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 .global USART0_RX_vect

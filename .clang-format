@@ -50,3 +50,5 @@ UseTab: Always
 WhitespaceSensitiveMacros:
   - STRINGIFY
   - Z_STRINGIFY
+AccessModifierOffset: -8
+IndentAccessModifiers: false

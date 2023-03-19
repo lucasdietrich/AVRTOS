@@ -42,10 +42,6 @@ void z_mem_slab_init_module(void)
 		z_create_free_list(&(&__k_mem_slabs_start)[i]);
 	}
 }
-#else
-void z_mem_slab_init_module(void)
-{
-}
 #endif
 
 int8_t k_mem_slab_init(struct k_mem_slab *slab,

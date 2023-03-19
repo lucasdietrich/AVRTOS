@@ -9,6 +9,8 @@ from typing import List
 
 from pprint import pprint
 
+DEFAULT_ARDUINO_SPEED = 9600
+
 # 0: not in target_compile_definitions
 # 1: in target_compile_definitions
 
@@ -51,17 +53,21 @@ arduino_examples_options = [
 	"CONFIG_THREAD_MAIN_STACK_SIZE=512",
 	"CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN=1",
 	"CONFIG_KERNEL_THREAD_TERMINATION_TYPE=1",
-	"CONFIG_KERNEL_SYSLOCK_HW_TIMER=1",
+	"CONFIG_KERNEL_SYSLOCK_HW_TIMER=2",
 	"CONFIG_KERNEL_DELAY_OBJECT_U32=1",
 	"CONFIG_KERNEL_THREAD_IDLE_ADD_STACK=96",
 	"CONFIG_THREAD_CANARIES=1",
 	"CONFIG_THREAD_STACK_SENTINEL=0",
 	"CONFIG_KERNEL_ASSERT=0",
 	"CONFIG_KERNEL_ARGS_CHECKS=0",
+    f"CONFIG_SERIAL_USART_BAUDRATE={DEFAULT_ARDUINO_SPEED}lu",
+    "CONFIG_THREAD_MAIN_COOPERATIVE=1",
+    "CONFIG_KERNEL_UPTIME=1",
+    "CONFIG_KERNEL_SYSCLOCK_PERIOD_US=1000lu",
+    "CONFIG_KERNEL_TIME_SLICE_US=1000lu",
 ]
 
 def generate_pio_env(env_name: str, example_path: str, options: List[str], isarduino: bool) -> str:
-
     options = "\n".join(["\t-D" + x for x in options])
 
     ret = f"[env:{env_name}]"
@@ -82,6 +88,8 @@ build_src_filter =
         ret += f"""
 build_flags =
 {options}
+
+monitor_speed = {DEFAULT_ARDUINO_SPEED}
 """
     else:
         ret += f"""
@@ -89,9 +97,6 @@ build_flags =
     ${{env.build_flags}}
 {options}
 """
-
-    if isarduino:
-        print(ret)
 
     return ret
 
@@ -110,15 +115,17 @@ def generate_example_env(example_path):
         env_name = example_dir_name
         return generate_pio_env(env_name, example_path, options, True)
     else:
-        print(f"\tCanniot generate pio env for example: {example_path}")
+        print(f"\tCAN NOT generate pio env for example: {example_path}")
+
 
 if __name__ == "__main__":
     print("Parsing examples...")
     envs = []
-    for example in os.listdir("./examples"):
+    for example in sorted(os.listdir("./examples"), key=lambda x: x.lower()):
         env = generate_example_env("./examples/" + example)
 
         if env:
+            print("\tGenerated env: " + example)
             envs.append(env)
 
     print("Generating configurations for ./platformio.ini ...")
@@ -130,6 +137,7 @@ if __name__ == "__main__":
     with open("platformio.ini", "r+") as f:
         lines = f.readlines()
         f.seek(0)
+        f.truncate(0)
         for line in lines:
             f.write(line)
             if line.strip() == "# examples":

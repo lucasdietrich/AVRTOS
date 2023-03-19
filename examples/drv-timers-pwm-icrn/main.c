@@ -50,9 +50,9 @@ int main(void)
 	};
 
 	/* Configure timer1 pins as output */
-	gpio_pin_init(GPIOB, 5u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
-	gpio_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
-	gpio_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+	gpiol_pin_init(GPIOB, 5u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+	gpiol_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+	gpiol_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 
 	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
 	ll_timer16_write_reg16(&TIMER1_DEVICE->IRCN, 1u); /* Set ICR1 to 0x8000 (32768) */

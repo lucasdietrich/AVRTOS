@@ -61,6 +61,11 @@ extern "C" {
 
 #define K_ASSERT_ISTHREADIDLE 20
 
+#define K_ASSERT_USER_MODE   21
+#define K_ASSERT_KERNEL_MODE 22
+
+#define K_ASSERT_UNDEFINED_LINE 0u
+
 #if CONFIG_KERNEL_ASSERT
 #define __ASSERT(_acode, _assertion)                                                     \
 	__assert((uint8_t)(_assertion), K_MODULE, _acode, __LINE__)

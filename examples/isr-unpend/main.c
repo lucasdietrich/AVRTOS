@@ -26,7 +26,7 @@ ISR(TIMER3_COMPA_vect)
 
 int main(void)
 {
-	gpio_init(GPIOB, 0xF0u, 0x00u);
+	gpiol_init(GPIOB, 0xF0u, 0x00u);
 
 	const struct timer_config timer_cfg = {
 		.counter   = TIMER_CALC_COUNTER_VALUE(500000u, 1024u),

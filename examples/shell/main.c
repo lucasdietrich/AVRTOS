@@ -6,12 +6,14 @@
 
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
-#include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/pgmspace.h>
+
+#include <avrtos/logging.h>
 #define LOG_LEVEL LOG_LEVEL_WRN
 
 #define K_MODULE K_MODULE_APPLICATION
@@ -156,7 +158,10 @@ static void cmd_help(void)
 
 static void cmd_version(void)
 {
-	printf_P(PSTR("version: %02u.%02u"), AVRTOS_VERSION_MAJOR, AVRTOS_VERSION_MINOR);
+	printf_P(PSTR("version: %02u.%02u.%02u"),
+		 AVRTOS_VERSION_MAJOR,
+		 AVRTOS_VERSION_MINOR,
+		 AVRTOS_VERSION_REVISION);
 }
 
 static void cmd_reboot(void)

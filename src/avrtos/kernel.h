@@ -52,6 +52,11 @@ __kernel void irq_enable(void);
 
 #endif /* CONFIG_KERNEL_IRQ_LOCK_COUNTER */
 
+/**
+ * @brief Lock interrupts and return the previous state
+ *
+ * @return uint8_t
+ */
 static inline uint8_t irq_lock(void)
 {
 	const uint8_t sreg = SREG;
@@ -59,6 +64,11 @@ static inline uint8_t irq_lock(void)
 	return sreg;
 }
 
+/**
+ * @brief Unlock interrupts (restore the previous state)
+ *
+ * @param sreg
+ */
 static inline void irq_unlock(uint8_t sreg)
 {
 	SREG = sreg;
@@ -237,6 +247,15 @@ __kernel int8_t k_thread_stop(struct k_thread *thread);
  */
 __kernel void k_stop(void);
 
+/**
+ * @brief Change the priority of the given thread.
+ *
+ * @param thread Thread
+ * @param prio Priority K_COOPERATIVE or K_PREEMPTIVE
+ * @return __kernel
+ */
+__kernel void k_thread_set_priority(struct k_thread *thread, uint8_t prio);
+
 /*___________________________________________________________________________*/
 
 //
@@ -276,8 +295,18 @@ static inline void k_yield(void)
 void yield(void);
 
 /**
+ * @brief Assert helper to check if we are in user mode.
+ */
+extern void z_assert_user_mode(void);
+
+/**
  * @brief Yield the thread interrupted by the current interrupt,
  * give CPU to the next thread in the runqueue.
+ *
+ * @warning Should be called from USER interrupt routine ONLY.
+ * Do never call this function from a k_timer or k_event callback handler.
+ * These handlers are called in "kernel mode", scheduling threads from these
+ * handler will cause an immediate switch to the last unpended thread.
  *
  * Note: Should be called from interrupt routine ONLY.
  *
@@ -292,8 +321,13 @@ void yield(void);
  */
 static inline void k_yield_from_isr(void)
 {
-	// ASSERT NOT ISR CONTEXT
+	// ASSERT ISR CONTEXT
 	// ASSERT IRQ LOCKED
+	// ASSERT NOT KERNEL MODE
+
+#if CONFIG_KERNEL_ASSERT
+	z_assert_user_mode();
+#endif
 
 	/* Check whether current thread can be preempted */
 	if ((z_current->flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) == 0u) {
@@ -305,7 +339,10 @@ static inline void k_yield_from_isr(void)
  * @brief Yield the thread interrupted by the current interrupt,
  * give CPU to the next thread in the runqueue.
  *
- * Note: Should be called from interrupt routine ONLY.
+ * @warning Should be called from USER interrupt routine ONLY.
+ * Do never call this function from a k_timer or k_event callback handler.
+ * These handlers are called in "kernel mode", scheduling threads from these
+ * handler will cause an immediate switch to the last unpended thread.
  *
  * Should be the last instruction of the interrupt routine.
  * Because everything after will be delayed.
@@ -332,7 +369,7 @@ static inline void k_yield_from_isr_cond(struct k_thread *thread)
 
 /**
  * @brief Increment the kernel tick counter.
- * 
+ *
  * Handle threads timeouts, timers and events.
  *
  * Assumptions :

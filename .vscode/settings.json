@@ -7,6 +7,9 @@
 	},
 	"files.associations": {
 		"*.asm": "avr",
+		"*.bb": "shellscript",
+		"*.bbclass": "shellscript",
+		"*.inc": "shellscript",
 		"multithreading_debug.h": "c",
 		"serial.h": "c",
 		"multithreading.h": "c",
@@ -55,7 +58,8 @@
 		"logging.h": "c",
 		"iom2560.h": "c",
 		"iomxx0_1.h": "c",
-		"typeinfo": "c"
+		"typeinfo": "c",
+		"exti.h": "c"
 	},
 	"editor.rulers": [80]
 }

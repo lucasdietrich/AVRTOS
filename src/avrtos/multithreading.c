@@ -121,7 +121,7 @@ int8_t k_thread_create(struct k_thread *thread,
 
 	z_thread_stack_create(thread, entry, context_p);
 
-	/* clear internal flags */
+	/* initialize internal data */
 	thread->flags	  = Z_THREAD_STATE_STOPPED | (prio & Z_THREAD_PRIO_MSK);
 	thread->symbol	  = symbol;
 	thread->swap_data = NULL;

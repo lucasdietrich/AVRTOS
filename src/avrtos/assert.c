@@ -9,6 +9,16 @@
 
 #include <avr/pgmspace.h>
 
+extern uint8_t z_kernel_mode;
+
+void z_assert_user_mode(void)
+{
+	__assert(!z_kernel_mode,
+		 K_MODULE_KERNEL,
+		 K_ASSERT_USER_MODE,
+		 K_ASSERT_UNDEFINED_LINE);
+}
+
 void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line)
 {
 	if (expression == 0u) {
@@ -25,11 +35,11 @@ void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line)
 		 */
 		serial_print_p(PSTR("\n\n\n*** K assert ! ***\n"));
 
-		serial_print_p(PSTR("mod=0x"));
+		serial_print_p(PSTR("m=x"));
 		serial_hex(module);
-		serial_print_p(PSTR(":L 0x"));
+		serial_print_p(PSTR(" L="));
 		serial_u16(line);
-		serial_print_p(PSTR(" acode=0x"));
+		serial_print_p(PSTR(" c="));
 		serial_u16(acode);
 
 		asm("jmp _exit");

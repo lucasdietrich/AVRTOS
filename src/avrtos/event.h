@@ -24,6 +24,9 @@ struct k_event;
 /**
  * @brief Event handler function.
  *
+ * @warning Never call any k_yield(), k_yield_from_isr(), k_yield_from_isr_cond()
+ * from a timer handler.
+ *
  * @param event Event that triggered the handler.
  */
 typedef void (*k_event_handler_t)(struct k_event *);

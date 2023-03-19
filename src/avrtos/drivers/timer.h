@@ -233,7 +233,7 @@ typedef struct {
 
 #define TIMER_GET_MAX_COUNTER(tim_idx) (IS_TIMER_INDEX_8BIT(tim_idx) ? 0xFFU : 0xFFFFU)
 #define TIMER_CALC_COUNTER_VALUE(period_us, prescaler)                                   \
-	((((F_CPU / 1000000LU) * period_us) / prescaler - 1))
+	((((F_CPU / 1000000lu) * period_us) / prescaler - 1lu))
 #define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max)                               \
 	(TIMER_CALC_COUNTER_VALUE(period_us, prescaler) <= max)
 

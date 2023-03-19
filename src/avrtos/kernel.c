@@ -81,6 +81,14 @@ struct titem *z_events_queue = NULL;
 uint8_t z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
 #endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
+#if CONFIG_KERNEL_ASSERT
+/* This flag is set to true when kernel code is being executed.
+ * This is used to detect if a user handler is being executed
+ * from a kernel context. e.g. k_timer or k_even handlers.
+ */
+uint8_t z_kernel_mode = 0u;
+#endif
+
 #if CONFIG_KERNEL_TICKS_COUNTER
 // necessary ?
 union {
@@ -307,6 +315,13 @@ __STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
  */
 void z_system_tick_inc(void)
 {
+	__Z_DBG_GPIO_SET_0();
+
+#if CONFIG_KERNEL_ASSERT
+	__ASSERT(!z_kernel_mode, K_ASSERT_USER_MODE);
+	z_kernel_mode = 1u;
+#endif
+
 	__ASSERT_NOINTERRUPT();
 
 	tqueue_shift(&z_events_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
@@ -335,6 +350,12 @@ void z_system_tick_inc(void)
 #if CONFIG_KERNEL_EVENTS
 	z_event_q_process();
 #endif /* CONFIG_KERNEL_EVENTS */
+
+#if CONFIG_KERNEL_ASSERT
+	z_kernel_mode = 0u;
+#endif
+
+	__Z_DBG_GPIO_CLEAR_0();
 }
 
 /**
@@ -703,6 +724,15 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
 void k_stop()
 {
 	k_thread_stop(z_current);
+}
+
+void k_thread_set_priority(struct k_thread *thread, uint8_t prio)
+{
+	const uint8_t key = irq_lock();
+
+	thread->flags = (thread->flags & ~Z_THREAD_PRIO_MSK) | (prio & Z_THREAD_PRIO_MSK);
+
+	irq_unlock(key);
 }
 
 /*___________________________________________________________________________*/
