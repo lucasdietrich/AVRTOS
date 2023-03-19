@@ -15,13 +15,22 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define WORKQ_RUNTIME_INIT 0
+
 /*___________________________________________________________________________*/
 
 void tasks_generator(void *p);
 void tasks_handler(void *p);
 
 K_THREAD_DEFINE(generator, tasks_generator, 0x100, K_PREEMPTIVE, NULL, 'G');
+
+#if WORKQ_RUNTIME_INIT
+struct k_workqueue workqueue;
+struct k_thread workqueue_thread;
+uint8_t workqueue_stack[0x200];
+#else
 K_WORKQUEUE_DEFINE(workqueue, 0x200, K_PREEMPTIVE, 'W');
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -59,6 +68,15 @@ int main(void)
 {
 	led_init();
 	serial_init();
+
+#if WORKQ_RUNTIME_INIT
+	k_workqueue_create(&workqueue,
+			   &workqueue_thread,
+			   workqueue_stack,
+			   sizeof(workqueue_stack),
+			   K_PREEMPTIVE,
+			   'W');
+#endif
 
 	k_thread_dump_all();
 

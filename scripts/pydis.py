@@ -50,4 +50,4 @@ if __name__ == "__main__":
         if os.path.exists(elf) and os.path.isfile(elf):
             create_dir(os.path.join(TMP, name))
             commands = dis(name, elf)
-            print(f"- {name} :\n\t" + '\n\t'.join(map(lambda cmd: cmd[1], commands)))
+            print(f"- Disassembled '{name}' :\n\t" + '\n\t'.join(map(lambda cmd: cmd[1], commands)))

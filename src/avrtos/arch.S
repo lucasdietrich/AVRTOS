@@ -16,7 +16,7 @@
 .extern z_current
 .extern z_ticks 			; u32/u40
 .extern z_sched_ticks_remaining 	; u8
-.extern z_system_shift
+.extern z_system_tick_inc
 
 #if CONFIG_KERNEL_SYSLOCK_HW_TIMER == 0
 #define TIMERn_COMPA_vect TIMER0_COMPA_vect
@@ -101,7 +101,7 @@ TIMERn_COMPA_vect:
 #endif
 ; CONFIG_KERNEL_DEBUG
 
-	call z_system_shift
+	call z_system_tick_inc
 
 ; check if scheduler is locked (cooperative thread or temporarely locked)
 #if CONFIG_KERNEL_COOPERATIVE_THREADS

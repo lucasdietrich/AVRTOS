@@ -331,13 +331,14 @@ static inline void k_yield_from_isr_cond(struct k_thread *thread)
 /*___________________________________________________________________________*/
 
 /**
- * @brief Shift time in kernel time queue list (z_events_queue)
- * and process timers if any
+ * @brief Increment the kernel tick counter.
+ * 
+ * Handle threads timeouts, timers and events.
  *
  * Assumptions :
  *  - interrupt flag is cleared when called.
  */
-__kernel void z_system_shift(void);
+__kernel void z_system_tick_inc(void);
 
 /**
  * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
