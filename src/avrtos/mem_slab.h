@@ -35,7 +35,8 @@ extern "C" {
  * - Allocation/free is O(1)
  *
  * Maximum number of blocks is 255
- * Maximum block _block_size is 65535 (but technically impossible on AVR architectures)
+ * Maximum block _block_size is 65535 (but technically impossible on AVR
+ * architectures)
  */
 
 /*___________________________________________________________________________*/
@@ -61,18 +62,18 @@ struct k_mem_slab {
 
 /*___________________________________________________________________________*/
 
-#define K_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                         \
-	{                                                                                \
-		.buffer = _buf, .count = _blocks_count, .block_size = _block_size,       \
-		.free_list = NULL, .waitqueue = DLIST_INIT(_slab.waitqueue)              \
+#define K_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                   \
+	{                                                                          \
+		.buffer = _buf, .count = _blocks_count, .block_size = _block_size, \
+		.free_list = NULL, .waitqueue = DLIST_INIT(_slab.waitqueue)        \
 	}
 
 #define Z_MEM_SLAB_BUF_NAME(_slab_name) z_mem_slab_buf_##_slab_name
 
-#define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                        \
-	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];        \
-	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                              \
-	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                           \
+#define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                 \
+	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)]; \
+	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                       \
+	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                    \
 		_slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
 /*___________________________________________________________________________*/

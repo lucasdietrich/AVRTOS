@@ -8,7 +8,7 @@ GENERATOR_ARGS?="--no-print-directory"
 
 
 DEVICE?=/dev/ttyACM0
-SINGLE_SAMPLE?=shell
+SINGLE_SAMPLE?=drv-spi-master
 TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
 BAUDRATE?=500000
 QEMU?=OFF
@@ -72,5 +72,15 @@ piogen:
 
 arduinogen:
 	python3 ./scripts/arduinogen.py
+
+# spi: cmake
+# 	make -C build sample_drv_spi_master
+# 	make -C build sample_drv_spi_slave
+	
+# 	avr-objcopy -R .eeprom -O ihex build/examples/drv-spi-master/sample_drv_spi_master build/examples/drv-spi-master/sample_drv_spi_master.hex
+# 	avr-objcopy -R .eeprom -O ihex build/examples/drv-spi-slave/sample_drv_spi_slave build/examples/drv-spi-slave/sample_drv_spi_slave.hex
+
+# 	avrdude -c wiring -p m2560 -P /dev/ttyACM0 -U flash:w:build/examples/drv-spi-master/sample_drv_spi_master.hex
+# 	avrdude -c wiring -p m328p -P /dev/ttyACM1 -U flash:w:build/examples/drv-spi-slave/sample_drv_spi_slave.hex
 
 gen: format piogen arduinogen

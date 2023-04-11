@@ -15,6 +15,6 @@
 #define __I  volatile const
 #define __O  volatile
 
-#define AVR_IO_BASE_ADDR 0x0000U
+#define AVR_IO_BASE_ADDR 0x0000u
 
 #endif /* _AVRTOS_DRIVERS_H_ */

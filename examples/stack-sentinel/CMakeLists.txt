@@ -3,7 +3,6 @@ add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-	CONFIG_KERNEL_TIME=1
 	CONFIG_KERNEL_UPTIME=1
 
 	CONFIG_STDIO_PRINTF_TO_USART=0

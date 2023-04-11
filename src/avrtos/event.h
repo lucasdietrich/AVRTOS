@@ -24,8 +24,8 @@ struct k_event;
 /**
  * @brief Event handler function.
  *
- * @warning Never call any k_yield(), k_yield_from_isr(), k_yield_from_isr_cond()
- * from a timer handler.
+ * @warning Never call any k_yield(), k_yield_from_isr(),
+ * k_yield_from_isr_cond() from a timer handler.
  *
  * @param event Event that triggered the handler.
  */
@@ -39,9 +39,9 @@ struct k_event {
 	uint8_t scheduled : 1;
 };
 
-#define K_EVENT_INIT(hdlr)                                                               \
-	{                                                                                \
-		.tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0             \
+#define K_EVENT_INIT(hdlr)                                                   \
+	{                                                                    \
+		.tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0 \
 	}
 #define K_EVENT_DEFINE(name, hdlr) struct k_event name = K_EVENT_INIT(hdlr)
 

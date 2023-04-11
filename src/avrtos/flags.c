@@ -13,7 +13,7 @@
 #define Z_SWAP_DATA_GET_TRIG_MASK(swapd) ((uint8_t)(((uint16_t)swapd) & 0xFFu))
 
 #define Z_SWAP_DATA_INIT_TRIG_MASK(trig) ((void *)(((uint16_t)trig) & 0xFFu))
-#define Z_SWAP_DATA_INIT_OPT_N_MASK(opt, mask)                                           \
+#define Z_SWAP_DATA_INIT_OPT_N_MASK(opt, mask) \
 	((void *)((((uint16_t)opt) << 8u) | ((uint16_t)mask)))
 
 int k_flags_init(struct k_flags *flags, uint8_t value)

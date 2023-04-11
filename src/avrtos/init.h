@@ -7,9 +7,8 @@
 #ifndef _AVRTOS_INIT_H_
 #define _AVRTOS_INIT_H_
 
-#include <avrtos/defines.h>
-
 #include <avr/io.h>
+#include <avrtos/defines.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,14 +32,14 @@ extern "C" {
 
 #endif
 
-#define K_KERNEL_LINK_AVRTOS_INIT()                                                      \
-	__attribute__((naked, used, section(".init8"))) void k_avrtos_init(void)         \
-	{                                                                                \
-		z_avrtos_init();                                                         \
+#define K_KERNEL_LINK_AVRTOS_INIT()                                              \
+	__attribute__((naked, used, section(".init8"))) void k_avrtos_init(void) \
+	{                                                                        \
+		z_avrtos_init();                                                 \
 	}
 
-#define K_KERNEL_LINK_INIT()                                                             \
-	K_KERNEL_LINK_SP_INIT()                                                          \
+#define K_KERNEL_LINK_INIT()    \
+	K_KERNEL_LINK_SP_INIT() \
 	K_KERNEL_LINK_AVRTOS_INIT()
 
 #define K_KERNEL_INIT K_KERNEL_LINK_INIT

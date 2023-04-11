@@ -27,13 +27,13 @@ struct k_work {
 	k_work_handler_t handler;
 };
 
-#define K_WORK_INIT(work_handler)                                                        \
-	{                                                                                \
-		._tie = SNODE_INIT(), .handler = work_handler,                           \
+#define K_WORK_INIT(work_handler)                              \
+	{                                                      \
+		._tie = SNODE_INIT(), .handler = work_handler, \
 	}
 #define K_WORK_INITIALIZER(work_handler) K_WORK_INIT(work_handler)
 
-#define K_WORK_DEFINE(work_name, work_handler)                                           \
+#define K_WORK_DEFINE(work_name, work_handler) \
 	struct k_work work_name = K_WORK_INIT(work_handler)
 
 /*___________________________________________________________________________*/
@@ -45,17 +45,13 @@ struct k_workqueue {
 
 #define k_workq k_workqueue
 
-#define K_WORKQUEUE_DEFINE(_name, _stack_size, _prio_flags, _symbol)                     \
-	struct k_workqueue _name = {                                                     \
-		.q     = K_FIFO_INIT(_name.q),                                           \
-		.flags = 0u,                                                             \
-	};                                                                               \
-	K_THREAD_DEFINE(z_workq_##_name,                                                 \
-			z_workqueue_entry,                                               \
-			_stack_size,                                                     \
-			_prio_flags,                                                     \
-			&_name,                                                          \
-			_symbol)
+#define K_WORKQUEUE_DEFINE(_name, _stack_size, _prio_flags, _symbol)                  \
+	struct k_workqueue _name = {                                                  \
+		.q     = K_FIFO_INIT(_name.q),                                        \
+		.flags = 0u,                                                          \
+	};                                                                            \
+	K_THREAD_DEFINE(z_workq_##_name, z_workqueue_entry, _stack_size, _prio_flags, \
+			&_name, _symbol)
 
 /*___________________________________________________________________________*/
 

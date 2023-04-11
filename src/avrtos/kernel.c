@@ -12,6 +12,9 @@
 #include <util/atomic.h>
 #include <util/delay.h>
 
+#include <avr/sleep.h>
+#include <util/delay.h>
+
 /*___________________________________________________________________________*/
 
 #define K_MODULE K_MODULE_KERNEL
@@ -64,8 +67,7 @@ uint8_t k_ready_count(void)
 #if CONFIG_TREAD_PRIO_MULTIQ
 #error "CONFIG_TREAD_PRIO_MULTIQ not supported yet"
 dlist_t z_runqs[4u] = {DLIST_INIT(z_runqs[K_PRIO_HIGHEST]),
-		       DLIST_INIT(z_runqs[K_PRIO_HIGH]),
-		       DLIST_INIT(z_runqs[K_PRIO_LOW]),
+		       DLIST_INIT(z_runqs[K_PRIO_HIGH]), DLIST_INIT(z_runqs[K_PRIO_LOW]),
 		       DLIST_INIT(z_runqs[K_PRIO_LOWEST])};
 #define THREAD_GET_RUNQ(thread) (&z_runqs[thread->priority])
 #else
@@ -234,7 +236,7 @@ __kernel void z_wake_up(struct k_thread *thread)
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
 
-	__K_DBG_WAKEUP(thread); // @
+	__K_DBG_WAKEUP(thread);	 // @
 
 	z_cancel_scheduled_wake_up(thread);
 
@@ -315,7 +317,7 @@ __STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
  */
 void z_system_tick_inc(void)
 {
-	__Z_DBG_GPIO_SET_0();
+	__Z_DBG_SYSTICK_ENTER();
 
 #if CONFIG_KERNEL_ASSERT
 	__ASSERT(!z_kernel_mode, K_ASSERT_USER_MODE);
@@ -334,7 +336,7 @@ void z_system_tick_inc(void)
 	while ((ready = tqueue_pop(&z_events_queue)) != NULL) {
 		struct k_thread *const thread = Z_THREAD_FROM_EVENTQUEUE(ready);
 
-		__K_DBG_SCHED_EVENT(thread); // !
+		__K_DBG_SCHED_EVENT(thread);  // !
 
 		/* set ready thread expired flag */
 		thread->flags |= Z_THREAD_TIMER_EXPIRED_MSK;
@@ -355,7 +357,7 @@ void z_system_tick_inc(void)
 	z_kernel_mode = 0u;
 #endif
 
-	__Z_DBG_GPIO_CLEAR_0();
+	__Z_DBG_SYSTICK_EXIT();
 }
 
 /**
@@ -436,8 +438,8 @@ static void z_suspend(struct k_thread *thread)
 			z_runq = &z_thread_idle.tie.runqueue;
 #endif
 		} else if (thread == z_current) {
-			/* Set runq pointer so that it points to the next thread to be
-			 * executed */
+			/* Set runq pointer so that it points to the next thread
+			 * to be executed */
 			z_runq = thread->tie.runqueue.next->prev;
 		}
 
@@ -452,7 +454,6 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 	/* In case of returning without waiting */
 	int8_t err = -EBUSY;
 	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-
 		/* queue thread to pending queue of the object */
 		dlist_append(waitqueue, &z_current->wany);
 
@@ -654,30 +655,57 @@ void k_sleep(k_timeout_t timeout)
 }
 
 #if CONFIG_KERNEL_UPTIME
-void k_wait(k_timeout_t timeout)
+void k_wait(k_timeout_t delay)
 {
 	__ASSERT_INTERRUPT();
 
-	uint64_t ticks = k_ticks_get_64();
-	uint64_t now;
+	uint32_t now;
+	uint32_t ticks = k_ticks_get_32();
 
 	do {
-		k_idle(); /* idle the thread until next interrupt */
+		k_idle();
 
-		now = k_ticks_get_64();
-	} while (now - ticks < K_TIMEOUT_TICKS(timeout));
+		now = k_ticks_get_32();
+	} while (now - ticks < K_TIMEOUT_TICKS(delay));
+}
+
+void k_busy_wait(k_timeout_t delay)
+{
+	__ASSERT_INTERRUPT();
+
+	uint32_t now;
+	uint32_t ticks;
+
+	k_sched_lock();
+
+	ticks = k_ticks_get_32();
+
+	do {
+#ifndef __QEMU__
+		sleep_cpu(); /* idle the thread until next interrupt */
+#endif			     /* __QEMU__ */
+
+		now = k_ticks_get_32();
+	} while (now - ticks < K_TIMEOUT_TICKS(delay));
+
+	k_sched_unlock();
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 
-void k_block(k_timeout_t timeout)
+void k_block_us(uint32_t delay_us)
 {
 	const uint8_t key = irq_lock();
 
-	k_ticks_t ticks = K_TIMEOUT_TICKS(timeout);
-	while (ticks != 0) {
-		_delay_us(K_TICKS_US);
-		ticks--;
-	}
+	_delay_us(delay_us);
+
+	irq_unlock(key);
+}
+
+void k_block_ms(uint32_t delay_ms)
+{
+	const uint8_t key = irq_lock();
+
+	_delay_ms(delay_ms);
 
 	irq_unlock(key);
 }

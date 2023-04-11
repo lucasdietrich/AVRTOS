@@ -78,15 +78,15 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 	return ret;
 }
 
-__always_inline static int8_t
-z_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
+__always_inline static int8_t z_msgq_get(struct k_msgq *msgq,
+					 void *data,
+					 k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(msgq);
 	__ASSERT_NOTNULL(data);
 
 	if (msgq->used_msgs > 0) {
-
 		/* copy first message from the msgq to the thread */
 		memcpy(data, msgq->read_cursor, msgq->msg_size);
 		msgq->read_cursor = msgq->read_cursor + msgq->msg_size;
@@ -100,8 +100,7 @@ z_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 			/* a thread is waiting to write a msg,
 			 * we copy the data from the thread to the msgq
 			 */
-			memcpy(msgq->write_cursor,
-			       pending_thread->swap_data,
+			memcpy(msgq->write_cursor, pending_thread->swap_data,
 			       msgq->msg_size);
 			msgq->write_cursor = msgq->write_cursor + msgq->msg_size;
 			if (msgq->write_cursor == msgq->buf_end) {
@@ -132,7 +131,6 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 	const uint8_t key = irq_lock();
 
 	if (msgq->used_msgs > 0) {
-
 		/* copy first message from the msgq to the thread */
 		memcpy(data, msgq->read_cursor, msgq->msg_size);
 		msgq->read_cursor = msgq->read_cursor + msgq->msg_size;
@@ -146,8 +144,7 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 			/* a thread is waiting to write a msg,
 			 * we copy the data from the thread to the msgq
 			 */
-			memcpy(msgq->write_cursor,
-			       pending_thread->swap_data,
+			memcpy(msgq->write_cursor, pending_thread->swap_data,
 			       msgq->msg_size);
 			msgq->write_cursor = msgq->write_cursor + msgq->msg_size;
 			if (msgq->write_cursor == msgq->buf_end) {

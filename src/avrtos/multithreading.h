@@ -133,28 +133,28 @@ struct z_intctx {
  * Warning : Every definition of a "struct k_thread" variable must be stack
  */
 struct k_thread {
-	void *sp; // stack point, keep it at the beginning of the structure
+	void *sp;  // stack point, keep it at the beginning of the structure
 
-	uint8_t flags; // thread flags
-
-	union {
-		struct dnode runqueue; // represent the thread in the runqueue (4B)
-		struct titem event;    // represent the thread in the events queue (4B)
-	} tie; // the thread cannot be in the events_queue and the runqueue at
-	       // the same time
+	uint8_t flags;	// thread flags
 
 	union {
-		struct dnode wany;   // represent the thread pending on a generic
-				     // object
-		struct dnode wmutex; // represent the thread pending on an mutex
-		struct dnode wsem;   // represent the thread pending on an semaphore
-		struct dnode wsig;   // represent the thread pending on an signal
-		struct dnode wfifo;  // represent the thread pending on a fifo item
-		struct dnode wmsgq;  // represent the thread pending on a msgq item
-		struct dnode wflags; // represent the thread pending on a flags item
+		struct dnode runqueue;	// represent the thread in the runqueue (4B)
+		struct titem event;	// represent the thread in the events queue (4B)
+	} tie;	// the thread cannot be in the events_queue and the runqueue at
+		// the same time
+
+	union {
+		struct dnode wany;    // represent the thread pending on a generic
+				      // object
+		struct dnode wmutex;  // represent the thread pending on an mutex
+		struct dnode wsem;    // represent the thread pending on an semaphore
+		struct dnode wsig;    // represent the thread pending on an signal
+		struct dnode wfifo;   // represent the thread pending on a fifo item
+		struct dnode wmsgq;   // represent the thread pending on a msgq item
+		struct dnode wflags;  // represent the thread pending on a flags item
 	};
-	void *swap_data; // data returned by kernel API's when calling
-			 // z_unpend_first_thread
+	void *swap_data;  // data returned by kernel API's when calling
+			  // z_unpend_first_thread
 
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER
 	/**
@@ -171,15 +171,15 @@ struct k_thread {
 #endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
 	struct {
-		void *end;   // stack end
-		size_t size; // stack size
-	} stack;	     // thread stack definition
-	char symbol;	     // 1-letter symbol to name the thread, reserver M (main),
-			     // idle : I (idle)
+		void *end;    // stack end
+		size_t size;  // stack size
+	} stack;	      // thread stack definition
+	char symbol;	      // 1-letter symbol to name the thread, reserver M (main),
+			      // idle : I (idle)
 
 #if CONFIG_THREAD_ERRNO
-	uint8_t errno; // Thread errno
-#endif		       /* CONFIG_THREAD_ERRNO */
+	uint8_t errno;	// Thread errno
+#endif			/* CONFIG_THREAD_ERRNO */
 };
 
 /**

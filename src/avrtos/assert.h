@@ -14,9 +14,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h>
 
-#include <avrtos/common.h>
-
 #include <avr/io.h>
+#include <avrtos/sys.h>
 #include <util/atomic.h>
 
 #define K_MODULE_KERNEL	  1
@@ -67,9 +66,9 @@ extern "C" {
 #define K_ASSERT_UNDEFINED_LINE 0u
 
 #if CONFIG_KERNEL_ASSERT
-#define __ASSERT(_acode, _assertion)                                                     \
+#define __ASSERT(_acode, _assertion) \
 	__assert((uint8_t)(_assertion), K_MODULE, _acode, __LINE__)
-#define __ASSERT_APP(_assertion)                                                         \
+#define __ASSERT_APP(_assertion) \
 	__assert((uint8_t)(_assertion), K_MODULE_APPLICATION, K_ASSERT_ANY, __LINE__)
 #else
 #define __ASSERT(_acode, _assertion)
@@ -90,11 +89,11 @@ extern bool z_interrupts(void);
 #define __ASSERT_NOTNULL(var) __ASSERT(K_ASSERT_NOTNULL, (var) != NULL)
 #define __ASSERT_NULL(var)    __ASSERT(K_ASSERT_NULL, (var) == NULL)
 
-#define __ASSERT_LEASTONE_RUNNING()                                                      \
+#define __ASSERT_LEASTONE_RUNNING() \
 	__ASSERT(K_ASSERT_LEASTONE_RUNNING, k_ready_count() != 0u)
-#define __ASSERT_THREAD_STATE(thread, th_state)                                          \
+#define __ASSERT_THREAD_STATE(thread, th_state) \
 	__ASSERT(K_ASSERT_THREAD_STATE, (thread->flags & Z_THREAD_STATE_MSK) == th_state)
-#define __ASSERT_THREAD_NOT_STATE(thread, th_state)                                      \
+#define __ASSERT_THREAD_NOT_STATE(thread, th_state) \
 	__ASSERT(K_ASSERT_THREAD_STATE, (thread->flags & Z_THREAD_STATE_MSK) != th_state)
 
 #define __ASSERT_PREEMPTIVE()	__ASSERT(K_ASSERT_PREEMPTIVE, k_cur_is_preempt())

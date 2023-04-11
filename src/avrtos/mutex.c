@@ -9,7 +9,6 @@
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
-
 #include <util/atomic.h>
 
 #define K_MODULE K_MODULE_MUTEX
@@ -37,7 +36,7 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	}
 
 	if (lock == 0) {
-		__K_DBG_MUTEX_LOCKED(z_current); // }
+		__K_DBG_MUTEX_LOCKED(z_current);  // }
 		mutex->owner = z_current;
 	}
 
@@ -58,7 +57,7 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 		goto ret;
 	}
 
-	__K_DBG_MUTEX_UNLOCKED(z_current); // {
+	__K_DBG_MUTEX_UNLOCKED(z_current);  // {
 
 	/* there is a new owner, we don't need to unlock the mutex
 	 * The mutex owner is changed when returning to the

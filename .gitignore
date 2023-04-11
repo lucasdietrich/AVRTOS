@@ -8,3 +8,5 @@
 /tmp
 
 /build
+/build_master
+/build_slave

@@ -9,7 +9,6 @@
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
-
 #include <util/atomic.h>
 
 void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)

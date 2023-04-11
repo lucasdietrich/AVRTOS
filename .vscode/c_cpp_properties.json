@@ -2,7 +2,33 @@
 	"configurations": [
 		{
 			"name": "AVR",
-			"compileCommands": "${workspaceRoot}/build/compile_commands.json",
+			"compileCommands": "${workspaceRoot}/build_master/compile_commands.json",
+			"intelliSenseMode": "gcc-avr",
+			"browse": {
+				"path": [
+					"${workspaceFolder}"
+				]
+			},
+			"cStandard": "c11",
+			"cppStandard": "c++17",
+			"configurationProvider": "ms-vscode.cmake-tools"
+		},
+		{
+			"name": "AVR SPI master",
+			"compileCommands": "${workspaceRoot}/build_master/compile_commands.json",
+			"intelliSenseMode": "gcc-avr",
+			"browse": {
+				"path": [
+					"${workspaceFolder}"
+				]
+			},
+			"cStandard": "c11",
+			"cppStandard": "c++17",
+			"configurationProvider": "ms-vscode.cmake-tools"
+		},
+		{
+			"name": "AVR SPI slave",
+			"compileCommands": "${workspaceRoot}/build_slave/compile_commands.json",
 			"intelliSenseMode": "gcc-avr",
 			"browse": {
 				"path": [

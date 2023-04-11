@@ -13,9 +13,7 @@ extern uint8_t z_kernel_mode;
 
 void z_assert_user_mode(void)
 {
-	__assert(!z_kernel_mode,
-		 K_MODULE_KERNEL,
-		 K_ASSERT_USER_MODE,
+	__assert(!z_kernel_mode, K_MODULE_KERNEL, K_ASSERT_USER_MODE,
 		 K_ASSERT_UNDEFINED_LINE);
 }
 

@@ -20,12 +20,12 @@ extern "C" {
 // Kernel Debug Macros
 //
 
-#define __K_DBG_HELPER_TH(thread, chr)                                                   \
-	serial_transmit(chr);                                                            \
+#define __K_DBG_HELPER_TH(thread, chr) \
+	serial_transmit(chr);          \
 	serial_transmit(thread->symbol)
 
-#define __K_DBG_HELPER_TH_R(thread, chr)                                                 \
-	serial_transmit(thread->symbol);                                                 \
+#define __K_DBG_HELPER_TH_R(thread, chr) \
+	serial_transmit(thread->symbol); \
 	serial_transmit(chr)
 
 #if CONFIG_KERNEL_SCHEDULER_DEBUG
@@ -72,9 +72,61 @@ extern "C" {
 
 /* Kernel GPIO Debug */
 
-#if CONFIG_KERNEL_DEBUG_GPIO
+#if CONFIG_KERNEL_DEBUG_GPIO == 1
+#define __Z_DBG_GPIO_PORT  GPIOA_DEVICE
+#define __Z_DBG_GPIO_0_PIN 0u
+#define __Z_DBG_GPIO_1_PIN 1u
+#define __Z_DBG_GPIO_2_PIN 2u
+#define __Z_DBG_GPIO_3_PIN 3u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 2
+#define __Z_DBG_GPIO_PORT  GPIOA_DEVICE
+#define __Z_DBG_GPIO_0_PIN 4u
+#define __Z_DBG_GPIO_1_PIN 5u
+#define __Z_DBG_GPIO_2_PIN 6u
+#define __Z_DBG_GPIO_3_PIN 7u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 3
+#define __Z_DBG_GPIO_PORT  GPIOB_DEVICE
+#define __Z_DBG_GPIO_0_PIN 0u
+#define __Z_DBG_GPIO_1_PIN 1u
+#define __Z_DBG_GPIO_2_PIN 2u
+#define __Z_DBG_GPIO_3_PIN 3u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 4
+#define __Z_DBG_GPIO_PORT  GPIOB_DEVICE
+#define __Z_DBG_GPIO_0_PIN 4u
+#define __Z_DBG_GPIO_1_PIN 5u
+#define __Z_DBG_GPIO_2_PIN 6u
+#define __Z_DBG_GPIO_3_PIN 7u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 5
+#define __Z_DBG_GPIO_PORT  GPIOC_DEVICE
+#define __Z_DBG_GPIO_0_PIN 0u
+#define __Z_DBG_GPIO_1_PIN 1u
+#define __Z_DBG_GPIO_2_PIN 2u
+#define __Z_DBG_GPIO_3_PIN 3u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 6
+#define __Z_DBG_GPIO_PORT  GPIOC_DEVICE
+#define __Z_DBG_GPIO_0_PIN 4u
+#define __Z_DBG_GPIO_1_PIN 5u
+#define __Z_DBG_GPIO_2_PIN 6u
+#define __Z_DBG_GPIO_3_PIN 7u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 7
+#define __Z_DBG_GPIO_PORT  GPIOD_DEVICE
+#define __Z_DBG_GPIO_0_PIN 0u
+#define __Z_DBG_GPIO_1_PIN 1u
+#define __Z_DBG_GPIO_2_PIN 2u
+#define __Z_DBG_GPIO_3_PIN 3u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 8
+#define __Z_DBG_GPIO_PORT  GPIOD_DEVICE
+#define __Z_DBG_GPIO_0_PIN 4u
+#define __Z_DBG_GPIO_1_PIN 5u
+#define __Z_DBG_GPIO_2_PIN 6u
+#define __Z_DBG_GPIO_3_PIN 7u
+#elif CONFIG_KERNEL_DEBUG_GPIO >= 9
+#error "Invalid CONFIG_KERNEL_DEBUG_GPIO_PINS_RANGE value"
+#endif
+
+#if CONFIG_KERNEL_DEBUG_GPIO > 0
 #include "drivers/gpio.h"
-#define __Z_DBG_GPIO_INIT(_port, _pin)                                                   \
+#define __Z_DBG_GPIO_INIT(_port, _pin) \
 	gpiol_pin_init(_port, _pin, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_HIGH)
 #define __Z_DBG_GPIO_SET(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 1u)
 #define __Z_DBG_GPIO_CLEAR(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 0u)
@@ -86,25 +138,38 @@ extern "C" {
 #define __Z_DBG_GPIO_TOGGLE(_port, _pin)
 #endif
 
-#define __Z_DBG_GPIO_INIT_0() __Z_DBG_GPIO_INIT(GPIOB, 7u)
-#define __Z_DBG_GPIO_INIT_1() __Z_DBG_GPIO_INIT(GPIOB, 6u)
-#define __Z_DBG_GPIO_INIT_2() __Z_DBG_GPIO_INIT(GPIOB, 5u)
-#define __Z_DBG_GPIO_INIT_3() __Z_DBG_GPIO_INIT(GPIOB, 4u)
+#define __Z_DBG_GPIO_0_INIT() __Z_DBG_GPIO_INIT(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_0_PIN)
+#define __Z_DBG_GPIO_1_INIT() __Z_DBG_GPIO_INIT(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_1_PIN)
+#define __Z_DBG_GPIO_2_INIT() __Z_DBG_GPIO_INIT(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_2_PIN)
+#define __Z_DBG_GPIO_3_INIT() __Z_DBG_GPIO_INIT(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_3_PIN)
 
-#define __Z_DBG_GPIO_TOGGLE_0() __Z_DBG_GPIO_TOGGLE(GPIOB, 7u)
-#define __Z_DBG_GPIO_TOGGLE_1() __Z_DBG_GPIO_TOGGLE(GPIOB, 6u)
-#define __Z_DBG_GPIO_TOGGLE_2() __Z_DBG_GPIO_TOGGLE(GPIOB, 5u)
-#define __Z_DBG_GPIO_TOGGLE_3() __Z_DBG_GPIO_TOGGLE(GPIOB, 4u)
+#define __Z_DBG_GPIO_0_TOGGLE() __Z_DBG_GPIO_TOGGLE(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_0_PIN)
+#define __Z_DBG_GPIO_1_TOGGLE() __Z_DBG_GPIO_TOGGLE(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_1_PIN)
+#define __Z_DBG_GPIO_2_TOGGLE() __Z_DBG_GPIO_TOGGLE(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_2_PIN)
+#define __Z_DBG_GPIO_3_TOGGLE() __Z_DBG_GPIO_TOGGLE(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_3_PIN)
 
-#define __Z_DBG_GPIO_SET_0() __Z_DBG_GPIO_SET(GPIOB, 7u)
-#define __Z_DBG_GPIO_SET_1() __Z_DBG_GPIO_SET(GPIOB, 6u)
-#define __Z_DBG_GPIO_SET_2() __Z_DBG_GPIO_SET(GPIOB, 5u)
-#define __Z_DBG_GPIO_SET_3() __Z_DBG_GPIO_SET(GPIOB, 4u)
+#define __Z_DBG_GPIO_0_SET() __Z_DBG_GPIO_SET(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_0_PIN)
+#define __Z_DBG_GPIO_1_SET() __Z_DBG_GPIO_SET(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_1_PIN)
+#define __Z_DBG_GPIO_2_SET() __Z_DBG_GPIO_SET(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_2_PIN)
+#define __Z_DBG_GPIO_3_SET() __Z_DBG_GPIO_SET(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_3_PIN)
 
-#define __Z_DBG_GPIO_CLEAR_0() __Z_DBG_GPIO_CLEAR(GPIOB, 7u)
-#define __Z_DBG_GPIO_CLEAR_1() __Z_DBG_GPIO_CLEAR(GPIOB, 6u)
-#define __Z_DBG_GPIO_CLEAR_2() __Z_DBG_GPIO_CLEAR(GPIOB, 5u)
-#define __Z_DBG_GPIO_CLEAR_3() __Z_DBG_GPIO_CLEAR(GPIOB, 4u)
+#define __Z_DBG_GPIO_0_CLEAR() __Z_DBG_GPIO_CLEAR(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_0_PIN)
+#define __Z_DBG_GPIO_1_CLEAR() __Z_DBG_GPIO_CLEAR(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_1_PIN)
+#define __Z_DBG_GPIO_2_CLEAR() __Z_DBG_GPIO_CLEAR(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_2_PIN)
+#define __Z_DBG_GPIO_3_CLEAR() __Z_DBG_GPIO_CLEAR(__Z_DBG_GPIO_PORT, __Z_DBG_GPIO_3_PIN)
+
+#if CONFIG_KERNEL_DEBUG_GPIO_SYSTICK == 0
+#define __Z_DBG_SYSTICK_ENTER()
+#define __Z_DBG_SYSTICK_EXIT()
+#elif CONFIG_KERNEL_DEBUG_GPIO_SYSTICK == 1
+#define __Z_DBG_SYSTICK_ENTER() __Z_DBG_GPIO_3_TOGGLE()
+#define __Z_DBG_SYSTICK_EXIT()
+#elif CONFIG_KERNEL_DEBUG_GPIO_SYSTICK == 2
+#define __Z_DBG_SYSTICK_ENTER() __Z_DBG_GPIO_3_SET()
+#define __Z_DBG_SYSTICK_EXIT()	__Z_DBG_GPIO_3_CLEAR()
+#else
+#error "Invalid CONFIG_KERNEL_DEBUG_GPIO_SYSTICK value"
+#endif
 
 /*___________________________________________________________________________*/
 
@@ -229,15 +294,15 @@ void z_set_stack_pointer(struct k_thread *thread);
  */
 uint8_t z_read_sreg(void);
 
-#define Z_LOG_SREG()                                                                     \
-	serial_u8(SREG);                                                                 \
+#define Z_LOG_SREG()     \
+	serial_u8(SREG); \
 	serial_transmit(';');
-#define Z_LOG_SREG2()                                                                    \
-	serial_u8(z_read_sreg());                                                        \
+#define Z_LOG_SREG2()             \
+	serial_u8(z_read_sreg()); \
 	serial_transmit(';');
-#define Z_LOG_SREG_I()                                                                   \
-	serial_transmit('[');                                                            \
-	serial_u8(SREG >> 7);                                                            \
+#define Z_LOG_SREG_I()        \
+	serial_transmit('['); \
+	serial_u8(SREG >> 7); \
 	serial_transmit(']');
 
 /*___________________________________________________________________________*/

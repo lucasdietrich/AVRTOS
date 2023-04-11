@@ -25,8 +25,8 @@ struct k_timer;
 /**
  * @brief Timer handler function prototype
  *
- * @warning Never call any k_yield(), k_yield_from_isr(), k_yield_from_isr_cond()
- * from a timer handler.
+ * @warning Never call any k_yield(), k_yield_from_isr(),
+ * k_yield_from_isr_cond() from a timer handler.
  *
  */
 typedef void (*k_timer_handler_t)(struct k_timer *);
@@ -37,15 +37,15 @@ struct k_timer {
 	k_timer_handler_t handler;
 };
 
-#define K_TIMER_INIT(timer_handler, timeout_ms, starting_delay)                          \
-	{                                                                                \
-		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms,                \
-		.handler = timer_handler,                                                \
+#define K_TIMER_INIT(timer_handler, timeout_ms, starting_delay)           \
+	{                                                                 \
+		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms, \
+		.handler = timer_handler,                                 \
 	}
 
-#define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay)                  \
-	Z_LINK_KERNEL_SECTION(.k_timers)                                                 \
-	static struct k_timer timer_name =                                               \
+#define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay) \
+	Z_LINK_KERNEL_SECTION(.k_timers)                                \
+	static struct k_timer timer_name =                              \
 		K_TIMER_INIT(handler, timeout_ms, starting_delay)
 
 #define K_TIMER_STOPPED ((k_delta_t)-1)

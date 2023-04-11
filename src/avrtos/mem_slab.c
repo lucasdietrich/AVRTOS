@@ -33,7 +33,6 @@ extern struct k_mem_slab __k_mem_slabs_end;
 /* TODO Set always inline */
 void z_mem_slab_init_module(void)
 {
-
 	/* must be called during MCU initialization, in order to initialize
 	 * known memory slabs using the linker section defined
 	 */

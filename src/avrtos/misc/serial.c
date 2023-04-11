@@ -6,9 +6,8 @@
 
 #include "serial.h"
 
-#include <avrtos/drivers/usart.h>
-
 #include <avr/pgmspace.h>
+#include <avrtos/drivers/usart.h>
 
 #define USART_DEVICE USART0_DEVICE
 
@@ -118,7 +117,7 @@ void serial_send_hex(const uint8_t *buffer, size_t len)
 		serial_hex(buffer[i]);
 
 		if (0xF == (i & 0xF)) {
-			serial_transmit('\n'); // EOL every 16 chars
+			serial_transmit('\n');	// EOL every 16 chars
 		} else {
 			serial_transmit(' ');
 		}

@@ -41,12 +41,12 @@ struct titem {
 #define tqref titem
 
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
-#define INIT_TITEM(timeout_ms)                                                           \
-	{                                                                                \
-		{                                                                        \
-			.timeout = timeout_ms,                                           \
-		},                                                                       \
-			.next = NULL                                                     \
+#define INIT_TITEM(timeout_ms)                 \
+	{                                      \
+		{                              \
+			.timeout = timeout_ms, \
+		},                             \
+			.next = NULL           \
 	}
 #define INIT_TITEM_DEFAULT() INIT_TITEM(0)
 

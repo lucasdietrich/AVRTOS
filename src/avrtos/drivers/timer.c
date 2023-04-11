@@ -8,9 +8,9 @@
 
 #include <avrtos/assert.h>
 
-#define DRIVERS_TIMERS_API                                                               \
-	((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) ||                   \
-	 (CONFIG_DRIVERS_TIMER2_API) || (CONFIG_DRIVERS_TIMER3_API) ||                   \
+#define DRIVERS_TIMERS_API                                             \
+	((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) || \
+	 (CONFIG_DRIVERS_TIMER2_API) || (CONFIG_DRIVERS_TIMER3_API) || \
 	 (CONFIG_DRIVERS_TIMER4_API) || (CONFIG_DRIVERS_TIMER5_API))
 
 #define K_MODULE K_MODULE_DRIVERS_TIMERS
@@ -284,14 +284,14 @@ struct timer_api_ctx {
 
 __bss struct timer_api_ctx tim_ctx[TIMERS_COUNT];
 
-#define __DECL_TIMER_COMPA_ISR(n)                                                        \
-	ISR(TIMER##n##_COMPA_vect)                                                       \
-	{                                                                                \
-		struct timer_api_ctx *const ctx = &tim_ctx[n];                           \
-		void *const dev			= timer_get_device(n);                   \
-		if (ctx->cb != NULL) {                                                   \
-			ctx->cb(dev, n, ctx->user_data);                                 \
-		}                                                                        \
+#define __DECL_TIMER_COMPA_ISR(n)                                      \
+	ISR(TIMER##n##_COMPA_vect)                                     \
+	{                                                              \
+		struct timer_api_ctx *const ctx = &tim_ctx[n];         \
+		void *const dev			= timer_get_device(n); \
+		if (ctx->cb != NULL) {                                 \
+			ctx->cb(dev, n, ctx->user_data);               \
+		}                                                      \
 	}
 
 #if CONFIG_DRIVERS_TIMER0_API && TIMER_INDEX_EXISTS(0)

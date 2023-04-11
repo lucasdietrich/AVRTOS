@@ -22,7 +22,7 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
 #endif
 
 K_THREAD struct k_thread z_thread_main = {
-	.sp = 0, // main thread is running, context already "restored"
+	.sp = 0,  // main thread is running, context already "restored"
 #if CONFIG_THREAD_MAIN_COOPERATIVE == 1
 	.flags = Z_THREAD_STATE_READY | Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW,
 #else
@@ -32,18 +32,18 @@ K_THREAD struct k_thread z_thread_main = {
 		{
 			.runqueue =
 				{
-					// thread in before initialisation at the top of
-					// the runqueue (is actually the reference
-					// element)
+					// thread in before initialisation at
+					// the top of the runqueue (is actually
+					// the reference element)
 					.prev = &z_thread_main.tie.runqueue,
 					.next = &z_thread_main.tie.runqueue,
 				},
 		},
-	.wany	   = DITEM_INIT_NULL(), // the thread isn't pending on any events
+	.wany	   = DITEM_INIT_NULL(),	 // the thread isn't pending on any events
 	.swap_data = NULL,
-#if CONFIG_THREAD_EXPLICIT_MAIN_STACK ==                                                 \
-	1 // explicit stack defined, we set the main thread stack at the end of
-	  // the defined buffer
+#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == \
+	1  // explicit stack defined, we set the main thread stack at the end of
+	   // the defined buffer
 	.stack =
 		{
 			.end  = (void *)Z_STACK_END(z_main_stack,
@@ -61,7 +61,7 @@ K_THREAD struct k_thread z_thread_main = {
 								  only */
 		},
 #endif
-	.symbol = 'M' // default main thread sumbol
+	.symbol = 'M'  // default main thread sumbol
 };
 
 struct k_thread *z_current = &z_thread_main;

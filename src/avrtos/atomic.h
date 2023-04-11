@@ -9,10 +9,9 @@
 
 #include <stdbool.h>
 
-#include <avrtos/defines.h>
-
 #include <avr/cpufunc.h>
 #include <avr/io.h>
+#include <avrtos/defines.h>
 #include <util/atomic.h>
 
 #ifdef __cplusplus
@@ -185,7 +184,8 @@ __kernel bool atomic_test_and_set_bit(atomic_t *target, uint8_t bit);
  *
  * @param target
  * @param value
- * @return Return true if the atomic variable value was updated, false otherwise.
+ * @return Return true if the atomic variable value was updated, false
+ * otherwise.
  */
 __kernel bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
 
@@ -195,7 +195,8 @@ __kernel bool atomic_cas(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
  * @param target
  * @param cmd
  * @param val
- * @return Return true if the atomic variable value was updated, false otherwise.
+ * @return Return true if the atomic variable value was updated, false
+ * otherwise.
  */
 __kernel bool atomic_cas2(atomic_t *target, atomic_val_t cmd, atomic_val_t val);
 

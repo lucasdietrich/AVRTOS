@@ -37,8 +37,23 @@ Additional Features:
 - Thread safe termination (excluding main thread)
 - stdout redirection to USART0, and stack sentinels
 
-We plan to implement several new features and improvements, including:
+We plan (TODO) to implement several new features and improvements, including:
 
+- **SPI**
+	- Check reliability
+- CRC
+- Low duration sleep (e.g., 18us) with the use a dedicated timer counter.
+	- APi would be `uscounter_init()`, `uscounter_get()`, `uscounter_set`
+- sys_le32_read/write, etc ...
+- Use sysclock as granularity for threads wake up (k_sleep) instead of the timeslice.
+	- Option to choose the SYSCLOCK or TIMESLICE as scheduling point: `KERNEL_SCHEDULING_EVENT`
+	- Explain that if timeslice is used, it's still possible to wait for small duration with `k_busy_wait(K_USEC(20u));`.
+- Add functions:
+	- k_msleep (k_sleep(K_MSEC(1000u));
+	- k_usleep (which uses k_msleep and k_busy_wait depending on the duration)
+	- k_wait which polls uptime, yield() or sleep but doesn't lock the scheduler
+	- k_busy_wait which polls uptime and locks the scheduler (k_sched_lock)
+	- k_block_us which locks IRQ and use _delay_us (uptime not incremented)
 - Threads priority
 - Per-thread CPU usage statistics
 - Polling

@@ -11,8 +11,8 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
-#define DRIVERS_UART_ASYNC                                                               \
-	((CONFIG_DRIVERS_USART0_ASYNC) || (CONFIG_DRIVERS_USART1_ASYNC) ||               \
+#define DRIVERS_UART_ASYNC                                                 \
+	((CONFIG_DRIVERS_USART0_ASYNC) || (CONFIG_DRIVERS_USART1_ASYNC) || \
 	 (CONFIG_DRIVERS_USART2_ASYNC) || (CONFIG_DRIVERS_USART3_ASYNC))
 
 /* same for all USARTs */

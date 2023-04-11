@@ -29,12 +29,8 @@ void k_show_uptime(void)
 	uint32_t minutes = seconds / 60;
 	uint32_t hours	 = minutes / 60;
 
-	printf_P(PSTR("%02lu:%02hhu:%02hhu [%lu.%03u s] : "),
-		 hours,
-		 (uint8_t)(minutes % 60),
-		 (uint8_t)(seconds % 60),
-		 ts.tv_sec,
-		 ts.tv_msec);
+	printf_P(PSTR("%02lu:%02hhu:%02hhu [%lu.%03u s] : "), hours,
+		 (uint8_t)(minutes % 60), (uint8_t)(seconds % 60), ts.tv_sec, ts.tv_msec);
 }
 
 void k_show_ticks(void)
@@ -93,4 +89,4 @@ void k_time_unset(void)
 	k_mutex_unlock(&time_ref.mutex);
 }
 
-#endif /* CONFIG_KERNEL_TIME */
+#endif /* CONFIG_KERNEL_UPTIME */

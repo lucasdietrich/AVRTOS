@@ -34,9 +34,9 @@ struct k_mutex {
 
 /*___________________________________________________________________________*/
 
-#define K_MUTEX_INIT(mutex)                                                              \
-	{                                                                                \
-		.lock = 0xFFu, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL   \
+#define K_MUTEX_INIT(mutex)                                                            \
+	{                                                                              \
+		.lock = 0xFFu, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL \
 	}
 
 #define K_MUTEX_DEFINE(mutex_name) struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)

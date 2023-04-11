@@ -14,7 +14,7 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-#include "common.h"
+#include "sys.h"
 #include "defines.h"
 #include "multithreading.h"
 #include "init.h"

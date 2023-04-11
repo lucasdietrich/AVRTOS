@@ -182,11 +182,10 @@ static __inline__ uint8_t z_sched_lock_ret(void)
  * Inspiration for this MACRO come greatly from
  *    ATOMIC_BLOCK(ATOMIC_FORCEON) { } macro from <avr/atomic.h>
  */
-#define K_SCHED_LOCK_CONTEXT                                                             \
-	for (uint8_t __k_schedl_x __attribute__((__cleanup__(z_sched_restore))) = 0u,    \
-				  __k_todo = z_sched_lock_ret();                         \
-	     __k_todo;                                                                   \
-	     __k_todo = 0)
+#define K_SCHED_LOCK_CONTEXT                                                          \
+	for (uint8_t __k_schedl_x __attribute__((__cleanup__(z_sched_restore))) = 0u, \
+				  __k_todo = z_sched_lock_ret();                      \
+	     __k_todo; __k_todo		   = 0)
 
 /**
  * @brief Stop the execution of the current thread for the specified amount of
@@ -204,25 +203,64 @@ static __inline__ uint8_t z_sched_lock_ret(void)
 __kernel void k_sleep(k_timeout_t timeout);
 
 /**
+ * @brief Sleep for ms milliseconds.
+ * 
+ * @see k_sleep
+ * 
+ * @param ms 
+ */
+static inline void k_msleep(uint32_t ms)
+{
+	k_sleep(K_MSEC(ms));
+}
+
+/**
  * @brief Make the thread waiting for timeout milliseconds.
  *
- * Important: Doesn't release the CPU. Poll on k_uptime_get() to know if the
- * timeout has expired.
+ * Important: Keep the thread ready, but yield() CPU to another thread if
+ * available, sleep_cpu() otherwise. 
  *
- * Note: Can be used in the case there is no IDLE thread.
+ * Note: Can be used without an IDLE thread (with CONFIG_KERNEL_THREAD_IDLE disabled)
  *
  * Note: Require KERNEL_UPTIME to be set.
  *
  * @param timeout
  */
-__kernel void k_wait(k_timeout_t timeout);
+__kernel void k_wait(k_timeout_t delay);
 
 /**
- * @brief Block the RTOS for a specified amount of time.
- *
- * @param timeout
+ * @brief Busy wait for us microseconds.
+ * 
+ * Important: Lock the CPU for the current thread being executed.
+ * 
+ * Note: Require KERNEL_UPTIME to be set.
+ * 
+ * @param us 
+ * @return __kernel 
  */
-void k_block(k_timeout_t timeout);
+__kernel void k_busy_wait(k_timeout_t delay);
+
+/**
+ * @brief Block the RTOS (scheduler + SYSCLOCK) for a specified amount of time in
+ * microseconds
+ *
+ * Note: Don't exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US otherwise the uptime
+ * will be delayed.
+ *
+ * @param delay_us compile time constant to wait
+ */
+__kernel void k_block_us(uint32_t delay_us);
+
+/**
+ * @brief Block the RTOS (scheduler + SYSCLOCK) for a specified amount of time in
+ * milliseconds.
+ *
+ * Note: Don't exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to ms)
+ * otherwise the uptime will be delayed.
+ *
+ * @param delay_ms compile time constant to wait
+ */
+__kernel void k_block_ms(uint32_t delay_ms);
 
 /*___________________________________________________________________________*/
 
@@ -385,7 +423,21 @@ __kernel void z_system_tick_inc(void);
 __kernel uint32_t k_ticks_get_32(void);
 
 /**
- * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled
+ * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
+ * 
+ * @see k_ticks_get_32
+ * 
+ * @return uint32_t 
+ */
+static inline uint32_t k_ticks_get(void)
+{
+	return k_ticks_get_32();
+}
+
+/**
+ * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled.
+ * Meaningful only if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS is enabled,
+ * otherwise, this function is equivalent to k_ticks_get_32.
  *
  * @return Kernel ticks value (64 bits)
  */

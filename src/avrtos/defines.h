@@ -8,8 +8,8 @@
 #define _AVRTOS_DEFINES_H
 
 #include "avrtos_conf.h"
-#include "common.h"
 #include "errno.h"
+#include "sys.h"
 
 #define AVRTOS_VERSION_MAJOR	1
 #define AVRTOS_VERSION_MINOR	0
@@ -26,7 +26,7 @@
 #endif
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
-#define Z_LINK_KERNEL_SECTION(_section)                                                  \
+#define Z_LINK_KERNEL_SECTION(_section) \
 	__attribute__((used, section(Z_STRINGIFY(_section))))
 #else
 #define Z_LINK_KERNEL_SECTION(_section) __attribute__((used))
@@ -81,7 +81,7 @@
 #endif
 
 #if CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US <= 255
-#define CONFIG_KERNEL_TIME_SLICE_TICKS                                                   \
+#define CONFIG_KERNEL_TIME_SLICE_TICKS \
 	(CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
 #else
 #error "Time slice too different compared to CONFIG_KERNEL_SYSCLOCK_PERIOD_US\
@@ -101,6 +101,7 @@
 #define K_TICKS_US	   CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #define K_TICKS_PER_SECOND (((float)1000000ULL) / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
 #define K_TICKS_PER_MS	   (((float)1000ULL) / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
+#define K_TICKS_PER_USEC   (((float)1ULL) / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
 
 // put all c specific definitions  here
 
@@ -136,6 +137,7 @@ typedef struct {
 
 #define K_SECONDS(seconds)   ((k_timeout_t){.value = K_TICKS_PER_SECOND * seconds})
 #define K_MSEC(milliseconds) ((k_timeout_t){.value = K_TICKS_PER_MS * milliseconds})
+#define K_USEC(microseconds) ((k_timeout_t){.value = K_TICKS_PER_USEC * microseconds})
 #define K_NO_WAIT	     ((k_timeout_t){.value = (k_ticks_t)0})
 #define K_NEXT_TICK	     ((k_timeout_t){.value = (k_ticks_t)1})
 #define K_FOREVER	     ((k_timeout_t){.value = (k_ticks_t)-1})
@@ -145,10 +147,12 @@ typedef struct {
 
 #else
 
-#define K_SECONDS(seconds)                                                               \
+#define K_SECONDS(seconds) \
 	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_SECOND * seconds)})
-#define K_MSEC(milliseconds)                                                             \
+#define K_MSEC(milliseconds) \
 	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_MS * milliseconds)})
+#define K_USEC(microseconds) \
+	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_USEC * microseconds)})
 #define K_NO_WAIT      ((k_timeout_t){.value = (k_ticks_t)0})
 #define K_NEXT_TICK    ((k_timeout_t){.value = (k_ticks_t)1})
 #define K_FOREVER      ((k_timeout_t){.value = (k_ticks_t)-1})
@@ -190,8 +194,8 @@ typedef struct {
 /* stack sentinel */
 
 #if CONFIG_THREAD_STACK_SENTINEL
-#define Z_STACK_SENTINEL_REGISTER(stack_symb)                                            \
-	Z_LINK_KERNEL_SECTION(.k_sentinels)                                              \
+#define Z_STACK_SENTINEL_REGISTER(stack_symb) \
+	Z_LINK_KERNEL_SECTION(.k_sentinels)   \
 	void *z_sent_##stack_symb = (void *)(&stack_symb)
 #else
 #define Z_STACK_SENTINEL_REGISTER(stack_symb)
@@ -214,10 +218,10 @@ typedef struct {
 #define Z_INTCTX_SIZE sizeof(struct z_intctx)
 
 #define Z_THREAD_STACK_VOID_SIZE Z_CALLSAVED_CTX_SIZE
-#define Z_THREAD_CTX_START(stack_end)                                                    \
+#define Z_THREAD_CTX_START(stack_end) \
 	((struct z_callsaved_ctx *)((uint8_t *)stack_end - Z_CALLSAVED_CTX_SIZE + 1U))
 
-#define Z_THREAD_STACK_MIN_SIZE                                                          \
+#define Z_THREAD_STACK_MIN_SIZE \
 	(Z_THREAD_STACK_VOID_SIZE + CONFIG_THREAD_STACK_SENTINEL_SIZE)
 
 // some of following macros need to be differenciate for c or asm :
@@ -231,7 +235,7 @@ typedef struct {
 
 /* real stack start and size without counting sentinel */
 #if CONFIG_THREAD_STACK_SENTINEL
-#define Z_STACK_START_USABLE(stack_end, size)                                            \
+#define Z_STACK_START_USABLE(stack_end, size) \
 	(K_STACK_START(stack_end, size) + CONFIG_THREAD_STACK_SENTINEL_SIZE)
 #define Z_STACK_SIZE_USABLE(size) ((size)-CONFIG_THREAD_STACK_SENTINEL_SIZE)
 #else
@@ -239,7 +243,7 @@ typedef struct {
 #define Z_STACK_SIZE_USABLE(size)	      (size)
 #endif
 
-#define Z_THREAD_STACK_START_USABLE(thread)                                              \
+#define Z_THREAD_STACK_START_USABLE(thread) \
 	Z_STACK_START_USABLE(thread->stack.end, thread->stack.size)
 
 #define Z_STACK_END(stack_start, size) ((stack_start) + (size)-1)
@@ -254,7 +258,7 @@ typedef struct {
 
 #define Z_THREAD_STACK_SIZE(name) (sizeof(z_stack_buf_##name))
 
-#define Z_STACK_INIT_SP_FROM_NAME(name, stack_size)                                      \
+#define Z_STACK_INIT_SP_FROM_NAME(name, stack_size) \
 	Z_STACK_INIT_SP(Z_STACK_END(Z_THREAD_STACK_START(name), stack_size))
 
 #define K_THREAD Z_LINK_KERNEL_SECTION(.k_threads)
@@ -264,38 +268,38 @@ typedef struct {
 #define Z_THREAD_OF_TITEM(item)	       CONTAINER_OF(item, struct k_thread, tie.event)
 
 #if Z_ARCH_PC_SIZE == 3
-#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)                                              \
-	{                                                                                \
-		.pch = 0x00u, .pc = (void *)_entry,                                      \
+#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)         \
+	{                                           \
+		.pch = 0x00u, .pc = (void *)_entry, \
 	}
 #else
-#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)                                              \
-	{                                                                                \
-		.pc = (void *)_entry,                                                    \
+#define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry) \
+	{                                   \
+		.pc = (void *)_entry,       \
 	}
 #endif
 
-#define Z_CORE_CONTEXT_INIT(entry, ctx, _entry)                                          \
-	(struct z_callsaved_ctx)                                                         \
-	{                                                                                \
-		.sreg = 0x00,                                                            \
-		{.regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U}},          \
-		{.init_sreg = CONFIG_THREAD_DEFAULT_SREG},                               \
-		{.thread_entry = (thread_entry_t)entry},                                 \
-		{.thread_context = (void *)ctx}, Z_CORE_CONTEXT_ARCH_PC_INIT(_entry),    \
+#define Z_CORE_CONTEXT_INIT(entry, ctx, _entry)                                       \
+	(struct z_callsaved_ctx)                                                      \
+	{                                                                             \
+		.sreg = 0x00,                                                         \
+		{.regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U}},       \
+		{.init_sreg = CONFIG_THREAD_DEFAULT_SREG},                            \
+		{.thread_entry = (thread_entry_t)entry},                              \
+		{.thread_context = (void *)ctx}, Z_CORE_CONTEXT_ARCH_PC_INIT(_entry), \
 	}
 
-#define Z_STACK_INITIALIZER(name, stack_size, entry, ctx)                                \
-	struct {                                                                         \
-		uint8_t empty[(stack_size)-Z_CALLSAVED_CTX_SIZE];                        \
-		struct z_callsaved_ctx core;                                             \
-	} z_stack_buf_##name = {                                                         \
-		{0x00},                                                                  \
-		Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry),                         \
+#define Z_STACK_INITIALIZER(name, stack_size, entry, ctx)         \
+	struct {                                                  \
+		uint8_t empty[(stack_size)-Z_CALLSAVED_CTX_SIZE]; \
+		struct z_callsaved_ctx core;                      \
+	} z_stack_buf_##name = {                                  \
+		{0x00},                                           \
+		Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry),  \
 	}
 
-#define Z_STACK_MINIMAL_INITIALIZER(name, entry, ctx)                                    \
-	struct z_callsaved_ctx z_stack_buf_##name =                                      \
+#define Z_STACK_MINIMAL_INITIALIZER(name, entry, ctx) \
+	struct z_callsaved_ctx z_stack_buf_##name =   \
 		Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry)
 
 #define Z_THREAD_INITIALIZER(_name, stack_size, prio_flag, sym)                          \
@@ -315,26 +319,102 @@ typedef struct {
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
 
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
-	__attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p);   \
-	Z_LINK_KERNEL_SECTION(.k_threads)                                                \
-	Z_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol);                       \
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)         \
+	__attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p); \
+	Z_LINK_KERNEL_SECTION(.k_threads)                                              \
+	Z_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol);                     \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
 
-#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)               \
-	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p);       \
-	Z_LINK_KERNEL_SECTION(.k_threads)                                                \
-	Z_THREAD_INITIALIZER(name, Z_CALLSAVED_CTX_SIZE, prio_flag, symbol);             \
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)         \
+	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
+	Z_LINK_KERNEL_SECTION(.k_threads)                                          \
+	Z_THREAD_INITIALIZER(name, Z_CALLSAVED_CTX_SIZE, prio_flag, symbol);       \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
 
 #else
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
-	__STATIC_ASSERT(0u, "Static thread (K_THREAD_DEFINE) creation is not supported");
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol) \
+	__STATIC_ASSERT(0u,                                                    \
+			"Static thread (K_THREAD_DEFINE) creation is not "     \
+			"supported");
 
-#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)               \
-	__STATIC_ASSERT(0u, "Static thread (K_THREAD_DEFINE) creation is not supported");
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol) \
+	__STATIC_ASSERT(0u,                                                \
+			"Static thread (K_THREAD_DEFINE) creation is not " \
+			"supported");
 
 #endif
+
+/*___________________________________________________________________________*/
+
+/* Note: Willingly not adding unsigned "u" suffix to numbers
+ * because these flags are used in assembly code
+ */
+
+#define Z_THREAD_STATE_POS 0
+#define Z_THREAD_STATE_MSK (3 << Z_THREAD_STATE_POS)
+
+#define Z_THREAD_SCHED_LOCKED_POS 2
+#define Z_THREAD_SCHED_LOCKED_MSK (1 << Z_THREAD_SCHED_LOCKED_POS)
+
+#define Z_THREAD_PRIO_POS	3
+#define Z_THREAD_PRIO_MSK	(3 << Z_THREAD_PRIO_POS)
+#define Z_THREAD_PRIO_COOP_MSK	(2 << Z_THREAD_PRIO_POS)
+#define Z_THREAD_PRIO_LEVEL_MSK (1 << Z_THREAD_PRIO_POS)
+
+#define Z_THREAD_TIMER_EXPIRED_POS 5
+#define Z_THREAD_TIMER_EXPIRED_MSK (1 << Z_THREAD_TIMER_EXPIRED_POS)
+
+#define Z_THREAD_PEND_CANCELED_POS 6
+#define Z_THREAD_PEND_CANCELED_MSK (1 << Z_THREAD_PEND_CANCELED_POS)
+
+#define Z_THREAD_WAKEUP_SCHED_POS 7
+#define Z_THREAD_WAKEUP_SCHED_MSK (1 << Z_THREAD_WAKEUP_SCHED_POS)
+
+/* the thread is not running and is not in the runqueue,
+ * it can be stopped/started with k_thread_stop/k_thread_start functions.
+ */
+#define Z_THREAD_STATE_STOPPED (0 << Z_THREAD_STATE_POS)
+
+/* the thread is (yet/still) ready for execution and is the runqueue
+ */
+#define Z_THREAD_STATE_READY (1 << Z_THREAD_STATE_POS)
+
+/* The thread is pending for an event, it may be in the time queue
+ * (events_queue) but it is not in the runqueue. It can be wake up with
+ * function z_wake_up()
+ */
+#define Z_THREAD_STATE_PENDING (2 << Z_THREAD_STATE_POS)
+
+/* This flag is reserved for IDLE thread only (if enabled),
+ * it is used to know whether the thread being evaluated is the IDLE
+ * thread
+ */
+#define Z_THREAD_STATE_IDLE (3 << Z_THREAD_STATE_POS)
+
+/* Thread is cooperative and cannot be preempted by other threads */
+#define Z_THREAD_PRIO_COOP (2 << Z_THREAD_PRIO_POS)
+
+/* Thread is preemptible and can be preempted by other threads */
+#define Z_THREAD_PRIO_PREEMPT (0 << Z_THREAD_PRIO_POS)
+
+/* Thread priority level is high, it will be scheduled before
+ * threads with low priority
+ */
+#define Z_THREAD_PRIO_HIGH (1 << Z_THREAD_PRIO_POS)
+
+/* Thread priority level is low, it will be scheduled after
+ * threads with high priority
+ */
+#define Z_THREAD_PRIO_LOW (0 << Z_THREAD_PRIO_POS)
+
+/* Default thread priority level for cooperative threads */
+#define K_COOPERATIVE (Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
+
+/* Default thread priority level for preemptible threads */
+#define K_PREEMPTIVE (Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW)
+
+/* Default thread priority level */
+#define K_PRIO_DEFAULT (K_COOPERATIVE | Z_THREAD_PRIO_LOW)
 
 /*___________________________________________________________________________*/
 

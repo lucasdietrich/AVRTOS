@@ -80,27 +80,35 @@ static inline void gpiol_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullu
 	gpio->PORT = pullup_mask;
 }
 
-static inline void
-gpiol_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup)
+static inline void gpiol_pin_init(GPIO_Device *gpio,
+				  uint8_t pin,
+				  uint8_t dir,
+				  uint8_t pullup)
 {
-	if (dir == GPIO_INPUT) {
-		gpio->DDR = gpio->DDR & ~BIT(pin);
-	} else {
-		gpio->DDR = gpio->DDR | BIT(pin);
-	}
-
 	/* represent either pullup (if input) or output level (if output)*/
 	if (pullup == GPIO_INPUT_NO_PULLUP) {
 		gpio->PORT = gpio->PORT & ~BIT(pin);
 	} else {
 		gpio->PORT = gpio->PORT | BIT(pin);
 	}
+
+	if (dir == GPIO_INPUT) {
+		gpio->DDR = gpio->DDR & ~BIT(pin);
+	} else {
+		gpio->DDR = gpio->DDR | BIT(pin);
+	}
 }
 
-static inline void
-gpiol_pin_set_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction)
+static inline void gpiol_pin_set_direction(GPIO_Device *gpio,
+					   uint8_t pin,
+					   uint8_t direction)
 {
 	gpio->DDR = (gpio->DDR & ~BIT(pin)) | ((direction & 1u) << pin);
+}
+
+static inline uint8_t gpiol_pin_get_direction(GPIO_Device *gpio, uint8_t pin)
+{
+	return (gpio->DDR >> pin) & 1u;
 }
 
 static inline void gpiol_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)
@@ -202,13 +210,13 @@ uint8_t gpio_pin_read_state(GPIO_Device *gpio, uint8_t pin);
 #endif
 
 /* Get the GPIO device from the port letter index (0: A, 1: B, ...) */
-#define GPIO_DEVICE_ABCDEFG(_idx)                                                        \
+#define GPIO_DEVICE_ABCDEFG(_idx) \
 	((GPIO_Device *)(AVR_GPIO_BASE_ADDR + ((_idx) * sizeof(GPIO_Device))))
 
 #if defined(PORTH)
-#define GPIO_DEVICE_HIKL(_idx)                                                           \
+#define GPIO_DEVICE_HIKL(_idx) \
 	((GPIO_Device *)(AVR_GPIO_HIKL_BASE_ADDR + ((_idx - 6u) * sizeof(GPIO_Device))))
-#define GPIO_DEVICE(_idx)                                                                \
+#define GPIO_DEVICE(_idx) \
 	(((_idx) <= 5) ? GPIO_DEVICE_ABCDEFG(_idx) : GPIO_DEVICE_HIKL(_idx))
 #else
 #define GPIO_DEVICE GPIO_DEVICE_ABCDEFG

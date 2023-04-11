@@ -8,7 +8,6 @@
 
 #include <avrtos/kernel.h>
 #include <avrtos/kernel_internals.h>
-
 #include <util/atomic.h>
 
 #define K_MODULE K_MODULE_SIGNAL

@@ -13,12 +13,17 @@ void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
 
 void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup)
 {
-	gpio_pin_init(gpio, pin, dir, pullup);
+	gpiol_pin_init(gpio, pin, dir, pullup);
 }
 
 void gpio_pin_set_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction)
 {
 	gpiol_pin_set_direction(gpio, pin, direction);
+}
+
+uint8_t gpio_pin_get_direction(GPIO_Device *gpio, uint8_t pin)
+{
+	return gpiol_pin_get_direction(gpio, pin);
 }
 
 void gpio_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)

@@ -7,7 +7,6 @@
 #include "event.h"
 
 #include <avrtos/assert.h>
-
 #include <util/atomic.h>
 
 #define K_MODULE K_MODULE_EVENT
@@ -18,9 +17,9 @@ struct k_event_q {
 	struct titem *first;
 };
 
-#define K_EVENT_Q_INIT()                                                                 \
-	{                                                                                \
-		.first = NULL,                                                           \
+#define K_EVENT_Q_INIT()       \
+	{                      \
+		.first = NULL, \
 	}
 #define K_EVENT_Q_DEFINE(name) struct k_event_q name = K_EVENT_Q_INIT()
 

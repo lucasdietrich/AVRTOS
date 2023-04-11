@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_DEFAULT_CONFIG_H
 #define _AVRTOS_DEFAULT_CONFIG_H
 
-#include "common.h"
+#include "sys.h"
 
 #include <avr/io.h>
 
@@ -58,13 +58,15 @@
 
 //
 // Tells whether AVRTOS linker script was provided, so that kernel sections can
-//  be used to reference and initialize kernel objects during RTOS initialization.
+//  be used to reference and initialize kernel objects during RTOS
+//  initialization.
 //
 // Note: If disabled,  All kernel objects must be initialized manually.
-// - K_THREAD_DEFINE() is disabled and must be replaced by K_THREAD_DEFINE_STATIC()
-// and should be initialized manually using k_thread_static_create_and_schedule()
-// - Following macros are still usable but manual initialization should be performed
-// K_TIMER_DEFINE(), K_MEM_SLAB_DEFINE()
+// - K_THREAD_DEFINE() is disabled and must be replaced by
+// K_THREAD_DEFINE_STATIC() and should be initialized manually using
+// k_thread_static_create_and_schedule()
+// - Following macros are still usable but manual initialization should be
+// performed K_TIMER_DEFINE(), K_MEM_SLAB_DEFINE()
 // - Disables functions: k_dump_stack_canaries(), k_thread_dump_all()
 //
 // Note: Arduino framework with Arduino IDE requires this option to be disabled,
@@ -119,9 +121,9 @@
 //
 // IMPORTANT NOTE: If you're using the heap, you must set this to 0 as stdlib
 // malloc use the stack pointer to make checks on the remaining heap size.
-// i.e. : With explicit main stack, a buffer is allocated (for main thread stack),
-// before the heap. stdlib malloc() will then constantly fails while stack pointer
-// is beyond the limit (actually on the other side of the heap).
+// i.e. : With explicit main stack, a buffer is allocated (for main thread
+// stack), before the heap. stdlib malloc() will then constantly fails while
+// stack pointer is beyond the limit (actually on the other side of the heap).
 // The checker, expect main stack to be near to RAMEND, in upper memory regions.
 //
 #ifndef CONFIG_THREAD_EXPLICIT_MAIN_STACK
@@ -778,10 +780,46 @@
 // Enable kernel debug GPIO
 //
 // 0: Kernel debug GPIO is disabled
-// 1: Kernel debug GPIO is enabled
+// 1: GPIO port A pins 0 to 3
+// 2: GPIO port A pins 4 to 7
+// 3: GPIO port B pins 0 to 3
+// 4: GPIO port B pins 4 to 7
+// 5: GPIO port C pins 0 to 3
+// 6: GPIO port C pins 4 to 7
+// 7: GPIO port D pins 0 to 3
+// 8: GPIO port D pins 4 to 7
 //
 #ifndef CONFIG_KERNEL_DEBUG_GPIO
 #define CONFIG_KERNEL_DEBUG_GPIO 0
+#endif
+
+//
+// Enable kernel debug GPIO for systick
+//
+// depends on CONFIG_KERNEL_DEBUG_GPIO
+//
+// 0: Kernel debug GPIO for systick is disabled
+// 1: Kernel debug GPIO for systick is enabled (toggle on systick)
+// 2: Kernel debug GPIO for systick is enabled (enter/exit on systick)
+#ifndef CONFIG_KERNEL_DEBUG_GPIO_SYSTICK
+#define CONFIG_KERNEL_DEBUG_GPIO_SYSTICK 1
+#endif
+
+//
+// Enable asynchronous support for SPI
+//
+// This option defines ISR(SPI_STC_vect) { } interrupt handler, which
+// prevents the developper from defining its own.
+// 
+// Synchroneous functions can still be used when this option is enabled.
+// However, synchronous functions should not be used when when an asynchronous
+// transfer is in progress.
+//
+// 0: SPI asynchronous support is disabled
+// 1: SPI asynchronous support is enabled
+//
+#ifndef CONFIG_SPI_ASYNC
+#define CONFIG_SPI_ASYNC 0
 #endif
 
 #endif

@@ -5,6 +5,8 @@
 		"CMAKE_GENERATOR": "Unix Makefiles",
 		"CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/avr6-atmega2560.cmake",
 	},
+	"editor.tabSize": 8,
+	"editor.rulers": [80],
 	"files.associations": {
 		"*.asm": "avr",
 		"*.bb": "shellscript",
@@ -22,7 +24,7 @@
 		"interrupt.h": "c",
 		"kernel.h": "c",
 		"defines.h": "c",
-		"common.h": "c",
+		"sys.h": "c",
 		"debug.h": "c",
 		"fifo.h": "c",
 		"assert.h": "c",
@@ -59,7 +61,9 @@
 		"iom2560.h": "c",
 		"iomxx0_1.h": "c",
 		"typeinfo": "c",
-		"exti.h": "c"
+		"exti.h": "c",
+		"spi.h": "c",
+		"sleep.h": "c",
+		"cmath": "c"
 	},
-	"editor.rulers": [80]
 }

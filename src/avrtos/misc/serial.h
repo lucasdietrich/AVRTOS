@@ -10,10 +10,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <avrtos/avrtos.h>
-
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <avrtos/avrtos.h>
 
 #ifdef __cplusplus
 extern "C" {

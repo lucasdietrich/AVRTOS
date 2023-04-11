@@ -35,10 +35,10 @@ void z_avrtos_init(void)
 	// }
 
 	/* Debug pins */
-	__Z_DBG_GPIO_INIT_0();
-	__Z_DBG_GPIO_INIT_1();
-	__Z_DBG_GPIO_INIT_2();
-	__Z_DBG_GPIO_INIT_3();
+	__Z_DBG_GPIO_0_INIT();
+	__Z_DBG_GPIO_1_INIT();
+	__Z_DBG_GPIO_2_INIT();
+	__Z_DBG_GPIO_3_INIT();
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 	SET_BIT(UCSR0B, BIT(RXCIE0));

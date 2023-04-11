@@ -232,17 +232,17 @@ typedef struct {
 #define IS_TIMER_INDEX_16BIT(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
 
 #define TIMER_GET_MAX_COUNTER(tim_idx) (IS_TIMER_INDEX_8BIT(tim_idx) ? 0xFFU : 0xFFFFU)
-#define TIMER_CALC_COUNTER_VALUE(period_us, prescaler)                                   \
+#define TIMER_CALC_COUNTER_VALUE(period_us, prescaler) \
 	((((F_CPU / 1000000lu) * period_us) / prescaler - 1lu))
-#define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max)                               \
+#define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max) \
 	(TIMER_CALC_COUNTER_VALUE(period_us, prescaler) <= max)
 
 #define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
 #define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
 #define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
 
-#define IS_TIMER_16BITS(dev)                                                             \
-	(IS_TIMER1_DEVICE(dev) || IS_TIMER3_DEVICE(dev) || IS_TIMER4_DEVICE(dev) ||      \
+#define IS_TIMER_16BITS(dev)                                                        \
+	(IS_TIMER1_DEVICE(dev) || IS_TIMER3_DEVICE(dev) || IS_TIMER4_DEVICE(dev) || \
 	 IS_TIMER5_DEVICE(dev))
 
 #define IS_TIMER_8BITS(dev) (IS_TIMER0_DEVICE(dev) || IS_TIMER2_DEVICE(dev))
@@ -350,7 +350,7 @@ struct timer_config {
 	/**
 	 * @brief Enable interrupts handlers
 	 */
-	uint8_t timsk; // TOIEn, OCIEnA, OCIEnB, OCIEnC, ICIEn
+	uint8_t timsk;	// TOIEn, OCIEnA, OCIEnB, OCIEnC, ICIEn
 };
 
 /**

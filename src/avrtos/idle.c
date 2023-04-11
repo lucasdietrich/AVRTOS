@@ -25,12 +25,12 @@ static void z_thread_idle_entry(void *context);
 
 #if CONFIG_THREAD_IDLE_COOPERATIVE
 /* Z_THREAD_STACK_MIN_SIZE without interrupts */
-#define Z_THREAD_IDLE_STACK_SIZE                                                         \
+#define Z_THREAD_IDLE_STACK_SIZE \
 	(Z_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
 #define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
 #else
 /* If IDLE thread can be preempted, plan additionnal stack */
-#define Z_THREAD_IDLE_STACK_SIZE                                                         \
+#define Z_THREAD_IDLE_STACK_SIZE \
 	(Z_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
 #define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW)
 #endif
@@ -50,13 +50,8 @@ __noinit uint8_t z_thread_idle_stack[Z_THREAD_IDLE_STACK_SIZE];
 __noinit struct k_thread z_thread_idle;
 void z_thread_idle_create(void)
 {
-	k_thread_create(&z_thread_idle,
-			z_thread_idle_entry,
-			z_thread_idle_stack,
-			Z_THREAD_IDLE_STACK_SIZE,
-			Z_THREAD_IDLE_PRIORITY,
-			NULL,
-			'I');
+	k_thread_create(&z_thread_idle, z_thread_idle_entry, z_thread_idle_stack,
+			Z_THREAD_IDLE_STACK_SIZE, Z_THREAD_IDLE_PRIORITY, NULL, 'I');
 }
 #endif
 
@@ -69,7 +64,7 @@ static void z_thread_idle_entry(void *context)
 {
 	for (;;) {
 #if CONFIG_THREAD_IDLE_COOPERATIVE
-#warning                                                                                 \
+#warning \
 	"CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
 		k_yield();
 		// z_yield_from_idle_thread();

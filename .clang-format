@@ -1,17 +1,12 @@
+#
 # SPDX-License-Identifier: Apache-2.0
 #
-# .clang-format inspired by the Zephyr RTOS project
-#
-# References:
-#   Documentation/process/clang-format.rst
-#   https://clang.llvm.org/docs/ClangFormat.html
-#   https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 ---
-BasedOnStyle: LLVM
+BasedOnStyle: Chromium
 AlignConsecutiveMacros: true
 AlignConsecutiveAssignments: true
-# AlignConsecutiveDeclarations: true
+AlignConsecutiveDeclarations: false
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortEnumsOnASingleLine: false
@@ -20,35 +15,24 @@ AllowShortIfStatementsOnASingleLine: true
 AlignOperands: Align
 AllowShortLoopsOnASingleLine: true
 AlignTrailingComments: true
-BinPackArguments: false
+BinPackArguments: true
 BinPackParameters: false
-AttributeMacros:
-  - __aligned
-  - __deprecated
-  - __packed
-  - __printf_like
-  - __syscall
-  - __subsystem
+PointerAlignment: Right
 BreakBeforeBraces: Linux
-ColumnLimit: 90 # 80 would be ideal, but strict "80" make the code too long
-ConstructorInitializerIndentWidth: 8
-ContinuationIndentWidth: 8
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^".*\.h"$'
     Priority: 0
   - Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype)\.h>$'
     Priority: 1
-  - Regex: '^\<avrtos/.*\.h\>$'
-    Priority: 2
   - Regex: '.*'
     Priority: 3
-IndentCaseLabels: false
 IndentWidth: 8
-# SpaceBeforeParens: ControlStatementsExceptControlMacros # clang-format >= 13.0
+IndentCaseLabels: false
+ConstructorInitializerIndentWidth: 8
+ContinuationIndentWidth: 8
 UseTab: Always
+ColumnLimit: 90
 WhitespaceSensitiveMacros:
   - STRINGIFY
   - Z_STRINGIFY
-AccessModifierOffset: -8
-IndentAccessModifiers: false
