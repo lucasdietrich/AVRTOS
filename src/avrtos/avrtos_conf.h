@@ -822,4 +822,16 @@
 #define CONFIG_SPI_ASYNC 0
 #endif
 
+#ifndef CONFIG_IPC
+#define CONFIG_IPC 0
+#endif
+
+#ifndef CONFIG_IPC_SPI
+#define CONFIG_IPC_SPI 1
+#endif
+
+#ifndef CONFIG_IPC_UART
+#define CONFIG_IPC_UART 0
+#endif
+
 #endif

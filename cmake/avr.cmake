@@ -60,6 +60,7 @@ function(target_link_avrtos target)
 	target_include_directories(${target} PUBLIC
 		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/drivers
 		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/dstruct
+		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/subsys/ipc
 		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/avrtos/misc
 		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/
 	)

@@ -5,16 +5,20 @@
  */
 
 #include <avrtos/debug.h>
+#include <avrtos/kernel.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/spi.h>
-#include <avrtos/kernel.h>
-#include <util/crc16.h>
+#include <avrtos/subsys/ipc/ipc.h>
+#include <avrtos/logging.h>
+#define LOG_LEVEL LOG_LEVEL_DEBUG
 
 int main(void)
 {
+	int ret;
+
 	serial_init();
 
-	const struct spi_config cfg = {
+	const struct spi_config spi_master_cfg = {
 		.mode	     = SPI_MODE_MASTER,
 		.polarity    = SPI_CLOCK_POLARITY_RISING,
 		.phase	     = SPI_CLOCK_PHASE_SAMPLE,
@@ -22,25 +26,19 @@ int main(void)
 		.irq_enabled = 0u,
 	};
 
-	gpiol_pin_init(GPIOB, PIN0, GPIO_MODE_OUTPUT, GPIO_HIGH);
+	const struct spi_slave spi_slave = {
+		.cs_port = GPIOB_DEVICE,
+		.cs_pin = PIN0,
+		.active_state = GPIO_LOW,
+	};
 
-	spi_init(&cfg);
+	const struct ipc_config ipc_cfg = {
+	};
 
-	k_thread_dump_all();
-
-	char chr = 0u;
+	ret = ipc_init(&ipc_cfg);
+	LOG_DBG("ipc_init: %d", ret);
 
 	for (;;) {
-		gpiol_pin_write_state(GPIOB, PIN0, GPIO_LOW);
 
-		spi_transceive(chr);
-
-		gpiol_pin_write_state(GPIOB, PIN0, GPIO_HIGH);
-
-		__Z_DBG_GPIO_0_TOGGLE();
-
-		k_block_us(10u);
-
-		chr++;
 	}
 }
