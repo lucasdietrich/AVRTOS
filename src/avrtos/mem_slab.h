@@ -112,7 +112,7 @@ __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
  * If there is no block available timeout is different from K_NO_WAIT,
  * the function is blocking until a block is freed or timeout.
  *
- * Can be called from an interrupt routine.
+ * Can be called from an interrupt routine with timeout equals to K_NO_WAIT.
  *
  * Assumptions :
  * - slab not null
@@ -137,8 +137,7 @@ __kernel int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
  *
  * Switch thread before returning if a thread is pending on a block.
  *
- * Cannot be called from an interrupt routine
- * if timeout is different from K_NO_WAIT.
+ * Can be called from an interrupt routine.
  *
  * Assumptions :
  * - slab not null

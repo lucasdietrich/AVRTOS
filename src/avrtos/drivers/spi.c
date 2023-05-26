@@ -99,10 +99,22 @@ void spi_transceive_buf(char *rxtx, uint8_t len)
 	}
 }
 
+static inline uint8_t slave_select(struct spi_slave *slave)
+{
+	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
+			     slave->active_state);
+}
+
+static inline uint8_t slave_unselect(struct spi_slave *slave)
+{
+	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
+			     1u - slave->active_state);
+}
+
 int8_t spi_slave_init(struct spi_slave *slave,
 		      GPIO_Device *cs_port,
 		      uint8_t cs_pin,
-		      bool active_low)
+		      uint8_t active_state)
 {
 #if CONFIG_KERNEL_ARGS_CHECKS
 	if (!slave || !cs_port || cs_pin > PIN7) {
@@ -110,12 +122,22 @@ int8_t spi_slave_init(struct spi_slave *slave,
 	}
 #endif
 
-	slave->cs_port	  = cs_port;
-	slave->cs_pin	  = cs_pin;
-	slave->active_low = active_low;
+	slave->cs_port	    = cs_port;
+	slave->cs_pin	    = cs_pin;
+	slave->active_state = active_state;
 
-	gpio_pin_init(cs_port, cs_pin, GPIO_MODE_OUTPUT,
-		      active_low ? GPIO_HIGH : GPIO_LOW);
+	return 0;
+}
+
+int8_t spi_slave_ss_init(const struct spi_slave *slave)
+{
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!slave) {
+		return -EINVAL;
+	}
+#endif
+	gpio_pin_init(slave->cs_port, slave->cs_pin, GPIO_MODE_OUTPUT,
+		      (slave->active_state == GPIO_LOW) ? GPIO_HIGH : GPIO_LOW);
 
 	return 0;
 }
@@ -124,13 +146,11 @@ char spi_slave_transceive(const struct spi_slave *slave, char tx)
 {
 	char rx;
 
-	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_low ? GPIO_LOW : GPIO_HIGH);
+	slave_select(slave);
 
 	rx = spi_transceive(tx);
 
-	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_low ? GPIO_HIGH : GPIO_LOW);
+	slave_unselect(slave);
 
 	return rx;
 }
@@ -138,12 +158,12 @@ char spi_slave_transceive(const struct spi_slave *slave, char tx)
 void spi_slave_transceive_buf(const struct spi_slave *slave, char *rxtx, uint8_t len)
 {
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_low ? GPIO_LOW : GPIO_HIGH);
+			     slave->active_state ? GPIO_LOW : GPIO_HIGH);
 
 	spi_transceive_buf(rxtx, len);
 
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_low ? GPIO_HIGH : GPIO_LOW);
+			     slave->active_state ? GPIO_HIGH : GPIO_LOW);
 }
 
 #if CONFIG_SPI_ASYNC

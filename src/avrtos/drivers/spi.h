@@ -151,7 +151,7 @@ struct spi_slave {
 	/* Slave chip select pin */
 	uint8_t cs_pin : 3u;
 	/* Slave chip select active low */
-	uint8_t active_low : 1u;
+	uint8_t active_state : 1u;
 };
 
 /**
@@ -160,13 +160,21 @@ struct spi_slave {
  * @param slave Pointer to the slave structure.
  * @param cs_port Pointer to the GPIO port of the slave chip select pin.
  * @param cs_pin Slave chip select pin.
- * @param active_low Slave chip select active low.
+ * @param active_state Slave chip select active low.
  * @return int8_t 0 on success, negative on error.
  */
 int8_t spi_slave_init(struct spi_slave *slave,
 		      GPIO_Device *cs_port,
 		      uint8_t cs_pin,
-		      bool active_low);
+		      uint8_t active_state);
+
+/**
+ * @brief Initialize a SPI chip select pin for the slave.
+ *
+ * @param slave Pointer to the slave structure.
+ * @return int8_t 0 on success, negative on error.
+ */
+int8_t spi_slave_ss_init(const struct spi_slave *slave);
 
 /**
  * @brief Transceive a byte over SPI with a slave.

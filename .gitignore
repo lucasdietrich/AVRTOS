@@ -10,3 +10,5 @@
 /build
 /build_master
 /build_slave
+/build_ipc_master
+/build_ipc_slave
