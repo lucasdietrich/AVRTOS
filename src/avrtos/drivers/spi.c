@@ -99,13 +99,13 @@ void spi_transceive_buf(char *rxtx, uint8_t len)
 	}
 }
 
-static inline uint8_t slave_select(struct spi_slave *slave)
+static inline void slave_select(const struct spi_slave *slave)
 {
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
 			     slave->active_state);
 }
 
-static inline uint8_t slave_unselect(struct spi_slave *slave)
+static inline void slave_unselect(const struct spi_slave *slave)
 {
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
 			     1u - slave->active_state);
