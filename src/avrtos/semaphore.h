@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_SEM_H
 #define _AVRTOS_SEM_H
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #include <stdbool.h>
 

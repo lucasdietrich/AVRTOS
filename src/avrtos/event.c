@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "assert.h"
 #include "event.h"
 
-#include <avrtos/assert.h>
 #include <util/atomic.h>
 
 #define K_MODULE K_MODULE_EVENT

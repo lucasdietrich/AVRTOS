@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/misc/serial.h>
 
 #define K_MODULE K_MODULE_APPLICATION

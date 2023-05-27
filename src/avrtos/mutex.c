@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "debug.h"
+#include "kernel.h"
+#include "kernel_internals.h"
 #include "mutex.h"
 
-#include <avrtos/debug.h>
-#include <avrtos/kernel.h>
-#include <avrtos/kernel_internals.h>
 #include <util/atomic.h>
 
 #define K_MODULE K_MODULE_MUTEX

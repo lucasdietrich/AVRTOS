@@ -7,10 +7,10 @@
 #ifndef _AVRTOS_MEM_SLAB_H
 #define _AVRTOS_MEM_SLAB_H
 
+#include "kernel.h"
+
 #include <stdbool.h>
 #include <stdint.h>
-
-#include <avrtos/multithreading.h>
 
 #ifdef __cplusplus
 extern "C" {

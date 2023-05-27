@@ -6,7 +6,7 @@
 
 #include <avrtos/debug.h>
 #include <avrtos/drivers/timer.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 

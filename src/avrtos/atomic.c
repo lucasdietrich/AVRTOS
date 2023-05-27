@@ -5,8 +5,7 @@
  */
 
 #include "atomic.h"
-
-#include <avrtos/kernel.h>
+#include "kernel.h"
 
 #if CONFIG_KERNEL_ATOMIC_API
 

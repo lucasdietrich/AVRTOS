@@ -11,13 +11,13 @@
 extern "C" {
 #endif
 
+#include "kernel.h"
 #include "kernel_internals.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 
 #include <avr/io.h>
-#include <avrtos/sys.h>
 #include <util/atomic.h>
 
 // modules

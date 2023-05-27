@@ -16,7 +16,7 @@
 
 #include "sys.h"
 #include "defines.h"
-#include "multithreading.h"
+#include "types.h"
 #include "init.h"
 
 #include "dstruct/slist.h"
@@ -43,7 +43,6 @@
 #include "timer.h"
 #include "event.h"
 #include "signal.h"
-
 #include "fifo.h"
 #include "mem_slab.h"
 #include "msgq.h"

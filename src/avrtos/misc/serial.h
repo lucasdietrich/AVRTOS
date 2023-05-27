@@ -8,11 +8,9 @@
 #define _SERIAL_H
 
 #include <stddef.h>
-#include <string.h>
 
-#include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <avrtos/avrtos.h>
+#include <avrtos/kernel.h>
 
 #ifdef __cplusplus
 extern "C" {

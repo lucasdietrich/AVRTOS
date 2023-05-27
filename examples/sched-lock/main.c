@@ -7,7 +7,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avrtos/debug.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 #include <util/delay.h>

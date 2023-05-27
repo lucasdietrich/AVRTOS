@@ -9,9 +9,10 @@
 
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
+#include <avrtos/misc/serial.h>
 
 #include <avr/io.h>
 #define LOG_LEVEL LOG_LEVEL_DBG

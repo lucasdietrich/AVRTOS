@@ -7,11 +7,99 @@
 #ifndef _AVRTOS_KERNEL_H
 #define _AVRTOS_KERNEL_H
 
-#include <avrtos/avrtos.h>
+#include "assert.h"
+#include "defines.h"
+#include "sys.h"
+#include "types.h"
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Define a new thread at runtime and initialize its stack
+ *
+ * @param thread hread structure pointer
+ * @param entry thread entry function
+ * @param stack thread stack start location
+ * @param stack_size thread stack size
+ * @param priority thread priority
+ * @param context_p thread context passed to entry function
+ * @param symbol thread symbol letter
+ * @return int 0 on success
+ */
+int8_t k_thread_create(struct k_thread *thread,
+		       thread_entry_t entry,
+		       void *stack,
+		       size_t stack_size,
+		       uint8_t priority,
+		       void *context_p,
+		       char symbol);
+
+/**
+ * @brief Start the execution of the given thread.
+ *
+ * @param thread The thread to start execution.
+ * @return 0 if successful, otherwise a negative error code.
+ */
+__kernel int8_t k_thread_start(struct k_thread *thread);
+
+/**
+ * @brief Stop the execution of the specified thread.
+ *
+ * @param thread The thread to stop execution.
+ * @return 0 if successful, otherwise a negative error code.
+ */
+__kernel int8_t k_thread_stop(struct k_thread *thread);
+
+/**
+ * @brief Stop the execution of the current thread.
+ *
+ * @see k_thread_stop
+ *
+ * @param thread The ready/pending thread to start.
+ */
+__kernel void k_stop(void);
+
+/**
+ * @brief Change the priority of the specified thread.
+ *
+ * This function allows you to change the priority of a given thread. The thread parameter
+ * specifies the thread for which the priority needs to be changed. The prio parameter
+ * can be set to either K_COOPERATIVE or K_PREEMPTIVE, indicating the desired priority.
+ *
+ * @param thread The thread for which to change the priority.
+ * @param prio The desired priority (K_COOPERATIVE or K_PREEMPTIVE).
+ * @return The status code indicating the success or failure of the operation.
+ */
+__kernel int8_t k_thread_change_priority(struct k_thread *thread, int prio);
+
+/**
+ * @brief Thread entry point function.
+ *
+ * This function serves as the entry point for a new thread. It is responsible for
+ * executing the code within the thread and receives a context pointer as an argument.
+ *
+ * @param context A pointer to the context data for the thread.
+ */
+void z_thread_entry(void *context);
+
+extern struct k_thread *z_current;
+
+/**
+ * @brief Get current thread
+ *
+ * @see struct k_thread * z_current
+ *
+ * @return thread_t*
+ */
+static inline struct k_thread *k_thread_current(void)
+{
+	return z_current;
+}
 
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER == 0
 
@@ -261,44 +349,6 @@ __kernel void k_block_us(uint32_t delay_us);
  * @param delay_ms The duration to block in milliseconds.
  */
 __kernel void k_block_ms(uint32_t delay_ms);
-
-/**
- * @brief Start the execution of the given thread.
- *
- * @param thread The thread to start execution.
- * @return 0 if successful, otherwise a negative error code.
- */
-__kernel int8_t k_thread_start(struct k_thread *thread);
-
-/**
- * @brief Stop the execution of the specified thread.
- *
- * @param thread The thread to stop execution.
- * @return 0 if successful, otherwise a negative error code.
- */
-__kernel int8_t k_thread_stop(struct k_thread *thread);
-
-/**
- * @brief Stop the execution of the current thread.
- *
- * @see k_thread_stop
- *
- * @param thread The ready/pending thread to start.
- */
-__kernel void k_stop(void);
-
-/**
- * @brief Change the priority of the specified thread.
- *
- * This function allows you to change the priority of a given thread. The thread parameter
- * specifies the thread for which the priority needs to be changed. The prio parameter
- * can be set to either K_COOPERATIVE or K_PREEMPTIVE, indicating the desired priority.
- *
- * @param thread The thread for which to change the priority.
- * @param prio The desired priority (K_COOPERATIVE or K_PREEMPTIVE).
- * @return The status code indicating the success or failure of the operation.
- */
-__kernel int8_t k_thread_change_priority(struct k_thread *thread, int prio);
 
 /**
  * @brief Get the number of currently ready threads.

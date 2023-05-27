@@ -7,7 +7,7 @@
 #include <avrtos/debug.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/spi.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <util/crc16.h>
 
 int main(void)

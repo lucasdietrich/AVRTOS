@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "mutex.h"
 #include "time.h"
+
+#include <avr/pgmspace.h>
 
 #if CONFIG_KERNEL_UPTIME
 

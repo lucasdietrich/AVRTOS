@@ -7,10 +7,10 @@
 #ifndef _AVRTOS_WORKQUEUE
 #define _AVRTOS_WORKQUEUE
 
-#include <stddef.h>
+#include "fifo.h"
+#include "kernel.h"
 
-#include <avrtos/fifo.h>
-#include <avrtos/kernel.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {

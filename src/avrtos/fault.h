@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_FAULT_H_
 #define _AVRTOS_FAULT_H_
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #include <stdint.h>
 

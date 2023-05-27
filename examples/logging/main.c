@@ -5,7 +5,7 @@
  */
 
 #include <avrtos/drivers/usart.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
 #define LOG_LEVEL LOG_LEVEL_INF
 

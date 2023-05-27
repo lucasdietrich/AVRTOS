@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_STACK_SENTINEL_H_
 #define _AVRTOS_STACK_SENTINEL_H_
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #include <stdbool.h>
 

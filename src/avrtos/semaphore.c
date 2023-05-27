@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "debug.h"
+#include "kernel.h"
+#include "kernel_internals.h"
 #include "semaphore.h"
 
-#include <avrtos/debug.h>
-#include <avrtos/kernel.h>
-#include <avrtos/kernel_internals.h>
 #include <util/atomic.h>
 
 int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)

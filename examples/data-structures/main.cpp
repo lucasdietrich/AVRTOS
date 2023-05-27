@@ -11,6 +11,7 @@
 #include <avrtos/dstruct/tqueue.h>
 #include <avrtos/misc/serial.h>
 
+#include <avr/pgmspace.h>
 #include <avr/io.h>
 
 #define FLAG_SLIST  1

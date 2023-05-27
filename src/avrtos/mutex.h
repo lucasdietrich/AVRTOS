@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_MUTEX_H
 #define _AVRTOS_MUTEX_H
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #include <stdbool.h>
 

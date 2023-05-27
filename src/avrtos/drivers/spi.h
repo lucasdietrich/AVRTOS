@@ -1,8 +1,8 @@
 #ifndef SPI_H_
 #define SPI_H_
 
-#include <avrtos/avrtos.h>
 #include <avrtos/drivers/gpio.h>
+#include <avrtos/kernel.h>
 
 /**
  * SPI driver

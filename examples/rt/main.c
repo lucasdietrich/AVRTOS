@@ -6,7 +6,7 @@
 
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 
 #define PINn PIN7
 #define GPIO GPIOB_DEVICE

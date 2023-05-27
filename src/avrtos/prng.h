@@ -15,10 +15,11 @@
  * https://www.maximintegrated.com/en/design/technical-documents/app-notes/4/4400.html
  */
 
+#include "kernel.h"
+
 #include <stdint.h>
 
 #include <avr/io.h>
-#include <avrtos/kernel.h>
 
 #ifdef __cplusplus
 extern "C" {

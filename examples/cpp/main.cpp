@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <string.h>
+
 #include <avrtos/debug.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
+
 
 K_MEM_SLAB_DEFINE(stacks, 0x80, 4U);
 

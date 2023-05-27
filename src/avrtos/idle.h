@@ -7,7 +7,7 @@
 #ifndef _IDLE_H_
 #define _IDLE_H_
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #include <stdbool.h>
 #include <stddef.h>

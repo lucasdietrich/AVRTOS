@@ -10,7 +10,7 @@
 /* Implement a thread/irq-safe flags notification subscription/notification
  * system  */
 
-#include <avrtos/kernel.h>
+#include "kernel.h"
 
 struct k_flags {
 	struct dnode _waitqueue;

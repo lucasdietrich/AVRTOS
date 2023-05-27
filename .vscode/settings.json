@@ -8,13 +8,13 @@
 	"editor.tabSize": 8,
 	"editor.rulers": [80],
 	"files.associations": {
+		"*.jinja": "python",
 		"*.asm": "avr",
 		"*.bb": "shellscript",
 		"*.bbclass": "shellscript",
 		"*.inc": "shellscript",
 		"multithreading_debug.h": "c",
 		"serial.h": "c",
-		"multithreading.h": "c",
 		"multithreading_defines.h": "c",
 		"schedules_items.h": "c",
 		"xqueue.h": "c",
@@ -64,6 +64,12 @@
 		"exti.h": "c",
 		"spi.h": "c",
 		"sleep.h": "c",
-		"cmath": "c"
+		"cmath": "c",
+		"types.h": "c",
+		"errno.h": "c",
+		"init.h": "c",
+		"ring.h": "c",
+		"string.h": "c",
+		"crc16.h": "c"
 	},
 }

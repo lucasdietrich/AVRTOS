@@ -34,7 +34,7 @@
 
 // precize calculation : cycles, etc...
 
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 

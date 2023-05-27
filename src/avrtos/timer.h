@@ -7,8 +7,8 @@
 #ifndef _AVRTOS_KERNEL
 #define _AVRTOS_KERNEL
 
-#include <avrtos/dstruct/tqueue.h>
-#include <avrtos/multithreading.h>
+#include "dstruct/tqueue.h"
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -6,8 +6,9 @@
 
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
+#include <avrtos/misc/serial.h>
 #include <avrtos/misc/led.h>
 
 #include <avr/io.h>

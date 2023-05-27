@@ -7,7 +7,7 @@
 #include <Arduino.h>
 
 #include <avrtos.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/misc/led.h>
 
 void setup(void)

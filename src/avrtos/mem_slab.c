@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "dstruct/dlist.h"
+#include "dstruct/slist.h"
+#include "kernel.h"
+#include "kernel_internals.h"
 #include "mem_slab.h"
-
-#include <avrtos/kernel.h>
-#include <avrtos/kernel_internals.h>
 
 #define K_MODULE K_MODULE_MEMSLAB
 

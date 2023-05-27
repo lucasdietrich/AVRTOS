@@ -6,6 +6,8 @@
 
 #include "debug.h"
 
+#include <avr/pgmspace.h>
+
 void print_slist(struct slist *list, void (*qitem_printer)(struct snode *item))
 {
 	struct snode *item = list->head;

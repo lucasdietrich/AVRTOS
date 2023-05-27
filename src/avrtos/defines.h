@@ -165,6 +165,7 @@ typedef struct {
 #define K_IMMEDIATE K_NEXT_TICK
 
 #endif /* __cplusplus */
+
 /*___________________________________________________________________________*/
 
 // MCU specific fixups

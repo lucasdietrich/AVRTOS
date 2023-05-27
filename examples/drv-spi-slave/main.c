@@ -5,7 +5,7 @@
  */
 
 #include <avrtos/debug.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/drivers/spi.h>
 #include <avrtos/drivers/exti.h>
 

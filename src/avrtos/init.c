@@ -4,11 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "canaries.h"
 #include "debug.h"
 #include "init.h"
 #include "io.h"
-
-#include <avrtos/kernel.h>
+#include "kernel.h"
+#include "kernel_internals.h"
+#include "mem_slab.h"
+#include "stack_sentinel.h"
+#include "timer.h"
 
 extern void z_init_sysclock(void);
 

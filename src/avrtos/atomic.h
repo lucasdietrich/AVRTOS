@@ -7,11 +7,12 @@
 #ifndef _AVRTOS_ATOMIC_H_
 #define _AVRTOS_ATOMIC_H_
 
+#include "defines.h"
+
 #include <stdbool.h>
 
 #include <avr/cpufunc.h>
 #include <avr/io.h>
-#include <avrtos/defines.h>
 #include <util/atomic.h>
 
 #ifdef __cplusplus

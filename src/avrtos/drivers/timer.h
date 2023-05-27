@@ -7,8 +7,8 @@
 #ifndef _AVRTOS_DRIVER_TIMER_H_
 #define _AVRTOS_DRIVER_TIMER_H_
 
-#include <avrtos/avrtos.h>
 #include <avrtos/drivers.h>
+#include <avrtos/kernel.h>
 
 #if defined(__cplusplus)
 extern "C" {

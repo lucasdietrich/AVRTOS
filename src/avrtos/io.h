@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_IO_H_
 #define _AVRTOS_IO_H_
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #include <stdio.h>
 

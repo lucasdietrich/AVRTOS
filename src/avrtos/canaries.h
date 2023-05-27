@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_CANARIES_H_
 #define _AVRTOS_CANARIES_H_
 
-#include "avrtos.h"
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

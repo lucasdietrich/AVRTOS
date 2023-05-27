@@ -7,7 +7,14 @@
 #ifndef _AVRTOS_KERNEL_INTERNALS_H
 #define _AVRTOS_KERNEL_INTERNALS_H
 
-#include "kernel.h"
+#include "assert.h"
+#include "defines.h"
+#include "sys.h"
+#include "types.h"
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /**
  * @brief Set the state of a thread.
@@ -172,5 +179,9 @@ __kernel void z_wake_up(struct k_thread *thread);
  * @return false, interrupt flag is cleared
  */
 bool z_interrupts(void);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

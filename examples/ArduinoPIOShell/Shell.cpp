@@ -8,7 +8,7 @@
 
 #include <avrtos.h>
 #include <avrtos/debug.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 
 #include <avrtos/drivers/usart.h>
 #include <avrtos/misc/led.h>

@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_SIGNAL_H_
 #define _AVRTOS_SIGNAL_H_
 
-#include "multithreading.h"
+#include "kernel.h"
 
 #include <stdbool.h>
 

@@ -9,7 +9,7 @@
 
 /* TODO Implement an atomic thread/irq-safe ring buffer */
 
-#include <avrtos/kernel.h>
+#include "kernel.h"
 
 #define K_RING_CONCURRENT_WRITTERS 0u
 #define K_RING_CONCURRENT_READERS  0u

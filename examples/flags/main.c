@@ -5,7 +5,7 @@
  */
 
 #include <avrtos/drivers/usart.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 
 #include <avr/io.h>
 

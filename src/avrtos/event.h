@@ -7,11 +7,11 @@
 #ifndef _AVRTOS_EVENT_H_
 #define _AVRTOS_EVENT_H_
 
+#include "dstruct/tqueue.h"
+#include "kernel.h"
+
 #include <stdbool.h>
 #include <stdint.h>
-
-#include <avrtos/avrtos.h>
-#include <avrtos/dstruct/tqueue.h>
 
 #ifdef __cplusplus
 extern "C" {

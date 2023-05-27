@@ -6,7 +6,7 @@
 
 #include <avrtos/drivers/exti.h>
 #include <avrtos/drivers/gpio.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 

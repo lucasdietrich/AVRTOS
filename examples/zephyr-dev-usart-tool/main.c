@@ -6,7 +6,7 @@
 
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/kernel.h>
+#include <avrtos/avrtos.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>

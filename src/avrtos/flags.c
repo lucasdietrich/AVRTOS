@@ -1,7 +1,6 @@
 #include "flags.h"
-
-#include <avrtos/kernel.h>
-#include <avrtos/kernel_internals.h>
+#include "kernel.h"
+#include "kernel_internals.h"
 
 #define KERNEL_FLAGS_OPT_SET_ALL_ENABLED 0
 #define KERNEL_FLAGS_OPT_SET_ANY_ENABLED 1

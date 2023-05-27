@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/defines.h>
-#include <avrtos/drivers/timer.h>
+#include "defines.h"
+#include "drivers/timer.h"
 
 #if (CONFIG_KERNEL_SYSCLOCK_PERIOD_US < 100)
 #warning SYSCLOCK is probably too fast !

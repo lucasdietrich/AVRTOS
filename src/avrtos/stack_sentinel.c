@@ -7,6 +7,8 @@
 #include "fault.h"
 #include "stack_sentinel.h"
 
+#include <avr/pgmspace.h>
+
 extern struct k_thread z_thread_main;
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
