@@ -16,8 +16,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 struct k_work;
 
 typedef void (*k_work_handler_t)(struct k_work *);
@@ -36,8 +34,6 @@ struct k_work {
 #define K_WORK_DEFINE(work_name, work_handler) \
 	struct k_work work_name = K_WORK_INIT(work_handler)
 
-/*___________________________________________________________________________*/
-
 struct k_workqueue {
 	struct k_fifo q;
 	uint8_t flags;
@@ -53,15 +49,11 @@ struct k_workqueue {
 	K_THREAD_DEFINE(z_workq_##_name, z_workqueue_entry, _stack_size, _prio_flags, \
 			&_name, _symbol)
 
-/*___________________________________________________________________________*/
-
 //
 // Workqueue internal
 //
 
 __kernel void z_workqueue_entry(struct k_workqueue *const workqueue);
-
-/*___________________________________________________________________________*/
 
 /**
  * @brief Create a workqueue thread at runtime.
@@ -145,8 +137,6 @@ __kernel void k_workqueue_enable_yieldeach(struct k_workqueue *workqueue);
  */
 __kernel void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue);
 
-/*___________________________________________________________________________*/
-
 //
 // System workqueue
 //
@@ -157,8 +147,6 @@ __kernel void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue);
  * @param work
  */
 bool k_system_workqueue_submit(struct k_work *work);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

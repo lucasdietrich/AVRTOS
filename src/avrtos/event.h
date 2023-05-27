@@ -17,8 +17,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 struct k_event;
 
 /**
@@ -44,8 +42,6 @@ struct k_event {
 		.tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0 \
 	}
 #define K_EVENT_DEFINE(name, hdlr) struct k_event name = K_EVENT_INIT(hdlr)
-
-/*___________________________________________________________________________*/
 
 /**
  * @brief Initialize an event.
@@ -94,8 +90,6 @@ __kernel bool k_event_pending(struct k_event *event);
  * The call periodicity is constant and equals CONFIG_KERNEL_TIME_SLICE_US.
  */
 __kernel void z_event_q_process(void);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

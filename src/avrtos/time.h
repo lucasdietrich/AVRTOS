@@ -13,17 +13,25 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 struct timespec {
 	uint32_t tv_sec;
 	uint16_t tv_msec;
 };
 
-/*___________________________________________________________________________*/
-
+/**
+ * @brief Get the current time.
+ *
+ * @param ts
+ * @return __kernel
+ */
 __kernel void k_timespec_get(struct timespec *ts);
 
+/**
+ * @brief Set the current time.
+ *
+ * @param ts
+ * @return __kernel
+ */
 __kernel void k_time_set(uint32_t sec);
 
 __kernel bool k_time_is_set(void);
@@ -35,8 +43,6 @@ __kernel void k_time_unset(void);
 void k_show_uptime(void);
 
 void k_show_ticks(void);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

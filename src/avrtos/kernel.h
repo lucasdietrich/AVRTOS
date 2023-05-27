@@ -13,17 +13,8 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
-extern bool z_interrupts(void);
-
-/*___________________________________________________________________________*/
-
-//
-// Kernel Public API
-//
-
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER == 0
+
 /**
  * @brief Disable interrupts in the current thread
  */
@@ -52,6 +43,9 @@ __kernel void irq_enable(void);
 
 #endif /* CONFIG_KERNEL_IRQ_LOCK_COUNTER */
 
+#define CRITICAL_SECTION_BEGIN() irq_disable()
+#define CRITICAL_SECTION_END()	 irq_enable()
+
 /**
  * @brief Lock interrupts and return the previous state
  *
@@ -59,91 +53,89 @@ __kernel void irq_enable(void);
  */
 static inline uint8_t irq_lock(void)
 {
-	const uint8_t sreg = SREG;
+	const uint8_t key = SREG;
 	irq_disable();
-	return sreg;
+	return key;
 }
 
 /**
  * @brief Unlock interrupts (restore the previous state)
  *
- * @param sreg
+ * @param key
  */
-static inline void irq_unlock(uint8_t sreg)
+static inline void irq_unlock(uint8_t key)
 {
-	SREG = sreg;
-}
-
-#define CRITICAL_SECTION_BEGIN() irq_disable()
-#define CRITICAL_SECTION_END()	 irq_enable()
-
-/**
- * @brief Software reset the microcontroller by calling the reset vector
- * (address 0x0000)
- */
-static inline void k_sys_sw_reset(void)
-{
-	cli();
-
-	/* TODO: jump to reset vector instead of calling it asm("jmp ...")*/
-	((void (*)(void))(0x0000U))();
-
-	__builtin_unreachable();
+	SREG = key;
 }
 
 /**
- * @brief Lock the CPU for the current thread being executed. Actually it sets
- * the current thread as cooperative thread until function k_sched_unlock is
- * called. The syslock is still executed and it stills shift the timed threads
- * in the time queue. As cooperative threads, executing should no last very
- * long, since it could delay other threads execution and break time sensitive
- * (RT) threads. In cooperative threads locking/unlocking the scheduler doesn't
- * have no effect.
+ * @brief Lock the scheduler for the current thread.
  *
- * Cannot be called from an interrupt routine.
+ * This function sets the current thread as a cooperative thread until the function
+ * k_sched_unlock is called. The scheduler continues to execute system tasks and
+ * handle timeout. However, for cooperative threads, it is
+ * recommended that the execution time is kept short to avoid delaying other threads
+ * and potentially impacting time-sensitivethreads.
  *
- * If CONFIG_KERNEL_SCHED_LOCK_COUNTER is defined, k_sched_unlock() can be
- * called recursively. In this case, the maximum  number of calls without
+ * Locking and unlocking the scheduler has no effect on cooperative threads.
+ *
+ * This function cannot be called from an interrupt routine.
+ *
+ * If CONFIG_KERNEL_SCHED_LOCK_COUNTER is defined, k_sched_unlock() can be called
+ * recursively. In this case, the maximum number of calls to k_sched_lock without
  * calling k_sched_unlock() is 255.
  *
- * Note: Scheduler is called anyway if a function yielding the CPU is called
- *  like k_yield(), k_sleep() or any kernel function waiting for an
- *  event to be signaled (e.g. k_sem_take(), k_mutex_lock() with delay)
+ * Note: Locking the scheduler doesn't have an impact on functions that explicitely
+ * yields the CPU, such as k_yield(), k_sleep(), or any kernel function waiting
+ * for an event to be signaled (e.g., k_sem_take(), k_mutex_lock() with delay),
+ * is called.
  */
 __kernel void k_sched_lock(void);
 
 /**
- * @brief Unlock the CPU for the current thread being executed @see
- * k_sched_lock. Set it as preemptive. In cooperative threads locking/unlocking
- * the scheduler doesn't have no effect.
+ * @brief Unlock the scheduler for the current thread and set it as preemptive.
  *
- * Cannot be called from an interrupt routine.
+ * This function unlocks the scheduler for the current thread, allowing it to be
+ * preempted by other threads.
+ *
+ * For cooperative threads, locking and unlocking the scheduler has no effect.
+ *
+ * This function cannot be called from an interrupt routine.
  *
  * @see k_sched_lock()
  */
 __kernel void k_sched_unlock(void);
 
 /**
- * @brief Tells if the scheduler is locked by the current thread or not.
- * @see k_sched_lock/k_sched_unlock.
+ * @brief Check if the scheduler is locked by the current thread.
  *
- * @return true     if scheduler is locked for the current thread or thread is
- * cooperative
- * @return false    if not
+ * This function determines whether the scheduler is locked by the current thread
+ * or if the thread is a cooperative thread.
+ *
+ * @see k_sched_lock()
+ * @see k_sched_unlock()
+ *
+ * @return true if the scheduler is locked for the current thread or if the thread is
+ * cooperative.
+ * @return false otherwise.
  */
 __kernel bool k_sched_locked(void);
 
 /**
- * @brief Tells whether current current thread is preemptive.
+ * @brief Check if the current thread is preemptive.
  *
- * @return True if current thread is preemptive
+ * This function determines whether the current thread is preemptive.
+ *
+ * @return true if the current thread is preemptive.
  */
 __kernel bool k_cur_is_preempt(void);
 
 /**
- * @brief Tells whether current thread is cooperative
+ * @brief Check if the current thread is cooperative.
  *
- * @return  True if current thread is cooperative
+ * This function determines whether the current thread is cooperative.
+ *
+ * @return true if the current thread is cooperative.
  */
 __kernel bool k_cur_is_coop(void);
 
@@ -174,13 +166,14 @@ static __inline__ uint8_t z_sched_lock_ret(void)
 }
 
 /**
- * @brief This macro lock the scheduler for the duration of the inner scope.
+ * @brief Macro to lock the scheduler within a specific scope.
  *
- * This code in the block is equivalent to the code between k_sched_lock();
- *    and k_sched_unlock();
+ * This macro locks the scheduler for the duration of the inner scope.
+ * The code within the block is equivalent to the code between k_sched_lock()
+ * and k_sched_unlock().
  *
- * Inspiration for this MACRO come greatly from
- *    ATOMIC_BLOCK(ATOMIC_FORCEON) { } macro from <avr/atomic.h>
+ * This macro draws inspiration from the ATOMIC_BLOCK(ATOMIC_FORCEON) macro
+ * in <avr/atomic.h>.
  */
 #define K_SCHED_LOCK_CONTEXT                                                          \
 	for (uint8_t __k_schedl_x __attribute__((__cleanup__(z_sched_restore))) = 0u, \
@@ -188,26 +181,31 @@ static __inline__ uint8_t z_sched_lock_ret(void)
 	     __k_todo; __k_todo		   = 0)
 
 /**
- * @brief Stop the execution of the current thread for the specified amount of
- * time. This function schedule the execution of the current thread when the
- * timer expires. Returning of this function is equivalent that returning from
- * k_yield.
+ * @brief Suspend the execution of the current thread for the specified amount of time.
  *
- * If timeout is K_FOREVER, the thread will never be executed again, like
- * stopped (TODO review this).
+ * This function schedules the current thread to be woken up after the specified amount of
+ * time.
+ *
+ * If the timeout is set to K_FOREVER, the thread will not be executed again until
+ * explicitly resumed with z_wake_up() or z_schedule().
+ *
+ * If the timeout is set to K_NO_WAIT, the function has no effect.
  *
  * @see k_yield
  *
- * @param timeout pending timeout
+ * @param timeout The duration of the sleep in milliseconds.
  */
 __kernel void k_sleep(k_timeout_t timeout);
 
 /**
- * @brief Sleep for ms milliseconds.
- * 
+ * @brief Sleep for a specified number of milliseconds.
+ *
+ * This function is a convenience wrapper around k_sleep() to simplify sleeping for
+ * milliseconds.
+ *
  * @see k_sleep
- * 
- * @param ms 
+ *
+ * @param ms The duration of the sleep in milliseconds.
  */
 static inline void k_msleep(uint32_t ms)
 {
@@ -215,108 +213,126 @@ static inline void k_msleep(uint32_t ms)
 }
 
 /**
- * @brief Make the thread waiting for timeout milliseconds.
+ * @brief Wait for the specified amount of time in milliseconds.
  *
- * Important: Keep the thread ready, but yield() CPU to another thread if
- * available, sleep_cpu() otherwise. 
+ * This function keeps the thread ready but yields the CPU to another thread if available.
+ * If no other thread is available, it puts the CPU into a sleep state until the timeout
+ * expires.
  *
- * Note: Can be used without an IDLE thread (with CONFIG_KERNEL_THREAD_IDLE disabled)
+ * Note: This function can always be used without an IDLE thread (with
+ * CONFIG_KERNEL_THREAD_IDLE disabled).
  *
- * Note: Require KERNEL_UPTIME to be set.
+ * Note: Requires KERNEL_UPTIME to be set.
  *
- * @param timeout
+ * @param timeout The duration to wait in milliseconds.
  */
 __kernel void k_wait(k_timeout_t delay);
 
 /**
- * @brief Busy wait for us microseconds.
- * 
- * Important: Lock the CPU for the current thread being executed.
- * 
- * Note: Require KERNEL_UPTIME to be set.
- * 
- * @param us 
- * @return __kernel 
+ * @brief Busy wait for the specified number of microseconds.
+ *
+ * This function actively waits for the specified number of microseconds by locking the
+ * CPU for the current thread.
+ *
+ * Note: Requires KERNEL_UPTIME to be set.
+ *
+ * @param delay_us The duration to wait in microseconds.
  */
 __kernel void k_busy_wait(k_timeout_t delay);
 
 /**
- * @brief Block the RTOS (scheduler + SYSCLOCK) for a specified amount of time in
- * microseconds
+ * @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time in
+ * microseconds.
  *
- * Note: Don't exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US otherwise the uptime
- * will be delayed.
+ * Note: Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US, otherwise the system uptime may
+ * be delayed.
  *
- * @param delay_us compile time constant to wait
+ * @param delay_us The duration to block in microseconds.
  */
 __kernel void k_block_us(uint32_t delay_us);
 
 /**
- * @brief Block the RTOS (scheduler + SYSCLOCK) for a specified amount of time in
+ * @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time in
  * milliseconds.
  *
- * Note: Don't exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to ms)
- * otherwise the uptime will be delayed.
+ * Note: Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds),
+ * otherwise the system uptime may be delayed.
  *
- * @param delay_ms compile time constant to wait
+ * @param delay_ms The duration to block in milliseconds.
  */
 __kernel void k_block_ms(uint32_t delay_ms);
 
-/*___________________________________________________________________________*/
-
 /**
- * @brief Start the execution the given thread.
+ * @brief Start the execution of the given thread.
  *
- * @param thread : stopped thread to start.
+ * @param thread The thread to start execution.
+ * @return 0 if successful, otherwise a negative error code.
  */
 __kernel int8_t k_thread_start(struct k_thread *thread);
 
 /**
- * @brief Stop the execution of the current thread.
+ * @brief Stop the execution of the specified thread.
  *
- * @param thread : started thread to stop.
+ * @param thread The thread to stop execution.
+ * @return 0 if successful, otherwise a negative error code.
  */
 __kernel int8_t k_thread_stop(struct k_thread *thread);
 
 /**
- * @brief Stop current thread
+ * @brief Stop the execution of the current thread.
  *
- * @param thread : ready/pending thread to start.
+ * @see k_thread_stop
+ *
+ * @param thread The ready/pending thread to start.
  */
 __kernel void k_stop(void);
 
 /**
- * @brief Change the priority of the given thread.
+ * @brief Change the priority of the specified thread.
  *
- * @param thread Thread
- * @param prio Priority K_COOPERATIVE or K_PREEMPTIVE
- * @return __kernel
+ * This function allows you to change the priority of a given thread. The thread parameter
+ * specifies the thread for which the priority needs to be changed. The prio parameter
+ * can be set to either K_COOPERATIVE or K_PREEMPTIVE, indicating the desired priority.
+ *
+ * @param thread The thread for which to change the priority.
+ * @param prio The desired priority (K_COOPERATIVE or K_PREEMPTIVE).
+ * @return The status code indicating the success or failure of the operation.
  */
-__kernel void k_thread_set_priority(struct k_thread *thread, uint8_t prio);
-
-/*___________________________________________________________________________*/
-
-//
-// Kernel Private API
-//
+__kernel int8_t k_thread_change_priority(struct k_thread *thread, int prio);
 
 /**
- * @brief Get the number of threads currently ready. 0 if cpu is IDLE
+ * @brief Get the number of currently ready threads.
  *
- * @return uint8_t
+ * This function returns the count of threads that are currently in the ready state,
+ * meaning they are eligible for execution. If the CPU is in the IDLE state with no
+ * threads ready for execution, the function will return 0.
+ *
+ * @return The number of currently ready threads.
  */
 uint8_t k_ready_count(void);
 
-/* @see k_yield but assume interrupts are disabled */
+/**
+ * @brief Yield the CPU to another ready thread, assuming interrupts are disabled.
+ *
+ * The behavior is similar to k_yield(), but with the additional assumption that
+ * interrupts are already disabled.
+ *
+ * @see k_yield
+ */
 void z_yield(void);
 
 /**
- * @brief Release the CPU : Stop the execution of the current thread and set it
- * at the end of the runqueue (if it's still ready) in order to execute it one
- * "cycle" later. This function call the scheduler that determine which thread
- * is the next on to be executing. This function restore the context of the
- * current thread when returning. This function can be called from either a
- * cooperative thread or a premptive thread.
+ * @brief Yield the CPU to the next thread in the scheduler's runqueue.
+ *
+ * This function releases the CPU by stopping the execution of the current thread.
+ * If the thread is still in the ready state, it is placed at the end of the runqueue,
+ * allowing other threads to execute before it.
+ *
+ * The function restores the context of the current thread when returning.
+ *
+ * It can be called from both cooperative and preemptive threads.
+ *
+ * Can be called from ISRs.
  */
 static inline void k_yield(void)
 {
@@ -328,43 +344,79 @@ static inline void k_yield(void)
 /**
  * @brief Yield function for Arduino compatibility.
  *
+ * This function is provided for compatibility with Arduino and serves as a wrapper
+ * for the k_yield() function.
+ *
  * @see k_yield
  */
 void yield(void);
 
 /**
- * @brief Assert helper to check if we are in user mode.
+ * @brief Assertion helper to check if the code is running in user context.
+ *
+ * This function is an assertion helper that checks if the code is executing in user
+ * context. It can be used to verify that certain operations or code paths are only
+ * accessed in user context. If the code is not running in user context, an assertion
+ * failure or error can be triggered.
  */
-extern void z_assert_user_mode(void);
+extern void z_assert_user_context(void);
 
 /**
- * @brief Yield the thread interrupted by the current interrupt,
- * give CPU to the next thread in the runqueue.
+ * @brief Assertion helper to check if a thread is in the ready state.
  *
- * @warning Should be called from USER interrupt routine ONLY.
- * Do never call this function from a k_timer or k_event callback handler.
- * These handlers are called in "kernel mode", scheduling threads from these
- * handler will cause an immediate switch to the last unpended thread.
+ * This function is an assertion helper that checks if a given thread is in the ready
+ * state, indicating that it is eligible for execution.
  *
- * Note: Should be called from interrupt routine ONLY.
+ * If the thread is not in the ready state, an assertion failure or error can be
+ * triggered.
  *
- * Should be the last instruction of the interrupt routine.
- * Because everything after will be delayed.
+ * @param thread The thread to check.
+ */
+extern void z_assert_thread_ready(struct k_thread *thread);
+
+/**
+ * @brief Contain the address of the thread currently running.
+ */
+extern struct k_thread *z_current;
+
+/**
+ * @brief Yield the interrupted thread to the next thread in the runqueue from an
+ * interrupt context.
  *
- * Use this function in ISR after having unpend a thread (e.g. k_sem_give). This
- * allow to immediately give CPU to woke up thread.
+ * It should only be called from a USER interrupt routine. It should not be called from a
+ * k_timer or k_event callback handler, as those handlers are called in "kernel context"
+ * and scheduling threads from those handlers will cause an immediate switch to the last
+ * unpended thread.
  *
- * Inlining this function decrease the required stack size by 2 (o 3) bytes,
- * when interrupt is called.
+ * Note: This function should be called only from an interrupt routine.
+ *
+ * This function should be the last instruction in the interrupt routine because any code
+ * after it will be delayed. It is typically used in an ISR after waking up a thread
+ * (e.g., k_sem_give) to immediately give the CPU to the woken-up thread.
+ *
+ * Inlining this function reduces the required stack size by 2 (or 3) bytes when the
+ * interrupt is called.
+ *
+ * @example
+ * ISR(USART0_RX_vect)
+ * {
+ * 	const char flags = USART0_DEVICE->UDRn;
+ * 	ll_usart_sync_putc(USART0_DEVICE, flags);
+ *
+ * 	int ret = k_flags_notify(&flags, flags, K_FLAGS_SET);
+ * 	if (ret > 0) {
+ * 		k_yield_from_isr();
+ * 	}
+ * }
  */
 static inline void k_yield_from_isr(void)
 {
 	// ASSERT ISR CONTEXT
 	// ASSERT IRQ LOCKED
-	// ASSERT NOT KERNEL MODE
+	// ASSERT NOT kernel context
 
 #if CONFIG_KERNEL_ASSERT
-	z_assert_user_mode();
+	z_assert_user_context();
 #endif
 
 	/* Check whether current thread can be preempted */
@@ -374,46 +426,42 @@ static inline void k_yield_from_isr(void)
 }
 
 /**
- * @brief Yield the thread interrupted by the current interrupt,
- * give CPU to the next thread in the runqueue.
+ * @brief Yield the interrupted thread if a thread is given as an argument.
  *
- * @warning Should be called from USER interrupt routine ONLY.
- * Do never call this function from a k_timer or k_event callback handler.
- * These handlers are called in "kernel mode", scheduling threads from these
- * handler will cause an immediate switch to the last unpended thread.
+ * It should only be called from a USER interrupt routine. It should not be called from a
+ * k_timer or k_event callback handler, as those handlers are called in "kernel context"
+ * and scheduling threads from those handlers will cause an immediate switch to the last
+ * unpended thread.
  *
- * Should be the last instruction of the interrupt routine.
- * Because everything after will be delayed.
+ * This function should be the last instruction in the interrupt routine because any code
+ * after it will be delayed. It is typically used in an ISR after waking up a thread
+ * (e.g., k_sem_give) to immediately give the CPU to the woken-up thread.
  *
- * Use this function in ISR after having unpend a thread (e.g. k_sem_give). This
- * allow to immediately give CPU to woke up thread.
- *
- * Inlining this function decrease the required stack size by 2 (o 3) bytes,
- * when interrupt is called.
+ * Inlining this function reduces the required stack size by 2 (or 3) bytes when the
+ * interrupt is called.
  *
  * @see k_yield_from_isr
- * @param thread Thread that is ready to be scheduled. If thread is NULL,
- * this function do nothing.
+ * @param thread The thread that is ready to be scheduled. If the thread is NULL, this
+ * function does nothing.
+ *
+ * @example:
+ * ISR(INT0_vect)
+ * {
+ * 	led_toggle();
+ * 	const struct k_thread *thread = k_sem_give(&button_sem);
+ * 	k_yield_from_isr_cond(thread);
+ * }
  */
-
 static inline void k_yield_from_isr_cond(struct k_thread *thread)
 {
 	if (thread != NULL) {
+#if CONFIG_KERNEL_ASSERT
+		z_assert_thread_ready(thread);
+#endif
+
 		k_yield_from_isr();
 	}
 }
-
-/*___________________________________________________________________________*/
-
-/**
- * @brief Increment the kernel tick counter.
- *
- * Handle threads timeouts, timers and events.
- *
- * Assumptions :
- *  - interrupt flag is cleared when called.
- */
-__kernel void z_system_tick_inc(void);
 
 /**
  * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
@@ -424,10 +472,10 @@ __kernel uint32_t k_ticks_get_32(void);
 
 /**
  * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
- * 
+ *
  * @see k_ticks_get_32
- * 
- * @return uint32_t 
+ *
+ * @return uint32_t
  */
 static inline uint32_t k_ticks_get(void)
 {
@@ -465,8 +513,6 @@ __kernel uint64_t k_uptime_get_ms64(void);
  * @return Uptime in seconds
  */
 __kernel uint32_t k_uptime_get(void);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

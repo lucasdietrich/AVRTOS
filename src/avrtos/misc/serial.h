@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _UART_H
-#define _UART_H
+#ifndef _SERIAL_H
+#define _SERIAL_H
 
 #include <stddef.h>
 #include <string.h>
@@ -133,4 +133,4 @@ void serial_printl_p(const char *text);
 }
 #endif
 
-#endif
+#endif /* _SERIAL_H */

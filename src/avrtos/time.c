@@ -46,47 +46,51 @@ void k_show_ticks(void)
 	}
 }
 
+#if CONFIG_KERNEL_TIME_API
+
 static struct {
 	uint32_t timestamp;
 	uint32_t uptime_sec;
 	struct k_mutex mutex;
-} time_ref = {
+} z_time_ref = {
 	.timestamp  = 0,
 	.uptime_sec = 0,
-	.mutex	    = K_MUTEX_INIT(time_ref.mutex),
+	.mutex	    = K_MUTEX_INIT(z_time_ref.mutex),
 };
 
 void k_time_set(uint32_t sec)
 {
-	k_mutex_lock(&time_ref.mutex, K_FOREVER);
-	time_ref.uptime_sec = k_uptime_get();
-	time_ref.timestamp  = sec;
-	k_mutex_unlock(&time_ref.mutex);
+	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
+	z_time_ref.uptime_sec = k_uptime_get();
+	z_time_ref.timestamp  = sec;
+	k_mutex_unlock(&z_time_ref.mutex);
 }
 
 uint32_t k_time_get(void)
 {
 	uint32_t timestamp;
-	k_mutex_lock(&time_ref.mutex, K_FOREVER);
+	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
 	timestamp = k_uptime_get();
-	k_mutex_unlock(&time_ref.mutex);
-	return timestamp - time_ref.uptime_sec + time_ref.timestamp;
+	k_mutex_unlock(&z_time_ref.mutex);
+	return timestamp - z_time_ref.uptime_sec + z_time_ref.timestamp;
 }
 
 bool k_time_is_set(void)
 {
-	k_mutex_lock(&time_ref.mutex, K_FOREVER);
-	bool isset = time_ref.timestamp != 0;
-	k_mutex_unlock(&time_ref.mutex);
+	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
+	bool isset = z_time_ref.timestamp != 0;
+	k_mutex_unlock(&z_time_ref.mutex);
 	return isset;
 }
 
 void k_time_unset(void)
 {
-	k_mutex_lock(&time_ref.mutex, K_FOREVER);
-	time_ref.timestamp  = 0;
-	time_ref.uptime_sec = 0;
-	k_mutex_unlock(&time_ref.mutex);
+	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
+	z_time_ref.timestamp  = 0;
+	z_time_ref.uptime_sec = 0;
+	k_mutex_unlock(&z_time_ref.mutex);
 }
+
+#endif
 
 #endif /* CONFIG_KERNEL_UPTIME */

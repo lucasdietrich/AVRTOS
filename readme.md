@@ -64,7 +64,7 @@ We plan (TODO) to implement several new features and improvements, including:
 
 ### Description
 
-Example [minimal-example](src/examples/minimal-example/main.c) configures an usart, 
+Example [minimal-example](examples/minimal-example/main.c) configures an usart, 
 and blink a led at a frequency of 1Hz.
 Morover, typing a character on the serial console will wake up a thread which
 will print the received character.
@@ -303,6 +303,23 @@ With VS Code, select `QEMU (avr)` configuration, then press `F5` to start debugg
 
 ![](./pics/vscode_qemu_minimal_example.png)
 
+### Use Makefile
+
+The `Makefile` at the root of the project provides *shortcut* commands to build 
+and flash samples.
+
+In order to build the sample `shell` for QEMU run:
+
+	QEMU=ON SAMPLE=shell make
+
+Run it with:
+
+	make run_qemu
+
+Debug it with:
+
+	make qemu
+
 ---
 
 ## clang-format
@@ -311,8 +328,24 @@ With VS Code, select `QEMU (avr)` configuration, then press `F5` to start debugg
 - Or install `xaver.clang-format` extension for VS Code, and format on save or
 format using `Ctrl + K, Ctrl + F`
 
+## Miscelaneous
+
+- Calculate code metrics with `make metrics`, following metrics are calculated:
+	- Flash/ram usage for each (cmake) sample: [docs/metrics/exsizes.txt](./docs/metrics/exsizes.txt)
+- To update Arduino samples from the *cmake* ones, run `make arduino_gen`
+- To generate the `platformio.ini` file from the *cmake* samples, run `make piogen`.
+- Run `make arduino_lint` to check the project is compliant with Arduino Library
+- To change the default generator to *make* for example, ovreride following variable in the [Makefile](Makefile)
+```
+GENERATOR?="Unix Makefiles"
+GENERATOR_COMMAND?="make"
+GENERATOR_ARGS?="--no-print-directory"
+```
+
 ## Troubleshooting
 
+- Note that `qemu_*` like targets override the file [.vscode/launch.json](.vscode/launch.json) each time they are run.
+- `qemu_*` like targets run QEMU with `-s -S` options, which means QEMU will wait for a debugger to connect on port 1234, while `run_` targets run QEMU directly.
 - If your program crashes/restart/gets stuck, just increase all stack sizes, just in case (especially with `CONFIG_KERNEL_TIMERS`, `CONFIG_KERNEL_EVENTS`).
   - Note: Also increase IDLE stack size with `CONFIG_KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
   - Note: function call with ATmge2560 for example are stack consuming (because of the 3B return addresses)

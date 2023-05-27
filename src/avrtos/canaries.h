@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize canaries in thread stack.
  *
@@ -42,8 +40,6 @@ __kernel void z_init_stacks_canaries(void);
  */
 void *z_stack_canaries(struct k_thread *thread);
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Pretty print found canaries in thread {thread}
  *
@@ -69,8 +65,6 @@ void k_print_current_canaries(void);
  *
  */
 void k_dump_stack_canaries(void);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

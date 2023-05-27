@@ -586,6 +586,16 @@
 #endif
 
 //
+// Enable time API
+//
+// 0: Enable time API
+// 1: Disable time API
+//
+#ifndef CONFIG_KERNEL_TIME_API
+#define CONFIG_KERNEL_TIME_API 0
+#endif
+
+//
 // Enable atomic API
 //
 // 0: Atomic API is disabled
@@ -750,7 +760,10 @@
 // Debug systick using given GPIO pin of PORTB
 //
 // 0: Systick debug is disabled
-// n: Systick debug is enabled on given GPIO pin of PORTB
+// 1 << n: Systick debug is enabled on given GPIO pin of PORTB
+//
+// Example: with CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG=0x80,
+// systick debug is enabled on GPIO pin 7 of PORTB
 //
 #ifndef CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
 #define CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG 0
@@ -810,7 +823,7 @@
 //
 // This option defines ISR(SPI_STC_vect) { } interrupt handler, which
 // prevents the developper from defining its own.
-// 
+//
 // Synchroneous functions can still be used when this option is enabled.
 // However, synchronous functions should not be used when when an asynchronous
 // transfer is in progress.

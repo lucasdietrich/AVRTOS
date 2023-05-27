@@ -2,7 +2,7 @@
 	"configurations": [
 		{
 			"name": "AVR",
-			"compileCommands": "${workspaceRoot}/build_master/compile_commands.json",
+			"compileCommands": "${workspaceRoot}/build/compile_commands.json",
 			"intelliSenseMode": "gcc-avr",
 			"browse": {
 				"path": [

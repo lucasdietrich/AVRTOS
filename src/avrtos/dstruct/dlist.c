@@ -6,8 +6,6 @@
 
 #include "dlist.h"
 
-/*___________________________________________________________________________*/
-
 void dlist_init(struct dnode *list)
 {
 	list->head = list;

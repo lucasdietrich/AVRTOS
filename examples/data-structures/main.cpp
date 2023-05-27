@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/defines.h>
 #include <avrtos/dstruct/debug.h>
 #include <avrtos/dstruct/dlist.h>
@@ -14,8 +12,6 @@
 #include <avrtos/misc/serial.h>
 
 #include <avr/io.h>
-
-/*___________________________________________________________________________*/
 
 #define FLAG_SLIST  1
 #define FLAG_DLIST  4
@@ -26,8 +22,6 @@
 void test_slist(void);
 void test_dlis(void);
 void test_tqueue(void);
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -52,8 +46,6 @@ int main(void)
 	test_tqueue();
 #endif
 }
-
-/*___________________________________________________________________________*/
 
 //
 // SLIST
@@ -129,8 +121,6 @@ void test_slist(void)
 	print_slist();
 }
 
-/*___________________________________________________________________________*/
-
 //
 // DLIST
 //
@@ -193,8 +183,6 @@ void test_dlis(void)
 	test_dlist_dequeue(&dlist);
 	test_dlist_dequeue(&dlist);
 }
-
-/*___________________________________________________________________________*/
 
 //
 // TQUEUE
@@ -267,5 +255,3 @@ void test_tqueue(void)
 
 	print_tqueue(root);
 }
-
-/*___________________________________________________________________________*/

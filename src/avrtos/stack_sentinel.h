@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize stack sentinel byte(s) for all threads.
  *
@@ -47,7 +45,6 @@ bool k_verify_stack_sentinel(struct k_thread *thread);
  * @return false
  */
 void k_assert_registered_stack_sentinel(void);
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

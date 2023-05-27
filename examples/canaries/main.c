@@ -20,8 +20,6 @@
  * [K] CANARIES until @051F [found 26], MAX usage = 36 / 62
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -30,8 +28,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-/*___________________________________________________________________________*/
 
 static uint8_t dthread_stack[0x40u];
 static struct k_thread dthread;
@@ -44,8 +40,6 @@ void dthread_entry(void *p);
 K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PREEMPTIVE, NULL, 'L');
 K_THREAD_DEFINE(task1, thread_task1, 0x100, K_PREEMPTIVE, NULL, '1');
 K_THREAD_DEFINE(task2, thread_task2, 0x200, K_PREEMPTIVE, NULL, '2');
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -121,5 +115,3 @@ void thread_task2(void *p)
 		k_sleep(K_MSEC(50));
 	}
 }
-
-/*___________________________________________________________________________*/

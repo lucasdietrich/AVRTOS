@@ -11,14 +11,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
-
-/*___________________________________________________________________________*/
 
 uint8_t on  = 1u;
 uint8_t off = 0u;
@@ -41,8 +37,6 @@ static char stack1[0x100u];
 static char stack2[0x100u];
 static char stack3[0x100u];
 #endif
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -81,8 +75,6 @@ int main(void)
 	}
 }
 
-/*___________________________________________________________________________*/
-
 // use thread local storage
 void inthread_setled(uint8_t state)
 {
@@ -114,5 +106,3 @@ void thread_monitor(void *p)
 		k_yield();
 	}
 }
-
-/*___________________________________________________________________________*/

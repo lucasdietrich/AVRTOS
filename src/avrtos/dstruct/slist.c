@@ -6,8 +6,6 @@
 
 #include "slist.h"
 
-/*___________________________________________________________________________*/
-
 void slist_init(struct slist *list)
 {
 	list->head = NULL;
@@ -41,5 +39,3 @@ struct snode *slist_get(struct slist *list)
 	}
 	return node;
 }
-
-/*___________________________________________________________________________*/

@@ -71,6 +71,10 @@
 #define CONFIG_KERNEL_TICKS_COUNTER_SIZE 0
 #endif
 
+#if !CONFIG_KERNEL_UPTIME && CONFIG_KERNEL_TIME_API
+#error "CONFIG_KERNEL_TIME_API requires CONFIG_KERNEL_UPTIME"
+#endif
+
 #if CONFIG_KERNEL_TIME_SLICE_US < CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #error[UNSUPPORTED] CONFIG_KERNEL_TIME_SLICE_US < CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #elif CONFIG_KERNEL_TIME_SLICE_US > CONFIG_KERNEL_SYSCLOCK_PERIOD_US
@@ -386,8 +390,7 @@ typedef struct {
 #define Z_THREAD_STATE_PENDING (2 << Z_THREAD_STATE_POS)
 
 /* This flag is reserved for IDLE thread only (if enabled),
- * it is used to know whether the thread being evaluated is the IDLE
- * thread
+ * it is used to know whether the thread the IDLE thread or a normal thread
  */
 #define Z_THREAD_STATE_IDLE (3 << Z_THREAD_STATE_POS)
 

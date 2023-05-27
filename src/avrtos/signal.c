@@ -12,13 +12,19 @@
 
 #define K_MODULE K_MODULE_SIGNAL
 
-void k_signal_init(struct k_signal *sig)
+int8_t k_signal_init(struct k_signal *sig)
 {
-	__ASSERT_NOTNULL(sig);
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!sig) {
+		return -EINVAL;
+	}
+#endif
 
 	sig->signal = 0u;
 	sig->flags  = K_POLL_STATE_NOT_READY;
 	dlist_init(&sig->waitqueue);
+
+	return 0;
 }
 
 struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value)
@@ -73,5 +79,3 @@ uint8_t k_poll_cancel_wait(struct k_signal *sig)
 
 	return ret;
 }
-
-/*___________________________________________________________________________*/

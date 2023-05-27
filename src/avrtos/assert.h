@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+#include "kernel_internals.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -18,6 +20,7 @@ extern "C" {
 #include <avrtos/sys.h>
 #include <util/atomic.h>
 
+// modules
 #define K_MODULE_KERNEL	  1
 #define K_MODULE_ARCH	  2
 #define K_MODULE_SYSCLOCK 3
@@ -39,6 +42,7 @@ extern "C" {
 
 #define K_MODULE_APPLICATION 32
 
+// assertions codes
 #define K_ASSERT_UNDEFINED 0
 #define K_ASSERT_ANY	   0
 
@@ -63,6 +67,11 @@ extern "C" {
 #define K_ASSERT_USER_MODE   21
 #define K_ASSERT_KERNEL_MODE 22
 
+#define K_ASSERT_THREAD_READY	23
+#define K_ASSERT_THREAD_PENDING 24
+#define K_ASSERT_THREAD_STOPPED 25
+#define K_ASSERT_THREAD_IDLE	26
+
 #define K_ASSERT_UNDEFINED_LINE 0u
 
 #if CONFIG_KERNEL_ASSERT
@@ -77,8 +86,6 @@ extern "C" {
 
 #define K_ASSERT(_acode, _assertion) __ASSERT(_acode, _assertion)
 #define K_ASSERT_APP(_assertion)     __ASSERT_APP(_assertion)
-
-extern bool z_interrupts(void);
 
 #define __ASSERT_TRUE(test)  __ASSERT(K_ASSERT_TRUE, (test) != 0)
 #define __ASSERT_FALSE(test) __ASSERT(K_ASSERT_FALSE, (test) == 0)

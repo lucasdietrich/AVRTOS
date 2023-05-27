@@ -17,8 +17,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Structure representing a mutex, "lock" parameter tells
  * if the current is locked or not (0 if lock, 0xFF otherwise).
@@ -32,8 +30,6 @@ struct k_mutex {
 	struct k_thread *owner;
 };
 
-/*___________________________________________________________________________*/
-
 #define K_MUTEX_INIT(mutex)                                                            \
 	{                                                                              \
 		.lock = 0xFFu, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL \
@@ -41,14 +37,12 @@ struct k_mutex {
 
 #define K_MUTEX_DEFINE(mutex_name) struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize a mutex
  *
  * @param mutex address of the mutex structure
  */
-void k_mutex_init(struct k_mutex *mutex);
+int8_t k_mutex_init(struct k_mutex *mutex);
 
 /**
  * @brief Lock a mutex, return immediately if mutex is available,
@@ -94,8 +88,6 @@ __kernel struct k_thread *k_mutex_unlock(struct k_mutex *mutex);
 /* concept */
 __kernel int8_t k_mutex_cancel_wait(struct k_mutex *mutex);
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Arch lock a mutex, doesn't clear the interrupt flag (if set)
  * and set it to its original state when finished.
@@ -111,8 +103,6 @@ uint8_t z_mutex_lock(struct k_mutex *mutex);
  * @param mutex
  */
 struct k_thread *z_mutex_unlock(struct k_mutex *mutex);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

@@ -16,23 +16,16 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 struct k_msgq {
-	struct dnode waitqueue;
-
-	size_t msg_size;
-	uint8_t max_msgs;
-	uint8_t used_msgs;
-
+	struct dnode waitqueue; /* waitqueue for threads waiting for a message */
+	size_t msg_size;	/* Size of a message */
+	uint8_t max_msgs;	/* Maximum number of messages */
+	uint8_t used_msgs;	/* Number of used messages */
 	void *buf_start;
 	void *buf_end;
-
 	void *read_cursor;
 	void *write_cursor;
 };
-
-/*___________________________________________________________________________*/
 
 #define K_MSGQ_INIT(_name, _buffer, _msg_size, _max_msgs)                               \
 	{                                                                               \
@@ -46,8 +39,6 @@ struct k_msgq {
 	uint8_t z_msgq_buf_##_name[(_msg_size) * (_max_msgs)]; \
 	struct k_msgq _name = K_MSGQ_INIT(_name, z_msgq_buf_##_name, _msg_size, _max_msgs)
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize a MsgQ
  *
@@ -56,10 +47,10 @@ struct k_msgq {
  * @param msg_size
  * @param max_msgs
  */
-__kernel void k_msgq_init(struct k_msgq *msgq,
-			  char *buffer,
-			  size_t msg_size,
-			  uint32_t max_msgs);
+__kernel int8_t k_msgq_init(struct k_msgq *msgq,
+			    char *buffer,
+			    size_t msg_size,
+			    uint32_t max_msgs);
 
 /**
  * @brief Try to append the message @a data to the MsgQ @a msgq.
@@ -124,8 +115,6 @@ __kernel uint8_t k_msgq_num_free_get(struct k_msgq *msgq);
  * @return Number of used messages in the MsgQ
  */
 __kernel uint8_t k_msgq_num_used_get(struct k_msgq *msgq);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

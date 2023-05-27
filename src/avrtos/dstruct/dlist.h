@@ -14,8 +14,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Doubly linked list data structure
  * - O(1) queue/dequeue/insertion/deletion complexity.
@@ -29,8 +27,6 @@ extern "C" {
  * - a dnode is not in the list if next == null && prev == null
  * - poping the last element of the runqueue doesn't have no any effect
  */
-
-/*___________________________________________________________________________*/
 
 struct dnode {
 	union {
@@ -76,16 +72,12 @@ typedef struct dnode dlist_t;
 #define DITEM_NEXT(_list, _node)  (_node->next)
 #define DITEM_PREV(_list, _node)  (_node->prev)
 
-/*___________________________________________________________________________*/
-
 #define DLIST_FOREACH(_list, _node) \
 	for (_node = _list->head; _node != _list; _node = _node->next)
 
 #define DLIST_FOREACH_SAFE(_list, _tmp, _node)                        \
 	for (_node = _list->head, _tmp = _list->head; _node != _list; \
 	     _node = _node->next, _tmp = _node)
-
-/*___________________________________________________________________________*/
 
 /**
  * @brief Initialize a doubly linked list
@@ -149,8 +141,6 @@ bool dlist_is_empty(struct dnode *list);
  * @return uint8_t
  */
 uint8_t dlist_count(struct dnode *list);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

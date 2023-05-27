@@ -21,11 +21,7 @@ K_THREAD_DEFINE(thread2, thread, 0x100, K_PREEMPTIVE, NULL, '2');
 K_THREAD_DEFINE(thread3, thread, 0x100, K_PREEMPTIVE, NULL, '3');
 K_THREAD_DEFINE(thread4, threadp, 0x100, K_PREEMPTIVE, NULL, '4');
 
-/*___________________________________________________________________________*/
-
 K_MUTEX_DEFINE(mymutex);
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -84,5 +80,3 @@ void threadp(void *p)
 
 	k_sleep(K_FOREVER);
 }
-
-/*___________________________________________________________________________*/

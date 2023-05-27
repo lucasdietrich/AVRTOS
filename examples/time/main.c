@@ -25,7 +25,7 @@ int main(void)
 
 	k_thread_dump_all();
 
-	_delay_ms(2000);
+	// _delay_ms(2000);
 
 	irq_enable();
 

@@ -18,8 +18,6 @@ extern "C" {
  * @brief Requires additionnal stack (IDLE thread for example)
  */
 
-/*___________________________________________________________________________*/
-
 struct k_timer;
 
 /**
@@ -50,8 +48,6 @@ struct k_timer {
 
 #define K_TIMER_STOPPED ((k_delta_t)-1)
 
-/*___________________________________________________________________________*/
-
 __kernel void z_timer_init_module(void);
 
 __kernel void z_timers_process(void);
@@ -68,8 +64,6 @@ __kernel bool k_timer_started(struct k_timer *timer);
 __kernel int8_t k_timer_stop(struct k_timer *timer);
 
 __kernel int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

@@ -17,8 +17,6 @@
 // we need to insert i beetween A and B in order to have :
 // 0 |-- A(10) -- E(15) -- B(15) -- C(0) -- D(10)
 
-/*___________________________________________________________________________*/
-
 void z_tqueue_schedule(struct titem **root, struct titem *item)
 {
 	struct titem **prev_next_p = root;
@@ -114,5 +112,3 @@ void tqueue_remove(struct titem **root, struct titem *item)
 		prev_next_p = &(p_current->next);
 	}
 }
-
-/*___________________________________________________________________________*/

@@ -48,6 +48,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 		       size_t block_size,
 		       uint8_t num_blocks)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (buffer == NULL) {
 		return -EINVAL;
 	}
@@ -58,6 +59,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 	if ((block_size < 2) || (num_blocks == 0)) {
 		return -EINVAL;
 	}
+#endif
 
 	dlist_init(&slab->waitqueue);
 

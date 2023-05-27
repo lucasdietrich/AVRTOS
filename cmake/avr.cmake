@@ -9,6 +9,10 @@ find_program(AVR_CXX avr-g++ REQUIRED)
 find_program(AVR_OBJCOPY avr-objcopy REQUIRED)
 find_program(AVR_SIZE_TOOL avr-size REQUIRED)
 find_program(AVR_OBJDUMP avr-objdump REQUIRED)
+find_program(AVR_READELF avr-readelf REQUIRED)
+find_program(AVR_NM avr-nm REQUIRED)
+find_program(AVR_SIZE avr-size REQUIRED)
+find_program(QEMU_SYSTEM_AVR qemu-system-avr REQUIRED)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR avr)
@@ -21,7 +25,11 @@ set(CMAKE_GENERATOR "Unix Makefiles")
 set(VERBOSITY "") # --verbose
 
 # -Werror 
-set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -fno-fat-lto-objects -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fdata-sections -ffunction-sections -fno-split-wide-types -fno-tree-scev-cprop -flto")
+set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -fno-fat-lto-objects \
+    -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
+    -fdata-sections -ffunction-sections -fno-split-wide-types \
+    -fno-tree-scev-cprop -flto"
+)
 # -Wall -Wno-main -Wundef -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fdata-sections -ffunction-sections -fno-split-wide-types -fno-tree-scev-cprop
 
 set(DEBUG_FLAGS "-Og -g -gdwarf-3 -gstrict-dwarf")
@@ -38,10 +46,6 @@ set(CMAKE_ASM_FLAGS_RELEASE ${RELEASE_FLAGS})
 set(CMAKE_C_FLAGS "${OBJECT_GEN_FLAGS} -Wstrict-prototypes -std=gnu11 " CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=gnu++11 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
-
-set(CMAKE_EXE_LINKER_FLAGS
-	"${VERBOSITY} -mmcu=${MCU} -Wl,--gc-sections -Wl,-Map,map.out -T${LINKER_SCRIPT} -lc -lm -lgcc -Wl,--print-memory-usage"
-)
 
 file(GLOB_RECURSE AVRTOS_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.c**")
 file(GLOB_RECURSE AVRTOS_ASM_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.S")
@@ -66,6 +70,19 @@ function(target_link_avrtos target)
 endfunction()
 
 function(target_prepare_env target)
+	target_link_options(
+		${target} PUBLIC
+		${VERBOSITY}
+		-mmcu=${MCU}
+		-Wl,--gc-sections
+		-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/map.out
+		-T${LINKER_SCRIPT}
+		-lc
+		-lm
+		-lgcc
+		-Wl,--print-memory-usage
+	)
+
 	# get target output name
 	get_target_property(output_name ${target} OUTPUT_NAME)
 	if (output_name STREQUAL "output_name-NOTFOUND")
@@ -74,53 +91,79 @@ function(target_prepare_env target)
 
 	set(ELF_PATH "${CMAKE_CURRENT_BINARY_DIR}/${output_name}")
 
+	# generate launch.json file
+	configure_file(
+		${CMAKE_CURRENT_FUNCTION_LIST_DIR}/qemu-avr-launch.json.in
+		${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json 
+		@ONLY
+	)
+
 	# create hex file
-	add_custom_target(hex_${target} ALL avr-objcopy -R .eeprom -O ihex ${output_name} ${output_name}.hex 
+	add_custom_target(
+		hex_${target} 
+		ALL
+		avr-objcopy -R .eeprom -O ihex ${output_name} ${output_name}.hex 
 		DEPENDS ${target}
 	)
-
+		
 	# add upload command
-	add_custom_target(upload_${target} avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
+	add_custom_target(
+		upload_${target} 
+		avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
 		DEPENDS hex_${target}
 	)
-	
-	if (DEFINED ENABLE_SINGLE_SAMPLE)
-		add_custom_target(upload avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
-			DEPENDS hex_${target}
-		)
-	endif()
-	
-	# monitor command
-	# add_custom_target(monitor_${target} python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}")
 
-	# generate launch.json file
-	configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/qemu-avr-launch.json.in ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json @ONLY)
+	# add monitor command
+	add_custom_target(
+		monitor_${target} 
+		COMMAND echo "Press Ctrl-T + Q to exit" && python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}" --raw --eol LF
+		USES_TERMINAL
+	)
 
 	if (QEMU)
-		# generate custom target for debug in qemu
+		# generate custom target for debug in qemu:
+		# - Use console: https://stackoverflow.com/questions/76005036/how-can-i-make-custom-commands-and-targets-flush-their-output-immediately-instea/76005037#76005037
+		# - Regenerate and copy launch.json each time we run the target
 		add_custom_target(qemu_${target} 
 			COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json
-			COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic
-			DEPENDS ${target})
+			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic
+			USES_TERMINAL 
+			DEPENDS 
+				${target} 
+				${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json
+		)
 
 		# generate custom target for run in qemu
 		add_custom_target(run_${target} 
-			COMMAND qemu-system-avr -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic
+			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic
+			USES_TERMINAL 
 			DEPENDS ${target}
 		)
 	endif()
 
+	if (DEFINED ENABLE_SINGLE_SAMPLE)
+		add_custom_target(upload DEPENDS upload_${target})
+		add_custom_target(monitor  DEPENDS monitor_${target})
+
+		if (QEMU)
+			add_custom_target(qemu DEPENDS qemu_${target})
+			add_custom_target(run_qemu DEPENDS run_${target})
+		endif()
+	endif()
+
+	# disassembly + debug info
 	add_custom_command(TARGET ${target} POST_BUILD
-		COMMAND avr-objdump -S ${output_name} > objdump_src.s VERBATIM
-		COMMAND avr-objdump -d ${output_name} > objdump.s VERBATIM
-		COMMAND avr-objdump -D ${output_name} > objdump_all.s VERBATIM
-		COMMAND avr-objdump -h ${output_name} > objdump_sections.s VERBATIM
-		COMMAND avr-readelf -a ${output_name} > readelf.txt VERBATIM
-		COMMAND avr-readelf -x .data ${output_name} > section_data.txt VERBATIM
-		COMMAND avr-readelf -x .bss ${output_name} > section_bss.txt VERBATIM
-		COMMAND avr-readelf -x .noinit ${output_name} > section_noinit.txt VERBATIM
-		COMMAND avr-readelf -x .text ${output_name} > section_text.txt VERBATIM
-		COMMAND avr-nm --print-size --size-sort --radix=x ${output_name} > nm.txt VERBATIM
+		COMMAND ${AVR_OBJDUMP} -S ${output_name} > objdump_src.s VERBATIM
+		COMMAND ${AVR_OBJDUMP} -d ${output_name} > objdump.s VERBATIM
+		COMMAND ${AVR_OBJDUMP} -D ${output_name} > objdump_all.s VERBATIM
+		COMMAND ${AVR_OBJDUMP} -h ${output_name} > objdump_sections.s VERBATIM
+		COMMAND ${AVR_READELF} -a ${output_name} > readelf.txt VERBATIM
+		COMMAND ${AVR_READELF} -x .data ${output_name} > section_data.txt VERBATIM
+		COMMAND ${AVR_READELF} -x .bss ${output_name} > section_bss.txt VERBATIM
+		COMMAND ${AVR_READELF} -x .noinit ${output_name} > section_noinit.txt VERBATIM
+		COMMAND ${AVR_READELF} -x .text ${output_name} > section_text.txt VERBATIM
+		COMMAND ${AVR_NM} --print-size --size-sort --radix=x ${output_name} > nm.txt VERBATIM
+		COMMAND ${AVR_SIZE} --mcu=${MCU} -C ${output_name} > size.txt VERBATIM
 		DEPENDS ${output_name}
 	)
 endfunction()

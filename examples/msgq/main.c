@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -15,14 +13,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-/*___________________________________________________________________________*/
-
 #define BLOCKS_COUNT 10
 #define BLOCK_SIZE   0x20
 
 K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
-
-/*___________________________________________________________________________*/
 
 #define WRITER_TIMEOUT 500
 #define WRITER_DELAY   250
@@ -39,8 +33,6 @@ K_THREAD_DEFINE(w0, writer, 0x50, K_PREEMPTIVE, &msgq, 'w');
 K_THREAD_DEFINE(w1, writer, 0x50, K_PREEMPTIVE, &msgq, 'W');
 K_THREAD_DEFINE(r0, reader, 0x50, K_PREEMPTIVE, &msgq, 'r');
 K_THREAD_DEFINE(r1, reader, 0x50, K_PREEMPTIVE, &msgq, 'R');
-
-/*___________________________________________________________________________*/
 
 void writer(struct k_msgq *msgq)
 {
@@ -106,4 +98,3 @@ int main(void)
 	}
 }
 
-/*___________________________________________________________________________*/

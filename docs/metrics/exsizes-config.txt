@@ -1,0 +1,2 @@
+toolchain: cmake/avr6-atmega2560.cmake
+build type: Release

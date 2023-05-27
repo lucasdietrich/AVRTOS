@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -14,8 +12,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-/*___________________________________________________________________________*/
 
 #define CRASH_TEST 1
 
@@ -27,11 +23,7 @@
 #define PERIOD_SEM_TAKE 1000
 #endif
 
-/*___________________________________________________________________________*/
-
 void waiter_entry(void *);
-
-/*___________________________________________________________________________*/
 
 K_SEM_DEFINE(mysem, 5, 5);
 K_THREAD_DEFINE(waiter1, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'A');
@@ -39,8 +31,6 @@ K_THREAD_DEFINE(waiter2, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'B');
 K_THREAD_DEFINE(waiter3, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'C');
 K_THREAD_DEFINE(waiter4, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'D');
 K_THREAD_DEFINE(waiter5, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'E');
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -84,5 +74,3 @@ void waiter_entry(void *context)
 		}
 	}
 }
-
-/*___________________________________________________________________________*/

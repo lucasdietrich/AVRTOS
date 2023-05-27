@@ -6,7 +6,7 @@ from colorama import Fore, Style
 if __name__ == "__main__":
     print("Generating Arduino samples from ArduinoPIO ...")
 
-    # Match "ArduinoPIO*" and store reste (*) in group "name"
+    # Match "ArduinoPIO*" and store rest (*) in group "name"
     re_arduino_pio = re.compile(r"ArduinoPIO(?P<name>.*)")
 
     for example in os.listdir("./examples"):

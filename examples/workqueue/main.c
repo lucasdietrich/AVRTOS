@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -16,8 +14,6 @@
 #include <util/delay.h>
 
 #define WORKQ_RUNTIME_INIT 0
-
-/*___________________________________________________________________________*/
 
 void tasks_generator(void *p);
 void tasks_handler(void *p);
@@ -31,8 +27,6 @@ uint8_t workqueue_stack[0x200];
 #else
 K_WORKQUEUE_DEFINE(workqueue, 0x200, K_PREEMPTIVE, 'W');
 #endif
-
-/*___________________________________________________________________________*/
 
 struct task_t {
 	struct k_work work;
@@ -61,8 +55,6 @@ void task_handler(struct k_work *self)
 
 #define TASKS_COUNT 15
 struct task_t tasks[TASKS_COUNT];
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -104,5 +96,3 @@ void tasks_generator(void *p)
 		i = (i + 1) % ARRAY_SIZE(tasks);
 	}
 }
-
-/*___________________________________________________________________________*/

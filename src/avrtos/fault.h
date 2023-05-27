@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 
+// fault codes
 #define K_FAULT_ASSERT	    0
 #define K_FAULT_SENTINEL    1
 #define K_FAULT_MEMORY	    2

@@ -101,14 +101,12 @@ void spi_transceive_buf(char *rxtx, uint8_t len)
 
 static inline void slave_select(const struct spi_slave *slave)
 {
-	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_state);
+	gpio_pin_write_state(slave->cs_port, slave->cs_pin, slave->active_state);
 }
 
 static inline void slave_unselect(const struct spi_slave *slave)
 {
-	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     1u - slave->active_state);
+	gpio_pin_write_state(slave->cs_port, slave->cs_pin, 1u - slave->active_state);
 }
 
 int8_t spi_slave_init(struct spi_slave *slave,
@@ -196,7 +194,7 @@ int8_t spi_tranceive_async(char first_tx, spi_callback_t callback)
 	if (spi_async_inprogress()) return -EBUSY;
 
 	spi_callback = callback;
-	SPI->SPDRn = first_tx;
+	SPI->SPDRn   = first_tx;
 	SPI->SPCRn |= BIT(SPIE);
 
 	return 0;

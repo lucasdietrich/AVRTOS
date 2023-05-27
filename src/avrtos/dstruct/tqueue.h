@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Scheduling queue data structure
  *
@@ -26,8 +24,6 @@ extern "C" {
  *
  * TODO tqueue_remove could be optimized to O(1), using a doubly linked list
  */
-
-/*___________________________________________________________________________*/
 
 struct titem {
 	union {
@@ -51,8 +47,6 @@ struct titem {
 #define INIT_TITEM_DEFAULT() INIT_TITEM(0)
 
 #define DEFINE_TITEM(name) struct titem name = INIT_TITEM_DEFAULT()
-
-/*___________________________________________________________________________*/
 
 /**
  * @brief Schedule an event by adding it to the list.
@@ -143,8 +137,6 @@ struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout);
  * @param item Item to remove if exists in the time queue.
  */
 void tqueue_remove(struct titem **root, struct titem *item);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

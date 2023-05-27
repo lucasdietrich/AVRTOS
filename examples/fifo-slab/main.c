@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/dstruct/debug.h>
 #include <avrtos/kernel.h>
@@ -16,11 +14,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-/*___________________________________________________________________________*/
-
 #define MEM_SLAB_COMPILATION_TIME 1
-
-/*___________________________________________________________________________*/
 
 struct block {
 	struct snode tie;
@@ -46,8 +40,6 @@ void block_write(uint8_t *buffer, uint16_t size, uint8_t symb)
 	}
 }
 
-/*___________________________________________________________________________*/
-
 void consumer_thread(void *);
 
 K_FIFO_DEFINE(fifo);
@@ -59,8 +51,6 @@ K_MEM_SLAB_DEFINE(myslab, BLOCK_SIZE, BLOCK_COUNT);
 uint8_t buffer[BLOCK_SIZE * BLOCK_COUNT];
 struct k_mem_slab myslab;
 #endif
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -110,5 +100,3 @@ void consumer_thread(void *context)
 		k_sleep(K_SECONDS(1));
 	}
 }
-
-/*___________________________________________________________________________*/

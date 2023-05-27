@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -15,20 +13,14 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-/*___________________________________________________________________________*/
-
 void waiting_thread(void *p);
 void monitoring_thread(void *p);
 
 K_THREAD_DEFINE(waiting, waiting_thread, 0x200, K_PREEMPTIVE, NULL, 'W');
 K_THREAD_DEFINE(monitoring, monitoring_thread, 0x200, K_PREEMPTIVE, NULL, 'R');
 
-/*___________________________________________________________________________*/
-
 K_FIFO_DEFINE(myfifo);
 K_MEM_SLAB_DEFINE(myslab, 2u + 1u, 10u);
-
-/*___________________________________________________________________________*/
 
 static uint8_t usart_read_rx(void)
 {
@@ -110,5 +102,3 @@ void monitoring_thread(void *p)
 		k_dump_stack_canaries();
 	}
 }
-
-/*___________________________________________________________________________*/

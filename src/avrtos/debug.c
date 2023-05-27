@@ -15,12 +15,8 @@
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
 
-/*___________________________________________________________________________*/
-
-extern struct dnode *z_runqueue;
-extern struct titem *z_events_queue;
-
-/*___________________________________________________________________________*/
+extern struct dnode *z_runq;
+extern struct titem *z_timeouts_queue;
 
 uint16_t k_thread_usage(struct k_thread *thread)
 {
@@ -129,8 +125,6 @@ void *z_thread_get_return_addr(struct k_thread *thread)
 	return NULL;
 }
 
-/*___________________________________________________________________________*/
-
 void z_thread_symbol_runqueue(struct dnode *item)
 {
 	serial_transmit(CONTAINER_OF(item, struct k_thread, tie.runqueue)->symbol);
@@ -148,10 +142,8 @@ void z_print_runqueue(void)
 
 void z_print_events_queue(void)
 {
-	print_tqueue(z_events_queue, z_thread_symbol_events_queue);
+	print_tqueue(z_timeouts_queue, z_thread_symbol_events_queue);
 }
-
-/*___________________________________________________________________________*/
 
 void z_sem_debug(struct k_sem *sem)
 {
@@ -169,5 +161,3 @@ void z_sem_debug(struct k_sem *sem)
 	serial_u8(limit);
 	serial_transmit('\n');
 }
-
-/*___________________________________________________________________________*/

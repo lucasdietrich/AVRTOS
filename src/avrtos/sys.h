@@ -7,7 +7,7 @@
 #ifndef _AVRTOS_COMMON_H
 #define _AVRTOS_COMMON_H
 
-/*___________________________________________________________________________*/
+/* misc */
 
 #define Z_STRINGIFY(x) #x
 #define STRINGIFY(s)   Z_STRINGIFY(s)
@@ -15,7 +15,7 @@
 #define _DO_CONCAT(x, y) x##y
 #define _CONCAT(x, y)	 _DO_CONCAT(x, y)
 
-/*___________________________________________________________________________*/
+#define ARG_UNUSED(arg) ((void)arg)
 
 /* Compiler specific */
 
@@ -33,7 +33,7 @@
 #define __STATIC_ASSERT_NOMSG(test_for_true) \
 	__static_assert(test_for_true, "(" #test_for_true ") failed")
 
-/*___________________________________________________________________________*/
+/* bits manipulation */
 
 #define HTONL(n)                                                             \
 	((((((uint32_t)(n)&0xFF)) << 24) | ((((uint32_t)(n)&0xFF00)) << 8) | \
@@ -54,8 +54,6 @@
 #define SET_BIT(x, b)  ((x) |= b)
 #define CLR_BIT(x, b)  ((x) &= (~(b)))
 #define TEST_BIT(x, b) ((bool)((x)&b))
-
-#define ARG_UNUSED(arg) ((void)arg)
 
 #define IN_RANGE(x, a, b) ((x >= a) && (x <= b))
 
@@ -81,7 +79,5 @@
 #define sys_ptr_diff(a, b)	     ((uint16_t)((char *)(a) - (char *)(b)))
 #define sys_ptr_add(ptr, offset)     ((void *)((char *)(ptr) + (offset)))
 #define sys_ptr_shift(ptr_p, offset) (*(ptr_p) = sys_ptr_add(*(ptr_p), offset))
-
-/*___________________________________________________________________________*/
 
 #endif

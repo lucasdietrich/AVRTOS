@@ -67,13 +67,13 @@ typedef enum {
 /* Leading edge */
 typedef enum {
 	SPI_CLOCK_POLARITY_RISING  = 0u, /* CPOL = 0, SCK is low when idle */
-	SPI_CLOCK_POLARITY_FALLING = 1u /* CPOL = 1, SCK is high when idle */
+	SPI_CLOCK_POLARITY_FALLING = 1u	 /* CPOL = 1, SCK is high when idle */
 } spi_clock_polarity_t;
 
 /* Leading edge */
 typedef enum {
 	SPI_CLOCK_PHASE_SAMPLE = 0u, /* CPHA = 0, sample on leading edge */
-	SPI_CLOCK_PHASE_SETUP  = 1u /* CPHA = 1, sample on trailing edge */
+	SPI_CLOCK_PHASE_SETUP  = 1u  /* CPHA = 1, sample on trailing edge */
 } spi_clock_phase_t;
 
 struct spi_config {

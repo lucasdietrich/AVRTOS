@@ -11,11 +11,19 @@
 
 extern uint8_t z_kernel_mode;
 
-void z_assert_user_mode(void)
+#if CONFIG_KERNEL_ASSERT
+void z_assert_user_context(void)
 {
 	__assert(!z_kernel_mode, K_MODULE_KERNEL, K_ASSERT_USER_MODE,
 		 K_ASSERT_UNDEFINED_LINE);
 }
+
+void z_assert_thread_ready(struct k_thread *thread)
+{
+	__assert((thread->flags & Z_THREAD_STATE_MSK) == Z_THREAD_STATE_READY,
+		 K_MODULE_KERNEL, K_ASSERT_THREAD_READY, K_ASSERT_UNDEFINED_LINE);
+}
+#endif
 
 void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line)
 {

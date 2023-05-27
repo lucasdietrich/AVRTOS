@@ -17,12 +17,8 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 #define K_POLL_STATE_NOT_READY 0x00
 #define K_POLL_STATE_SIGNALED  0x01
-
-/*___________________________________________________________________________*/
 
 #define K_SIGNAL_INIT(sig)                                     \
 	{                                                      \
@@ -35,22 +31,18 @@ extern "C" {
 
 #define K_SIGNAL_SET_UNREADY(signal) (signal)->flags = K_POLL_STATE_NOT_READY
 
-/*___________________________________________________________________________*/
-
 struct k_signal {
 	uint8_t signal;
 	uint8_t flags;
 	struct dnode waitqueue;
 };
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize a signal object.
  *
  * @param sig
  */
-__kernel void k_signal_init(struct k_signal *sig);
+__kernel int8_t k_signal_init(struct k_signal *sig);
 
 /**
  * @brief Wake up the first thread (TODO all threads) polling on the signal.
@@ -81,8 +73,6 @@ __kernel int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
  * @return Number of threads that were woken up.
  */
 __kernel uint8_t k_poll_cancel_wait(struct k_signal *sig);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

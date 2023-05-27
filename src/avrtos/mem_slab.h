@@ -16,8 +16,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Implement a pool of memory blocks in RAM.
  *
@@ -39,8 +37,6 @@ extern "C" {
  * architectures)
  */
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Structure representing a memory slab.
  *
@@ -60,8 +56,6 @@ struct k_mem_slab {
 	struct dnode waitqueue;
 };
 
-/*___________________________________________________________________________*/
-
 #define K_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                   \
 	{                                                                          \
 		.buffer = _buf, .count = _blocks_count, .block_size = _block_size, \
@@ -75,8 +69,6 @@ struct k_mem_slab {
 	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                       \
 	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                    \
 		_slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
-
-/*___________________________________________________________________________*/
 
 /**
  * @brief This function is called on start up to initialize all memory
@@ -149,8 +141,6 @@ __kernel int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
  * @return The thread that was woken up or NULL if no thread was woken up.
  */
 __kernel struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

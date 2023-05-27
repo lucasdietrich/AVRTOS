@@ -10,17 +10,14 @@
 
 #define K_MODULE K_MODULE_IDLE
 
+extern struct dnode *z_runq;
 extern uint8_t z_ready_count;
-extern struct dnode *z_runqueue;
-
-extern bool z_runqueue_single(void);
 
 #if CONFIG_KERNEL_THREAD_IDLE
 
 static void z_thread_idle_entry(void *context);
-
 #if defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE != 0)
-#warning "QEMU doesn't support cooperative IDLE thread for now and I don't know why "
+#warning "QEMU doesn't work well with CONFIG_THREAD_IDLE_COOPERATIVE, TODO"
 #endif
 
 #if CONFIG_THREAD_IDLE_COOPERATIVE
@@ -102,5 +99,3 @@ void k_idle(void)
 #endif /* __QEMU__ */
 	}
 }
-
-/*___________________________________________________________________________*/

@@ -34,21 +34,15 @@
 
 // precize calculation : cycles, etc...
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 #include <util/delay.h>
 
-/*___________________________________________________________________________*/
-
 void thread_led(void *p);
 
 K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'O');
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -74,5 +68,3 @@ void thread_led(void *p)
 		k_yield();
 	}
 }
-
-/*___________________________________________________________________________*/

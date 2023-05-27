@@ -7,8 +7,6 @@
 #ifndef _AVRTOS_MULTITHREADING_H
 #define _AVRTOS_MULTITHREADING_H
 
-/*___________________________________________________________________________*/
-
 #include "defines.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
@@ -18,8 +16,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -183,18 +179,6 @@ struct k_thread {
 };
 
 /**
- * @brief Main thread structure, defined in z_threads section
- */
-extern struct k_thread z_thread_main;
-
-/**
- * @brief Contain the address of the thread currently running.
- */
-extern struct k_thread *z_current;
-
-/*___________________________________________________________________________*/
-
-/**
  * @brief Define a new thread at runtime and initialize its stack
  *
  * @param thread hread structure pointer
@@ -214,11 +198,17 @@ int8_t k_thread_create(struct k_thread *thread,
 		       void *context_p,
 		       char symbol);
 
-/*___________________________________________________________________________*/
+/**
+ * @brief Thread entry point function.
+ *
+ * This function serves as the entry point for a new thread. It is responsible for
+ * executing the code within the thread and receives a context pointer as an argument.
+ *
+ * @param context A pointer to the context data for the thread.
+ */
+void z_thread_entry(void *context);
 
-void z_thread_entry(void);
-
-/*___________________________________________________________________________*/
+extern struct k_thread *z_current;
 
 /**
  * @brief Get current thread
@@ -227,9 +217,10 @@ void z_thread_entry(void);
  *
  * @return thread_t*
  */
-struct k_thread *k_thread_current(void);
-
-/*___________________________________________________________________________*/
+static inline struct k_thread *k_thread_current(void)
+{
+	return z_current;
+}
 
 #ifdef __cplusplus
 }

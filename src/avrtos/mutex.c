@@ -13,13 +13,22 @@
 
 #define K_MODULE K_MODULE_MUTEX
 
-void k_mutex_init(struct k_mutex *mutex)
-{
-	__ASSERT_NOTNULL(mutex);
+#define Z_MUTEX_UNLOCKED_VALUE 0x01u
+#define Z_MUTEX_LOCKED_VALUE   0x00u
 
-	mutex->lock  = 0xFFu;
+int8_t k_mutex_init(struct k_mutex *mutex)
+{
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!mutex) {
+		return -EINVAL;
+	}
+#endif
+
+	mutex->lock  = Z_MUTEX_UNLOCKED_VALUE;
 	mutex->owner = NULL;
 	dlist_init(&mutex->waitqueue);
+
+	return 0;
 }
 
 int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
@@ -29,8 +38,8 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	int8_t lock	  = 0;
 	const uint8_t key = irq_lock();
 
-	if (mutex->lock != 0x00) {
-		mutex->lock = 0x00;
+	if (mutex->lock != Z_MUTEX_LOCKED_VALUE) {
+		mutex->lock = Z_MUTEX_LOCKED_VALUE;
 	} else {
 		lock = z_pend_current(&mutex->waitqueue, timeout);
 	}
@@ -69,7 +78,7 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 		/* no new owner, we need to unlock
 		 * the mutex and remove the owner
 		 */
-		mutex->lock  = 0xFFu;
+		mutex->lock  = Z_MUTEX_UNLOCKED_VALUE;
 		mutex->owner = NULL;
 	}
 

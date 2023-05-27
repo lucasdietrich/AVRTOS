@@ -10,6 +10,78 @@
 #include "kernel.h"
 
 /**
+ * @brief Set the state of a thread.
+ *
+ * This function sets the state of a thread by updating the corresponding flags.
+ *
+ * @param thread Pointer to the thread structure.
+ * @param state The new state of the thread.
+ */
+static inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
+{
+	thread->flags =
+		(thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
+}
+
+/**
+ * @brief Get the state of a thread.
+ *
+ * This function retrieves the state of a thread by extracting the relevant bits from the
+ * flags.
+ *
+ * @param thread Pointer to the thread structure.
+ * @return The state of the thread.
+ */
+static inline uint8_t z_get_thread_state(struct k_thread *thread)
+{
+	return thread->flags & Z_THREAD_STATE_MSK;
+}
+
+/**
+ * @def THREAD_IS_IDLE(_thread)
+ * @brief Checks if a thread is the idle thread.
+ *
+ * This macro checks whether a given thread pointer corresponds to the idle thread.
+ * The idle thread is a special system thread that runs when no other threads are eligible
+ * for execution.
+ *
+ * @param _thread Pointer to the thread structure to be checked.
+ * @return 1 if the thread is the idle thread, 0 otherwise.
+ */
+#if CONFIG_KERNEL_THREAD_IDLE
+#define THREAD_IS_IDLE(_thread) (_thread == &z_thread_idle)
+#else
+#define THREAD_IS_IDLE(_thread) (0)
+#endif
+
+/**
+ * @def THREAD_IS_MAIN(_thread)
+ * @brief Checks if a thread is the main thread.
+ *
+ * This macro checks whether a given thread pointer corresponds to the main thread.
+ *
+ * @param _thread Pointer to the thread structure to be checked.
+ * @return 1 if the thread is the main thread, 0 otherwise.
+ */
+#define THREAD_IS_MAIN(_thread) (_thread == &z_thread_main)
+
+/**
+ * @brief Perform a thread switch (assembly function).
+ *
+ * This function performs a context switch between two threads. The steps involved in the
+ * thread switch are as follows:
+ *
+ * 1. Save the context of the first thread.
+ * 2. Store the stack pointer (SP) of the first thread to its structure.
+ * 3. Restore the stack pointer (SP) of the second thread from its structure.
+ * 4. Restore the context of the second thread.
+ *
+ * @param from Pointer to the thread structure of the first thread.
+ * @param to Pointer to the thread structure of the second thread.
+ */
+extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
+
+/**
  * @brief Make the current thread waiting/pending for an object being available.
  *
  * Suspend the thread and add it to the waitqueue.
@@ -92,5 +164,13 @@ __kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue);
  * @param thread
  */
 __kernel void z_wake_up(struct k_thread *thread);
+
+/**
+ * @brief Helper function
+ *
+ * @return true, interrupt flag is set
+ * @return false, interrupt flag is cleared
+ */
+bool z_interrupts(void);
 
 #endif /* _AVRTOS_KERNEL_INTERNALS_H */

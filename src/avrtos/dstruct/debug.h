@@ -11,38 +11,26 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
+#include "dlist.h"
+#include "slist.h"
+#include "tqueue.h"
 
 #include <avrtos/misc/serial.h>
-
-/*___________________________________________________________________________*/
-
-#include "slist.h"
 
 //
 // SList
 //
 void print_slist(struct slist *list, void (*qitem_printer)(struct snode *item));
 
-/*___________________________________________________________________________*/
-
-#include "dlist.h"
-
 //
 // DList
 //
 void print_dlist(struct dnode *dlist, void (*ditem_printer)(struct dnode *item));
 
-/*___________________________________________________________________________*/
-
-#include "tqueue.h"
-
 //
 // TQueue
 //
 void print_tqueue(struct titem *root, void (*titem_printer)(struct titem *item));
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

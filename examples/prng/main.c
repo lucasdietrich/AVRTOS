@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -14,8 +12,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-/*___________________________________________________________________________*/
 
 void thread(struct k_prng *prng);
 
@@ -27,8 +23,6 @@ K_PRNG_DEFINE(p4, 0xABCDEF12, 0x12345678);
 K_THREAD_DEFINE(t1, thread, 0x100, K_PREEMPTIVE, &p1, 'A');
 K_THREAD_DEFINE(t2, thread, 0x100, K_PREEMPTIVE, &p2, 'B');
 K_THREAD_DEFINE(t3, thread, 0x100, K_PREEMPTIVE, &p3, 'C');
-
-/*___________________________________________________________________________*/
 
 uint8_t buffer[256];
 
@@ -64,5 +58,3 @@ void thread(struct k_prng *prng)
 		k_sleep(K_MSEC(500));
 	}
 }
-
-/*___________________________________________________________________________*/

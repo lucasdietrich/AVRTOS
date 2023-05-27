@@ -12,10 +12,17 @@
 
 #define K_MODULE K_MODULE_FIFO
 
-void k_fifo_init(struct k_fifo *fifo)
+int8_t k_fifo_init(struct k_fifo *fifo)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!fifo) {
+		return -EINVAL;
+	}
+#endif
 	slist_init(&fifo->queue);
 	dlist_init(&fifo->waitqueue);
+
+	return 0;
 }
 
 struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item)

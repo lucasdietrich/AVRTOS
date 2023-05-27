@@ -4,12 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include "kernel.h"
 #include "multithreading.h"
-
-/*___________________________________________________________________________*/
 
 extern int main(void);
 
@@ -21,6 +17,25 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
 
 #endif
 
+/**
+ * @brief Main thread instance.
+ *
+ * This variable represents the main thread of the application.
+ *
+ * The field initializations are as follows:
+ * - `.sp`: Set to 0 to indicate that the main thread is running and no context
+ *   is currently saved.
+ * - `.flags`: Combination of flags indicating the state and priority of the
+ *   thread. The specific combination depends on the configuration options.
+ * - `.tie`: Contains the reference element for the thread in the runqueue.
+ * - `.wany`: Initialized to indicate that the thread is not pending on any events.
+ * - `.swap_data`: Set to NULL as there is no explicit swapping data associated with
+ *   the main thread.
+ * - `.stack`: Contains information about the thread's stack. The specific values
+ *   depend on the configuration options, such as whether an explicit stack is defined
+ *   or an implicit stack is used.
+ * - `.symbol`: Default symbol for the main thread, here set to 'M'.
+ */
 K_THREAD struct k_thread z_thread_main = {
 	.sp = 0,  // main thread is running, context already "restored"
 #if CONFIG_THREAD_MAIN_COOPERATIVE == 1
@@ -64,9 +79,14 @@ K_THREAD struct k_thread z_thread_main = {
 	.symbol = 'M'  // default main thread sumbol
 };
 
+/**
+ * @brief Pointer to the thread currently having the CPU (context set).
+ *
+ * @note there are cases where z_runq and z_current doesn't refer to the same thread
+ * this is because the next thread to be scheduled is already set but the context hasn't
+ * been switched yet.
+ */
 struct k_thread *z_current = &z_thread_main;
-
-/*___________________________________________________________________________*/
 
 static void z_thread_stack_create(struct k_thread *const thread,
 				  thread_entry_t entry,
@@ -104,9 +124,11 @@ int8_t k_thread_create(struct k_thread *thread,
 		       void *context_p,
 		       char symbol)
 {
-	if (stack_size < Z_THREAD_STACK_MIN_SIZE) {
-		return -1;
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!thread || !entry || !stack || stack_size < Z_THREAD_STACK_MIN_SIZE) {
+		return -EINVAL;
 	}
+#endif
 
 	thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
 	thread->stack.size = stack_size;
@@ -128,12 +150,3 @@ int8_t k_thread_create(struct k_thread *thread,
 
 	return 0;
 }
-
-/*___________________________________________________________________________*/
-
-inline struct k_thread *k_thread_current(void)
-{
-	return z_current;
-}
-
-/*___________________________________________________________________________*/

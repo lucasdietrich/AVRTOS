@@ -14,11 +14,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-/*___________________________________________________________________________*/
-
 #define K_MODULE K_MODULE_APPLICATION
-
-/*___________________________________________________________________________*/
 
 void consumer(void *context);
 
@@ -48,8 +44,6 @@ void free_mem(struct in *mem)
 {
 	k_mem_slab_free(&myslab, mem);
 }
-
-/*___________________________________________________________________________*/
 
 static inline void input(const char rx)
 {
@@ -117,8 +111,6 @@ void consumer(void *context)
 		k_mem_slab_free(&myslab, mem);
 	}
 }
-
-/*___________________________________________________________________________*/
 
 // IPC uart
 const struct usart_config usart_ipc_cfg PROGMEM = {.baudrate	= USART_BAUD_1000000,

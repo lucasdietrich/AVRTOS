@@ -69,8 +69,10 @@ static inline void input(const char rx)
 	case 0x1A: /* Ctrl + Z -> drop */
 		mem->len = 0;
 	case '\r':
-		/* ignore */
+		/* TODO: With QEMU, the \n is not received, so assume EOL on \r */
+#if !defined(__QEMU__)
 		break;
+#endif
 	case '\n': /* process the packet */
 		mem->buffer[mem->len] = '\0';
 		push(&mem);

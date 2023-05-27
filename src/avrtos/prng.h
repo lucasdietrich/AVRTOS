@@ -24,8 +24,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 struct k_prng {
 	uint32_t lfsr32;
 	uint32_t lfsr31;
@@ -49,15 +47,11 @@ struct k_prng {
 #define K_PRNG_DEFINE_DEFAULT(prng_name) \
 	K_PRNG_DEFINE(prng_name, K_PRNG_DEFAULT_LFSR32, K_PRNG_DEFAULT_LFSR31)
 
-/*___________________________________________________________________________*/
-
 __kernel uint16_t k_prng_get(struct k_prng *prng);
 
 __kernel uint32_t k_prng_get_u32(struct k_prng *prng);
 
 __kernel void k_prng_get_buffer(struct k_prng *prng, uint8_t *buffer, uint16_t len);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

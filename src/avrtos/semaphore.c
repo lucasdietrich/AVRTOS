@@ -11,11 +11,19 @@
 #include <avrtos/kernel_internals.h>
 #include <util/atomic.h>
 
-void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
+int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!sem || !limit) {
+		return -EINVAL;
+	}
+#endif
+
 	sem->limit = limit;
 	sem->count = MIN(limit, initial_count);
 	dlist_init(&sem->waitqueue);
+
+	return 0;
 }
 
 int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)

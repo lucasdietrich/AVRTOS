@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -14,8 +12,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-/*___________________________________________________________________________*/
 
 volatile uint16_t counter  = 0;
 volatile uint16_t counter2 = 0;
@@ -65,8 +61,6 @@ int main(void)
 	}
 }
 
-/*___________________________________________________________________________*/
-
 void handler1(struct k_timer *timer)
 {
 	counter++;
@@ -93,5 +87,3 @@ void thread2(void *context)
 	k_timer_stop(&mytimer1);
 	k_sleep(K_FOREVER);
 }
-
-/*___________________________________________________________________________*/

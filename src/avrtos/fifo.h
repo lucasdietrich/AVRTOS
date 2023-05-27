@@ -17,8 +17,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Structure representing a fifo.
  *
@@ -31,8 +29,6 @@ struct k_fifo {
 	struct dnode waitqueue;	 // waitqueue of thread pending to get an item
 };
 
-/*___________________________________________________________________________*/
-
 #define K_FIFO_INIT(fifo)                                                      \
 	{                                                                      \
 		.queue = SLIST_INIT(), .waitqueue = DLIST_INIT(fifo.waitqueue) \
@@ -40,14 +36,12 @@ struct k_fifo {
 
 #define K_FIFO_DEFINE(fifo_name) struct k_fifo fifo_name = K_FIFO_INIT(fifo_name)
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize a fifo if it wasn't defined using the macro K_FIFO_DEFINE.
  *
  * @param fifo
  */
-__kernel void k_fifo_init(struct k_fifo *fifo);
+__kernel int8_t k_fifo_init(struct k_fifo *fifo);
 
 /**
  * @brief Add an item to the fifo.
@@ -150,8 +144,6 @@ __kernel struct snode *k_fifo_peek_head(struct k_fifo *fifo);
  * @return  struct* tail item, NULL if empty
  */
 __kernel struct snode *k_fifo_peek_tail(struct k_fifo *fifo);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -14,8 +12,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-/*___________________________________________________________________________*/
 
 void task_handler(struct k_work *self)
 {
@@ -39,8 +35,6 @@ void task_handler(struct k_work *self)
 }
 
 K_WORK_DEFINE(work, task_handler);
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -66,5 +60,3 @@ int main(void)
 		/* some processing */
 	}
 }
-
-/*___________________________________________________________________________*/

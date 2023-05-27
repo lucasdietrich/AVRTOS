@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -14,8 +12,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-/*___________________________________________________________________________*/
 
 #define BLOCKS 9
 
@@ -38,8 +34,6 @@ K_THREAD_DEFINE(w8, thread, STACK_SIZE, THREAD_PRIO, NULL, '8');
 K_THREAD_DEFINE(time, thread_time, 0x80, K_COOPERATIVE, NULL, 'T');
 
 K_MEM_SLAB_DEFINE(myslab, 0x10, BLOCKS);
-
-/*___________________________________________________________________________*/
 
 static uint8_t ms(struct k_prng *prng)
 {

@@ -9,15 +9,10 @@
 
 #include <avrtos/defines.h>
 
-.global z_thread_switch
-.global z_thread_entry
-
-.extern z_scheduler
-.extern z_current
-.extern z_ticks 			; u32/u40
-.extern z_sched_ticks_remaining 	; u8
-.extern z_system_tick_inc
-
+/*
+ * Select the appropriate timer interrupt vector based on the
+ * configuration.
+ */
 #if CONFIG_KERNEL_SYSLOCK_HW_TIMER == 0
 #define TIMERn_COMPA_vect TIMER0_COMPA_vect
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 1
@@ -32,9 +27,29 @@
 #define TIMERn_COMPA_vect TIMER5_COMPA_vect
 #endif
 
+.global z_thread_switch
+.global z_thread_entry
+.global z_yield
+.global z_interrupts
 .global TIMERn_COMPA_vect
 
+.extern z_scheduler			; struct k_thread *(void)
+.extern z_current			; struct k_thread *
+.extern z_ticks 			; u32/u40
+.extern z_sched_ticks_remaining 	; u8
+.extern z_handle_timeouts		; void (void)
+.extern k_stop				; void (struct k_thread *)
+.extern __fault				; void (uint8_t)
+
+/*
+ * This is our system tick interrupt handler, which is called at
+ * the period specified by CONFIG_KERNEL_SYSCLOCK_PERIOD_US
+ */
 TIMERn_COMPA_vect:
+	/*
+	 * Save the registers that we are going to use for the increment
+	 * of the system tick counter.
+	 */
 	push	r1
 	push	r0
 	lds	r0, SREG
@@ -43,18 +58,23 @@ TIMERn_COMPA_vect:
 	push	r18
 
 #if CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	/*
+	 * Toggle the GPIO B pin specified by CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	 * on each system tick. 
+	 */
 	ldi 	r18, CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
 	sts 	PINB, r18
-#endif /* CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG */
+#endif
 
 #if CONFIG_KERNEL_TICKS_COUNTER
+	/*
+	 * Increment the system tick counter.
+	 */
 	ldi r18, 0x01			; 1 cycle
 
-	; TODO, check for first byte overflow, abd calculate the rest of the bytes
-	; if required
-	lds r0, z_ticks		; 2 cycles
+	lds r0, z_ticks			; 2 cycles
 	add r0, r18			; 1 cycle
-	sts z_ticks, r0		; 2 cycles
+	sts z_ticks, r0			; 2 cycles
 
 	lds r0, z_ticks + 1		; 2 cycles
 	adc r0, r1			; 1 cycle
@@ -69,22 +89,38 @@ TIMERn_COMPA_vect:
 	sts z_ticks + 3, r0		; 2 cycles
 
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
+	/*
+	 * In case we have a 40-bit counter, increment the upper 32:40 bits
+	 * of the counter.
+	 */
 	lds r0, z_ticks + 4		; 2 cycles
 	adc r0, r1			; 1 cycle
 	sts z_ticks + 4, r0		; 2 cycles
 #endif
-; CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 #endif
-; CONFIG_KERNEL_TICKS_COUNTER
 
 #if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+	/*
+	 * If the time slice is doesn't match the system tick period,
+	 * (i.e. is a multiple of the system tick period), decrement
+	 * the number of ticks remaining for the current thread.
+	 */
 	lds r18, z_sched_ticks_remaining
 	subi r18, 0x01
+
+	/*
+	 * If the number of ticks remaining is zero, we need to
+	 * call the scheduler to evaluate a possible thread switch.
+	 * 
+	 * Otherwise, we just exit the interrupt.
+	 */
 	sts z_sched_ticks_remaining, r18
 	brne __intctx_restore_minimal
 #endif 
-;CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 
+	/*
+	 * Save the rest of the registers
+	 */
 	push	r19
 	push	r20
 	push	r21
@@ -98,26 +134,39 @@ TIMERn_COMPA_vect:
 	push	r31
 
 #if CONFIG_KERNEL_DEBUG
+	/*
+	 * Write a dot '.' to the serial port to indicate that a
+	 * call to the scheduler is being made.
+	 */
 	ldi r24, 0x2e           ; '.'
 	call serial_transmit
 #endif
-; CONFIG_KERNEL_DEBUG
 
-	call z_system_tick_inc
+	/*
+	 * Evaluate timeouts for threads/timers and events.
+	 * Schedule threads consequently. 
+	 */
+	call z_handle_timeouts
 
-; check if scheduler is locked (cooperative thread or temporarely locked)
 #if CONFIG_KERNEL_COOPERATIVE_THREADS
-	lds ZL, z_current           ; load current thread addr in Z
+	/* 
+	 * Determine if the current thread is eligible for preemption, 
+	 * meaning it is neither a cooperative thread nor the scheduler is locked.
+	 */
+	lds ZL, z_current       ; load current thread addr in Z
 	lds ZH, z_current + 1
-
-	ldd r18, Z + 2      ; read flag
+	ldd r18, Z + 2      	; read current thread flags
 	andi r18, Z_THREAD_PRIO_COOP | Z_THREAD_SCHED_LOCKED_MSK
 
-	; scheduler is locked: do not switch thread and exit interrupt
+	/* 
+	 * scheduler is locked: do not switch thread then exit interrupt
+	 */
 	brne __exit_kernel_int
 
-	; prepare return context for preempted thread
-	; so that __intctx_restore is called when returning from z_yield
+	/*
+	 * prepare return context for preempted thread
+	 * so that __intctx_restore is called when returning from z_yield
+	 */
 	ldi r24, pm_lo8(__intctx_restore)
 	ldi r25, pm_hi8(__intctx_restore)
 	push r24
@@ -125,12 +174,16 @@ TIMERn_COMPA_vect:
 #if defined(__AVR_3_BYTE_PC__)
 	push r1
 #endif 
+	/* Finally call the scheduler */
 	jmp z_yield
 #endif
-; CONFIG_KERNEL_COOPERATIVE_THREADS
 
 __exit_kernel_int:
 #if CONFIG_KERNEL_COOPERATIVE_THREADS && CONFIG_KERNEL_SCHEDULER_DEBUG
+	/*
+	 * Write a 'c' to the serial port to indicate that the scheduler
+	 * is locked and no thread switch is being made.
+	 */
 	ldi r24, 0x63	    ; 'c'
 	call serial_transmit
 #endif
@@ -150,9 +203,14 @@ __intctx_restore:
 
 __intctx_restore_minimal:
 #if CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	/*
+	 * Toggle the GPIO B pin specified by CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
+	 * on each system tick exit.
+	 */
 	ldi 	r18, CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG
 	sts 	PINB, r18
-#endif /* CONFIG_KERNEL_SYSTICK_GPIOB_DEBUG */
+#endif
+
 	pop	r18
 	pop	r0
 	sts	SREG, r0
@@ -160,30 +218,38 @@ __intctx_restore_minimal:
 	pop	r1
 	reti
 
-.global z_yield
 z_yield:
-	; call scheduler to determine which thread is next
+	/*
+	 * call scheduler to determine which thread is next
+	 */
 	call z_scheduler
 
-	; r24 contain previous thread
-	movw r26, r24
+	movw r26, r24 ; r24 contains previous thread
 	
-	; current thread
-	lds r30, z_current
+	lds r30, z_current ; Z contains current thread
 	lds r31, z_current + 1
 
 #if CONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH
-	; Compare threads addresses after scheduler call to prevent thread switch to the same thread
-	; - i.e.thread switch only if "previous" and "z_current" threads are different
-	; - inefficient if at least two threads are always ready
-	; - compare low bytes before high bytes because 
-	;     they have a higher probability to be different
+	/* 
+	 * Compare thread addresses after the scheduler call to prevent a thread 
+	 * switch to the same thread. 
+	 * 
+	 * i.e. Thread switch should only occur if the "previous" and "z_current" 
+	 * threads are different. 
+	 * 
+	 * This approach may be inefficient if at least two threads are always 
+	 * ready. 
+	 * 
+	 * The comparison starts with the low bytes before the high bytes because 
+	 * they have a higher probability of being different.
+	 */
 	cp r26, r30
 	brne z_thread_switch
 	cp r27, r31
 	brne z_thread_switch
 	ret
 #endif
+
 
 ; "from" thread addr is in r24, r25
 ; "to" thread  addr in in r22, r23
@@ -250,8 +316,6 @@ z_thread_switch:
 
 	ret
 
-.extern k_stop
-.extern __fault
 z_thread_entry:
 	; get thread context address
 	movw r24, r2
@@ -259,7 +323,7 @@ z_thread_entry:
 	; get thread_entry function address
 	movw r30, r4
 
-	; get thread flags
+	; write SREG flags for the thread
 	sts SREG, r6
 	
 #if CONFIG_KERNEL_THREAD_TERMINATION_TYPE == 0
@@ -268,22 +332,31 @@ z_thread_entry:
 #elif CONFIG_KERNEL_THREAD_TERMINATION_TYPE == -1
 	; call thread entry function
 	icall
+
+	/*
+	 * Exiting the thread will cause a fault
+	 */
 	ldi r24, 0x03 ; K_THREAD_TERMINATED
 	call __fault
 #else
 	; call thread entry function
 	icall
+
+	/*
+	 * Graceful/permitted termination of the thread
+	 */
 	call k_stop
 #endif
 
-
-.global z_interrupts
 z_interrupts:
-    ldi r24, 0x00
-    lds r25, SREG
-    sbrc r25, SREG_I
-    ldi r24, 0x01
-    ret
+	/*
+	 * Helper function, which returns 1 if interrupts are enabled, 0 otherwise.
+	 */
+	ldi r24, 0x00
+	lds r25, SREG
+	sbrc r25, SREG_I
+	ldi r24, 0x01
+	ret
 
 
 #if CONFIG_KERNEL_TICKS_COUNTER
@@ -321,6 +394,10 @@ k_ticks_get_64:
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 .global USART0_RX_vect
 USART0_RX_vect:
+	/*
+	* This debug interrupt handler is used to trigger a thread switch when a 
+	* byte is received on the UART.
+	*/
 	push	r1
 	push	r0
 	lds	r0, SREG

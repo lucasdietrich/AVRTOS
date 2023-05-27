@@ -27,9 +27,11 @@ K_EVENT_Q_DEFINE(z_event_q);
 
 int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (!event || !handler) {
 		return -EINVAL;
 	}
+#endif
 
 	event->handler = handler;
 

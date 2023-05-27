@@ -9,15 +9,11 @@
 
 #include <util/atomic.h>
 
-/*___________________________________________________________________________*/
-
 #define K_MODULE K_MODULE_WORKQUEUE
 
-#define K_WQ_YIELDEACH_POS 0u
-#define K_WQ_YIELDEACH_MSK (1u << K_WQ_YIELDEACH_POS)
-#define K_WQ_YIELDEACH(_x) (((_x) << K_WQ_YIELDEACH_POS) & K_WQ_YIELDEACH_MSK)
-
-/*___________________________________________________________________________*/
+#define Z_WQ_YIELDEACH_POS 0u
+#define Z_WQ_YIELDEACH_MSK (1u << Z_WQ_YIELDEACH_POS)
+#define Z_WQ_YIELDEACH(_x) (((_x) << Z_WQ_YIELDEACH_POS) & Z_WQ_YIELDEACH_MSK)
 
 int8_t k_workqueue_create(struct k_workqueue *workqueue,
 			  struct k_thread *thread,
@@ -27,6 +23,12 @@ int8_t k_workqueue_create(struct k_workqueue *workqueue,
 			  char symbol)
 {
 	int8_t ret;
+
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!workqueue || !thread || !stack || !stack_size) {
+		return -EINVAL;
+	}
+#endif
 
 	k_fifo_init(&workqueue->q);
 	workqueue->flags = 0u;
@@ -70,13 +72,11 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		handler(work);
 
 		/* yield if "yieldeach" option is enabled */
-		if (workqueue->flags & K_WQ_YIELDEACH_MSK) {
+		if (workqueue->flags & Z_WQ_YIELDEACH_MSK) {
 			k_yield();
 		}
 	}
 }
-
-/*___________________________________________________________________________*/
 
 void k_work_init(struct k_work *work, k_work_handler_t handler)
 {
@@ -111,7 +111,7 @@ void k_workqueue_enable_yieldeach(struct k_workqueue *workqueue)
 	__ASSERT_NOTNULL(workqueue);
 
 	const uint8_t key = irq_lock();
-	workqueue->flags |= K_WQ_YIELDEACH_MSK;
+	workqueue->flags |= Z_WQ_YIELDEACH_MSK;
 	irq_unlock(key);
 }
 
@@ -120,11 +120,9 @@ void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue)
 	__ASSERT_NOTNULL(workqueue);
 
 	const uint8_t key = irq_lock();
-	workqueue->flags &= ~K_WQ_YIELDEACH_MSK;
+	workqueue->flags &= ~Z_WQ_YIELDEACH_MSK;
 	irq_unlock(key);
 }
-
-/*___________________________________________________________________________*/
 
 #if CONFIG_SYSTEM_WORKQUEUE_ENABLE
 
@@ -139,5 +137,3 @@ bool k_system_workqueue_submit(struct k_work *work)
 }
 
 #endif
-
-/*___________________________________________________________________________*/

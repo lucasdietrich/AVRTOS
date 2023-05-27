@@ -5,6 +5,7 @@
  */
 
 #include "canaries.h"
+#include "misc/serial.h"
 
 void z_init_thread_stack_canaries(struct k_thread *thread)
 {
@@ -44,10 +45,6 @@ void *z_stack_canaries(struct k_thread *thread)
 	}
 	return preserved;
 }
-
-/*___________________________________________________________________________*/
-
-#include "misc/serial.h"
 
 void k_print_stack_canaries(struct k_thread *thread)
 {

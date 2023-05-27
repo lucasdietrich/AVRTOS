@@ -14,8 +14,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK
 
 // #error "(TODO) INVESTIGATE SP PROBLEM with
@@ -50,8 +48,6 @@ extern "C" {
  * @brief Manual user AVRTOS init
  */
 void z_avrtos_init(void);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

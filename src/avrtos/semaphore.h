@@ -17,8 +17,6 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Structure describing a semaphore, "count" parameter tells the number
  * of available semaphore, "limit" describe the maximum number of semaphores.
@@ -33,8 +31,6 @@ struct k_sem {
 	struct dnode waitqueue;
 };
 
-/*___________________________________________________________________________*/
-
 #define K_SEM_INIT(sem, initial_count, count_limit)                             \
 	{                                                                       \
 		.count = MIN(initial_count, count_limit), .limit = count_limit, \
@@ -44,14 +40,12 @@ struct k_sem {
 #define K_SEM_DEFINE(sem_name, initial_count, count_limit) \
 	struct k_sem sem_name = K_SEM_INIT(sem_name, initial_count, count_limit)
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Initialize a semaphore
  *
  * @param sem : structure representing the semaphore
  */
-void k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
+int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit);
 
 /**
  * @brief Take a semaphore, return immediately if a semaphore is available,
@@ -95,8 +89,6 @@ __kernel int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
  * @return thread that was woken up, NULL otherwise
  */
 __kernel struct k_thread *k_sem_give(struct k_sem *sem);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

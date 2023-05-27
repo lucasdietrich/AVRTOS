@@ -10,12 +10,13 @@
 
 #define K_MODULE K_MODULE_MSGQ
 
-void k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint32_t max_msgs)
+int8_t k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint32_t max_msgs)
 {
-	__ASSERT_NOINTERRUPT();
-	__ASSERT_NOTNULL(buffer);
-	__ASSERT_TRUE(msg_size > 0);
-	__ASSERT_TRUE(max_msgs > 0);
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!msgq || !buffer || !msg_size || !max_msgs) {
+		return -EINVAL;
+	}
+#endif
 
 	/* list of pending thread (on writing XOR on reading)
 	 * depending on the nuber of messages used, we can assert that
@@ -32,6 +33,8 @@ void k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint32_t ma
 
 	msgq->read_cursor  = buffer;
 	msgq->write_cursor = buffer;
+
+	return 0;
 }
 
 int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)

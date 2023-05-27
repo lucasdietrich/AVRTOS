@@ -158,7 +158,6 @@ irq_disable	KEYWORD2
 irq_enable	KEYWORD2
 irq_lock	KEYWORD2
 irq_unlock	KEYWORD2
-k_sys_sw_reset	KEYWORD2
 k_sched_lock	KEYWORD2
 k_sched_unlock	KEYWORD2
 k_sched_locked	KEYWORD2

@@ -16,15 +16,13 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Idle thread structure
  */
 extern struct k_thread z_thread_idle;
 
 /**
- * @brief Tells if the runqueue contains the thread IDLE
+ * @brief Tells whether the runqueue contains the thread IDLE
  *
  * @return true
  * @return false
@@ -44,8 +42,6 @@ __kernel bool k_is_cpu_idle(void);
  * Note: This function forces interrupts to be enabled.
  */
 __kernel void k_idle(void);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

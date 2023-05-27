@@ -1,14 +1,8 @@
 .pio
-.vscode/.browse.c_cpp.db*
-.vscode/launch.json
-.vscode/ipch
 
-.idea
+.vscode/launch.json
 
 /tmp
 
 /build
-/build_master
-/build_slave
-/build_ipc_master
-/build_ipc_slave
+/build_*

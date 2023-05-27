@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*___________________________________________________________________________*/
-
 #include <avrtos/debug.h>
 #include <avrtos/kernel.h>
 #include <avrtos/misc/led.h>
@@ -15,19 +13,13 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-/*___________________________________________________________________________*/
-
 void thread_led_on(void *p);
 void thread_led_off(void *p);
 
 K_THREAD_DEFINE(ledon, thread_led_on, 0x120, K_PREEMPTIVE, NULL, 'O');
 K_THREAD_DEFINE(ledoff, thread_led_off, 0x140, K_PREEMPTIVE, NULL, 'F');
 
-/*___________________________________________________________________________*/
-
 K_MUTEX_DEFINE(mymutex);
-
-/*___________________________________________________________________________*/
 
 int main(void)
 {
@@ -69,5 +61,3 @@ void thread_led_off(void *p)
 		k_mutex_unlock(&mymutex);
 	}
 }
-
-/*___________________________________________________________________________*/
