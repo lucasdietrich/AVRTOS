@@ -4,7 +4,7 @@
 #include <avrtos/drivers.h>
 #include <avrtos/drivers/gpio.h>
 
-#if defined(__AVR_ATmega328P__)
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__)
 #define SPI_MOSI_PIN 3u
 #define SPI_MISO_PIN 4u
 #define SPI_SCK_PIN  5u
