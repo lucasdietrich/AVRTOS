@@ -592,7 +592,7 @@
 // 1: Atomic API is enabled
 //
 #ifndef CONFIG_KERNEL_ATOMIC_API
-#define CONFIG_KERNEL_ATOMIC_API 0
+#define CONFIG_KERNEL_ATOMIC_API 1
 #endif
 
 //
