@@ -222,16 +222,16 @@ build_flags =
 	-DCONFIG_THREAD_MAIN_STACK_SIZE=256
 	-DCONFIG_THREAD_EXPLICIT_MAIN_STACK=0
 	-DCONFIG_THREAD_MAIN_COOPERATIVE=1
-    -DCONFIG_KERNEL_SYSCLOCK_PERIOD_US=1000
-    -DCONFIG_KERNEL_TIME_SLICE_US=1000
-	; ...
+    	-DCONFIG_KERNEL_SYSCLOCK_PERIOD_US=1000
+    	-DCONFIG_KERNEL_TIME_SLICE_US=1000
+	; other options ...
 ```
 
 An example project which uses AVRTOS as a dependency can be found here: [github.com/lucasdietrich/caniot-device](https://github.com/lucasdietrich/caniot-device)
 
 ### Cmake
 
-To build the samples with cmake, you'll need to have `avr-gcc` and `cmake` installed.
+To build the samples with cmake, you'll need to have `avr-gcc`, `cmake`, `make` and `ninja` installed.
 `avr-gdb` and `qemu` are optional
 
 To configure your environnement for an Arduino Mega 2560, run the following commands:
@@ -246,7 +246,7 @@ You can also specify the generator :
 ```bash
 cmake -S . -B build \
   -DCMAKE_TOOLCHAIN_FILE="cmake/avr6-atmega2560.cmake" \
-  -DCMAKE_GENERATOR="Ninja"
+  -DCMAKE_GENERATOR="Unix Makefiles"
 ```
 
 You can also provide the device where the program will be flashed, this enables 
@@ -257,7 +257,8 @@ cmake -S . -B build \
   -DPROG_DEV=/dev/ttyACM0
 ```
 
-To build the `minimal_example` program, run the following command:
+To build the `minimal_example` program, run the following command (Replace `ninja`
+with `make` if you specified the `Unix Makefiles` generator) :
 
 ```bash
 make -C build sample_minimal_example
@@ -274,7 +275,49 @@ Monitor the serial console with `miniterm`:
 BAUDRATE=500000 make monitor
 ```
 
-### Debug with QEMU
+### Custom target (Cmake)
+
+In case you have a custom target (e.g. a board not explicitly supported by AVRTOS), 
+you can create a custom `avr<version>-<target>.cmake` file and specify it with the `CMAKE_TOOLCHAIN_FILE` option.
+
+A toolchain file has the following structure:
+
+```cmake
+set(F_CPU 16000000UL)
+set(MCU atmega328p)
+set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/../architecture/avr/avrtos-avr5-atmega328p.xn)
+set(QEMU_MCU uno)
+set(PROG_TYPE wiring) # arduino
+set(PROG_PARTNO m328p)
+
+include(${CMAKE_CURRENT_LIST_DIR}/avr.cmake)
+```
+
+| Option                        | Description                                                                                                                              |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `F_CPU`                       | Defines the CPU clock frequency.                                                                                               |
+| `MCU`                         | Specifies the target microcontroller unit (MCU) as ATmega328P. See list https://www.nongnu.org/avr-libc/user-manual/using_tools.html     |
+| `LINKER_SCRIPT`               | Sets the linker script path for the project. Linker scripts location: [architecture/avr](./architecture/avr)                             |
+| `QEMU_MCU` (QEMU only)        | Specifies the target microcontroller unit (MCU) for QEMU simulation as "uno." Can be listed with command `qemu-system-avr -machine help` |
+| `PROG_TYPE` (real board only) | Sets the programming type to "wiring." Can be listed with command `avrdude -c help`                                                      |
+| `PROG_PARTNO m328p`           | Specifies the target microcontroller part number as "m328p." Can be listed with command `avrdude -c ${PROG_TYPE} -p help`                |
+| `include(...)`                | Includes the AVR architecture generic cmake file                                                                                         |
+
+### Custom target (PlatformIO)
+
+In order to describe a custom target with PlatformIO, please refer to the
+example `platformio.ini` file from section [Use AVRTOS as a library dependency in your project](#use-avrtos-as-a-library-dependency-in-your-project).
+
+
+### Run/debug in QEMU
+
+Note about AVR support in QEMU: https://qemu-project.gitlab.io/qemu/system/target-avr.html
+You will have limited support for peripherals: all UART are supported, however 
+only 16-bit timers are supported.
+
+Moreover you'll need to apply the following patch to QEMU (<= 8.0.2): 
+[scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch](./scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch)
+to have all 16-bit timers working.
 
 In case you want to emulate you program with QEMU:
 ```bash
@@ -284,11 +327,11 @@ cmake -S . -B build \
   -DQEMU=ON
 ```
 
-This enables targets like `make run_sample_*` and `make qemu_sample_*`.
+This enables targets like `run_sample_*` and `qemu_sample_*`.
 For example, to run the `minimal-example` program in QEMU, run the following command:
 
 ```bash
-make -C build run_sample_minimal_example
+ninja -C build run_sample_minimal_example
 ```
 
 To exit QEMU, press `Ctrl+A` and then `x`.
@@ -296,7 +339,7 @@ To exit QEMU, press `Ctrl+A` and then `x`.
 If you want to debug your program with QEMU, run the following command:
 
 ```bash
-make -C build qemu_sample_minimal_example
+ninja -C build qemu_sample_minimal_example
 ```
 
 With VS Code, select `QEMU (avr)` configuration, then press `F5` to start debugging (`launch.json` configuration is automatically generated during build).
@@ -307,6 +350,8 @@ With VS Code, select `QEMU (avr)` configuration, then press `F5` to start debugg
 
 The `Makefile` at the root of the project provides *shortcut* commands to build 
 and flash samples.
+
+### Build a sample for QEMU
 
 In order to build the sample `shell` for QEMU run:
 
@@ -319,6 +364,20 @@ Run it with:
 Debug it with:
 
 	make qemu
+
+### Build a sample for a custom target
+
+In order to build the sample `drv-timer` for a custom target run:
+
+	TOOLCHAIN_FILE="cmake/avr5-board-caniot-tiny-pb.cmake" SAMPLE="drv-timer" make single
+
+Upload it with:
+
+	make upload
+
+Monitor it with:
+
+	make monitor
 
 ---
 
@@ -354,6 +413,14 @@ GENERATOR_ARGS?="--no-print-directory"
 	- in `build/examples/${sample}` folder for `cmake` build
 	- in `tmp/${sample}/*` folder for PlatformIO build, after running `python3 ./scripts/pydis.py`
 - In case python `miniterm` package is not installed, install python dependencies with `pip3 install -r scripts/requirements.txt`
+- Interesting flags for QEMU avr (modify the `QEMU_ARGS` variable in the toolchain file [cmake/avr.cmake](cmake/avr.cmake)):
+  - `-d in_asm`
+  - `-d exec`
+  - `-d cpu`
+  - `-d cpu_reset`
+  - All timer traces `--trace "avr_timer16_*"`
+  - `-d trace:avr_timer16_read,trace:avr_timer16_read_ifr,trace:avr_timer16_read_imsk,trace:avr_timer16_write,trace:avr_timer16_write_imsk,trace:avr_timer16_write_imsk,trace:avr_timer16_clksrc_update`
+  - Or a combinations of all: `-d cpu,in_asm,trace:avr_timer16_read`
 
 ## Some links :
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
@@ -374,6 +441,7 @@ avr-gdb: GNU gdb (GDB) 12.1
 QEMU emulator version 7.0.0 (v7.0.0)
 avrdude version 6.4
 cmake version 3.25.1
+ninja 1.10.2
 GNU Make 4.3
 Python 3.10.9
 ```

@@ -206,16 +206,6 @@
 #endif
 
 //
-// Enable support for thread priorities using a multiple queues mechanism
-//
-// 0: Thread priorities are not supported
-// 1: Thread priorities are supported
-//
-#ifndef CONFIG_TREAD_PRIO_MULTIQ
-#define CONFIG_TREAD_PRIO_MULTIQ 0
-#endif
-
-//
 // Compare threads addresses before thread switch to avoid unnecessary switch
 // to the same context.
 //

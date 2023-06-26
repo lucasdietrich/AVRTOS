@@ -3,6 +3,22 @@ import re
 import sys
 
 def parse_memory_usage(file_path):
+    """Parse a file of the following format and synthesize the result into a 
+    single line printed to stdout.
+        
+        AVR Memory Usage
+        ----------------
+        Device: atmega2560
+
+        Program:    5566 bytes (2.1% Full)
+        (.text + .data + .bootloader)
+
+        Data:       1836 bytes (22.4% Full)
+        (.data + .bss + .noinit)
+
+    Args:
+        file_path (string): file to path
+    """
     if not os.path.isfile(file_path):
         return
 

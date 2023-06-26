@@ -23,12 +23,12 @@ static int _get_index(void *dev)
 
 static bool _is_8bits(uint8_t tim_idx)
 {
-	return IS_TIMER_IDX_8BITS(tim_idx);
+	return TIMER_INDEX_IS_8BITS(tim_idx);
 }
 
 static bool _is_16bits(uint8_t tim_idx)
 {
-	return IS_TIMER_IDX_16BITS(tim_idx);
+	return TIMER_INDEX_IS_16BITS(tim_idx);
 }
 
 void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx)

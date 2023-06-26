@@ -9,10 +9,10 @@
 
 #include <avr/pgmspace.h>
 
-/* Minimum footprint (Release for ATmega2560)
+/* Footprint (Release for ATmega2560)
 	Memory region         Used Size  Region Size  %age Used
-		text:        1448 B       256 KB      0.55%
-		data:          31 B         8 KB      0.38%
+	            text:        1408 B       256 KB      0.54%
+	            data:          31 B         8 KB      0.38%
 */
 int main(void)
 {

@@ -21,11 +21,6 @@
 
 #define K_MODULE K_MODULE_KERNEL
 
-void yield(void)
-{
-	k_yield();
-}
-
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 
 __noinit char z_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
@@ -114,22 +109,11 @@ struct k_thread *z_current = &z_thread_main;
  *
  * The possible values and their meanings are as follows:
  * - 0: Indicates that only the IDLE thread is running.
- * - 1: Indicates that a single thread, typically the main thread, is running.
+ * - 1: Indicates that a single thread is running.
  * - n > 1: Indicates that multiple threads are running.
  */
 uint8_t z_ready_count = 1u;
 
-/**
- * @brief Runqueue containing the queue of all ready threads.
- * Should never be NULL.
- */
-#if CONFIG_TREAD_PRIO_MULTIQ
-#error "CONFIG_TREAD_PRIO_MULTIQ not supported yet"
-dlist_t z_runqs[4u] = {DLIST_INIT(z_runqs[K_PRIO_HIGHEST]),
-		       DLIST_INIT(z_runqs[K_PRIO_HIGH]), DLIST_INIT(z_runqs[K_PRIO_LOW]),
-		       DLIST_INIT(z_runqs[K_PRIO_LOWEST])};
-#define THREAD_GET_RUNQ(thread) (&z_runqs[thread->priority])
-#else
 /**
  * @brief Pointer to the currently running thread in the runqueue.
  *
@@ -153,7 +137,6 @@ dlist_t z_runqs[4u] = {DLIST_INIT(z_runqs[K_PRIO_HIGHEST]),
  * convenient to execute the next thread by simply setting z_runq to z_runq->next.
  */
 struct dnode *z_runq = &z_thread_main.tie.runqueue;
-#endif
 
 /**
  * @brief Pointer to the head of the timeouts queue.
@@ -190,8 +173,7 @@ uint8_t z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
  * such as within kernel timer or kernel event handlers.
  *
  * The variable `z_kernel_mode` is initially set to 0, indicating that the kernel code
- * is not being executed. When the kernel code is entered, this flag is typically set
- * to a non-zero value, indicating that the code is now running in the kernel context.
+ * is not being executed. When the kernel code is entered, this flag is set to 1.
  */
 uint8_t z_kernel_mode = 0u;
 #endif
@@ -548,17 +530,6 @@ struct k_thread *z_scheduler(void)
 }
 
 /**
- * @brief Generic function to suspend a thread.
- *
- * - If thread is PENDING, it is removed from the events queue.
- * - If thread is READY, it is removed from the runqueue.
- * 	- If thread is the current thread, the runqueue is prepared so that the
- * 	  normally next thread is executed.
- *
- * @param thread
- */
-
-/**
  * @brief Suspend a thread.
  *
  * This function suspends a thread by removing it from the events queue or the
@@ -649,21 +620,20 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
 
-	struct dnode *tie = dlist_get(waitqueue);
+	struct k_thread *pending_thread = NULL;
+	struct dnode *tie		= dlist_get(waitqueue);
+
 	if (DITEM_VALID(waitqueue, tie)) {
-		struct k_thread *pending_thread = Z_THREAD_FROM_WAITQUEUE(tie);
+		pending_thread = Z_THREAD_FROM_WAITQUEUE(tie);
 
 		/* immediate wake up is not more required because
 		 * with the swap model, the object is already reserved for the
 		 * first pending thread
 		 */
 		z_wake_up(pending_thread);
-
-		/* we return !NULL if a pending thread got the object*/
-		return pending_thread;
 	}
 	/* if no thread is pending on the object, we simply return */
-	return NULL;
+	return pending_thread;
 }
 
 __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,

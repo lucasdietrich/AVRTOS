@@ -55,6 +55,17 @@ static void thread_entry(void *arg)
 	}
 }
 
+static void print_help(void)
+{
+	LOG_INF("Press:");
+	LOG_INF("\tx - to spawn a new thread");
+	LOG_INF("\tk - to kill the oldest thread");
+	LOG_INF("\tc - to print stack canaries");
+	LOG_INF("\tv - to print thread counters");
+	LOG_INF("\ty - to yield");
+	LOG_INF("\ts - to sleep");
+}
+
 static void handle_data(char data)
 {
 	switch (data) {
@@ -128,6 +139,7 @@ static void handle_data(char data)
 		k_sleep(K_MSEC(200));
 		break;
 	default:
+		print_help();
 		break;
 	}
 }
@@ -140,6 +152,8 @@ int main(void)
 
 	serial_init();
 	ll_usart_enable_rx_isr(USART0_DEVICE);
+
+	print_help();
 
 	for (;;) {
 		k_sem_take(&sem, K_FOREVER);

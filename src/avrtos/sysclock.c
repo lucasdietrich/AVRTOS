@@ -85,6 +85,15 @@
 #warning "Sysclock may not be accurate"
 #endif
 
+// in case of qemu emulator, check if the timer is available
+#if defined(__QEMU__) && TIMER_INDEX_IS_8BITS(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
+#error "QEMU emulator detected, only 16 bits timers are available"
+#elif CONFIG_KERNEL_SYSLOCK_HW_TIMER >= 4
+#warning \
+	"In order to use timer 4 or 5 with QEMU <= 8.0.2, you'll need to apply patch located at \
+scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch to qemu"
+#endif
+
 #define COUNTER_VALUE \
 	TIMER_CALC_COUNTER_VALUE(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
 
@@ -99,9 +108,9 @@ void z_init_sysclock(void)
 		.timsk	   = BIT(OCIEnA),
 	};
 
-#if IS_TIMER_INDEX_16BIT(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
+#if TIMER_INDEX_IS_16BIT(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
 	ll_timer16_init(dev, CONFIG_KERNEL_SYSLOCK_HW_TIMER, &cfg);
-#elif IS_TIMER_INDEX_8BIT(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
+#elif TIMER_INDEX_IS_8BIT(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
 	ll_timer8_init(dev, CONFIG_KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #else
 #error "invalid timer type"
