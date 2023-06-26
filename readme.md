@@ -1,12 +1,19 @@
 # AVRTOS: An RTOS for 8-bit AVR Microcontrollers
 
 ## Introduction
-AVRTOS is a real-time operating system (RTOS) designed specifically for 8-bit AVR microcontrollers. The project aims to provide an efficient and highly configurable RTOS solution for AVR-based systems. Fully C/C++ compliant, AVRTOS is compatible with the AVR-GCC toolchain, Arduino and PlatformIO frameworks.
 
-Currently, AVRTOS supports and has been tested on the following AVR architectures:
+AVRTOS is a real-time operating system (RTOS) crafted for 8-bit AVR microcontrollers.
+It aims to provide an efficient and highly configurable RTOS solution for AVR-based 
+systems. Fully C/C++ compliant, AVRTOS is compatible with the AVR-GCC toolchain, 
+Arduino and PlatformIO frameworks, it can even be emulated using QEMU.
 
-- AVR5, particularly ATmega328p: Tested on Arduino PRO
-- AVR6, particularly ATmega2560: Tested on Arduino Mega2560
+AVRTOS has been successfully tested on the following AVR architectures:
+
+- AVR5, particularly ATmega328p
+- AVR6, especially ATmega2560
+
+Please bear in mind that as a personal project, it doesn't come with any guarantees.
+I hope you find AVRTOS as exciting to use as I found it to develop !
 
 ## Features
 
