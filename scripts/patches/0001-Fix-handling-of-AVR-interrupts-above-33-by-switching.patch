@@ -1,0 +1,44 @@
+From c872c0f164a5ab595cf347d098430301e628b741 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <ld.adecy@gmail.com>
+Date: Thu, 1 Jun 2023 23:26:33 +0200
+Subject: [PATCH] Fix handling of AVR interrupts above 33 by switching ctz32 to
+ ctz64
+
+This commit addresses a bug in the AVR interrupt handling code.
+The modification involves replacing the usage of the ctz32 function
+with ctz64 to ensure proper handling of interrupts above 33 in the AVR
+target.
+
+Previously, timers 3, 4, and 5 interrupts were not functioning correctly
+because most of their interrupt vectors are numbered above 33.
+
+Signed-off-by: Lucas Dietrich <ld.adecy@gmail.com>
+---
+ target/avr/helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/avr/helper.c b/target/avr/helper.c
+index c27f702901..db338a8761 100644
+--- a/target/avr/helper.c
++++ b/target/avr/helper.c
+@@ -45,7 +45,7 @@ bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     }
+     if (interrupt_request & CPU_INTERRUPT_HARD) {
+         if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
+-            int index = ctz32(env->intsrc);
++            int index = ctz64(env->intsrc);
+             cs->exception_index = EXCP_INT(index);
+             cc->tcg_ops->do_interrupt(cs);
+ 
+@@ -73,7 +73,7 @@ void avr_cpu_do_interrupt(CPUState *cs)
+     if (cs->exception_index == EXCP_RESET) {
+         vector = 0;
+     } else if (env->intsrc != 0) {
+-        vector = ctz32(env->intsrc) + 1;
++        vector = ctz64(env->intsrc) + 1;
+     }
+ 
+     if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
+-- 
+2.39.1
+

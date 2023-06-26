@@ -32,13 +32,6 @@
 #define Z_LINK_KERNEL_SECTION(_section) __attribute__((used))
 #endif
 
-// in case of qemu emulator, check if the timer is available
-#if defined(__QEMU__) && (CONFIG_KERNEL_SYSLOCK_HW_TIMER != 1U)
-#warning "QEMU emulator detected, only timer 1 is supported (forced)"
-#undef CONFIG_KERNEL_SYSLOCK_HW_TIMER
-#define CONFIG_KERNEL_SYSLOCK_HW_TIMER 1U
-#endif
-
 #if !CONFIG_KERNEL_COOPERATIVE_THREADS && CONFIG_THREAD_IDLE_COOPERATIVE
 #error "CONFIG_THREAD_IDLE_COOPERATIVE is required with CONFIG_KERNEL_COOPERATIVE_THREADS"
 #endif

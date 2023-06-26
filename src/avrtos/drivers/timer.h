@@ -71,31 +71,31 @@ typedef struct {
 } TIMER16_Device;
 
 #if defined(TCCR1A)
-#define TIMER1_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0x80u)
-#define TIMER1_DEVICE	      ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
-#define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
-#define TIMER1_INDEX	      1u
+#define TIMER1_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x80u)
+#define TIMER1_DEVICE	       ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
+#define TIMER_DEVICE_IS_1(dev) ((void *)dev == (void *)TIMER1_DEVICE)
+#define TIMER1_INDEX	       1u
 #endif
 
 #if defined(TCCR3A)
-#define TIMER3_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0x90u)
-#define TIMER3_DEVICE	      ((TIMER16_Device *)(TIMER3_DEVICE_ADDR))
-#define IS_TIMER3_DEVICE(dev) ((void *)dev == (void *)TIMER3_DEVICE)
-#define TIMER3_INDEX	      3u
+#define TIMER3_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x90u)
+#define TIMER3_DEVICE	       ((TIMER16_Device *)(TIMER3_DEVICE_ADDR))
+#define TIMER_DEVICE_IS_3(dev) ((void *)dev == (void *)TIMER3_DEVICE)
+#define TIMER3_INDEX	       3u
 #endif
 
 #if defined(TCCR4A)
-#define TIMER4_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0xA0u)
-#define TIMER4_DEVICE	      ((TIMER16_Device *)(TIMER4_DEVICE_ADDR))
-#define IS_TIMER4_DEVICE(dev) ((void *)dev == (void *)TIMER4_DEVICE)
-#define TIMER4_INDEX	      4u
+#define TIMER4_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0xA0u)
+#define TIMER4_DEVICE	       ((TIMER16_Device *)(TIMER4_DEVICE_ADDR))
+#define TIMER_DEVICE_IS_4(dev) ((void *)dev == (void *)TIMER4_DEVICE)
+#define TIMER4_INDEX	       4u
 #endif
 
 #if defined(TCCR5A)
-#define TIMER5_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0x120u)
-#define TIMER5_DEVICE	      ((TIMER16_Device *)(TIMER5_DEVICE_ADDR))
-#define IS_TIMER5_DEVICE(dev) ((void *)dev == (void *)TIMER5_DEVICE)
-#define TIMER5_INDEX	      5u
+#define TIMER5_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x120u)
+#define TIMER5_DEVICE	       ((TIMER16_Device *)(TIMER5_DEVICE_ADDR))
+#define TIMER_DEVICE_IS_5(dev) ((void *)dev == (void *)TIMER5_DEVICE)
+#define TIMER5_INDEX	       5u
 #endif
 
 /**
@@ -111,17 +111,17 @@ typedef struct {
 } TIMER8_Device;
 
 #if defined(TCCR0A)
-#define TIMER0_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0x44U)
-#define TIMER0_DEVICE	      ((TIMER8_Device *)(TIMER0_DEVICE_ADDR))
-#define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
-#define TIMER0_INDEX	      0u
+#define TIMER0_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x44U)
+#define TIMER0_DEVICE	       ((TIMER8_Device *)(TIMER0_DEVICE_ADDR))
+#define TIMER_DEVICE_IS_0(dev) ((void *)dev == (void *)TIMER0_DEVICE)
+#define TIMER0_INDEX	       0u
 #endif
 
 #if defined(TCCR2A)
-#define TIMER2_DEVICE_ADDR    (AVR_IO_BASE_ADDR + 0xB0U)
-#define TIMER2_DEVICE	      ((TIMER8_Device *)(TIMER2_DEVICE_ADDR))
-#define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
-#define TIMER2_INDEX	      2u
+#define TIMER2_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0xB0U)
+#define TIMER2_DEVICE	       ((TIMER8_Device *)(TIMER2_DEVICE_ADDR))
+#define TIMER_DEVICE_IS_2(dev) ((void *)dev == (void *)TIMER2_DEVICE)
+#define TIMER2_INDEX	       2u
 #endif
 
 /**
@@ -228,27 +228,31 @@ typedef struct {
 
 #define TIMER_INDEX_EXISTS(tim_idx) ((tim_idx) < TIMERS_COUNT)
 
-#define IS_TIMER_INDEX_8BIT(idx)  ((idx == 0) || (idx == 2))
-#define IS_TIMER_INDEX_16BIT(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
+#define TIMER_INDEX_IS_8BIT(idx)  ((idx == 0) || (idx == 2))
+#define TIMER_INDEX_IS_16BIT(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
 
-#define TIMER_GET_MAX_COUNTER(tim_idx) (IS_TIMER_INDEX_8BIT(tim_idx) ? 0xFFU : 0xFFFFU)
+#define TIMER_MAX_COUNTER_8BIT	0xFFu
+#define TIMER_MAX_COUNTER_16BIT 0xFFFFu
+
+#define TIMER_GET_MAX_COUNTER(tim_idx) \
+	(TIMER_INDEX_IS_8BIT(tim_idx) ? TIMER_MAX_COUNTER_8BIT : TIMER_MAX_COUNTER_16BIT)
 #define TIMER_CALC_COUNTER_VALUE(period_us, prescaler) \
 	((((F_CPU / 1000000lu) * period_us) / prescaler - 1lu))
 #define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max) \
 	(TIMER_CALC_COUNTER_VALUE(period_us, prescaler) <= max)
 
-#define IS_TIMER0_DEVICE(dev) ((void *)dev == (void *)TIMER0_DEVICE)
-#define IS_TIMER1_DEVICE(dev) ((void *)dev == (void *)TIMER1_DEVICE)
-#define IS_TIMER2_DEVICE(dev) ((void *)dev == (void *)TIMER2_DEVICE)
+#define TIMER_DEVICE_IS_0(dev) ((void *)dev == (void *)TIMER0_DEVICE)
+#define TIMER_DEVICE_IS_1(dev) ((void *)dev == (void *)TIMER1_DEVICE)
+#define TIMER_DEVICE_IS_2(dev) ((void *)dev == (void *)TIMER2_DEVICE)
 
-#define IS_TIMER_16BITS(dev)                                                        \
-	(IS_TIMER1_DEVICE(dev) || IS_TIMER3_DEVICE(dev) || IS_TIMER4_DEVICE(dev) || \
-	 IS_TIMER5_DEVICE(dev))
+#define TIMER_DEVICE_IS_16BITS(dev)                                                    \
+	(TIMER_DEVICE_IS_1(dev) || TIMER_DEVICE_IS_3(dev) || TIMER_DEVICE_IS_4(dev) || \
+	 TIMER_DEVICE_IS_5(dev))
 
-#define IS_TIMER_8BITS(dev) (IS_TIMER0_DEVICE(dev) || IS_TIMER2_DEVICE(dev))
+#define TIMER_DEVICE_IS_8BITS(dev) (TIMER_DEVICE_IS_0(dev) || TIMER_DEVICE_IS_2(dev))
 
-#define IS_TIMER_IDX_8BITS(idx)	 ((idx == 0) || (idx == 2))
-#define IS_TIMER_IDX_16BITS(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
+#define TIMER_INDEX_IS_8BITS(idx)  ((idx == 0) || (idx == 2))
+#define TIMER_INDEX_IS_16BITS(idx) ((idx == 1) || (idx == 3) || (idx == 4) || (idx == 5))
 
 typedef enum {
 	TIMER_MODE_NORMAL = 0x00, /* 8bit timer */
@@ -366,7 +370,7 @@ struct timer_config {
  * @param dev
  * @return int
  */
-static inline int timer_get_index(void *dev)
+static inline __attribute__((__always_inline__)) int timer_get_index(void *dev)
 {
 	switch ((uint16_t)dev) {
 #if defined(TIMER0_DEVICE)
@@ -412,7 +416,7 @@ static inline int timer_get_index(void *dev)
  * @param dev
  * @return int
  */
-static inline void *timer_get_device(uint8_t idx)
+static inline __attribute__((__always_inline__)) void *timer_get_device(uint8_t idx)
 {
 	switch (idx) {
 #if defined(TIMER0_DEVICE)
@@ -462,6 +466,11 @@ static inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
 	 * writing a logic one to its bit location.
 	 */
 	TIFRn[tim_idx] = 0xFFU;
+}
+
+static inline uint8_t ll_timer_get_irq_flags(uint8_t tim_idx)
+{
+	return TIFRn[tim_idx];
 }
 
 static inline void ll_timer8_stop(TIMER8_Device *dev)

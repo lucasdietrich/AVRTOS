@@ -111,6 +111,7 @@ function(target_prepare_env target)
 		upload_${target} 
 		avrdude -c ${PROG_TYPE} -p ${PROG_PARTNO} -P ${PROG_DEV} -U flash:w:${output_name}.hex 
 		DEPENDS hex_${target}
+		USES_TERMINAL
 	)
 
 	# add monitor command
@@ -121,12 +122,14 @@ function(target_prepare_env target)
 	)
 
 	if (QEMU)
+		set(QEMU_ARGS "")
+
 		# generate custom target for debug in qemu:
 		# - Use console: https://stackoverflow.com/questions/76005036/how-can-i-make-custom-commands-and-targets-flush-their-output-immediately-instea/76005037#76005037
 		# - Regenerate and copy launch.json each time we run the target
 		add_custom_target(qemu_${target} 
 			COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json
-			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic
+			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic ${QEMU_ARGS}
 			USES_TERMINAL 
 			DEPENDS 
 				${target} 
@@ -135,7 +138,7 @@ function(target_prepare_env target)
 
 		# generate custom target for run in qemu
 		add_custom_target(run_${target} 
-			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic
+			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic ${QEMU_ARGS}
 			USES_TERMINAL 
 			DEPENDS ${target}
 		)

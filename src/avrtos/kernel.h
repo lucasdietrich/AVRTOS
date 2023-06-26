@@ -391,6 +391,16 @@ static inline void k_yield(void)
 	irq_unlock(key);
 }
 
+#if CONFIG_ARDUINO_FRAMEWORK
+/**
+ * @brief Arduino definition of yield function.
+ */
+void yield(void)
+{
+	k_yield();
+}
+#endif
+
 /**
  * @brief Yield function for Arduino compatibility.
  *

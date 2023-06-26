@@ -17,11 +17,10 @@
 #include <avr/io.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
 
-/* Period range is [256us to 8.388sec] */
-#define PERIOD_MS_MIN 256llu
-#define PERIOD_MS_MAX 8388608llu
+#define TIMER_DEVICE TIMER1_DEVICE
 
 /* 50Hz signals */
+/* Period range is [256us to 8.388sec] */
 #define PERIOD_US 20000llu
 
 int main(void)
@@ -39,15 +38,15 @@ int main(void)
 	gpiol_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 	gpiol_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 
-	ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
+	ll_timer16_init(TIMER_DEVICE, timer_get_index(TIMER_DEVICE), &config);
 
 	struct timer_channel_compare_config comp_conf = {
 		.mode  = TIMER_CHANNEL_COMP_MODE_TOGGLE,
 		.value = TIMER_CALC_COUNTER_VALUE(PERIOD_US >> 1u, 1024u),
 	};
-	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_A, &comp_conf);
-	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_B, &comp_conf);
-	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_C, &comp_conf);
+	ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_A, &comp_conf);
+	ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_B, &comp_conf);
+	ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_C, &comp_conf);
 
 	k_sleep(K_FOREVER);
 }

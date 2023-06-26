@@ -7,7 +7,7 @@ This sample demonstrates how to use the timers driver with 8bits and 16bits time
 - Emulation not supported on QEMU (because of the use of several hardware timers)
 
 Commands :
-- Build `make -C build upload_sample_drv_timers`
+- Build `make -C build sample_drv_timers`
 - Upload `make -C build upload_sample_drv_timers`
 - Monitor `make monitor`
 

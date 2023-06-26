@@ -70,6 +70,7 @@
 		"init.h": "c",
 		"ring.h": "c",
 		"string.h": "c",
-		"crc16.h": "c"
+		"crc16.h": "c",
+		"delay_basic.h": "c"
 	},
 }

@@ -10,7 +10,7 @@ DEVICE?=/dev/ttyACM0
 SAMPLE?=shell
 TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
 BAUDRATE?=115200
-QEMU?=ON
+QEMU?=OFF
 
 # if QEMU is enabled, set CMAKE_BUILD_TYPE to Debug by default
 ifeq ($(QEMU),ON)
@@ -29,6 +29,7 @@ cmake:
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		-DCMAKE_GENERATOR=$(GENERATOR) \
 		-DPROG_DEV=$(DEVICE) \
+		-DBAUDRATE=$(BAUDRATE) \
 		-DQEMU=$(QEMU) \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 
@@ -38,6 +39,7 @@ multiple:
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		-DCMAKE_GENERATOR=$(GENERATOR) \
 		-DPROG_DEV=$(DEVICE) \
+		-DBAUDRATE=$(BAUDRATE) \
 		-DQEMU=$(QEMU) \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
@@ -49,8 +51,21 @@ single:
 		-DCMAKE_GENERATOR=$(GENERATOR) \
 		-DENABLE_SINGLE_SAMPLE=$(SAMPLE) \
 		-DPROG_DEV=$(DEVICE) \
+		-DBAUDRATE=$(BAUDRATE) \
 		-DQEMU=$(QEMU) \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
+	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
+
+drv-timer:
+	cmake -S . -B build \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+		-DCMAKE_GENERATOR=$(GENERATOR) \
+		-DENABLE_SINGLE_SAMPLE=drv-timer \
+		-DPROG_DEV=$(DEVICE) \
+		-DBAUDRATE=$(BAUDRATE) \
+		-DQEMU=ON \
+		-DCMAKE_BUILD_TYPE=Debug
 	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
 
 upload:
@@ -83,4 +98,5 @@ arduino_lint:
 metrics:
 	scripts/metrics-example-sizes.sh
 
-gen: format piogen arduino_gen
+# Prepare for release
+publish: piogen arduino_gen format clean multiple metrics arduino_lint
