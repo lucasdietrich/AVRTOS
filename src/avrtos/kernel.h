@@ -65,17 +65,16 @@ __kernel int8_t k_thread_stop(struct k_thread *thread);
 __kernel void k_stop(void);
 
 /**
- * @brief Change the priority of the specified thread.
+ * @brief Set the priority of the specified thread.
  *
- * This function allows you to change the priority of a given thread. The thread parameter
- * specifies the thread for which the priority needs to be changed. The prio parameter
- * can be set to either K_COOPERATIVE or K_PREEMPTIVE, indicating the desired priority.
+ * This function allows you to change the priority of a given thread. The prio parameter
+ * can be set to either K_COOPERATIVE or K_PREEMPTIVE.
  *
  * @param thread The thread for which to change the priority.
  * @param prio The desired priority (K_COOPERATIVE or K_PREEMPTIVE).
  * @return The status code indicating the success or failure of the operation.
  */
-__kernel int8_t k_thread_change_priority(struct k_thread *thread, int prio);
+__kernel void k_thread_set_priority(struct k_thread *thread, uint8_t prio);
 
 /**
  * @brief Thread entry point function.
@@ -96,9 +95,23 @@ extern struct k_thread *z_current;
  *
  * @return thread_t*
  */
-static inline struct k_thread *k_thread_current(void)
+static inline struct k_thread *k_thread_get_current(void)
 {
 	return z_current;
+}
+
+extern struct k_thread z_thread_main;
+
+/**
+ * @brief Get main thread
+ *
+ * @see struct k_thread z_thread_main
+ *
+ * @return struct k_thread*
+ */
+static inline struct k_thread *k_thread_get_main(void)
+{
+	return &z_thread_main;
 }
 
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER == 0
@@ -390,16 +403,6 @@ static inline void k_yield(void)
 	z_yield();
 	irq_unlock(key);
 }
-
-#if CONFIG_ARDUINO_FRAMEWORK
-/**
- * @brief Arduino definition of yield function.
- */
-void yield(void)
-{
-	k_yield();
-}
-#endif
 
 /**
  * @brief Yield function for Arduino compatibility.

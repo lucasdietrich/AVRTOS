@@ -959,6 +959,16 @@ void k_block_ms(uint32_t delay_ms)
 	irq_unlock(key);
 }
 
+#if CONFIG_ARDUINO_FRAMEWORK
+/**
+ * @brief Arduino definition of yield function.
+ */
+void yield(void)
+{
+	k_yield();
+}
+#endif
+
 #if CONFIG_KERNEL_UPTIME
 
 uint32_t k_uptime_get(void)

@@ -22,7 +22,8 @@ snode_t	KEYWORD1
 #######################################
 
 k_thread_create KEYWORD2
-k_thread_current    KEYWORD2
+k_thread_get_current    KEYWORD2
+k_thread_get_main       KEYWORD2
 k_timer_init    KEYWORD2
 k_timer_started KEYWORD2
 k_timer_stop    KEYWORD2
