@@ -48,8 +48,10 @@ void z_avrtos_init(void)
 	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif
 
+#if CONFIG_STDIO_PRINTF_TO_USART >= 0
 	/* Send output stream to usart0 */
 	k_set_stdio_usart0();
+#endif
 
 	z_kernel_init();
 

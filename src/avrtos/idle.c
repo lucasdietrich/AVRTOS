@@ -39,9 +39,6 @@ K_THREAD_DEFINE(z_thread_idle,
 		Z_THREAD_IDLE_PRIORITY,
 		NULL,
 		'I');
-void z_thread_idle_create(void)
-{
-}
 #else
 __noinit uint8_t z_thread_idle_stack[Z_THREAD_IDLE_STACK_SIZE];
 __noinit struct k_thread z_thread_idle;

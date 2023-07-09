@@ -179,6 +179,8 @@ uint8_t z_kernel_mode = 0u;
 #endif
 
 #if CONFIG_KERNEL_TICKS_COUNTER
+
+typedef char z_ticks_t[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
 /**
  * @brief Ticks counter for the kernel.
  *
@@ -188,7 +190,7 @@ uint8_t z_kernel_mode = 0u;
  *
  * The `z_ticks` array is initialized with all elements set to 0 during startup.
  */
-uint8_t z_ticks[CONFIG_KERNEL_TICKS_COUNTER_SIZE] = {0u};
+z_ticks_t z_ticks = {0u};
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
 
 /**
@@ -401,7 +403,9 @@ extern void z_thread_idle_create(void);
 void z_kernel_init(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
+#if CONFIG_AVRTOS_LINKER_SCRIPT == 0
 	z_thread_idle_create();
+#endif
 
 	/* Mark idle thread */
 	z_set_thread_state(&z_thread_idle, Z_THREAD_STATE_IDLE);

@@ -26,11 +26,4 @@ void k_set_stdio_usart0(void)
 
 #warning "CONFIG_STDIO_PRINTF_TO_USART > 0 not supported"
 
-#else
-
-void k_set_stdio_usart0(void)
-{
-	/* Nothing to do */
-}
-
 #endif /* CONFIG_STDIO_PRINTF_TO_USART */
