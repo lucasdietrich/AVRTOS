@@ -399,9 +399,9 @@ void z_yield(void);
  */
 static inline void k_yield(void)
 {
-	const uint8_t key = irq_lock();
+	// const uint8_t key = irq_lock();
 	z_yield();
-	irq_unlock(key);
+	// irq_unlock(key);
 }
 
 /**

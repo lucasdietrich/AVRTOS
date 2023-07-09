@@ -41,6 +41,58 @@
 .extern k_stop				; void (struct k_thread *)
 .extern __fault				; void (uint8_t)
 
+#if CONFIG_KERNEL_SCHEDULER_OFFLOAD
+
+TIMERn_COMPA_vect:
+	push	r1
+	push	r0
+	lds	r0, SREG
+	push	r0
+	eor	r1, r1
+	push	r18
+
+#if CONFIG_KERNEL_TICKS_COUNTER
+	/*
+	 * Increment the system tick counter.
+	 */
+	ldi r18, 0x01			; 1 cycle
+
+	lds r0, z_ticks			; 2 cycles
+	add r0, r18			; 1 cycle
+	sts z_ticks, r0			; 2 cycles
+
+	lds r0, z_ticks + 1		; 2 cycles
+	adc r0, r1			; 1 cycle
+	sts z_ticks + 1, r0		; 2 cycles
+	
+	lds r0, z_ticks + 2		; 2 cycles
+	adc r0, r1			; 1 cycle
+	sts z_ticks + 2, r0		; 2 cycles
+
+	lds r0, z_ticks + 3		; 2 cycles
+	adc r0, r1			; 1 cycle
+	sts z_ticks + 3, r0		; 2 cycles
+
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
+	/*
+	 * In case we have a 40-bit counter, increment the upper 32:40 bits
+	 * of the counter.
+	 */
+	lds r0, z_ticks + 4		; 2 cycles
+	adc r0, r1			; 1 cycle
+	sts z_ticks + 4, r0		; 2 cycles
+#endif
+
+	pop	r18
+	pop	r0
+	sts	SREG, r0
+	pop	r0
+	pop	r1
+	reti
+#endif
+
+#else
+
 /*
  * This is our system tick interrupt handler, which is called at
  * the period specified by CONFIG_KERNEL_SYSCLOCK_PERIOD_US
@@ -217,6 +269,8 @@ __intctx_restore_minimal:
 	pop	r0
 	pop	r1
 	reti
+
+#endif
 
 z_yield:
 	/*

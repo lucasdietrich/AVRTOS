@@ -457,9 +457,13 @@ void z_handle_timeouts(void)
 	z_kernel_mode = 1u;
 #endif
 
+	static uint32_t last_ticks = 0u;
+
 	__ASSERT_NOINTERRUPT();
 
-	tqueue_shift(&z_timeouts_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
+	k_delta_t diff = (k_delta_t *)z_ticks - last_ticks;
+
+	tqueue_shift(&z_timeouts_queue, diff);
 
 #if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;

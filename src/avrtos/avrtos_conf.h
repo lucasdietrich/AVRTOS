@@ -230,6 +230,17 @@
 #endif
 
 //
+// Offload execution of the scheduler in thread context only,
+// This feature forces threads to be cooperative.
+//
+// 0: Scheduler execution is not offloaded
+// 1: Scheduler execution is offloaded in thread context only
+//
+#ifndef CONFIG_KERNEL_SCHEDULER_OFFLOAD
+#define CONFIG_KERNEL_SCHEDULER_OFFLOAD 0
+#endif
+
+//
 // Sysclock period when precision mode is disabled ("llu" suffix is important)
 //
 // Reducing this value can cause some precision loss
