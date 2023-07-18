@@ -32,7 +32,7 @@ typedef void (*thread_entry_t)(void *);
  * associated with it, including the stack pointer, thread priority, stack location and
  * size, local storage pointer, and other relevant fields.
  *
- * This structure is 16 bytes long.
+ * This structure is 16 bytes long in its minimal form.
  */
 struct k_thread {
 	void *sp;  // stack pointer, TO KEEP it at the beginning of the structure !

@@ -586,6 +586,16 @@
 #endif
 
 //
+// Enable time API with millisecond precision
+//
+// 0: Time API is using second precision
+// 1: Time API is using millisecond precision
+//
+#ifndef CONFIG_KERNEL_TIME_API_MS_PRECISION
+#define CONFIG_KERNEL_TIME_API_MS_PRECISION 0
+#endif
+
+//
 // Enable atomic API
 //
 // 0: Atomic API is disabled

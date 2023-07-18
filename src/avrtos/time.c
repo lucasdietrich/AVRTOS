@@ -51,23 +51,58 @@ void k_show_ticks(void)
 
 #if CONFIG_KERNEL_TIME_API
 
+#if CONFIG_KERNEL_TIME_API_MS_PRECISION
+typedef uint64_t k_uptime_t; /* ms */
+#else
+typedef uint32_t k_uptime_t; /* s */
+#endif
+
 static struct {
+	/* last set timestamp (seconds) */
 	uint32_t timestamp;
-	uint32_t uptime_sec;
+
+	/* uptime the timestamp was set
+	 * - in seconds if CONFIG_KERNEL_TIME_API_MS_PRECISION is not set
+	 * - in milliseconds if CONFIG_KERNEL_TIME_API_MS_PRECISION is set
+	 */
+	k_uptime_t uptime; 
+
+	/* mutex to protect timestamp and uptime */
 	struct k_mutex mutex;
 } z_time_ref = {
-	.timestamp  = 0,
-	.uptime_sec = 0,
+	.timestamp  = 0u,
+	.uptime = 0u, 
 	.mutex	    = K_MUTEX_INIT(z_time_ref.mutex),
 };
 
 void k_time_set(uint32_t sec)
 {
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
-	z_time_ref.uptime_sec = k_uptime_get();
-	z_time_ref.timestamp  = sec;
+#if CONFIG_KERNEL_TIME_API_MS_PRECISION
+	z_time_ref.uptime = k_uptime_get_ms64(); /* ms */
+#else
+	z_time_ref.uptime = k_uptime_get(); /* s */
+#endif
+	z_time_ref.timestamp = sec;
 	k_mutex_unlock(&z_time_ref.mutex);
 }
+
+#if CONFIG_KERNEL_TIME_API_MS_PRECISION
+uint32_t k_time_get(void)
+{
+	return (uint32_t)(k_time_get_ms() / 1000);
+}
+
+uint64_t k_time_get_ms(void)
+{
+	uint64_t timestamp;
+	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
+	timestamp = k_uptime_get_ms64();
+	k_mutex_unlock(&z_time_ref.mutex);
+	return timestamp - z_time_ref.uptime + z_time_ref.timestamp;
+}
+
+#else
 
 uint32_t k_time_get(void)
 {
@@ -75,8 +110,14 @@ uint32_t k_time_get(void)
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
 	timestamp = k_uptime_get();
 	k_mutex_unlock(&z_time_ref.mutex);
-	return timestamp - z_time_ref.uptime_sec + z_time_ref.timestamp;
+	return timestamp - z_time_ref.uptime + z_time_ref.timestamp;
 }
+
+uint64_t k_time_get_ms(void)
+{
+	return (uint64_t)k_time_get() * 1000llu;
+}
+#endif
 
 bool k_time_is_set(void)
 {
@@ -90,7 +131,7 @@ void k_time_unset(void)
 {
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
 	z_time_ref.timestamp  = 0;
-	z_time_ref.uptime_sec = 0;
+	z_time_ref.uptime = 0;
 	k_mutex_unlock(&z_time_ref.mutex);
 }
 
