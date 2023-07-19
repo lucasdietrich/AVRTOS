@@ -82,10 +82,9 @@ exit:
 	return ret;
 }
 
-int k_flags_notify(struct k_flags *flags, uint8_t mask, k_flags_options options)
+int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options options)
 {
 	int ret = 0;
-	uint8_t notify_value;
 	struct dnode *thread_handle;
 
 #if CONFIG_KERNEL_ARGS_CHECKS
@@ -101,6 +100,7 @@ int k_flags_notify(struct k_flags *flags, uint8_t mask, k_flags_options options)
 	const uint8_t lock = irq_lock();
 
 	thread_handle = flags->_waitqueue.head;
+	notify_value = ~flags->flags & notify_value;
 
 	while (notify_value != 0u) {
 		if (!DITEM_VALID(&flags->_waitqueue, thread_handle)) {

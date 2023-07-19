@@ -75,12 +75,11 @@ int main(void)
 
 	for (;;) {
 		printf_P(PSTR("<main> poll\n"));
-		int ret = k_flags_poll(&flags, 0xFEu, K_FLAGS_SET_ANY, K_SECONDS(2u));
+		int ret = k_flags_poll(&flags, 0xFEu, K_FLAGS_SET_ANY, K_FOREVER);
 		printf_P(PSTR("<main> ret: %d\n"), ret);
 
-		k_sleep(K_SECONDS(5u));
-
 		k_dump_stack_canaries();
+		k_sleep(K_SECONDS(5u));
 	}
 }
 

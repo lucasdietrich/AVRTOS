@@ -102,7 +102,7 @@ int k_flags_poll(struct k_flags *flags,
  * @return  -EINVAL if flags object is NULL
  * @return  -ENOTSUP if options is not supported
  */
-int k_flags_notify(struct k_flags *flags, uint8_t mask, k_flags_options options);
+int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options options);
 
 /**
  * @brief Reset a flags object
