@@ -12,6 +12,10 @@
 #include "sys.h"
 #include "types.h"
 
+#if CONFIG_KERNEL_STATS
+#include "stats.h"
+#endif
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 

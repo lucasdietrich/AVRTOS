@@ -82,6 +82,10 @@ struct k_thread {
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno;	// Thread errno
 #endif			/* CONFIG_THREAD_ERRNO */
+
+#if CONFIG_KERNEL_STATS_THREADS
+
+#endif
 };
 
 /**
@@ -170,7 +174,11 @@ struct z_callused_ctx {
 };
 
 /**
- * @brief Represent the registers to be saved during an interrupt before calling the ISR.
+ * @brief Represent the registers to be saved when an interrupt occurs.
+ * - pc is automatically saved by the hardware on the stack on interrupt (2 or 3 bytes)
+ * - r0 must be saved as it is used as a temporary register by the compiler (for multiplication, etc.)
+ * - same for r1
+ * - sreg must be saved as it contains the flags
  */
 struct z_intctx {
 #if Z_ARCH_PC_SIZE == 3

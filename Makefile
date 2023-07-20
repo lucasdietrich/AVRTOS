@@ -7,7 +7,7 @@ GENERATOR_COMMAND?="ninja"
 GENERATOR_ARGS?=
 
 DEVICE?=/dev/ttyACM0
-SAMPLE?=shell
+SAMPLE?=flags
 TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
 BAUDRATE?=115200
 QEMU?=OFF

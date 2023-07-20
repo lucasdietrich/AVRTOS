@@ -37,6 +37,9 @@ struct k_work {
 struct k_workqueue {
 	struct k_fifo q;
 	uint8_t flags;
+#if CONFIG_KERNEL_STATS_WORKQ
+	struct z_stats_workq _stats;
+#endif
 };
 
 #define k_workq k_workqueue

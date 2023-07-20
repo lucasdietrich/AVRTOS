@@ -21,6 +21,7 @@ int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 
 	sem->limit = limit;
 	sem->count = MIN(limit, initial_count);
+	Z_STATS_SEM_CLEAR(sem);
 	dlist_init(&sem->waitqueue);
 
 	return 0;
@@ -35,10 +36,13 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 	if (sem->count != 0) {
 		sem->count--;
 	} else {
+		Z_STATS_SEM_PEND(sem);
 		get = z_pend_current(&sem->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
+
+	Z_STATS_SEM_TAKE(sem);
 
 	if (get == 0) {
 		__K_DBG_SEM_TAKE(z_current);
@@ -72,6 +76,8 @@ struct k_thread *k_sem_give(struct k_sem *sem)
 	}
 
 	irq_unlock(key);
+
+	Z_STATS_SEM_GIVE(sem);
 
 	return thread;
 }

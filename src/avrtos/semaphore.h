@@ -29,12 +29,16 @@ struct k_sem {
 	uint8_t count;
 	uint8_t limit;
 	struct dnode waitqueue;
+
+#if CONFIG_KERNEL_STATS_SEM
+	struct z_stats_sem _stats;
+#endif
 };
 
 #define K_SEM_INIT(sem, initial_count, count_limit)                             \
 	{                                                                       \
 		.count = MIN(initial_count, count_limit), .limit = count_limit, \
-		.waitqueue = DLIST_INIT(sem.waitqueue)                          \
+		.waitqueue = DLIST_INIT(sem.waitqueue),                         \
 	}
 
 #define K_SEM_DEFINE(sem_name, initial_count, count_limit) \

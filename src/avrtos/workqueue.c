@@ -33,6 +33,8 @@ int8_t k_workqueue_create(struct k_workqueue *workqueue,
 	k_fifo_init(&workqueue->q);
 	workqueue->flags = 0u;
 
+	Z_STATS_WORKQ_CLEAR(workqueue);
+
 	ret = k_thread_create(thread, (thread_entry_t)z_workqueue_entry, stack,
 			      stack_size, prio_flags, (void *)workqueue, symbol);
 	if (ret == 0) {
@@ -70,6 +72,8 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		irq_unlock(key);
 
 		handler(work);
+
+		Z_STATS_WORKQ_PROC(workqueue);
 
 		/* yield if "yieldeach" option is enabled */
 		if (workqueue->flags & Z_WQ_YIELDEACH_MSK) {
