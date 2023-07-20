@@ -29,6 +29,23 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
 
 #endif
 
+/* Set main thread priority */
+#if CONFIG_THREAD_MAIN_COOPERATIVE == 1
+#define Z_THREAD_MAIN_PRIORITY Z_THREAD_PRIO_COOP
+#else
+#define Z_THREAD_MAIN_PRIORITY Z_THREAD_PRIO_PREEMPT
+#endif
+
+/* Calculate main thread stack end address */
+#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
+/* explicit stack defined, stack is at the end of the defined buffer */
+#define Z_THREAD_MAIN_STACK_END_ADDR \
+	(void *)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE)
+#else
+/* implicit stack, we set the main thread stack end at the end of the RAM */
+#define Z_THREAD_MAIN_STACK_END_ADDR (void *)RAMEND
+#endif
+
 /**
  * @brief Main thread instance.
  *
@@ -49,12 +66,8 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
  * - `.symbol`: Default symbol for the main thread, here set to 'M'.
  */
 K_THREAD struct k_thread z_thread_main = {
-	.sp = 0,  // main thread is running, context already "restored"
-#if CONFIG_THREAD_MAIN_COOPERATIVE == 1
-	.flags = Z_THREAD_STATE_READY | Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW,
-#else
-	.flags = Z_THREAD_STATE_READY | Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW,
-#endif
+	.sp    = 0,  // main thread is running, context already "restored"
+	.flags = Z_THREAD_STATE_READY | Z_THREAD_MAIN_PRIORITY | Z_THREAD_PRIO_LOW,
 	.tie =
 		{
 			.runqueue =
@@ -68,26 +81,15 @@ K_THREAD struct k_thread z_thread_main = {
 		},
 	.wany	   = DITEM_INIT_NULL(),	 // the thread isn't pending on any events
 	.swap_data = NULL,
-#if CONFIG_THREAD_EXPLICIT_MAIN_STACK == \
-	1  // explicit stack defined, we set the main thread stack at the end of
-	   // the defined buffer
 	.stack =
 		{
-			.end  = (void *)Z_STACK_END(z_main_stack,
-						    CONFIG_THREAD_MAIN_STACK_SIZE),
-			.size = CONFIG_THREAD_MAIN_STACK_SIZE,
-		},
-#else
-	.stack =
-		{
-			// implicit stack, we set the main thread stack end at
-			// the end of the RAM
-			.end  = (void *)RAMEND,
+			.end  = Z_THREAD_MAIN_STACK_END_ADDR,
 			.size = CONFIG_THREAD_MAIN_STACK_SIZE, /* Used as
 								  indication
-								  only */
+								  only if
+								  CONFIG_THREAD_EXPLICIT_MAIN_STACK
+								  is enabled */
 		},
-#endif
 	.symbol = 'M'  // default main thread sumbol
 };
 
