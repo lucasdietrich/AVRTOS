@@ -90,7 +90,7 @@ void k_time_set(uint32_t sec)
 #if CONFIG_KERNEL_TIME_API_MS_PRECISION
 uint32_t k_time_get(void)
 {
-	return (uint32_t)(k_time_get_ms() / 1000);
+	return (uint32_t)(k_time_get_ms() / 1000u);
 }
 
 uint64_t k_time_get_ms(void)

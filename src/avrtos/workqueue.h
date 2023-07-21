@@ -83,15 +83,6 @@ __kernel int8_t k_workqueue_create(struct k_workqueue *workqueue,
 __kernel void k_work_init(struct k_work *work, k_work_handler_t handler);
 
 /**
- * @brief Tells if the work item is submittable or not.
- *
- * @param work
- * @return true if submittable
- * @return false if in a workqueueu fifo
- */
-bool k_work_submittable(struct k_work *work);
-
-/**
  * @brief Submit a work item to the desired workqueue.
  *
  * If the work item has already been queued but didn't get processed, the

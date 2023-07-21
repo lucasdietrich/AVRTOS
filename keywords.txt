@@ -29,8 +29,8 @@ k_timer_started KEYWORD2
 k_timer_stop    KEYWORD2
 k_timer_start	KEYWORD2
 k_work_init	KEYWORD2
-k_work_submittable	KEYWORD2
 k_work_submit	KEYWORD2
+k_workqueue_create              KEYWORD2
 k_workqueue_enable_yieldeach	KEYWORD2
 k_workqueue_disable_yieldeach	KEYWORD2
 k_system_workqueue_submit	KEYWORD2

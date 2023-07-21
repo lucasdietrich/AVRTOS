@@ -83,7 +83,16 @@ void k_work_init(struct k_work *work, k_work_handler_t handler)
 	work->handler = handler;
 }
 
-inline bool k_work_submittable(struct k_work *work)
+/**
+ * @brief Tells whether the work item is submittable or not.
+ * 
+ * Requires interrupts to be disabled.
+ *
+ * @param work
+ * @return true if submittable
+ * @return false if in already in queue
+ */
+static inline bool z_work_submittable(struct k_work *work)
 {
 	return work->_tie.next == NULL;
 }
@@ -98,7 +107,7 @@ bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 
 	/* if item not already in queue */
 	const uint8_t key = irq_lock();
-	if (k_work_submittable(work)) {
+	if (z_work_submittable(work)) {
 		z_fifo_put(&workqueue->q, &work->_tie);
 		ret = true;
 	}
