@@ -1,4 +1,4 @@
-if (NOT QEMU)
+if (NOT QEMU AND ${FEATURE_USART_COUNT} GREATER 1)
 
 	project(sample_zephyr_dev_usart_tool)
 	add_executable(${PROJECT_NAME} main.c)

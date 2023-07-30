@@ -11,4 +11,7 @@ set(QEMU_MCU mega2560)
 set(PROG_TYPE wiring)
 set(PROG_PARTNO m2560)
 
+set(FEATURE_TIMER_COUNT 6)
+set(FEATURE_USART_COUNT 4)
+
 include(${CMAKE_CURRENT_LIST_DIR}/avr.cmake)

@@ -21,7 +21,7 @@
 [ atmega2560 ]  fault_hook                              flash 2034 B  (0.8 %)   ram 189 B   (2.3 %)   
 [ atmega2560 ]  fifo                                    flash 3264 B  (1.2 %)   ram 488 B   (6.0 %)   
 [ atmega2560 ]  fifo-slab                               flash 3270 B  (1.2 %)   ram 622 B   (7.6 %)   
-[ atmega2560 ]  flags                                   flash 4662 B  (1.8 %)   ram 850 B   (10.4 %)  
+[ atmega2560 ]  flags                                   flash 4698 B  (1.8 %)   ram 858 B   (10.5 %)  
 [ atmega2560 ]  footprint                               flash 1412 B  (0.5 %)   ram 31 B    (0.4 %)   
 [ atmega2560 ]  idle                                    flash 3982 B  (1.5 %)   ram 51 B    (0.6 %)   
 [ atmega2560 ]  interrupt-yield                         flash 4638 B  (1.8 %)   ram 1274 B  (15.6 %)  

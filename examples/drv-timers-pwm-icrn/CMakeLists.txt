@@ -1,4 +1,4 @@
-if (NOT QEMU)
+if (NOT QEMU AND ${FEATURE_TIMER_COUNT} GREATER 3)
 
 	project(sample_drv_timers_pwm_ircn)
 	add_executable(${PROJECT_NAME} main.c)

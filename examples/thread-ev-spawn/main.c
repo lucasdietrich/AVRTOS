@@ -22,7 +22,12 @@ struct task {
 };
 
 #define BLOCK_SIZE   sizeof(struct task)
-#define BLOCKS_COUNT 32u
+
+#if defined(__AVR_ATmega2560__)
+#	define BLOCKS_COUNT 32u
+#else
+#	define BLOCKS_COUNT 10u
+#endif
 
 K_MEM_SLAB_DEFINE(tasks_pool, BLOCK_SIZE, BLOCKS_COUNT);
 K_SEM_DEFINE(sem, 0u, 1u);

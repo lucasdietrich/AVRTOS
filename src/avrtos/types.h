@@ -46,8 +46,8 @@ struct k_thread {
 		// the same time
 
 	union {
-		struct dnode wany;    // represent the thread pending on a generic
-				      // object
+		struct dnode wany;  // represent the thread pending on a generic
+				    // object
 		struct dnode wmutex;  // represent the thread pending on an mutex
 		struct dnode wsem;    // represent the thread pending on an semaphore
 		struct dnode wsig;    // represent the thread pending on an signal

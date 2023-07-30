@@ -54,7 +54,7 @@ void k_show_ticks(void)
 #if CONFIG_KERNEL_TIME_API_MS_PRECISION
 typedef uint64_t k_uptime_t; /* ms */
 #else
-typedef uint32_t k_uptime_t; /* s */
+typedef uint32_t k_uptime_t;		    /* s */
 #endif
 
 static struct {
@@ -65,14 +65,14 @@ static struct {
 	 * - in seconds if CONFIG_KERNEL_TIME_API_MS_PRECISION is not set
 	 * - in milliseconds if CONFIG_KERNEL_TIME_API_MS_PRECISION is set
 	 */
-	k_uptime_t uptime; 
+	k_uptime_t uptime;
 
 	/* mutex to protect timestamp and uptime */
 	struct k_mutex mutex;
 } z_time_ref = {
-	.timestamp  = 0u,
-	.uptime = 0u, 
-	.mutex	    = K_MUTEX_INIT(z_time_ref.mutex),
+	.timestamp = 0u,
+	.uptime	   = 0u,
+	.mutex	   = K_MUTEX_INIT(z_time_ref.mutex),
 };
 
 void k_time_set(uint32_t sec)
@@ -130,8 +130,8 @@ bool k_time_is_set(void)
 void k_time_unset(void)
 {
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
-	z_time_ref.timestamp  = 0;
-	z_time_ref.uptime = 0;
+	z_time_ref.timestamp = 0;
+	z_time_ref.uptime    = 0;
 	k_mutex_unlock(&z_time_ref.mutex);
 }
 

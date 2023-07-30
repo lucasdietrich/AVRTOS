@@ -50,7 +50,7 @@ __kernel uint32_t k_time_get(void);
 
 /**
  * @brief Get the current time in milliseconds.
- * 
+ *
  * IF CONFIG_KERNEL_TIME_API_MS_PRECISION is set to 0, the return value is
  * truncated to seconds.
  *

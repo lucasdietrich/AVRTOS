@@ -4,11 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-set(F_CPU 16000000UL)
-set(MCU atmega328p)
-set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/../architecture/avr/avrtos-avr5-atmega328p.xn)
-set(QEMU_MCU uno)
+include(${CMAKE_CURRENT_LIST_DIR}/avr5-atmega328p.cmake)
+
 set(PROG_TYPE arduino)
-set(PROG_PARTNO m328p)
 
 include(${CMAKE_CURRENT_LIST_DIR}/avr.cmake)
