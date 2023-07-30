@@ -1,3 +1,4 @@
+
 #!/usr/bin/bash
 
 # This script is used to calculate the size of each examples for the current commit
@@ -27,13 +28,9 @@ cmake -S . -B $BUILD_DIR \
         -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 ninja -C $BUILD_DIR
 
-: > $METRICS_FILE_PATH
 : > $METRICS_CONFIG_FILE_PATH
 
-# get the size of each example
-for example in $(ls -1 $BUILD_DIR/examples); do
-        python3 ./scripts/parse_size_txt.py $BUILD_DIR/examples/$example/size.txt >> $METRICS_FILE_PATH
-done
+bash ./scripts/metrics-collect.sh $BUILD_DIR $METRICS_FILE_PATH
 
 echo "toolchain: $TOOLCHAIN_FILE" >> $METRICS_CONFIG_FILE_PATH
 echo "build type: $BUILD_TYPE" >> $METRICS_CONFIG_FILE_PATH
@@ -42,4 +39,4 @@ cp $METRICS_FILE_PATH $METRICS_FILE_REV_PATH
 
 echo "$METRICS_FILE_PATH"
 
-# rm -rf $BUILD_DIR
+rm -rf $BUILD_DIR

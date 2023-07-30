@@ -1,0 +1,9 @@
+# docker build -t fedora-avr-toolchain -f scripts/Dockerfile-base .
+
+FROM fedora:37
+
+RUN dnf update -y && \
+    dnf clean all && \
+    dnf install -y avr-gcc avr-gcc-c++ avr-libc \
+    avr-binutils git cmake ninja-build make python3 python3-pip \
+    qemu-system-avr
