@@ -1,0 +1,25 @@
+# docker build -t fedora-avr-toolchain -f scripts/Dockerfile-run .
+
+FROM fedora:37
+
+RUN dnf update -y && \
+    dnf clean all && \
+    dnf install -y avr-gcc avr-gcc-c++ avr-libc \
+    avr-binutils git cmake ninja-build make python3 python3-pip \
+    qemu-system-avr
+
+RUN git clone https://github.com/lucasdietrich/AVRTOS.git && \
+    cd AVRTOS && \
+    git switch main && \
+    git submodule update --init --recursive && \
+    python3 -m pip install -r scripts/requirements.txt
+
+WORKDIR /AVRTOS
+
+ENTRYPOINT cmake -S . -B build \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/avr6-atmega2560.cmake \
+		-DCMAKE_GENERATOR=Ninja \
+		-DQEMU=OFF \
+		-DCMAKE_BUILD_TYPE=Release \
+    && ninja -C build
