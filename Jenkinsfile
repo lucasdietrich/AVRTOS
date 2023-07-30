@@ -76,18 +76,8 @@ pipeline {
         }
         
         stage('Metrics') {
-            when {
-                expression {
-                    params.QEMU == 'OFF'
-                }
-            }
             steps {
-                sh """
-                    TOOLCHAIN_FILE=${params.CMAKE_TOOLCHAIN_FILE} \
-                    BUILD_TYPE=${params.CMAKE_BUILD_TYPE} \
-                    METRICS_PATH=$WORKSPACE_OUTPUT_DIR \
-                    scripts/metrics-example-sizes.sh
-                """
+                sh "scripts/metrics-collect.sh $WORKSPACE_BUILD_DIR $WORKSPACE_BUILD_DIR/metrics-exsizes.txt"
             }
         }
 
@@ -95,7 +85,8 @@ pipeline {
             steps {
                 sh "mkdir -p $WORKSPACE_OUTPUT_DIR"
                 sh "cp $WORKSPACE_BUILD_DIR/compile_commands.json $WORKSPACE_OUTPUT_DIR"
-                dir("$WORKSPACE_OUTPUT_DIR") {
+                sh "cp $WORKSPACE_BUILD_DIR/metrics-exsizes.txt $WORKSPACE_OUTPUT_DIR"
+                dir("$WORKSPACE_BUILD_DIR") {
                     sh """
                         find examples -type f \\( \
                             -name '*.s' \
