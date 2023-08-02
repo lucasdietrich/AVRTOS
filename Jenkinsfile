@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'fedora-avr-toolchain:latest' }
+        docker { image 'devops/fedora-avr-toolchain:latest' }
     }
 
     environment {
