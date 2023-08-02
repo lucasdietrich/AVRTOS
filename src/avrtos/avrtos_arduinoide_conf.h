@@ -13,7 +13,7 @@
  */
 
 #if !defined(ARDUINO_ARCH_AVR)
-#error “This library only supports 8bits AVR-based MCU”
+#error "This library only supports 8bits AVR-based MCU"
 #endif
 
 /* If using Arduino IDE, it's not possible to use a custom linker script
