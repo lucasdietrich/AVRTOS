@@ -1,4 +1,4 @@
-# docker build -t fedora-avr-toolchain -f scripts/Dockerfile-base .
+# docker build -t devops/fedora-avr-toolchain -f scripts/Dockerfile-base .
 
 FROM fedora:37
 

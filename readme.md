@@ -238,8 +238,9 @@ An example project which uses AVRTOS as a dependency can be found here: [github.
 
 ### Cmake
 
-To build the samples with cmake, you'll need to have `avr-gcc`, `cmake`, `make` and `ninja` installed.
-`avr-gdb` and `qemu` are optional
+To build the samples with cmake, you'll need to have `avr-gcc`, `avr-gcc-c++`, 
+`avr-libc`, `avr-binutils`, `cmake`, `make`, `ninja-build` installed,
+`avr-gdb`, `avrdude` and `qemu-system-avr` are optional
 
 To configure your environnement for an Arduino Mega 2560, run the following commands:
 
@@ -308,6 +309,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/avr.cmake)
 | `QEMU_MCU` (QEMU only)        | Specifies the target microcontroller unit (MCU) for QEMU simulation as "uno." Can be listed with command `qemu-system-avr -machine help` |
 | `PROG_TYPE` (real board only) | Sets the programming type to "wiring." Can be listed with command `avrdude -c help`                                                      |
 | `PROG_PARTNO m328p`           | Specifies the target microcontroller part number as "m328p." Can be listed with command `avrdude -c ${PROG_TYPE} -p help`                |
+| `FEATURE_TIMER_COUNT`         | Sets the number of 16-bit timers available on the target.                                                              |
+| `FEATURE_UART_COUNT`          | Sets the number of UARTs available on the target.                                                                 |
 | `include(...)`                | Includes the AVR architecture generic cmake file                                                                                         |
 
 ### Custom target (PlatformIO)
