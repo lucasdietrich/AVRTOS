@@ -316,6 +316,17 @@ static inline void k_msleep(uint32_t ms)
 /**
  * @brief Wait for the specified amount of time in milliseconds.
  *
+ * This function keeps the thread ready and actively using the CPU until the timeout.
+ *
+ * Note: Requires KERNEL_UPTIME to be set.
+ *
+ * @param timeout The duration to wait in milliseconds.
+ */
+__kernel void k_active_loop_wait(k_timeout_t delay);
+
+/**
+ * @brief Wait for the specified amount of time in milliseconds.
+ *
  * This function keeps the thread ready but yields the CPU to another thread if available.
  * If no other thread is available, it puts the CPU into a sleep state until the timeout
  * expires.

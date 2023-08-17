@@ -39,7 +39,7 @@ __kernel bool k_is_cpu_idle(void);
  * Important: if others thread a ready, they will be blocked until an interrupt
  * occurs !
  *
- * Note: This function forces interrupts to be enabled.
+ * Note: This function requires interrupts to be enabled.
  */
 __kernel void k_idle(void);
 

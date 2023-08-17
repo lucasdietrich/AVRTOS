@@ -783,8 +783,13 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
 
 	if (thread == z_current)
 		z_yield();
-	else
-		irq_unlock(key);
+
+	/* Unlock in all cases:
+	 * - if we stopped ourselves, in which case we need to unlock in any case
+	 *   another thread started/resumed us again.
+	 * - if we stopped another thread, in which case we need to unlock
+	 */
+	irq_unlock(key);
 
 	return 0;
 }
@@ -910,6 +915,19 @@ void k_sleep(k_timeout_t timeout)
 }
 
 #if CONFIG_KERNEL_UPTIME
+
+void k_active_loop_wait(k_timeout_t delay)
+{
+	__ASSERT_INTERRUPT();
+
+	uint32_t now;
+	uint32_t ticks = k_ticks_get_32();
+
+	do {
+		now = k_ticks_get_32();
+	} while (now - ticks < K_TIMEOUT_TICKS(delay));
+}
+
 void k_wait(k_timeout_t delay)
 {
 	__ASSERT_INTERRUPT();
