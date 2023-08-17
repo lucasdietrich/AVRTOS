@@ -66,7 +66,6 @@ static struct {
 	 * - in milliseconds if CONFIG_KERNEL_TIME_API_MS_PRECISION is set
 	 */
 	k_uptime_t uptime;
-
 	/* mutex to protect timestamp and uptime */
 	struct k_mutex mutex;
 } z_time_ref = {
@@ -90,32 +89,36 @@ void k_time_set(uint32_t sec)
 #if CONFIG_KERNEL_TIME_API_MS_PRECISION
 uint32_t k_time_get(void)
 {
-	return (uint32_t)(k_time_get_ms() / 1000u);
+	return (uint32_t)(k_time_get_ms() / MSEC_PER_SEC);
 }
 
 uint64_t k_time_get_ms(void)
 {
-	uint64_t timestamp;
+	uint64_t timestamp_ms;
+
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
-	timestamp = k_uptime_get_ms64();
+	timestamp_ms = k_uptime_get_ms64() - z_time_ref.uptime +
+		  (k_uptime_t)z_time_ref.timestamp * MSEC_PER_SEC;
 	k_mutex_unlock(&z_time_ref.mutex);
-	return timestamp - z_time_ref.uptime + z_time_ref.timestamp;
+
+	return timestamp_ms;
 }
 
 #else
 
 uint32_t k_time_get(void)
 {
-	uint32_t timestamp;
+	uint32_t timestamp_s;
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
-	timestamp = k_uptime_get();
+	timestamp_s = k_uptime_get() - z_time_ref.uptime + z_time_ref.timestamp;
 	k_mutex_unlock(&z_time_ref.mutex);
-	return timestamp - z_time_ref.uptime + z_time_ref.timestamp;
+
+	return timestamp_s;
 }
 
 uint64_t k_time_get_ms(void)
 {
-	return (uint64_t)k_time_get() * 1000llu;
+	return (uint64_t)k_time_get() * MSEC_PER_SEC;
 }
 #endif
 
