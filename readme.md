@@ -23,7 +23,7 @@ AVRTOS offers an extensive list of features, including:
 - Round-robin scheduling without priority support
 - Configurable system clock with support for all hardware timers (e.g. 0-2 for ATmega328p and 0-5 for ATmega2560)
 - Synchronization objects like mutexes, semaphores, workqueues, FIFOs, message queues, memory slabs, flags, signals
-- Drivers for UART, timers, GPIO, and external interrupts
+- Drivers for UART, timers, GPIO, SPI and external interrupts
 - Thread sleep with up to 65-second duration in simple mode (extendable using high-precision time objects)
 - Scheduler lock/unlock to temporarily prevent preemption for preemptive threads
 - Thread switching from interrupts
@@ -43,11 +43,11 @@ Additional Features:
 - Custom error codes (e.g., EAGAIN, EINVAL, ETIMEDOUT)
 - Thread safe termination (excluding main thread)
 - stdout redirection to USART0, and stack sentinels
+- Various wait variants (e.g., k_sleep, k_wait with modes IDLE, ACTIVE, BLOCK and z_cpu_block_us)
 
 We plan (TODO) to implement several new features and improvements, including:
 
-- **SPI**
-	- Check reliability
+- Tests
 - CRC
 - Low duration sleep (e.g., 18us) with the use a dedicated timer counter.
 	- APi would be `uscounter_init()`, `uscounter_get()`, `uscounter_set`
@@ -55,16 +55,10 @@ We plan (TODO) to implement several new features and improvements, including:
 - Use sysclock as granularity for threads wake up (k_sleep) instead of the timeslice.
 	- Option to choose the SYSCLOCK or TIMESLICE as scheduling point: `KERNEL_SCHEDULING_EVENT`
 	- Explain that if timeslice is used, it's still possible to wait for small duration with `k_busy_wait(K_USEC(20u));`.
-- Add functions:
-	- k_msleep (k_sleep(K_MSEC(1000u));
-	- k_usleep (which uses k_msleep and k_busy_wait depending on the duration)
-	- k_wait which polls uptime, yield() or sleep but doesn't lock the scheduler
-	- k_busy_wait which polls uptime and locks the scheduler (k_sched_lock)
-	- k_block_us which locks IRQ and use _delay_us (uptime not incremented)
 - Threads priority
 - Per-thread CPU usage statistics
 - Polling
-- Drivers for SPI, I2C and ADC
+- Drivers for I2C and ADC
 - Memory heaps
 
 ## Getting Started
@@ -388,6 +382,32 @@ Upload it with:
 Monitor it with:
 
 	make monitor
+
+### Build in Docker container
+
+Two `Dockerfile` are provided to build the project in a container (based on Fedora)
+- [scripts/Dockerfile-base](./scripts/Dockerfile-base) is used as a base image for Jenkins (Devops)
+- ~~[scripts/Dockerfile-run](./scripts/Dockerfile-run) is used to build the project directly~~ (deprecated)
+
+Build the container with:
+
+    docker build -t fedora-avr-toolchain -f scripts/Dockerfile-base .
+
+Run the container with (`Z` flag is required with SELinux)
+
+    docker run -it --rm -v $(pwd):/avrtos:Z fedora-avr-toolchain
+
+Build the project within it:
+
+    cd /avrtos
+    cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="cmake/avr6-atmega2560.cmake"
+    make -C build sample_minimal_example
+
+### Jenkins
+
+A [Jenkinsfile](./Jenkinsfile) is provided to build the project in a Jenkins (multibranch) pipeline.
+
+It is based on the previous Docker container: `devops/fedora-avr-toolchain`
 
 ---
 

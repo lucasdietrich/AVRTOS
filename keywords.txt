@@ -167,9 +167,8 @@ k_cur_is_coop	KEYWORD2
 k_sleep	KEYWORD2
 k_msleep	KEYWORD2
 k_wait	        KEYWORD2
-k_bysy_wait	KEYWORD2
-k_block_ms	KEYWORD2
-k_block_us	KEYWORD2
+z_cpu_block_ms	KEYWORD2
+z_cpu_block_us	KEYWORD2
 k_thread_start	KEYWORD2
 k_thread_stop	KEYWORD2
 k_stop	KEYWORD2

@@ -29,6 +29,6 @@ int main(void)
 
 	for (;;) {
 		ll_usart_sync_putc(USART0_DEVICE, inc(c));
-		k_block_ms(1000u);
+		z_cpu_block_ms(1000u);
 	}
 }

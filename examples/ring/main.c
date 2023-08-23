@@ -67,7 +67,7 @@ int main(void)
 		if (chr > 'z') {
 			chr = 'a';
 		}
-		k_wait(K_MSEC(500u));
+		k_wait(K_MSEC(500u), K_WAIT_MODE_IDLE);
 	}
 
 	k_sleep(K_FOREVER);

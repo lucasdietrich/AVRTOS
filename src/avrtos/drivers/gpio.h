@@ -72,81 +72,6 @@ typedef struct {
 #define PORTn6 PORTA6
 #define PORTn7 PORTA7
 
-/* Inline API */
-
-static inline void gpiol_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
-{
-	gpio->DDR  = dir_mask;
-	gpio->PORT = pullup_mask;
-}
-
-static inline void gpiol_pin_init(GPIO_Device *gpio,
-				  uint8_t pin,
-				  uint8_t dir,
-				  uint8_t pullup)
-{
-	/* represent either pullup (if input) or output level (if output)*/
-	if (pullup == GPIO_INPUT_NO_PULLUP) {
-		gpio->PORT = gpio->PORT & ~BIT(pin);
-	} else {
-		gpio->PORT = gpio->PORT | BIT(pin);
-	}
-
-	if (dir == GPIO_INPUT) {
-		gpio->DDR = gpio->DDR & ~BIT(pin);
-	} else {
-		gpio->DDR = gpio->DDR | BIT(pin);
-	}
-}
-
-static inline void gpiol_pin_set_direction(GPIO_Device *gpio,
-					   uint8_t pin,
-					   uint8_t direction)
-{
-	gpio->DDR = (gpio->DDR & ~BIT(pin)) | ((direction & 1u) << pin);
-}
-
-static inline uint8_t gpiol_pin_get_direction(GPIO_Device *gpio, uint8_t pin)
-{
-	return (gpio->DDR >> pin) & 1u;
-}
-
-static inline void gpiol_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)
-{
-	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((pullup & 1u) << pin);
-}
-
-static inline void gpiol_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state)
-{
-	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((state & 1u) << pin);
-}
-
-static inline void gpiol_pin_toggle(GPIO_Device *gpio, uint8_t pin)
-{
-	gpio->PIN = BIT(pin);
-}
-
-static inline uint8_t gpiol_pin_read_state(GPIO_Device *gpio, uint8_t pin)
-{
-	return (gpio->PIN >> pin) & 1u;
-}
-
-/* Non-inline API */
-
-void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask);
-
-void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup);
-
-void gpio_pin_set_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction);
-
-void gpio_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup);
-
-void gpio_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state);
-
-void gpio_pin_toggle(GPIO_Device *gpio, uint8_t pin);
-
-uint8_t gpio_pin_read_state(GPIO_Device *gpio, uint8_t pin);
-
 #define AVR_GPIO_BASE_ADDR (AVR_IO_BASE_ADDR + 0x20u)
 
 #define AVR_GPIO_ABCDEFG_BASE_ADDR (AVR_IO_BASE_ADDR + 0x20u)
@@ -221,6 +146,81 @@ uint8_t gpio_pin_read_state(GPIO_Device *gpio, uint8_t pin);
 #else
 #define GPIO_DEVICE GPIO_DEVICE_ABCDEFG
 #endif
+
+/* Inline API */
+
+static inline void gpiol_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
+{
+	gpio->DDR  = dir_mask;
+	gpio->PORT = pullup_mask;
+}
+
+static inline void gpiol_pin_init(GPIO_Device *gpio,
+				  uint8_t pin,
+				  uint8_t dir,
+				  uint8_t pullup)
+{
+	/* represent either pullup (if input) or output level (if output)*/
+	if (pullup == GPIO_INPUT_NO_PULLUP) {
+		gpio->PORT = gpio->PORT & ~BIT(pin);
+	} else {
+		gpio->PORT = gpio->PORT | BIT(pin);
+	}
+
+	if (dir == GPIO_INPUT) {
+		gpio->DDR = gpio->DDR & ~BIT(pin);
+	} else {
+		gpio->DDR = gpio->DDR | BIT(pin);
+	}
+}
+
+static inline void gpiol_pin_set_direction(GPIO_Device *gpio,
+					   uint8_t pin,
+					   uint8_t direction)
+{
+	gpio->DDR = (gpio->DDR & ~BIT(pin)) | ((direction & 1u) << pin);
+}
+
+static inline uint8_t gpiol_pin_get_direction(GPIO_Device *gpio, uint8_t pin)
+{
+	return (gpio->DDR >> pin) & 1u;
+}
+
+static inline void gpiol_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)
+{
+	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((pullup & 1u) << pin);
+}
+
+static inline void gpiol_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state)
+{
+	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((state & 1u) << pin);
+}
+
+static inline void gpiol_pin_toggle(GPIO_Device *gpio, uint8_t pin)
+{
+	gpio->PIN = BIT(pin);
+}
+
+static inline uint8_t gpiol_pin_read_state(GPIO_Device *gpio, uint8_t pin)
+{
+	return (gpio->PIN >> pin) & 1u;
+}
+
+/* Non-inline API */
+
+void gpio_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask);
+
+void gpio_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup);
+
+void gpio_pin_set_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction);
+
+void gpio_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup);
+
+void gpio_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state);
+
+void gpio_pin_toggle(GPIO_Device *gpio, uint8_t pin);
+
+uint8_t gpio_pin_read_state(GPIO_Device *gpio, uint8_t pin);
 
 #if defined(__cplusplus)
 }

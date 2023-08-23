@@ -314,43 +314,45 @@ static inline void k_msleep(uint32_t ms)
 }
 
 /**
- * @brief Wait for the specified amount of time in milliseconds.
- *
- * This function keeps the thread ready and actively using the CPU until the timeout.
- *
- * Note: Requires KERNEL_UPTIME to be set.
- *
- * @param timeout The duration to wait in milliseconds.
+ * @brief This mode keeps the thread ready but yields the CPU to another thread if
+ * available. If no other thread is available, it puts the CPU into a sleep state making
+ * the system responsive to interrupts.
  */
-__kernel void k_active_loop_wait(k_timeout_t delay);
+#define K_WAIT_MODE_IDLE 0u
 
 /**
- * @brief Wait for the specified amount of time in milliseconds.
+ * @brief  This mode keeps the thread ready and actively using the CPU until the timeout.
+ * - If the thread is preemptive, the CPU will be shared with other threads.
+ * - If the thread is cooperative, it will keep the CPU until the timeout, blocking other.
+ *   For cooperative threads this mode is equivalent to K_WAIT_BLOCK
+ */
+#define K_WAIT_MODE_ACTIVE 1u
+
+/**
+ * @brief  This function actively waits for the specified number of milliseconds by
+ * locking the CPU for the current thread.
+ */
+#define K_WAIT_MODE_BLOCK 2u
+
+/**
+ * @brief Make the thread wait for the specified amount of time in milliseconds,
+ * but keep it ready (in opposite to k_sleep which suspends the thread).
  *
- * This function keeps the thread ready but yields the CPU to another thread if available.
- * If no other thread is available, it puts the CPU into a sleep state until the timeout
- * expires.
+ * The function must poll the elapsed time and is in charge to exit to continu
+ * the execution of the current thread.
+ *
+ * This function doesn't disable interrupts and doesn't break system time.
+ * However the choosen mode can affect the execution of other threads.
  *
  * Note: This function can always be used without an IDLE thread (with
  * CONFIG_KERNEL_THREAD_IDLE disabled).
  *
- * Note: Requires KERNEL_UPTIME to be set.
+ * Note: Requires KERNEL_UPTIME to be enabled.
  *
  * @param timeout The duration to wait in milliseconds.
+ * @param mode The wait mode (K_WAIT_MODE_IDLE, K_WAIT_MODE_ACTIVE, K_WAIT_MODE_BLOCK)
  */
-__kernel void k_wait(k_timeout_t delay);
-
-/**
- * @brief Busy wait for the specified number of microseconds.
- *
- * This function actively waits for the specified number of microseconds by locking the
- * CPU for the current thread.
- *
- * Note: Requires KERNEL_UPTIME to be set.
- *
- * @param delay_us The duration to wait in microseconds.
- */
-__kernel void k_busy_wait(k_timeout_t delay);
+__kernel void k_wait(k_timeout_t delay, uint8_t mode);
 
 /**
  * @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time in
@@ -359,9 +361,12 @@ __kernel void k_busy_wait(k_timeout_t delay);
  * Note: Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US, otherwise the system uptime may
  * be delayed.
  *
+ * This function relies on _delay_us() from <util/delay.h> which can only be used
+ * int realise mode (not in debug mode).
+ *
  * @param delay_us The duration to block in microseconds.
  */
-__kernel void k_block_us(uint32_t delay_us);
+__kernel void z_cpu_block_us(uint32_t delay_us);
 
 /**
  * @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time in
@@ -370,9 +375,12 @@ __kernel void k_block_us(uint32_t delay_us);
  * Note: Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds),
  * otherwise the system uptime may be delayed.
  *
+ * This function relies on _delay_ms() from <util/delay.h> which can only be used
+ * int realise mode (not in debug mode).
+ *
  * @param delay_ms The duration to block in milliseconds.
  */
-__kernel void k_block_ms(uint32_t delay_ms);
+__kernel void z_cpu_block_ms(uint32_t delay_ms);
 
 /**
  * @brief Get the number of currently ready threads.

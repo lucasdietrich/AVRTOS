@@ -99,7 +99,7 @@ uint64_t k_time_get_ms(void)
 
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
 	timestamp_ms = k_uptime_get_ms64() - z_time_ref.uptime +
-		  (k_uptime_t)z_time_ref.timestamp * MSEC_PER_SEC;
+		       (k_uptime_t)z_time_ref.timestamp * MSEC_PER_SEC;
 	k_mutex_unlock(&z_time_ref.mutex);
 
 	return timestamp_ms;

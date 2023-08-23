@@ -39,7 +39,7 @@ int main(void)
 
 		__Z_DBG_GPIO_0_TOGGLE();
 
-		k_block_us(10u);
+		z_cpu_block_us(10u);
 
 		chr++;
 	}

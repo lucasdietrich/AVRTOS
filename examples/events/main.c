@@ -74,7 +74,7 @@ int main(void)
 			irq_unlock(key);
 		}
 
-		k_wait(K_SECONDS(10));
+		k_wait(K_SECONDS(10), K_WAIT_MODE_IDLE);
 	}
 }
 

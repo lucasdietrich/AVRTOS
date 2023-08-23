@@ -61,72 +61,181 @@ typedef struct {
 extern "C" {
 #endif
 
+/**
+ * @brief Configure an external interrupt
+ *
+ * @param exti EXTI number
+ * @param isc
+ * @return int 0 on success, -EINVAL if EXTI number is invalid
+ *
+ * Example for ATmega328P :
+ *
+ * ```c
+ * #include <avr/io.h>
+ * #include <avrtos/drivers/exti.h>
+ * exti_configure(INT0, ISC_FALLING);
+ * exti_clear_flag(INT0);
+ * exti_enable(INT0);
+ * ```
+ */
 int exti_configure(uint8_t exti, uint8_t isc);
 
+/**
+ * @brief Clear an external interrupt flag
+ *
+ * @param exti EXTI number
+ */
 static inline void exti_clear_flag(uint8_t exti)
 {
 	EIFR |= BIT(exti);
 }
 
+/**
+ * @brief Get an external interrupt flag
+ *
+ * @param exti EXTI number
+ * @return uint8_t interrupt flag value
+ */
 static inline uint8_t exti_get_flag(uint8_t exti)
 {
 	return (EIFR & BIT(exti)) >> exti;
 }
 
+/**
+ * @brief Poll an external interrupt flag until it is set
+ *
+ * @param exti EXTI number
+ */
 static inline void exti_poll_flag(uint8_t exti)
 {
 	while (!exti_get_flag(exti))
 		;
 }
 
+/**
+ * @brief Enable an external interrupt
+ *
+ * @param exti EXTI number
+ */
 static inline void exti_enable(uint8_t exti)
 {
 	EIMSK |= BIT(exti);
 }
 
+/**
+ * @brief Disable an external interrupt
+ *
+ * @param exti EXTI number
+ */
 static inline void exti_disable(uint8_t exti)
 {
 	EIMSK &= ~BIT(exti);
 }
 
+/**
+ * @brief Configure a pin change interrupt
+ *
+ * @param pci_group Group number
+ * @param mask Mask of pins to enable
+ *
+ * Example for ATmega328P :
+ *
+ * ```c
+ * #include <avr/io.h>
+ * #include <avrtos/drivers/exti.h>
+ * pci_configure(PCINT_16_23, BIT(PCINT0) | BIT(PCINT1));
+ * pci_clear_flag(PCINT_16_23);
+ * pci_enable(PCINT_16_23);
+ */
 static inline void pci_configure(uint8_t pci_group, uint8_t mask)
 {
 	PCI_CTRL_DEVICE->PCMSK[pci_group] = mask;
 }
 
+/**
+ * @brief Enable a pin change interrupt on a group line
+ *
+ * @param group Group number
+ * @param line Line number (0-7)
+ */
 static inline void pci_pin_enable_group_line(uint8_t group, uint8_t line)
 {
 	PCI_CTRL_DEVICE->PCMSK[group] |= BIT(line);
 }
 
+/**
+ * @brief Disable a pin change interrupt on a group line
+ *
+ * @param group Group number
+ * @param line Line number (0-7)
+ */
 static inline void pci_pin_disable_group_line(uint8_t group, uint8_t line)
 {
 	PCI_CTRL_DEVICE->PCMSK[group] &= ~BIT(line);
 }
 
+/**
+ * @brief Enable a pin change interrupt on a pin
+ *
+ * @param pci Pin change interrupt number
+ *
+ * Example for ATmega328P :
+ * `pci_pin_enable(23)` is equivalent to `pci_pin_enable_group_line(2, 7)` # PCINT23
+ */
 static inline void pci_pin_enable(uint8_t pci)
 {
 	pci_pin_enable_group_line(pci >> 3u, pci & 0x07u);
 }
 
+/**
+ * @brief Disable a pin change interrupt on a pin
+ *
+ * @param pci Pin change interrupt number
+ *
+ * Example for ATmega328P :
+ * `pci_pin_disable(23)` is equivalent to `pci_pin_disable_group_line(2, 7)` # PCINT23
+ */
 static inline void pci_pin_disable(uint8_t pci)
 {
 	pci_pin_disable_group_line(pci >> 3u, pci & 0x07u);
 }
 
-static inline void pci_clear_flag(uint8_t pci)
+/**
+ * @brief Clear a pin change interrupt flag
+ *
+ * @param group Group number
+ *
+ * Example for ATmega328P :
+ *
+ * ```c
+ * #include <avr/io.h>
+ * #include <avrtos/drivers/exti.h>
+ * pci_clear_flag(PCINT_16_23);
+ * ```
+ */
+static inline void pci_clear_flag(uint8_t group)
 {
-	PCIFR |= BIT(pci);
+	PCIFR |= BIT(group);
 }
 
-static inline void pci_enable(uint8_t pci)
+/**
+ * @brief Enable a pin change interrupt
+ *
+ * @param group Group number
+ */
+static inline void pci_enable(uint8_t group)
 {
-	PCICR |= BIT(pci);
+	PCICR |= BIT(group);
 }
 
-static inline void pci_disable(uint8_t pci)
+/**
+ * @brief Disable a pin change interrupt
+ *
+ * @param group Group number
+ */
+static inline void pci_disable(uint8_t group)
 {
-	PCICR &= ~BIT(pci);
+	PCICR &= ~BIT(group);
 }
 
 #if defined(__cplusplus)

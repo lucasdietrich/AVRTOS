@@ -48,7 +48,7 @@ int main(void)
 
 		printf_P(PSTR("%lu s (timestamp)\n"), timestamp);
 
-		k_wait(K_SECONDS(1));
+		k_wait(K_SECONDS(1), K_WAIT_MODE_IDLE);
 	}
 }
 

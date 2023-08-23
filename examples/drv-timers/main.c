@@ -93,7 +93,7 @@ int main(void)
 
 		printf("\n");
 		k_show_uptime();
-		k_wait(K_SECONDS(1));
+		k_wait(K_SECONDS(1), K_WAIT_MODE_IDLE);
 		i++;
 	}
 }

@@ -131,33 +131,20 @@ typedef struct {
 #define K_TIMEOUT_SECONDS(t) ((uint32_t)(K_TIMEOUT_TICKS(t) / K_TICKS_PER_SECOND))
 
 #ifndef __cplusplus
+#define K_TICKS(ticks) ((k_timeout_t){.value = (k_ticks_t)ticks})
+#else
+#define K_TICKS(ticks) ((k_timeout_t){.value = static_cast<k_ticks_t>(ticks)})
+#endif /* __cplusplus */
 
-#define K_SECONDS(seconds)   ((k_timeout_t){.value = K_TICKS_PER_SECOND * seconds})
-#define K_MSEC(milliseconds) ((k_timeout_t){.value = K_TICKS_PER_MS * milliseconds})
-#define K_USEC(microseconds) ((k_timeout_t){.value = K_TICKS_PER_USEC * microseconds})
-#define K_NO_WAIT	     ((k_timeout_t){.value = (k_ticks_t)0})
-#define K_NEXT_TICK	     ((k_timeout_t){.value = (k_ticks_t)1})
-#define K_FOREVER	     ((k_timeout_t){.value = (k_ticks_t)-1})
+#define K_SECONDS(seconds)   K_TICKS(K_TICKS_PER_SECOND *seconds)
+#define K_MSEC(milliseconds) K_TICKS(K_TICKS_PER_MS *milliseconds)
+#define K_USEC(microseconds) K_TICKS(K_TICKS_PER_USEC *microseconds)
+#define K_NO_WAIT	     K_TICKS(0)
+#define K_NEXT_TICK	     K_TICKS(1)
+#define K_FOREVER	     K_TICKS(-1)
 #define K_UNTIL_WAKEUP	     K_FOREVER
 
 #define K_IMMEDIATE K_NEXT_TICK
-
-#else
-
-#define K_SECONDS(seconds) \
-	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_SECOND * seconds)})
-#define K_MSEC(milliseconds) \
-	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_MS * milliseconds)})
-#define K_USEC(microseconds) \
-	((k_timeout_t){.value = static_cast<k_ticks_t>(K_TICKS_PER_USEC * microseconds)})
-#define K_NO_WAIT      ((k_timeout_t){.value = (k_ticks_t)0})
-#define K_NEXT_TICK    ((k_timeout_t){.value = (k_ticks_t)1})
-#define K_FOREVER      ((k_timeout_t){.value = (k_ticks_t)-1})
-#define K_UNTIL_WAKEUP K_FOREVER
-
-#define K_IMMEDIATE K_NEXT_TICK
-
-#endif /* __cplusplus */
 
 /*___________________________________________________________________________*/
 

@@ -770,11 +770,11 @@ int8_t k_thread_start(struct k_thread *thread)
 
 __kernel int8_t k_thread_stop(struct k_thread *thread)
 {
-	if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) return -EINVAL;
-
 #if CONFIG_KERNEL_THREAD_IDLE
-	if (z_get_thread_state(thread) == Z_THREAD_STATE_IDLE) return -EINVAL;
+	__ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
 #endif
+
+	if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) return -EINVAL;
 
 	const uint8_t key = irq_lock();
 
@@ -782,8 +782,7 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
 
 	z_set_thread_state(thread, Z_THREAD_STATE_STOPPED);
 
-	if (thread == z_current)
-		z_yield();
+	if (thread == z_current) z_yield();
 
 	/* Unlock in all cases:
 	 * - if we stopped ourselves, in which case we need to unlock in any case
@@ -917,56 +916,37 @@ void k_sleep(k_timeout_t timeout)
 
 #if CONFIG_KERNEL_UPTIME
 
-void k_active_loop_wait(k_timeout_t delay)
+void k_wait(k_timeout_t delay, uint8_t mode)
 {
 	__ASSERT_INTERRUPT();
 
 	uint32_t now;
 	uint32_t ticks = k_ticks_get_32();
 
-	do {
-		now = k_ticks_get_32();
-	} while (now - ticks < K_TIMEOUT_TICKS(delay));
-}
-
-void k_wait(k_timeout_t delay)
-{
-	__ASSERT_INTERRUPT();
-
-	uint32_t now;
-	uint32_t ticks = k_ticks_get_32();
+	if (mode & K_WAIT_MODE_BLOCK) k_sched_lock();
 
 	do {
-		k_idle();
-
-		now = k_ticks_get_32();
-	} while (now - ticks < K_TIMEOUT_TICKS(delay));
-}
-
-void k_busy_wait(k_timeout_t delay)
-{
-	__ASSERT_INTERRUPT();
-
-	uint32_t now;
-	uint32_t ticks;
-
-	k_sched_lock();
-
-	ticks = k_ticks_get_32();
-
-	do {
+		switch (mode) {
+		case K_WAIT_MODE_ACTIVE:
+			break;
+		case K_WAIT_MODE_BLOCK:
 #ifndef __QEMU__
-		sleep_cpu(); /* idle the thread until next interrupt */
-#endif			     /* __QEMU__ */
-
+			sleep_cpu(); /* idle the thread until next interrupt */
+#endif				     /* __QEMU__ */
+			break;
+		case K_WAIT_MODE_IDLE:
+		default:
+			k_idle();
+			break;
+		}
 		now = k_ticks_get_32();
 	} while (now - ticks < K_TIMEOUT_TICKS(delay));
 
-	k_sched_unlock();
+	if (mode & K_WAIT_MODE_BLOCK) k_sched_unlock();
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 
-void k_block_us(uint32_t delay_us)
+void z_cpu_block_us(uint32_t delay_us)
 {
 	const uint8_t key = irq_lock();
 
@@ -975,7 +955,7 @@ void k_block_us(uint32_t delay_us)
 	irq_unlock(key);
 }
 
-void k_block_ms(uint32_t delay_ms)
+void z_cpu_block_ms(uint32_t delay_ms)
 {
 	const uint8_t key = irq_lock();
 
