@@ -7,11 +7,11 @@
 #ifndef _AVRTOS_FIFO_H
 #define _AVRTOS_FIFO_H
 
-#include "dstruct/slist.h"
-#include "kernel.h"
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "dstruct/slist.h"
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

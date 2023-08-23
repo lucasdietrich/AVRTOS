@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "dstruct/slist.h"
 #include "fifo.h"
+
+#include "dstruct/slist.h"
 #include "kernel.h"
 #include "kernel_internals.h"
 

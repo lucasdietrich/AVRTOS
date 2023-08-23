@@ -5,12 +5,12 @@
  */
 
 #include "serial.h"
-
 #include <string.h>
+
+#include <avrtos/drivers/usart.h>
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <avrtos/drivers/usart.h>
 
 #define USART_DEVICE USART0_DEVICE
 

@@ -7,11 +7,11 @@
 #ifndef _AVRTOS_SEM_H
 #define _AVRTOS_SEM_H
 
-#include "kernel.h"
-
 #include <stdbool.h>
 
 #include <avr/io.h>
+
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -5,6 +5,7 @@
  */
 
 #include "atomic.h"
+
 #include "kernel.h"
 
 #if CONFIG_KERNEL_ATOMIC_API

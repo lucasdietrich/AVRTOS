@@ -11,11 +11,11 @@
 extern "C" {
 #endif
 
+#include <avrtos/misc/serial.h>
+
 #include "dlist.h"
 #include "slist.h"
 #include "tqueue.h"
-
-#include <avrtos/misc/serial.h>
 
 //
 // SList

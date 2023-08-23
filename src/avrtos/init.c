@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "init.h"
+
 #include "canaries.h"
 #include "debug.h"
-#include "init.h"
 #include "io.h"
 #include "kernel.h"
 #include "kernel_internals.h"

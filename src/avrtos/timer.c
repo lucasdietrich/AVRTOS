@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "kernel.h"
-#include "misc/serial.h"
 #include "timer.h"
 
 #include <util/atomic.h>
+
+#include "kernel.h"
+#include "misc/serial.h"
 
 #if CONFIG_KERNEL_TIMERS
 

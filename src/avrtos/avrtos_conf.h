@@ -7,9 +7,9 @@
 #ifndef _AVRTOS_DEFAULT_CONFIG_H
 #define _AVRTOS_DEFAULT_CONFIG_H
 
-#include "sys.h"
-
 #include <avr/io.h>
+
+#include "sys.h"
 
 //
 // Tells whether the kernel is compiled for Arduino framework

@@ -5,6 +5,7 @@
  */
 
 #include "io.h"
+
 #include "misc/serial.h"
 
 #if CONFIG_STDIO_PRINTF_TO_USART == 0

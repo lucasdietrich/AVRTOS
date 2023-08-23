@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "kernel.h"
-#include "kernel_internals.h"
 #include "signal.h"
 
 #include <util/atomic.h>
+
+#include "kernel.h"
+#include "kernel_internals.h"
 
 #define K_MODULE K_MODULE_SIGNAL
 

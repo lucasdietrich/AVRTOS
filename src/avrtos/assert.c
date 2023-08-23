@@ -5,9 +5,10 @@
  */
 
 #include "assert.h"
-#include "misc/serial.h"
 
 #include <avr/pgmspace.h>
+
+#include "misc/serial.h"
 
 extern uint8_t z_kernel_mode;
 

@@ -7,9 +7,9 @@
 #ifndef _AVRTOS_FAULT_H_
 #define _AVRTOS_FAULT_H_
 
-#include "kernel.h"
-
 #include <stdint.h>
+
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

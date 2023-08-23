@@ -7,11 +7,11 @@
 #ifndef _AVRTOS_LOGGING_H_
 #define _AVRTOS_LOGGING_H_
 
-#include "kernel.h"
-
 #include <stdio.h>
 
 #include <avr/pgmspace.h>
+
+#include "kernel.h"
 
 #define LOG_LEVEL_NONE	  0u
 #define LOG_LEVEL_ERROR	  1u

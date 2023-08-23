@@ -5,15 +5,15 @@
  */
 
 #include "debug.h"
-#include "dstruct/debug.h"
-#include "dstruct/dlist.h"
-
 #include <stdio.h>
 #include <string.h>
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
+
+#include "dstruct/debug.h"
+#include "dstruct/dlist.h"
 
 extern struct dnode *z_runq;
 extern struct titem *z_timeouts_queue;

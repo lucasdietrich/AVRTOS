@@ -9,8 +9,9 @@
 
 #include <stddef.h>
 
-#include <avr/pgmspace.h>
 #include <avrtos/kernel.h>
+
+#include <avr/pgmspace.h>
 
 #ifdef __cplusplus
 extern "C" {

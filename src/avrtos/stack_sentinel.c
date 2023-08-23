@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "fault.h"
 #include "stack_sentinel.h"
 
 #include <avr/pgmspace.h>
+
+#include "fault.h"
 
 extern struct k_thread z_thread_main;
 

@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "kernel.h"
 #include "workqueue.h"
 
 #include <util/atomic.h>
+
+#include "kernel.h"
 
 #define K_MODULE K_MODULE_WORKQUEUE
 
@@ -85,7 +86,7 @@ void k_work_init(struct k_work *work, k_work_handler_t handler)
 
 /**
  * @brief Tells whether the work item is submittable or not.
- * 
+ *
  * Requires interrupts to be disabled.
  *
  * @param work

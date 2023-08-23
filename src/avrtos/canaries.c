@@ -5,6 +5,7 @@
  */
 
 #include "canaries.h"
+
 #include "misc/serial.h"
 
 void z_init_thread_stack_canaries(struct k_thread *thread)

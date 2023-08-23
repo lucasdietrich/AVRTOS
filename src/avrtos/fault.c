@@ -5,9 +5,10 @@
  */
 
 #include "fault.h"
-#include "misc/serial.h"
 
 #include <avr/pgmspace.h>
+
+#include "misc/serial.h"
 
 __attribute__((weak, used)) void __fault_hook(void)
 {

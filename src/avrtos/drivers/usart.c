@@ -5,7 +5,6 @@
  */
 
 #include "usart.h"
-
 #include <stdbool.h>
 
 #include <avr/io.h>

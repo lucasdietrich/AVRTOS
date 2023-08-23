@@ -7,13 +7,13 @@
 #ifndef _AVRTOS_ATOMIC_H_
 #define _AVRTOS_ATOMIC_H_
 
-#include "defines.h"
-
 #include <stdbool.h>
 
 #include <avr/cpufunc.h>
 #include <avr/io.h>
 #include <util/atomic.h>
+
+#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {

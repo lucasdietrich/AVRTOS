@@ -7,12 +7,12 @@
 #ifndef _AVRTOS_DEBUG_H
 #define _AVRTOS_DEBUG_H
 
+#include <avr/pgmspace.h>
+
 #include "kernel.h"
 #include "misc/serial.h"
 #include "mutex.h"
 #include "semaphore.h"
-
-#include <avr/pgmspace.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -7,11 +7,11 @@
 #ifndef _AVRTOS_KERNEL_TYPES_H
 #define _AVRTOS_KERNEL_TYPES_H
 
+#include <stddef.h>
+
 #include "defines.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
-
-#include <stddef.h>
 
 /**
  * @brief Thread entry point function type.
@@ -46,8 +46,8 @@ struct k_thread {
 		// the same time
 
 	union {
-		struct dnode wany;  // represent the thread pending on a generic
-				    // object
+		struct dnode wany;    // represent the thread pending on a generic
+				      // object
 		struct dnode wmutex;  // represent the thread pending on an mutex
 		struct dnode wsem;    // represent the thread pending on an semaphore
 		struct dnode wsig;    // represent the thread pending on an signal

@@ -7,13 +7,13 @@
 #ifndef _AVRTOS_KERNEL_H
 #define _AVRTOS_KERNEL_H
 
+#include <avr/interrupt.h>
+#include <avr/io.h>
+
 #include "assert.h"
 #include "defines.h"
 #include "sys.h"
 #include "types.h"
-
-#include <avr/interrupt.h>
-#include <avr/io.h>
 
 #ifdef __cplusplus
 extern "C" {

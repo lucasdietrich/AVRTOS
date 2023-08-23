@@ -7,10 +7,10 @@
 #ifndef _AVRTOS_MSGQ_H_
 #define _AVRTOS_MSGQ_H_
 
+#include <stdint.h>
+
 #include "dstruct/dlist.h"
 #include "kernel.h"
-
-#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

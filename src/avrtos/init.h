@@ -7,10 +7,10 @@
 #ifndef _AVRTOS_INIT_H_
 #define _AVRTOS_INIT_H_
 
+#include <avr/io.h>
+
 #include "defines.h"
 #include "kernel.h"
-
-#include <avr/io.h>
 
 #ifdef __cplusplus
 extern "C" {

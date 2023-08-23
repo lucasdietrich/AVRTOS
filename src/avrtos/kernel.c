@@ -4,20 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "kernel.h"
+
+#include <avr/sleep.h>
+#include <util/atomic.h>
+#include <util/delay.h>
+
 #include "assert.h"
 #include "canaries.h"
 #include "debug.h"
 #include "event.h"
 #include "fault.h"
 #include "idle.h"
-#include "kernel.h"
 #include "kernel_internals.h"
 #include "stack_sentinel.h"
 #include "timer.h"
-
-#include <avr/sleep.h>
-#include <util/atomic.h>
-#include <util/delay.h>
 
 #define K_MODULE K_MODULE_KERNEL
 

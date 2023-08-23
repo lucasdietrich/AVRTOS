@@ -7,11 +7,11 @@
 #ifndef _AVRTOS_SIGNAL_H_
 #define _AVRTOS_SIGNAL_H_
 
-#include "kernel.h"
-
 #include <stdbool.h>
 
 #include <avr/io.h>
+
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {
