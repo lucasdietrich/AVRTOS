@@ -400,8 +400,16 @@ Run the container with (`Z` flag is required with SELinux)
 Build the project within it:
 
     cd /avrtos
-    cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="cmake/avr6-atmega2560.cmake"
-    make -C build sample_minimal_example
+    cmake -S . -B build \
+    	-DCMAKE_TOOLCHAIN_FILE="cmake/avr6-atmega2560.cmake" \
+	-DCMAKE_BUILD_TYPE=Debug \
+	-DQEMU=ON \
+	-G="Ninja"
+    ninja -C build sample_minimal_example
+
+Run the sample in QEMU:
+
+    ninja -C build run_sample_minimal_example
 
 ### Jenkins
 
