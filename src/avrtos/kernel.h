@@ -362,7 +362,7 @@ __kernel void k_wait(k_timeout_t delay, uint8_t mode);
  * be delayed.
  *
  * This function relies on _delay_us() from <util/delay.h> which can only be used
- * int realise mode (not in debug mode).
+ * in release mode(not in debug mode).
  *
  * @param delay_us The duration to block in microseconds.
  */
@@ -376,7 +376,7 @@ __kernel void z_cpu_block_us(uint32_t delay_us);
  * otherwise the system uptime may be delayed.
  *
  * This function relies on _delay_ms() from <util/delay.h> which can only be used
- * int realise mode (not in debug mode).
+ * in release mode(not in debug mode).
  *
  * @param delay_ms The duration to block in milliseconds.
  */
