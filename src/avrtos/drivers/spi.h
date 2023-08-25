@@ -49,11 +49,11 @@ typedef struct {
 #define SPI SPI_DEVICE
 
 typedef enum {
-	SPI_PRESCALER_4	  = 0u,
+	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed */
 	SPI_PRESCALER_16  = 1u,
 	SPI_PRESCALER_64  = 2u,
 	SPI_PRESCALER_128 = 3u,
-	SPI_PRESCALER_X2  = 4u,
+	SPI_PRESCALER_X2  = 4u, /* Not recommended */
 	SPI_PRESCALER_X8  = 5u,
 	SPI_PRESCALER_X32 = 6u,
 	SPI_PRESCALER_X64 = 7u
@@ -239,7 +239,7 @@ typedef bool (*spi_callback_t)(char *rxtx);
  * complete.
  * @return int number of bytes sent on success, negative value on error.
  */
-int8_t spi_tranceive_async(char first_tx, spi_callback_t callback);
+int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback);
 
 /**
  * @brief Check if an asynchronous SPI transmission is running.

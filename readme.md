@@ -44,6 +44,7 @@ Additional Features:
 - Thread safe termination (excluding main thread)
 - stdout redirection to USART0, and stack sentinels
 - Various wait variants (e.g., k_sleep, k_wait with modes IDLE, ACTIVE, BLOCK and z_cpu_block_us)
+- Dockerfile and Jenkinsfile templates for CI/CD
 
 We plan (TODO) to implement several new features and improvements, including:
 

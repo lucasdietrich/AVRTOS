@@ -186,7 +186,7 @@ ISR(SPI_STC_vect)
 	}
 }
 
-int8_t spi_tranceive_async(char first_tx, spi_callback_t callback)
+int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback)
 {
 #if CONFIG_KERNEL_ARGS_CHECKS
 	if (!callback) return -EINVAL;
