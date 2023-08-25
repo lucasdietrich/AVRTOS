@@ -45,11 +45,6 @@ Minor changes:
 
 ## avrtos v1.0.0
 
-(Previous description remains unchanged)
-Breaking changes
-
-## avrtos v1.0.0
-
 AVRTOS is a real-time operating system (RTOS) designed specifically for 8-bit
 AVR microcontrollers. The project aims to provide an efficient and highly
 configurable RTOS solution for AVR-based systems. Fully C/C++ compliant, AVRTOS
