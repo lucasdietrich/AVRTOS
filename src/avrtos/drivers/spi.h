@@ -97,6 +97,7 @@ struct spi_config {
 	// uint8_t force_ss_output : 1u;
 };
 
+/* 4Mhz SPI Master in mode 0,0 */
 #define SPI_CONFIG_MASTER_DEFAULTS                                               \
 	{                                                                        \
 		.mode = SPI_MODE_MASTER, .polarity = SPI_CLOCK_POLARITY_FALLING, \
@@ -104,6 +105,7 @@ struct spi_config {
 		.prescaler = SPI_PRESCALER_4,                                    \
 	}
 
+/* 4Mhz SPI Slave in mode 0,0 */
 #define SPI_CONFIG_SLAVE_DEFAULTS                                               \
 	{                                                                       \
 		.mode = SPI_MODE_SLAVE, .polarity = SPI_CLOCK_POLARITY_FALLING, \

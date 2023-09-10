@@ -21,6 +21,9 @@
 
 int8_t spi_init(const struct spi_config *config)
 {
+	uint8_t spcr = 0u;
+	uint8_t spsr = 0u;
+
 	spi_deinit();
 
 	if (config->mode == SPI_MODE_MASTER) {
@@ -35,12 +38,12 @@ int8_t spi_init(const struct spi_config *config)
 					GPIO_MODE_INPUT);  // MISO
 
 		/* Master mode */
-		SPI->SPCRn |= BIT(MSTR);
+		spcr |= BIT(MSTR);
 
 		/* Set clock rate */
-		SPI->SPCRn |= (config->prescaler & 0x3u) << SPR0;
-		SPI->SPSRn = (SPI->SPSRn & ~SPI2X_MASK) |
-			     ((config->prescaler >> 2u) & SPI2X_MASK) << SPI2X;
+		spcr |= (config->prescaler & 0x3u) << SPR0;
+		spsr = (spsr & ~SPI2X_MASK) |
+		       (((config->prescaler >> 2u) & SPI2X_MASK) << SPI2X);
 	} else {
 		gpiol_pin_set_direction(GPIOB, SPI_SS_PIN,
 					GPIO_MODE_INPUT);  // SS
@@ -54,23 +57,26 @@ int8_t spi_init(const struct spi_config *config)
 	}
 
 	if (config->polarity == SPI_CLOCK_POLARITY_FALLING) {
-		SPI->SPCRn |= BIT(CPOL);
+		spcr |= BIT(CPOL);
 	}
 
 	if (config->phase == SPI_CLOCK_PHASE_SETUP) {
-		SPI->SPCRn |= BIT(CPHA);
+		spcr |= BIT(CPHA);
 	}
 
 	/* If async API is used, the interrupt cannot be enabled through
 	 * configuration */
 #if !CONFIG_SPI_ASYNC
 	if (config->irq_enabled) {
-		SPI->SPCRn |= BIT(SPIE);
+		spcr |= BIT(SPIE);
 	}
 #endif
 
 	// enable SPI
-	SPI->SPCRn |= BIT(SPE);
+	spcr |= BIT(SPE);
+
+	SPI->SPSRn = spsr;
+	SPI->SPCRn = spcr;
 
 	return 0;
 }
@@ -78,6 +84,7 @@ int8_t spi_init(const struct spi_config *config)
 int8_t spi_deinit(void)
 {
 	SPI->SPCRn = 0u;
+	SPI->SPSRn = 0u;
 
 	return 0u;
 }
