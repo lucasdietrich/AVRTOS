@@ -49,11 +49,11 @@ typedef struct {
 #define SPI SPI_DEVICE
 
 typedef enum {
-	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed */
+	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed (for F_CPU=16MHz = 4MHz) */
 	SPI_PRESCALER_16  = 1u,
 	SPI_PRESCALER_64  = 2u,
 	SPI_PRESCALER_128 = 3u,
-	SPI_PRESCALER_X2  = 4u, /* Not recommended */
+	SPI_PRESCALER_X2  = 4u, /* Not recommended (for F_CPU=16MHz = 8Mhz) */
 	SPI_PRESCALER_X8  = 5u,
 	SPI_PRESCALER_X32 = 6u,
 	SPI_PRESCALER_X64 = 7u

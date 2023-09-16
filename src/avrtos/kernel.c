@@ -982,7 +982,6 @@ uint32_t k_uptime_get(void)
 	return k_ticks_get_64() / K_TICKS_PER_SECOND;
 #else
 	return k_ticks_get_32() / K_TICKS_PER_SECOND;
-	return 0;
 #endif /* CONFIG_KERNEL_UPTIME */
 }
 
