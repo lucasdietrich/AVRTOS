@@ -25,7 +25,7 @@ int main(void)
 	};
 
 	// initialize SPI
-	spi_init(&cfg);
+	spi_init(cfg);
 
 	// initialize PB0 as CS
 	gpiol_pin_init(GPIOB, PIN0, GPIO_MODE_OUTPUT, GPIO_HIGH);

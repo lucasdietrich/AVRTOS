@@ -65,7 +65,7 @@ int main(void)
 		.irq_enabled = 0u,
 	};
 
-	spi_init(&cfg);
+	spi_init(cfg);
 
 #if USE_BUTTON
 	k_signal_init(&sig);

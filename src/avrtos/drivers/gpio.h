@@ -45,14 +45,14 @@ typedef struct {
 #define GPIO_LOW  0u
 #define GPIO_HIGH 1u
 
-#define PINn0 PINA0
-#define PINn1 PINA1
-#define PINn2 PINA2
-#define PINn3 PINA3
-#define PINn4 PINA4
-#define PINn5 PINA5
-#define PINn6 PINA6
-#define PINn7 PINA7
+#define PINn0 PIN0
+#define PINn1 PIN1
+#define PINn2 PIN2
+#define PINn3 PIN3
+#define PINn4 PIN4
+#define PINn5 PIN5
+#define PINn6 PIN6
+#define PINn7 PIN7
 
 #define DDn0 DDA0
 #define DDn1 DDA1

@@ -19,31 +19,25 @@
 
 #define SPI2X_MASK BIT(SPI2X)
 
-int8_t spi_init(const struct spi_config *config)
+int8_t spi_init(struct spi_config config)
 {
-	uint8_t spcr = 0u;
-	uint8_t spsr = 0u;
+#if CONFIG_SPI_ASYNC
+	/* If async API is used, the interrupt cannot be enabled through
+	 * configuration, so disable it */
+	config.irq_enabled = 0u;
+#endif
+
+	const struct spi_regs stg = spi_config_into_regs(config);
 
 	spi_deinit();
 
-	if (config->mode == SPI_MODE_MASTER) {
-		gpiol_pin_set_direction(GPIOB, SPI_SS_PIN,
-					GPIO_MODE_OUTPUT);  // SS
-
+	if (config.mode == SPI_MODE_MASTER) {
 		gpiol_pin_set_direction(GPIOB, SPI_SCK_PIN,
 					GPIO_MODE_OUTPUT);  // SCK
 		gpiol_pin_set_direction(GPIOB, SPI_MOSI_PIN,
 					GPIO_MODE_OUTPUT);  // MOSI
 		gpiol_pin_set_direction(GPIOB, SPI_MISO_PIN,
 					GPIO_MODE_INPUT);  // MISO
-
-		/* Master mode */
-		spcr |= BIT(MSTR);
-
-		/* Set clock rate */
-		spcr |= (config->prescaler & 0x3u) << SPR0;
-		spsr = (spsr & ~SPI2X_MASK) |
-		       (((config->prescaler >> 2u) & SPI2X_MASK) << SPI2X);
 	} else {
 		gpiol_pin_set_direction(GPIOB, SPI_SS_PIN,
 					GPIO_MODE_INPUT);  // SS
@@ -56,37 +50,51 @@ int8_t spi_init(const struct spi_config *config)
 					GPIO_MODE_OUTPUT);  // MISO
 	}
 
-	if (config->polarity == SPI_CLOCK_POLARITY_FALLING) {
-		spcr |= BIT(CPOL);
-	}
-
-	if (config->phase == SPI_CLOCK_PHASE_SETUP) {
-		spcr |= BIT(CPHA);
-	}
-
-	/* If async API is used, the interrupt cannot be enabled through
-	 * configuration */
-#if !CONFIG_SPI_ASYNC
-	if (config->irq_enabled) {
-		spcr |= BIT(SPIE);
-	}
-#endif
-
-	// enable SPI
-	spcr |= BIT(SPE);
-
-	SPI->SPSRn = spsr;
-	SPI->SPCRn = spcr;
+	spi_regs_restore(&stg);
 
 	return 0;
 }
 
-int8_t spi_deinit(void)
+struct spi_regs spi_config_into_regs(struct spi_config config)
+{
+	struct spi_regs regs;
+
+	/* Set clock rate */
+	regs.spcr = BIT(SPE) | (config.prescaler & 0x3u) << SPR0;
+	regs.spsr = ((config.prescaler >> 2u) & SPI2X_MASK) << SPI2X;
+
+	if (config.mode == SPI_MODE_MASTER) regs.spcr |= BIT(MSTR);
+	if (config.polarity == SPI_CLOCK_POLARITY_FALLING) regs.spcr |= BIT(CPOL);
+	if (config.phase == SPI_CLOCK_PHASE_SETUP) regs.spcr |= BIT(CPHA);
+	if (config.irq_enabled) regs.spcr |= BIT(SPIE);
+
+	return regs;
+}
+
+void spi_regs_restore(const struct spi_regs *regs)
+{
+	SPI->SPCRn = regs->spcr;
+	SPI->SPSRn = regs->spsr;
+}
+
+void spi_regs_swap(struct spi_regs *regs)
+{
+	struct spi_regs current_regs;
+	spi_regs_save(&current_regs);
+	spi_regs_restore(regs);
+	*regs = current_regs;
+}
+
+void spi_regs_save(struct spi_regs *regs)
+{
+	regs->spcr = SPI->SPCRn;
+	regs->spsr = SPI->SPSRn;
+}
+
+void spi_deinit(void)
 {
 	SPI->SPCRn = 0u;
 	SPI->SPSRn = 0u;
-
-	return 0u;
 }
 
 char spi_transceive(char tx)
@@ -109,6 +117,9 @@ void spi_transceive_buf(char *rxtx, uint8_t len)
 
 static inline void slave_select(const struct spi_slave *slave)
 {
+	/* Apply SPI regs for slave */
+	spi_regs_restore(&slave->regs);
+
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin, slave->active_state);
 }
 
@@ -120,10 +131,11 @@ static inline void slave_unselect(const struct spi_slave *slave)
 int8_t spi_slave_init(struct spi_slave *slave,
 		      GPIO_Device *cs_port,
 		      uint8_t cs_pin,
-		      uint8_t active_state)
+		      uint8_t active_state,
+		      const struct spi_regs *regs)
 {
 #if CONFIG_KERNEL_ARGS_CHECKS
-	if (!slave || !cs_port || cs_pin > PIN7) {
+	if (!slave || !regs || !cs_port || cs_pin > PIN7) {
 		return -EINVAL;
 	}
 #endif
@@ -131,6 +143,7 @@ int8_t spi_slave_init(struct spi_slave *slave,
 	slave->cs_port	    = cs_port;
 	slave->cs_pin	    = cs_pin;
 	slave->active_state = active_state;
+	slave->regs	    = *regs;
 
 	return 0;
 }

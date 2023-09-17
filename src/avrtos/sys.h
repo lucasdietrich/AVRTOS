@@ -50,10 +50,10 @@
 #define CONTAINER_OF(ptr, type, field) ((type *)(((char *)(ptr)) - offsetof(type, field)))
 #define SIZEOF_MEMBER(type, member)    (sizeof(((type *)0)->member))
 
-#define BIT(b)	       (1 << (b))
-#define SET_BIT(x, b)  ((x) |= b)
+#define BIT(b)	       (1llu << (b))
+#define SET_BIT(x, b)  ((x) |= (b))
 #define CLR_BIT(x, b)  ((x) &= (~(b)))
-#define TEST_BIT(x, b) ((bool)((x)&b))
+#define TEST_BIT(x, b) ((bool)((x) & (b)))
 
 #define IN_RANGE(x, a, b) ((x >= a) && (x <= b))
 

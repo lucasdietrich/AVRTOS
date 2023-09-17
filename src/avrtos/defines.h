@@ -287,10 +287,10 @@ typedef struct {
 	struct z_callsaved_ctx z_stack_buf_##name =   \
 		Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry)
 
-#define Z_THREAD_INITIALIZER(_name, stack_size, prio_flag, sym)                          \
+#define Z_THREAD_INITIALIZER(_name, stack_size, _flags, sym)                             \
 	struct k_thread _name = {                                                        \
 		.sp    = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),           \
-		.flags = Z_THREAD_STATE_READY | prio_flag,                               \
+		.flags = _flags,                                                         \
 		.tie   = {.runqueue = DITEM_INIT(NULL)},                                 \
 		{.wany = DITEM_INIT(NULL)},                                              \
 		.swap_data = NULL,                                                       \
@@ -302,29 +302,42 @@ typedef struct {
 			},                                                               \
 		.symbol = sym}
 
-#if CONFIG_AVRTOS_LINKER_SCRIPT
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol) \
+	Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 1)
 
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)         \
+#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol) \
+	Z_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol, 1)
+
+#if CONFIG_AVRTOS_LINKER_SCRIPT
+#define Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol,         \
+			auto_start)                                                    \
 	__attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p); \
 	Z_LINK_KERNEL_SECTION(.k_threads)                                              \
-	Z_THREAD_INITIALIZER(name, stack_size, prio_flag, symbol);                     \
+	Z_THREAD_INITIALIZER(                                                          \
+		name, stack_size,                                                      \
+		(auto_start ? Z_THREAD_STATE_READY : Z_THREAD_STATE_STOPPED) |         \
+			prio_flag,                                                     \
+		symbol);                                                               \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
-
-#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol)         \
-	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p); \
-	Z_LINK_KERNEL_SECTION(.k_threads)                                          \
-	Z_THREAD_INITIALIZER(name, Z_CALLSAVED_CTX_SIZE, prio_flag, symbol);       \
+#define Z_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start) \
+	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p);     \
+	Z_LINK_KERNEL_SECTION(.k_threads)                                              \
+	Z_THREAD_INITIALIZER(                                                          \
+		name, Z_CALLSAVED_CTX_SIZE,                                            \
+		(auto_start ? Z_THREAD_STATE_READY : Z_THREAD_STATE_STOPPED) |         \
+			prio_flag,                                                     \
+		symbol);                                                               \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
-
 #else
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol) \
+#define Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, \
+			auto_start)                                            \
 	__STATIC_ASSERT(0u,                                                    \
 			"Static thread (K_THREAD_DEFINE) creation is not "     \
 			"supported");
 
-#define K_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol) \
-	__STATIC_ASSERT(0u,                                                \
-			"Static thread (K_THREAD_DEFINE) creation is not " \
+#define Z_THREAD_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start) \
+	__STATIC_ASSERT(0u,                                                    \
+			"Static thread (K_THREAD_DEFINE) creation is not "     \
 			"supported");
 
 #endif

@@ -76,6 +76,7 @@ typedef enum {
 	SPI_CLOCK_PHASE_SETUP  = 1u  /* CPHA = 1, sample on trailing edge */
 } spi_clock_phase_t;
 
+/** SPI configuration (1 byte) */
 struct spi_config {
 	/* Master or slave */
 	spi_mode_t mode : 1u;
@@ -91,10 +92,14 @@ struct spi_config {
 
 	/* Clock prescaler (master only)*/
 	spi_prescaler_t prescaler : 3u;
+};
 
-	// /* Force SS pin to output mode if the SPI is in master mode.
-	//  * (master only, in slave mode, the SS pin is always input) */
-	// uint8_t force_ss_output : 1u;
+/** SPI registers (2 bytes) */
+struct spi_regs {
+	/* SPI control register */
+	uint8_t spcr;
+	/* SPI status register */
+	uint8_t spsr;
 };
 
 /* 4Mhz SPI Master in mode 0,0 */
@@ -118,14 +123,41 @@ struct spi_config {
  * @param config Configuration to use.
  * @return int8_t 0 on success, negative on error.
  */
-int8_t spi_init(const struct spi_config *config);
+int8_t spi_init(struct spi_config config);
+
+/**
+ * @brief Build SPI regs from init configuration.
+ *
+ * @param config
+ * @return struct spi_regs
+ */
+struct spi_regs spi_config_into_regs(struct spi_config config);
+
+/**
+ * @brief Apply SPI regs.
+ *
+ * @param regs
+ */
+void spi_regs_restore(const struct spi_regs *regs);
+
+/**
+ * @brief Swap SPI regs.
+ *
+ * @param regs
+ */
+void spi_regs_swap(struct spi_regs *regs);
+
+/**
+ * @brief Retrieve SPI regs.
+ *
+ * @param regs
+ */
+void spi_regs_save(struct spi_regs *regs);
 
 /**
  * @brief Deinitialize SPI peripheral.
- *
- * @return int8_t 0 on success, negative on error.
  */
-int8_t spi_deinit(void);
+void spi_deinit(void);
 
 /**
  * @brief Transceive a byte over SPI.
@@ -154,6 +186,8 @@ struct spi_slave {
 	uint8_t cs_pin : 3u;
 	/* Slave chip select active low */
 	uint8_t active_state : 1u;
+	/* SPI regs */
+	struct spi_regs regs;
 };
 
 /**
@@ -163,12 +197,14 @@ struct spi_slave {
  * @param cs_port Pointer to the GPIO port of the slave chip select pin.
  * @param cs_pin Slave chip select pin.
  * @param active_state Slave chip select active low.
+ * @param regs SPI regs to use for the slave.
  * @return int8_t 0 on success, negative on error.
  */
 int8_t spi_slave_init(struct spi_slave *slave,
 		      GPIO_Device *cs_port,
 		      uint8_t cs_pin,
-		      uint8_t active_state);
+		      uint8_t active_state,
+		      const struct spi_regs *regs);
 
 /**
  * @brief Initialize a SPI chip select pin for the slave.
