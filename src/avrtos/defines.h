@@ -309,6 +309,7 @@ typedef struct {
 	Z_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol, 1)
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
+
 #define Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol,         \
 			auto_start)                                                    \
 	__attribute__((used)) Z_STACK_INITIALIZER(name, stack_size, entry, context_p); \
@@ -319,6 +320,7 @@ typedef struct {
 			prio_flag,                                                     \
 		symbol);                                                               \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
+
 #define Z_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start) \
 	__attribute__((used)) Z_STACK_MINIMAL_INITIALIZER(name, entry, context_p);     \
 	Z_LINK_KERNEL_SECTION(.k_threads)                                              \
@@ -328,7 +330,9 @@ typedef struct {
 			prio_flag,                                                     \
 		symbol);                                                               \
 	Z_STACK_SENTINEL_REGISTER(z_stack_buf_##name)
+
 #else
+
 #define Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, \
 			auto_start)                                            \
 	__STATIC_ASSERT(0u,                                                    \

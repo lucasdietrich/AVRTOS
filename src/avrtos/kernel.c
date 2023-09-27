@@ -190,8 +190,6 @@ typedef char z_ticks_t[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
  * This array represents the ticks counter used by the kernel to keep track of time.
  * The counter is implemented as an array of bytes with a specific size determined by
  * `CONFIG_KERNEL_TICKS_COUNTER_SIZE`.
- *
- * The `z_ticks` array is initialized with all elements set to 0 during startup.
  */
 z_ticks_t z_ticks = {0u};
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
