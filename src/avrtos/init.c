@@ -86,7 +86,7 @@ void z_avrtos_init(void)
 /**
  * @brief Automatically initialize AVRTOS if Arduino framework is used
  */
-#if CONFIG_ARDUINO_FRAMEWORK
+#if CONFIG_ARDUINO_FRAMEWORK && CONFIG_KERNEL_AUTO_INIT
 void initVariant(void)
 {
 	z_avrtos_init();

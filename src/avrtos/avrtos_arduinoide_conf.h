@@ -23,7 +23,7 @@
 #endif
 
 #ifndef CONFIG_KERNEL_AUTO_INIT
-#define CONFIG_KERNEL_AUTO_INIT 0
+#define CONFIG_KERNEL_AUTO_INIT 1
 #endif
 
 /* Features */
