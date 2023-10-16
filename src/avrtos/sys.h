@@ -49,13 +49,14 @@
 #define ARRAY_SIZE(array)	       (sizeof(array) / sizeof(array[0]))
 #define CONTAINER_OF(ptr, type, field) ((type *)(((char *)(ptr)) - offsetof(type, field)))
 #define SIZEOF_MEMBER(type, member)    (sizeof(((type *)0)->member))
+#define INDEX_OF(array, element)       ((element) - (array))
 
 #define BIT(b)	       (1llu << (b))
 #define SET_BIT(x, b)  ((x) |= (b))
 #define CLR_BIT(x, b)  ((x) &= (~(b)))
 #define TEST_BIT(x, b) ((bool)((x) & (b)))
 
-#define IN_RANGE(x, a, b) ((x >= a) && (x <= b))
+#define IN_RANGE(x, a, b) (((x) >= (a)) && ((x) <= (b)))
 
 #define sys_read_le16(addr)	  (*(uint16_t *)(addr))
 #define sys_write_le16(addr, val) (*(uint16_t *)(addr) = (val))
