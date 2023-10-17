@@ -29,7 +29,7 @@ int main(void)
 		k_wait(K_SECONDS(1u), K_WAIT_MODE_ACTIVE);
 		k_wait(K_SECONDS(1u), K_WAIT_MODE_BLOCK);
 
-		z_cpu_block_ms(1000);
-		z_cpu_block_us(1000000);
+		z_cpu_block_ms(2);
+		z_cpu_block_us(100);
 	}
 }

@@ -19,5 +19,6 @@ if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	target_link_avrtos(${PROJECT_NAME})
 
 	target_prepare_env(${PROJECT_NAME})
-
+else()
+	message(WARNING "Sample ${PROJECT_NAME} is not available for Debug build")
 endif()

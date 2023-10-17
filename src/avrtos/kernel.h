@@ -358,8 +358,9 @@ __kernel void k_wait(k_timeout_t delay, uint8_t mode);
  * @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time in
  * microseconds.
  *
- * Note: Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US, otherwise the system uptime may
- * be delayed.
+ * Note: consider using this function only for very short delays.
+ * Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds), otherwise
+ * the system uptime may be delayed.
  *
  * This function relies on _delay_us() from <util/delay.h> which can only be used
  * in release mode(not in debug mode).
@@ -372,8 +373,9 @@ __kernel void z_cpu_block_us(uint32_t delay_us);
  * @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time in
  * milliseconds.
  *
- * Note: Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds),
- * otherwise the system uptime may be delayed.
+ * Note: consider using this function only for very short delays.
+ * Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds), otherwise
+ * the system uptime may be delayed.
  *
  * This function relies on _delay_ms() from <util/delay.h> which can only be used
  * in release mode(not in debug mode).

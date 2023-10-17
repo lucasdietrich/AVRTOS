@@ -12,7 +12,7 @@ find_program(AVR_OBJDUMP avr-objdump REQUIRED)
 find_program(AVR_READELF avr-readelf REQUIRED)
 find_program(AVR_NM avr-nm REQUIRED)
 find_program(AVR_SIZE avr-size REQUIRED)
-find_program(QEMU_SYSTEM_AVR qemu-system-avr REQUIRED)
+find_program(QEMU_SYSTEM_AVR qemu-system-avr OPTIONAL)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR avr)
