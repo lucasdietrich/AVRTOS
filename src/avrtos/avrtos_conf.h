@@ -435,6 +435,16 @@
 #endif
 
 //
+// Tells whether support for delayable work items is enabled
+//
+// 0: Delayable work items are disabled
+// 1: Delayable work items are enabled
+//
+#ifndef CONFIG_SYSTEM_WORKQUEUE_DELAYABLE
+#define CONFIG_SYSTEM_WORKQUEUE_DELAYABLE 0
+#endif
+
+//
 // Enable kernel assertion test for debug purpose
 //
 // 0: Kernel assertion is disabled

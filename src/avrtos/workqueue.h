@@ -9,6 +9,7 @@
 
 #include <stddef.h>
 
+#include "event.h"
 #include "fifo.h"
 #include "kernel.h"
 
@@ -138,6 +139,82 @@ __kernel void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue);
  * @param work
  */
 bool k_system_workqueue_submit(struct k_work *work);
+
+/**
+ * @brief Delayable workqueue item.
+ * - Underlying work item to queue after timeout
+ * - Event object triggering the work item
+ * - Workqueue to queue the work item
+ */
+struct k_work_delayable {
+	struct k_work work;
+	struct k_event _event;
+	struct k_workqueue *_workqueue;
+};
+
+#define K_WORK_DELAYABLE_INIT(work_handler)                                      \
+	{                                                                        \
+		.work = K_WORK_INIT(work_handler), ._event = K_EVENT_INIT(NULL), \
+		._workqueue = NULL,                                              \
+	}
+
+#define K_WORK_DELAYABLE_DEFINE(name, work_handler) \
+	struct k_work_delayable name = K_WORK_DELAYABLE_INIT(work_handler)
+
+/**
+ * @brief Initialize a delayable workqueue item at runtime.
+ * k_work_delayable items can also be defined at compilation time using
+ * K_WORK_DELAYABLE_DEFINE
+ *
+ * @param work work item
+ * @param handler handler
+ */
+__kernel void k_work_delayable_init(struct k_work_delayable *dwork,
+				    k_work_handler_t handler);
+
+/**
+ * @brief Schedule a delayable work item to be queued after the given timeout.
+ *
+ * If the work item has already been scheduled or queued for processing, the
+ * work is not sent a new time and the function returns -EAGAIN.
+ *
+ * @param workqueue Workqueue to queue the work item
+ * @param dwork Delayable work item
+ * @param timeout Timeout before the work item is queued
+ * @return 0 if success, negative error code otherwise
+ */
+__kernel int k_work_delayable_schedule(struct k_workqueue *workqueue,
+				       struct k_work_delayable *dwork,
+				       k_timeout_t timeout);
+
+/**
+ * @brief Schedule a delayable work item for the system workqueue.
+ *
+ * @see k_work_delayable_schedule
+ *
+ * @param dwork
+ * @param timeout
+ * @return __kernel
+ */
+__kernel int k_system_work_delayable_schedule(struct k_work_delayable *dwork,
+					      k_timeout_t timeout);
+
+/**
+ * @brief Cancel a delayable work item which has been scheduled but not already
+ * queued for processing.
+ *
+ * If the work item is not yet scheduled, the function returns -EAGAIN.
+ * - If the work item is scheduled, the submission is cancelled and the function
+ * returns 0.
+ * - If the work item not schedule but still in the queue for processing, the
+ * function returns -EBUSY.
+ * - If the work item is not schedule and not in the queue for processing, the
+ * function returns -EAGAIN.
+ *
+ * @param dwork
+ * @return 0 if success, negative error code otherwise
+ */
+__kernel int k_work_delayable_cancel(struct k_work_delayable *dwork);
 
 #ifdef __cplusplus
 }

@@ -41,58 +41,76 @@ int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
 	return 0;
 }
 
+void z_event_schedule(struct k_event *event, k_timeout_t timeout)
+{
+	event->scheduled   = 1u;
+	event->tie.next	   = NULL;
+	event->tie.timeout = K_TIMEOUT_TICKS(timeout);
+
+	z_tqueue_schedule(&z_event_q.first, &event->tie);
+}
+
 int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
-	if (!event || event->scheduled) {
-		return -EINVAL;
-	}
-
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!event) return -EINVAL;
 #if !CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT
-	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-		return -EINVAL;
-	}
+	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
+#endif
 #endif
 
+	int ret		   = 0;
 	const uint8_t lock = irq_lock();
+
+	if (event->scheduled) {
+		ret = -EAGAIN;
+		goto exit;
+	}
 
 	if (CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT && K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		/* If no wait is requested, execute the handler immediately
 		 * without scheduling it */
 		event->handler(event);
 	} else {
-		event->scheduled   = 1u;
-		event->tie.next	   = NULL;
-		event->tie.timeout = K_TIMEOUT_TICKS(timeout);
-
-		z_tqueue_schedule(&z_event_q.first, &event->tie);
+		z_event_schedule(event, timeout);
 	}
 
+exit:
 	irq_unlock(lock);
-
-	return 0;
+	return ret;
 }
 
 int8_t k_event_cancel(struct k_event *event)
 {
-	if (!event || !event->scheduled) {
+#if CONFIG_KERNEL_ARGS_CHECKS
+	if (!event) {
 		return -EINVAL;
 	}
+#endif
 
+	int ret		   = 0;
 	const uint8_t lock = irq_lock();
+
+	if (!event->scheduled) {
+		ret = -EAGAIN;
+		goto exit;
+	}
 
 	tqueue_remove(&z_event_q.first, &event->tie);
 	event->scheduled = 0;
 
+exit:
 	irq_unlock(lock);
-
-	return 0;
+	return ret;
 }
 
 bool k_event_pending(struct k_event *event)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (!event) {
 		return false;
 	}
+#endif
 
 	return event->scheduled == 1;
 }
