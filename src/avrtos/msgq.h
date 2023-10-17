@@ -63,7 +63,7 @@ __kernel int8_t k_msgq_init(struct k_msgq *msgq,
  * @param data
  * @param timeout
  * @return 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled
- *      ENOMSG on MsgQ full)
+ *      ENOMEM on MsgQ full)
  */
 __kernel int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout);
 

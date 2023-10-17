@@ -64,7 +64,8 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		 * (even during the being processed handler)
 		 *
 		 * However, we can't do any assumption regarding the context of
-		 *the work item
+		 * the work item. Proper synchronization must be done by the
+		 * user.
 		 **/
 		const uint8_t key = irq_lock();
 		item->next	  = NULL;

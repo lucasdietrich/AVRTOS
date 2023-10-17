@@ -68,7 +68,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 		}
 		ret = 0;
 	} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-		ret = -ENOMSG;
+		ret = -ENOMEM;
 	} else {
 		/* tells from were the data should be copied
 		 * where there will be space in the msgq
