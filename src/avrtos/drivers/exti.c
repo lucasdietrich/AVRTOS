@@ -8,11 +8,14 @@
 
 int exti_configure(uint8_t exti, uint8_t isc)
 {
+#if CONFIG_KERNEL_ARGS_CHECKS
 	if (exti >= EXTI_COUNT) {
 		return -EINVAL;
 	}
 
 	isc &= 0x3u;
+#endif
+
 
 	const uint8_t regn	 = exti >> 2u;
 	const uint8_t group	 = exti & 0x03u;

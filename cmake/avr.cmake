@@ -154,7 +154,7 @@ function(target_prepare_env target)
 
 	if (DEFINED ENABLE_SINGLE_SAMPLE)
 		add_custom_target(upload DEPENDS upload_${target})
-		add_custom_target(monitor  DEPENDS monitor_${target})
+		add_custom_target(monitor DEPENDS monitor_${target})
 
 		if (QEMU)
 			add_custom_target(qemu DEPENDS qemu_${target})

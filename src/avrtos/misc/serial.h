@@ -17,6 +17,10 @@
 extern "C" {
 #endif
 
+#if CONFIG_AVRTOS_BANNER_ENABLE && !CONFIG_SERIAL_AUTO_INIT
+#error "CONFIG_AVRTOS_BANNER_ENABLE requires CONFIG_SERIAL_AUTO_INIT"
+#endif
+
 /**
  * @brief Initialize the USART with custom baudrate
  *
@@ -31,6 +35,11 @@ static inline void serial_init(void)
 {
 	serial_init_baud(CONFIG_SERIAL_USART_BAUDRATE);
 }
+
+/**
+ * @brief Print the AVRTOS banner over the USART
+ */
+void serial_print_banner(void);
 
 /**
  * @brief Send a single character over the USART

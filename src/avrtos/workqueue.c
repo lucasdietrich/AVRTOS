@@ -136,7 +136,6 @@ void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue)
 }
 
 #if CONFIG_SYSTEM_WORKQUEUE_ENABLE
-
 K_WORKQUEUE_DEFINE(z_system_workqueue,
 		   CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE,
 		   CONFIG_SYSTEM_WORKQUEUE_PRIORITY,
@@ -146,15 +145,16 @@ bool k_system_workqueue_submit(struct k_work *work)
 {
 	return k_work_submit(&z_system_workqueue, work);
 }
+#endif
 
-#if CONFIG_SYSTEM_WORKQUEUE_DELAYABLE
+#if CONFIG_WORKQUEUE_DELAYABLE
 
 #if !CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT
-#error "CONFIG_SYSTEM_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT"
+#error "CONFIG_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT"
 #endif
 
 #if !CONFIG_KERNEL_EVENTS
-#error "CONFIG_SYSTEM_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS"
+#error "CONFIG_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS"
 #endif
 
 static void delayable_work_trigger(struct k_event *event)
@@ -194,7 +194,7 @@ int k_work_delayable_schedule(struct k_workqueue *workqueue,
 	/* Ensure the work item is not already pending for submission or already in queue.
 	 */
 	if (dwork->_event.scheduled || !z_work_submittable(&dwork->work)) {
-		ret = -EAGAIN;
+		ret = -EBUSY;
 		goto exit;
 	}
 
@@ -211,11 +211,6 @@ int k_work_delayable_schedule(struct k_workqueue *workqueue,
 exit:
 	irq_unlock(lock);
 	return ret;
-}
-
-int k_system_work_delayable_schedule(struct k_work_delayable *dwork, k_timeout_t timeout)
-{
-	return k_work_delayable_schedule(&z_system_workqueue, dwork, timeout);
 }
 
 int k_work_delayable_cancel(struct k_work_delayable *dwork)
@@ -244,5 +239,10 @@ int k_work_delayable_cancel(struct k_work_delayable *dwork)
 	return ret;
 }
 
+#if CONFIG_SYSTEM_WORKQUEUE_ENABLE
+int k_system_work_delayable_schedule(struct k_work_delayable *dwork, k_timeout_t timeout)
+{
+	return k_work_delayable_schedule(&z_system_workqueue, dwork, timeout);
+}
 #endif
 #endif

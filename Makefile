@@ -21,7 +21,7 @@ endif
 
 all: single
 
-.PHONY: single cmake multiple upload monitor qemu run_qemu format clean piogen arduino_gen gen
+.PHONY: single cmake multiple upload monitor qemu run_qemu format clean piogen arduino_gen gen flash
 
 cmake:
 	cmake -S . -B build \
@@ -68,8 +68,10 @@ drv-timer:
 		-DCMAKE_BUILD_TYPE=Debug
 	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
 
-upload:
+upload: all
 	$(GENERATOR_COMMAND) -C build upload $(GENERATOR_ARGS)
+
+flash: upload
 
 monitor:
 	$(GENERATOR_COMMAND) -C build monitor $(GENERATOR_ARGS)

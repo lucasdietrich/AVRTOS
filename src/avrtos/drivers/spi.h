@@ -39,13 +39,8 @@ typedef struct {
 	__IO uint8_t SPDRn; /* Data register */
 } SPI_Device;
 
-/* SPI base address */
 #define SPI_BASE_ADDR (AVR_IO_BASE_ADDR + 0x004Cu)
-
-/* SPI device */
 #define SPI_DEVICE ((SPI_Device *)SPI_BASE_ADDR)
-
-/* SPI device shorthand */
 #define SPI SPI_DEVICE
 
 typedef enum {

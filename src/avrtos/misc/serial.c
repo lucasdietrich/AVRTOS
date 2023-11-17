@@ -30,6 +30,11 @@ void serial_init_baud(uint32_t baud)
 	ll_usart_init(USART_DEVICE, &usart_config);
 }
 
+void serial_print_banner(void)
+{
+	serial_print_p(PSTR(CONFIG_AVRTOS_BANNER));
+}
+
 void serial_transmit(char data)
 {
 	ll_usart_sync_putc(USART_DEVICE, data);
