@@ -99,6 +99,11 @@ static inline bool z_work_submittable(struct k_work *work)
 	return work->_tie.next == NULL;
 }
 
+static inline void z_work_submit(struct k_workqueue *workqueue, struct k_work *work)
+{
+	z_fifo_put(&workqueue->q, &work->_tie);
+}
+
 bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
 	__ASSERT_NOTNULL(workqueue);
@@ -110,7 +115,7 @@ bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 	/* if item not already in queue */
 	const uint8_t key = irq_lock();
 	if (z_work_submittable(work)) {
-		z_fifo_put(&workqueue->q, &work->_tie);
+		z_work_submit(workqueue, work);
 		ret = true;
 	}
 	irq_unlock(key);
@@ -162,8 +167,10 @@ static void delayable_work_trigger(struct k_event *event)
 	struct k_work_delayable *const dwork =
 		CONTAINER_OF(event, struct k_work_delayable, _event);
 
-	/* work and _workqueue should remain valid until here */
-	k_work_submit(dwork->_workqueue, &dwork->work);
+	/* - work item and _workqueue should remain valid until here
+	 * - work item is necessarily submittable, so no need to check
+	 */
+	z_work_submit(dwork->_workqueue, &dwork->work);
 }
 
 void k_work_delayable_init(struct k_work_delayable *dwork, k_work_handler_t handler)
