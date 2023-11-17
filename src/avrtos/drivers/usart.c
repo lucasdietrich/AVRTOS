@@ -150,16 +150,13 @@ void ll_usart_sync_putc(UART_Device *dev, char c)
 	dev->UDRn = c;
 }
 
-int ll_usart_sync_getc(UART_Device *dev)
+uint8_t ll_usart_sync_getc(UART_Device *dev)
 {
-	int ret = -EAGAIN;
-
 	/* get and return received data from HW buffer */
-	if (dev->UCSRnA & BIT(RXCn)) {
-		ret = dev->UDRn;
-	}
+	while (!(dev->UCSRnA & BIT(RXCn)))
+		;
 
-	return ret;
+	return dev->UDRn;
 }
 
 int usart_send(UART_Device *dev, const char *buf, int len)
@@ -175,52 +172,6 @@ int usart_send(UART_Device *dev, const char *buf, int len)
 	}
 
 	return len;
-}
-
-/*
- * Problem is that execution time is much longer than the old "serial_transmit",
- * because of fetch IO address for the proper USART from flash.
- */
-
-int usart_sync_putc(UART_Device *dev, char c)
-{
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (dev == NULL) {
-		return -EINVAL;
-	}
-#endif
-
-	ll_usart_sync_putc(dev, c);
-
-	return 0;
-}
-
-__kernel int usart_getc(UART_Device *dev)
-{
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (dev == NULL) {
-		return -EINVAL;
-	}
-#endif
-
-	return ll_usart_sync_getc(dev);
-}
-
-/* as fast as serial_transmit */
-void usart0_sync_putc(char c)
-{
-	while (!(USART0_DEVICE->UCSRnA & BIT(UDREn)))
-		;
-	UDR0 = c;
-}
-
-__kernel int usart0_getc(void)
-{
-	if (!(USART0_DEVICE->UCSRnA & BIT(RXCn))) {
-		return -EAGAIN;
-	}
-
-	return UDR0;
 }
 
 #if DRIVERS_UART_ASYNC

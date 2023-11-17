@@ -20,7 +20,7 @@ I hope you find AVRTOS as exciting to use as I found it to develop !
 AVRTOS offers an extensive list of features, including:
 
 - Cooperative and preemptive threads
-- Round-robin scheduling without priority support
+- Naive scheduler without priority support
 - Configurable system clock with support for all hardware timers (e.g. 0-2 for ATmega328p and 0-5 for ATmega2560)
 - Synchronization objects like mutexes, semaphores, workqueues, FIFOs, message queues, memory slabs, flags, signals
 - Drivers for UART, timers, GPIO, SPI and external interrupts
@@ -61,6 +61,8 @@ We plan (TODO) to implement several new features and improvements, including:
 - Polling
 - Drivers for I2C and ADC
 - Memory heaps
+- Detect available space for main thread stack at runtime (init)
+  - Take care of the available heap
 
 ## Getting Started
 

@@ -175,7 +175,7 @@ __kernel int usart_deinit(UART_Device *dev);
 
 __kernel void ll_usart_sync_putc(UART_Device *dev, char c);
 
-__kernel int ll_usart_sync_getc(UART_Device *dev);
+__kernel uint8_t ll_usart_sync_getc(UART_Device *dev);
 
 static inline void ll_usart_enable_rx_isr(UART_Device *dev)
 {
@@ -208,14 +208,6 @@ static inline void ll_usart_disable_udre_isr(UART_Device *dev)
 }
 
 __kernel int usart_send(UART_Device *dev, const char *buf, int len);
-
-__kernel int usart_sync_putc(UART_Device *dev, char c);
-
-__kernel int usart_getc(UART_Device *dev);
-
-__kernel void usart0_sync_putc(char c);
-
-__kernel int usart0_getc(void);
 
 // ASYNC API
 

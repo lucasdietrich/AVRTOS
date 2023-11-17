@@ -451,8 +451,8 @@
 // 0: Delayable work items are disabled
 // 1: Delayable work items are enabled
 //
-#ifndef CONFIG_SYSTEM_WORKQUEUE_DELAYABLE
-#define CONFIG_SYSTEM_WORKQUEUE_DELAYABLE 0
+#ifndef CONFIG_WORKQUEUE_DELAYABLE
+#define CONFIG_WORKQUEUE_DELAYABLE 0
 #endif
 
 //
@@ -550,10 +550,15 @@
 #endif
 
 //
-// USART0 (serial console) default baudrate
+// Automatic initialization of theserial console
 //
-// 0: Kernel faults silently
-// 1: Kernel faults with message
+#ifndef CONFIG_SERIAL_AUTO_INIT
+#define CONFIG_SERIAL_AUTO_INIT 0u
+#endif
+
+
+//
+// USART0 (serial console) default baudrate
 //
 #ifndef CONFIG_SERIAL_USART_BAUDRATE
 #define CONFIG_SERIAL_USART_BAUDRATE 500000lu
@@ -854,6 +859,25 @@
 //
 #ifndef CONFIG_SPI_ASYNC
 #define CONFIG_SPI_ASYNC 0
+#endif
+
+//
+// Enable AVRTOS banner on startup
+//
+// This option automatically initializes serial console with default baudrate
+//
+// 0: AVRTOS banner is disabled
+// 1: AVRTOS banner is enabled
+//
+#ifndef CONFIG_AVRTOS_BANNER_ENABLE
+#define CONFIG_AVRTOS_BANNER_ENABLE 0
+#endif
+
+//
+// AVRTOS banner string
+//
+#ifndef CONFIG_AVRTOS_BANNER
+#define CONFIG_AVRTOS_BANNER "*** AVRTOS ***\n"
 #endif
 
 #endif

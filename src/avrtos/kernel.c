@@ -401,7 +401,7 @@ extern void z_thread_idle_create(void);
  * on the configuration. It also sets the state of the idle thread and adds
  * ready threads to the runqueue if necessary.
  */
-void z_kernel_init(void)
+void z_init_threads(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
 #if CONFIG_AVRTOS_LINKER_SCRIPT == 0

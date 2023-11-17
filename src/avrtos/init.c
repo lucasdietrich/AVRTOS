@@ -17,7 +17,7 @@
 
 extern void z_init_sysclock(void);
 
-extern void z_kernel_init(void);
+extern void z_init_threads(void);
 
 void z_avrtos_init(void)
 {
@@ -45,6 +45,13 @@ void z_avrtos_init(void)
 	__Z_DBG_GPIO_2_INIT();
 	__Z_DBG_GPIO_3_INIT();
 
+#if CONFIG_SERIAL_AUTO_INIT
+	serial_init();
+#if CONFIG_AVRTOS_BANNER_ENABLE
+	serial_print_banner();
+#endif
+#endif
+
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 	SET_BIT(UCSR0B, BIT(RXCIE0));
 #endif
@@ -54,7 +61,7 @@ void z_avrtos_init(void)
 	k_set_stdio_usart0();
 #endif
 
-	z_kernel_init();
+	z_init_threads();
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
 	z_mem_slab_init_module();

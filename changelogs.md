@@ -53,7 +53,7 @@ is compatible with the AVR-GCC toolchain, Arduino and PlatformIO frameworks.
 Key Features:
 
 - Cooperative and preemptive threads
-- Round-robin scheduling without priority support
+- Naive scheduler without priority support
 - Configurable system clock
 - Synchronization objects (mutexes, semaphores, workqueues, etc.)
 - Drivers for UART, timers, GPIO, and external interrupts

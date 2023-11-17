@@ -5,49 +5,58 @@
  */
 
 #include <avrtos/avrtos.h>
-#include <avrtos/misc/serial.h>
 #include <avrtos/drivers/usart.h>
+#include <avrtos/misc/serial.h>
 
-struct k_work_delayable work;
-K_SEM_DEFINE(sem, 0, 1);
+struct MyStruct {
+	struct k_work_delayable work;
+	struct k_sem sem;
+};
+
+static struct MyStruct my_struct;
 
 void work_handler(struct k_work *work)
 {
-	// struct k_work_delayable *dwork =
-	// 	CONTAINER_OF(work, struct k_work_delayable, work);
+	struct MyStruct *my_struct = CONTAINER_OF(work, struct MyStruct, work);
 
-	serial_transmit('h');
-	k_sem_give(&sem);
+	k_sem_give(&my_struct->sem);
 }
 
-ISR(USART0_RX_vect)
+static void usart_task(void *arg)
 {
-	int ret;
-	uint8_t c = USART0_DEVICE->UDRn;
-	if (c == 'c') {
-		serial_transmit('c');
-		ret = k_work_delayable_cancel(&work);
-	} else {
-		serial_transmit('!');
-		ret = k_system_work_delayable_schedule(&work, K_MSEC(1000));
-	}
+	struct MyStruct *ms = (struct MyStruct *)arg;
 
-	if (ret == 0) {
-		serial_transmit('0');
-	} else {
-		serial_transmit('e');
+	int ret;
+	uint8_t c;
+	for (;;) {
+		c = ll_usart_sync_getc(USART0_DEVICE);
+		if (c == 'c') {
+			printf_P(PSTR("Cancelling scheduled work\n"));
+			ret = k_work_delayable_cancel(&ms->work);
+		} else {
+			printf_P(PSTR("Scheduling work\n"));
+			ret = k_system_work_delayable_schedule(&ms->work, K_MSEC(1000));
+		}
+
+		if (ret == 0) {
+			printf_P(PSTR("OK\n"));
+		} else {
+			printf_P(PSTR("Error: %d\n"), ret);
+		}
 	}
 }
+
+K_THREAD_DEFINE(usart, usart_task, 0x200, K_PREEMPTIVE, &my_struct, 'u');
 
 int main(void)
 {
 	serial_init();
-	ll_usart_enable_rx_isr(USART0_DEVICE);
 
-	k_work_delayable_init(&work, work_handler);
+	k_work_delayable_init(&my_struct.work, work_handler);
+	k_sem_init(&my_struct.sem, 0, 1);
 
 	for (;;) {
-		k_sem_take(&sem, K_FOREVER);
-		printf("w\n");
+		k_sem_take(&my_struct.sem, K_FOREVER);
+		printf_P(PSTR("Work done !\n"));
 	}
 }
