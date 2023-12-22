@@ -354,6 +354,17 @@
 #endif
 
 //
+// Tells whether the kernel should define a idle hook to execute when no thread
+// is ready. This hook is executed in the context of the idle thread.
+//
+// 0: Kernel idle hook is disabled
+// 1: Kernel idle hook is enabled
+//
+#ifndef CONFIG_IDLE_HOOK
+#define CONFIG_IDLE_HOOK 0
+#endif
+
+//
 // Enable thread canaries. Threads stacks are filled with a canary symbol
 // to detect stack overflows.
 //

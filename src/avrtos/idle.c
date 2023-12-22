@@ -49,6 +49,15 @@ void z_thread_idle_create(void)
 }
 #endif
 
+#if CONFIG_IDLE_HOOK
+/**
+ * @brief Idle thread hook
+ */
+__attribute__((weak)) void z_idle_hook(void)
+{
+}
+#endif
+
 /**
  * @brief Idle thread entry function
  *
@@ -57,6 +66,10 @@ void z_thread_idle_create(void)
 static void z_thread_idle_entry(void *context)
 {
 	for (;;) {
+#if CONFIG_IDLE_HOOK
+		z_idle_hook();
+#endif
+
 #if CONFIG_THREAD_IDLE_COOPERATIVE
 #warning \
 	"CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"

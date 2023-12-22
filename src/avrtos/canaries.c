@@ -28,6 +28,7 @@ void z_init_stacks_canaries(void)
 		z_init_thread_stack_canaries(thread);
 	}
 }
+
 void k_dump_stack_canaries(void)
 {
 	serial_transmit('\n');
