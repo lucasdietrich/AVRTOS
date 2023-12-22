@@ -33,12 +33,14 @@ static void z_thread_idle_entry(void *context);
 #endif
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
-K_THREAD_DEFINE(z_thread_idle,
+Z_THREAD_DEFINE(z_thread_idle,
 		z_thread_idle_entry,
 		Z_THREAD_IDLE_STACK_SIZE,
 		Z_THREAD_IDLE_PRIORITY,
 		NULL,
-		'I');
+		'I',
+		0  // don't start IDLE thread at init
+);
 #else
 __noinit uint8_t z_thread_idle_stack[Z_THREAD_IDLE_STACK_SIZE];
 __noinit struct k_thread z_thread_idle;

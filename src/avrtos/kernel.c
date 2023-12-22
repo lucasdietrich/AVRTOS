@@ -422,10 +422,8 @@ void z_kernel_init(void)
 			continue;
 		}
 
-		/* idle thread must not be added to the
-		 * runqueue as the main thread is running */
-		if (!THREAD_IS_IDLE(thread) &&
-		    (z_get_thread_state(thread) == Z_THREAD_STATE_READY)) {
+		/* Only auto-start threads must be added to the runqueue */
+		if (z_get_thread_state(thread) == Z_THREAD_STATE_READY) {
 			z_ready_count++;
 			dlist_append(z_runq, &thread->tie.runqueue);
 		}
