@@ -539,12 +539,11 @@
 #endif
 
 //
-// Automatic initialization of theserial console
+// Automatic initialization of the serial console
 //
 #ifndef CONFIG_SERIAL_AUTO_INIT
 #define CONFIG_SERIAL_AUTO_INIT 0u
 #endif
-
 
 //
 // USART0 (serial console) default baudrate

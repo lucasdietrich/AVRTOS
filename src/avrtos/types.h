@@ -46,8 +46,8 @@ struct k_thread {
 		// the same time
 
 	union {
-		struct dnode wany;  // represent the thread pending on a generic
-				    // object
+		struct dnode wany;    // represent the thread pending on a generic
+				      // object
 		struct dnode wmutex;  // represent the thread pending on an mutex
 		struct dnode wsem;    // represent the thread pending on an semaphore
 		struct dnode wsig;    // represent the thread pending on an signal
@@ -57,6 +57,13 @@ struct k_thread {
 	};
 	void *swap_data;  // data returned by kernel API's when calling
 			  // z_unpend_first_thread
+
+	struct {
+		void *end;    // stack end
+		size_t size;  // stack size
+	} stack;	      // thread stack definition
+	char symbol;	      // 1-letter symbol to name the thread, reserver M (main),
+			      // idle : I (idle)
 
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER
 	/**
@@ -71,13 +78,6 @@ struct k_thread {
 	 */
 	uint8_t sched_lock_cnt;
 #endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
-
-	struct {
-		void *end;    // stack end
-		size_t size;  // stack size
-	} stack;	      // thread stack definition
-	char symbol;	      // 1-letter symbol to name the thread, reserver M (main),
-			      // idle : I (idle)
 
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno;	// Thread errno

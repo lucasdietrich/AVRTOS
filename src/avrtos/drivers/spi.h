@@ -1,5 +1,11 @@
-#ifndef SPI_H_
-#define SPI_H_
+/*
+ * Copyright (c) 2024 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#ifndef DRIVERS_SPI_H_
+#define DRIVERS_SPI_H_
 
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/kernel.h>
@@ -40,8 +46,8 @@ typedef struct {
 } SPI_Device;
 
 #define SPI_BASE_ADDR (AVR_IO_BASE_ADDR + 0x004Cu)
-#define SPI_DEVICE ((SPI_Device *)SPI_BASE_ADDR)
-#define SPI SPI_DEVICE
+#define SPI_DEVICE    ((SPI_Device *)SPI_BASE_ADDR)
+#define SPI	      SPI_DEVICE
 
 typedef enum {
 	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed (for F_CPU=16MHz = 4MHz) */
@@ -296,4 +302,4 @@ int8_t spi_cancel_async(void);
 }
 #endif
 
-#endif /* SPI_H_ */
+#endif /* DRIVERS_SPI_H_ */

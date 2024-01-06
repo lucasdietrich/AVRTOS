@@ -339,10 +339,9 @@ typedef struct {
 			"Static thread (K_THREAD_DEFINE) creation is not "     \
 			"supported");
 
-#define Z_THREAD_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start) \
-	__STATIC_ASSERT(0u,                                                    \
-			"Static thread (K_THREAD_DEFINE) creation is not "     \
-			"supported");
+#define Z_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start)   \
+	Z_THREAD_DEFINE(name, entry, Z_CALLSAVED_CTX_SIZE, prio_flag, context_p, symbol, \
+			auto_start)
 
 #endif
 

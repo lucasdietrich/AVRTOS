@@ -61,7 +61,7 @@ drv-timer:
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		-DCMAKE_GENERATOR=$(GENERATOR) \
-		-DENABLE_SINGLE_SAMPLE=drv-timer \
+		-DENABLE_SINGLE_SAMPLE=$@ \
 		-DPROG_DEV=$(DEVICE) \
 		-DBAUDRATE=$(BAUDRATE) \
 		-DQEMU=ON \
@@ -78,6 +78,8 @@ monitor:
 
 qemu:
 	$(GENERATOR_COMMAND) -C build qemu $(GENERATOR_ARGS)
+
+debug: qemu
 
 run_qemu:
 	$(GENERATOR_COMMAND) -C build run_qemu $(GENERATOR_ARGS)

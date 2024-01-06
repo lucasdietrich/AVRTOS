@@ -104,8 +104,10 @@ K_THREAD struct k_thread z_thread_main = {
 struct k_thread *z_current = &z_thread_main;
 
 /**
- * @brief Number of threads in the runqueue(s).
+ * @brief Number of threads (except IDLE) in the runqueue(s).
  *
+ * The IDLE thread is not included in this count.
+ * 
  * This variable represents the count of threads currently in the runqueue(s),
  * indicating the number of threads that are ready to run. It is initialized to 1
  * during startup, indicating that only the main thread is running initially.

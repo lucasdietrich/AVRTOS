@@ -71,6 +71,8 @@
 		"ring.h": "c",
 		"string.h": "c",
 		"crc16.h": "c",
-		"delay_basic.h": "c"
+		"delay_basic.h": "c",
+		"twi.h": "c",
+		"i2c.h": "c",
 	},
 }
