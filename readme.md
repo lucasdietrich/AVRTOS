@@ -64,6 +64,9 @@ We plan (TODO) to implement several new features and improvements, including:
 - Detect available space for main thread stack at runtime (init)
   - Take care of the available heap
 - I2C Repeated start
+- Move or remove yet unused `AVRTOS_VERSION_MAJOR` vars
+- Move "MCU specific fixups" and board specific stuff to a dedicated directory "board
+- Move assembly files to a dedicated directory "arch/avr"
 
 ## Getting Started
 

@@ -15,7 +15,7 @@
 #include <string.h>
 
 #define BLOCKS_COUNT 2
-#define BLOCK_SIZE   1500
+#define BLOCK_SIZE   100
 
 K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
 

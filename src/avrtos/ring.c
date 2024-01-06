@@ -2,11 +2,7 @@
 
 int8_t k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!ring || !buffer || !size) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(ring && buffer && size) return -EINVAL;
 
 	ring->buffer = buffer;
 	ring->size   = size;

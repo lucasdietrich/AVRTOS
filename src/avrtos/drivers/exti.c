@@ -8,11 +8,9 @@
 
 int exti_configure(uint8_t exti, uint8_t isc)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (exti >= EXTI_COUNT) {
-		return -EINVAL;
-	}
+	Z_ARGS_CHECK(exti < EXTI_COUNT) return -EINVAL;
 
+#if CONFIG_KERNEL_ARGS_CHECKS
 	isc &= 0x3u;
 #endif
 

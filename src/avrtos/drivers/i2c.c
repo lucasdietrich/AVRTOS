@@ -267,9 +267,9 @@ static int8_t i2c_transfer_setup(I2C_Device *dev,
 				 i2c_state_t state)
 {
 	struct i2c_context *const x = i2c_get_context(dev);
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!x || !data || (len > I2C_MAX_BUF_LEN)) return -EINVAL;
-#endif
+	
+	Z_ARGS_CHECK(x && data && (len <= I2C_MAX_BUF_LEN)) return -EINVAL;
+
 #if CONFIG_I2C_SEMAPHORE
 	int8_t ret = k_sem_take(&x->sem_terminated, K_NO_WAIT);
 	if (ret != 0 && ret != -EBUSY) return ret;
@@ -318,11 +318,8 @@ int8_t i2c_master_receive(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t 
 int8_t i2c_status(I2C_Device *dev)
 {
 	struct i2c_context *const x = i2c_get_context(dev);
-	
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!x) return -EINVAL;
-#endif
 
+	Z_ARGS_CHECK(x) return -EINVAL;
 	if (x->state != READY) return -EBUSY;
 	return 0;
 }
@@ -331,9 +328,7 @@ i2c_error_t i2c_poll_end(I2C_Device *dev)
 {
 	struct i2c_context *const x = i2c_get_context(dev);
 
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!x) return I2C_ERROR_ARGS;
-#endif
+	Z_ARGS_CHECK(x) return I2C_ERROR_ARGS;
 
 #if CONFIG_I2C_INTERRUPT_DRIVEN
 	while (x->state != READY)
@@ -347,9 +342,7 @@ i2c_error_t i2c_last_error(I2C_Device *dev)
 {
 	struct i2c_context *const x = i2c_get_context(dev);
 
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!x) return I2C_ERROR_ARGS;
-#endif // CONFIG_KERNEL_ARGS_CHECKS
+	Z_ARGS_CHECK(x) return I2C_ERROR_ARGS;
 
 	return get_error(x);
 }
@@ -359,9 +352,7 @@ struct k_sem *i2c_get_sem(I2C_Device *dev)
 {
 	struct i2c_context *const x = i2c_get_context(dev);
 
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!x) return I2C_ERROR_ARGS;
-#endif
+	Z_ARGS_CHECK(x) return NULL;
 
 	return &x->sem_terminated;
 }

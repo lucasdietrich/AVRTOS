@@ -724,11 +724,10 @@ int8_t k_thread_create(struct k_thread *thread,
 		       void *context_p,
 		       char symbol)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!thread || !entry || !stack || stack_size < Z_THREAD_STACK_MIN_SIZE) {
+	Z_ARGS_CHECK(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE)
+	{
 		return -EINVAL;
 	}
-#endif
 
 	thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
 	thread->stack.size = stack_size;

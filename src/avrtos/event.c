@@ -28,14 +28,9 @@ K_EVENT_Q_DEFINE(z_event_q);
 
 int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!event || !handler) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(event && handler) return -EINVAL;
 
 	event->handler = handler;
-
 	event->scheduled = 0;
 
 	return 0;
@@ -52,14 +47,12 @@ void z_event_schedule(struct k_event *event, k_timeout_t timeout)
 
 int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!event) return -EINVAL;
+	Z_ARGS_CHECK(event) return -EINVAL;
 #if !CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT
-	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
-#endif
+	Z_ARGS_CHECK(!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
 #endif
 
-	int ret		   = 0;
+	int8_t ret		   = 0;
 	const uint8_t lock = irq_lock();
 
 	if (event->scheduled) {
@@ -82,11 +75,7 @@ exit:
 
 int8_t k_event_cancel(struct k_event *event)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!event) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(event) return -EINVAL;
 
 	int ret		   = 0;
 	const uint8_t lock = irq_lock();
@@ -106,11 +95,7 @@ exit:
 
 bool k_event_pending(struct k_event *event)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!event) {
-		return false;
-	}
-#endif
+	Z_ARGS_CHECK(event) return false;
 
 	return event->scheduled == 1;
 }

@@ -14,11 +14,7 @@
 
 int8_t k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint32_t max_msgs)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!msgq || !buffer || !msg_size || !max_msgs) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(msgq && buffer && msg_size && max_msgs) return -EINVAL;
 
 	/* list of pending thread (on writing XOR on reading)
 	 * depending on the nuber of messages used, we can assert that

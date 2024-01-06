@@ -161,11 +161,7 @@ uint8_t ll_usart_sync_getc(UART_Device *dev)
 
 int usart_send(UART_Device *dev, const char *buf, int len)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (dev == NULL) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(dev && (buf || !len)) return -EINVAL;
 
 	for (int i = 0; i < len; i++) {
 		ll_usart_sync_putc(dev, buf[i]);

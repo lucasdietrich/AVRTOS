@@ -15,11 +15,7 @@
 
 int8_t k_signal_init(struct k_signal *sig)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!sig) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(sig) return -EINVAL;
 
 	sig->signal = 0u;
 	sig->flags  = K_POLL_STATE_NOT_READY;

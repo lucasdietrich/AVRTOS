@@ -1,4 +1,4 @@
-project(sample_pmgq_msgq)
+project(sample_perf_msgq)
 add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration
