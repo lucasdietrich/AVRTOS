@@ -63,6 +63,7 @@ We plan (TODO) to implement several new features and improvements, including:
 - Memory heaps
 - Detect available space for main thread stack at runtime (init)
   - Take care of the available heap
+- I2C Repeated start
 
 ## Getting Started
 
