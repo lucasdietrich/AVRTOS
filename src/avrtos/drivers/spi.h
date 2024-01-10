@@ -40,8 +40,8 @@ typedef struct {
 } SPI_Device;
 
 #define SPI_BASE_ADDR (AVR_IO_BASE_ADDR + 0x004Cu)
-#define SPI_DEVICE ((SPI_Device *)SPI_BASE_ADDR)
-#define SPI SPI_DEVICE
+#define SPI_DEVICE    ((SPI_Device *)SPI_BASE_ADDR)
+#define SPI	      SPI_DEVICE
 
 typedef enum {
 	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed (for F_CPU=16MHz = 4MHz) */

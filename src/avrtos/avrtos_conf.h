@@ -556,7 +556,6 @@
 #define CONFIG_SERIAL_AUTO_INIT 0u
 #endif
 
-
 //
 // USART0 (serial console) default baudrate
 //
