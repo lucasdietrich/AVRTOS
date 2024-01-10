@@ -12,7 +12,7 @@
 #include "sys.h"
 
 #define AVRTOS_VERSION_MAJOR	1
-#define AVRTOS_VERSION_MINOR	0
+#define AVRTOS_VERSION_MINOR	1
 #define AVRTOS_VERSION_REVISION 0
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN && CONFIG_THREAD_EXPLICIT_MAIN_STACK
@@ -26,8 +26,7 @@
 #endif
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
-#define Z_LINK_KERNEL_SECTION(_section) \
-	__attribute__((used, section(Z_STRINGIFY(_section))))
+#define Z_LINK_KERNEL_SECTION(_section) Z_LINK_SECTION_USED(_section)
 #else
 #define Z_LINK_KERNEL_SECTION(_section) __attribute__((used))
 #endif
@@ -46,11 +45,15 @@
 #define CONFIG_SYSTEM_WORKQUEUE_PRIORITY K_PREEMPTIVE
 #endif
 
-// #if CONFIG_STDIO_PRINTF_TO_USART < 0 && CONFIG_LOGGING_SUBSYSTEM
-// #   error "CONFIG_LOGGING_SUBSYSTEM is incompatible with
-// CONFIG_STDIO_PRINTF_TO_USART < 0" #endif
+#if CONFIG_KERNEL_ARGS_CHECKS
+#define Z_ARGS_CHECK(_cond) if (!(_cond))
+#else
+#define Z_ARGS_CHECK(_cond) if (0)
+#endif
 
 /*___________________________________________________________________________*/
+
+// Timing
 
 #if CONFIG_KERNEL_UPTIME
 #define CONFIG_KERNEL_TICKS_COUNTER 1
@@ -339,10 +342,9 @@ typedef struct {
 			"Static thread (K_THREAD_DEFINE) creation is not "     \
 			"supported");
 
-#define Z_THREAD_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start) \
-	__STATIC_ASSERT(0u,                                                    \
-			"Static thread (K_THREAD_DEFINE) creation is not "     \
-			"supported");
+#define Z_THREAD_MINIMAL_DEFINE(name, entry, prio_flag, context_p, symbol, auto_start)   \
+	Z_THREAD_DEFINE(name, entry, Z_CALLSAVED_CTX_SIZE, prio_flag, context_p, symbol, \
+			auto_start)
 
 #endif
 

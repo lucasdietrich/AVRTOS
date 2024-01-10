@@ -10,7 +10,7 @@
 
 #include "debug.h"
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 #define K_MODULE K_MODULE_MUTEX
 
@@ -19,11 +19,7 @@
 
 int8_t k_mutex_init(struct k_mutex *mutex)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!mutex) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(mutex) return -EINVAL;
 
 	mutex->lock  = Z_MUTEX_UNLOCKED_VALUE;
 	mutex->owner = NULL;

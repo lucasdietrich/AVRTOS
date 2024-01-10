@@ -9,7 +9,7 @@
 #include "dstruct/dlist.h"
 #include "dstruct/slist.h"
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 #define K_MODULE K_MODULE_MEMSLAB
 
@@ -50,18 +50,10 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 		       size_t block_size,
 		       uint8_t num_blocks)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (buffer == NULL) {
-		return -EINVAL;
-	}
-
-	/* we need a list 2 bytes to store the next
+	/* we need at least 2 bytes to store the next
 	 * free block address if not allocated
 	 */
-	if ((block_size < 2) || (num_blocks == 0)) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(buffer && (block_size >= 2) && num_blocks) return -EINVAL;
 
 	dlist_init(&slab->waitqueue);
 

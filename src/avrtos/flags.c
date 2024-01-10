@@ -1,7 +1,7 @@
 #include "flags.h"
 
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 #define KERNEL_FLAGS_OPT_SET_ALL_ENABLED 0
 #define KERNEL_FLAGS_OPT_SET_ANY_ENABLED 1
@@ -18,11 +18,7 @@
 
 int k_flags_init(struct k_flags *flags, uint8_t value)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (flags == NULL) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(flags) return -EINVAL;
 
 	dlist_init(&flags->_waitqueue);
 	flags->flags	   = value;
@@ -38,15 +34,11 @@ int k_flags_poll(struct k_flags *flags,
 {
 	int ret = -EAGAIN;
 
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (flags == NULL) {
-		return -EINVAL;
-	}
-
-	if ((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) != 0u) {
+	Z_ARGS_CHECK(flags) return -EINVAL;
+	Z_ARGS_CHECK((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u)
+	{
 		return -ENOTSUP;
 	}
-#endif
 
 	if (mask == 0u) {
 		ret = 0;
@@ -88,15 +80,8 @@ int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options 
 	int ret = 0;
 	struct dnode *thread_handle;
 
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (flags == NULL) {
-		return -EINVAL;
-	}
-
-	if ((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) != 0u) {
-		return -ENOTSUP;
-	}
-#endif
+	Z_ARGS_CHECK(flags) return -EINVAL;
+	Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u) return -ENOTSUP;
 
 	const uint8_t lock = irq_lock();
 
@@ -146,11 +131,7 @@ int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options 
 
 int k_flags_reset(struct k_flags *flags)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (flags == NULL) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(flags) return -EINVAL;
 
 	const uint8_t lock = irq_lock();
 

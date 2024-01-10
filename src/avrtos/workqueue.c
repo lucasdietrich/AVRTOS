@@ -23,19 +23,13 @@ int8_t k_workqueue_create(struct k_workqueue *workqueue,
 			  uint8_t prio_flags,
 			  char symbol)
 {
-	int8_t ret;
-
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!workqueue || !thread || !stack || !stack_size) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(workqueue && thread && stack && stack_size) return -EINVAL;
 
 	k_fifo_init(&workqueue->q);
 	workqueue->flags = 0u;
 
-	ret = k_thread_create(thread, (thread_entry_t)z_workqueue_entry, stack,
-			      stack_size, prio_flags, (void *)workqueue, symbol);
+	int8_t ret = k_thread_create(thread, (thread_entry_t)z_workqueue_entry, stack,
+				     stack_size, prio_flags, (void *)workqueue, symbol);
 	if (ret == 0) {
 		k_thread_start(thread);
 	}
@@ -189,11 +183,7 @@ int k_work_delayable_schedule(struct k_workqueue *workqueue,
 			      struct k_work_delayable *dwork,
 			      k_timeout_t timeout)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!workqueue || !dwork) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(workqueue && dwork) return -EINVAL;
 
 	int ret		   = 0;
 	const uint8_t lock = irq_lock();
@@ -222,11 +212,7 @@ exit:
 
 int k_work_delayable_cancel(struct k_work_delayable *dwork)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!workqueue || !dwork) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(workqueue && dwork) return -EINVAL;
 
 	int ret = k_event_cancel(&dwork->_event);
 	if (ret == -EAGAIN) {

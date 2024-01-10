@@ -20,6 +20,8 @@
 /* Compiler specific */
 
 #define Z_LINK_SECTION(_section) __attribute__((section(Z_STRINGIFY(_section))))
+#define Z_LINK_SECTION_USED(_section) \
+	__attribute__((used, section(Z_STRINGIFY(_section))))
 
 #define __noinline	 __attribute__((noinline))
 #define __noreturn	 __attribute__((__noreturn__))

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _AVRTOS_USART_H
-#define _AVRTOS_USART_H
+#ifndef _AVRTOS_DRIVERS_USART_H
+#define _AVRTOS_DRIVERS_USART_H
 
 #include <stddef.h>
 
@@ -252,4 +252,4 @@ __kernel int usart_tx(UART_Device *dev, const void *buf, size_t size);
 }
 #endif
 
-#endif /* _AVRTOS_USART_H */
+#endif /* _AVRTOS_DRIVERS_USART_H */

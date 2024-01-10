@@ -16,7 +16,7 @@
 #include "event.h"
 #include "fault.h"
 #include "idle.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 #include "stack_sentinel.h"
 #include "timer.h"
 
@@ -104,7 +104,9 @@ K_THREAD struct k_thread z_thread_main = {
 struct k_thread *z_current = &z_thread_main;
 
 /**
- * @brief Number of threads in the runqueue(s).
+ * @brief Number of threads (except IDLE) in the runqueue(s).
+ *
+ * The IDLE thread is not included in this count.
  *
  * This variable represents the count of threads currently in the runqueue(s),
  * indicating the number of threads that are ready to run. It is initialized to 1
@@ -720,11 +722,10 @@ int8_t k_thread_create(struct k_thread *thread,
 		       void *context_p,
 		       char symbol)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!thread || !entry || !stack || stack_size < Z_THREAD_STACK_MIN_SIZE) {
+	Z_ARGS_CHECK(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE)
+	{
 		return -EINVAL;
 	}
-#endif
 
 	thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
 	thread->stack.size = stack_size;

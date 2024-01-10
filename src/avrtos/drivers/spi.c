@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "spi.h"
 
 #include <avrtos/drivers.h>
@@ -134,11 +140,7 @@ int8_t spi_slave_init(struct spi_slave *slave,
 		      uint8_t active_state,
 		      const struct spi_regs *regs)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!slave || !regs || !cs_port || cs_pin > PIN7) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(slave && regs && cs_port && cs_pin <= PIN7) return -EINVAL;
 
 	slave->cs_port	    = cs_port;
 	slave->cs_pin	    = cs_pin;
@@ -150,11 +152,8 @@ int8_t spi_slave_init(struct spi_slave *slave,
 
 int8_t spi_slave_ss_init(const struct spi_slave *slave)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!slave) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(slave) return -EINVAL;
+
 	gpio_pin_init(slave->cs_port, slave->cs_pin, GPIO_MODE_OUTPUT,
 		      (slave->active_state == GPIO_LOW) ? GPIO_HIGH : GPIO_LOW);
 
@@ -208,9 +207,7 @@ ISR(SPI_STC_vect)
 
 int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!callback) return -EINVAL;
-#endif
+	Z_ARGS_CHECK(callback) return -EINVAL;
 
 	if (spi_async_inprogress()) return -EBUSY;
 

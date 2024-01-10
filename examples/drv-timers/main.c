@@ -31,9 +31,9 @@ ISR(TIMER1_COMPA_vect)
 {
 	static uint8_t cnt = 0U;
 	if (cnt++ & 1) {
-		LED_PORT |= _BV(LED_PIN);
+		LED_PORT |= BIT(LED_PIN);
 	} else {
-		LED_PORT &= ~_BV(LED_PIN);
+		LED_PORT &= ~BIT(LED_PIN);
 	}
 	serial_transmit('1');
 }
@@ -59,8 +59,8 @@ int main(void)
 	serial_init();
 
 	/* Initialize LED */
-	LED_DDR |= _BV(LED_PIN);
-	LED_PORT &= ~_BV(LED_PIN);
+	LED_DDR |= BIT(LED_PIN);
+	LED_PORT &= ~BIT(LED_PIN);
 
 	struct timer_config cfg = {
 		.mode	   = TIMER_MODE_CTC,

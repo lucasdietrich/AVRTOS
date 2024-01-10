@@ -1,13 +1,17 @@
 project(sample_footprint)
 add_executable(${PROJECT_NAME} main.c)
 
-set(CMAKE_BUILD_TYPE Release)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	message(WARNING "Build in Release mode for a smaller footprint")
+endif()
 
 # AVRTOS Configuration
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	CONFIG_KERNEL_ASSERT=0
 	CONFIG_KERNEL_DEBUG=0
 	CONFIG_KERNEL_THREAD_IDLE=0
+
+	# CONFIG_AVRTOS_LINKER_SCRIPT=0
 
 	CONFIG_THREAD_EXPLICIT_MAIN_STACK=0
 	CONFIG_STDIO_PRINTF_TO_USART=-1

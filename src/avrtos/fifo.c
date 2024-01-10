@@ -8,17 +8,14 @@
 
 #include "dstruct/slist.h"
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 #define K_MODULE K_MODULE_FIFO
 
 int8_t k_fifo_init(struct k_fifo *fifo)
 {
-#if CONFIG_KERNEL_ARGS_CHECKS
-	if (!fifo) {
-		return -EINVAL;
-	}
-#endif
+	Z_ARGS_CHECK(fifo) return -EINVAL;
+
 	slist_init(&fifo->queue);
 	dlist_init(&fifo->waitqueue);
 

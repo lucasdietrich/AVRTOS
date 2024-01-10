@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _AVRTOS_DRIVER_GPIO_H_
-#define _AVRTOS_DRIVER_GPIO_H_
+#ifndef _AVRTOS_DRIVERS_GPIO_H_
+#define _AVRTOS_DRIVERS_GPIO_H_
 
 #include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
