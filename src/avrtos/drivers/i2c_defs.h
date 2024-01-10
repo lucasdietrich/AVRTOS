@@ -29,4 +29,8 @@
 #warning "Unsupported MCU"
 #endif
 
+#define AVR_I2C_BASE_ADDR     (AVR_IO_BASE_ADDR + 0x00B8u)
+#define AVR_I2Cn_BASE_ADDR(n) (AVR_I2C_BASE_ADDR + (n)*0x20)
+#define AVR_I2Cn_DEVICE(n)    ((I2C_Device *)AVR_I2Cn_BASE_ADDR(n))
+
 #endif /* DRIVERS_SPI_DEFS_H_ */

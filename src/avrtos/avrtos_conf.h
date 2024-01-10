@@ -868,4 +868,68 @@
 #define CONFIG_AVRTOS_BANNER "*** AVRTOS ***\n"
 #endif
 
+//
+// Configure I2C driver as interrupt driven
+//
+// 0: I2C driver is not interrupt driven
+// 1: I2C driver is interrupt driven
+//
+#ifndef CONFIG_I2C_INTERRUPT_DRIVEN
+#define CONFIG_I2C_INTERRUPT_DRIVEN 1
+#endif
+
+//
+// Configure I2C driver frequency
+//
+// Value in Hz
+//
+#ifndef CONFIG_I2C_FREQ
+#define CONFIG_I2C_FREQ 400000
+#endif
+
+//
+// Make I2C transactions blocking
+//
+// 0: I2C transactions are not blocking
+// 1: I2C transactions are blocking
+//
+#ifndef CONFIG_I2C_BLOCKING
+#define CONFIG_I2C_BLOCKING 1
+#endif
+
+//
+// Configure I2C driver maximum buffer length.
+// Maximum buffer length is 2^CONFIG_I2C_MAX_BUF_LEN_BITS
+//
+// 0: Maximum buffer length is 1 byte
+// 1: Maximum buffer length is 2 bytes
+// 2: Maximum buffer length is 4 bytes
+// 3: Maximum buffer length is 8 bytes
+// 4: Maximum buffer length is 16 bytes
+// 5: Maximum buffer length is 32 bytes
+//
+#ifndef CONFIG_I2C_MAX_BUF_LEN_BITS
+#define CONFIG_I2C_MAX_BUF_LEN_BITS 3u
+#endif
+
+//
+// Enable I2C driver last error tracking
+//
+// 0: I2C driver last error tracking is disabled
+// 1: I2C driver last error tracking is enabled
+//
+#ifndef CONFIG_I2C_LAST_ERROR
+#define CONFIG_I2C_LAST_ERROR 1
+#endif
+
+//
+// Enable I2C driver debug
+//
+// 0: I2C driver debug is disabled
+// 1: I2C driver debug is enabled
+//
+#ifndef CONFIG_I2C_DEBUG
+#define CONFIG_I2C_DEBUG 0
+#endif
+
 #endif

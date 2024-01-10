@@ -68,7 +68,7 @@ drv-timer:
 		-DCMAKE_BUILD_TYPE=Debug
 	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
 
-drv-i2c-ctrl:
+drv-i2c-tcn75:
 	cmake -S . -B build \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
