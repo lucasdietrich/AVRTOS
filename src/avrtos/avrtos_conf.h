@@ -868,6 +868,38 @@
 #define CONFIG_AVRTOS_BANNER "*** AVRTOS ***\n"
 #endif
 
+
+//
+// Enable I2C driver
+//
+// 0: I2C driver is disabled
+// 1: I2C driver is enabled
+//
+#ifndef CONFIG_I2C_DRIVER_ENABLE
+#define CONFIG_I2C_DRIVER_ENABLE 1
+#endif
+
+
+//
+// Enable I2C driver
+//
+// 0: I2C0 device is disabled
+// 1: I2C0 device is enabled
+//
+#ifndef CONFIG_I2C0_ENABLED
+#define CONFIG_I2C0_ENABLED 1
+#endif
+
+//
+// Enable I2C driver
+//
+// 0: I2C1 device is disabled
+// 1: I2C1 device is enabled
+//
+#ifndef CONFIG_I2C1_ENABLED
+#define CONFIG_I2C1_ENABLED 0
+#endif
+
 //
 // Configure I2C driver as interrupt driven
 //
@@ -875,7 +907,7 @@
 // 1: I2C driver is interrupt driven
 //
 #ifndef CONFIG_I2C_INTERRUPT_DRIVEN
-#define CONFIG_I2C_INTERRUPT_DRIVEN 1
+#define CONFIG_I2C_INTERRUPT_DRIVEN 0
 #endif
 
 //

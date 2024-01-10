@@ -22,11 +22,11 @@
 #endif
 
 #if defined(TWI1_vect)
-#define I2C_COUNT 2
+#define MCU_I2C_COUNT 2
 #elif defined(TWI0_vect)
-#define I2C_COUNT 1
+#define MCU_I2C_COUNT 1
 #else
-#warning "Unsupported MCU"
+#define MCU_I2C_COUNT 0
 #endif
 
 #define AVR_I2C_BASE_ADDR     (AVR_IO_BASE_ADDR + 0x00B8u)

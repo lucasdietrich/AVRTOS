@@ -14,6 +14,31 @@
 #include <avr/eeprom.h>
 #include <util/twi.h>
 
+#if CONFIG_I2C_DRIVER_ENABLE
+
+#if MCU_I2C_COUNT == 0
+#error "No I2C device enabled"
+#endif
+
+#if defined(I2C0_DEVICE) && CONFIG_I2C0_ENABLED
+#define I2C0_DEVICE_ENABLED 1
+#define I2C0_INDEX	    0
+#else
+#define I2C0_DEVICE_ENABLED 0
+#endif
+
+#if defined(I2C1_DEVICE) && CONFIG_I2C1_ENABLED
+#define I2C1_DEVICE_ENABLED 1
+// Adjust I2C1 index if I2C0 is not enabled
+#if MCU_I2C_COUNT == 1
+#define I2C1_INDEX 0
+#elif MCU_I2C_COUNT == 2
+#define I2C1_INDEX 1
+#endif
+#else
+#define I2C1_DEVICE_ENABLED 0
+#endif
+
 #define I2C_MAX_BUF_LEN ((1u << CONFIG_I2C_MAX_BUF_LEN_BITS) - 1u)
 
 #define TWI_INT_MASK	(CONFIG_I2C_INTERRUPT_DRIVEN ? BIT(TWIE) : 0u)
@@ -54,17 +79,19 @@ struct i2c_context {
 #define get_error(_x) I2C_ERROR_NONE
 #endif	// CONFIG_I2C_LAST_ERROR
 
-static struct i2c_context i2c_contexts[I2C_COUNT];
+static struct i2c_context i2c_contexts[MCU_I2C_COUNT];
 
 static int8_t i2c_get_device_index(const I2C_Device *dev)
 {
 	switch ((uint16_t)dev) {
+#if I2C0_DEVICE_ENABLED
 	case I2C0_BASE_ADDR:
 		return I2C0_INDEX;
-#if defined(I2C1_DEVICE)
+#endif // I2C0_DEVICE_ENABLED
+#if I2C1_DEVICE_ENABLED
 	case I2C1_BASE_ADDR:
 		return I2C1_INDEX;
-#endif
+#endif // I2C1_DEVICE_ENABLED
 	default:
 		return -EBADF;
 	}
@@ -82,14 +109,16 @@ static struct i2c_context *i2c_get_context(const I2C_Device *dev)
 static void prr_enable(uint8_t dev_index)
 {
 	switch (dev_index) {
+#if I2C0_DEVICE_ENABLED
 	case I2C0_INDEX:
 		PRR0 &= ~BIT(PRTWI0);
 		break;
-#if defined(I2C1_DEVICE)
+#endif // I2C0_DEVICE_ENABLED
+#if I2C1_DEVICE_ENABLED
 	case I2C1_INDEX:
 		PRR1 &= ~BIT(PRTWI1);
 		break;
-#endif
+#endif // I2C1_DEVICE_ENABLED
 	default:
 		break;
 	}
@@ -98,16 +127,18 @@ static void prr_enable(uint8_t dev_index)
 static void i2c_gpio_setup(uint8_t dev_index)
 {
 	switch (dev_index) {
+#if I2C0_DEVICE_ENABLED
 	case I2C0_INDEX:
 		gpiol_pin_init(GPIOC_DEVICE, 4u, GPIO_INPUT, GPIO_INPUT_PULLUP);
 		gpiol_pin_init(GPIOC_DEVICE, 5u, GPIO_INPUT, GPIO_INPUT_PULLUP);
 		break;
-#if defined(I2C1_DEVICE)
+#endif // I2C0_DEVICE_ENABLED
+#if I2C1_DEVICE_ENABLED
 	case I2C1_INDEX:
 		gpiol_pin_init(GPIOE_DEVICE, 0u, GPIO_INPUT, GPIO_INPUT_PULLUP);
 		gpiol_pin_init(GPIOE_DEVICE, 1u, GPIO_INPUT, GPIO_INPUT_PULLUP);
 		break;
-#endif
+#endif // I2C1_DEVICE_ENABLED
 	default:
 		break;
 	}
@@ -289,11 +320,15 @@ static int8_t i2c_run(I2C_Device *dev,
 
 #if !CONFIG_I2C_INTERRUPT_DRIVEN
 	switch ((uint16_t)dev) {
+#if I2C0_DEVICE_ENABLED
 	case I2C0_BASE_ADDR:
 		i2c_state_machine_loop(I2C0_DEVICE, x);
-#if defined(I2C1_DEVICE)
+		break;
+#endif
+#if I2C1_DEVICE_ENABLED
 	case I2C1_BASE_ADDR:
 		i2c_state_machine_loop(I2C1_DEVICE, x);
+		break;
 #endif
 	default:
 		break;
@@ -346,15 +381,18 @@ i2c_error_t i2c_last_error(I2C_Device *dev)
 }
 
 #if CONFIG_I2C_INTERRUPT_DRIVEN
+#if I2C0_DEVICE_ENABLED
 ISR(TWI0_vect)
 {
 	i2c_state_machine(I2C0_DEVICE, &i2c_contexts[I2C0_INDEX]);
 }
+#endif // I2C0_DEVICE_ENABLED
 
-#if defined(TWI1_vect)
+#if I2C1_DEVICE_ENABLED
 ISR(TWI1_vect)
 {
 	i2c_state_machine(I2C0_DEVICE, &i2c_contexts[I2C1_INDEX]);
 }
-#endif	// defined(TWI1_vect)
+#endif	// I2C1_DEVICE_ENABLED
 #endif	// CONFIG_I2C_INTERRUPT_DRIVEN
+#endif	// CONFIG_I2C_DRIVER_ENABLE

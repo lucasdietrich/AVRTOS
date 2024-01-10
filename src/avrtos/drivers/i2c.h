@@ -32,12 +32,10 @@ typedef struct {
 #define I2C0_BASE_ADDR AVR_I2Cn_BASE_ADDR(0)
 #define I2C0_DEVICE    AVR_I2Cn_DEVICE(0)
 #define I2C0	       I2C0_DEVICE
-#define I2C0_INDEX     0
 
 #define I2C_BASE_ADDR I2C0_BASE_ADDR
 #define I2C_DEVICE    I2C0_DEVICE
 #define I2C	      I2C_DEVICE
-#define I2C_INDEX     I2C0_INDEX
 
 // header iom328pb.h is missing in avr toolchain, need to be added manually as described
 // here: https://stuvel.eu/post/2021-04-27-atmega328pb-on-gcc/
@@ -45,7 +43,6 @@ typedef struct {
 #define I2C1_BASE_ADDR AVR_I2Cn_BASE_ADDR(1)
 #define I2C1_DEVICE    AVR_I2Cn_DEVICE(1)
 #define I2C1	       I2C1_DEVICE
-#define I2C1_INDEX     1
 #endif
 
 typedef enum {
