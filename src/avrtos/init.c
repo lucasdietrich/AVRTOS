@@ -10,7 +10,7 @@
 #include "debug.h"
 #include "io.h"
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 #include "mem_slab.h"
 #include "stack_sentinel.h"
 #include "timer.h"

@@ -308,7 +308,7 @@ __kernel void k_sleep(k_timeout_t timeout);
  *
  * @param ms The duration of the sleep in milliseconds.
  */
-static inline void k_msleep(uint32_t ms)
+__always_inline void k_msleep(uint32_t ms)
 {
 	k_sleep(K_MSEC(ms));
 }

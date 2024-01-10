@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _AVRTOS_DRIVER_EXTI_H_
-#define _AVRTOS_DRIVER_EXTI_H_
+#ifndef _AVRTOS_DRIVERS_EXTI_H_
+#define _AVRTOS_DRIVERS_EXTI_H_
 
 #include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
@@ -242,4 +242,4 @@ static inline void pci_disable(uint8_t group)
 }
 #endif
 
-#endif /* _AVRTOS_DRIVER_EXTI_H_ */
+#endif /* _AVRTOS_DRIVERS_EXTI_H_ */

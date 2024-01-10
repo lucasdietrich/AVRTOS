@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _AVRTOS_DRIVER_TIMER_H_
-#define _AVRTOS_DRIVER_TIMER_H_
+#ifndef _AVRTOS_DRIVERS_TIMER_H_
+#define _AVRTOS_DRIVERS_TIMER_H_
 
 #include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
@@ -533,4 +533,4 @@ uint32_t timer_get_max_period_us(uint8_t tim_idx);
 }
 #endif
 
-#endif /* _AVRTOS_DRIVER_TIMER_H_ */
+#endif /* _AVRTOS_DRIVERS_TIMER_H_ */

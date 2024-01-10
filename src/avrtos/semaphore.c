@@ -10,7 +10,7 @@
 
 #include "debug.h"
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 {

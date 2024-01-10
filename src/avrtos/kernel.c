@@ -16,7 +16,7 @@
 #include "event.h"
 #include "fault.h"
 #include "idle.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 #include "stack_sentinel.h"
 #include "timer.h"
 
@@ -107,7 +107,7 @@ struct k_thread *z_current = &z_thread_main;
  * @brief Number of threads (except IDLE) in the runqueue(s).
  *
  * The IDLE thread is not included in this count.
- * 
+ *
  * This variable represents the count of threads currently in the runqueue(s),
  * indicating the number of threads that are ready to run. It is initialized to 1
  * during startup, indicating that only the main thread is running initially.

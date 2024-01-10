@@ -30,12 +30,23 @@ int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
 {
 	Z_ARGS_CHECK(event && handler) return -EINVAL;
 
-	event->handler = handler;
+	event->handler	 = handler;
 	event->scheduled = 0;
 
 	return 0;
 }
 
+/**
+ * @brief Inner function of k_event_schedule.
+ * Requires interrupts to be disabled.
+ * 
+ * Schedule the event to be triggered after timeout (in ms).
+ * Can be called from an interrupt.
+ *
+ * @param event
+ * @param timeout
+ * @return int
+ */
 void z_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
 	event->scheduled   = 1u;
@@ -52,7 +63,7 @@ int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 	Z_ARGS_CHECK(!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
 #endif
 
-	int8_t ret		   = 0;
+	int8_t ret	   = 0;
 	const uint8_t lock = irq_lock();
 
 	if (event->scheduled) {

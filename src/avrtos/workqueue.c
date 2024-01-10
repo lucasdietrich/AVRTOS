@@ -29,7 +29,7 @@ int8_t k_workqueue_create(struct k_workqueue *workqueue,
 	workqueue->flags = 0u;
 
 	int8_t ret = k_thread_create(thread, (thread_entry_t)z_workqueue_entry, stack,
-			      stack_size, prio_flags, (void *)workqueue, symbol);
+				     stack_size, prio_flags, (void *)workqueue, symbol);
 	if (ret == 0) {
 		k_thread_start(thread);
 	}

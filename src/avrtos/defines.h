@@ -26,8 +26,7 @@
 #endif
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
-#define Z_LINK_KERNEL_SECTION(_section) \
-	__attribute__((used, section(Z_STRINGIFY(_section))))
+#define Z_LINK_KERNEL_SECTION(_section) Z_LINK_SECTION_USED(_section)
 #else
 #define Z_LINK_KERNEL_SECTION(_section) __attribute__((used))
 #endif

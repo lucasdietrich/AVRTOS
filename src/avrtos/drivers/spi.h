@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef DRIVERS_SPI_H_
-#define DRIVERS_SPI_H_
+#ifndef _AVRTOS_DRIVERS_SPI_H_
+#define _AVRTOS_DRIVERS_SPI_H_
 
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/kernel.h>
@@ -302,4 +302,4 @@ int8_t spi_cancel_async(void);
 }
 #endif
 
-#endif /* DRIVERS_SPI_H_ */
+#endif /* _AVRTOS_DRIVERS_SPI_H_ */

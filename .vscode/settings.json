@@ -53,7 +53,7 @@
 		"stdbool.h": "c",
 		"usart.h": "c",
 		"semaphore.h": "c",
-		"kernel_internals.h": "c",
+		"kernel_private.h": "c",
 		"drivers.h": "c",
 		"gpio.h": "c",
 		"flags.h": "c",
@@ -74,5 +74,6 @@
 		"delay_basic.h": "c",
 		"twi.h": "c",
 		"i2c.h": "c",
+		"i2c_defs.h": "c"
 	},
 }

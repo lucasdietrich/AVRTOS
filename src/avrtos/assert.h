@@ -18,7 +18,7 @@ extern "C" {
 #include <util/atomic.h>
 
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 // modules
 #define K_MODULE_KERNEL	  1

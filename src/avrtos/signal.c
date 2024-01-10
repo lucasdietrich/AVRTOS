@@ -9,7 +9,7 @@
 #include <util/atomic.h>
 
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 #define K_MODULE K_MODULE_SIGNAL
 

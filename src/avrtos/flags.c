@@ -1,7 +1,7 @@
 #include "flags.h"
 
 #include "kernel.h"
-#include "kernel_internals.h"
+#include "kernel_private.h"
 
 #define KERNEL_FLAGS_OPT_SET_ALL_ENABLED 0
 #define KERNEL_FLAGS_OPT_SET_ANY_ENABLED 1
@@ -35,7 +35,10 @@ int k_flags_poll(struct k_flags *flags,
 	int ret = -EAGAIN;
 
 	Z_ARGS_CHECK(flags) return -EINVAL;
-	Z_ARGS_CHECK((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u) return -ENOTSUP;
+	Z_ARGS_CHECK((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u)
+	{
+		return -ENOTSUP;
+	}
 
 	if (mask == 0u) {
 		ret = 0;

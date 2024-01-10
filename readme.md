@@ -67,6 +67,10 @@ We plan (TODO) to implement several new features and improvements, including:
 - Move or remove yet unused `AVRTOS_VERSION_MAJOR` vars
 - Move "MCU specific fixups" and board specific stuff to a dedicated directory "board
 - Move assembly files to a dedicated directory "arch/avr"
+- Move private defines to _private.h headers
+- Check why metrics are this high
+- Tickless
+- Rename "static inline" to "__always_inline"
 
 ## Getting Started
 
