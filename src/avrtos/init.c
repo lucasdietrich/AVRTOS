@@ -19,19 +19,18 @@ extern void z_init_sysclock(void);
 
 extern void z_init_threads(void);
 
-
 #if CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
 __noinit uint8_t z_mcusr;
 __attribute__((naked, used, section(".init0"))) void z_save_mcusr(void)
 {
-    /*
-    ; read r2 and write it to z_mcusr
-        i.e.: sts z_mcusr, r2
-    */
-    asm volatile("sts %0, r2" 
-        : "=m"(z_mcusr)
-        : /* no input */
-    );
+	/*
+	; read r2 and write it to z_mcusr
+	    i.e.: sts z_mcusr, r2
+	*/
+	asm volatile("sts %0, r2"
+		     : "=m"(z_mcusr)
+		     : /* no input */
+	);
 }
 
 /* This code is equivalent to the following assembly code:
@@ -51,6 +50,7 @@ z_save_mcusr:
 
 void z_avrtos_init(void)
 {
+#if CONFIG_KERNEL_CLEAR_WDT_ON_INIT
 	/* Page 52 (ATmega328p datasheet) :
 	 *	Note: If the Watchdog is accidentally enabled, for example by a
 	 *runaway pointer or brown-out condition, the device will be reset and
@@ -65,9 +65,10 @@ void z_avrtos_init(void)
 	/* If the watchdog caused the reset, clear the flag */
 	if (MCUSR & BIT(WDRF)) {
 		MCUSR &= ~BIT(WDRF);
-		WDTCSR |= (_BV(WDCE) | _BV(WDE)); // change
+		WDTCSR |= (BIT(WDCE) | BIT(WDE));  // change
 		WDTCSR = 0x00;
 	}
+#endif /* CONFIG_KERNEL_INIT_CLEAR_WDT */
 
 #if CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
 	/* Clear MCUSR for next reset */
@@ -84,8 +85,8 @@ void z_avrtos_init(void)
 	serial_init();
 #if CONFIG_AVRTOS_BANNER_ENABLE
 	serial_print_banner();
-#endif
-#endif
+#endif /* CONFIG_AVRTOS_BANNER_ENABLE */
+#endif /* CONFIG_SERIAL_AUTO_INIT */
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
 	SET_BIT(UCSR0B, BIT(RXCIE0));

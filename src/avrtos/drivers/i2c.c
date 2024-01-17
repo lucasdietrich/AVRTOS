@@ -309,7 +309,7 @@ static int8_t i2c_run(I2C_Device *dev,
 		      uint8_t len,
 		      i2c_state_t state)
 {
-	int8_t ret = 0;
+	int8_t ret		    = 0;
 	struct i2c_context *const x = i2c_get_context(dev);
 
 	Z_ARGS_CHECK(x && data && (len <= I2C_MAX_BUF_LEN)) return -EINVAL;

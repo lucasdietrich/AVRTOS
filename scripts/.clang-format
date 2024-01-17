@@ -1,0 +1,44 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+BasedOnStyle: Chromium
+AlignConsecutiveMacros: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AlignOperands: Align
+AllowShortLoopsOnASingleLine: true
+AlignTrailingComments: true
+BinPackArguments: true
+BinPackParameters: false
+PointerAlignment: Right
+BreakBeforeBraces: Linux
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype)\.h>$'
+    Priority: 0
+  - Regex: '^\<avrtos/.*\.h\>$'
+    Priority: 2
+    SortPriority: 1
+  - Regex: '^<.*\.h>$'
+    Priority: 1
+    SortPriority: 2
+  - Regex: '^".*\.h"$'
+    Priority: 3
+  - Regex: '.*'
+    Priority: 4
+IndentWidth: 8
+IndentCaseLabels: false
+ConstructorInitializerIndentWidth: 8
+ContinuationIndentWidth: 8
+UseTab: Always
+ColumnLimit: 90
+WhitespaceSensitiveMacros:
+  - STRINGIFY
+  - Z_STRINGIFY

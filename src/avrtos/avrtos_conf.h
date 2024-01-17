@@ -330,7 +330,28 @@
 // 1: Reset cause is saved
 //
 #ifndef CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
-#define CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE 1
+#define CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE 0
+#endif
+
+//
+// Clear WDT on kernel initialization
+//
+//  Page 52 (ATmega328p datasheet) :
+// 	Note: If the Watchdog is accidentally enabled, for example by a
+// runaway pointer or brown-out condition, the device will be reset and
+// the Watchdog Timer will stay enabled. If the code is not set up to
+// handle the Watchdog, this might lead to an eternal loop of time-out
+// resets. To avoid this situation, the application software should
+//  always clear the Watchdog System Reset Flag (WDRF) and the WDE
+// control bit in the initialization routine, even if the Watchdog is not
+// in use.
+//
+//
+// 0: WDT is not cleared
+// 1: WDT is cleared
+//
+#ifndef CONFIG_KERNEL_CLEAR_WDT_ON_INIT
+#define CONFIG_KERNEL_CLEAR_WDT_ON_INIT 0
 #endif
 
 //

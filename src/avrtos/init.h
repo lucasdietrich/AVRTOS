@@ -21,14 +21,14 @@ extern uint8_t z_mcusr;
 
 /**
  * @brief Retrieve the reset cause
- * 
- * @return uint8_t 
+ *
+ * @return uint8_t
  */
 static inline uint8_t z_get_mcusr(void)
 {
 	return z_mcusr;
 }
-#endif // CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
+#endif	// CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK
 
