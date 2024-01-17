@@ -17,6 +17,7 @@ def dis(name: str, elf: str, elf_dir: str):
         (f"avr-readelf -x .text {elf}", f"{elf_dir}/section_text.txt"),
         (f"avr-nm --print-size --size-sort --radix=x {elf}", f"{elf_dir}/nm-size.txt"),
         (f"avr-nm {elf}", f"{elf_dir}/nm.txt"),
+        (f"avr-size {elf}", f"{elf_dir}/size.txt"),
     ]
 
     for command in commands:

@@ -309,6 +309,7 @@ static int8_t i2c_run(I2C_Device *dev,
 		      uint8_t len,
 		      i2c_state_t state)
 {
+	int8_t ret = 0;
 	struct i2c_context *const x = i2c_get_context(dev);
 
 	Z_ARGS_CHECK(x && data && (len <= I2C_MAX_BUF_LEN)) return -EINVAL;
@@ -338,11 +339,13 @@ static int8_t i2c_run(I2C_Device *dev,
 	default:
 		break;
 	}
+	if (get_error(x) != I2C_ERROR_NONE) ret = -EIO;
 #elif CONFIG_I2C_BLOCKING
 	poll_end(x);
+	if (get_error(x) != I2C_ERROR_NONE) ret = -EIO;
 #endif
 
-	return 0;
+	return ret;
 }
 
 int8_t i2c_master_transmit(I2C_Device *dev,

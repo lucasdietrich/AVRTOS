@@ -24,7 +24,7 @@ int8_t tcn75_configure(struct tcn75_context *tcn75)
 {
 	Z_ARGS_CHECK(tcn75) return -EINVAL;
 
-	uint8_t buf[2u] = {TCN75_CONFIG_REGISTER, tcn75->config};
+	const uint8_t buf[2u] = {TCN75_CONFIG_REGISTER, tcn75->config};
 
 	return i2c_master_transmit(tcn75->i2c, tcn75->addr, buf, 2u);
 }
@@ -33,7 +33,7 @@ int8_t tcn75_select_data_register(struct tcn75_context *tcn75)
 {
 	Z_ARGS_CHECK(tcn75) return -EINVAL;
 
-	uint8_t buf[1u] = {TCN75_TEMPERATURE_REGISTER};
+	const uint8_t buf[1u] = {TCN75_TEMPERATURE_REGISTER};
 
 	return i2c_master_transmit(tcn75->i2c, tcn75->addr, buf, 1u);
 }
