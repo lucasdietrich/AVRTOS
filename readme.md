@@ -71,6 +71,7 @@ We plan (TODO) to implement several new features and improvements, including:
 - Check why metrics are this high
 - Tickless
 - Rename "static inline" to "__always_inline"
+- Implement builtin_ctz for 8-bit
 
 ## Getting Started
 

@@ -19,6 +19,36 @@ extern void z_init_sysclock(void);
 
 extern void z_init_threads(void);
 
+
+#if CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
+__noinit uint8_t z_mcusr;
+__attribute__((naked, used, section(".init0"))) void z_save_mcusr(void)
+{
+    /*
+    ; read r2 and write it to z_mcusr
+        i.e.: sts z_mcusr, r2
+    */
+    asm volatile("sts %0, r2" 
+        : "=m"(z_mcusr)
+        : /* no input */
+    );
+}
+
+/* This code is equivalent to the following assembly code:
+
+.section .noinit
+.global z_mcusr
+z_mcusr:
+    .byte 1
+
+.section .init0
+.global z_save_mcusr
+z_save_mcusr:
+    sts z_mcusr, r2
+
+*/
+#endif
+
 void z_avrtos_init(void)
 {
 	/* Page 52 (ATmega328p datasheet) :
@@ -33,11 +63,16 @@ void z_avrtos_init(void)
 	 */
 
 	/* If the watchdog caused the reset, clear the flag */
-	// if (MCUSR & BIT(WDRF)) {
-	// 	MCUSR &= ~BIT(WDRF);
-	// 	WDTCSR |= (_BV(WDCE) | _BV(WDE)); // change
-	// 	WDTCSR = 0x00;
-	// }
+	if (MCUSR & BIT(WDRF)) {
+		MCUSR &= ~BIT(WDRF);
+		WDTCSR |= (_BV(WDCE) | _BV(WDE)); // change
+		WDTCSR = 0x00;
+	}
+
+#if CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
+	/* Clear MCUSR for next reset */
+	MCUSR = 0u;
+#endif
 
 	/* Debug pins */
 	__Z_DBG_GPIO_0_INIT();

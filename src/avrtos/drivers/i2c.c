@@ -124,19 +124,21 @@ static void prr_enable(uint8_t dev_index)
 	}
 }
 
-static void i2c_gpio_setup(uint8_t dev_index)
+static void i2c_gpio_setup(uint8_t dev_index, bool enable)
 {
+	uint8_t pullup = enable ? GPIO_INPUT_PULLUP : GPIO_INPUT_NO_PULLUP;
+
 	switch (dev_index) {
 #if I2C0_DEVICE_ENABLED
 	case I2C0_INDEX:
-		gpiol_pin_init(GPIOC_DEVICE, 4u, GPIO_INPUT, GPIO_INPUT_PULLUP);
-		gpiol_pin_init(GPIOC_DEVICE, 5u, GPIO_INPUT, GPIO_INPUT_PULLUP);
+		gpiol_pin_init(GPIOC_DEVICE, 4u, GPIO_INPUT, pullup);
+		gpiol_pin_init(GPIOC_DEVICE, 5u, GPIO_INPUT, pullup);
 		break;
 #endif	// I2C0_DEVICE_ENABLED
 #if I2C1_DEVICE_ENABLED
 	case I2C1_INDEX:
-		gpiol_pin_init(GPIOE_DEVICE, 0u, GPIO_INPUT, GPIO_INPUT_PULLUP);
-		gpiol_pin_init(GPIOE_DEVICE, 1u, GPIO_INPUT, GPIO_INPUT_PULLUP);
+		gpiol_pin_init(GPIOE_DEVICE, 0u, GPIO_INPUT, pullup);
+		gpiol_pin_init(GPIOE_DEVICE, 1u, GPIO_INPUT, pullup);
 		break;
 #endif	// I2C1_DEVICE_ENABLED
 	default:
@@ -162,7 +164,7 @@ int8_t i2c_init(I2C_Device *dev, struct i2c_config config)
 		     (2 * PRESCALER_VALUE(config.prescaler));
 
 	// set internal pullups on SDA, SCL
-	i2c_gpio_setup(dev_index);
+	i2c_gpio_setup(dev_index, true);
 
 	dev->TWARn  = 0u;  // TODO
 	dev->TWAMRn = 0u;  // TODO
@@ -192,6 +194,9 @@ int8_t i2c_deinit(I2C_Device *dev)
 	dev->TWARn  = 0x02;
 	dev->TWDRn  = 0x01;
 	dev->TWAMRn = 0u;
+
+	// clear internal pullups on SDA, SCL
+	i2c_gpio_setup(dev_index, false);
 
 	ret = 0;
 

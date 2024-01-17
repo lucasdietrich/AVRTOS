@@ -320,6 +320,20 @@
 #endif
 
 //
+// Save reset cause retrieved from MCUSR register by the MiniCore bootloader.
+//
+// MiniCore bootloader saves MCUSR (reset cause) value in the r2 register
+// before jumping to the application. Enabling this option allows to copy
+// this value before it is overwritten by the kernel.
+//
+// 0: Reset cause is not saved
+// 1: Reset cause is saved
+//
+#ifndef CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
+#define CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE 1
+#endif
+
+//
 // Tells whether the kernel should define a idle thread to enable other threads
 // to sleep. If disabled, at least one thread must be always ready, otherwise
 // a fault will be triggered.
