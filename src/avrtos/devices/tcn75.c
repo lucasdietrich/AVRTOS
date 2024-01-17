@@ -7,13 +7,13 @@
 #include "tcn75.h"
 
 int8_t tcn75_init_context(struct tcn75_context *tcn75,
-			  uint8_t addr,
+			  uint8_t addr_lsb,
 			  uint8_t config,
 			  I2C_Device *i2c)
 {
 	Z_ARGS_CHECK(tcn75) return -EINVAL;
 
-	tcn75->addr   = (addr & 0x07u) | TCN75_ADDR_BASE;
+	tcn75->addr   = (addr_lsb & 0x07u) | TCN75_ADDR_BASE;
 	tcn75->config = config;
 	tcn75->i2c    = i2c;
 

@@ -31,19 +31,19 @@ typedef enum {
 	PHIL_STATE_STARVING,
 } phil_state_t;
 
-char phil_state_to_char(phil_state_t state)
+const char *phil_state_to_string(phil_state_t state)
 {
-	static char states_char[] = {
-		[PHIL_STATE_NONE]		= '-',
-		[PHIL_STATE_THINKING]		= 'K',
-		[PHIL_STATE_PENDING_LEFT_FORK]	= '1',
-		[PHIL_STATE_PENDING_RIGHT_FORK] = '2',
-		[PHIL_STATE_EATING]		= 'E',
-		[PHIL_STATE_STARVING]		= 'S',
+	static const char *states_char[] = {
+		[PHIL_STATE_NONE]		= "-",
+		[PHIL_STATE_THINKING]		= "THINKING  ",
+		[PHIL_STATE_PENDING_LEFT_FORK]	= "PEND_LEFT ",
+		[PHIL_STATE_PENDING_RIGHT_FORK] = "PEND_RIGHT",
+		[PHIL_STATE_EATING]		= "EATING    ",
+		[PHIL_STATE_STARVING]		= "STARVING  ",
 	};
 
 	if (state >= ARRAY_SIZE(states_char)) {
-		return '?';
+		return "???";
 	}
 
 	return states_char[state];
@@ -356,7 +356,7 @@ void loop(void)
 	for (Philosopher &phil : philosophers) {
 		phil_state_t state = phil.GetState();
 
-		printf_P(PSTR("%c "), phil_state_to_char(state));
+		printf_P(PSTR("%s "), phil_state_to_string(state));
 	}
 
 	printf_P(PSTR("\n"));

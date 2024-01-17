@@ -33,11 +33,18 @@ __kernel bool k_is_cpu_idle(void);
 /**
  * @brief IDLE the CPU.
  *
- * This function can be called from a thread to make it behave as an IDLE
+ * This function can be called from any thread to make it behave as an IDLE
  * thread.
  *
- * Important: if others thread a ready, they will be blocked until an interrupt
- * occurs !
+ * This function shouldn't be called from an ISR.
+ *
+ * If others thread a ready, the function will call k_yield() to give them
+ * a chance to run. If no other thread is ready, the MCU is put in sleep mode
+ * until an interrupt occurs.
+ *
+ * The function keeps the thread as "ready". This means that if an interrupt
+ * occurs or other threads finished to consume their time slice,
+ * the thread will be scheduled to run again.
  *
  * Note: This function requires interrupts to be enabled.
  */

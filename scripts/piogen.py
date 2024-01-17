@@ -43,7 +43,7 @@ def to_camel_case(snake_str):
 # refer to src/avrtos/avrtos_arduinoide_conf.h
 arduino_examples_options = [
 	"CONFIG_AVRTOS_LINKER_SCRIPT=0",
-	"CONFIG_KERNEL_AUTO_INIT=0",
+	"CONFIG_KERNEL_AUTO_INIT=1",
 	"CONFIG_KERNEL_TIMERS=1",
 	"CONFIG_KERNEL_EVENTS=1",
 	"CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT=1",

@@ -12,7 +12,7 @@
 
 void __fault_hook(void)
 {
-	
+	serial_transmit('!');
 }
 
 int main(void)

@@ -28,6 +28,7 @@ Documentation and Samples:
 - Enhanced documentation
 - added new samples demonstrating various features:
   - Added `MCP3008` and `TCN75` driver samples.
+  - Added Arduino sample `MinimalExample`.
 
 ## avrtos v1.1.0
 

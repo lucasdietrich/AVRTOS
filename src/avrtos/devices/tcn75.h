@@ -81,7 +81,7 @@ struct tcn75_context {
  * @return int8_t 0 if success, negative value otherwise
  */
 int8_t tcn75_init_context(struct tcn75_context *tcn75,
-			  uint8_t addr,
+			  uint8_t addr_lsb,
 			  uint8_t config,
 			  I2C_Device *i2c);
 

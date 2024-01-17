@@ -11,8 +11,7 @@
 #include <avrtos/drivers/i2c.h>
 #include <avrtos/devices/tcn75.h>
 
-#define TCN75A_ADDR 0x49
-#define UNKNOW_ADDR 0x77
+#define TCN75A_ADDR_LSb 0b001
 
 int main(void)
 {
@@ -27,7 +26,7 @@ int main(void)
 	k_msleep(100);
 
 	struct tcn75_context tcn75;
-	ret = tcn75_init_context(&tcn75, TCN75A_ADDR | 0b001, TCN75_DEFAULT_CONFIG, I2C0_DEVICE);
+	ret = tcn75_init_context(&tcn75, TCN75A_ADDR_LSb, TCN75_DEFAULT_CONFIG, I2C0_DEVICE);
 	printf("tcn75_init_context: %d\n", ret);
 
 	ret = tcn75_configure(&tcn75);

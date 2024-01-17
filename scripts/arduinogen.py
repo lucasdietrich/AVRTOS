@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
             found_main = False
 
-            for file in glob.glob(os.path.join("./examples", example, "*.cpp")):
+            for file in glob.glob(os.path.join("./examples", example, "*.c*")):
                 basename = os.path.basename(file)
                 if basename in [
                     sample_name + ".cpp",
