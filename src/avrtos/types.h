@@ -16,14 +16,14 @@
 /**
  * @brief Thread entry point function type.
  *
- * The `thread_entry_t` type is a function pointer type representing a thread entry
+ * The `k_thread_entry_t` type is a function pointer type representing a thread entry
  * point function. A thread entry point function is a function that serves as the
  * starting point for the execution of a thread. It takes a single `void*` parameter
  * used to pass the thread context when the entry function is called.
  *
  * @param context A pointer to the context data for the thread.
  */
-typedef void (*thread_entry_t)(void *);
+typedef void (*k_thread_entry_t)(void *);
 
 /**
  * @brief Structure representing a thread.
@@ -46,8 +46,8 @@ struct k_thread {
 		// the same time
 
 	union {
-		struct dnode wany;    // represent the thread pending on a generic
-				      // object
+		struct dnode wany;  // represent the thread pending on a generic
+				    // object
 		struct dnode wmutex;  // represent the thread pending on an mutex
 		struct dnode wsem;    // represent the thread pending on an semaphore
 		struct dnode wsig;    // represent the thread pending on an signal
@@ -121,7 +121,7 @@ struct z_callsaved_ctx {
 			uint8_t r5;
 			uint8_t r4;
 		};
-		thread_entry_t thread_entry;
+		k_thread_entry_t thread_entry;
 	};
 	union {
 		struct {

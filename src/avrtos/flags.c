@@ -29,7 +29,7 @@ int k_flags_init(struct k_flags *flags, uint8_t value)
 
 int k_flags_poll(struct k_flags *flags,
 		 uint8_t mask,
-		 k_flags_options options,
+		 k_flags_options_t options,
 		 k_timeout_t timeout)
 {
 	int ret = -EAGAIN;
@@ -75,7 +75,7 @@ exit:
 	return ret;
 }
 
-int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options options)
+int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_t options)
 {
 	int ret = 0;
 	struct dnode *thread_handle;

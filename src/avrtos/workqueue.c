@@ -28,7 +28,7 @@ int8_t k_workqueue_create(struct k_workqueue *workqueue,
 	k_fifo_init(&workqueue->q);
 	workqueue->flags = 0u;
 
-	int8_t ret = k_thread_create(thread, (thread_entry_t)z_workqueue_entry, stack,
+	int8_t ret = k_thread_create(thread, (k_thread_entry_t)z_workqueue_entry, stack,
 				     stack_size, prio_flags, (void *)workqueue, symbol);
 	if (ret == 0) {
 		k_thread_start(thread);
@@ -88,12 +88,12 @@ void k_work_init(struct k_work *work, k_work_handler_t handler)
  * @return true if submittable
  * @return false if in already in queue
  */
-static inline bool z_work_submittable(struct k_work *work)
+__always_inline bool z_work_submittable(struct k_work *work)
 {
 	return work->_tie.next == NULL;
 }
 
-static inline void z_work_submit(struct k_workqueue *workqueue, struct k_work *work)
+__always_inline void z_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 {
 	z_fifo_put(&workqueue->q, &work->_tie);
 }

@@ -32,7 +32,7 @@ extern "C" {
  * @return int 0 on success
  */
 int8_t k_thread_create(struct k_thread *thread,
-		       thread_entry_t entry,
+		       k_thread_entry_t entry,
 		       void *stack,
 		       size_t stack_size,
 		       uint8_t priority,
@@ -95,7 +95,7 @@ extern struct k_thread *z_current;
  *
  * @return thread_t*
  */
-static inline struct k_thread *k_thread_get_current(void)
+__always_inline struct k_thread *k_thread_get_current(void)
 {
 	return z_current;
 }
@@ -109,7 +109,7 @@ extern struct k_thread z_thread_main;
  *
  * @return struct k_thread*
  */
-static inline struct k_thread *k_thread_get_main(void)
+__always_inline struct k_thread *k_thread_get_main(void)
 {
 	return &z_thread_main;
 }
@@ -152,7 +152,7 @@ __kernel void irq_enable(void);
  *
  * @return uint8_t
  */
-static inline uint8_t irq_lock(void)
+__always_inline uint8_t irq_lock(void)
 {
 	const uint8_t key = SREG;
 	irq_disable();
@@ -164,7 +164,7 @@ static inline uint8_t irq_lock(void)
  *
  * @param key
  */
-static inline void irq_unlock(uint8_t key)
+__always_inline void irq_unlock(uint8_t key)
 {
 	SREG = key;
 }
@@ -418,7 +418,7 @@ void z_yield(void);
  *
  * Can be called from ISRs.
  */
-static inline void k_yield(void)
+__always_inline void k_yield(void)
 {
 	const uint8_t key = irq_lock();
 	z_yield();
@@ -493,7 +493,7 @@ extern struct k_thread *z_current;
  * 	}
  * }
  */
-static inline void k_yield_from_isr(void)
+__always_inline void k_yield_from_isr(void)
 {
 	// ASSERT ISR CONTEXT
 	// ASSERT IRQ LOCKED
@@ -536,7 +536,7 @@ static inline void k_yield_from_isr(void)
  * 	k_yield_from_isr_cond(thread);
  * }
  */
-static inline void k_yield_from_isr_cond(struct k_thread *thread)
+__always_inline void k_yield_from_isr_cond(struct k_thread *thread)
 {
 	if (thread != NULL) {
 #if CONFIG_KERNEL_ASSERT
@@ -561,7 +561,7 @@ __kernel uint32_t k_ticks_get_32(void);
  *
  * @return uint32_t
  */
-static inline uint32_t k_ticks_get(void)
+__always_inline uint32_t k_ticks_get(void)
 {
 	return k_ticks_get_32();
 }

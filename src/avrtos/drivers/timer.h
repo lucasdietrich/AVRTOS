@@ -292,7 +292,7 @@ struct timer_config {
 /**
  * @brief Get the timer index from the device address
  *
- * This function is declared static inline, because it can be mostly optimized
+ * This function is declared __always_inline, because it can be mostly optimized
  * to a constant value by the compiler when called on a constant timer device.
  *
  * Example: "timer_get_index(TIMER4_DEVICE)" will give "4" at compile time.
@@ -302,7 +302,7 @@ struct timer_config {
  * @param dev
  * @return int
  */
-static inline __attribute__((__always_inline__)) int timer_get_index(void *dev)
+__always_inline __attribute__((__always_inline__)) int timer_get_index(void *dev)
 {
 	switch ((uint16_t)dev) {
 #if defined(TIMER0_DEVICE)
@@ -337,7 +337,7 @@ static inline __attribute__((__always_inline__)) int timer_get_index(void *dev)
 /**
  * @brief Get the timer device address from its index
  *
- * This function is declared static inline, because it can be mostly optimized
+ * This function is declared __always_inline, because it can be mostly optimized
  * to a constant value by the compiler when called on a constant timer device.
  *
  * Example: "timer_get_device(4)" will give the value of TIMER4_DEVICE at
@@ -348,7 +348,7 @@ static inline __attribute__((__always_inline__)) int timer_get_index(void *dev)
  * @param dev
  * @return int
  */
-static inline __attribute__((__always_inline__)) void *timer_get_device(uint8_t idx)
+__always_inline __attribute__((__always_inline__)) void *timer_get_device(uint8_t idx)
 {
 	switch (idx) {
 #if defined(TIMER0_DEVICE)
@@ -380,17 +380,17 @@ static inline __attribute__((__always_inline__)) void *timer_get_device(uint8_t 
 	}
 }
 
-static inline void ll_timer_clear_enable_int_mask(uint8_t tim_idx)
+__always_inline void ll_timer_clear_enable_int_mask(uint8_t tim_idx)
 {
 	TIMSKn[tim_idx] = 0U;
 }
 
-static inline void ll_timer_set_enable_int_mask(uint8_t tim_idx, uint8_t mask)
+__always_inline void ll_timer_set_enable_int_mask(uint8_t tim_idx, uint8_t mask)
 {
 	TIMSKn[tim_idx] = mask;
 }
 
-static inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
+__always_inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
 {
 	/* For example : OCF1A:
 	 * OCFnA is automatically cleared when the Output Compare Match A
@@ -400,29 +400,29 @@ static inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
 	TIFRn[tim_idx] = 0xFFU;
 }
 
-static inline uint8_t ll_timer_get_irq_flags(uint8_t tim_idx)
+__always_inline uint8_t ll_timer_get_irq_flags(uint8_t tim_idx)
 {
 	return TIFRn[tim_idx];
 }
 
-static inline void ll_timer8_stop(TIMER8_Device *dev)
+__always_inline void ll_timer8_stop(TIMER8_Device *dev)
 {
 	/* timer stops counting at the timer prescaler is set to zero */
 	dev->TCCRnB &= ~(BIT(CSn0) | BIT(CSn1) | BIT(CSn2));
 }
 
-static inline void ll_timer8_counter_reset(TIMER8_Device *dev)
+__always_inline void ll_timer8_counter_reset(TIMER8_Device *dev)
 {
 	dev->TCNTn = 0x00U;
 }
 
-static inline void ll_timer8_start(TIMER8_Device *dev, uint8_t prescaler)
+__always_inline void ll_timer8_start(TIMER8_Device *dev, uint8_t prescaler)
 {
 	/* timer starts counting at the timer prescaler is set*/
 	dev->TCCRnB |= prescaler << CSn0;
 }
 
-static inline void ll_timer16_write_reg16(__IO uint16_t *reg, uint16_t val)
+__always_inline void ll_timer16_write_reg16(__IO uint16_t *reg, uint16_t val)
 {
 	/**
 	 * To do a 16-bit write, the high byte must be written before the low
@@ -433,7 +433,7 @@ static inline void ll_timer16_write_reg16(__IO uint16_t *reg, uint16_t val)
 	*((__IO uint8_t *)reg)	    = val & 0xffu;
 }
 
-static inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
+__always_inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
 {
 	/**
 	 * To do a 16-bit write, the high byte must be written before the low
@@ -444,42 +444,42 @@ static inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
 	dev->TCNTnL = val & 0xffU;
 }
 
-static inline void ll_timer16_stop(TIMER16_Device *dev)
+__always_inline void ll_timer16_stop(TIMER16_Device *dev)
 {
 	/* timer stops counting at the timer prescaler is set to zero */
 	dev->TCCRnB &= ~(BIT(CSn0) | BIT(CSn1) | BIT(CSn2));
 }
 
-static inline void ll_timer16_counter_reset(TIMER16_Device *dev)
+__always_inline void ll_timer16_counter_reset(TIMER16_Device *dev)
 {
 	ll_timer16_set_tcnt(dev, 0x0000U);
 }
 
-static inline void ll_timer16_start(TIMER16_Device *dev, uint8_t prescaler)
+__always_inline void ll_timer16_start(TIMER16_Device *dev, uint8_t prescaler)
 {
 	/* timer starts counting at the timer prescaler is set*/
 	dev->TCCRnB |= prescaler < CSn0;
 }
 
-static inline void ll_timer_stop(void *dev)
+__always_inline void ll_timer_stop(void *dev)
 {
 	/* as TCCRnB is at the same address in the timer regisiters, we
 	 * can use the same function to stop all timers types */
 	ll_timer8_stop((TIMER8_Device *)dev);
 }
 
-static inline void ll_timer_start(void *dev, uint8_t prescaler)
+__always_inline void ll_timer_start(void *dev, uint8_t prescaler)
 {
 	/* see ll_timer_stop */
 	ll_timer8_start((TIMER8_Device *)dev, prescaler);
 }
 
-static inline void ll_timer16_enable_interrupt(uint8_t tim_idx, timer16_interrupt_t n)
+__always_inline void ll_timer16_enable_interrupt(uint8_t tim_idx, timer16_interrupt_t n)
 {
 	TIMSKn[tim_idx] |= BIT(n);
 }
 
-static inline void ll_timer16_disable_interrupt(uint8_t tim_idx, timer16_interrupt_t n)
+__always_inline void ll_timer16_disable_interrupt(uint8_t tim_idx, timer16_interrupt_t n)
 {
 	TIMSKn[tim_idx] &= ~BIT(n);
 }

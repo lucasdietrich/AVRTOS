@@ -24,7 +24,7 @@ extern "C" {
  * @param thread Pointer to the thread structure.
  * @param state The new state of the thread.
  */
-static inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
+__always_inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
 {
 	thread->flags =
 		(thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
@@ -39,7 +39,7 @@ static inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
  * @param thread Pointer to the thread structure.
  * @return The state of the thread.
  */
-static inline uint8_t z_get_thread_state(struct k_thread *thread)
+__always_inline uint8_t z_get_thread_state(struct k_thread *thread)
 {
 	return thread->flags & Z_THREAD_STATE_MSK;
 }

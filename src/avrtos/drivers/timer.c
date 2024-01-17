@@ -15,7 +15,7 @@
 
 #define K_MODULE K_MODULE_DRIVERS_TIMERS
 
-/* not static inline version of timer_get_index */
+/* not __always_inline version of timer_get_index */
 static int _get_index(void *dev)
 {
 	return timer_get_index(dev);

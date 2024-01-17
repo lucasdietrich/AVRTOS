@@ -149,16 +149,16 @@ typedef struct {
 
 /* Inline API */
 
-static inline void gpiol_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
+__always_inline void gpiol_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pullup_mask)
 {
 	gpio->DDR  = dir_mask;
 	gpio->PORT = pullup_mask;
 }
 
-static inline void gpiol_pin_init(GPIO_Device *gpio,
-				  uint8_t pin,
-				  uint8_t dir,
-				  uint8_t pullup)
+__always_inline void gpiol_pin_init(GPIO_Device *gpio,
+				    uint8_t pin,
+				    uint8_t dir,
+				    uint8_t pullup)
 {
 	/* represent either pullup (if input) or output level (if output)*/
 	if (pullup == GPIO_INPUT_NO_PULLUP) {
@@ -174,34 +174,34 @@ static inline void gpiol_pin_init(GPIO_Device *gpio,
 	}
 }
 
-static inline void gpiol_pin_set_direction(GPIO_Device *gpio,
-					   uint8_t pin,
-					   uint8_t direction)
+__always_inline void gpiol_pin_set_direction(GPIO_Device *gpio,
+					     uint8_t pin,
+					     uint8_t direction)
 {
 	gpio->DDR = (gpio->DDR & ~BIT(pin)) | ((direction & 1u) << pin);
 }
 
-static inline uint8_t gpiol_pin_get_direction(GPIO_Device *gpio, uint8_t pin)
+__always_inline uint8_t gpiol_pin_get_direction(GPIO_Device *gpio, uint8_t pin)
 {
 	return (gpio->DDR >> pin) & 1u;
 }
 
-static inline void gpiol_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)
+__always_inline void gpiol_pin_set_pullup(GPIO_Device *gpio, uint8_t pin, uint8_t pullup)
 {
 	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((pullup & 1u) << pin);
 }
 
-static inline void gpiol_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state)
+__always_inline void gpiol_pin_write_state(GPIO_Device *gpio, uint8_t pin, uint8_t state)
 {
 	gpio->PORT = (gpio->PORT & ~BIT(pin)) | ((state & 1u) << pin);
 }
 
-static inline void gpiol_pin_toggle(GPIO_Device *gpio, uint8_t pin)
+__always_inline void gpiol_pin_toggle(GPIO_Device *gpio, uint8_t pin)
 {
 	gpio->PIN = BIT(pin);
 }
 
-static inline uint8_t gpiol_pin_read_state(GPIO_Device *gpio, uint8_t pin)
+__always_inline uint8_t gpiol_pin_read_state(GPIO_Device *gpio, uint8_t pin)
 {
 	return (gpio->PIN >> pin) & 1u;
 }

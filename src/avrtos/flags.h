@@ -53,7 +53,7 @@ typedef enum {
 	K_FLAGS_CLR = 1 << 6u,
 	/* Call the scheduler if task have been wake up after notify() */
 	K_FLAGS_SCHED = 1 << 7u,
-} k_flags_options;
+} k_flags_options_t;
 
 /**
  * @brief Initialize a flags object
@@ -81,7 +81,7 @@ int k_flags_init(struct k_flags *flags, uint8_t value);
  */
 int k_flags_poll(struct k_flags *flags,
 		 uint8_t mask,
-		 k_flags_options options,
+		 k_flags_options_t options,
 		 k_timeout_t timeout);
 
 /**
@@ -102,7 +102,9 @@ int k_flags_poll(struct k_flags *flags,
  * @return  -EINVAL if flags object is NULL
  * @return  -ENOTSUP if options is not supported
  */
-int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options options);
+int k_flags_notify(struct k_flags *flags,
+		   uint8_t notify_value,
+		   k_flags_options_t options);
 
 /**
  * @brief Reset a flags object

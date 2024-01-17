@@ -1,5 +1,34 @@
 # Changelog
 
+## avrtos v1.2.0
+
+Key features:
+- **I2C**: Introduced full I2C driver, including a new TCN75 device driver. 
+- **SPI Driver Refactor**: Enhanced SPI driver by introducing the `spi_regs` 
+  intermediate structure, holding SPI registers.
+- **Work Queue**: Added support for delayable work queue items with a sample 
+  demonstrating the feature.
+
+Minor Changes:
+- Stored MCUSR at startup with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` option.
+- Introduced new configuration options:
+  - Handling of reset cause with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` and `CONFIG_KERNEL_CLEAR_WDT_ON_INIT`
+  - `CONFIG_IDLE_HOOK`
+  - `CONFIG_WORKQUEUE_DELAYABLE`
+  - `CONFIG_SERIAL_AUTO_INIT`
+  - Banner configuration options `CONFIG_AVRTOS_BANNER_ENABLE` and `CONFIG_AVRTOS_BANNER`
+  - Various options for the I2C driver.
+- Updated samples, documentation.
+- Removed unused USART functions and eradicated unused code.
+- Move assembly files to `src/arch`.
+
+Bug Fixes:
+
+Documentation and Samples:
+- Enhanced documentation
+- added new samples demonstrating various features:
+  - Added `MCP3008` and `TCN75` driver samples.
+
 ## avrtos v1.1.0
 
 Main features:
@@ -26,8 +55,8 @@ Improvements:
 - Optimized headers inclusions.
 
 Minor changes:
-- Introduced K_TICKS to declare timeouts in ticks.
-- Introduced macros: FEATURE_TIMER_COUNT and FEATURE_USART_COUNT to ascertain if
+- Introduced `K_TICKS` to declare timeouts in ticks.
+- Introduced macros: `FEATURE_TIMER_COUNT` and FEATURE_USART_COUNT to ascertain if
   an example can be built for a certain toolchain.
 - Enhanced disassembly script for PlatformIO.
 - k_work_submittable removed from public API, but k_workqueue_create was added
@@ -38,10 +67,10 @@ Minor changes:
 - Introduced a script for computing code metrics.
 - Dead code was purged.
 - Help added for thread-ev-spawn example.
-- Defined internal macros: Z_THREAD_MAIN_PRIORITY and
-  Z_THREAD_MAIN_STACK_END_ADDR.
+- Defined internal macros: `Z_THREAD_MAIN_PRIORITY` and
+  `Z_THREAD_MAIN_STACK_END_ADDR`.
 - Eradicated unused/unfished file descriptor features (fd.c/fd.h).
-- Eliminated /*______*/ code boundaries.
+- Eliminated `/*______*/` code boundaries.
 
 ## avrtos v1.0.0
 

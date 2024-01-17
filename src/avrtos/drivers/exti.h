@@ -85,7 +85,7 @@ int exti_configure(uint8_t exti, uint8_t isc);
  *
  * @param exti EXTI number
  */
-static inline void exti_clear_flag(uint8_t exti)
+__always_inline void exti_clear_flag(uint8_t exti)
 {
 	EIFR |= BIT(exti);
 }
@@ -96,7 +96,7 @@ static inline void exti_clear_flag(uint8_t exti)
  * @param exti EXTI number
  * @return uint8_t interrupt flag value
  */
-static inline uint8_t exti_get_flag(uint8_t exti)
+__always_inline uint8_t exti_get_flag(uint8_t exti)
 {
 	return (EIFR & BIT(exti)) >> exti;
 }
@@ -106,7 +106,7 @@ static inline uint8_t exti_get_flag(uint8_t exti)
  *
  * @param exti EXTI number
  */
-static inline void exti_poll_flag(uint8_t exti)
+__always_inline void exti_poll_flag(uint8_t exti)
 {
 	while (!exti_get_flag(exti))
 		;
@@ -117,7 +117,7 @@ static inline void exti_poll_flag(uint8_t exti)
  *
  * @param exti EXTI number
  */
-static inline void exti_enable(uint8_t exti)
+__always_inline void exti_enable(uint8_t exti)
 {
 	EIMSK |= BIT(exti);
 }
@@ -127,7 +127,7 @@ static inline void exti_enable(uint8_t exti)
  *
  * @param exti EXTI number
  */
-static inline void exti_disable(uint8_t exti)
+__always_inline void exti_disable(uint8_t exti)
 {
 	EIMSK &= ~BIT(exti);
 }
@@ -147,7 +147,7 @@ static inline void exti_disable(uint8_t exti)
  * pci_clear_flag(PCINT_16_23);
  * pci_enable(PCINT_16_23);
  */
-static inline void pci_configure(uint8_t pci_group, uint8_t mask)
+__always_inline void pci_configure(uint8_t pci_group, uint8_t mask)
 {
 	PCI_CTRL_DEVICE->PCMSK[pci_group] = mask;
 }
@@ -158,7 +158,7 @@ static inline void pci_configure(uint8_t pci_group, uint8_t mask)
  * @param group Group number
  * @param line Line number (0-7)
  */
-static inline void pci_pin_enable_group_line(uint8_t group, uint8_t line)
+__always_inline void pci_pin_enable_group_line(uint8_t group, uint8_t line)
 {
 	PCI_CTRL_DEVICE->PCMSK[group] |= BIT(line);
 }
@@ -169,7 +169,7 @@ static inline void pci_pin_enable_group_line(uint8_t group, uint8_t line)
  * @param group Group number
  * @param line Line number (0-7)
  */
-static inline void pci_pin_disable_group_line(uint8_t group, uint8_t line)
+__always_inline void pci_pin_disable_group_line(uint8_t group, uint8_t line)
 {
 	PCI_CTRL_DEVICE->PCMSK[group] &= ~BIT(line);
 }
@@ -182,7 +182,7 @@ static inline void pci_pin_disable_group_line(uint8_t group, uint8_t line)
  * Example for ATmega328P :
  * `pci_pin_enable(23)` is equivalent to `pci_pin_enable_group_line(2, 7)` # PCINT23
  */
-static inline void pci_pin_enable(uint8_t pci)
+__always_inline void pci_pin_enable(uint8_t pci)
 {
 	pci_pin_enable_group_line(pci >> 3u, pci & 0x07u);
 }
@@ -195,7 +195,7 @@ static inline void pci_pin_enable(uint8_t pci)
  * Example for ATmega328P :
  * `pci_pin_disable(23)` is equivalent to `pci_pin_disable_group_line(2, 7)` # PCINT23
  */
-static inline void pci_pin_disable(uint8_t pci)
+__always_inline void pci_pin_disable(uint8_t pci)
 {
 	pci_pin_disable_group_line(pci >> 3u, pci & 0x07u);
 }
@@ -213,7 +213,7 @@ static inline void pci_pin_disable(uint8_t pci)
  * pci_clear_flag(PCINT_16_23);
  * ```
  */
-static inline void pci_clear_flag(uint8_t group)
+__always_inline void pci_clear_flag(uint8_t group)
 {
 	PCIFR |= BIT(group);
 }
@@ -223,7 +223,7 @@ static inline void pci_clear_flag(uint8_t group)
  *
  * @param group Group number
  */
-static inline void pci_enable(uint8_t group)
+__always_inline void pci_enable(uint8_t group)
 {
 	PCICR |= BIT(group);
 }
@@ -233,7 +233,7 @@ static inline void pci_enable(uint8_t group)
  *
  * @param group Group number
  */
-static inline void pci_disable(uint8_t group)
+__always_inline void pci_disable(uint8_t group)
 {
 	PCICR &= ~BIT(group);
 }

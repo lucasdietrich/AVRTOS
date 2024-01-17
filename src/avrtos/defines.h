@@ -273,7 +273,7 @@ typedef struct {
 		.sreg = 0x00,                                                         \
 		{.regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U}},       \
 		{.init_sreg = CONFIG_THREAD_DEFAULT_SREG},                            \
-		{.thread_entry = (thread_entry_t)entry},                              \
+		{.thread_entry = (k_thread_entry_t)entry},                            \
 		{.thread_context = (void *)ctx}, Z_CORE_CONTEXT_ARCH_PC_INIT(_entry), \
 	}
 

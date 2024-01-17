@@ -363,7 +363,7 @@ __kernel void z_wake_up(struct k_thread *thread)
  *
  * @param addr Pointer to the memory address to swap endianness.
  */
-inline static void swap_endianness(void **addr)
+__always_inline void swap_endianness(void **addr)
 {
 	*addr = (void *)HTONS(*addr);
 }
@@ -373,7 +373,7 @@ inline static void swap_endianness(void **addr)
  *
  * @param thread Pointer to the thread
  */
-static inline void z_thread_finalize_stack_init(struct k_thread *const thread)
+__always_inline void z_thread_finalize_stack_init(struct k_thread *const thread)
 {
 	/* Swap endianness of addresses in compilation-time built
 	 * stacks. We cannot change the endianness of addresses
@@ -683,7 +683,7 @@ __kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue)
 }
 
 static void z_thread_stack_create(struct k_thread *const thread,
-				  thread_entry_t entry,
+				  k_thread_entry_t entry,
 				  void *const context_p)
 {
 	struct z_callsaved_ctx *const ctx = Z_THREAD_CTX_START(thread->stack.end);
@@ -715,7 +715,7 @@ static void z_thread_stack_create(struct k_thread *const thread,
 //
 
 int8_t k_thread_create(struct k_thread *thread,
-		       thread_entry_t entry,
+		       k_thread_entry_t entry,
 		       void *stack,
 		       size_t stack_size,
 		       uint8_t prio,
@@ -868,7 +868,7 @@ void k_sched_unlock(void)
 	__K_DBG_SCHED_UNLOCK();
 }
 
-static inline uint8_t z_current_flags_get(void)
+__always_inline uint8_t z_current_flags_get(void)
 {
 	return z_current->flags;
 }

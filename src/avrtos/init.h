@@ -24,7 +24,7 @@ extern uint8_t z_mcusr;
  *
  * @return uint8_t
  */
-static inline uint8_t z_get_mcusr(void)
+__always_inline uint8_t z_get_mcusr(void)
 {
 	return z_mcusr;
 }

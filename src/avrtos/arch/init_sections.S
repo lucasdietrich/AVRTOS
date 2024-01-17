@@ -6,7 +6,7 @@
 
 #include <avr/io.h>
 
-#include "defines.h"
+#include <avrtos/defines.h>
 
 .extern z_main_stack
 .extern z_avrtos_init

@@ -121,7 +121,7 @@ void spi_transceive_buf(char *rxtx, uint8_t len)
 	}
 }
 
-static inline void slave_select(const struct spi_slave *slave)
+__always_inline void slave_select(const struct spi_slave *slave)
 {
 	/* Apply SPI regs for slave */
 	spi_regs_restore(&slave->regs);
@@ -129,7 +129,7 @@ static inline void slave_select(const struct spi_slave *slave)
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin, slave->active_state);
 }
 
-static inline void slave_unselect(const struct spi_slave *slave)
+__always_inline void slave_unselect(const struct spi_slave *slave)
 {
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin, 1u - slave->active_state);
 }

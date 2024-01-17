@@ -59,7 +59,7 @@ We plan (TODO) to implement several new features and improvements, including:
 - Threads priority
 - Per-thread CPU usage statistics
 - Polling
-- Drivers for I2C and ADC
+- Drivers for ADC
 - Memory heaps
 - Detect available space for main thread stack at runtime (init)
   - Take care of the available heap
@@ -72,6 +72,8 @@ We plan (TODO) to implement several new features and improvements, including:
 - Tickless
 - Rename "static inline" to "__always_inline"
 - Implement builtin_ctz for 8-bit
+- Sample for discovering the I2C bus
+- Remove outdated samples
 
 ## Getting Started
 

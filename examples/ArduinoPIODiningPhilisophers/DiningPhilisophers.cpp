@@ -172,7 +172,7 @@ public:
 		: m_left_fork(left), m_right_fork(right), m_name(name)
 	{
 		k_thread_create(&m_thread,
-				reinterpret_cast<thread_entry_t>(Philosopher::Live),
+				reinterpret_cast<k_thread_entry_t>(Philosopher::Live),
 				m_stack,
 				sizeof(m_stack),
 				K_COOPERATIVE,

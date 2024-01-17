@@ -31,7 +31,7 @@ void serial_init_baud(uint32_t baud);
 /**
  * @brief Initialize the USART with default baudrate
  */
-static inline void serial_init(void)
+__always_inline void serial_init(void)
 {
 	serial_init_baud(CONFIG_SERIAL_USART_BAUDRATE);
 }

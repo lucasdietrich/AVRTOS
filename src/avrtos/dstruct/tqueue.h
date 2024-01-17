@@ -34,7 +34,7 @@ struct titem {
 	struct titem *next;
 };
 
-#define tqref titem
+typedef struct titem titem_t;
 
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
 #define INIT_TITEM(timeout_ms)                 \

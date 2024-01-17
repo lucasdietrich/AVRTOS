@@ -177,32 +177,32 @@ __kernel void ll_usart_sync_putc(UART_Device *dev, char c);
 
 __kernel uint8_t ll_usart_sync_getc(UART_Device *dev);
 
-static inline void ll_usart_enable_rx_isr(UART_Device *dev)
+__always_inline void ll_usart_enable_rx_isr(UART_Device *dev)
 {
 	SET_BIT(dev->UCSRnB, BIT(RXCIEn));
 }
 
-static inline void ll_usart_disable_rx_isr(UART_Device *dev)
+__always_inline void ll_usart_disable_rx_isr(UART_Device *dev)
 {
 	CLR_BIT(dev->UCSRnB, BIT(RXCIEn));
 }
 
-static inline void ll_usart_enable_tx_isr(UART_Device *dev)
+__always_inline void ll_usart_enable_tx_isr(UART_Device *dev)
 {
 	SET_BIT(dev->UCSRnB, BIT(TXCIEn));
 }
 
-static inline void ll_usart_disable_tx_isr(UART_Device *dev)
+__always_inline void ll_usart_disable_tx_isr(UART_Device *dev)
 {
 	CLR_BIT(dev->UCSRnB, BIT(TXCIEn));
 }
 
-static inline void ll_usart_enable_udre_isr(UART_Device *dev)
+__always_inline void ll_usart_enable_udre_isr(UART_Device *dev)
 {
 	SET_BIT(dev->UCSRnB, BIT(UDRIEn));
 }
 
-static inline void ll_usart_disable_udre_isr(UART_Device *dev)
+__always_inline void ll_usart_disable_udre_isr(UART_Device *dev)
 {
 	CLR_BIT(dev->UCSRnB, BIT(UDRIEn));
 }
