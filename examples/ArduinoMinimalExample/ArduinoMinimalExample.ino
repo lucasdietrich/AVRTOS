@@ -4,16 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
 
-static char usart_msgq_buf[16u];
-static struct k_msgq usart_msgq;
+K_MSGQ_DEFINE(usart_msgq, 1u, 16u);
 
 static struct k_thread thread_usart;
 static uint8_t thread_usart_stack[164u];
@@ -46,9 +45,6 @@ void setup(void)
 	ll_usart_enable_rx_isr(USART0_DEVICE);
 
 	led_init();
-
-	k_msgq_init(&usart_msgq, usart_msgq_buf, 1u, sizeof(usart_msgq_buf));
-	ll_usart_enable_rx_isr(USART0_DEVICE); // enable USART0 RX ISR only after msgq is initialized
 	
 	k_thread_create(&thread_usart, thread_usart_task, thread_usart_stack,
 			sizeof(thread_usart_stack), K_COOPERATIVE, NULL, 'X');
@@ -69,9 +65,6 @@ void loop(void)
 	/* loop() is executed in the context of the main thread which is cooperative, 
 	 * therefore we need to give the other threads a chance to run, this is done 
 	 * through the k_idle() function.
-	 * 
-	 * Another way to do this would be to change the main thread to preemptive with:
-	 * - k_thread_set_priority(k_thread_get_main(), K_PREEMPTIVE);
 	 */
 	k_idle();
 }

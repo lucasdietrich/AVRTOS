@@ -2,33 +2,33 @@
 
 ## avrtos v1.2.0
 
-Key features:
-- **I2C**: Introduced full I2C driver, including a new TCN75 device driver. 
-- **SPI Driver Refactor**: Enhanced SPI driver by introducing the `spi_regs` 
-  intermediate structure, holding SPI registers.
-- **Work Queue**: Added support for delayable work queue items with a sample 
-  demonstrating the feature.
+Key Features:
+- **I2C**: Introduced a comprehensive I2C driver, and a minimal TCN75 device driver.
+- **SPI Driver Refactor**: Enhanced the SPI driver by introducing the `spi_regs` intermediate structure, which holds SPI registers.
+- **Work Queue**: Added support for delayable work queue items, with a sample demonstrating this feature.
 
 Minor Changes:
-- Stored MCUSR at startup with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` option.
+- Stored MCUSR at startup using the `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` option.
 - Introduced new configuration options:
-  - Handling of reset cause with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` and `CONFIG_KERNEL_CLEAR_WDT_ON_INIT`
-  - `CONFIG_IDLE_HOOK`
-  - `CONFIG_WORKQUEUE_DELAYABLE`
-  - `CONFIG_SERIAL_AUTO_INIT`
-  - Banner configuration options `CONFIG_AVRTOS_BANNER_ENABLE` and `CONFIG_AVRTOS_BANNER`
+  - Management of reset cause with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` and `CONFIG_KERNEL_CLEAR_WDT_ON_INIT`.
+  - Addition of an idle hook through `CONFIG_IDLE_HOOK`.
+  - Enabling of the delayable work feature with `CONFIG_WORKQUEUE_DELAYABLE`.
+  - `CONFIG_SERIAL_AUTO_INIT`.
+  - Banner configuration options `CONFIG_AVRTOS_BANNER_ENABLE` and `CONFIG_AVRTOS_BANNER`.
   - Various options for the I2C driver.
-- Updated samples, documentation.
-- Removed unused USART functions and eradicated unused code.
-- Move assembly files to `src/arch`.
+- Updated samples and documentation.
+- Removed unused USART functions and eradicated obsolete code.
+- Moved assembly files to `src/arch`.
+- Improved overall error code returns and extended support for `CONFIG_KERNEL_ARGS_CHECK`.
 
 Bug Fixes:
+- Fixed `CONFIG_KERNEL_AUTO_INIT` with the Arduino framework by utilizing the `initVariant()` function.
 
 Documentation and Samples:
-- Enhanced documentation
-- added new samples demonstrating various features:
-  - Added `MCP3008` and `TCN75` driver samples.
-  - Added Arduino sample `MinimalExample`.
+- Enhanced documentation.
+- Added new samples demonstrating various features:
+  - `MCP3008` and `TCN75` driver samples.
+  - Arduino sample `MinimalExample`.
 
 ## avrtos v1.1.0
 

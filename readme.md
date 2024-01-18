@@ -15,6 +15,8 @@ AVRTOS has been successfully tested on the following AVR architectures:
 Please bear in mind that as a personal project, it doesn't come with any guarantees.
 I hope you find AVRTOS as exciting to use as I found it to develop !
 
+**Please refer to [developer.md](./developer.md) for troubleshooting and development notes.**
+
 ## Features
 
 AVRTOS offers an extensive list of features, including:
@@ -22,13 +24,14 @@ AVRTOS offers an extensive list of features, including:
 - Cooperative and preemptive threads
 - Naive scheduler without priority support
 - Configurable system clock with support for all hardware timers (e.g. 0-2 for ATmega328p and 0-5 for ATmega2560)
-- Synchronization objects like mutexes, semaphores, workqueues, FIFOs, message queues, memory slabs, flags, signals
-- Drivers for UART, timers, GPIO, SPI and external interrupts
+- Synchronization objects like mutexes, semaphores, workqueues (+delayables), FIFOs, message queues, memory slabs, flags, signals
+- Drivers for UART, timers, GPIO, SPI, I2C and external interrupts
+- Devices drivers for TCN75
 - Thread sleep with up to 65-second duration in simple mode (extendable using high-precision time objects)
 - Scheduler lock/unlock to temporarily prevent preemption for preemptive threads
 - Thread switching from interrupts
 - Runtime creation for many kernel objects (threads, mutexes, semaphores, workqueues, fifos, memory slabs, ...)
-- Thread canaries and sentinel stack protection
+- Diagnostics: Thread canaries and sentinel stack protection
 - Events and timers
 - Atomic API for 8-bit variables
 - Macro-based logging subsystem
@@ -38,44 +41,42 @@ AVRTOS offers an extensive list of features, including:
 Additional Features:
 - Thread naming with symbols (e.g., 'M' for the main thread, 'I' for the idle thread)
 - Pseudorandom number generator (LFSR)
-- Debug/util functions (RAM_DUMP, CORE_DUMP, z_read_ra)
+- Debugging and utility functions  (RAM_DUMP, CORE_DUMP, z_read_ra)
 - Kernel assertions (__ASSERT)
-- Custom error codes (e.g., EAGAIN, EINVAL, ETIMEDOUT)
+- Custom error codes (e.g., EAGAIN, EINVAL, EIO, ENOMEM, ...)
 - Thread safe termination (excluding main thread)
-- stdout redirection to USART0, and stack sentinels
+- `stdout` redirection to USART0
 - Various wait variants (e.g., k_sleep, k_wait with modes IDLE, ACTIVE, BLOCK and z_cpu_block_us)
+- Reset reason detection
 - Dockerfile and Jenkinsfile templates for CI/CD
+- Full compatibility with QEMU emulation
 
-We plan (TODO) to implement several new features and improvements, including:
-
-- Tests
-- CRC
-- Low duration sleep (e.g., 18us) with the use a dedicated timer counter.
-	- APi would be `uscounter_init()`, `uscounter_get()`, `uscounter_set`
-- sys_le32_read/write, etc ...
-- Use sysclock as granularity for threads wake up (k_sleep) instead of the timeslice.
-	- Option to choose the SYSCLOCK or TIMESLICE as scheduling point: `KERNEL_SCHEDULING_EVENT`
-	- Explain that if timeslice is used, it's still possible to wait for small duration with `k_busy_wait(K_USEC(20u));`.
-- Threads priority
+Planned Features (TODOs):
+- Comprehensive tests
+- Enhanced documentation based on `mkdocs` (and `doxygen` ??)
+- Ultra-low duration sleep (e.g., 18us) using a dedicated timer counter with API: `uscounter_init()`, `uscounter_get()`, `uscounter_set`
+- Functions like sys_le32_read/write
+- Utilizing sysclock for thread wake-up granularity (k_sleep) instead of timeslice
+  - Option to select SYSCLOCK or TIMESLICE as the scheduling point (`KERNEL_SCHEDULING_EVENT`)
+  - Note on using `k_busy_wait(K_USEC(20u))` for precise short-duration waits
+- Thread priority implementation
 - Per-thread CPU usage statistics
-- Polling
-- Drivers for ADC
-- Memory heaps
-- Detect available space for main thread stack at runtime (init)
-  - Take care of the available heap
-- I2C Repeated start
-- Move or remove yet unused `AVRTOS_VERSION_MAJOR` vars
-- Move "MCU specific fixups" and board specific stuff to a dedicated directory "board
-- Move assembly files to a dedicated directory "arch/avr"
-- Move private defines to _private.h headers
-- Check why metrics are this high
-- Tickless
-- Rename "static inline" to "__always_inline"
-- Implement builtin_ctz for 8-bit
+- Polling mechanisms
+- ADC drivers
+- Memory heap management
+- Runtime detection of available space for the main thread stack (init)
+- Consideration of available heap space
+- Implementation of I2C Repeated Start
+- Refactoring: Move or remove unused `AVRTOS_VERSION_MAJOR` variables
+- Organize MCU specific fixups and board-specific items in a dedicated "board" directory
+- Relocation of assembly files to "arch/avr"
+- Consolidation of private defines in _private.h headers
+- Investigation of high metric readings
+- Introduction of tickless operation
+- Renaming "static inline" functions to "__always_inline"
+- Implementation of builtin_ctz for 8-bit variables
 - Sample for discovering the I2C bus
-- Remove outdated samples
-
-## Getting Started
+- Removal of outdated samples
 
 ### Description
 
@@ -106,10 +107,10 @@ Code:
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
@@ -430,70 +431,3 @@ Run the sample in QEMU:
 A [Jenkinsfile](./Jenkinsfile) is provided to build the project in a Jenkins (multibranch) pipeline.
 
 It is based on the previous Docker container: `devops/fedora-avr-toolchain`
-
----
-
-## clang-format
-
-- Install clang-format, and run `make format` to format all files
-- Or install `xaver.clang-format` extension for VS Code, and format on save or
-format using `Ctrl + K, Ctrl + F`
-
-## Miscelaneous
-
-- Calculate code metrics with `make metrics`, following metrics are calculated:
-	- Flash/ram usage for each (cmake) sample: [docs/metrics/exsizes.txt](./docs/metrics/exsizes.txt)
-- To update Arduino samples from the *cmake* ones, run `make arduino_gen`
-- To generate the `platformio.ini` file from the *cmake* samples, run `make piogen`.
-- Run `make arduino_lint` to check the project is compliant with Arduino Library
-- To change the default generator to *make* for example, ovreride following variable in the [Makefile](Makefile)
-```
-GENERATOR?="Unix Makefiles"
-GENERATOR_COMMAND?="make"
-GENERATOR_ARGS?="--no-print-directory"
-```
-
-## Troubleshooting
-
-- Note that `qemu_*` like targets override the file [.vscode/launch.json](.vscode/launch.json) each time they are run.
-- `qemu_*` like targets run QEMU with `-s -S` options, which means QEMU will wait for a debugger to connect on port 1234, while `run_` targets run QEMU directly.
-- If your program crashes/restart/gets stuck, just increase all stack sizes, just in case (especially with `CONFIG_KERNEL_TIMERS`, `CONFIG_KERNEL_EVENTS`).
-  - Note: Also increase IDLE stack size with `CONFIG_KERNEL_THREAD_IDLE_ADD_STACK`, IDLE stack is tiny by default
-  - Note: function call with ATmge2560 for example are stack consuming (because of the 3B return addresses)
-- Please note that, when using VS Code with PIO, `c_cpp_properties.json` file is frequently overwritten by PIO extension, which is not convenient when working with `cmake`.
-- Disassembly files can be found :
-	- in `build/examples/${sample}` folder for `cmake` build
-	- in `tmp/${sample}/*` folder for PlatformIO build, after running `python3 ./scripts/pydis.py`
-- In case python `miniterm` package is not installed, install python dependencies with `pip3 install -r scripts/requirements.txt`
-- Interesting flags for QEMU avr (modify the `QEMU_ARGS` variable in the toolchain file [cmake/avr.cmake](cmake/avr.cmake)):
-  - `-d in_asm`
-  - `-d exec`
-  - `-d cpu`
-  - `-d cpu_reset`
-  - All timer traces `--trace "avr_timer16_*"`
-  - `-d trace:avr_timer16_read,trace:avr_timer16_read_ifr,trace:avr_timer16_read_imsk,trace:avr_timer16_write,trace:avr_timer16_write_imsk,trace:avr_timer16_write_imsk,trace:avr_timer16_clksrc_update`
-  - Or a combinations of all: `-d cpu,in_asm,trace:avr_timer16_read`
-
-## Some links :
-- More information on data structures : https://en.wikipedia.org/wiki/Linked_list
-- Memory sections on AVR : https://www.nongnu.org/avr-libc/user-manual/mem_sections.html
-- avr-gcc : https://gcc.gnu.org/wiki/avr-gcc
-- Pseudo-ops and operators : https://www.nongnu.org/avr-libc/user-manual/assembler.html#ass_pseudoop
-- AVR Instruction Set Manual : http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
-- cmake-avr github repository : https://github.com/mkleemann/cmake-avr
-- [`arduino-lint`](https://github.com/arduino/arduino-lint) tool to check Arduino libraries
-- Arduino library specification: https://arduino.github.io/arduino-cli/0.31/library-specification/
-- Arduino library manager FAQ: https://github.com/arduino/library-registry/blob/main/FAQ.md#submission-requirements
-
-## My versions
-
-```
-avr-gcc (Fedora 11.2.0-1.fc36) 11.2.0
-avr-gdb: GNU gdb (GDB) 12.1
-QEMU emulator version 7.0.0 (v7.0.0)
-avrdude version 6.4
-cmake version 3.25.1
-ninja 1.10.2
-GNU Make 4.3
-Python 3.10.9
-```
