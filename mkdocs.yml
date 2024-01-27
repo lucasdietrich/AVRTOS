@@ -1,0 +1,77 @@
+nav:
+  - Introduction:
+    - Home: index.md
+    - Changelogs: changelogs.md
+    - Developer notes: developer.md
+  - Getting Started: getting_started/index.md
+  - Samples: samples/index.md
+site_name: AVRTOS Documentation
+repo_url: https://github.com/lucasdietrich/AVRTOS
+
+# Configuration
+
+docs_dir: docs
+extra_css:
+  - extra/css/extra.css
+
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tilde
+  - pymdownx.tasklist:
+      custom_checkbox: true
+theme:
+  name: material # readthedocs | material
+  features:
+      # - announce.dismiss
+      # - content.action.edit
+      # - content.action.view
+      # - content.code.annotate
+      - content.code.copy
+      # - content.code.select
+      # - content.tabs.link
+      # - content.tooltips
+      - header.autohide
+      # - navigation.expand
+      # - navigation.footer
+      - navigation.indexes
+      # - navigation.instant
+      # - navigation.instant.prefetch
+      # - navigation.instant.progress
+      # - navigation.prune
+      - navigation.sections
+      - navigation.tabs
+      # - navigation.tabs.sticky
+      # - navigation.top
+      # - navigation.tracking
+      - search.highlight
+      # - search.share
+      - search.suggest
+      # - toc.follow
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  palette:
+    - scheme: default
+      primary: blue grey # indigo
+      accent: blue # indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode

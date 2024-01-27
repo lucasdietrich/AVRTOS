@@ -1,0 +1,30 @@
+h1 {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 25px !important;
+}
+
+h2 {
+    border-bottom: 1px solid #ccc;
+}
+
+p {
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+code {
+    padding:0.5em 0.5 !important
+}
+
+pre {
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
+}
+
+li {
+    margin-bottom: 0.2em !important;
+}
+
+div.md-content a:hover {
+    border-bottom: 1px solid rgb(66, 135, 255);
+}

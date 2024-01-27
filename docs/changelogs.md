@@ -1,13 +1,13 @@
-# Changelog
-
 ## avrtos v1.2.0
 
 Key Features:
+
 - **I2C**: Introduced a comprehensive I2C driver, and a minimal TCN75 device driver.
 - **SPI Driver Refactor**: Enhanced the SPI driver by introducing the `spi_regs` intermediate structure, which holds SPI registers.
 - **Work Queue**: Added support for delayable work queue items, with a sample demonstrating this feature.
 
 Minor Changes:
+
 - Stored MCUSR at startup using the `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` option.
 - Introduced new configuration options:
   - Management of reset cause with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` and `CONFIG_KERNEL_CLEAR_WDT_ON_INIT`.
@@ -22,17 +22,22 @@ Minor Changes:
 - Improved overall error code returns and extended support for `CONFIG_KERNEL_ARGS_CHECK`.
 
 Bug Fixes:
+
 - Fixed `CONFIG_KERNEL_AUTO_INIT` with the Arduino framework by utilizing the `initVariant()` function.
 
 Documentation and Samples:
+
 - Enhanced documentation.
 - Added new samples demonstrating various features:
   - `MCP3008` and `TCN75` driver samples.
   - Arduino sample `MinimalExample`.
 
+Full Changelog: <https://github.com/lucasdietrich/AVRTOS/commits/v1.2.0>
+
 ## avrtos v1.1.0
 
 Main features:
+
 - SPI: Added SPI drivers for master and slave with full support for atmega328p
   and atmega2560.
 - SPI: Added two samples to demonstrate communication between master and slave
@@ -40,6 +45,7 @@ Main features:
 - DevOps: Added Dockerfile and Jenkinsfile for CI/CD.
   
 Bug Fixes:
+
 - Corrected bad characters in a preprocessor #error message.
 - Resolved anomalies in the implementation of k_flags_notify() consequently,
   refined the flags sample.
@@ -49,6 +55,7 @@ Bug Fixes:
   here).
 
 Improvements:
+
 - Improved time functions: introduced `k_wait` allowing to wait for a specific
   time in a particular mode. Added support for millisecond precision in time API
   through CONFIG_KERNEL_TIME_API_MS_PRECISION.
@@ -56,6 +63,7 @@ Improvements:
 - Optimized headers inclusions.
 
 Minor changes:
+
 - Introduced `K_TICKS` to declare timeouts in ticks.
 - Introduced macros: `FEATURE_TIMER_COUNT` and FEATURE_USART_COUNT to ascertain if
   an example can be built for a certain toolchain.
@@ -72,6 +80,8 @@ Minor changes:
   `Z_THREAD_MAIN_STACK_END_ADDR`.
 - Eradicated unused/unfished file descriptor features (fd.c/fd.h).
 - Eliminated `/*______*/` code boundaries.
+
+Full Changelog: <https://github.com/lucasdietrich/AVRTOS/commits/v1.1.0>
 
 ## avrtos v1.0.0
 
@@ -100,4 +110,4 @@ Supported AVR Architectures:
 - AVR5: Tested on ATmega328p (Arduino PRO)
 - AVR6: Tested on ATmega2560 (Arduino Mega2560)
 
-Full Changelog: https://github.com/lucasdietrich/AVRTOS/commits/v1.0.0
+Full Changelog: <https://github.com/lucasdietrich/AVRTOS/commits/v1.0.0>
