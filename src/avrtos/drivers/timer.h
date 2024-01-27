@@ -23,7 +23,7 @@ extern "C" {
  */
 typedef struct {
 	__IO uint8_t TCCRnA;	 /* COM1A1 COM1A0 COM1B1 COM1B0 COM1C1 COM1C0 WGM11
-				    WGM10 */
+					WGM10 */
 	__IO uint8_t TCCRnB;	 /* ICNCn ICESn - WGMn3 WGMn2 CSn2 CSn1 CSn0 */
 	__IO uint8_t TCCRnC;	 /* FOCnA FOCnB FOCnC */
 	__IO uint8_t _reserved1; /* reserved */
@@ -34,9 +34,9 @@ typedef struct {
 						Low Byte */
 			__IO uint8_t TCNTnH; /* Timer/Counter - Counter Register
 						High Byte */
-			__IO uint8_t ICRnL;  /* Timer/Counter - Input Capture
+			__IO uint8_t ICRnL;	 /* Timer/Counter - Input Capture
 						Register High Byte */
-			__IO uint8_t ICRnH;  /* Timer/Counter - Input Capture
+			__IO uint8_t ICRnH;	 /* Timer/Counter - Input Capture
 						Register High Byte */
 			__IO uint8_t OCRnAL; /* Timer/Counter - Output Compare
 						Register A Low Byte */
@@ -53,7 +53,7 @@ typedef struct {
 		};
 		struct {
 			__IO uint16_t TCNTn; /* Timer/Counter - Counter Register */
-			__IO uint16_t IRCN;  /* Timer/Counter - Input Capture
+			__IO uint16_t IRCN;	 /* Timer/Counter - Input Capture
 						Register */
 
 			union {
@@ -73,31 +73,31 @@ typedef struct {
 } TIMER16_Device;
 
 #if defined(TCCR1A)
-#define TIMER1_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x80u)
-#define TIMER1_DEVICE	       ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
+#define TIMER1_DEVICE_ADDR	   (AVR_IO_BASE_ADDR + 0x80u)
+#define TIMER1_DEVICE		   ((TIMER16_Device *)(TIMER1_DEVICE_ADDR))
 #define TIMER_DEVICE_IS_1(dev) ((void *)dev == (void *)TIMER1_DEVICE)
-#define TIMER1_INDEX	       1u
+#define TIMER1_INDEX		   1u
 #endif
 
 #if defined(TCCR3A)
-#define TIMER3_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x90u)
-#define TIMER3_DEVICE	       ((TIMER16_Device *)(TIMER3_DEVICE_ADDR))
+#define TIMER3_DEVICE_ADDR	   (AVR_IO_BASE_ADDR + 0x90u)
+#define TIMER3_DEVICE		   ((TIMER16_Device *)(TIMER3_DEVICE_ADDR))
 #define TIMER_DEVICE_IS_3(dev) ((void *)dev == (void *)TIMER3_DEVICE)
-#define TIMER3_INDEX	       3u
+#define TIMER3_INDEX		   3u
 #endif
 
 #if defined(TCCR4A)
-#define TIMER4_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0xA0u)
-#define TIMER4_DEVICE	       ((TIMER16_Device *)(TIMER4_DEVICE_ADDR))
+#define TIMER4_DEVICE_ADDR	   (AVR_IO_BASE_ADDR + 0xA0u)
+#define TIMER4_DEVICE		   ((TIMER16_Device *)(TIMER4_DEVICE_ADDR))
 #define TIMER_DEVICE_IS_4(dev) ((void *)dev == (void *)TIMER4_DEVICE)
-#define TIMER4_INDEX	       4u
+#define TIMER4_INDEX		   4u
 #endif
 
 #if defined(TCCR5A)
-#define TIMER5_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x120u)
-#define TIMER5_DEVICE	       ((TIMER16_Device *)(TIMER5_DEVICE_ADDR))
+#define TIMER5_DEVICE_ADDR	   (AVR_IO_BASE_ADDR + 0x120u)
+#define TIMER5_DEVICE		   ((TIMER16_Device *)(TIMER5_DEVICE_ADDR))
 #define TIMER_DEVICE_IS_5(dev) ((void *)dev == (void *)TIMER5_DEVICE)
-#define TIMER5_INDEX	       5u
+#define TIMER5_INDEX		   5u
 #endif
 
 /**
@@ -107,23 +107,23 @@ typedef struct {
 typedef struct {
 	__IO uint8_t TCCRnA; /* COMnA1 COMnA0 COMnB1 COMnB0 – – WGMn1 WGMn0 */
 	__IO uint8_t TCCRnB; /* FOCnA FOCnB – – WGMn2 CSn2 CSn1 CSn0 */
-	__IO uint8_t TCNTn;  /* Timer/Counter (8-bit) */
-	__IO uint8_t OCRnA;  /* Timer/Counter Output Compare Register A */
-	__IO uint8_t OCRnB;  /* Timer/Counter Output Compare Register B */
+	__IO uint8_t TCNTn;	 /* Timer/Counter (8-bit) */
+	__IO uint8_t OCRnA;	 /* Timer/Counter Output Compare Register A */
+	__IO uint8_t OCRnB;	 /* Timer/Counter Output Compare Register B */
 } TIMER8_Device;
 
 #if defined(TCCR0A)
-#define TIMER0_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0x44U)
-#define TIMER0_DEVICE	       ((TIMER8_Device *)(TIMER0_DEVICE_ADDR))
+#define TIMER0_DEVICE_ADDR	   (AVR_IO_BASE_ADDR + 0x44U)
+#define TIMER0_DEVICE		   ((TIMER8_Device *)(TIMER0_DEVICE_ADDR))
 #define TIMER_DEVICE_IS_0(dev) ((void *)dev == (void *)TIMER0_DEVICE)
-#define TIMER0_INDEX	       0u
+#define TIMER0_INDEX		   0u
 #endif
 
 #if defined(TCCR2A)
-#define TIMER2_DEVICE_ADDR     (AVR_IO_BASE_ADDR + 0xB0U)
-#define TIMER2_DEVICE	       ((TIMER8_Device *)(TIMER2_DEVICE_ADDR))
+#define TIMER2_DEVICE_ADDR	   (AVR_IO_BASE_ADDR + 0xB0U)
+#define TIMER2_DEVICE		   ((TIMER8_Device *)(TIMER2_DEVICE_ADDR))
 #define TIMER_DEVICE_IS_2(dev) ((void *)dev == (void *)TIMER2_DEVICE)
-#define TIMER2_INDEX	       2u
+#define TIMER2_INDEX		   2u
 #endif
 
 /**
@@ -166,19 +166,19 @@ typedef struct {
 #define TIMER_MAX_COUNTER_8BIT	0xFFu
 #define TIMER_MAX_COUNTER_16BIT 0xFFFFu
 
-#define TIMER_GET_MAX_COUNTER(tim_idx) \
+#define TIMER_GET_MAX_COUNTER(tim_idx)                                                   \
 	(TIMER_INDEX_IS_8BIT(tim_idx) ? TIMER_MAX_COUNTER_8BIT : TIMER_MAX_COUNTER_16BIT)
-#define TIMER_CALC_COUNTER_VALUE(period_us, prescaler) \
+#define TIMER_CALC_COUNTER_VALUE(period_us, prescaler)                                   \
 	((((F_CPU / 1000000lu) * period_us) / prescaler - 1lu))
-#define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max) \
+#define TIMER_COUNTER_VALUE_FIT(period_us, prescaler, max)                               \
 	(TIMER_CALC_COUNTER_VALUE(period_us, prescaler) <= max)
 
 #define TIMER_DEVICE_IS_0(dev) ((void *)dev == (void *)TIMER0_DEVICE)
 #define TIMER_DEVICE_IS_1(dev) ((void *)dev == (void *)TIMER1_DEVICE)
 #define TIMER_DEVICE_IS_2(dev) ((void *)dev == (void *)TIMER2_DEVICE)
 
-#define TIMER_DEVICE_IS_16BITS(dev)                                                    \
-	(TIMER_DEVICE_IS_1(dev) || TIMER_DEVICE_IS_3(dev) || TIMER_DEVICE_IS_4(dev) || \
+#define TIMER_DEVICE_IS_16BITS(dev)                                                      \
+	(TIMER_DEVICE_IS_1(dev) || TIMER_DEVICE_IS_3(dev) || TIMER_DEVICE_IS_4(dev) ||       \
 	 TIMER_DEVICE_IS_5(dev))
 
 #define TIMER_DEVICE_IS_8BITS(dev) (TIMER_DEVICE_IS_0(dev) || TIMER_DEVICE_IS_2(dev))
@@ -206,16 +206,16 @@ typedef enum {
 } timer_mode_t;
 
 /* 8 bits */
-#define TIMER_MODE_PWM_PC      TIMER_MODE_PWM_PC_9bit
+#define TIMER_MODE_PWM_PC	   TIMER_MODE_PWM_PC_9bit
 #define TIMER_MODE_FAST_PWM_PC TIMER_MODE_FAST_PWM_9bit
 
 /* prescalers for timer 2 only */
 typedef enum {
-	TIMER2_STOPPED	      = 0x00,
-	TIMER2_PRESCALER_1    = 0x01,
-	TIMER2_PRESCALER_8    = 0x02,
-	TIMER2_PRESCALER_32   = 0x03,
-	TIMER2_PRESCALER_64   = 0x04,
+	TIMER2_STOPPED		  = 0x00,
+	TIMER2_PRESCALER_1	  = 0x01,
+	TIMER2_PRESCALER_8	  = 0x02,
+	TIMER2_PRESCALER_32	  = 0x03,
+	TIMER2_PRESCALER_64	  = 0x04,
 	TIMER2_PRESCALER_128  = 0x05,
 	TIMER2_PRESCALER_256  = 0x06,
 	TIMER2_PRESCALER_1024 = 0x07,
@@ -223,11 +223,11 @@ typedef enum {
 
 /* prescalers for timer 0, 1, 3, 4, 5 */
 typedef enum {
-	TIMER_STOPPED	     = 0x00,
-	TIMER_PRESCALER_1    = 0x01,
-	TIMER_PRESCALER_8    = 0x02,
-	TIMER_PRESCALER_64   = 0x03,
-	TIMER_PRESCALER_256  = 0x04,
+	TIMER_STOPPED		 = 0x00,
+	TIMER_PRESCALER_1	 = 0x01,
+	TIMER_PRESCALER_8	 = 0x02,
+	TIMER_PRESCALER_64	 = 0x03,
+	TIMER_PRESCALER_256	 = 0x04,
 	TIMER_PRESCALER_1024 = 0x05,
 
 	/* unsupported for now */
@@ -236,22 +236,22 @@ typedef enum {
 } timer_prescaler_t;
 
 typedef enum {
-	TIMER16_OVERFLOW_INTERRUPT		 = 0u,
+	TIMER16_OVERFLOW_INTERRUPT				 = 0u,
 	TIMER16_OUTPUT_COMPARE_MATCH_A_INTERRUPT = 1u,
 	TIMER16_OUTPUT_COMPARE_MATCH_B_INTERRUPT = 2u,
 	TIMER16_OUTPUT_COMPARE_MATCH_C_INTERRUPT = 3u,
-	TIMER16_INPUT_CAPTURE_INTERRUPT		 = 5u,
+	TIMER16_INPUT_CAPTURE_INTERRUPT			 = 5u,
 } timer16_interrupt_t;
 
 typedef enum {
 	TIMER_CHANNEL_COMP_MODE_NORMAL =
 		0u, /* Normal port operation, OCnA/OCnB/OCnC disconnected */
 	TIMER_CHANNEL_COMP_MODE_TOGGLE = 1u, /* Toggle OCnA/OCnB/OCnC on compare match */
-	TIMER_CHANNEL_COMP_MODE_CLEAR  = 2u, /* Clear OCnA/OCnB/OCnC on compare match (set
-						output to low  level) */
-	TIMER_CHANNEL_COMP_MODE_SET = 3u,    /* Set OCnA/OCnB/OCnC on compare match
+	TIMER_CHANNEL_COMP_MODE_CLEAR  = 2u, /* Clear OCnA/OCnB/OCnC on compare match
+						(set output to low  level) */
+	TIMER_CHANNEL_COMP_MODE_SET = 3u,	 /* Set OCnA/OCnB/OCnC on compare match
 						(set output to high level */
-} timer_channel_com_t;			     /* Timer Channel Compare Output Mode */
+} timer_channel_com_t;					 /* Timer Channel Compare Output Mode */
 
 typedef enum {
 	TIMER_CHANNEL_A = 0u,
@@ -286,7 +286,7 @@ struct timer_config {
 	/**
 	 * @brief Enable interrupts handlers
 	 */
-	uint8_t timsk;	// TOIEn, OCIEnA, OCIEnB, OCIEnC, ICIEn
+	uint8_t timsk; // TOIEn, OCIEnA, OCIEnB, OCIEnC, ICIEn
 };
 
 /**
@@ -430,7 +430,7 @@ __always_inline void ll_timer16_write_reg16(__IO uint16_t *reg, uint16_t val)
 	 * byte.
 	 */
 	*((__IO uint8_t *)reg + 1u) = val >> 8u;
-	*((__IO uint8_t *)reg)	    = val & 0xffu;
+	*((__IO uint8_t *)reg)		= val & 0xffu;
 }
 
 __always_inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
@@ -485,16 +485,16 @@ __always_inline void ll_timer16_disable_interrupt(uint8_t tim_idx, timer16_inter
 }
 
 void ll_timer8_init(TIMER8_Device *dev,
-		    uint8_t tim_idx,
-		    const struct timer_config *config);
+					uint8_t tim_idx,
+					const struct timer_config *config);
 
 void ll_timer16_init(TIMER16_Device *dev,
-		     uint8_t tim_idx,
-		     const struct timer_config *config);
+					 uint8_t tim_idx,
+					 const struct timer_config *config);
 
 void ll_timer16_channel_configure(TIMER16_Device *dev,
-				  timer_channel_t channel,
-				  const struct timer_channel_compare_config *config);
+								  timer_channel_t channel,
+								  const struct timer_channel_compare_config *config);
 
 void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx);
 
@@ -516,10 +516,10 @@ typedef void (*timer_callback_t)(void *dev, uint8_t tim_idx, void *user_data);
 
 /* High level API */
 int timer_init(uint8_t tim_idx,
-	       uint32_t period_us,
-	       timer_callback_t cb,
-	       void *user_data,
-	       uint8_t flags);
+			   uint32_t period_us,
+			   timer_callback_t cb,
+			   void *user_data,
+			   uint8_t flags);
 
 void timer_start(uint8_t tim_idx);
 

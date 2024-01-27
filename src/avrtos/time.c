@@ -20,7 +20,7 @@ void k_timespec_get(struct timespec *ts)
 
 	const uint64_t ms = k_uptime_get_ms64();
 
-	ts->tv_sec  = ms / 1000;
+	ts->tv_sec	= ms / 1000;
 	ts->tv_msec = ms % 1000;
 }
 
@@ -33,15 +33,15 @@ void k_show_uptime(void)
 	uint32_t minutes = seconds / 60;
 	uint32_t hours	 = minutes / 60;
 
-	printf_P(PSTR("%02lu:%02hhu:%02hhu [%lu.%03u s] : "), hours,
-		 (uint8_t)(minutes % 60), (uint8_t)(seconds % 60), ts.tv_sec, ts.tv_msec);
+	printf_P(PSTR("%02lu:%02hhu:%02hhu [%lu.%03u s] : "), hours, (uint8_t)(minutes % 60),
+			 (uint8_t)(seconds % 60), ts.tv_sec, ts.tv_msec);
 }
 
 void k_show_ticks(void)
 {
 	const uint64_t ticks = k_ticks_get_64();
-	const uint32_t msb   = (uint32_t)(ticks >> 32llu);
-	const uint32_t lsb   = (uint32_t)ticks;
+	const uint32_t msb	 = (uint32_t)(ticks >> 32llu);
+	const uint32_t lsb	 = (uint32_t)ticks;
 
 	if (msb) {
 		printf_P(PSTR("%lu%lu"), msb, lsb);
@@ -55,7 +55,7 @@ void k_show_ticks(void)
 #if CONFIG_KERNEL_TIME_API_MS_PRECISION
 typedef uint64_t k_uptime_t; /* ms */
 #else
-typedef uint32_t k_uptime_t;		    /* s */
+typedef uint32_t k_uptime_t;			/* s */
 #endif
 
 static struct {
@@ -99,7 +99,7 @@ uint64_t k_time_get_ms(void)
 
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
 	timestamp_ms = k_uptime_get_ms64() - z_time_ref.uptime +
-		       (k_uptime_t)z_time_ref.timestamp * MSEC_PER_SEC;
+				   (k_uptime_t)z_time_ref.timestamp * MSEC_PER_SEC;
 	k_mutex_unlock(&z_time_ref.mutex);
 
 	return timestamp_ms;
@@ -135,7 +135,7 @@ void k_time_unset(void)
 {
 	k_mutex_lock(&z_time_ref.mutex, K_FOREVER);
 	z_time_ref.timestamp = 0;
-	z_time_ref.uptime    = 0;
+	z_time_ref.uptime	 = 0;
 	k_mutex_unlock(&z_time_ref.mutex);
 }
 

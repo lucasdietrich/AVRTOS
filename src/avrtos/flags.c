@@ -13,7 +13,7 @@
 #define Z_SWAP_DATA_GET_TRIG_MASK(swapd) ((uint8_t)(((uint16_t)swapd) & 0xFFu))
 
 #define Z_SWAP_DATA_INIT_TRIG_MASK(trig) ((void *)(((uint16_t)trig) & 0xFFu))
-#define Z_SWAP_DATA_INIT_OPT_N_MASK(opt, mask) \
+#define Z_SWAP_DATA_INIT_OPT_N_MASK(opt, mask)                                           \
 	((void *)((((uint16_t)opt) << 8u) | ((uint16_t)mask)))
 
 int k_flags_init(struct k_flags *flags, uint8_t value)
@@ -28,9 +28,9 @@ int k_flags_init(struct k_flags *flags, uint8_t value)
 }
 
 int k_flags_poll(struct k_flags *flags,
-		 uint8_t mask,
-		 k_flags_options_t options,
-		 k_timeout_t timeout)
+				 uint8_t mask,
+				 k_flags_options_t options,
+				 k_timeout_t timeout)
 {
 	int ret = -EAGAIN;
 
@@ -81,7 +81,8 @@ int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_
 	struct dnode *thread_handle;
 
 	Z_ARGS_CHECK(flags) return -EINVAL;
-	Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u) return -ENOTSUP;
+	Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u)
+	return -ENOTSUP;
 
 	const uint8_t lock = irq_lock();
 
@@ -99,8 +100,8 @@ int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_
 		struct k_thread *const thread =
 			CONTAINER_OF(thread_handle, struct k_thread, wflags);
 		const uint16_t swap_data = (uint16_t)thread->swap_data;
-		const uint8_t mask	 = Z_SWAP_DATA_GET_PEND_MASK(swap_data);
-		const uint8_t trig	 = notify_value & mask;
+		const uint8_t mask		 = Z_SWAP_DATA_GET_PEND_MASK(swap_data);
+		const uint8_t trig		 = notify_value & mask;
 
 		if (trig != 0u) {
 			thread->swap_data = Z_SWAP_DATA_INIT_TRIG_MASK(trig);
@@ -135,7 +136,7 @@ int k_flags_reset(struct k_flags *flags)
 
 	const uint8_t lock = irq_lock();
 
-	int ret	     = z_cancel_all_pending(&flags->_waitqueue);
+	int ret		 = z_cancel_all_pending(&flags->_waitqueue);
 	flags->flags = flags->reset_value;
 
 	irq_unlock(lock);

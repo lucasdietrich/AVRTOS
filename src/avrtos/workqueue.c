@@ -17,11 +17,11 @@
 #define Z_WQ_YIELDEACH(_x) (((_x) << Z_WQ_YIELDEACH_POS) & Z_WQ_YIELDEACH_MSK)
 
 int8_t k_workqueue_create(struct k_workqueue *workqueue,
-			  struct k_thread *thread,
-			  uint8_t *stack,
-			  size_t stack_size,
-			  uint8_t prio_flags,
-			  char symbol)
+						  struct k_thread *thread,
+						  uint8_t *stack,
+						  size_t stack_size,
+						  uint8_t prio_flags,
+						  char symbol)
 {
 	Z_ARGS_CHECK(workqueue && thread && stack && stack_size) return -EINVAL;
 
@@ -29,7 +29,7 @@ int8_t k_workqueue_create(struct k_workqueue *workqueue,
 	workqueue->flags = 0u;
 
 	int8_t ret = k_thread_create(thread, (k_thread_entry_t)z_workqueue_entry, stack,
-				     stack_size, prio_flags, (void *)workqueue, symbol);
+								 stack_size, prio_flags, (void *)workqueue, symbol);
 	if (ret == 0) {
 		k_thread_start(thread);
 	}
@@ -62,7 +62,7 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		 * user.
 		 **/
 		const uint8_t key = irq_lock();
-		item->next	  = NULL;
+		item->next		  = NULL;
 		irq_unlock(key);
 
 		handler(work);
@@ -136,9 +136,9 @@ void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue)
 
 #if CONFIG_SYSTEM_WORKQUEUE_ENABLE
 K_WORKQUEUE_DEFINE(z_system_workqueue,
-		   CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE,
-		   CONFIG_SYSTEM_WORKQUEUE_PRIORITY,
-		   'W');
+				   CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE,
+				   CONFIG_SYSTEM_WORKQUEUE_PRIORITY,
+				   'W');
 
 bool k_system_workqueue_submit(struct k_work *work)
 {
@@ -180,23 +180,24 @@ void k_work_delayable_init(struct k_work_delayable *dwork, k_work_handler_t hand
 extern void z_event_schedule(struct k_event *event, k_timeout_t timeout);
 
 int k_work_delayable_schedule(struct k_workqueue *workqueue,
-			      struct k_work_delayable *dwork,
-			      k_timeout_t timeout)
+							  struct k_work_delayable *dwork,
+							  k_timeout_t timeout)
 {
 	Z_ARGS_CHECK(workqueue && dwork) return -EINVAL;
 
-	int ret		   = 0;
+	int ret			   = 0;
 	const uint8_t lock = irq_lock();
 
-	/* Ensure the work item is not already pending for submission or already in queue.
+	/* Ensure the work item is not already pending for submission or already in
+	 * queue.
 	 */
 	if (dwork->_event.scheduled || !z_work_submittable(&dwork->work)) {
 		ret = -EBUSY;
 		goto exit;
 	}
 
-	/* By the use of the lock We make ensure _workqueue is not written while the work
-	 * item is being sent from delayable_work_trigger.
+	/* By the use of the lock We make ensure _workqueue is not written while the
+	 * work item is being sent from delayable_work_trigger.
 	 */
 	dwork->_workqueue = workqueue;
 

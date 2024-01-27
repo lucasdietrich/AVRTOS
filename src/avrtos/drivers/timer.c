@@ -8,9 +8,9 @@
 
 #include <avrtos/assert.h>
 
-#define DRIVERS_TIMERS_API                                             \
-	((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) || \
-	 (CONFIG_DRIVERS_TIMER2_API) || (CONFIG_DRIVERS_TIMER3_API) || \
+#define DRIVERS_TIMERS_API                                                               \
+	((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) ||                       \
+	 (CONFIG_DRIVERS_TIMER2_API) || (CONFIG_DRIVERS_TIMER3_API) ||                       \
 	 (CONFIG_DRIVERS_TIMER4_API) || (CONFIG_DRIVERS_TIMER5_API))
 
 #define K_MODULE K_MODULE_DRIVERS_TIMERS
@@ -38,8 +38,8 @@ void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx)
 }
 
 void ll_timer8_init(TIMER8_Device *dev,
-		    uint8_t tim_idx,
-		    const struct timer_config *config)
+					uint8_t tim_idx,
+					const struct timer_config *config)
 {
 	/* Set timer mode WGMn0:3
 	 * bit 0 for timer 0 is ignored */
@@ -97,8 +97,8 @@ void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
 }
 
 void ll_timer16_init(TIMER16_Device *dev,
-		     uint8_t tim_idx,
-		     const struct timer_config *config)
+					 uint8_t tim_idx,
+					 const struct timer_config *config)
 {
 	/* Set timer mode WGMn0:3 */
 	dev->TCCRnA = (config->mode & 0x03u) << WGMn0;
@@ -129,12 +129,12 @@ void ll_timer16_init(TIMER16_Device *dev,
 }
 
 void ll_timer16_channel_configure(TIMER16_Device *dev,
-				  timer_channel_t channel,
-				  const struct timer_channel_compare_config *config)
+								  timer_channel_t channel,
+								  const struct timer_channel_compare_config *config)
 {
 	const uint8_t group_shift = (2 * (2 - channel) + 2u);
 	const uint8_t reg_val	  = dev->TCCRnA & ~(0x03u << group_shift);
-	dev->TCCRnA		  = reg_val | (config->mode << group_shift);
+	dev->TCCRnA				  = reg_val | (config->mode << group_shift);
 	ll_timer16_write_reg16(&dev->OCRnx[channel], config->value);
 }
 
@@ -244,9 +244,9 @@ static int timer2_get_presc_value(timer2_prescaler_t prescaler)
 
 int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter)
 {
-	const bool is_16bit	   = _is_16bits(timer_index);
+	const bool is_16bit		   = _is_16bits(timer_index);
 	const uint16_t max_counter = is_16bit ? 0xFFFFu : 0xFFu;
-	const bool is_timer2 = timer_index == 2; /* timer2 has more prescaler values */
+	const bool is_timer2	   = timer_index == 2; /* timer2 has more prescaler values */
 
 	/* iterate over prescaler values and find the best match */
 	uint8_t prescaler_id = 0;
@@ -256,7 +256,7 @@ int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *coun
 	do {
 		prescaler_id++; /* fetch next prescaler */
 		int prescaler_val = is_timer2 ? timer2_get_presc_value(prescaler_id)
-					      : timer_get_prescaler_value(prescaler_id);
+									  : timer_get_prescaler_value(prescaler_id);
 		if (prescaler_val < 0) {
 			return -1;
 		}
@@ -284,57 +284,57 @@ struct timer_api_ctx {
 
 __bss struct timer_api_ctx tim_ctx[TIMERS_COUNT];
 
-#define __DECL_TIMER_COMPA_ISR(n)                                      \
-	ISR(TIMER##n##_COMPA_vect)                                     \
-	{                                                              \
-		struct timer_api_ctx *const ctx = &tim_ctx[n];         \
-		void *const dev			= timer_get_device(n); \
-		if (ctx->cb != NULL) {                                 \
-			ctx->cb(dev, n, ctx->user_data);               \
-		}                                                      \
+#define __DECL_TIMER_COMPA_ISR(n)                                                        \
+	ISR(TIMER##n##_COMPA_vect)                                                           \
+	{                                                                                    \
+		struct timer_api_ctx *const ctx = &tim_ctx[n];                                   \
+		void *const dev					= timer_get_device(n);                           \
+		if (ctx->cb != NULL) {                                                           \
+			ctx->cb(dev, n, ctx->user_data);                                             \
+		}                                                                                \
 	}
 
 #if CONFIG_DRIVERS_TIMER0_API && TIMER_INDEX_EXISTS(0)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 0,
-		"Cannot enable drivers API for system timer 0");
+				"Cannot enable drivers API for system timer 0");
 __DECL_TIMER_COMPA_ISR(0);
 #endif /* CONFIG_DRIVERS_TIMER0_API */
 
 #if CONFIG_DRIVERS_TIMER1_API && TIMER_INDEX_EXISTS(1)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 1,
-		"Cannot enable drivers API for system timer 1");
+				"Cannot enable drivers API for system timer 1");
 __DECL_TIMER_COMPA_ISR(1);
 #endif /* CONFIG_DRIVERS_TIMER1_API */
 
 #if CONFIG_DRIVERS_TIMER2_API && TIMER_INDEX_EXISTS(2)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 2,
-		"Cannot enable drivers API for system timer 2");
+				"Cannot enable drivers API for system timer 2");
 __DECL_TIMER_COMPA_ISR(2);
 #endif /* CONFIG_DRIVERS_TIMER2_API */
 
 #if CONFIG_DRIVERS_TIMER3_API && TIMER_INDEX_EXISTS(3)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 3,
-		"Cannot enable drivers API for system timer 3");
+				"Cannot enable drivers API for system timer 3");
 __DECL_TIMER_COMPA_ISR(3);
 #endif /* CONFIG_DRIVERS_TIMER3_API */
 
 #if CONFIG_DRIVERS_TIMER4_API && TIMER_INDEX_EXISTS(4)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 4,
-		"Cannot enable drivers API for system timer 4");
+				"Cannot enable drivers API for system timer 4");
 __DECL_TIMER_COMPA_ISR(4);
 #endif /* CONFIG_DRIVERS_TIMER4_API */
 
 #if CONFIG_DRIVERS_TIMER5_API && TIMER_INDEX_EXISTS(5)
 __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 5,
-		"Cannot enable drivers API for system timer 5");
+				"Cannot enable drivers API for system timer 5");
 __DECL_TIMER_COMPA_ISR(5);
 #endif /* CONFIG_DRIVERS_TIMER5_API */
 
 int timer_init(uint8_t tim_idx,
-	       uint32_t period_us,
-	       timer_callback_t cb,
-	       void *user_data,
-	       uint8_t flags)
+			   uint32_t period_us,
+			   timer_callback_t cb,
+			   void *user_data,
+			   uint8_t flags)
 {
 	if ((tim_idx == CONFIG_KERNEL_SYSLOCK_HW_TIMER) || (cb == NULL)) {
 		return -EINVAL;
@@ -352,7 +352,7 @@ int timer_init(uint8_t tim_idx,
 		return -ENOTSUP;
 	}
 
-	tim_ctx[tim_idx].cb	   = cb;
+	tim_ctx[tim_idx].cb		   = cb;
 	tim_ctx[tim_idx].user_data = user_data;
 	tim_ctx[tim_idx].prescaler = prescaler_id;
 

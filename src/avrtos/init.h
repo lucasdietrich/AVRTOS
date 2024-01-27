@@ -28,17 +28,17 @@ __always_inline uint8_t z_get_mcusr(void)
 {
 	return z_mcusr;
 }
-#endif	// CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
+#endif // CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK
 
 // #error "(TODO) INVESTIGATE SP PROBLEM with
 // CONFIG_THREAD_EXPLICIT_MAIN_STACK=1"
 #define K_KERNEL_LINK_SP_INIT()                                                          \
-	__attribute__((naked, used, section(".init3"))) void z_kernel_sp(void)           \
-	{                                                                                \
-		extern char z_main_stack[];                                              \
-		SP = (uint16_t)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE); \
+	__attribute__((naked, used, section(".init3"))) void z_kernel_sp(void)               \
+	{                                                                                    \
+		extern char z_main_stack[];                                                      \
+		SP = (uint16_t)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE);         \
 	}
 #else
 
@@ -46,14 +46,14 @@ __always_inline uint8_t z_get_mcusr(void)
 
 #endif
 
-#define K_KERNEL_LINK_AVRTOS_INIT()                                              \
-	__attribute__((naked, used, section(".init8"))) void k_avrtos_init(void) \
-	{                                                                        \
-		z_avrtos_init();                                                 \
+#define K_KERNEL_LINK_AVRTOS_INIT()                                                      \
+	__attribute__((naked, used, section(".init8"))) void k_avrtos_init(void)             \
+	{                                                                                    \
+		z_avrtos_init();                                                                 \
 	}
 
-#define K_KERNEL_LINK_INIT()    \
-	K_KERNEL_LINK_SP_INIT() \
+#define K_KERNEL_LINK_INIT()                                                             \
+	K_KERNEL_LINK_SP_INIT()                                                              \
 	K_KERNEL_LINK_AVRTOS_INIT()
 
 #define K_KERNEL_INIT K_KERNEL_LINK_INIT

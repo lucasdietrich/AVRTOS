@@ -63,9 +63,9 @@ void z_timers_process(void)
 }
 
 void k_timer_init(struct k_timer *timer,
-		  k_timer_handler_t handler,
-		  k_timeout_t timeout,
-		  k_timeout_t starting_delay)
+				  k_timer_handler_t handler,
+				  k_timeout_t timeout,
+				  k_timeout_t starting_delay)
 {
 	__ASSERT_NOTNULL(timer);
 	__ASSERT_NOTNULL(handler);

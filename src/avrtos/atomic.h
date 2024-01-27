@@ -27,13 +27,13 @@ extern "C" {
  * interrupts temporarily.
  */
 
-#define K_ATOMIC_INIT(val)	   ((atomic_t)(val))
+#define K_ATOMIC_INIT(val)		   ((atomic_t)(val))
 #define K_ATOMIC_DEFINE(name, val) atomic_t name = K_ATOMIC_INIT(val)
 
 #define ATOMIC_SIZE_BITS (sizeof(atomic_val_t) * 8)
 
 /* for further uint32_t atomic support */
-#define ATOMIC_BIT(bit)	       (1 << (bit))
+#define ATOMIC_BIT(bit)		   (1 << (bit))
 #define ATOMIC_BYTE(addr, bit) ((addr) + ((bit) / ATOMIC_SIZE_BITS))
 
 typedef uint8_t atomic_val_t;

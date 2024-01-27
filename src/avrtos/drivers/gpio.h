@@ -24,18 +24,18 @@ typedef struct {
 #define DIR_OUTPUT 1u
 
 #define PIN_NO_PULLUP	   0u
-#define PIN_PULLUP	   1u
+#define PIN_PULLUP		   1u
 #define OUTPUT_DRIVEN_LOW  0u
 #define OUTPUT_DRIVEN_HIGH 1u
 
-#define GPIO_INPUT  0u
+#define GPIO_INPUT	0u
 #define GPIO_OUTPUT 1u
 
 #define GPIO_MODE_INPUT	 0u
 #define GPIO_MODE_OUTPUT 1u
 
 #define GPIO_INPUT_NO_PULLUP	0u
-#define GPIO_INPUT_PULLUP	1u
+#define GPIO_INPUT_PULLUP		1u
 #define GPIO_OUTPUT_DRIVEN_LOW	0u
 #define GPIO_OUTPUT_DRIVEN_HIGH 1u
 
@@ -94,54 +94,54 @@ typedef struct {
 
 #if defined(PORTE)
 #define GPIOE_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Cu))
-#define GPIOE	     GPIOE_DEVICE
-#define GPIOE_INDEX  4u
+#define GPIOE		 GPIOE_DEVICE
+#define GPIOE_INDEX	 4u
 #endif
 
 #if defined(PORTF)
 #define GPIOF_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x2Fu))
-#define GPIOF	     GPIOF_DEVICE
-#define GPIOF_INDEX  5u
+#define GPIOF		 GPIOF_DEVICE
+#define GPIOF_INDEX	 5u
 #endif
 
 #if defined(PORTG)
 #define GPIOG_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x32u))
-#define GPIOG	     GPIOG_DEVICE
-#define GPIOG_INDEX  6u
+#define GPIOG		 GPIOG_DEVICE
+#define GPIOG_INDEX	 6u
 #endif
 
 #if defined(PORTH)
 #define GPIOH_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x100u))
-#define GPIOH	     GPIOH_DEVICE
-#define GPIOH_INDEX  7u
+#define GPIOH		 GPIOH_DEVICE
+#define GPIOH_INDEX	 7u
 #endif
 
 #if defined(PORTJ)
 #define GPIOJ_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x103u))
-#define GPIOJ	     GPIOJ_DEVICE
-#define GPIOJ_INDEX  8u
+#define GPIOJ		 GPIOJ_DEVICE
+#define GPIOJ_INDEX	 8u
 #endif
 
 #if defined(PORTK)
 #define GPIOK_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x106u))
-#define GPIOK	     GPIOK_DEVICE
-#define GPIOK_INDEX  9u
+#define GPIOK		 GPIOK_DEVICE
+#define GPIOK_INDEX	 9u
 #endif
 
 #if defined(PORTL)
 #define GPIOL_DEVICE ((GPIO_Device *)(AVR_IO_BASE_ADDR + 0x109u))
-#define GPIOL	     GPIOL_DEVICE
-#define GPIOL_INDEX  10u
+#define GPIOL		 GPIOL_DEVICE
+#define GPIOL_INDEX	 10u
 #endif
 
 /* Get the GPIO device from the port letter index (0: A, 1: B, ...) */
-#define GPIO_DEVICE_ABCDEFG(_idx) \
+#define GPIO_DEVICE_ABCDEFG(_idx)                                                        \
 	((GPIO_Device *)(AVR_GPIO_BASE_ADDR + ((_idx) * sizeof(GPIO_Device))))
 
 #if defined(PORTH)
-#define GPIO_DEVICE_HIKL(_idx) \
+#define GPIO_DEVICE_HIKL(_idx)                                                           \
 	((GPIO_Device *)(AVR_GPIO_HIKL_BASE_ADDR + ((_idx - 6u) * sizeof(GPIO_Device))))
-#define GPIO_DEVICE(_idx) \
+#define GPIO_DEVICE(_idx)                                                                \
 	(((_idx) <= 5) ? GPIO_DEVICE_ABCDEFG(_idx) : GPIO_DEVICE_HIKL(_idx))
 #else
 #define GPIO_DEVICE GPIO_DEVICE_ABCDEFG
@@ -155,10 +155,8 @@ __always_inline void gpiol_init(GPIO_Device *gpio, uint8_t dir_mask, uint8_t pul
 	gpio->PORT = pullup_mask;
 }
 
-__always_inline void gpiol_pin_init(GPIO_Device *gpio,
-				    uint8_t pin,
-				    uint8_t dir,
-				    uint8_t pullup)
+__always_inline void
+gpiol_pin_init(GPIO_Device *gpio, uint8_t pin, uint8_t dir, uint8_t pullup)
 {
 	/* represent either pullup (if input) or output level (if output)*/
 	if (pullup == GPIO_INPUT_NO_PULLUP) {
@@ -174,9 +172,8 @@ __always_inline void gpiol_pin_init(GPIO_Device *gpio,
 	}
 }
 
-__always_inline void gpiol_pin_set_direction(GPIO_Device *gpio,
-					     uint8_t pin,
-					     uint8_t direction)
+__always_inline void
+gpiol_pin_set_direction(GPIO_Device *gpio, uint8_t pin, uint8_t direction)
 {
 	gpio->DDR = (gpio->DDR & ~BIT(pin)) | ((direction & 1u) << pin);
 }

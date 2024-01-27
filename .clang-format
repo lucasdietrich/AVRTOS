@@ -3,7 +3,7 @@
 #
 
 ---
-BasedOnStyle: Chromium
+BasedOnStyle: LLVM
 AlignConsecutiveMacros: true
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
@@ -33,10 +33,11 @@ IncludeCategories:
     Priority: 3
   - Regex: '.*'
     Priority: 4
-IndentWidth: 8
+IndentWidth: 4
+TabWidth: 4
 IndentCaseLabels: false
-ConstructorInitializerIndentWidth: 8
-ContinuationIndentWidth: 8
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
 UseTab: Always
 ColumnLimit: 90
 WhitespaceSensitiveMacros:

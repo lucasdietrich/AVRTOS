@@ -7,15 +7,15 @@
 #include "tcn75.h"
 
 int8_t tcn75_init_context(struct tcn75_context *tcn75,
-			  uint8_t addr_lsb,
-			  uint8_t config,
-			  I2C_Device *i2c)
+						  uint8_t addr_lsb,
+						  uint8_t config,
+						  I2C_Device *i2c)
 {
 	Z_ARGS_CHECK(tcn75) return -EINVAL;
 
-	tcn75->addr   = (addr_lsb & 0x07u) | TCN75_ADDR_BASE;
+	tcn75->addr	  = (addr_lsb & 0x07u) | TCN75_ADDR_BASE;
 	tcn75->config = config;
-	tcn75->i2c    = i2c;
+	tcn75->i2c	  = i2c;
 
 	return 0;
 }
@@ -69,7 +69,7 @@ int16_t tcn75_read(struct tcn75_context *tcn75)
 	int16_t temperature = INT16_MAX;
 
 	uint8_t buf[2u] = {0};
-	int8_t ret	= i2c_master_receive(tcn75->i2c, tcn75->addr, buf, 2u);
+	int8_t ret		= i2c_master_receive(tcn75->i2c, tcn75->addr, buf, 2u);
 	if (ret == 0) {
 		temperature = tcn75_temp2int16(buf[0], buf[1]);
 	}

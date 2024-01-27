@@ -31,15 +31,15 @@ struct slist {
 typedef struct slist slist_t;
 typedef struct snode snode_t;
 
-#define SLIST_INIT()                       \
-	{                                  \
-		.head = NULL, .tail = NULL \
+#define SLIST_INIT()                                                                     \
+	{                                                                                    \
+		.head = NULL, .tail = NULL                                                       \
 	}
 #define SLIST_DEFINE(name) struct slist name = SLIST_INIT()
 
-#define SNODE_INIT()         \
-	{                    \
-		.next = NULL \
+#define SNODE_INIT()                                                                     \
+	{                                                                                    \
+		.next = NULL                                                                     \
 	}
 
 void slist_init(struct slist *list);

@@ -99,8 +99,7 @@ __always_inline int8_t z_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t t
 			/* a thread is waiting to write a msg,
 			 * we copy the data from the thread to the msgq
 			 */
-			memcpy(msgq->write_cursor, pending_thread->swap_data,
-			       msgq->msg_size);
+			memcpy(msgq->write_cursor, pending_thread->swap_data, msgq->msg_size);
 			msgq->write_cursor = msgq->write_cursor + msgq->msg_size;
 			if (msgq->write_cursor == msgq->buf_end) {
 				msgq->write_cursor = msgq->buf_start;
@@ -143,8 +142,7 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 			/* a thread is waiting to write a msg,
 			 * we copy the data from the thread to the msgq
 			 */
-			memcpy(msgq->write_cursor, pending_thread->swap_data,
-			       msgq->msg_size);
+			memcpy(msgq->write_cursor, pending_thread->swap_data, msgq->msg_size);
 			msgq->write_cursor = msgq->write_cursor + msgq->msg_size;
 			if (msgq->write_cursor == msgq->buf_end) {
 				msgq->write_cursor = msgq->buf_start;

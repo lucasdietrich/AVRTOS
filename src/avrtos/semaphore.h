@@ -31,13 +31,13 @@ struct k_sem {
 	struct dnode waitqueue;
 };
 
-#define K_SEM_INIT(sem, initial_count, count_limit)                             \
-	{                                                                       \
-		.count = MIN(initial_count, count_limit), .limit = count_limit, \
-		.waitqueue = DLIST_INIT(sem.waitqueue)                          \
+#define K_SEM_INIT(sem, initial_count, count_limit)                                      \
+	{                                                                                    \
+		.count = MIN(initial_count, count_limit), .limit = count_limit,                  \
+		.waitqueue = DLIST_INIT(sem.waitqueue)                                           \
 	}
 
-#define K_SEM_DEFINE(sem_name, initial_count, count_limit) \
+#define K_SEM_DEFINE(sem_name, initial_count, count_limit)                               \
 	struct k_sem sem_name = K_SEM_INIT(sem_name, initial_count, count_limit)
 
 /**

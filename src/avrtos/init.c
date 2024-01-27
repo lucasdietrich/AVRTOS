@@ -25,11 +25,11 @@ __attribute__((naked, used, section(".init0"))) void z_save_mcusr(void)
 {
 	/*
 	; read r2 and write it to z_mcusr
-	    i.e.: sts z_mcusr, r2
+		i.e.: sts z_mcusr, r2
 	*/
 	asm volatile("sts %0, r2"
-		     : "=m"(z_mcusr)
-		     : /* no input */
+				 : "=m"(z_mcusr)
+				 : /* no input */
 	);
 }
 
@@ -38,12 +38,12 @@ __attribute__((naked, used, section(".init0"))) void z_save_mcusr(void)
 .section .noinit
 .global z_mcusr
 z_mcusr:
-    .byte 1
+	.byte 1
 
 .section .init0
 .global z_save_mcusr
 z_save_mcusr:
-    sts z_mcusr, r2
+	sts z_mcusr, r2
 
 */
 #endif
@@ -65,7 +65,7 @@ void z_avrtos_init(void)
 	/* If the watchdog caused the reset, clear the flag */
 	if (MCUSR & BIT(WDRF)) {
 		MCUSR &= ~BIT(WDRF);
-		WDTCSR |= (BIT(WDCE) | BIT(WDE));  // change
+		WDTCSR |= (BIT(WDCE) | BIT(WDE)); // change
 		WDTCSR = 0x00;
 	}
 #endif /* CONFIG_KERNEL_INIT_CLEAR_WDT */

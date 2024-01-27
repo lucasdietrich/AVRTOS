@@ -11,7 +11,7 @@
 #define ENOENT	2
 #define ESRCH	3
 #define EINTR	4
-#define EIO	5
+#define EIO		5
 #define ENXIO	6
 #define E2BIG	7
 #define ENOEXEC 8
@@ -45,7 +45,7 @@
 #define ENOMSG	35
 #define ENOTSUP 95
 
-#define EALREADY    114
+#define EALREADY	114
 #define EINPROGRESS 115
 
 #define ETIMEDOUT 110

@@ -24,28 +24,28 @@ extern "C" {
 // Kernel Debug Macros
 //
 
-#define __K_DBG_HELPER_TH(thread, chr) \
-	serial_transmit(chr);          \
+#define __K_DBG_HELPER_TH(thread, chr)                                                   \
+	serial_transmit(chr);                                                                \
 	serial_transmit(thread->symbol)
 
-#define __K_DBG_HELPER_TH_R(thread, chr) \
-	serial_transmit(thread->symbol); \
+#define __K_DBG_HELPER_TH_R(thread, chr)                                                 \
+	serial_transmit(thread->symbol);                                                     \
 	serial_transmit(chr)
 
 #if CONFIG_KERNEL_SCHEDULER_DEBUG
 
-#define __K_DBG_SCHED_LOCK(thread)	__K_DBG_HELPER_TH(thread, '[')
-#define __K_DBG_SCHED_UNLOCK()		serial_transmit(']')
-#define __K_DBG_SCHED_EVENT(thread)	__K_DBG_HELPER_TH(thread, '!')
+#define __K_DBG_SCHED_LOCK(thread)		__K_DBG_HELPER_TH(thread, '[')
+#define __K_DBG_SCHED_UNLOCK()			serial_transmit(']')
+#define __K_DBG_SCHED_EVENT(thread)		__K_DBG_HELPER_TH(thread, '!')
 #define __K_DBG_SCHED_SUSPENDED(thread) serial_transmit('~')
-#define __K_DBG_SCHED_NEXT_THREAD()	serial_transmit('>')
-#define __K_DBG_SCHED_SKIP_IDLE()	serial_print_p(PSTR("p"))
-#define __K_DBG_SCHED_NEXT(thread)	serial_transmit(thread->symbol)
-#define __K_DBG_WAKEUP(thread)		__K_DBG_HELPER_TH(thread, '@')
+#define __K_DBG_SCHED_NEXT_THREAD()		serial_transmit('>')
+#define __K_DBG_SCHED_SKIP_IDLE()		serial_print_p(PSTR("p"))
+#define __K_DBG_SCHED_NEXT(thread)		serial_transmit(thread->symbol)
+#define __K_DBG_WAKEUP(thread)			__K_DBG_HELPER_TH(thread, '@')
 
 #define __K_DBG_MUTEX_LOCKED(thread)   __K_DBG_HELPER_TH(thread, '}')
 #define __K_DBG_MUTEX_UNLOCKED(thread) __K_DBG_HELPER_TH_R(thread, '{')
-#define __K_DBG_MUTEX_WAIT(thread)     __K_DBG_HELPER_TH(thread, '#')
+#define __K_DBG_MUTEX_WAIT(thread)	   __K_DBG_HELPER_TH(thread, '#')
 
 #define __K_DBG_SEM_TAKE(thread) __K_DBG_HELPER_TH(thread, ')')
 #define __K_DBG_SEM_GIVE(thread) __K_DBG_HELPER_TH_R(thread, '(')
@@ -130,7 +130,7 @@ extern "C" {
 
 #if CONFIG_KERNEL_DEBUG_GPIO > 0
 #include "drivers/gpio.h"
-#define __Z_DBG_GPIO_INIT(_port, _pin) \
+#define __Z_DBG_GPIO_INIT(_port, _pin)                                                   \
 	gpiol_pin_init(_port, _pin, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_HIGH)
 #define __Z_DBG_GPIO_SET(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 1u)
 #define __Z_DBG_GPIO_CLEAR(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 0u)
@@ -298,15 +298,15 @@ void z_set_stack_pointer(struct k_thread *thread);
  */
 uint8_t z_read_sreg(void);
 
-#define Z_LOG_SREG()     \
-	serial_u8(SREG); \
+#define Z_LOG_SREG()                                                                     \
+	serial_u8(SREG);                                                                     \
 	serial_transmit(';');
-#define Z_LOG_SREG2()             \
-	serial_u8(z_read_sreg()); \
+#define Z_LOG_SREG2()                                                                    \
+	serial_u8(z_read_sreg());                                                            \
 	serial_transmit(';');
-#define Z_LOG_SREG_I()        \
-	serial_transmit('['); \
-	serial_u8(SREG >> 7); \
+#define Z_LOG_SREG_I()                                                                   \
+	serial_transmit('[');                                                                \
+	serial_u8(SREG >> 7);                                                                \
 	serial_transmit(']');
 
 /*___________________________________________________________________________*/

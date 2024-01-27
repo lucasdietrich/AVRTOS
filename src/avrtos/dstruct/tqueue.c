@@ -45,7 +45,7 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_t timeout)
 	if (item == NULL) return;
 
 	/* last item doesn't have a "next" item */
-	item->next    = NULL;
+	item->next	  = NULL;
 	item->timeout = timeout;
 
 	z_tqueue_schedule(root, item);

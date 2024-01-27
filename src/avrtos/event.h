@@ -37,9 +37,9 @@ struct k_event {
 	uint8_t scheduled : 1;
 };
 
-#define K_EVENT_INIT(hdlr)                                                   \
-	{                                                                    \
-		.tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0 \
+#define K_EVENT_INIT(hdlr)                                                               \
+	{                                                                                    \
+		.tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0                     \
 	}
 #define K_EVENT_DEFINE(name, hdlr) struct k_event name = K_EVENT_INIT(hdlr)
 

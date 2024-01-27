@@ -18,14 +18,14 @@ void serial_init_baud(uint32_t baud)
 {
 	/* UART initialisation */
 	const struct usart_config usart_config = {
-		.baudrate    = baud,
-		.receiver    = 1u,
+		.baudrate	 = baud,
+		.receiver	 = 1u,
 		.transmitter = 1u,
-		.mode	     = USART_MODE_ASYNCHRONOUS,
-		.parity	     = USART_PARITY_NONE,
-		.stopbits    = USART_STOP_BITS_1,
-		.databits    = USART_DATA_BITS_8,
-		.speed_mode  = USART_SPEED_MODE_NORMAL,
+		.mode		 = USART_MODE_ASYNCHRONOUS,
+		.parity		 = USART_PARITY_NONE,
+		.stopbits	 = USART_STOP_BITS_1,
+		.databits	 = USART_DATA_BITS_8,
+		.speed_mode	 = USART_SPEED_MODE_NORMAL,
 	};
 	ll_usart_init(USART_DEVICE, &usart_config);
 }
@@ -125,7 +125,7 @@ void serial_send_hex(const uint8_t *buffer, size_t len)
 		serial_hex(buffer[i]);
 
 		if (0xF == (i & 0xF)) {
-			serial_transmit('\n');	// EOL every 16 chars
+			serial_transmit('\n'); // EOL every 16 chars
 		} else {
 			serial_transmit(' ');
 		}

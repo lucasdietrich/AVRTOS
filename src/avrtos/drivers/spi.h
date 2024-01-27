@@ -46,8 +46,8 @@ typedef struct {
 } SPI_Device;
 
 #define SPI_BASE_ADDR (AVR_IO_BASE_ADDR + 0x004Cu)
-#define SPI_DEVICE    ((SPI_Device *)SPI_BASE_ADDR)
-#define SPI	      SPI_DEVICE
+#define SPI_DEVICE	  ((SPI_Device *)SPI_BASE_ADDR)
+#define SPI			  SPI_DEVICE
 
 typedef enum {
 	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed (for F_CPU=16MHz = 4MHz) */
@@ -74,7 +74,7 @@ typedef enum {
 /* Leading edge */
 typedef enum {
 	SPI_CLOCK_PHASE_SAMPLE = 0u, /* CPHA = 0, sample on leading edge */
-	SPI_CLOCK_PHASE_SETUP  = 1u  /* CPHA = 1, sample on trailing edge */
+	SPI_CLOCK_PHASE_SETUP  = 1u	 /* CPHA = 1, sample on trailing edge */
 } spi_clock_phase_t;
 
 /** SPI configuration (1 byte) */
@@ -104,18 +104,18 @@ struct spi_regs {
 };
 
 /* 4Mhz SPI Master in mode 0,0 */
-#define SPI_CONFIG_MASTER_DEFAULTS                                               \
-	{                                                                        \
-		.mode = SPI_MODE_MASTER, .polarity = SPI_CLOCK_POLARITY_FALLING, \
-		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,              \
-		.prescaler = SPI_PRESCALER_4,                                    \
+#define SPI_CONFIG_MASTER_DEFAULTS                                                       \
+	{                                                                                    \
+		.mode = SPI_MODE_MASTER, .polarity = SPI_CLOCK_POLARITY_FALLING,                 \
+		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
+		.prescaler = SPI_PRESCALER_4,                                                    \
 	}
 
 /* 4Mhz SPI Slave in mode 0,0 */
-#define SPI_CONFIG_SLAVE_DEFAULTS                                               \
-	{                                                                       \
-		.mode = SPI_MODE_SLAVE, .polarity = SPI_CLOCK_POLARITY_FALLING, \
-		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,             \
+#define SPI_CONFIG_SLAVE_DEFAULTS                                                        \
+	{                                                                                    \
+		.mode = SPI_MODE_SLAVE, .polarity = SPI_CLOCK_POLARITY_FALLING,                  \
+		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
 	}
 
 /**
@@ -202,10 +202,10 @@ struct spi_slave {
  * @return int8_t 0 on success, negative on error.
  */
 int8_t spi_slave_init(struct spi_slave *slave,
-		      GPIO_Device *cs_port,
-		      uint8_t cs_pin,
-		      uint8_t active_state,
-		      const struct spi_regs *regs);
+					  GPIO_Device *cs_port,
+					  uint8_t cs_pin,
+					  uint8_t active_state,
+					  const struct spi_regs *regs);
 
 /**
  * @brief Initialize a SPI chip select pin for the slave.
@@ -240,8 +240,9 @@ void spi_slave_transceive_buf(const struct spi_slave *slave, char *rxtx, uint8_t
 /**
  * @brief SPI callback function type for asynchronous SPI tranceive.
  *
- * @param rxtx Pointer to the byte to transmit. The received byte is also returned in this
- * pointer. If NULL, we are notified that the asynchronous transmission has been canceled.
+ * @param rxtx Pointer to the byte to transmit. The received byte is also
+ * returned in this pointer. If NULL, we are notified that the asynchronous
+ * transmission has been canceled.
  * @return true Continue the transmission, false stop the transmission.
  */
 typedef bool (*spi_callback_t)(char *rxtx);
@@ -249,33 +250,34 @@ typedef bool (*spi_callback_t)(char *rxtx);
 /**
  * @brief Transceive a byte over SPI asynchronously in master and slave mode.
  *
- * Assume that the slave is selected beforce the transmission and deselected after
- * (or deselected on the callback function).
+ * Assume that the slave is selected beforce the transmission and deselected
+ * after (or deselected on the callback function).
  *
  * This function is non-blocking and returns immediately.
  *
- * The function enables the SPI interrupt and disables it when the transmission is
- * complete.
+ * The function enables the SPI interrupt and disables it when the transmission
+ * is complete.
  *
- * In master mode, the transmission is started immediately. When a byte transmission
- * is complete, the callback function is called in the interrupt context.
- * The received byte is passed as an argument to the callback function.
- * The next byte to transmit is returned by the callback using the argument pointer.
- * If the callback returns true, the transmission is continued, otherwise it is stopped.
+ * In master mode, the transmission is started immediately. When a byte
+ * transmission is complete, the callback function is called in the interrupt
+ * context. The received byte is passed as an argument to the callback function.
+ * The next byte to transmit is returned by the callback using the argument
+ * pointer. If the callback returns true, the transmission is continued,
+ * otherwise it is stopped.
  *
- * If it is decided to abort the asynchronous transmission, the byte prepared for
- * transmission in the callback is ignored.
+ * If it is decided to abort the asynchronous transmission, the byte prepared
+ * for transmission in the callback is ignored.
  *
- * In slave mode, the behavior stays the same, except that the transmission is started
- * when the master starts to transmit. The callback function is called each time a byte
- * is received from the master.
+ * In slave mode, the behavior stays the same, except that the transmission is
+ * started when the master starts to transmit. The callback function is called
+ * each time a byte is received from the master.
  *
  * In slave mode:
  * In case you want to cancel a transmission, call spi_cancel_async().
  *
  * @param first_tx First byte to transmit.
- * @param callback Callback function to call when the transmission of the first byte is
- * complete.
+ * @param callback Callback function to call when the transmission of the first
+ * byte is complete.
  * @return int number of bytes sent on success, negative value on error.
  */
 int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback);
@@ -283,8 +285,8 @@ int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback);
 /**
  * @brief Check if an asynchronous SPI transmission is running.
  *
- * As synchronous functions should not be called while an asynchronous transmission is
- * running, this function can be used for this purpose.
+ * As synchronous functions should not be called while an asynchronous
+ * transmission is running, this function can be used for this purpose.
  *
  * @return true
  * @return false

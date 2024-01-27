@@ -27,14 +27,14 @@ typedef struct {
 	__IO uint8_t UCSRnA;
 	__IO uint8_t UCSRnB;
 	__IO uint8_t UCSRnC;
-	__IO uint8_t _reserved1;  // internal/unused register
+	__IO uint8_t _reserved1; // internal/unused register
 	__IO uint8_t UBRRnL;
 	__IO uint8_t UBRRnH;
 	__IO uint8_t UDRn;
 	__IO uint8_t _reserved2;
 } UART_Device;
 
-#define AVR_USARTn_BASE(n) \
+#define AVR_USARTn_BASE(n)                                                               \
 	((UART_Device *)(AVR_USART_BASE_ADDR + (n) * sizeof(UART_Device)))
 #define AVR_USARTn_INDEX(usart_dev) (usart_dev - AVR_USARTn_BASE(0))
 
@@ -87,13 +87,13 @@ typedef struct {
 #define USART_BAUD_500000  500000lu
 #define USART_BAUD_1000000 1000000lu
 
-#define USART_CALC_UBRRn(baudrate)	      (((F_CPU >> 4) / baudrate) - 1)
+#define USART_CALC_UBRRn(baudrate)			  (((F_CPU >> 4) / baudrate) - 1)
 #define USART_CALC_SPEED_MODE_UBRRn(baudrate) (((F_CPU >> 3) / baudrate) - 1)
 
 typedef enum {
 	USART_MODE_ASYNCHRONOUS = 0,
 	USART_MODE_SYNCHRONOUS	= 1,
-	USART_MODE_MSPI		= 2,
+	USART_MODE_MSPI			= 2,
 } usart_mode_t;
 
 typedef enum {
@@ -132,36 +132,36 @@ struct usart_config {
 	usart_speed_mode_t speed_mode : 1;
 };
 
-#define USART_CONFIG_DEFAULT_2400()                                             \
-	{                                                                       \
-		.baudrate = USART_BAUD_2400, .receiver = 1u, .transmitter = 1u, \
-		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,   \
-		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,   \
-		.speed_mode = USART_SPEED_MODE_NORMAL                           \
+#define USART_CONFIG_DEFAULT_2400()                                                      \
+	{                                                                                    \
+		.baudrate = USART_BAUD_2400, .receiver = 1u, .transmitter = 1u,                  \
+		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,                    \
+		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,                    \
+		.speed_mode = USART_SPEED_MODE_NORMAL                                            \
 	}
 
-#define USART_CONFIG_DEFAULT_9600()                                             \
-	{                                                                       \
-		.baudrate = USART_BAUD_9600, .receiver = 1u, .transmitter = 1u, \
-		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,   \
-		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,   \
-		.speed_mode = USART_SPEED_MODE_NORMAL                           \
+#define USART_CONFIG_DEFAULT_9600()                                                      \
+	{                                                                                    \
+		.baudrate = USART_BAUD_9600, .receiver = 1u, .transmitter = 1u,                  \
+		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,                    \
+		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,                    \
+		.speed_mode = USART_SPEED_MODE_NORMAL                                            \
 	}
 
-#define USART_CONFIG_DEFAULT_115200()                                             \
-	{                                                                         \
-		.baudrate = USART_BAUD_115200, .receiver = 1u, .transmitter = 1u, \
-		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,     \
-		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,     \
-		.speed_mode = USART_SPEED_MODE_NORMAL                             \
+#define USART_CONFIG_DEFAULT_115200()                                                    \
+	{                                                                                    \
+		.baudrate = USART_BAUD_115200, .receiver = 1u, .transmitter = 1u,                \
+		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,                    \
+		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,                    \
+		.speed_mode = USART_SPEED_MODE_NORMAL                                            \
 	}
 
-#define USART_CONFIG_DEFAULT_500000()                                             \
-	{                                                                         \
-		.baudrate = USART_BAUD_500000, .receiver = 1u, .transmitter = 1u, \
-		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,     \
-		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,     \
-		.speed_mode = USART_SPEED_MODE_NORMAL                             \
+#define USART_CONFIG_DEFAULT_500000()                                                    \
+	{                                                                                    \
+		.baudrate = USART_BAUD_500000, .receiver = 1u, .transmitter = 1u,                \
+		.mode = USART_MODE_ASYNCHRONOUS, .parity = USART_PARITY_NONE,                    \
+		.stopbits = USART_STOP_BITS_1, .databits = USART_DATA_BITS_8,                    \
+		.speed_mode = USART_SPEED_MODE_NORMAL                                            \
 	}
 
 #define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
@@ -216,7 +216,7 @@ struct usart_async_context;
 typedef enum {
 	USART_EVENT_RX_COMPLETE = 0,
 	USART_EVENT_TX_COMPLETE = 1,
-	USART_EVENT_ERROR	= 2,
+	USART_EVENT_ERROR		= 2,
 } usart_event_t;
 
 typedef void (*usart_async_callback_t)(UART_Device *dev, struct usart_async_context *ctx);

@@ -56,18 +56,18 @@ struct k_mem_slab {
 	struct dnode waitqueue;
 };
 
-#define K_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                   \
-	{                                                                          \
-		.buffer = _buf, .count = _blocks_count, .block_size = _block_size, \
-		.free_list = NULL, .waitqueue = DLIST_INIT(_slab.waitqueue)        \
+#define K_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                         \
+	{                                                                                    \
+		.buffer = _buf, .count = _blocks_count, .block_size = _block_size,               \
+		.free_list = NULL, .waitqueue = DLIST_INIT(_slab.waitqueue)                      \
 	}
 
 #define Z_MEM_SLAB_BUF_NAME(_slab_name) z_mem_slab_buf_##_slab_name
 
-#define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                 \
-	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)]; \
-	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                       \
-	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                    \
+#define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                        \
+	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];            \
+	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                                  \
+	static struct k_mem_slab _slab_name = K_MEM_SLAB_INIT(                               \
 		_slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
 /**
@@ -86,9 +86,9 @@ __kernel void z_mem_slab_init_module(void);
  * @return return 0 on success else error code
  */
 __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
-				void *buffer,
-				size_t block_size,
-				uint8_t blocks_count);
+								void *buffer,
+								size_t block_size,
+								uint8_t blocks_count);
 
 /**
  * @brief Finalize the initialization of a memory slab when declared using
@@ -120,8 +120,8 @@ __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
  * - ECANCELED : wait aborted
  */
 __kernel int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
-				 void **mem,
-				 k_timeout_t timeout);
+								 void **mem,
+								 k_timeout_t timeout);
 
 /**
  * @brief Free a memory block and notify the first pending thread that

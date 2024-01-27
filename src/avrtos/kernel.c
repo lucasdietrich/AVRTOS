@@ -40,7 +40,7 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
 /* Calculate main thread stack end address */
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 /* explicit stack defined, stack is at the end of the defined buffer */
-#define Z_THREAD_MAIN_STACK_END_ADDR \
+#define Z_THREAD_MAIN_STACK_END_ADDR                                                     \
 	(void *)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE)
 #else
 /* implicit stack, we set the main thread stack end at the end of the RAM */
@@ -58,16 +58,17 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
  * - `.flags`: Combination of flags indicating the state and priority of the
  *   thread. The specific combination depends on the configuration options.
  * - `.tie`: Contains the reference element for the thread in the runqueue.
- * - `.wany`: Initialized to indicate that the thread is not pending on any events.
- * - `.swap_data`: Set to NULL as there is no explicit swapping data associated with
- *   the main thread.
- * - `.stack`: Contains information about the thread's stack. The specific values
- *   depend on the configuration options, such as whether an explicit stack is defined
- *   or an implicit stack is used.
+ * - `.wany`: Initialized to indicate that the thread is not pending on any
+ * events.
+ * - `.swap_data`: Set to NULL as there is no explicit swapping data associated
+ * with the main thread.
+ * - `.stack`: Contains information about the thread's stack. The specific
+ * values depend on the configuration options, such as whether an explicit stack
+ * is defined or an implicit stack is used.
  * - `.symbol`: Default symbol for the main thread, here set to 'M'.
  */
 K_THREAD struct k_thread z_thread_main = {
-	.sp    = 0,  // main thread is running, context already "restored"
+	.sp	   = 0, // main thread is running, context already "restored"
 	.flags = Z_THREAD_STATE_READY | Z_THREAD_MAIN_PRIORITY | Z_THREAD_PRIO_LOW,
 	.tie =
 		{
@@ -80,7 +81,7 @@ K_THREAD struct k_thread z_thread_main = {
 					.next = &z_thread_main.tie.runqueue,
 				},
 		},
-	.wany	   = DITEM_INIT_NULL(),	 // the thread isn't pending on any events
+	.wany	   = DITEM_INIT_NULL(), // the thread isn't pending on any events
 	.swap_data = NULL,
 	.stack =
 		{
@@ -91,15 +92,15 @@ K_THREAD struct k_thread z_thread_main = {
 								  CONFIG_THREAD_EXPLICIT_MAIN_STACK
 								  is enabled */
 		},
-	.symbol = 'M'  // default main thread sumbol
+	.symbol = 'M' // default main thread sumbol
 };
 
 /**
  * @brief Pointer to the thread currently having the CPU (context set).
  *
- * @note there are cases where z_runq and z_current doesn't refer to the same thread
- * this is because the next thread to be scheduled is already set but the context hasn't
- * been switched yet.
+ * @note there are cases where z_runq and z_current doesn't refer to the same
+ * thread this is because the next thread to be scheduled is already set but the
+ * context hasn't been switched yet.
  */
 struct k_thread *z_current = &z_thread_main;
 
@@ -109,8 +110,8 @@ struct k_thread *z_current = &z_thread_main;
  * The IDLE thread is not included in this count.
  *
  * This variable represents the count of threads currently in the runqueue(s),
- * indicating the number of threads that are ready to run. It is initialized to 1
- * during startup, indicating that only the main thread is running initially.
+ * indicating the number of threads that are ready to run. It is initialized to
+ * 1 during startup, indicating that only the main thread is running initially.
  *
  * The possible values and their meanings are as follows:
  * - 0: Indicates that only the IDLE thread is running.
@@ -122,14 +123,14 @@ uint8_t z_ready_count = 1u;
 /**
  * @brief Pointer to the currently running thread in the runqueue.
  *
- * This variable represents a pointer to the thread (node) in the runqueue, which is
- * currently running. The runqueue is implemented as a doubly-linked list, where each
- * node represents a thread. During startup, this variable is initialized with the
- * pointer to the node corresponding to the main thread.
+ * This variable represents a pointer to the thread (node) in the runqueue,
+ * which is currently running. The runqueue is implemented as a doubly-linked
+ * list, where each node represents a thread. During startup, this variable is
+ * initialized with the pointer to the node corresponding to the main thread.
  *
- * The runqueue is structured as a circular doubly-linked list, where each node contains
- * a pointer to the next and previous nodes. The illustration below demonstrates the
- * relationship between the nodes in the runqueue:
+ * The runqueue is structured as a circular doubly-linked list, where each node
+ * contains a pointer to the next and previous nodes. The illustration below
+ * demonstrates the relationship between the nodes in the runqueue:
  *
  *         A     B     C
  *     -> n --> n --> n --   (n for next, p for previous)
@@ -138,17 +139,19 @@ uint8_t z_ready_count = 1u;
  *  ___________|
  *  z_runq points to the thread currently running, here B
  *
- * By maintaining a pointer to the currently running thread (node) in z_runq, it becomes
- * convenient to execute the next thread by simply setting z_runq to z_runq->next.
+ * By maintaining a pointer to the currently running thread (node) in z_runq, it
+ * becomes convenient to execute the next thread by simply setting z_runq to
+ * z_runq->next.
  */
 struct dnode *z_runq = &z_thread_main.tie.runqueue;
 
 /**
  * @brief Pointer to the head of the timeouts queue.
  *
- * This variable represents a pointer to the head of the timeouts queue. The timeouts
- * queue is a linked list that holds the pending threads in the system. Each thread in the
- * list corresponds to a timeout event and is represented by a `struct titem`.
+ * This variable represents a pointer to the head of the timeouts queue. The
+ * timeouts queue is a linked list that holds the pending threads in the system.
+ * Each thread in the list corresponds to a timeout event and is represented by
+ * a `struct titem`.
  */
 struct titem *z_timeouts_queue = NULL;
 
@@ -156,15 +159,15 @@ struct titem *z_timeouts_queue = NULL;
 /**
  * @brief Number of ticks remaining in the current time slice.
  *
- * This variable represents the number of ticks remaining in the current time slice.
- * A time slice is a predetermined time duration allocated to each thread for execution
- * before being preempted and giving control to another thread.
+ * This variable represents the number of ticks remaining in the current time
+ * slice. A time slice is a predetermined time duration allocated to each thread
+ * for execution before being preempted and giving control to another thread.
  *
- * The variable `z_sched_ticks_remaining` is initialized with the value specified in
- * `CONFIG_KERNEL_TIME_SLICE_TICKS`, which indicates the length of the time slice in
- * ticks. As the thread runs and consumes ticks, the value of this variable decreases.
- * When it reaches zero, the thread may be preempted, and control is given to another
- * thread.
+ * The variable `z_sched_ticks_remaining` is initialized with the value
+ * specified in `CONFIG_KERNEL_TIME_SLICE_TICKS`, which indicates the length of
+ * the time slice in ticks. As the thread runs and consumes ticks, the value of
+ * this variable decreases. When it reaches zero, the thread may be preempted,
+ * and control is given to another thread.
  */
 uint8_t z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
 #endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
@@ -173,12 +176,13 @@ uint8_t z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
 /**
  * @brief Flag indicating execution context.
  *
- * This flag is used to indicate whether the kernel code is currently being executed.
- * Its purpose is to detect if a user handler is being executed from a kernel context,
- * such as within kernel timer or kernel event handlers.
+ * This flag is used to indicate whether the kernel code is currently being
+ * executed. Its purpose is to detect if a user handler is being executed from a
+ * kernel context, such as within kernel timer or kernel event handlers.
  *
- * The variable `z_kernel_mode` is initially set to 0, indicating that the kernel code
- * is not being executed. When the kernel code is entered, this flag is set to 1.
+ * The variable `z_kernel_mode` is initially set to 0, indicating that the
+ * kernel code is not being executed. When the kernel code is entered, this flag
+ * is set to 1.
  */
 uint8_t z_kernel_mode = 0u;
 #endif
@@ -189,9 +193,9 @@ typedef char z_ticks_t[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
 /**
  * @brief Ticks counter for the kernel.
  *
- * This array represents the ticks counter used by the kernel to keep track of time.
- * The counter is implemented as an array of bytes with a specific size determined by
- * `CONFIG_KERNEL_TICKS_COUNTER_SIZE`.
+ * This array represents the ticks counter used by the kernel to keep track of
+ * time. The counter is implemented as an array of bytes with a specific size
+ * determined by `CONFIG_KERNEL_TICKS_COUNTER_SIZE`.
  */
 z_ticks_t z_ticks = {0u};
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
@@ -199,15 +203,17 @@ z_ticks_t z_ticks = {0u};
 /**
  * @brief Start and end pointers for the kernel thread array.
  *
- * These symbols are defined in linker script if CONFIG_AVRTOS_LINKER_SCRIPT is set.
+ * These symbols are defined in linker script if CONFIG_AVRTOS_LINKER_SCRIPT is
+ * set.
  *
- * These external symbols represent the start and end pointers of the kernel thread array.
- * The kernel thread array is a collection of `struct k_thread` instances that represent
- * the threads managed by the kernel.
+ * These external symbols represent the start and end pointers of the kernel
+ * thread array. The kernel thread array is a collection of `struct k_thread`
+ * instances that represent the threads managed by the kernel.
  *
- * The symbol `__k_threads_start` points to the beginning of the kernel thread array, and
- * the symbol `__k_threads_end` points to the end of the kernel thread array. The range
- * between these two pointers inclusively represents all the threads in the kernel.
+ * The symbol `__k_threads_start` points to the beginning of the kernel thread
+ * array, and the symbol `__k_threads_end` points to the end of the kernel
+ * thread array. The range between these two pointers inclusively represents all
+ * the threads in the kernel.
  */
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
@@ -215,9 +221,10 @@ extern struct k_thread __k_threads_end;
 /**
  * @brief Idle thread.
  *
- * This external symbol represents the idle thread in the system. The idle thread is a
- * special system thread that runs when no other threads are eligible for execution.
- * It performs idle-time processing and waits for other threads to become ready.
+ * This external symbol represents the idle thread in the system. The idle
+ * thread is a special system thread that runs when no other threads are
+ * eligible for execution. It performs idle-time processing and waits for other
+ * threads to become ready.
  */
 extern struct k_thread z_thread_idle;
 
@@ -228,9 +235,10 @@ extern struct k_thread z_thread_idle;
 /**
  * @brief Schedule the thread to be executed.
  *
- * This function is responsible for scheduling a thread to be executed. If the IDLE thread
- * is present in the runqueue, it is removed, and the scheduled thread becomes the only
- * thread in the runqueue. The scheduled thread is added to the top of the runqueue.
+ * This function is responsible for scheduling a thread to be executed. If the
+ * IDLE thread is present in the runqueue, it is removed, and the scheduled
+ * thread becomes the only thread in the runqueue. The scheduled thread is added
+ * to the top of the runqueue.
  *
  * Preconditions:
  * - The thread is in the Z_READY state.
@@ -273,34 +281,36 @@ __kernel static void z_schedule(struct k_thread *thread)
 /**
  * @brief Schedule wake-up of the current thread.
  *
- * This function is responsible for scheduling the wake-up of the current thread. The
- * function assumes that the thread is currently suspended (Z_PENDING) and not in the
- * runqueue.
+ * This function is responsible for scheduling the wake-up of the current
+ * thread. The function assumes that the thread is currently suspended
+ * (Z_PENDING) and not in the runqueue.
  *
  * The function takes two parameters:
  * - @p thread: Pointer to the current thread.
- * - @p timeout: Timeout value indicating the time at which the wake-up should occur.
+ * - @p timeout: Timeout value indicating the time at which the wake-up should
+ * occur.
  *
  * Preconditions:
  * - The thread is suspended (Z_PENDING).
  * - The thread is not in the runqueue.
  *
  * Postconditions:
- * - If the @p timeout value is not K_FOREVER, the current thread is marked for wake-up
- *   by setting the Z_THREAD_WAKEUP_SCHED_MSK flag.
- * - The current thread is added to the timeouts queue for wake-up event scheduling using
- *   the provided @p timeout value.
+ * - If the @p timeout value is not K_FOREVER, the current thread is marked for
+ * wake-up by setting the Z_THREAD_WAKEUP_SCHED_MSK flag.
+ * - The current thread is added to the timeouts queue for wake-up event
+ * scheduling using the provided @p timeout value.
  *
- * Note: This is an assembly function implemented in assembly language, and it performs
- * low-level operations required for scheduling the wake-up of a suspended thread.
+ * Note: This is an assembly function implemented in assembly language, and it
+ * performs low-level operations required for scheduling the wake-up of a
+ * suspended thread.
  */
 
 /**
  * @brief Schedules a thread wakeup with a timeout.
  *
- * This function is responsible for scheduling the wake-up of the current thread. The
- * function assumes that the thread is currently suspended (Z_PENDING) and not in the
- * runqueue.
+ * This function is responsible for scheduling the wake-up of the current
+ * thread. The function assumes that the thread is currently suspended
+ * (Z_PENDING) and not in the runqueue.
  *
  * @param timeout The timeout value for the wakeup.
  */
@@ -312,7 +322,7 @@ __kernel static void z_schedule_wake_up(k_timeout_t timeout)
 	if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
 		z_current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
 		z_current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
-		z_current->tie.event.next    = NULL;
+		z_current->tie.event.next	 = NULL;
 		z_tqueue_schedule(&z_timeouts_queue, &z_current->tie.event);
 	}
 }
@@ -348,7 +358,7 @@ __kernel void z_wake_up(struct k_thread *thread)
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
 
-	__K_DBG_WAKEUP(thread);	 // @
+	__K_DBG_WAKEUP(thread); // @
 
 	z_cancel_scheduled_wake_up(thread);
 
@@ -398,10 +408,10 @@ extern void z_thread_idle_create(void);
 /**
  * @brief Initialize the kernel scheduler.
  *
- * This function initializes the kernel scheduler by performing various initialization
- * tasks such as creating the idle thread and initializing other threads based
- * on the configuration. It also sets the state of the idle thread and adds
- * ready threads to the runqueue if necessary.
+ * This function initializes the kernel scheduler by performing various
+ * initialization tasks such as creating the idle thread and initializing other
+ * threads based on the configuration. It also sets the state of the idle thread
+ * and adds ready threads to the runqueue if necessary.
  */
 void z_init_threads(void)
 {
@@ -443,9 +453,10 @@ __STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
  *
  * If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the
  * IDLE thread, the expired thread will be rescheduled only after the current
- * time slice interval finishes. As a result, we may lose a few ticks in the IDLE thread.
- * TODO: Improve this by checking for expired threads more often when we are in the IDLE
- * thread.
+ * time slice interval finishes. As a result, we may lose a few ticks in the
+ * IDLE thread.
+ * TODO: Improve this by checking for expired threads more often when we are in
+ * the IDLE thread.
  *
  * Assumptions: The interrupt flag is cleared when called.
  */
@@ -470,7 +481,7 @@ void z_handle_timeouts(void)
 	while ((ready = tqueue_pop(&z_timeouts_queue)) != NULL) {
 		struct k_thread *const thread = Z_THREAD_FROM_EVENTQUEUE(ready);
 
-		__K_DBG_SCHED_EVENT(thread);  // !
+		__K_DBG_SCHED_EVENT(thread); // !
 
 		/* set ready thread expired flag */
 		thread->flags |= Z_THREAD_TIMER_EXPIRED_MSK;
@@ -626,7 +637,7 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 	__ASSERT_NOTNULL(waitqueue);
 
 	struct k_thread *pending_thread = NULL;
-	struct dnode *tie		= dlist_get(waitqueue);
+	struct dnode *tie				= dlist_get(waitqueue);
 
 	if (DITEM_VALID(waitqueue, tie)) {
 		pending_thread = Z_THREAD_FROM_WAITQUEUE(tie);
@@ -642,7 +653,7 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 }
 
 __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
-						  void *set_swap_data)
+												  void *set_swap_data)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(waitqueue);
@@ -683,8 +694,8 @@ __kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue)
 }
 
 static void z_thread_stack_create(struct k_thread *const thread,
-				  k_thread_entry_t entry,
-				  void *const context_p)
+								  k_thread_entry_t entry,
+								  void *const context_p)
 {
 	struct z_callsaved_ctx *const ctx = Z_THREAD_CTX_START(thread->stack.end);
 
@@ -693,11 +704,11 @@ static void z_thread_stack_create(struct k_thread *const thread,
 		*reg = 0x00u;
 	}
 
-	ctx->sreg	    = 0U;
-	ctx->init_sreg	    = CONFIG_THREAD_DEFAULT_SREG;
+	ctx->sreg			= 0U;
+	ctx->init_sreg		= CONFIG_THREAD_DEFAULT_SREG;
 	ctx->thread_context = (void *)K_SWAP_ENDIANNESS(context_p);
-	ctx->thread_entry   = (void *)K_SWAP_ENDIANNESS(entry);
-	ctx->pc		    = (void *)K_SWAP_ENDIANNESS(z_thread_entry);
+	ctx->thread_entry	= (void *)K_SWAP_ENDIANNESS(entry);
+	ctx->pc				= (void *)K_SWAP_ENDIANNESS(z_thread_entry);
 
 #if defined(__AVR_3_BYTE_PC__)
 	ctx->pch = 0;
@@ -715,12 +726,12 @@ static void z_thread_stack_create(struct k_thread *const thread,
 //
 
 int8_t k_thread_create(struct k_thread *thread,
-		       k_thread_entry_t entry,
-		       void *stack,
-		       size_t stack_size,
-		       uint8_t prio,
-		       void *context_p,
-		       char symbol)
+					   k_thread_entry_t entry,
+					   void *stack,
+					   size_t stack_size,
+					   uint8_t prio,
+					   void *context_p,
+					   char symbol)
 {
 	Z_ARGS_CHECK(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE)
 	{
@@ -929,7 +940,7 @@ void k_wait(k_timeout_t delay, uint8_t mode)
 		case K_WAIT_MODE_BLOCK:
 #ifndef __QEMU__
 			sleep_cpu(); /* idle the thread until next interrupt */
-#endif				     /* __QEMU__ */
+#endif					 /* __QEMU__ */
 			break;
 		case K_WAIT_MODE_IDLE:
 		default:

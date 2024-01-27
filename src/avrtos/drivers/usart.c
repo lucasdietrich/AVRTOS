@@ -10,8 +10,8 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
-#define DRIVERS_UART_ASYNC                                                 \
-	((CONFIG_DRIVERS_USART0_ASYNC) || (CONFIG_DRIVERS_USART1_ASYNC) || \
+#define DRIVERS_UART_ASYNC                                                               \
+	((CONFIG_DRIVERS_USART0_ASYNC) || (CONFIG_DRIVERS_USART1_ASYNC) ||                   \
 	 (CONFIG_DRIVERS_USART2_ASYNC) || (CONFIG_DRIVERS_USART3_ASYNC))
 
 /* same for all USARTs */
@@ -33,7 +33,7 @@
 #define U2Xn  U2X0
 #define UPEn  UPE0
 #define DORn  DOR0
-#define FEn   FE0
+#define FEn	  FE0
 #define UDREn UDRE0
 #define TXCn  TXC0
 #define RXCn  RXC0
@@ -182,7 +182,7 @@ __always_inline struct usart_async_context *usart_get_async_context(UART_Device 
 
 static void rx_interrupt(UART_Device *dev)
 {
-	const char chr			= dev->UDRn;
+	const char chr					= dev->UDRn;
 	struct usart_async_context *ctx = usart_get_async_context(dev);
 
 	ctx->rx.buf[ctx->rx.cur++] = chr;
@@ -305,9 +305,9 @@ int usart_rx_enable(UART_Device *dev, void *buf, size_t size)
 		return -EINVAL;
 	}
 
-	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.buf  = (uint8_t *)buf;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.buf	= (uint8_t *)buf;
 	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.size = size;
-	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.cur  = 0U;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.cur	= 0U;
 
 	/* enable receiver */
 	SET_BIT(dev->UCSRnB, BIT(RXENn));
@@ -333,9 +333,9 @@ int usart_tx(UART_Device *dev, const void *buf, size_t size)
 		return -EINVAL;
 	}
 
-	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.buf  = (const uint8_t *)buf;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.buf	= (const uint8_t *)buf;
 	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.size = size;
-	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.cur  = 0U;
+	usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.cur	= 0U;
 
 	/* enable transmitter */
 	SET_BIT(dev->UCSRnB, BIT(UDRIEn));

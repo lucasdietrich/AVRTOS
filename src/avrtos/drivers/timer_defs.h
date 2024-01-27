@@ -31,10 +31,10 @@
 #endif
 
 #if defined(COMnC0)
-#define TIMER_HAS_CHANNEL_C  1u
+#define TIMER_HAS_CHANNEL_C	 1u
 #define TIMER_CHANNELS_COUNT 3u
 #else
-#define TIMER_HAS_CHANNEL_C  0u
+#define TIMER_HAS_CHANNEL_C	 0u
 #define TIMER_CHANNELS_COUNT 2u
 #endif
 

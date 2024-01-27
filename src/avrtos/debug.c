@@ -27,7 +27,7 @@ uint16_t k_thread_usage(struct k_thread *thread)
 		// empty stack : thread->stack.end == thread->sp
 		uint16_t sp;
 		const uint8_t lock = irq_lock();
-		sp		   = SP;
+		sp				   = SP;
 		irq_unlock(lock);
 		return ((uint16_t)thread->stack.end) - sp;
 	} else {
@@ -92,13 +92,11 @@ void k_thread_dump(struct k_thread *thread)
 
 	serial_transmit(' ');
 
-	serial_transmit((thread->flags & Z_THREAD_PRIO_COOP_MSK) == Z_THREAD_PRIO_COOP
-				? 'C'
-				: 'P');
+	serial_transmit((thread->flags & Z_THREAD_PRIO_COOP_MSK) == Z_THREAD_PRIO_COOP ? 'C'
+																				   : 'P');
 	serial_transmit(' ');
-	serial_transmit((thread->flags & Z_THREAD_PRIO_LEVEL_MSK) == Z_THREAD_PRIO_HIGH
-				? '0'
-				: '1');
+	serial_transmit(
+		(thread->flags & Z_THREAD_PRIO_LEVEL_MSK) == Z_THREAD_PRIO_HIGH ? '0' : '1');
 	serial_transmit(' ');
 	serial_transmit(thread->flags & Z_THREAD_SCHED_LOCKED_MSK ? 'S' : '_');
 	serial_transmit(thread->flags & Z_THREAD_TIMER_EXPIRED_MSK ? 'X' : '_');
@@ -117,8 +115,7 @@ void k_thread_dump(struct k_thread *thread)
 void *z_thread_get_return_addr(struct k_thread *thread)
 {
 	if (thread == z_current) {
-		uint16_t return_addr_reverted =
-			*((uint16_t *)((uint16_t)thread->stack.end - 2u));
+		uint16_t return_addr_reverted = *((uint16_t *)((uint16_t)thread->stack.end - 2u));
 
 		return (void *)K_SWAP_ENDIANNESS(return_addr_reverted);
 	}
@@ -151,8 +148,8 @@ void z_sem_debug(struct k_sem *sem)
 	uint8_t limit = sem->limit;
 
 	const uint8_t lock = irq_lock();
-	count		   = sem->count;
-	limit		   = sem->limit;
+	count			   = sem->count;
+	limit			   = sem->limit;
 	irq_unlock(lock);
 
 	serial_print_p(PSTR("K_SEM "));

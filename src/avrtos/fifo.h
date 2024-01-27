@@ -25,13 +25,13 @@ extern "C" {
  * Waitqueue list contains all threads pending for a fifo item.
  */
 struct k_fifo {
-	struct slist queue;	 // fifo reference to head item
-	struct dnode waitqueue;	 // waitqueue of thread pending to get an item
+	struct slist queue;		// fifo reference to head item
+	struct dnode waitqueue; // waitqueue of thread pending to get an item
 };
 
-#define K_FIFO_INIT(fifo)                                                      \
-	{                                                                      \
-		.queue = SLIST_INIT(), .waitqueue = DLIST_INIT(fifo.waitqueue) \
+#define K_FIFO_INIT(fifo)                                                                \
+	{                                                                                    \
+		.queue = SLIST_INIT(), .waitqueue = DLIST_INIT(fifo.waitqueue)                   \
 	}
 
 #define K_FIFO_DEFINE(fifo_name) struct k_fifo fifo_name = K_FIFO_INIT(fifo_name)

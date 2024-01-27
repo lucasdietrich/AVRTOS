@@ -18,9 +18,9 @@ struct k_event_q {
 	struct titem *first;
 };
 
-#define K_EVENT_Q_INIT()       \
-	{                      \
-		.first = NULL, \
+#define K_EVENT_Q_INIT()                                                                 \
+	{                                                                                    \
+		.first = NULL,                                                                   \
 	}
 #define K_EVENT_Q_DEFINE(name) struct k_event_q name = K_EVENT_Q_INIT()
 
@@ -63,7 +63,7 @@ int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 	Z_ARGS_CHECK(!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
 #endif
 
-	int8_t ret	   = 0;
+	int8_t ret		   = 0;
 	const uint8_t lock = irq_lock();
 
 	if (event->scheduled) {
@@ -88,7 +88,7 @@ int8_t k_event_cancel(struct k_event *event)
 {
 	Z_ARGS_CHECK(event) return -EINVAL;
 
-	int ret		   = 0;
+	int ret			   = 0;
 	const uint8_t lock = irq_lock();
 
 	if (!event->scheduled) {

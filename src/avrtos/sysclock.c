@@ -25,14 +25,14 @@
 #define PRESCALER_VALUE 1
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 8LU, TIMER_MAX_COUNTER)
 #define PRESCALER_VALUE 8
-#elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 32LU, \
-			      TIMER_MAX_COUNTER) &&                   \
+#elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 32LU,                    \
+							  TIMER_MAX_COUNTER) &&                                      \
 	(CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2)
 #define PRESCALER_VALUE 32
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 64LU, TIMER_MAX_COUNTER)
 #define PRESCALER_VALUE 64
-#elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 128LU, \
-			      TIMER_MAX_COUNTER) &&                    \
+#elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 128LU,                   \
+							  TIMER_MAX_COUNTER) &&                                      \
 	(CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2)
 #define PRESCALER_VALUE 128
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 256LU, TIMER_MAX_COUNTER)
@@ -89,12 +89,12 @@
 #if defined(__QEMU__) && TIMER_INDEX_IS_8BITS(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
 #error "QEMU emulator detected, only 16 bits timers are available"
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER >= 4
-#warning \
+#warning                                                                                 \
 	"In order to use timer 4 or 5 with QEMU <= 8.0.2, you'll need to apply patch located at \
 scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch to qemu"
 #endif
 
-#define COUNTER_VALUE \
+#define COUNTER_VALUE                                                                    \
 	TIMER_CALC_COUNTER_VALUE(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
 
 void z_init_sysclock(void)

@@ -22,7 +22,7 @@
 
 #if defined(I2C0_DEVICE) && CONFIG_I2C0_ENABLED
 #define I2C0_DEVICE_ENABLED 1
-#define I2C0_INDEX	    0
+#define I2C0_INDEX			0
 #else
 #define I2C0_DEVICE_ENABLED 0
 #endif
@@ -44,9 +44,9 @@
 #define TWI_INT_MASK	(CONFIG_I2C_INTERRUPT_DRIVEN ? BIT(TWIE) : 0u)
 #define TWI_ENABLE_MASK (BIT(TWINT) | BIT(TWEN) | TWI_INT_MASK)
 
-#define TWI_START(_dev)	      _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTA);
-#define TWI_STOP(_dev)	      _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTO)
-#define TWI_RESET(_dev)	      _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTO) | BIT(TWSTA)
+#define TWI_START(_dev)		  _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTA);
+#define TWI_STOP(_dev)		  _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTO)
+#define TWI_RESET(_dev)		  _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTO) | BIT(TWSTA)
 #define TWI_REPLY(_dev, _ack) _dev->TWCRn = TWI_ENABLE_MASK | (_ack ? BIT(TWEA) : 0u)
 
 #define PRESCALER_VALUE(_prescaler) (1 << (_prescaler << 1))
@@ -60,7 +60,7 @@ typedef enum {
 
 struct i2c_context {
 	uint8_t *buf;
-	uint8_t sla_w;	// Address already shifted by 1 + write bit
+	uint8_t sla_w; // Address already shifted by 1 + write bit
 
 	volatile i2c_state_t state : 2u;
 	uint8_t buf_len : CONFIG_I2C_MAX_BUF_LEN_BITS;
@@ -68,16 +68,16 @@ struct i2c_context {
 
 #if CONFIG_I2C_LAST_ERROR
 	i2c_error_t error;
-#endif	// CONFIG_I2C_LAST_ERROR
+#endif // CONFIG_I2C_LAST_ERROR
 };
 
 #if CONFIG_I2C_LAST_ERROR
 #define set_error(_x, _err) (_x)->error = _err
-#define get_error(_x)	    (_x)->error
+#define get_error(_x)		(_x)->error
 #else
 #define set_error(_x, _err)
 #define get_error(_x) I2C_ERROR_NONE
-#endif	// CONFIG_I2C_LAST_ERROR
+#endif // CONFIG_I2C_LAST_ERROR
 
 static struct i2c_context i2c_contexts[MCU_I2C_COUNT];
 
@@ -87,11 +87,11 @@ static int8_t i2c_get_device_index(const I2C_Device *dev)
 #if I2C0_DEVICE_ENABLED
 	case I2C0_BASE_ADDR:
 		return I2C0_INDEX;
-#endif	// I2C0_DEVICE_ENABLED
+#endif // I2C0_DEVICE_ENABLED
 #if I2C1_DEVICE_ENABLED
 	case I2C1_BASE_ADDR:
 		return I2C1_INDEX;
-#endif	// I2C1_DEVICE_ENABLED
+#endif // I2C1_DEVICE_ENABLED
 	default:
 		return -EBADF;
 	}
@@ -113,12 +113,12 @@ static void prr_enable(uint8_t dev_index)
 	case I2C0_INDEX:
 		PRR0 &= ~BIT(PRTWI0);
 		break;
-#endif	// I2C0_DEVICE_ENABLED
+#endif // I2C0_DEVICE_ENABLED
 #if I2C1_DEVICE_ENABLED
 	case I2C1_INDEX:
 		PRR1 &= ~BIT(PRTWI1);
 		break;
-#endif	// I2C1_DEVICE_ENABLED
+#endif // I2C1_DEVICE_ENABLED
 	default:
 		break;
 	}
@@ -134,13 +134,13 @@ static void i2c_gpio_setup(uint8_t dev_index, bool enable)
 		gpiol_pin_init(GPIOC_DEVICE, 4u, GPIO_INPUT, pullup);
 		gpiol_pin_init(GPIOC_DEVICE, 5u, GPIO_INPUT, pullup);
 		break;
-#endif	// I2C0_DEVICE_ENABLED
+#endif // I2C0_DEVICE_ENABLED
 #if I2C1_DEVICE_ENABLED
 	case I2C1_INDEX:
 		gpiol_pin_init(GPIOE_DEVICE, 0u, GPIO_INPUT, pullup);
 		gpiol_pin_init(GPIOE_DEVICE, 1u, GPIO_INPUT, pullup);
 		break;
-#endif	// I2C1_DEVICE_ENABLED
+#endif // I2C1_DEVICE_ENABLED
 	default:
 		break;
 	}
@@ -160,18 +160,18 @@ int8_t i2c_init(I2C_Device *dev, struct i2c_config config)
 	prr_enable(dev_index);
 
 	// freq = CPU_FREQ / (16 + 2 * TWBR * prescaler)
-	dev->TWBRn = ((F_CPU / CONFIG_I2C_FREQ) - 16) /
-		     (2 * PRESCALER_VALUE(config.prescaler));
+	dev->TWBRn =
+		((F_CPU / CONFIG_I2C_FREQ) - 16) / (2 * PRESCALER_VALUE(config.prescaler));
 
 	// set internal pullups on SDA, SCL
 	i2c_gpio_setup(dev_index, true);
 
-	dev->TWARn  = 0u;  // TODO
-	dev->TWAMRn = 0u;  // TODO
+	dev->TWARn	= 0u; // TODO
+	dev->TWAMRn = 0u; // TODO
 
-	dev->TWCRn = BIT(TWINT) | BIT(TWEN);  // Enable device and interrupt
+	dev->TWCRn					  = BIT(TWINT) | BIT(TWEN); // Enable device and interrupt
 	i2c_contexts[dev_index].state = READY;
-	ret			      = 0;
+	ret							  = 0;
 
 exit:
 	return ret;
@@ -188,11 +188,11 @@ int8_t i2c_deinit(I2C_Device *dev)
 		goto exit;
 	}
 
-	dev->TWCRn  = 0u;
-	dev->TWBRn  = 0u;
-	dev->TWSRn  = 0u;
-	dev->TWARn  = 0x02;
-	dev->TWDRn  = 0x01;
+	dev->TWCRn	= 0u;
+	dev->TWBRn	= 0u;
+	dev->TWSRn	= 0u;
+	dev->TWARn	= 0x02;
+	dev->TWDRn	= 0x01;
 	dev->TWAMRn = 0u;
 
 	// clear internal pullups on SDA, SCL
@@ -233,16 +233,16 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 #endif
 
 	switch (status) {
-	case TW_START:	// Start condition transmitted
+	case TW_START: // Start condition transmitted
 	case TW_REP_START:
 		dev->TWDRn = x->sla_w;
 		TWI_REPLY(dev, 1u);
 		/* Next expected interrupt is TW_MT_SLA_ACK */
 		break;
 
-	case TW_MT_DATA_ACK:  // Data transmitted, ACK received
+	case TW_MT_DATA_ACK: // Data transmitted, ACK received
 		x->cursor++;
-	case TW_MT_SLA_ACK:  // SLA+W transmitted, ACK received
+	case TW_MT_SLA_ACK: // SLA+W transmitted, ACK received
 		if (x->cursor < x->buf_len) {
 			dev->TWDRn = x->buf[x->cursor++];
 			TWI_REPLY(dev, 1u);
@@ -253,23 +253,22 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 		}
 		break;
 
-	case TW_MR_DATA_ACK:  // Data received, ACK returned
+	case TW_MR_DATA_ACK: // Data received, ACK returned
 		x->buf[x->cursor++] = dev->TWDRn;
-	case TW_MR_SLA_ACK:  // SLA+R transmitted, ACK received
+	case TW_MR_SLA_ACK: // SLA+R transmitted, ACK received
 		/*  ACK if more data is expected (NACK otherwise) */
 		TWI_REPLY(dev, x->buf_len - x->cursor > 1u);
 		break;
 
-	case TW_MR_DATA_NACK:  // Data received, NACK returned
+	case TW_MR_DATA_NACK: // Data received, NACK returned
 		x->buf[x->cursor++] = dev->TWDRn;
 		transfer_stop(dev, x);
 		/* Reception complete */
 		break;
 
-	case TW_MT_SLA_NACK:   // SLA+W transmitted, NACK received
-	case TW_MT_DATA_NACK:  // Data transmitted, NACK received
-		set_error(x,
-			  (status == TW_MT_SLA_NACK) ? I2C_ERROR_ADDR : I2C_ERROR_DATA);
+	case TW_MT_SLA_NACK:  // SLA+W transmitted, NACK received
+	case TW_MT_DATA_NACK: // Data transmitted, NACK received
+		set_error(x, (status == TW_MT_SLA_NACK) ? I2C_ERROR_ADDR : I2C_ERROR_DATA);
 		transfer_stop(dev, x);
 		/* Transmission complete with error */
 		break;
@@ -303,13 +302,10 @@ __always_inline void i2c_state_machine_loop(I2C_Device *dev, struct i2c_context 
 	} while (x->state != READY);
 }
 
-static int8_t i2c_run(I2C_Device *dev,
-		      uint8_t addr,
-		      uint8_t *data,
-		      uint8_t len,
-		      i2c_state_t state)
+static int8_t
+i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len, i2c_state_t state)
 {
-	int8_t ret		    = 0;
+	int8_t ret					= 0;
 	struct i2c_context *const x = i2c_get_context(dev);
 
 	Z_ARGS_CHECK(x && data && (len <= I2C_MAX_BUF_LEN)) return -EINVAL;
@@ -348,10 +344,8 @@ static int8_t i2c_run(I2C_Device *dev,
 	return ret;
 }
 
-int8_t i2c_master_transmit(I2C_Device *dev,
-			   uint8_t addr,
-			   const uint8_t *data,
-			   uint8_t len)
+int8_t
+i2c_master_transmit(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t len)
 {
 	return i2c_run(dev, addr, (uint8_t *)data, len, MASTER_TX);
 }
@@ -394,13 +388,13 @@ ISR(TWI0_vect)
 {
 	i2c_state_machine(I2C0_DEVICE, &i2c_contexts[I2C0_INDEX]);
 }
-#endif	// I2C0_DEVICE_ENABLED
+#endif // I2C0_DEVICE_ENABLED
 
 #if I2C1_DEVICE_ENABLED
 ISR(TWI1_vect)
 {
 	i2c_state_machine(I2C0_DEVICE, &i2c_contexts[I2C1_INDEX]);
 }
-#endif	// I2C1_DEVICE_ENABLED
-#endif	// CONFIG_I2C_INTERRUPT_DRIVEN
-#endif	// CONFIG_I2C_DRIVER_ENABLE
+#endif // I2C1_DEVICE_ENABLED
+#endif // CONFIG_I2C_INTERRUPT_DRIVEN
+#endif // CONFIG_I2C_DRIVER_ENABLE

@@ -41,7 +41,7 @@ void dlist_insert(struct dnode *successor, struct dnode *node)
 	prev->next = node;
 	node->prev = prev;
 
-	node->next	= successor;
+	node->next		= successor;
 	successor->prev = node;
 }
 

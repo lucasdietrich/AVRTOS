@@ -16,10 +16,11 @@
 /**
  * @brief Thread entry point function type.
  *
- * The `k_thread_entry_t` type is a function pointer type representing a thread entry
- * point function. A thread entry point function is a function that serves as the
- * starting point for the execution of a thread. It takes a single `void*` parameter
- * used to pass the thread context when the entry function is called.
+ * The `k_thread_entry_t` type is a function pointer type representing a thread
+ * entry point function. A thread entry point function is a function that serves
+ * as the starting point for the execution of a thread. It takes a single
+ * `void*` parameter used to pass the thread context when the entry function is
+ * called.
  *
  * @param context A pointer to the context data for the thread.
  */
@@ -28,42 +29,42 @@ typedef void (*k_thread_entry_t)(void *);
 /**
  * @brief Structure representing a thread.
  *
- * The `struct k_thread` structure represents a thread and defines various properties
- * associated with it, including the stack pointer, thread priority, stack location and
- * size, local storage pointer, and other relevant fields.
+ * The `struct k_thread` structure represents a thread and defines various
+ * properties associated with it, including the stack pointer, thread priority,
+ * stack location and size, local storage pointer, and other relevant fields.
  *
  * This structure is 16 bytes long in its minimal form.
  */
 struct k_thread {
-	void *sp;  // stack pointer, TO KEEP it at the beginning of the structure !
+	void *sp; // stack pointer, TO KEEP it at the beginning of the structure !
 
-	uint8_t flags;	// thread flags
-
-	union {
-		struct dnode runqueue;	// represent the thread in the runqueue (4B)
-		struct titem event;	// represent the thread in the events queue (4B)
-	} tie;	// the thread cannot be in the events_queue and the runqueue at
-		// the same time
+	uint8_t flags; // thread flags
 
 	union {
-		struct dnode wany;    // represent the thread pending on a generic
-				      // object
-		struct dnode wmutex;  // represent the thread pending on an mutex
-		struct dnode wsem;    // represent the thread pending on an semaphore
-		struct dnode wsig;    // represent the thread pending on an signal
-		struct dnode wfifo;   // represent the thread pending on a fifo item
-		struct dnode wmsgq;   // represent the thread pending on a msgq item
-		struct dnode wflags;  // represent the thread pending on a flags item
+		struct dnode runqueue; // represent the thread in the runqueue (4B)
+		struct titem event;	   // represent the thread in the events queue (4B)
+	} tie; // the thread cannot be in the events_queue and the runqueue at
+		   // the same time
+
+	union {
+		struct dnode wany;	 // represent the thread pending on a generic
+							 // object
+		struct dnode wmutex; // represent the thread pending on an mutex
+		struct dnode wsem;	 // represent the thread pending on an semaphore
+		struct dnode wsig;	 // represent the thread pending on an signal
+		struct dnode wfifo;	 // represent the thread pending on a fifo item
+		struct dnode wmsgq;	 // represent the thread pending on a msgq item
+		struct dnode wflags; // represent the thread pending on a flags item
 	};
-	void *swap_data;  // data returned by kernel API's when calling
-			  // z_unpend_first_thread
+	void *swap_data; // data returned by kernel API's when calling
+					 // z_unpend_first_thread
 
 	struct {
-		void *end;    // stack end
-		size_t size;  // stack size
-	} stack;	      // thread stack definition
-	char symbol;	      // 1-letter symbol to name the thread, reserver M (main),
-			      // idle : I (idle)
+		void *end;	 // stack end
+		size_t size; // stack size
+	} stack;		 // thread stack definition
+	char symbol;	 // 1-letter symbol to name the thread, reserver M (main),
+					 // idle : I (idle)
 
 #if CONFIG_KERNEL_IRQ_LOCK_COUNTER
 	/**
@@ -80,8 +81,8 @@ struct k_thread {
 #endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
 
 #if CONFIG_THREAD_ERRNO
-	uint8_t errno;	// Thread errno
-#endif			/* CONFIG_THREAD_ERRNO */
+	uint8_t errno; // Thread errno
+#endif			   /* CONFIG_THREAD_ERRNO */
 };
 
 /**
@@ -170,7 +171,8 @@ struct z_callused_ctx {
 };
 
 /**
- * @brief Represent the registers to be saved during an interrupt before calling the ISR.
+ * @brief Represent the registers to be saved during an interrupt before calling
+ * the ISR.
  */
 struct z_intctx {
 #if Z_ARCH_PC_SIZE == 3

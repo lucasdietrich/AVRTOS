@@ -37,15 +37,15 @@ struct k_prng {
 #define K_PRNG_DEFAULT_LFSR32 0xABCDE
 #define K_PRNG_DEFAULT_LFSR31 0x23456789
 
-#define K_PRNG_INITIALIZER(lfsr32_val, lfsr31_val)         \
-	{                                                  \
-		.lfsr32 = lfsr32_val, .lfsr31 = lfsr31_val \
+#define K_PRNG_INITIALIZER(lfsr32_val, lfsr31_val)                                       \
+	{                                                                                    \
+		.lfsr32 = lfsr32_val, .lfsr31 = lfsr31_val                                       \
 	}
 
-#define K_PRNG_DEFINE(prng_name, lfsr32_val, lfsr31_val) \
+#define K_PRNG_DEFINE(prng_name, lfsr32_val, lfsr31_val)                                 \
 	struct k_prng prng_name = K_PRNG_INITIALIZER(lfsr32_val, lfsr31_val)
 
-#define K_PRNG_DEFINE_DEFAULT(prng_name) \
+#define K_PRNG_DEFINE_DEFAULT(prng_name)                                                 \
 	K_PRNG_DEFINE(prng_name, K_PRNG_DEFAULT_LFSR32, K_PRNG_DEFAULT_LFSR31)
 
 __kernel uint16_t k_prng_get(struct k_prng *prng);

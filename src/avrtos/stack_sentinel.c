@@ -26,7 +26,7 @@ void z_init_thread_stack_sentinel(struct k_thread *thread)
 
 	uint8_t *const stack = K_STACK_START(thread->stack.end, thread->stack.size);
 	for (uint8_t *addr = stack; addr < stack + CONFIG_THREAD_STACK_SENTINEL_SIZE;
-	     addr++) {
+		 addr++) {
 		*addr = CONFIG_THREAD_STACK_SENTINEL_SYMBOL;
 	}
 }
@@ -34,7 +34,7 @@ void z_init_thread_stack_sentinel(struct k_thread *thread)
 void z_init_stacks_sentinel(void)
 {
 	for (struct k_thread *thread = &__k_threads_start; thread < &__k_threads_end;
-	     thread++) {
+		 thread++) {
 		z_init_thread_stack_sentinel(thread);
 	}
 }
@@ -50,7 +50,7 @@ bool k_verify_stack_sentinel(struct k_thread *thread)
 
 	uint8_t *const stack_sent = K_STACK_START(thread->stack.end, thread->stack.size);
 	for (uint8_t *addr = stack_sent;
-	     addr < stack_sent + CONFIG_THREAD_STACK_SENTINEL_SIZE; addr++) {
+		 addr < stack_sent + CONFIG_THREAD_STACK_SENTINEL_SIZE; addr++) {
 		if (*addr != CONFIG_THREAD_STACK_SENTINEL_SYMBOL) {
 			return false;
 		}

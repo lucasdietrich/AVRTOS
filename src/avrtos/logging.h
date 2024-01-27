@@ -26,22 +26,22 @@
 
 #if CONFIG_LOGGING_SUBSYSTEM
 
-#define _LOG(level, fmt, ...)                                             \
-	do {                                                              \
-		if ((level) <= (LOG_LEVEL)) {                             \
-			printf_P((const char *)PSTR(fmt), ##__VA_ARGS__); \
-		}                                                         \
+#define _LOG(level, fmt, ...)                                                            \
+	do {                                                                                 \
+		if ((level) <= (LOG_LEVEL)) {                                                    \
+			printf_P((const char *)PSTR(fmt), ##__VA_ARGS__);                            \
+		}                                                                                \
 	} while (0)
 
 /* line continuation */
-#define _LOG_HEXDUMP(level, data, len)                                         \
-	do {                                                                   \
-		if ((level) <= (LOG_LEVEL)) {                                  \
-			for (unsigned int i = 0; i < (len); i++) {             \
-				printf_P(PSTR("%02x "), ((uint8_t *)data)[i]); \
-			}                                                      \
-			printf_P(PSTR("\n"));                                  \
-		}                                                              \
+#define _LOG_HEXDUMP(level, data, len)                                                   \
+	do {                                                                                 \
+		if ((level) <= (LOG_LEVEL)) {                                                    \
+			for (unsigned int i = 0; i < (len); i++) {                                   \
+				printf_P(PSTR("%02x "), ((uint8_t *)data)[i]);                           \
+			}                                                                            \
+			printf_P(PSTR("\n"));                                                        \
+		}                                                                                \
 	} while (0)
 
 #else

@@ -18,25 +18,25 @@ extern "C" {
 
 struct k_msgq {
 	struct dnode waitqueue; /* waitqueue for threads waiting for a message */
-	size_t msg_size;	/* Size of a message */
-	uint8_t max_msgs;	/* Maximum number of messages */
-	uint8_t used_msgs;	/* Number of used messages */
+	size_t msg_size;		/* Size of a message */
+	uint8_t max_msgs;		/* Maximum number of messages */
+	uint8_t used_msgs;		/* Number of used messages */
 	void *buf_start;
 	void *buf_end;
 	void *read_cursor;
 	void *write_cursor;
 };
 
-#define K_MSGQ_INIT(_name, _buffer, _msg_size, _max_msgs)                               \
-	{                                                                               \
-		.waitqueue = DLIST_INIT(_name.waitqueue), .msg_size = _msg_size,        \
-		.max_msgs = _max_msgs, .used_msgs = 0, .buf_start = _buffer,            \
-		.buf_end = _buffer + (_msg_size) * (_max_msgs), .read_cursor = _buffer, \
-		.write_cursor = _buffer,                                                \
+#define K_MSGQ_INIT(_name, _buffer, _msg_size, _max_msgs)                                \
+	{                                                                                    \
+		.waitqueue = DLIST_INIT(_name.waitqueue), .msg_size = _msg_size,                 \
+		.max_msgs = _max_msgs, .used_msgs = 0, .buf_start = _buffer,                     \
+		.buf_end = _buffer + (_msg_size) * (_max_msgs), .read_cursor = _buffer,          \
+		.write_cursor = _buffer,                                                         \
 	}
 
-#define K_MSGQ_DEFINE(_name, _msg_size, _max_msgs)             \
-	uint8_t z_msgq_buf_##_name[(_msg_size) * (_max_msgs)]; \
+#define K_MSGQ_DEFINE(_name, _msg_size, _max_msgs)                                       \
+	uint8_t z_msgq_buf_##_name[(_msg_size) * (_max_msgs)];                               \
 	struct k_msgq _name = K_MSGQ_INIT(_name, z_msgq_buf_##_name, _msg_size, _max_msgs)
 
 /**
@@ -48,9 +48,9 @@ struct k_msgq {
  * @param max_msgs
  */
 __kernel int8_t k_msgq_init(struct k_msgq *msgq,
-			    char *buffer,
-			    size_t msg_size,
-			    uint32_t max_msgs);
+							char *buffer,
+							size_t msg_size,
+							uint32_t max_msgs);
 
 /**
  * @brief Try to append the message @a data to the MsgQ @a msgq.

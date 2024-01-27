@@ -35,16 +35,15 @@ struct k_timer {
 	k_timer_handler_t handler;
 };
 
-#define K_TIMER_INIT(timer_handler, timeout_ms, starting_delay)           \
-	{                                                                 \
-		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms, \
-		.handler = timer_handler,                                 \
+#define K_TIMER_INIT(timer_handler, timeout_ms, starting_delay)                          \
+	{                                                                                    \
+		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms,                        \
+		.handler = timer_handler,                                                        \
 	}
 
-#define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay) \
-	Z_LINK_KERNEL_SECTION(.k_timers)                                \
-	static struct k_timer timer_name =                              \
-		K_TIMER_INIT(handler, timeout_ms, starting_delay)
+#define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay)                  \
+	Z_LINK_KERNEL_SECTION(.k_timers)                                                     \
+	static struct k_timer timer_name = K_TIMER_INIT(handler, timeout_ms, starting_delay)
 
 #define K_TIMER_STOPPED ((k_delta_t)-1)
 
@@ -55,9 +54,9 @@ __kernel void z_timers_process(void);
 __kernel void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay);
 
 __kernel void k_timer_init(struct k_timer *timer,
-			   k_timer_handler_t handler,
-			   k_timeout_t timeout,
-			   k_timeout_t starting_delay);
+						   k_timer_handler_t handler,
+						   k_timeout_t timeout,
+						   k_timeout_t starting_delay);
 
 __kernel bool k_timer_started(struct k_timer *timer);
 

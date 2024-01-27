@@ -28,13 +28,13 @@ struct k_ring {
 	uint8_t size;
 };
 
-#define K_RING_INIT(_buf, _size)                                 \
-	{                                                        \
-		.buffer = _buf, .r = 0u, .w = 0u, .size = _size, \
+#define K_RING_INIT(_buf, _size)                                                         \
+	{                                                                                    \
+		.buffer = _buf, .r = 0u, .w = 0u, .size = _size,                                 \
 	}
 
-#define K_RING_DEFINE(_name, _size) \
-	uint8_t _name##_buf[_size]; \
+#define K_RING_DEFINE(_name, _size)                                                      \
+	uint8_t _name##_buf[_size];                                                          \
 	struct k_ring _name = K_RING_INIT(_name##_buf, _size)
 
 /**

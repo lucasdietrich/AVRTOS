@@ -5,7 +5,7 @@
 		"CMAKE_GENERATOR": "Unix Makefiles",
 		"CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/avr6-atmega2560.cmake",
 	},
-	"editor.tabSize": 8,
+	"editor.tabSize": 4,
 	"editor.rulers": [80],
 	"files.associations": {
 		"*.jinja": "python",

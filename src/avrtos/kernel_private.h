@@ -26,15 +26,14 @@ extern "C" {
  */
 __always_inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
 {
-	thread->flags =
-		(thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
+	thread->flags = (thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
 }
 
 /**
  * @brief Get the state of a thread.
  *
- * This function retrieves the state of a thread by extracting the relevant bits from the
- * flags.
+ * This function retrieves the state of a thread by extracting the relevant bits
+ * from the flags.
  *
  * @param thread Pointer to the thread structure.
  * @return The state of the thread.
@@ -48,9 +47,9 @@ __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
  * @def THREAD_IS_IDLE(_thread)
  * @brief Checks if a thread is the idle thread.
  *
- * This macro checks whether a given thread pointer corresponds to the idle thread.
- * The idle thread is a special system thread that runs when no other threads are eligible
- * for execution.
+ * This macro checks whether a given thread pointer corresponds to the idle
+ * thread. The idle thread is a special system thread that runs when no other
+ * threads are eligible for execution.
  *
  * @param _thread Pointer to the thread structure to be checked.
  * @return 1 if the thread is the idle thread, 0 otherwise.
@@ -65,7 +64,8 @@ __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
  * @def THREAD_IS_MAIN(_thread)
  * @brief Checks if a thread is the main thread.
  *
- * This macro checks whether a given thread pointer corresponds to the main thread.
+ * This macro checks whether a given thread pointer corresponds to the main
+ * thread.
  *
  * @param _thread Pointer to the thread structure to be checked.
  * @return 1 if the thread is the main thread, 0 otherwise.
@@ -75,8 +75,8 @@ __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
 /**
  * @brief Perform a thread switch (assembly function).
  *
- * This function performs a context switch between two threads. The steps involved in the
- * thread switch are as follows:
+ * This function performs a context switch between two threads. The steps
+ * involved in the thread switch are as follows:
  *
  * 1. Save the context of the first thread.
  * 2. Store the stack pointer (SP) of the first thread to its structure.
@@ -140,7 +140,7 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue);
  * @return thread pointer if a thread got the object, NULL otherwise
  */
 __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
-						  void *set_swap_data);
+												  void *set_swap_data);
 
 /**
  * @brief Cancel the first pending thread on a waitqueue.

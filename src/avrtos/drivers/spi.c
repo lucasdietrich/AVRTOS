@@ -14,13 +14,13 @@
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__)
 #define SPI_MOSI_PIN 3u
 #define SPI_MISO_PIN 4u
-#define SPI_SCK_PIN  5u
-#define SPI_SS_PIN   2u
+#define SPI_SCK_PIN	 5u
+#define SPI_SS_PIN	 2u
 #elif defined(__AVR_ATmega2560__)
 #define SPI_MOSI_PIN 2u
 #define SPI_MISO_PIN 3u
-#define SPI_SCK_PIN  1u
-#define SPI_SS_PIN   0u
+#define SPI_SCK_PIN	 1u
+#define SPI_SS_PIN	 0u
 #endif
 
 #define SPI2X_MASK BIT(SPI2X)
@@ -39,21 +39,21 @@ int8_t spi_init(struct spi_config config)
 
 	if (config.mode == SPI_MODE_MASTER) {
 		gpiol_pin_set_direction(GPIOB, SPI_SCK_PIN,
-					GPIO_MODE_OUTPUT);  // SCK
+								GPIO_MODE_OUTPUT); // SCK
 		gpiol_pin_set_direction(GPIOB, SPI_MOSI_PIN,
-					GPIO_MODE_OUTPUT);  // MOSI
+								GPIO_MODE_OUTPUT); // MOSI
 		gpiol_pin_set_direction(GPIOB, SPI_MISO_PIN,
-					GPIO_MODE_INPUT);  // MISO
+								GPIO_MODE_INPUT); // MISO
 	} else {
 		gpiol_pin_set_direction(GPIOB, SPI_SS_PIN,
-					GPIO_MODE_INPUT);  // SS
+								GPIO_MODE_INPUT); // SS
 
 		gpiol_pin_set_direction(GPIOB, SPI_SCK_PIN,
-					GPIO_MODE_INPUT);  // SCK
+								GPIO_MODE_INPUT); // SCK
 		gpiol_pin_set_direction(GPIOB, SPI_MOSI_PIN,
-					GPIO_MODE_INPUT);  // MOSI
+								GPIO_MODE_INPUT); // MOSI
 		gpiol_pin_set_direction(GPIOB, SPI_MISO_PIN,
-					GPIO_MODE_OUTPUT);  // MISO
+								GPIO_MODE_OUTPUT); // MISO
 	}
 
 	spi_regs_restore(&stg);
@@ -135,17 +135,17 @@ __always_inline void slave_unselect(const struct spi_slave *slave)
 }
 
 int8_t spi_slave_init(struct spi_slave *slave,
-		      GPIO_Device *cs_port,
-		      uint8_t cs_pin,
-		      uint8_t active_state,
-		      const struct spi_regs *regs)
+					  GPIO_Device *cs_port,
+					  uint8_t cs_pin,
+					  uint8_t active_state,
+					  const struct spi_regs *regs)
 {
 	Z_ARGS_CHECK(slave && regs && cs_port && cs_pin <= PIN7) return -EINVAL;
 
-	slave->cs_port	    = cs_port;
-	slave->cs_pin	    = cs_pin;
+	slave->cs_port		= cs_port;
+	slave->cs_pin		= cs_pin;
 	slave->active_state = active_state;
-	slave->regs	    = *regs;
+	slave->regs			= *regs;
 
 	return 0;
 }
@@ -155,7 +155,7 @@ int8_t spi_slave_ss_init(const struct spi_slave *slave)
 	Z_ARGS_CHECK(slave) return -EINVAL;
 
 	gpio_pin_init(slave->cs_port, slave->cs_pin, GPIO_MODE_OUTPUT,
-		      (slave->active_state == GPIO_LOW) ? GPIO_HIGH : GPIO_LOW);
+				  (slave->active_state == GPIO_LOW) ? GPIO_HIGH : GPIO_LOW);
 
 	return 0;
 }
@@ -176,12 +176,12 @@ char spi_slave_transceive(const struct spi_slave *slave, char tx)
 void spi_slave_transceive_buf(const struct spi_slave *slave, char *rxtx, uint8_t len)
 {
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_state ? GPIO_LOW : GPIO_HIGH);
+						 slave->active_state ? GPIO_LOW : GPIO_HIGH);
 
 	spi_transceive_buf(rxtx, len);
 
 	gpio_pin_write_state(slave->cs_port, slave->cs_pin,
-			     slave->active_state ? GPIO_HIGH : GPIO_LOW);
+						 slave->active_state ? GPIO_HIGH : GPIO_LOW);
 }
 
 #if CONFIG_SPI_ASYNC
@@ -212,7 +212,7 @@ int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback)
 	if (spi_async_inprogress()) return -EBUSY;
 
 	spi_callback = callback;
-	SPI->SPDRn   = first_tx;
+	SPI->SPDRn	 = first_tx;
 	SPI->SPCRn |= BIT(SPIE);
 
 	return 0;
@@ -227,7 +227,7 @@ int8_t spi_cancel_async(void)
 {
 	if (spi_async_inprogress()) {
 		SPI->SPCRn &= ~BIT(SPIE); /* Disable interrupt */
-		spi_callback(NULL);	  /* Notify cancelation */
+		spi_callback(NULL);		  /* Notify cancelation */
 
 		// required ?
 		SPI->SPSRn |= BIT(SPIF); /* Clear SPIF flag */

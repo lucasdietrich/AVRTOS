@@ -14,12 +14,12 @@
 #define ISCn1 1u
 
 #define ISC_LOW_LEVEL 0u
-#define ISC_EDGE      1u
-#define ISC_FALLING   2u
-#define ISC_RISING    3u
+#define ISC_EDGE	  1u
+#define ISC_FALLING	  2u
+#define ISC_RISING	  3u
 
-#define PCINT_0_7   0u
-#define PCINT_8_15  1u
+#define PCINT_0_7	0u
+#define PCINT_8_15	1u
 #define PCINT_16_23 2u
 
 #define PCINT_0_7_vect	 PCINT0_vect
@@ -30,11 +30,11 @@
 #define GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev)	 ((_dev) == GPIOC)
 #define GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ((_dev) == GPIOD)
 
-#define GPIO_PCINT_GROUP(_dev)                                    \
-	(GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev)	    ? PCINT_0_7   \
-	 : GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev)  ? PCINT_8_15  \
-	 : GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ? PCINT_16_23 \
-						    : 0xFFu)
+#define GPIO_PCINT_GROUP(_dev)                                                           \
+	(GPIO_EXTI_DEV_GROUP_IS_PCINT_0_7(_dev)		? PCINT_0_7                              \
+	 : GPIO_EXTI_DEV_GROUP_IS_PCINT_8_15(_dev)	? PCINT_8_15                             \
+	 : GPIO_EXTI_DEV_GROUP_IS_PCINT_16_23(_dev) ? PCINT_16_23                            \
+												: 0xFFu)
 
 #if defined(__AVR_ATmega2560__)
 #define EXTI_COUNT 8u
@@ -180,7 +180,8 @@ __always_inline void pci_pin_disable_group_line(uint8_t group, uint8_t line)
  * @param pci Pin change interrupt number
  *
  * Example for ATmega328P :
- * `pci_pin_enable(23)` is equivalent to `pci_pin_enable_group_line(2, 7)` # PCINT23
+ * `pci_pin_enable(23)` is equivalent to `pci_pin_enable_group_line(2, 7)` #
+ * PCINT23
  */
 __always_inline void pci_pin_enable(uint8_t pci)
 {
@@ -193,7 +194,8 @@ __always_inline void pci_pin_enable(uint8_t pci)
  * @param pci Pin change interrupt number
  *
  * Example for ATmega328P :
- * `pci_pin_disable(23)` is equivalent to `pci_pin_disable_group_line(2, 7)` # PCINT23
+ * `pci_pin_disable(23)` is equivalent to `pci_pin_disable_group_line(2, 7)` #
+ * PCINT23
  */
 __always_inline void pci_pin_disable(uint8_t pci)
 {

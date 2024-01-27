@@ -20,13 +20,13 @@ extern "C" {
 #define K_POLL_STATE_NOT_READY 0x00
 #define K_POLL_STATE_SIGNALED  0x01
 
-#define K_SIGNAL_INIT(sig)                                     \
-	{                                                      \
-		.signal = 0u, .flags = K_POLL_STATE_NOT_READY, \
-		.waitqueue = DLIST_INIT(sig.waitqueue)         \
+#define K_SIGNAL_INIT(sig)                                                               \
+	{                                                                                    \
+		.signal = 0u, .flags = K_POLL_STATE_NOT_READY,                                   \
+		.waitqueue = DLIST_INIT(sig.waitqueue)                                           \
 	}
 
-#define K_SIGNAL_DEFINE(signal_name) \
+#define K_SIGNAL_DEFINE(signal_name)                                                     \
 	struct k_signal signal_name = K_SIGNAL_INIT(signal_name)
 
 #define K_SIGNAL_SET_UNREADY(signal) (signal)->flags = K_POLL_STATE_NOT_READY

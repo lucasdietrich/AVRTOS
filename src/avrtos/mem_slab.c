@@ -16,7 +16,7 @@
 static void z_create_free_list(struct k_mem_slab *slab)
 {
 	slab->free_list = NULL;
-	uint8_t *p	= slab->buffer;
+	uint8_t *p		= slab->buffer;
 
 	for (uint8_t i = 0u; i < slab->count; i++) {
 		/* equivalent to "*(void**) p = slab->free_list;" */
@@ -46,9 +46,9 @@ void z_mem_slab_init_module(void)
 #endif
 
 int8_t k_mem_slab_init(struct k_mem_slab *slab,
-		       void *buffer,
-		       size_t block_size,
-		       uint8_t num_blocks)
+					   void *buffer,
+					   size_t block_size,
+					   uint8_t num_blocks)
 {
 	/* we need at least 2 bytes to store the next
 	 * free block address if not allocated
@@ -58,7 +58,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 	dlist_init(&slab->waitqueue);
 
 	slab->block_size = block_size;
-	slab->count	 = num_blocks;
+	slab->count		 = num_blocks;
 	slab->buffer	 = buffer;
 
 	z_create_free_list(slab);
@@ -87,7 +87,7 @@ __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab)
  */
 __always_inline int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
-	*mem		= (uint8_t *)slab->free_list;
+	*mem			= (uint8_t *)slab->free_list;
 	slab->free_list = slab->free_list->next;
 
 	return 0;
@@ -145,7 +145,7 @@ __kernel static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
 	/* eq to "**(struct snode***)mem = slab->free_list;" */
 
 	((struct snode *)mem)->next = slab->free_list;
-	slab->free_list		    = (struct snode *)mem;
+	slab->free_list				= (struct snode *)mem;
 
 	return 0;
 }

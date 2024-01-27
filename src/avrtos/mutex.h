@@ -30,9 +30,9 @@ struct k_mutex {
 	struct k_thread *owner;
 };
 
-#define K_MUTEX_INIT(mutex)                                                            \
-	{                                                                              \
-		.lock = 0xFFu, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL \
+#define K_MUTEX_INIT(mutex)                                                              \
+	{                                                                                    \
+		.lock = 0xFFu, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL           \
 	}
 
 #define K_MUTEX_DEFINE(mutex_name) struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)

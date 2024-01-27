@@ -18,7 +18,7 @@ int8_t k_signal_init(struct k_signal *sig)
 	Z_ARGS_CHECK(sig) return -EINVAL;
 
 	sig->signal = 0u;
-	sig->flags  = K_POLL_STATE_NOT_READY;
+	sig->flags	= K_POLL_STATE_NOT_READY;
 	dlist_init(&sig->waitqueue);
 
 	return 0;
