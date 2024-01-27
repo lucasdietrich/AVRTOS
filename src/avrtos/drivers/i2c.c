@@ -210,19 +210,19 @@ static void transfer_stop(I2C_Device *dev, struct i2c_context *x)
 	x->state = READY;
 }
 
-__always_inline static void poll_end(struct i2c_context *x)
+__always_inline void poll_end(struct i2c_context *x)
 {
 	while (x->state != READY)
 		;
 }
 
-__always_inline static void poll_irq(I2C_Device *dev)
+__always_inline void poll_irq(I2C_Device *dev)
 {
 	while (!(dev->TWCRn & BIT(TWINT)))
 		;
 }
 
-__always_inline static void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
+__always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 {
 	const uint8_t status = dev->TWSRn & TW_STATUS_MASK;
 
@@ -295,7 +295,7 @@ __always_inline static void i2c_state_machine(I2C_Device *dev, struct i2c_contex
 	}
 }
 
-__always_inline static void i2c_state_machine_loop(I2C_Device *dev, struct i2c_context *x)
+__always_inline void i2c_state_machine_loop(I2C_Device *dev, struct i2c_context *x)
 {
 	do {
 		poll_irq(dev);

@@ -79,9 +79,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 	return ret;
 }
 
-__always_inline static int8_t z_msgq_get(struct k_msgq *msgq,
-					 void *data,
-					 k_timeout_t timeout)
+__always_inline int8_t z_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_NOTNULL(msgq);

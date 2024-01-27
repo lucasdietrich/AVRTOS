@@ -26,7 +26,7 @@
 #define __noinline	 __attribute__((noinline))
 #define __noreturn	 __attribute__((__noreturn__))
 #define CODE_UNREACHABLE __builtin_unreachable();
-#define __always_inline	 __attribute__((always_inline)) inline
+#define __always_inline	 __attribute__((always_inline)) static inline
 #define __noinit	 Z_LINK_SECTION(.noinit)
 #define __bss		 Z_LINK_SECTION(.bss)
 
@@ -46,8 +46,8 @@
 #define K_SWAP_ENDIANNESS(n) \
 	(((((uint16_t)(n)&0xFF)) << 8) | (((uint16_t)(n)&0xFF00) >> 8))
 
-#define MIN(a, b)		       ((a < b) ? (a) : (b))
-#define MAX(a, b)		       ((a > b) ? (a) : (b))
+#define MIN(a, b)		       (((a) < (b)) ? (a) : (b))
+#define MAX(a, b)		       (((a) > (b)) ? (a) : (b))
 #define ARRAY_SIZE(array)	       (sizeof(array) / sizeof(array[0]))
 #define CONTAINER_OF(ptr, type, field) ((type *)(((char *)(ptr)) - offsetof(type, field)))
 #define SIZEOF_MEMBER(type, member)    (sizeof(((type *)0)->member))

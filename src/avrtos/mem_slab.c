@@ -85,7 +85,7 @@ __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab)
  * @param mem
  * @return 0
  */
-__always_inline static int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
+__always_inline int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
 	*mem		= (uint8_t *)slab->free_list;
 	slab->free_list = slab->free_list->next;

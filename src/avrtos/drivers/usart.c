@@ -175,8 +175,7 @@ int usart_send(UART_Device *dev, const char *buf, int len)
 // size should be configurable
 static struct usart_async_context usart_async_contexts[ARCH_USART_COUNT];
 
-__always_inline static struct usart_async_context *usart_get_async_context(
-	UART_Device *dev)
+__always_inline struct usart_async_context *usart_get_async_context(UART_Device *dev)
 {
 	return &usart_async_contexts[AVR_USARTn_INDEX(dev)];
 }
