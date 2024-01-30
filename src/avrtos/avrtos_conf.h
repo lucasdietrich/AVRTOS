@@ -554,37 +554,6 @@
 #endif
 
 //
-// Enable scheduler lock counter for each thread to allow
-// k_sched_lock() to be called recursively.
-//
-// Note: This option leads to performance overhead when locking/unlocking
-// the scheduler, enable it only if needed.
-//
-// 0: Scheduler lock counter is disabled
-// 1: Scheduler lock counter is enabled
-//
-#ifndef CONFIG_KERNEL_SCHED_LOCK_COUNTER
-#define CONFIG_KERNEL_SCHED_LOCK_COUNTER 0
-#endif
-
-//
-// Enable IRQ lock counter for each thread to allow
-// irq_enable() to be called recursively.
-//
-// If enabled, calling irq_disable() doesn't garantee that interrupts
-// are actually enabled again.
-//
-// Note: This option leads to performance overhead when enabling/disabling irqs,
-// enable it only if needed.
-//
-// 0: IRQ lock counter is disabled
-// 1: IRQ lock counter is enabled
-//
-#ifndef CONFIG_KERNEL_IRQ_LOCK_COUNTER
-#define CONFIG_KERNEL_IRQ_LOCK_COUNTER 0
-#endif
-
-//
 // Automatic initialization of the serial console
 //
 #ifndef CONFIG_SERIAL_AUTO_INIT
@@ -714,6 +683,27 @@
 //
 #ifndef CONFIG_FD_MAX_COUNT
 #define CONFIG_FD_MAX_COUNT 0
+#endif
+
+//
+// Enable reentrancy support for kernel functions
+//
+// For each manipulated object, it must be released as many times as it has been
+// acquired, otherwise the expected behavior of the "release" function is not
+// guaranteed.
+//
+// This applies to:
+// - k_mutex_lock()/k_mutex_unlock(): Enable IRQ lock counter for each mutex to allow
+//   k_mutex_lock() to be called recursively.
+// - k_sched_lock()/k_sched_unlock(): Enable scheduler lock counter for each thread to
+// allow
+//   k_sched_lock() to be called recursively.
+//
+// 0: Kernel reentrancy support is disabled
+// 1: Kernel reentrancy support is enabled
+//
+#ifndef CONFIG_KERNEL_REENTRANCY
+#define CONFIG_KERNEL_REENTRANCY 0
 #endif
 
 //

@@ -25,14 +25,21 @@ extern "C" {
  * first thread to wake up when mutex is unlocked is first in the queue.
  */
 struct k_mutex {
+	/* 0 if unlocked, any other value otherwise
+	 *
+	 * If CONFIG_KERNEL_REENTRANCY feature is enabled,
+	 * this value is the number of time the mutex is locked
+	 * by the owner thread.
+	 */
 	uint8_t lock;
+
 	struct dnode waitqueue;
 	struct k_thread *owner;
 };
 
 #define K_MUTEX_INIT(mutex)                                                              \
 	{                                                                                    \
-		.lock = 0xFFu, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL           \
+		.lock = 0u, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL              \
 	}
 
 #define K_MUTEX_DEFINE(mutex_name) struct k_mutex mutex_name = K_MUTEX_INIT(mutex_name)

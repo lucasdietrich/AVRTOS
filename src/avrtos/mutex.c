@@ -14,8 +14,7 @@
 
 #define K_MODULE K_MODULE_MUTEX
 
-#define Z_MUTEX_UNLOCKED_VALUE 0x01u
-#define Z_MUTEX_LOCKED_VALUE   0x00u
+#define Z_MUTEX_UNLOCKED_VALUE 0u
 
 int8_t k_mutex_init(struct k_mutex *mutex)
 {
@@ -35,8 +34,13 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	int8_t lock		  = 0;
 	const uint8_t key = irq_lock();
 
-	if (mutex->lock != Z_MUTEX_LOCKED_VALUE) {
-		mutex->lock = Z_MUTEX_LOCKED_VALUE;
+	if (mutex->lock == Z_MUTEX_UNLOCKED_VALUE) {
+		mutex->lock = 1u;
+	} else if (mutex->owner == z_current) {
+#if CONFIG_KERNEL_REENTRANCY
+		mutex->lock++;
+#endif /* CONFIG_KERNEL_REENTRANCY */
+		goto exit;
 	} else {
 		lock = z_pend_current(&mutex->waitqueue, timeout);
 	}
@@ -46,6 +50,7 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 		mutex->owner = z_current;
 	}
 
+exit:
 	irq_unlock(key);
 	return lock;
 }
@@ -55,12 +60,22 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 	__ASSERT_NOTNULL(mutex);
 
 	struct k_thread *thread = NULL;
+	const uint8_t key		= irq_lock();
 
-	const uint8_t key = irq_lock();
-
-	/* we check if the current thread actually owns the mutex */
+	/* we check if the current thread owns the mutex */
 	if (mutex->owner != z_current) {
-		goto ret;
+		goto exit;
+#if CONFIG_KERNEL_REENTRANCY
+	} else {
+		/* If the mutex is locked more than once by the owner,
+		 * we don't unlock the mutex and we decrement the lock
+		 * counter.
+		 */
+		if (mutex->lock != 1u) {
+			mutex->lock--;
+			goto exit;
+		}
+#endif /* CONFIG_KERNEL_REENTRANCY */
 	}
 
 	__K_DBG_MUTEX_UNLOCKED(z_current); // {
@@ -70,7 +85,6 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 	 * k_mutex_lock function.
 	 */
 	thread = z_unpend_first_thread(&mutex->waitqueue);
-
 	if (thread == NULL) {
 		/* no new owner, we need to unlock
 		 * the mutex and remove the owner
@@ -79,7 +93,7 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 		mutex->owner = NULL;
 	}
 
-ret:
+exit:
 	irq_unlock(key);
 	return thread;
 }

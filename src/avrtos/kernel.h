@@ -115,8 +115,6 @@ __always_inline struct k_thread *k_thread_get_main(void)
 	return &z_thread_main;
 }
 
-#if CONFIG_KERNEL_IRQ_LOCK_COUNTER == 0
-
 /**
  * @brief Disable interrupts in the current thread
  */
@@ -126,24 +124,6 @@ __always_inline struct k_thread *k_thread_get_main(void)
  * @brief Enable interrupts in the current thread
  */
 #define irq_enable sei
-
-#else
-
-/**
- * @brief Disable interrupts in the current thread.
- *
- * Can be called recursively.
- */
-__kernel void irq_disable(void);
-
-/**
- * @brief Enable interrupts in the current thread
- *
- * Can be called recursively.
- */
-__kernel void irq_enable(void);
-
-#endif /* CONFIG_KERNEL_IRQ_LOCK_COUNTER */
 
 #define CRITICAL_SECTION_BEGIN() irq_disable()
 #define CRITICAL_SECTION_END()	 irq_enable()
@@ -156,7 +136,7 @@ __kernel void irq_enable(void);
 __always_inline uint8_t irq_lock(void)
 {
 	const uint8_t key = SREG;
-	irq_disable();
+	cli();
 	return key;
 }
 
@@ -183,7 +163,7 @@ __always_inline void irq_unlock(uint8_t key)
  *
  * This function cannot be called from an interrupt routine.
  *
- * If CONFIG_KERNEL_SCHED_LOCK_COUNTER is defined, k_sched_unlock() can be
+ * If CONFIG_KERNEL_REENTRANCY is defined, k_sched_unlock() can be
  * called recursively. In this case, the maximum number of calls to k_sched_lock
  * without calling k_sched_unlock() is 255.
  *

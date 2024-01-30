@@ -66,19 +66,12 @@ struct k_thread {
 	char symbol;	 // 1-letter symbol to name the thread, reserver M (main),
 					 // idle : I (idle)
 
-#if CONFIG_KERNEL_IRQ_LOCK_COUNTER
-	/**
-	 * @brief Depth of calls to irq_disable()
-	 */
-	uint8_t irq_lock_cnt;
-#endif /* CONFIG_KERNEL_IRQ_LOCK_COUNTER */
-
-#if CONFIG_KERNEL_SCHED_LOCK_COUNTER
+#if CONFIG_KERNEL_REENTRANCY
 	/**
 	 * @brief Depth of calls to k_sched_lock()
 	 */
 	uint8_t sched_lock_cnt;
-#endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
+#endif /* CONFIG_KERNEL_REENTRANCY */
 
 #if CONFIG_THREAD_ERRNO
 	uint8_t errno; // Thread errno

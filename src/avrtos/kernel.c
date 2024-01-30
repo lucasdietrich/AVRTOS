@@ -23,11 +23,8 @@
 #define K_MODULE K_MODULE_KERNEL
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
-
 __noinit char z_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
-
 Z_STACK_SENTINEL_REGISTER(z_main_stack);
-
 #endif
 
 /* Set main thread priority */
@@ -821,47 +818,22 @@ uint8_t k_ready_count(void)
 	return z_ready_count;
 }
 
-#if CONFIG_KERNEL_IRQ_LOCK_COUNTER
-void irq_disable(void)
-{
-	cli();
-
-	z_current->irq_lock_cnt++;
-}
-
-void irq_enable(void)
-{
-	if (z_current->irq_lock_cnt == 0) {
-		return;
-	} else if (z_current->irq_lock_cnt == 1) {
-		z_current->irq_lock_cnt = 0;
-	} else {
-		z_current->irq_lock_cnt--;
-		return;
-	}
-
-	sei();
-}
-#endif
-
 void k_sched_lock(void)
 {
 	const uint8_t key = irq_lock();
-
 	z_current->flags |= Z_THREAD_SCHED_LOCKED_MSK;
-
 	irq_unlock(key);
 
-#if CONFIG_KERNEL_SCHED_LOCK_COUNTER
+#if CONFIG_KERNEL_REENTRANCY
 	z_current->sched_lock_cnt++;
-#endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
+#endif /* CONFIG_KERNEL_REENTRANCY */
 
 	__K_DBG_SCHED_LOCK(z_current);
 }
 
 void k_sched_unlock(void)
 {
-#if CONFIG_KERNEL_SCHED_LOCK_COUNTER
+#if CONFIG_KERNEL_REENTRANCY
 	if (z_current->sched_lock_cnt == 0) {
 		return;
 	} else if (z_current->sched_lock_cnt == 1) {
@@ -870,7 +842,7 @@ void k_sched_unlock(void)
 		z_current->sched_lock_cnt--;
 		return;
 	}
-#endif /* CONFIG_KERNEL_SCHED_LOCK_COUNTER */
+#endif /* CONFIG_KERNEL_REENTRANCY */
 
 	const uint8_t key = irq_lock();
 	z_current->flags &= ~Z_THREAD_SCHED_LOCKED_MSK;

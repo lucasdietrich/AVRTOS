@@ -39,6 +39,7 @@ AVRTOS offers an extensive list of features, including:
 - Data structures: singly and doubly linked lists, queues, ring buffers, timeout queue
 
 Additional Features:
+
 - Thread naming with symbols (e.g., 'M' for the main thread, 'I' for the idle thread)
 - Pseudorandom number generator (LFSR)
 - Debugging and utility functions  (RAM_DUMP, CORE_DUMP, z_read_ra)
@@ -52,6 +53,7 @@ Additional Features:
 - Full compatibility with QEMU emulation
 
 Planned Features (TODOs):
+
 - Comprehensive tests
 - Enhanced documentation based on `mkdocs` (and `doxygen` ??)
 - Ultra-low duration sleep (e.g., 18us) using a dedicated timer counter with API: `uscounter_init()`, `uscounter_get()`, `uscounter_set`
@@ -72,11 +74,15 @@ Planned Features (TODOs):
 - Relocation of assembly files to "arch/avr"
 - Consolidation of private defines in _private.h headers
 - Investigation of high metric readings
-- Introduction of tickless operation
+- Tickless kernel + timeslicing features
 - Renaming "static inline" functions to "__always_inline"
 - Implementation of builtin_ctz for 8-bit variables
 - Sample for discovering the I2C bus
 - Removal of outdated samples
+- i2c write_then_read function
+- Add support for rentrency
+  - k_sched_lock/k_sched_unlock
+  - k_mutex_lock/k_mutex_unlock
 
 ### Description
 
