@@ -27,6 +27,10 @@
 #define I2C0_DEVICE_ENABLED 0
 #endif
 
+#define FREQ_CALC(_prescaler, _twbr) (F_CPU / (16 + 2 * (_twbr)*I2C_PRESCALER_VALUE(_prescaler))
+#define FREQ_MIN FREQ_CALC(I2C_PRESCALER_64, 255)
+#define FREQ_MAX 400000lu
+
 #if defined(I2C1_DEVICE) && CONFIG_I2C1_ENABLED
 #define I2C1_DEVICE_ENABLED 1
 // Adjust I2C1 index if I2C0 is not enabled
@@ -48,8 +52,6 @@
 #define TWI_STOP(_dev)		  _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTO)
 #define TWI_RESET(_dev)		  _dev->TWCRn = TWI_ENABLE_MASK | BIT(TWSTO) | BIT(TWSTA)
 #define TWI_REPLY(_dev, _ack) _dev->TWCRn = TWI_ENABLE_MASK | (_ack ? BIT(TWEA) : 0u)
-
-#define PRESCALER_VALUE(_prescaler) (1 << (_prescaler << 1))
 
 typedef enum {
 	/* Driver is uninitialized */
@@ -169,17 +171,18 @@ int8_t i2c_init(I2C_Device *dev, struct i2c_config config)
 		goto exit;
 	}
 
-	prr_enable(dev_index);
+	dev->TWCRn = 0u; // Disable device
 
-	// freq = CPU_FREQ / (16 + 2 * TWBR * prescaler)
-	dev->TWBRn =
-		((F_CPU / CONFIG_I2C_FREQ) - 16) / (2 * PRESCALER_VALUE(config.prescaler));
+	// configure device
+	dev->TWSRn	= config.prescaler;
+	dev->TWBRn	= config.twbr;
+	dev->TWARn	= 0u;
+	dev->TWAMRn = 0u;
+
+	prr_enable(dev_index);
 
 	// set internal pullups on SDA, SCL
 	i2c_gpio_setup(dev_index, true);
-
-	dev->TWARn	= 0u; // TODO
-	dev->TWAMRn = 0u; // TODO
 
 	dev->TWCRn					  = BIT(TWINT) | BIT(TWEN); // Enable device and interrupt
 	i2c_contexts[dev_index].state = READY;
@@ -334,7 +337,10 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_l
 	int8_t ret					= 0;
 	struct i2c_context *const x = i2c_get_context(dev);
 
-	Z_ARGS_CHECK(x && data && (len <= I2C_MAX_BUF_LEN)) return -EINVAL;
+	Z_ARGS_CHECK(x && data && (w_len <= I2C_MAX_BUF_LEN) && (r_len <= I2C_MAX_BUF_LEN))
+	{
+		return -EINVAL;
+	}
 	if (x->state != READY) return -EBUSY;
 
 	x->sla_w = (addr << 1);
@@ -390,7 +396,7 @@ int8_t i2c_master_read(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len
 int8_t i2c_master_write_read(
 	I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t wlen, uint8_t rlen)
 {
-	return i2c_run(dev, addr, data, wlen, rlen); // TODO strange signature
+	return i2c_run(dev, addr, data, wlen, rlen);
 }
 
 int8_t i2c_status(I2C_Device *dev)
@@ -418,6 +424,13 @@ i2c_error_t i2c_last_error(I2C_Device *dev)
 	struct i2c_context *const x = i2c_get_context(dev);
 	Z_ARGS_CHECK(x) return I2C_ERROR_ARGS;
 	return get_error(x);
+}
+
+int8_t i2c_calc_config(struct i2c_config *config, uint32_t desired_freq)
+{
+	Z_ARGS_CHECK(config) return -EINVAL;
+
+	return -ENOTSUP;
 }
 
 #if CONFIG_I2C_INTERRUPT_DRIVEN

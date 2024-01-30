@@ -52,12 +52,42 @@ typedef enum {
 	I2C_PRESCALER_64 = 3u,
 } i2c_prescaler_t;
 
+// standard I2C frequencies for 16MHz clock
+#if F_CPU == 16000000
+#define I2C_CONF_1600	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_64, 1600)
+#define I2C_CONF_8000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 8000)
+#define I2C_CONF_10000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 10000)
+#define I2C_CONF_12500	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 12500)
+#define I2C_CONF_15625	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 15625)
+#define I2C_CONF_16000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 16000)
+#define I2C_CONF_20000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 20000)
+#define I2C_CONF_25000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_4, 25000)
+#define I2C_CONF_31250	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 31250)
+#define I2C_CONF_32000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 32000)
+#define I2C_CONF_40000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 40000)
+#define I2C_CONF_50000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 50000)
+#define I2C_CONF_62500	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 62500)
+#define I2C_CONF_64000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 64000)
+#define I2C_CONF_80000	I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 80000)
+#define I2C_CONF_100000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 100000)
+#define I2C_CONF_125000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 125000)
+#define I2C_CONF_160000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 160000)
+#define I2C_CONF_200000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 200000)
+#define I2C_CONF_250000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 250000)
+#define I2C_CONF_320000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 320000)
+#define I2C_CONF_400000 I2C_CONFIG_INIT_FREQ(I2C_PRESCALER_1, 400000)
+#endif // F_CPU == 16000000
+
+#define I2C_CONF_DEFAULT I2C_CONF_100000
+
 /**
  * @brief Configuration structure for I2C
  */
 struct i2c_config {
 	/* I2C clock prescaler */
 	i2c_prescaler_t prescaler : 2u;
+	/* I2C bit rate register value */
+	uint8_t twbr;
 };
 
 /**
@@ -180,6 +210,15 @@ i2c_error_t i2c_poll_end(I2C_Device *dev);
  * @return i2c_error_t
  */
 i2c_error_t i2c_last_error(I2C_Device *dev);
+
+/**
+ * @brief Calculate I2C configuration structure from desired frequency
+ *
+ * @param config Structure to fill
+ * @param desired_freq Desired frequency
+ * @return int8_t 0 if success, negative value otherwise
+ */
+int8_t i2c_calc_config(struct i2c_config *config, uint32_t desired_freq);
 
 #if defined(__cplusplus)
 }

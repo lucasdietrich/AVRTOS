@@ -68,7 +68,6 @@ Planned Features (TODOs):
 - Memory heap management
 - Runtime detection of available space for the main thread stack (init)
 - Consideration of available heap space
-- Implementation of I2C Repeated Start
 - Refactoring: Move or remove unused `AVRTOS_VERSION_MAJOR` variables
 - Organize MCU specific fixups and board-specific items in a dedicated "board" directory
 - Relocation of assembly files to "arch/avr"
@@ -77,12 +76,11 @@ Planned Features (TODOs):
 - Tickless kernel + timeslicing features
 - Renaming "static inline" functions to "__always_inline"
 - Implementation of builtin_ctz for 8-bit variables
-- Sample for discovering the I2C bus
 - Removal of outdated samples
-- i2c write_then_read function
-- Add support for rentrency
-  - k_sched_lock/k_sched_unlock
-  - k_mutex_lock/k_mutex_unlock
+- i2c
+  - make configurable clock speed
+  - implement: i2c_calc_config
+  - Sample for discovering the I2C bus
 
 ### Description
 

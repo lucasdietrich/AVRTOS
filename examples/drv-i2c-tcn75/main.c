@@ -19,7 +19,8 @@ int main(void)
 
 	struct i2c_config config = {
 		.prescaler = I2C_PRESCALER_1,
-	};
+		.twbr	   = I2C_CALC_TWBR(I2C_PRESCALER_1, 400000),
+	}; // or use I2C_CONF_400000
 
 	int8_t ret = i2c_init(I2C_DEVICE, config);
 	printf("i2c_init: %d last_error: %d\n", ret, i2c_last_error(I2C_DEVICE));
