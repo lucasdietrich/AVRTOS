@@ -64,10 +64,15 @@ struct i2c_config {
  * @brief I2C driver error codes
  */
 typedef enum i2c_error {
+	/* No error */
 	I2C_ERROR_NONE = 0u,
-	I2C_ERROR_BUS  = 1u,
+	/* Bus error (or unknown error) */
+	I2C_ERROR_BUS = 1u,
+	/* Address error, no slave responded or NACK received to address */
 	I2C_ERROR_ADDR = 2u,
+	/* Data error, NACK received */
 	I2C_ERROR_DATA = 3u,
+	/* Invalid arguments provided */
 	I2C_ERROR_ARGS = 4u,
 } i2c_error_t;
 
@@ -101,10 +106,9 @@ int8_t i2c_deinit(I2C_Device *dev);
  * @param addr Device address
  * @param data Data buffer to transmit
  * @param len Buffer length
- * @return int8_t 0 if success, negative value otherwise
+ * @return int8_t Number of bytes written if success, negative value otherwise
  */
-int8_t
-i2c_master_transmit(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t len);
+int8_t i2c_master_write(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t len);
 
 /**
  * @brief Receive data from I2C device as master
@@ -119,9 +123,35 @@ i2c_master_transmit(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t 
  * @param addr Device address
  * @param data Data buffer to receive
  * @param len Buffer length
- * @return int8_t 0 if success, negative value otherwise
+ * @return int8_t Number of bytes written if success, negative value otherwise
  */
-int8_t i2c_master_receive(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len);
+int8_t i2c_master_read(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len);
+
+/**
+ * @brief Write w_len bytes to I2C device then read r_len bytes from it as master.
+ *
+ * This function is convenient for devices that require a write operation before
+ * a read operation. It is equivalent to calling i2c_master_write() followed by
+ * i2c_master_read() but it is more efficient as it does not require to wait for
+ * the end of the first transmission before starting the second one.
+ *
+ * The given buffer must remain valid until the transmission is complete.
+ *
+ * If CONFIG_I2C_BLOCKING option is enabled, this function will block until
+ * the reception is complete, otherwise it will return immediately and the
+ * user must poll for the end of transmission using i2c_poll_end().
+ *
+ * @param dev I2C device
+ * @param addr Device address
+ * @param data Data buffer containing the wlen bytes to write, on function return
+ * 				it will contain the rlen bytes read. Its size must be at least
+ * 				the maximum between wlen and rlen.
+ * @param wlen Number of bytes to write
+ * @param rlen Number of bytes to read
+ * @return int8_t Number of bytes written if success, negative value otherwise
+ */
+int8_t i2c_master_write_read(
+	I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t wlen, uint8_t rlen);
 
 /**
  * @brief Get I2C status

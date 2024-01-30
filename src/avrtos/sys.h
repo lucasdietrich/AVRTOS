@@ -23,12 +23,14 @@
 #define Z_LINK_SECTION_USED(_section)                                                    \
 	__attribute__((used, section(Z_STRINGIFY(_section))))
 
-#define __noinline		 __attribute__((noinline))
-#define __noreturn		 __attribute__((__noreturn__))
-#define CODE_UNREACHABLE __builtin_unreachable();
-#define __always_inline	 __attribute__((always_inline)) static inline
-#define __noinit		 Z_LINK_SECTION(.noinit)
-#define __bss			 Z_LINK_SECTION(.bss)
+#define __noinline				 __attribute__((noinline))
+#define __noreturn				 __attribute__((__noreturn__))
+#define CODE_UNREACHABLE		 __builtin_unreachable();
+#define __always_inline			 __attribute__((always_inline)) static inline
+#define __noinit				 Z_LINK_SECTION(.noinit)
+#define __bss					 Z_LINK_SECTION(.bss)
+#define memory_barrier()		 asm volatile("" : : : "memory")
+#define memory_barrier_var(_var) asm volatile("" : : "b"(_var) : "memory")
 
 #define __static_assert						_Static_assert
 #define __STATIC_ASSERT(test_for_true, msg) __static_assert(test_for_true, msg)

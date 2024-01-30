@@ -52,9 +52,13 @@
 #define PRESCALER_VALUE(_prescaler) (1 << (_prescaler << 1))
 
 typedef enum {
-	NONE	  = 0,
-	READY	  = 1,
+	/* Driver is uninitialized */
+	UNINITIALIZED = 0,
+	/* Driver is initialized and ready to use */
+	READY = 1,
+	/* Driver is currently transmitting (busy) */
 	MASTER_TX = 2,
+	/* Driver is currently receiving (busy) */
 	MASTER_RX = 3,
 } i2c_state_t;
 
@@ -62,9 +66,17 @@ struct i2c_context {
 	uint8_t *buf;
 	uint8_t sla_w; // Address already shifted by 1 + write bit
 
-	volatile i2c_state_t state : 2u;
-	uint8_t buf_len : CONFIG_I2C_MAX_BUF_LEN_BITS;
+	/* Generic cursor to keep track */
 	uint8_t cursor : CONFIG_I2C_MAX_BUF_LEN_BITS;
+
+	/* State of the I2C state machine */
+	i2c_state_t state : 2u;
+
+	/* Length to write */
+	uint8_t write_len : CONFIG_I2C_MAX_BUF_LEN_BITS;
+
+	/* Length to read */
+	uint8_t read_len : CONFIG_I2C_MAX_BUF_LEN_BITS;
 
 #if CONFIG_I2C_LAST_ERROR
 	i2c_error_t error;
@@ -188,6 +200,11 @@ int8_t i2c_deinit(I2C_Device *dev)
 		goto exit;
 	}
 
+	if (i2c_contexts[dev_index].state != READY) {
+		ret = -EBUSY;
+		goto exit;
+	}
+
 	dev->TWCRn	= 0u;
 	dev->TWBRn	= 0u;
 	dev->TWSRn	= 0u;
@@ -198,7 +215,8 @@ int8_t i2c_deinit(I2C_Device *dev)
 	// clear internal pullups on SDA, SCL
 	i2c_gpio_setup(dev_index, false);
 
-	ret = 0;
+	i2c_contexts[dev_index].state = UNINITIALIZED;
+	ret							  = 0;
 
 exit:
 	return ret;
@@ -212,8 +230,9 @@ static void transfer_stop(I2C_Device *dev, struct i2c_context *x)
 
 __always_inline void poll_end(struct i2c_context *x)
 {
-	while (x->state != READY)
-		;
+	do {
+		memory_barrier();
+	} while (x->state != READY);
 }
 
 __always_inline void poll_irq(I2C_Device *dev)
@@ -227,7 +246,6 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 	const uint8_t status = dev->TWSRn & TW_STATUS_MASK;
 
 #if CONFIG_I2C_DEBUG
-	serial_print("TWSR: 0x");
 	serial_hex(status);
 	serial_print("\n");
 #endif
@@ -243,10 +261,17 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 	case TW_MT_DATA_ACK: // Data transmitted, ACK received
 		x->cursor++;
 	case TW_MT_SLA_ACK: // SLA+W transmitted, ACK received
-		if (x->cursor < x->buf_len) {
+		if (x->cursor < x->write_len) {
 			dev->TWDRn = x->buf[x->cursor++];
 			TWI_REPLY(dev, 1u);
 			/* Next expected interrupt is TW_MT_DATA_ACK */
+		} else if (x->read_len != 0) {
+			/* Switch to reception */
+			x->state  = MASTER_RX;
+			x->cursor = 0u;
+			x->sla_w  = (x->sla_w & ~TW_WRITE) | TW_READ;
+			TWI_START(dev); /* Trigger a repeated start */
+							/* Next expected interrupt is TW_REP_START */
 		} else {
 			transfer_stop(dev, x);
 			/* Transmission complete */
@@ -257,7 +282,7 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 		x->buf[x->cursor++] = dev->TWDRn;
 	case TW_MR_SLA_ACK: // SLA+R transmitted, ACK received
 		/*  ACK if more data is expected (NACK otherwise) */
-		TWI_REPLY(dev, x->buf_len - x->cursor > 1u);
+		TWI_REPLY(dev, x->read_len - x->cursor > 1u);
 		break;
 
 	case TW_MR_DATA_NACK: // Data received, NACK returned
@@ -299,11 +324,12 @@ __always_inline void i2c_state_machine_loop(I2C_Device *dev, struct i2c_context 
 	do {
 		poll_irq(dev);
 		i2c_state_machine(dev, x);
+		memory_barrier();
 	} while (x->state != READY);
 }
 
 static int8_t
-i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len, i2c_state_t state)
+i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_len)
 {
 	int8_t ret					= 0;
 	struct i2c_context *const x = i2c_get_context(dev);
@@ -311,11 +337,18 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len, i2c_state_t s
 	Z_ARGS_CHECK(x && data && (len <= I2C_MAX_BUF_LEN)) return -EINVAL;
 	if (x->state != READY) return -EBUSY;
 
-	x->sla_w   = (addr << 1) | (state == MASTER_TX ? TW_WRITE : TW_READ);
-	x->state   = state;
-	x->buf	   = data;
-	x->buf_len = len;
-	x->cursor  = 0u;
+	x->sla_w = (addr << 1);
+	if (w_len == 0) {
+		x->state = MASTER_RX;
+		x->sla_w |= TW_READ;
+	} else {
+		x->state = MASTER_TX;
+		x->sla_w |= TW_WRITE;
+	}
+	x->buf		 = data;
+	x->write_len = w_len;
+	x->read_len	 = r_len;
+	x->cursor	 = 0u;
 	set_error(x, I2C_ERROR_NONE);
 
 	TWI_START(dev);
@@ -344,15 +377,20 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len, i2c_state_t s
 	return ret;
 }
 
-int8_t
-i2c_master_transmit(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t len)
+int8_t i2c_master_write(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t len)
 {
-	return i2c_run(dev, addr, (uint8_t *)data, len, MASTER_TX);
+	return i2c_run(dev, addr, (uint8_t *)data, len, 0u);
 }
 
-int8_t i2c_master_receive(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len)
+int8_t i2c_master_read(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t len)
 {
-	return i2c_run(dev, addr, data, len, MASTER_RX);
+	return i2c_run(dev, addr, data, 0u, len);
+}
+
+int8_t i2c_master_write_read(
+	I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t wlen, uint8_t rlen)
+{
+	return i2c_run(dev, addr, data, wlen, rlen); // TODO strange signature
 }
 
 int8_t i2c_status(I2C_Device *dev)

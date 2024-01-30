@@ -106,9 +106,16 @@ int8_t tcn75_select_data_register(struct tcn75_context *tcn75);
  *
  * @param tcn75 initialized TCN75 context
  * @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error
-
  */
 int16_t tcn75_read(struct tcn75_context *tcn75);
+
+/**
+ * @brief Select the temperature register of a TCN75 device and read the temperature.
+ *
+ * @param tcn75 initialized TCN75 context
+ * @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error
+ */
+int16_t tcn75_select_read(struct tcn75_context *tcn75);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,21 @@
 # Changelog
 
+## avrtos v1.2.1
+
+Key features:
+- **I2C**:
+  - Introduce function `i2c_master_write_read()` enabling to write and 
+  read data in a single transaction.
+  - Rename `i2c_master_transmit())` to `i2c_master_write()`.
+  - Rename `i2c_master_receive()` to `i2c_master_read()`.
+
+Minor changes:
+- Introduce `CONFIG_KERNEL_REENTRANCY` configuration option to enable/disable
+  reentrancy support for kernel objects, such as mutexes and sched lock/unlock.
+
+Bug fixes:
+- Fix returned error code in `i2c_master_write()` and `i2c_master_read()`.
+
 ## avrtos v1.2.0
 
 Key Features:

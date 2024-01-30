@@ -231,7 +231,7 @@ __kernel bool k_cur_is_coop(void);
 static __inline__ void z_sched_restore(const uint8_t *__s)
 {
 	k_sched_unlock();
-	__asm__ volatile("" ::: "memory");
+	memory_barrier();
 	ARG_UNUSED(__s);
 }
 
