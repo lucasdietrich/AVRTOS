@@ -920,7 +920,7 @@ void k_wait(k_timeout_t delay, uint8_t mode)
 	uint32_t now;
 	uint32_t ticks = k_ticks_get_32();
 
-	if (mode & K_WAIT_MODE_BLOCK) k_sched_lock();
+	if (mode == K_WAIT_MODE_BLOCK) k_sched_lock();
 
 	do {
 		switch (mode) {
@@ -939,7 +939,7 @@ void k_wait(k_timeout_t delay, uint8_t mode)
 		now = k_ticks_get_32();
 	} while (now - ticks < K_TIMEOUT_TICKS(delay));
 
-	if (mode & K_WAIT_MODE_BLOCK) k_sched_unlock();
+	if (mode == K_WAIT_MODE_BLOCK) k_sched_unlock();
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 
