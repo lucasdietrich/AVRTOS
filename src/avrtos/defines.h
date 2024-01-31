@@ -51,6 +51,12 @@
 #define Z_ARGS_CHECK(_cond) if (0)
 #endif
 
+#if CONFIG_KERNEL_PRIVATE_MEMBERS
+#define Z_PRIVATE(_member) _member
+#else
+#define Z_PRIVATE(_member) _##_member
+#endif
+
 /*___________________________________________________________________________*/
 
 // Timing
