@@ -452,6 +452,16 @@
 #endif
 
 //
+// Automatically verify thread sentinel on thread switch
+//
+// 0: Thread sentinel auto verify is disabled
+// 1: Thread sentinel auto verify is enabled
+//
+#ifndef CONFIG_THREAD_STACK_SENTINEL_AUTO_VERIFY
+#define CONFIG_THREAD_STACK_SENTINEL_AUTO_VERIFY 0
+#endif
+
+//
 // Enable system workqueue
 //
 // 0: System workqueue is disabled

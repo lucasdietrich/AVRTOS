@@ -225,6 +225,8 @@ extern struct k_thread z_thread_idle;
 // Kernel Private API
 //
 
+extern void z_verify_stacks_sentinel(struct k_thread *thread);
+
 /**
  * @brief Schedule the thread to be executed.
  *
@@ -243,11 +245,9 @@ __kernel static void z_schedule(struct k_thread *thread)
 {
 	__ASSERT_NOINTERRUPT();
 
-#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_KERNEL_ASSERT
-	/* check that stack sentinel is still valid before switching to thread */
-	if (k_verify_stack_sentinel(thread) == false) {
-		__fault(K_FAULT_SENTINEL);
-	}
+#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_THREAD_STACK_SENTINEL_AUTO_VERIFY
+	/* check that stack sentinel is still valid before scheduling thread */
+	z_verify_stacks_sentinel(thread);
 #endif
 
 	/* Mark this thread as READY */
@@ -530,6 +530,11 @@ struct k_thread *z_scheduler(void)
 
 	__K_DBG_SCHED_NEXT_THREAD();
 	__K_DBG_SCHED_NEXT(z_current);
+
+#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_THREAD_STACK_SENTINEL_AUTO_VERIFY
+	/* check that stack sentinel is still valid before switching to thread */
+	z_verify_stacks_sentinel(z_current);
+#endif
 
 	return prev;
 }
