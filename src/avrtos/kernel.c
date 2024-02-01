@@ -363,19 +363,6 @@ __kernel void z_wake_up(struct k_thread *thread)
 }
 
 /**
- * @brief Swaps the endianness of a memory address.
- *
- * This function swaps the endianness of a memory address. It is used to convert
- * data between big-endian and little-endian formats.
- *
- * @param addr Pointer to the memory address to swap endianness.
- */
-__always_inline void swap_endianness(void **addr)
-{
-	*addr = (void *)HTONS(*addr);
-}
-
-/**
  * @brief Finalize the thread stack.
  *
  * @param thread Pointer to the thread
