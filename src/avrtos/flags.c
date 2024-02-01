@@ -16,7 +16,7 @@
 #define Z_SWAP_DATA_INIT_OPT_N_MASK(opt, mask)                                           \
 	((void *)((((uint16_t)opt) << 8u) | ((uint16_t)mask)))
 
-int k_flags_init(struct k_flags *flags, uint8_t value)
+int8_t k_flags_init(struct k_flags *flags, uint8_t value)
 {
 	Z_ARGS_CHECK(flags) return -EINVAL;
 
@@ -75,9 +75,10 @@ exit:
 	return ret;
 }
 
-int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_t options)
+int8_t
+k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_t options)
 {
-	int ret = 0;
+	int8_t ret = 0;
 	struct dnode *thread_handle;
 
 	Z_ARGS_CHECK(flags) return -EINVAL;
@@ -130,13 +131,13 @@ int k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_
 	return ret;
 }
 
-int k_flags_reset(struct k_flags *flags)
+int8_t k_flags_reset(struct k_flags *flags)
 {
 	Z_ARGS_CHECK(flags) return -EINVAL;
 
 	const uint8_t lock = irq_lock();
 
-	int ret		 = z_cancel_all_pending(&flags->_waitqueue);
+	int8_t ret	 = z_cancel_all_pending(&flags->_waitqueue);
 	flags->flags = flags->reset_value;
 
 	irq_unlock(lock);

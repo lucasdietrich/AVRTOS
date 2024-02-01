@@ -66,7 +66,7 @@ extern "C" {
  *
  * @param exti EXTI number
  * @param isc
- * @return int 0 on success, -EINVAL if EXTI number is invalid
+ * @return int8_t 0 on success, -EINVAL if EXTI number is invalid
  *
  * Example for ATmega328P :
  *
@@ -78,7 +78,7 @@ extern "C" {
  * exti_enable(INT0);
  * ```
  */
-int exti_configure(uint8_t exti, uint8_t isc);
+int8_t exti_configure(uint8_t exti, uint8_t isc);
 
 /**
  * @brief Clear an external interrupt flag

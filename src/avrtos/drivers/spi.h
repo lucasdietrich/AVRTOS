@@ -278,7 +278,7 @@ typedef bool (*spi_callback_t)(char *rxtx);
  * @param first_tx First byte to transmit.
  * @param callback Callback function to call when the transmission of the first
  * byte is complete.
- * @return int number of bytes sent on success, negative value on error.
+ * @return int8_t number of bytes sent on success, negative value on error.
  */
 int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback);
 

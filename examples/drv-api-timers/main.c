@@ -28,7 +28,7 @@ void callback(void *dev, uint8_t tim_idx, void *arg)
 
 static void app_init_timer(uint8_t tim_idx, uint32_t period_us, uint8_t flags)
 {
-	int ret = timer_init(tim_idx, period_us, callback, NULL, flags);
+	int8_t ret = timer_init(tim_idx, period_us, callback, NULL, flags);
 	if (ret < 0) {
 		printf_P(PSTR("timer_init(%d, %lu, %p, %p, %u) err = %d\n"),
 			 tim_idx,

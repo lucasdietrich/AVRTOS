@@ -16,7 +16,7 @@
 #define K_MODULE K_MODULE_DRIVERS_TIMERS
 
 /* not __always_inline version of timer_get_index */
-static int _get_index(void *dev)
+static int8_t _get_index(void *dev)
 {
 	return timer_get_index(dev);
 }
@@ -64,13 +64,13 @@ void ll_timer8_init(TIMER8_Device *dev,
 	dev->TCCRnB = (config->prescaler << CSn0);
 }
 
-int timer8_init(TIMER8_Device *dev, const struct timer_config *config)
+int8_t timer8_init(TIMER8_Device *dev, const struct timer_config *config)
 {
 	if (config == NULL) {
 		return -EINVAL;
 	}
 
-	int tim_idx = _get_index(dev);
+	int8_t tim_idx = _get_index(dev);
 	if (tim_idx < 0) {
 		return tim_idx;
 	}
@@ -138,13 +138,13 @@ void ll_timer16_channel_configure(TIMER16_Device *dev,
 	ll_timer16_write_reg16(&dev->OCRnx[channel], config->value);
 }
 
-int timer16_init(TIMER16_Device *dev, const struct timer_config *config)
+int8_t timer16_init(TIMER16_Device *dev, const struct timer_config *config)
 {
 	if (config == NULL) {
 		return -EINVAL;
 	}
 
-	int tim_idx = _get_index(dev);
+	int8_t tim_idx = _get_index(dev);
 	if (tim_idx < 0) {
 		return tim_idx;
 	}
@@ -158,9 +158,9 @@ int timer16_init(TIMER16_Device *dev, const struct timer_config *config)
 	return 0;
 }
 
-int timer8_deinit(TIMER8_Device *dev)
+int8_t timer8_deinit(TIMER8_Device *dev)
 {
-	const int tim_idx = _get_index(dev);
+	int8_t tim_idx = _get_index(dev);
 	if (tim_idx < 0) {
 		return tim_idx;
 	}
@@ -178,9 +178,9 @@ int timer8_deinit(TIMER8_Device *dev)
 	return 0;
 }
 
-int timer16_deinit(TIMER16_Device *dev)
+int8_t timer16_deinit(TIMER16_Device *dev)
 {
-	const int tim_idx = _get_index(dev);
+	int8_t tim_idx = _get_index(dev);
 	if (tim_idx < 0) {
 		return tim_idx;
 	}
@@ -242,7 +242,7 @@ static int timer2_get_presc_value(timer2_prescaler_t prescaler)
 	}
 }
 
-int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter)
+int8_t timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter)
 {
 	const bool is_16bit		   = _is_16bits(timer_index);
 	const uint16_t max_counter = is_16bit ? 0xFFFFu : 0xFFu;
@@ -258,14 +258,14 @@ int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *coun
 		int prescaler_val = is_timer2 ? timer2_get_presc_value(prescaler_id)
 									  : timer_get_prescaler_value(prescaler_id);
 		if (prescaler_val < 0) {
-			return -1;
+			return -ENOTSUP;
 		}
 		calc_counter = TIMER_CALC_COUNTER_VALUE(period_us, prescaler_val);
 	} while (calc_counter > max_counter);
 
 	*counter = (uint16_t)calc_counter;
 
-	return prescaler_id;
+	return (int8_t)prescaler_id;
 }
 
 #if DRIVERS_TIMERS_API
@@ -330,11 +330,11 @@ __STATIC_ASSERT(CONFIG_KERNEL_SYSLOCK_HW_TIMER != 5,
 __DECL_TIMER_COMPA_ISR(5);
 #endif /* CONFIG_DRIVERS_TIMER5_API */
 
-int timer_init(uint8_t tim_idx,
-			   uint32_t period_us,
-			   timer_callback_t cb,
-			   void *user_data,
-			   uint8_t flags)
+int8_t timer_init(uint8_t tim_idx,
+				  uint32_t period_us,
+				  timer_callback_t cb,
+				  void *user_data,
+				  uint8_t flags)
 {
 	if ((tim_idx == CONFIG_KERNEL_SYSLOCK_HW_TIMER) || (cb == NULL)) {
 		return -EINVAL;
@@ -347,9 +347,9 @@ int timer_init(uint8_t tim_idx,
 
 	uint16_t counter;
 
-	int prescaler_id = timer_calc_prescaler(tim_idx, period_us, &counter);
+	int8_t prescaler_id = timer_calc_prescaler(tim_idx, period_us, &counter);
 	if (prescaler_id < 0) {
-		return -ENOTSUP;
+		return prescaler_id;
 	}
 
 	tim_ctx[tim_idx].cb		   = cb;

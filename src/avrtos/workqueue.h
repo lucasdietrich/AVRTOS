@@ -183,9 +183,9 @@ __kernel void k_work_delayable_init(struct k_work_delayable *dwork,
  * @param timeout Timeout before the work item is queued
  * @return 0 if success, negative error code otherwise
  */
-__kernel int k_work_delayable_schedule(struct k_workqueue *workqueue,
-									   struct k_work_delayable *dwork,
-									   k_timeout_t timeout);
+__kernel int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
+										  struct k_work_delayable *dwork,
+										  k_timeout_t timeout);
 
 /**
  * @brief Schedule a delayable work item for the system workqueue.
@@ -196,8 +196,8 @@ __kernel int k_work_delayable_schedule(struct k_workqueue *workqueue,
  * @param timeout
  * @return __kernel
  */
-__kernel int k_system_work_delayable_schedule(struct k_work_delayable *dwork,
-											  k_timeout_t timeout);
+__kernel int8_t k_system_work_delayable_schedule(struct k_work_delayable *dwork,
+												 k_timeout_t timeout);
 
 /**
  * @brief Cancel a delayable work item which has been scheduled but not already
@@ -214,7 +214,7 @@ __kernel int k_system_work_delayable_schedule(struct k_work_delayable *dwork,
  * @param dwork
  * @return 0 if success, negative error code otherwise
  */
-__kernel int k_work_delayable_cancel(struct k_work_delayable *dwork);
+__kernel int8_t k_work_delayable_cancel(struct k_work_delayable *dwork);
 
 #ifdef __cplusplus
 }

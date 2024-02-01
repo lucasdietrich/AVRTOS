@@ -123,7 +123,7 @@ static void usart_rx_thread(struct k_msgq *msgq)
 		printf_P(PSTR("Buffer size : %u\n"), IPC_FRAME_SIZE);
 
 		// Pretty print buffer
-		for (int i = 0; i < IPC_FRAME_SIZE; i++) {
+		for (size_t i = 0; i < IPC_FRAME_SIZE; i++) {
 			if (i % 16 == 0) {
 				printf_P(PSTR("\n"));
 			}

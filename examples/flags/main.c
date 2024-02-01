@@ -51,7 +51,7 @@ ISR(USART0_RX_vect)
 		break;
 	}
 
-	int ret = k_flags_notify(&flags, notify, K_FLAGS_SET);
+	int8_t ret = k_flags_notify(&flags, notify, K_FLAGS_SET);
 
 	if (ret > 0) {
 		k_yield_from_isr();

@@ -62,7 +62,7 @@ typedef enum {
  * @param value Initial value
  * @return int
  */
-int k_flags_init(struct k_flags *flags, uint8_t value);
+int8_t k_flags_init(struct k_flags *flags, uint8_t value);
 
 /**
  * @brief Poll for any bit of the flags to be set
@@ -102,9 +102,8 @@ int k_flags_poll(struct k_flags *flags,
  * @return  -EINVAL if flags object is NULL
  * @return  -ENOTSUP if options is not supported
  */
-int k_flags_notify(struct k_flags *flags,
-				   uint8_t notify_value,
-				   k_flags_options_t options);
+int8_t
+k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_t options);
 
 /**
  * @brief Reset a flags object
@@ -114,6 +113,6 @@ int k_flags_notify(struct k_flags *flags,
  * @param flags
  * @return int
  */
-int k_flags_reset(struct k_flags *flags);
+int8_t k_flags_reset(struct k_flags *flags);
 
 #endif /* _AVRTOS_FLAGS_H */
