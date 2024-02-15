@@ -241,6 +241,7 @@ typedef struct {
 	Z_STACK_START_USABLE(thread->stack.end, thread->stack.size)
 
 #define Z_STACK_END(stack_start, size) ((stack_start) + (size)-1)
+#define Z_STACK_START(stack_end, size) ((stack_end) - (size) + 1)
 
 #define Z_STACK_END_ASM(stack_start, size) Z_STACK_END(stack_start, size)
 
@@ -352,6 +353,12 @@ typedef struct {
 	Z_THREAD_DEFINE(name, entry, Z_CALLSAVED_CTX_SIZE, prio_flag, context_p, symbol, \
 			auto_start)
 
+#endif
+
+#if CONFIG_THREAD_MAIN_MONITOR || CONFIG_THREAD_EXPLICIT_MAIN_STACK
+#define Z_THREAD_IS_MONITORED(thread) true
+#else
+#define Z_THREAD_IS_MONITORED(thread) ((thread) != &z_thread_main)
 #endif
 
 /*___________________________________________________________________________*/

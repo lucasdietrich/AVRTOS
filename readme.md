@@ -77,6 +77,9 @@ Planned Features (TODOs):
 - Implementation of builtin_ctz for 8-bit variables
 - Sample for discovering the I2C bus
 - Removal of outdated samples
+- Tutorial
+- Kconfig
+- make the kernel ISR aware with a dedicated ISR stack (can IDLE thread be reused?)
 
 ### Description
 

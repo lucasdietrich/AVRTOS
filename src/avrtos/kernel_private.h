@@ -17,6 +17,19 @@ extern "C" {
 #endif
 
 /**
+ * @brief Swaps the endianness of a memory address.
+ *
+ * This function swaps the endianness of a memory address. It is used to convert
+ * data between big-endian and little-endian formats.
+ *
+ * @param addr Pointer to the memory address to swap endianness.
+ */
+__always_inline void swap_endianness(void **addr)
+{
+	*addr = (void *)HTONS(*addr);
+}
+
+/**
  * @brief Set the state of a thread.
  *
  * This function sets the state of a thread by updating the corresponding flags.
@@ -45,7 +58,7 @@ __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
 }
 
 /**
- * @def THREAD_IS_IDLE(_thread)
+ * @def Z_THREAD_IS_IDLE(_thread)
  * @brief Checks if a thread is the idle thread.
  *
  * This macro checks whether a given thread pointer corresponds to the idle thread.
@@ -56,13 +69,13 @@ __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
  * @return 1 if the thread is the idle thread, 0 otherwise.
  */
 #if CONFIG_KERNEL_THREAD_IDLE
-#define THREAD_IS_IDLE(_thread) (_thread == &z_thread_idle)
+#define Z_THREAD_IS_IDLE(_thread) (_thread == &z_thread_idle)
 #else
-#define THREAD_IS_IDLE(_thread) (0)
+#define Z_THREAD_IS_IDLE(_thread) (0)
 #endif
 
 /**
- * @def THREAD_IS_MAIN(_thread)
+ * @def Z_THREAD_IS_MAIN(_thread)
  * @brief Checks if a thread is the main thread.
  *
  * This macro checks whether a given thread pointer corresponds to the main thread.
@@ -70,7 +83,7 @@ __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
  * @param _thread Pointer to the thread structure to be checked.
  * @return 1 if the thread is the main thread, 0 otherwise.
  */
-#define THREAD_IS_MAIN(_thread) (_thread == &z_thread_main)
+#define Z_THREAD_IS_MAIN(_thread) (_thread == &z_thread_main)
 
 /**
  * @brief Perform a thread switch (assembly function).
@@ -179,6 +192,27 @@ __kernel void z_wake_up(struct k_thread *thread);
  * @return false, interrupt flag is cleared
  */
 bool z_interrupts(void);
+/**
+ * @brief Initialize stack sentinel byte(s) for all threads.
+ *
+ */
+__kernel void z_init_stacks_sentinel(void);
+
+/**
+ * @brief Initialize stack sentinel byte(s) for specified thread.
+ *
+ * @param thread
+ */
+__kernel void z_init_thread_stack_sentinel(struct k_thread *thread);
+
+/**
+ * @brief Verify if stack sentinel byte(s) is(are) still intact for given thread.
+ *
+ * @param thread The thread to verify
+ * @return true
+ * @return false
+ */
+__kernel bool z_thread_verify_sent(struct k_thread *thread);
 
 #if defined(__cplusplus)
 }

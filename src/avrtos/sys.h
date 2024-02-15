@@ -29,7 +29,7 @@
 #define __always_inline	 __attribute__((always_inline)) inline
 #define __noinit	 Z_LINK_SECTION(.noinit)
 #define __bss		 Z_LINK_SECTION(.bss)
-#define __packed __attribute__((packed))
+#define __packed	 __attribute__((packed))
 
 #define __static_assert			    _Static_assert
 #define __STATIC_ASSERT(test_for_true, msg) __static_assert(test_for_true, msg)

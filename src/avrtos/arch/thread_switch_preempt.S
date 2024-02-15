@@ -335,7 +335,7 @@ z_thread_entry:
 	/*
 	 * Exiting the thread will cause a fault
 	 */
-	ldi r24, 0x03 ; K_THREAD_TERMINATED
+	ldi r24, 0x04 ; K_FAULT_THREAD_TERMINATED
 	call __fault
 #else
 	; call thread entry function

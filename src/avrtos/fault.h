@@ -16,13 +16,14 @@ extern "C" {
 #endif
 
 // fault codes
-#define K_FAULT_ASSERT	    0
-#define K_FAULT_SENTINEL    1
-#define K_FAULT_MEMORY	    2
-#define K_THREAD_TERMINATED 3
-#define K_FAULT_KERNEL_HALT 4
+#define K_FAULT_ASSERT		  0
+#define K_FAULT_STACK_SENTINEL	  1
+#define K_FAULT_STACK_OVERFLOW	  2
+#define K_FAULT_MEMORY		  3
+#define K_FAULT_THREAD_TERMINATED 4
+#define K_FAULT_KERNEL_HALT	  5
 
-#define K_FAULT 0xFF
+#define K_FAULT_ANY 0xFF
 
 #if !defined(__ASSEMBLER__)
 
