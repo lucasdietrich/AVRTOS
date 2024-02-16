@@ -69,7 +69,7 @@ __kernel int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout);
  * Can be called from an interrupt.
  *
  * @param event
- * @return int Return 0 if the event was pending, -EAGAIN otherwise.
+ * @return int8_t Return 0 if the event was pending, -EAGAIN otherwise.
  */
 __kernel int8_t k_event_cancel(struct k_event *event);
 

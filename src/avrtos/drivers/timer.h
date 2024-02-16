@@ -308,7 +308,7 @@ struct timer_config {
  * @param dev
  * @return int
  */
-__always_inline int timer_get_index(void *dev)
+__always_inline int8_t timer_get_index(void *dev)
 {
 	switch ((uint16_t)dev) {
 #if defined(TIMER0_DEVICE)
@@ -506,26 +506,26 @@ void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx);
 
 void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx);
 
-int timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter);
+int8_t timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter);
 
-int timer8_init(TIMER8_Device *dev, const struct timer_config *config);
+int8_t timer8_init(TIMER8_Device *dev, const struct timer_config *config);
 
-int timer16_init(TIMER16_Device *dev, const struct timer_config *config);
+int8_t timer16_init(TIMER16_Device *dev, const struct timer_config *config);
 
-int timer8_deinit(TIMER8_Device *dev);
+int8_t timer8_deinit(TIMER8_Device *dev);
 
-int timer16_deinit(TIMER16_Device *dev);
+int8_t timer16_deinit(TIMER16_Device *dev);
 
 #define TIMER_API_FLAG_AUTOSTART (1 << 0)
 
 typedef void (*timer_callback_t)(void *dev, uint8_t tim_idx, void *user_data);
 
 /* High level API */
-int timer_init(uint8_t tim_idx,
-			   uint32_t period_us,
-			   timer_callback_t cb,
-			   void *user_data,
-			   uint8_t flags);
+int8_t timer_init(uint8_t tim_idx,
+				  uint32_t period_us,
+				  timer_callback_t cb,
+				  void *user_data,
+				  uint8_t flags);
 
 void timer_start(uint8_t tim_idx);
 

@@ -26,7 +26,7 @@ static void usart_task(void *arg)
 {
 	struct MyStruct *ms = (struct MyStruct *)arg;
 
-	int ret;
+	int8_t ret;
 	uint8_t c;
 	for (;;) {
 		c = ll_usart_sync_getc(USART0_DEVICE);

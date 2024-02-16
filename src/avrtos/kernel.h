@@ -29,7 +29,7 @@ extern "C" {
  * @param priority thread priority
  * @param context_p thread context passed to entry function
  * @param symbol thread symbol letter
- * @return int 0 on success
+ * @return int8_t 0 on success
  */
 int8_t k_thread_create(struct k_thread *thread,
 					   k_thread_entry_t entry,
@@ -474,7 +474,7 @@ extern struct k_thread *z_current;
  * 	const char flags = USART0_DEVICE->UDRn;
  * 	ll_usart_sync_putc(USART0_DEVICE, flags);
  *
- * 	int ret = k_flags_notify(&flags, flags, K_FLAGS_SET);
+ * 	int8_t ret = k_flags_notify(&flags, flags, K_FLAGS_SET);
  * 	if (ret > 0) {
  * 		k_yield_from_isr();
  * 	}

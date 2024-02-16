@@ -6,7 +6,7 @@
 
 #include "exti.h"
 
-int exti_configure(uint8_t exti, uint8_t isc)
+int8_t exti_configure(uint8_t exti, uint8_t isc)
 {
 	Z_ARGS_CHECK(exti < EXTI_COUNT) return -EINVAL;
 

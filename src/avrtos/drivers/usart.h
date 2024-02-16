@@ -169,9 +169,9 @@ struct usart_config {
 // drivers API
 __kernel void ll_usart_init(UART_Device *dev, const struct usart_config *config);
 
-__kernel int usart_init(UART_Device *dev, const struct usart_config *config);
+__kernel int8_t usart_init(UART_Device *dev, const struct usart_config *config);
 
-__kernel int usart_deinit(UART_Device *dev);
+__kernel int8_t usart_deinit(UART_Device *dev);
 
 __kernel void ll_usart_sync_putc(UART_Device *dev, char c);
 
@@ -207,7 +207,7 @@ __always_inline void ll_usart_disable_udre_isr(UART_Device *dev)
 	CLR_BIT(dev->UCSRnB, BIT(UDRIEn));
 }
 
-__kernel int usart_send(UART_Device *dev, const char *buf, int len);
+__kernel int8_t usart_send(UART_Device *dev, const char *buf, size_t len);
 
 // ASYNC API
 
@@ -240,13 +240,13 @@ struct usart_async_context {
 };
 // typedef struct usart_event_t;
 
-__kernel int usart_set_callback(UART_Device *dev, usart_async_callback_t cb);
+__kernel int8_t usart_set_callback(UART_Device *dev, usart_async_callback_t cb);
 
-__kernel int usart_rx_disable(UART_Device *dev);
+__kernel int8_t usart_rx_disable(UART_Device *dev);
 
-__kernel int usart_rx_enable(UART_Device *dev, void *buf, size_t size);
+__kernel int8_t usart_rx_enable(UART_Device *dev, void *buf, size_t size);
 
-__kernel int usart_tx(UART_Device *dev, const void *buf, size_t size);
+__kernel int8_t usart_tx(UART_Device *dev, const void *buf, size_t size);
 
 #ifdef __cplusplus
 }

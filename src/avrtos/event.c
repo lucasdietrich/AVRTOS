@@ -88,7 +88,7 @@ int8_t k_event_cancel(struct k_event *event)
 {
 	Z_ARGS_CHECK(event) return -EINVAL;
 
-	int ret			   = 0;
+	int8_t ret		   = 0;
 	const uint8_t lock = irq_lock();
 
 	if (!event->scheduled) {

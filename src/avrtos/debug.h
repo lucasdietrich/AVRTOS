@@ -249,9 +249,9 @@ void *z_thread_get_return_addr(struct k_thread *thread);
  * @param thread
  * @param buffer
  * @param size
- * @return int
+ * @return int8_t
  */
-// int k_thread_copy_registers(struct k_thread *thread, uint8_t * buffer, const
+// int8_t k_thread_copy_registers(struct k_thread *thread, uint8_t * buffer, const
 // size_t size);
 
 /*___________________________________________________________________________*/
