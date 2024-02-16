@@ -77,10 +77,10 @@ Planned Features (TODOs):
 - Renaming "static inline" functions to "__always_inline"
 - Implementation of builtin_ctz for 8-bit variables
 - Removal of outdated samples
-- i2c
-  - make configurable clock speed
-  - implement: i2c_calc_config
-  - Sample for discovering the I2C bus
+- Tutorial
+- Kconfig
+- make the kernel ISR aware with a dedicated ISR stack (can IDLE thread be reused?)
+- Sample for discovering the I2C bus
 
 ### Description
 

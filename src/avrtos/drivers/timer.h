@@ -22,51 +22,55 @@ extern "C" {
  * - Timer 1 on ATmega328p
  */
 typedef struct {
-	__IO uint8_t TCCRnA;	 /* COM1A1 COM1A0 COM1B1 COM1B0 COM1C1 COM1C0 WGM11
-					WGM10 */
-	__IO uint8_t TCCRnB;	 /* ICNCn ICESn - WGMn3 WGMn2 CSn2 CSn1 CSn0 */
-	__IO uint8_t TCCRnC;	 /* FOCnA FOCnB FOCnC */
-	__IO uint8_t _reserved1; /* reserved */
+	/* COM1A1 COM1A0 COM1B1 COM1B0 COM1C1 COM1C0 WGM11 WGM10 */
+	__IO uint8_t TCCRnA;
+	/* ICNCn ICESn - WGMn3 WGMn2 CSn2 CSn1 CSn0 */
+	__IO uint8_t TCCRnB;
+	/* FOCnA FOCnB FOCnC */
+	__IO uint8_t TCCRnC;
+	/* reserved */
+	__IO uint8_t _reserved1;
 
 	union {
 		struct {
-			__IO uint8_t TCNTnL; /* Timer/Counter - Counter Register
-						Low Byte */
-			__IO uint8_t TCNTnH; /* Timer/Counter - Counter Register
-						High Byte */
-			__IO uint8_t ICRnL;	 /* Timer/Counter - Input Capture
-						Register High Byte */
-			__IO uint8_t ICRnH;	 /* Timer/Counter - Input Capture
-						Register High Byte */
-			__IO uint8_t OCRnAL; /* Timer/Counter - Output Compare
-						Register A Low Byte */
-			__IO uint8_t OCRnAH; /* Timer/Counter - Output Compare
-						Register A High Byte */
-			__IO uint8_t OCRnBL; /* Timer/Counter - Output Compare
-						Register B Low Byte */
-			__IO uint8_t OCRnBH; /* Timer/Counter - Output Compare
-						Register B High Byte */
-			__IO uint8_t OCRnCL; /* Timer/Counter - Output Compare
-						Register C Low Byte */
-			__IO uint8_t OCRnCH; /* Timer/Counter - Output Compare
-						Register C High Byte */
+			/* Timer/Counter - Counter Register Low Byte */
+			__IO uint8_t TCNTnL;
+			/* Timer/Counter - Counter Register High Byte */
+			__IO uint8_t TCNTnH;
+			/* Timer/Counter - Input Capture Register High Byte */
+			__IO uint8_t ICRnL;
+			/* Timer/Counter - Input Capture Register High Byte */
+			__IO uint8_t ICRnH;
+			/* Timer/Counter - Output Compare Register A Low Byte */
+			__IO uint8_t OCRnAL;
+			/* Timer/Counter - Output Compare Register A High Byte */
+			__IO uint8_t OCRnAH;
+			/* Timer/Counter - Output Compare Register B Low Byte */
+			__IO uint8_t OCRnBL;
+			/* Timer/Counter - Output Compare Register B High Byte */
+			__IO uint8_t OCRnBH;
+			/* Timer/Counter - Output Compare Register C Low Byte */
+			__IO uint8_t OCRnCL;
+			/* Timer/Counter - Output Compare Register C High Byte */
+			__IO uint8_t OCRnCH;
 		};
 		struct {
-			__IO uint16_t TCNTn; /* Timer/Counter - Counter Register */
-			__IO uint16_t IRCN;	 /* Timer/Counter - Input Capture
-						Register */
+			/* Timer/Counter - Counter Register */
+			__IO uint16_t TCNTn;
+			/* Timer/Counter - Input Capture Register */
+			__IO uint16_t IRCN;
 
 			union {
 				struct {
-					__IO uint16_t OCRnA; /* Timer/Counter - Output
-								Compare Register A */
-					__IO uint16_t OCRnB; /* Timer/Counter - Output
-								Compare Register B */
-					__IO uint16_t OCRnC; /* Timer/Counter - Output
-								Compare Register C */
+					/* Timer/Counter - Output Compare Register A */
+					__IO uint16_t OCRnA;
+					/* Timer/Counter - Output Compare Register B */
+					__IO uint16_t OCRnB;
+					/* Timer/Counter - Output Compare Register C */
+					__IO uint16_t OCRnC;
 				};
-				__IO uint16_t OCRnx[3]; /* Timer/Counter - Output
-							   Compare Register */
+				/* Timer/Counter - Output Compare Register */
+				__IO uint16_t OCRnx[3];
 			};
 		};
 	};
@@ -243,15 +247,17 @@ typedef enum {
 	TIMER16_INPUT_CAPTURE_INTERRUPT			 = 5u,
 } timer16_interrupt_t;
 
+/* Timer Channel Compare Output Mode */
 typedef enum {
-	TIMER_CHANNEL_COMP_MODE_NORMAL =
-		0u, /* Normal port operation, OCnA/OCnB/OCnC disconnected */
-	TIMER_CHANNEL_COMP_MODE_TOGGLE = 1u, /* Toggle OCnA/OCnB/OCnC on compare match */
-	TIMER_CHANNEL_COMP_MODE_CLEAR  = 2u, /* Clear OCnA/OCnB/OCnC on compare match
-						(set output to low  level) */
-	TIMER_CHANNEL_COMP_MODE_SET = 3u,	 /* Set OCnA/OCnB/OCnC on compare match
-						(set output to high level */
-} timer_channel_com_t;					 /* Timer Channel Compare Output Mode */
+	/* Normal port operation, OCnA/OCnB/OCnC disconnected */
+	TIMER_CHANNEL_COMP_MODE_NORMAL = 0u,
+	/* Toggle OCnA/OCnB/OCnC on compare match */
+	TIMER_CHANNEL_COMP_MODE_TOGGLE = 1u,
+	/* Clear OCnA/OCnB/OCnC on compare match (set output to low  level) */
+	TIMER_CHANNEL_COMP_MODE_CLEAR = 2u,
+	/* Set OCnA/OCnB/OCnC on compare match (set output to high level */
+	TIMER_CHANNEL_COMP_MODE_SET = 3u,
+} timer_channel_com_t;
 
 typedef enum {
 	TIMER_CHANNEL_A = 0u,
@@ -302,7 +308,7 @@ struct timer_config {
  * @param dev
  * @return int
  */
-__always_inline __attribute__((__always_inline__)) int timer_get_index(void *dev)
+__always_inline int timer_get_index(void *dev)
 {
 	switch ((uint16_t)dev) {
 #if defined(TIMER0_DEVICE)
@@ -348,7 +354,7 @@ __always_inline __attribute__((__always_inline__)) int timer_get_index(void *dev
  * @param dev
  * @return int
  */
-__always_inline __attribute__((__always_inline__)) void *timer_get_device(uint8_t idx)
+__always_inline void *timer_get_device(uint8_t idx)
 {
 	switch (idx) {
 #if defined(TIMER0_DEVICE)

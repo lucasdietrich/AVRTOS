@@ -53,6 +53,12 @@
 #define Z_ARGS_CHECK(_cond) if (0)
 #endif
 
+#if CONFIG_KERNEL_PRIVATE_MEMBERS
+#define Z_PRIVATE(_member) _member
+#else
+#define Z_PRIVATE(_member) _##_member
+#endif
+
 /*___________________________________________________________________________*/
 
 // Timing
@@ -237,6 +243,7 @@ typedef struct {
 	Z_STACK_START_USABLE(thread->stack.end, thread->stack.size)
 
 #define Z_STACK_END(stack_start, size) ((stack_start) + (size)-1)
+#define Z_STACK_START(stack_end, size) ((stack_end) - (size) + 1)
 
 #define Z_STACK_END_ASM(stack_start, size) Z_STACK_END(stack_start, size)
 
@@ -323,6 +330,12 @@ typedef struct {
 						auto_start)                                                      \
 	__STATIC_ASSERT(0u, "Static thread (K_THREAD_DEFINE) creation is not "               \
 						"supported");
+#endif
+
+#if CONFIG_THREAD_MAIN_MONITOR || CONFIG_THREAD_EXPLICIT_MAIN_STACK
+#define Z_THREAD_IS_MONITORED(thread) true
+#else
+#define Z_THREAD_IS_MONITORED(thread) ((thread) != &z_thread_main)
 #endif
 
 /*___________________________________________________________________________*/

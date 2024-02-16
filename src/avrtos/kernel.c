@@ -22,6 +22,10 @@
 
 #define K_MODULE K_MODULE_KERNEL
 
+#if CONFIG_KERNEL_ASSERT
+#warning "Assertions are globally enabled"
+#endif
+
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 __noinit char z_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
 Z_STACK_SENTINEL_REGISTER(z_main_stack);
@@ -37,11 +41,23 @@ Z_STACK_SENTINEL_REGISTER(z_main_stack);
 /* Calculate main thread stack end address */
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 /* explicit stack defined, stack is at the end of the defined buffer */
+#define Z_THREAD_MAIN_STACK_START_ADDR (void *)z_main_stack
 #define Z_THREAD_MAIN_STACK_END_ADDR                                                     \
-	(void *)Z_STACK_END(z_main_stack, CONFIG_THREAD_MAIN_STACK_SIZE)
+	(void *)Z_STACK_END(Z_THREAD_MAIN_STACK_START_ADDR, CONFIG_THREAD_MAIN_STACK_SIZE)
 #else
 /* implicit stack, we set the main thread stack end at the end of the RAM */
 #define Z_THREAD_MAIN_STACK_END_ADDR (void *)RAMEND
+
+#if CONFIG_THREAD_MAIN_MONITOR == 1
+#if CONFIG_THREAD_MAIN_STACK_SIZE == 0
+#error                                                                                   \
+	"CONFIG_THREAD_MAIN_STACK_SIZE must be set when CONFIG_THREAD_MAIN_MONITOR is enabled"
+#endif
+#define Z_THREAD_MAIN_STACK_START_ADDR                                                   \
+	(void *)Z_STACK_START(Z_THREAD_MAIN_STACK_END_ADDR, CONFIG_THREAD_MAIN_STACK_SIZE)
+Z_LINK_KERNEL_SECTION(.k_sentinels)
+void *z_sent_z_main_stack = Z_THREAD_MAIN_STACK_START_ADDR;
+#endif
 #endif
 
 /**
@@ -82,12 +98,11 @@ K_THREAD struct k_thread z_thread_main = {
 	.swap_data = NULL,
 	.stack =
 		{
-			.end  = Z_THREAD_MAIN_STACK_END_ADDR,
-			.size = CONFIG_THREAD_MAIN_STACK_SIZE, /* Used as
-								  indication
-								  only if
-								  CONFIG_THREAD_EXPLICIT_MAIN_STACK
-								  is enabled */
+			.end = Z_THREAD_MAIN_STACK_END_ADDR,
+			/* If CONFIG_THREAD_EXPLICIT_MAIN_STACK is disabled
+			 * the size is used by CONFIG_THREAD_MAIN_MONITOR
+			 */
+			.size = CONFIG_THREAD_MAIN_STACK_SIZE,
 		},
 	.symbol = 'M' // default main thread sumbol
 };
@@ -225,6 +240,36 @@ extern struct k_thread __k_threads_end;
  */
 extern struct k_thread z_thread_idle;
 
+#if CONFIG_THREAD_MONITOR
+/**
+ * @brief Monitor and verify the stack of a thread.
+ *
+ * Fault if the stack is invalid.
+ *
+ * @param thread Pointer to the thread
+ */
+static void z_thread_monitor(struct k_thread *thread)
+{
+	if (!Z_THREAD_IS_MONITORED(thread)) {
+		return;
+	}
+
+	/* Verify if a stack overflow occurs at the moment of executing the current code.
+	 */
+	const uint16_t stack_offset = sys_ptr_diff(thread->stack.end, SP);
+	if (stack_offset > thread->stack.size) {
+		__fault(K_FAULT_STACK_OVERFLOW);
+	}
+
+#if CONFIG_THREAD_STACK_SENTINEL
+	/* Check for the stack sentinel presence */
+	if (z_thread_verify_sent(thread) == false) {
+		__fault(K_FAULT_STACK_SENTINEL);
+	}
+#endif /* CONFIG_THREAD_STACK_SENTINEL */
+}
+#endif /* CONFIG_THREAD_MONITOR */
+
 //
 // Kernel Private API
 //
@@ -248,11 +293,9 @@ __kernel static void z_schedule(struct k_thread *thread)
 {
 	__ASSERT_NOINTERRUPT();
 
-#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_KERNEL_ASSERT
-	/* check that stack sentinel is still valid before switching to thread */
-	if (k_verify_stack_sentinel(thread) == false) {
-		__fault(K_FAULT_SENTINEL);
-	}
+#if CONFIG_THREAD_MONITOR
+	/* check that stack is valid before scheduling thread */
+	z_thread_monitor(thread);
 #endif
 
 	/* Mark this thread as READY */
@@ -363,19 +406,6 @@ __kernel void z_wake_up(struct k_thread *thread)
 }
 
 /**
- * @brief Swaps the endianness of a memory address.
- *
- * This function swaps the endianness of a memory address. It is used to convert
- * data between big-endian and little-endian formats.
- *
- * @param addr Pointer to the memory address to swap endianness.
- */
-__always_inline void swap_endianness(void **addr)
-{
-	*addr = (void *)HTONS(*addr);
-}
-
-/**
  * @brief Finalize the thread stack.
  *
  * @param thread Pointer to the thread
@@ -427,7 +457,7 @@ void z_init_threads(void)
 		struct k_thread *const thread = &(&__k_threads_start)[i];
 
 		/* Main thread already in queue */
-		if (THREAD_IS_MAIN(thread)) {
+		if (Z_THREAD_IS_MAIN(thread)) {
 			continue;
 		}
 
@@ -515,11 +545,11 @@ struct k_thread *z_scheduler(void)
 {
 	__ASSERT_NOINTERRUPT();
 
-#if CONFIG_THREAD_STACK_SENTINEL && CONFIG_KERNEL_ASSERT
-	k_assert_registered_stack_sentinel();
-#endif
-
 	struct k_thread *const prev = z_current;
+
+#if CONFIG_THREAD_MONITOR
+	z_thread_monitor(prev);
+#endif
 
 	/* reset flags */
 	prev->flags &= ~(Z_THREAD_TIMER_EXPIRED_MSK | Z_THREAD_PEND_CANCELED_MSK);
@@ -538,6 +568,10 @@ struct k_thread *z_scheduler(void)
 
 	__K_DBG_SCHED_NEXT_THREAD();
 	__K_DBG_SCHED_NEXT(z_current);
+
+#if CONFIG_THREAD_MONITOR
+	z_thread_monitor(z_current);
+#endif
 
 	return prev;
 }
@@ -559,6 +593,10 @@ static void z_suspend(struct k_thread *thread)
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_STOPPED);
 	__ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
+
+#if CONFIG_THREAD_MONITOR
+	z_thread_monitor(thread);
+#endif
 
 	if (z_get_thread_state(thread) == Z_THREAD_STATE_PENDING) { /* Z_PENDING */
 		z_cancel_scheduled_wake_up(thread);
@@ -903,7 +941,7 @@ void k_wait(k_timeout_t delay, uint8_t mode)
 	uint32_t now;
 	uint32_t ticks = k_ticks_get_32();
 
-	if (mode & K_WAIT_MODE_BLOCK) k_sched_lock();
+	if (mode == K_WAIT_MODE_BLOCK) k_sched_lock();
 
 	do {
 		switch (mode) {
@@ -922,7 +960,7 @@ void k_wait(k_timeout_t delay, uint8_t mode)
 		now = k_ticks_get_32();
 	} while (now - ticks < K_TIMEOUT_TICKS(delay));
 
-	if (mode & K_WAIT_MODE_BLOCK) k_sched_unlock();
+	if (mode == K_WAIT_MODE_BLOCK) k_sched_unlock();
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 

@@ -26,9 +26,10 @@
 #define __noinline				 __attribute__((noinline))
 #define __noreturn				 __attribute__((__noreturn__))
 #define CODE_UNREACHABLE		 __builtin_unreachable();
-#define __always_inline			 __attribute__((always_inline)) static inline
+#define __always_inline			 __attribute__((always_inline)) inline
 #define __noinit				 Z_LINK_SECTION(.noinit)
 #define __bss					 Z_LINK_SECTION(.bss)
+#define __packed				 __attribute__((packed))
 #define memory_barrier()		 asm volatile("" : : : "memory")
 #define memory_barrier_var(_var) asm volatile("" : : "b"(_var) : "memory")
 

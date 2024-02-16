@@ -6,7 +6,7 @@
 
 /build
 /build_*
-
 .venv
 *.dump
-misra-rules.txt
+/scripts/misra-rules.txt
+/misra.json

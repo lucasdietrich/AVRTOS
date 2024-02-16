@@ -225,7 +225,7 @@ exit:
 	return ret;
 }
 
-static void transfer_stop(I2C_Device *dev, struct i2c_context *x)
+void transfer_stop(I2C_Device *dev, struct i2c_context *x)
 {
 	TWI_STOP(dev);
 	x->state = READY;

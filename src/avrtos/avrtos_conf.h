@@ -138,7 +138,7 @@
 // If CONFIG_THREAD_EXPLICIT_MAIN_STACK is enabled, the main stack is  allocated
 // in a dedicated buffer in the .data section.
 //
-// If CONFIG_THREAD_EXPLICIT_MAIN_STACK=1 make sure main stack size does not
+// If CONFIG_THREAD_EXPLICIT_MAIN_STACK make sure main stack size does not
 // exceed the remaining RAM size.
 //
 // If heap grows down, canaries might be invalidated if expected stack size is
@@ -448,7 +448,31 @@
 // 0xAA or 0x55 are good values
 //
 #ifndef CONFIG_THREAD_STACK_SENTINEL_SYMBOL
-#define CONFIG_THREAD_STACK_SENTINEL_SYMBOL 0xAA
+#define CONFIG_THREAD_STACK_SENTINEL_SYMBOL 0x55
+#endif
+
+//
+// Monitor thread stack to detect overflows
+//
+// 0: Thread stack monitor is disabled
+// 1: Thread stack monitor is enabled
+//
+#ifndef CONFIG_THREAD_MONITOR
+#define CONFIG_THREAD_MONITOR 0
+#endif
+
+//
+// Monitor main thread stack to detect overflows
+//
+// * This option is discouraged with CONFIG_THREAD_EXPLICIT_MAIN_STACK=1 except
+// if you can predict the main thread maximum stack usage by defining
+// CONFIG_THREAD_MAIN_STACK_SIZE.
+//
+// 0: Main thread sentinel is disabled
+// 1: Main thread sentinel is enabled
+//
+#ifndef CONFIG_THREAD_MAIN_MONITOR
+#define CONFIG_THREAD_MAIN_MONITOR 0
 #endif
 
 //
@@ -830,13 +854,14 @@
 #endif
 
 //
-// Enable silent faults for kernel
+// Enable faults verbosity
 //
 // 0: Kernel faults silently
 // 1: Kernel faults with message
+// 2: Kernel faults with message and stack dump
 //
-#ifndef CONFIG_KERNEL_SILENT_FAULTS
-#define CONFIG_KERNEL_SILENT_FAULTS 0
+#ifndef CONFIG_KERNEL_FAULT_VERBOSITY
+#define CONFIG_KERNEL_FAULT_VERBOSITY 1
 #endif
 
 //
