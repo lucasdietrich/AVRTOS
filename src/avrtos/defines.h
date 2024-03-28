@@ -136,20 +136,20 @@ typedef struct {
 #define USEC_PER_MSEC (1000LU)
 #define USEC_PER_SEC  (USEC_PER_MSEC * MSEC_PER_SEC)
 
-#define K_TIMEOUT_TICKS(t)	 (t.value)
+#define K_TIMEOUT_TICKS(t)	 ((t).value)
 #define K_TIMEOUT_EQ(t1, t2) (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
 #define K_TIMEOUT_MS(t)		 ((uint32_t)(K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
 #define K_TIMEOUT_SECONDS(t) ((uint32_t)(K_TIMEOUT_TICKS(t) / K_TICKS_PER_SECOND))
 
 #ifndef __cplusplus
-#define K_TICKS(ticks) ((k_timeout_t){.value = (k_ticks_t)ticks})
+#define K_TICKS(ticks) ((k_timeout_t){.value = (k_ticks_t)(ticks)})
 #else
 #define K_TICKS(ticks) ((k_timeout_t){.value = static_cast<k_ticks_t>(ticks)})
 #endif /* __cplusplus */
 
-#define K_SECONDS(seconds)	 K_TICKS(K_TICKS_PER_SECOND *seconds)
-#define K_MSEC(milliseconds) K_TICKS(K_TICKS_PER_MS *milliseconds)
-#define K_USEC(microseconds) K_TICKS(K_TICKS_PER_USEC *microseconds)
+#define K_SECONDS(seconds)	 K_TICKS(K_TICKS_PER_SECOND *(seconds))
+#define K_MSEC(milliseconds) K_TICKS(K_TICKS_PER_MS *(milliseconds))
+#define K_USEC(microseconds) K_TICKS(K_TICKS_PER_USEC *(microseconds))
 #define K_NO_WAIT			 K_TICKS(0)
 #define K_NEXT_TICK			 K_TICKS(1)
 #define K_FOREVER			 K_TICKS(-1)
@@ -226,8 +226,9 @@ typedef struct {
 // - in asm files types are not understood by compiler
 #define K_STACK_END(stack_start, size) (uint8_t *)((uint8_t *)(stack_start) + (size)-1)
 #define K_STACK_START(stack_end, size) (uint8_t *)((uint8_t *)(stack_end) - (size) + 1)
-#define K_THREAD_STACK_START(thread)   K_STACK_START(thread->stack.end, thread->stack.size)
-#define K_THREAD_STACK_END(thread)	   (thread->stack.end)
+#define K_THREAD_STACK_START(thread)                                                     \
+	K_STACK_START((thread)->stack.end, (thread)->stack.size)
+#define K_THREAD_STACK_END(thread) ((thread)->stack.end)
 
 /* real stack start and size without counting sentinel */
 #if CONFIG_THREAD_STACK_SENTINEL
@@ -247,7 +248,7 @@ typedef struct {
 
 #define Z_STACK_END_ASM(stack_start, size) Z_STACK_END(stack_start, size)
 
-#define Z_STACK_INIT_SP(stack_end) (stack_end - Z_CALLSAVED_CTX_SIZE)
+#define Z_STACK_INIT_SP(stack_end) ((stack_end)-Z_CALLSAVED_CTX_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly
 // set
@@ -312,9 +313,6 @@ typedef struct {
 			},                                                                           \
 		.symbol = sym}
 
-#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
-	Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 1)
-
 #if CONFIG_AVRTOS_LINKER_SCRIPT
 #define Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol,           \
 						auto_start)                                                      \
@@ -331,6 +329,9 @@ typedef struct {
 	__STATIC_ASSERT(0u, "Static thread (K_THREAD_DEFINE) creation is not "               \
 						"supported");
 #endif
+
+#define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
+	Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 1)
 
 #if CONFIG_THREAD_MAIN_MONITOR || CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define Z_THREAD_IS_MONITORED(thread) true
