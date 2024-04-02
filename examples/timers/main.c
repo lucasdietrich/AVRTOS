@@ -13,29 +13,32 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-volatile uint16_t counter  = 0;
-volatile uint16_t counter2 = 0;
+#define TASKS_COUNT 10u
 
-void handler1(struct k_timer *timer);
-void handler2(struct k_timer *timer);
-void thread2(void *context);
-void thread_canaries(void *ctx)
+struct periodic_task {
+	struct k_timer timer;
+	uint16_t counter; // counter
+};
+
+int periodic_task_handler(struct k_timer *timer)
 {
-	for (;;) {
-		k_dump_stack_canaries();
-		k_sleep(K_SECONDS(10));
-	}
+	struct periodic_task *task = CONTAINER_OF(timer, struct periodic_task, timer);
+
+	task->counter++;
+
+	return 0; // continue timer
 }
 
-void work_handler(struct k_work *work);
+static struct periodic_task tasks[TASKS_COUNT];
 
-K_WORK_DEFINE(mywork, work_handler);
+int mytimer1_handler(struct k_timer *timer)
+{
+	printf("mytimer1_handler()\n");
 
-K_TIMER_DEFINE(mytimer1, handler1, K_MSEC(100), 0);
-K_TIMER_DEFINE(mytimer2, handler2, K_MSEC(100), K_TIMER_STOPPED);
-K_THREAD_DEFINE(cantid, thread_canaries, 0x200, K_COOPERATIVE, NULL, 'C');
+	return -1; // stop timer
+}
 
-K_THREAD_DEFINE(th2, thread2, 0x100, K_PREEMPTIVE, NULL, 'A');
+K_TIMER_DEFINE(mytimer1, mytimer1_handler, K_MSEC(500), 0);
 
 int main(void)
 {
@@ -44,46 +47,20 @@ int main(void)
 
 	k_thread_dump_all();
 
-	k_timer_start(&mytimer2, K_NO_WAIT);
-
-	sei();
+	for (uint8_t i = 0; i < ARRAY_SIZE(tasks); i++) {
+		k_timer_init(&tasks[i].timer, periodic_task_handler, K_MSEC(100lu * (i + 1)), K_NO_WAIT);
+	}
 
 	for (;;) {
-		irq_disable();
-		serial_print_p(PSTR("MAIN : "));
-		serial_u16(counter);
-		serial_transmit('\n');
-		irq_enable();
+		for (uint8_t i = 0; i < ARRAY_SIZE(tasks); i++) {
+			printf("Task %u counter = %u\n", i, tasks[i].counter);
+		}
 
-		led_toggle();
+		k_dump_stack_canaries();
 
-		k_sleep(K_MSEC(1000));
+		printf("Restart mytimer1\n");
+		k_timer_start(&mytimer1, mytimer1.timeout);
+
+		k_sleep(K_SECONDS(5));
 	}
-}
-
-void handler1(struct k_timer *timer)
-{
-	counter++;
-}
-
-void handler2(struct k_timer *timer)
-{
-	counter2++;
-	k_system_workqueue_submit(&mywork);
-}
-
-void work_handler(struct k_work *work)
-{
-	k_sleep(K_MSEC(200));
-
-	serial_print_p(PSTR("WORKQUEUE : "));
-	serial_u16(counter2);
-	serial_transmit('\n');
-}
-
-void thread2(void *context)
-{
-	k_sleep(K_SECONDS(5));
-	k_timer_stop(&mytimer1);
-	k_sleep(K_FOREVER);
 }

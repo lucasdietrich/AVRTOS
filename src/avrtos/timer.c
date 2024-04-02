@@ -38,9 +38,7 @@ void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
 	__ASSERT_NOTNULL(timer);
 
 	const uint8_t key = irq_lock();
-
 	tqueue_schedule(&z_timers_runqueue, &timer->tie, starting_delay.value);
-
 	irq_unlock(key);
 }
 
@@ -55,20 +53,32 @@ void z_timers_process(void)
 
 	while (!!(item = tqueue_pop(&z_timers_runqueue))) {
 		timer = CONTAINER_OF(item, struct k_timer, tie);
-		timer->handler(timer);
-		timer->tie.next	   = NULL;
-		timer->tie.timeout = timer->timeout.value;
-		z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
+
+		int ret = timer->handler(timer);
+
+		/* stop timer if handler returns non-zero */
+		if (ret != 0) {
+			timer->tie.timeout = K_TIMER_STOPPED;
+		}
+
+		/* reschedule if not stopped */
+		if (timer->tie.timeout != K_TIMER_STOPPED) {
+			timer->tie.next	   = NULL;
+			timer->tie.timeout = timer->timeout.value;
+			z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
+		}
 	}
 }
 
-void k_timer_init(struct k_timer *timer,
-				  k_timer_handler_t handler,
-				  k_timeout_t timeout,
-				  k_timeout_t starting_delay)
+int8_t k_timer_init(struct k_timer *timer,
+					k_timer_handler_t handler,
+					k_timeout_t timeout,
+					k_timeout_t starting_delay)
 {
 	__ASSERT_NOTNULL(timer);
 	__ASSERT_NOTNULL(handler);
+
+	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
 
 	timer->handler = handler;
 	timer->timeout = timeout;
@@ -78,6 +88,8 @@ void k_timer_init(struct k_timer *timer,
 	} else {
 		timer->tie.timeout = K_FOREVER.value;
 	}
+
+	return 0;
 }
 
 bool k_timer_started(struct k_timer *timer)
@@ -87,9 +99,7 @@ bool k_timer_started(struct k_timer *timer)
 	bool ret;
 
 	const uint8_t key = irq_lock();
-
-	ret = timer->tie.timeout != K_TIMER_STOPPED;
-
+	ret				  = timer->tie.timeout != K_TIMER_STOPPED;
 	irq_unlock(key);
 
 	return ret;
@@ -99,15 +109,19 @@ int8_t k_timer_stop(struct k_timer *timer)
 {
 	__ASSERT_NOTNULL(timer);
 
-	if (!k_timer_started(timer)) {
-		return -1;
+	int ret;
+
+	if (timer->tie.timeout != K_TIMER_STOPPED) {
+		const uint8_t key = irq_lock();
+		tqueue_remove(&z_timers_runqueue, &timer->tie);
+		timer->tie.timeout = K_TIMER_STOPPED;
+		irq_unlock(key);
+		ret = 0;
+	} else {
+		ret = -1;
 	}
 
-	const uint8_t key = irq_lock();
-	tqueue_remove(&z_timers_runqueue, &timer->tie);
-	irq_unlock(key);
-	timer->timeout = K_FOREVER;
-	return 0;
+	return ret;
 }
 
 int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay)

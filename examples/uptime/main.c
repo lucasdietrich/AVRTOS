@@ -9,9 +9,11 @@
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
-void timer_handler(struct k_timer *timer)
+int timer_handler(struct k_timer *timer)
 {
 	printf("uptime: %lu seconds\n", k_uptime_get());
+	
+	return 0;
 }
 
 K_TIMER_DEFINE(mstimer, timer_handler, K_MSEC(1000), 1000);

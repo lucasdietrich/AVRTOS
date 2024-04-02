@@ -35,6 +35,7 @@ struct titem {
 };
 
 typedef struct titem titem_t;
+typedef struct titem tqueue_t;
 
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
 #define INIT_TITEM(timeout_ms)                                                           \
@@ -80,7 +81,6 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_t timeout)
  * @brief Shift the queue time of {time_passed}
  *
  * Assumptions :
- *  - time_passed is not null
  *  - root is not null
  *
  * @param root
@@ -91,7 +91,7 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed);
 /**
  * @brief Pop an item from the time queue.
  *
- * Note: this function doesn't set the poped item->next parameter to null.
+ * Note: this function doesn't alter/reset the item->tie nor the item->next members.
  *
  * Assumptions:
  * - root is not null
@@ -100,18 +100,6 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed);
  * @return struct titem*
  */
 struct titem *tqueue_pop(struct titem **root);
-
-/**
- * @brief Shift the queue time of {time_passed}
- * and pop an item from the time queue.
- *
- * @see tqueue_shift, tqueue_pop
- *
- * @param root
- * @param time_passed
- * @return struct titem*
- */
-// struct titem *tqueue_shift_pop(struct titem **root, k_delta_t time_passed);
 
 /**
  * @brief

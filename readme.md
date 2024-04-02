@@ -78,9 +78,11 @@ Planned Features (TODOs):
 - Implementation of builtin_ctz for 8-bit variables
 - Removal of outdated samples
 - Tutorial
-- Kconfig
+- Kconfig to configure the kernel and generate the configuration file
 - make the kernel ISR aware with a dedicated ISR stack (can IDLE thread be reused?)
 - Sample for discovering the I2C bus
+- Doubly linked list implementation for tqueue for optimized removal
+- Set `CONFIG_STDIO_PRINTF_TO_USART=0` by default
 
 ### Description
 

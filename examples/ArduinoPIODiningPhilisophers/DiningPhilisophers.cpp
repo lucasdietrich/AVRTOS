@@ -315,9 +315,11 @@ static Philosopher philosophers[5u] = {
 struct k_timer timer;
 struct k_sem sem;
 
-void timer_handler(struct k_timer *timer)
+int timer_handler(struct k_timer *timer)
 {
 	k_sem_give(&sem);
+
+	return 0; // continue
 }
 
 

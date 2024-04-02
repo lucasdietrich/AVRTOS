@@ -27,7 +27,7 @@ struct k_timer;
  * k_yield_from_isr_cond() from a timer handler.
  *
  */
-typedef void (*k_timer_handler_t)(struct k_timer *);
+typedef int (*k_timer_handler_t)(struct k_timer *);
 
 struct k_timer {
 	struct titem tie;
@@ -53,13 +53,22 @@ __kernel void z_timers_process(void);
 
 __kernel void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay);
 
-__kernel void k_timer_init(struct k_timer *timer,
-						   k_timer_handler_t handler,
-						   k_timeout_t timeout,
-						   k_timeout_t starting_delay);
+__kernel int8_t k_timer_init(struct k_timer *timer,
+							 k_timer_handler_t handler,
+							 k_timeout_t timeout,
+							 k_timeout_t starting_delay);
 
 __kernel bool k_timer_started(struct k_timer *timer);
 
+/**
+ * @brief Stop a timer
+ *
+ * Note: Usage of this function is discouraged in timer handlers.
+ * Prefer returning any non-zero value from the handler to stop the timer.
+ *
+ * @param timer
+ * @return __kernel
+ */
 __kernel int8_t k_timer_stop(struct k_timer *timer);
 
 __kernel int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay);

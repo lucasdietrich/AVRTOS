@@ -24,7 +24,11 @@ void z_tqueue_schedule(struct titem **root, struct titem *item)
 		/* next of previous become current */
 		struct titem *p_current = *prev_next_p;
 
-		/* if new element expires after we go to next */
+		/* if new element expires after we go to next.
+		 *
+		 * Note: if two items expire at the same time, the item that was inserted first
+		 * will be processed first. This justify the "<=" in the condition.
+		 */
 		if (p_current->delay_shift <= item->delay_shift) {
 			item->delay_shift -= p_current->delay_shift;
 			prev_next_p = &(p_current->next);
