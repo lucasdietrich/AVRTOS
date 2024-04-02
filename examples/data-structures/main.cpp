@@ -9,6 +9,7 @@
 #include <avrtos/dstruct/dlist.h>
 #include <avrtos/dstruct/slist.h>
 #include <avrtos/dstruct/tqueue.h>
+#include <avrtos/dstruct/tdqueue.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/pgmspace.h>
@@ -17,26 +18,28 @@
 #define FLAG_SLIST  1
 #define FLAG_DLIST  4
 #define FLAG_TQUEUE 8
+#define FLAG_TDQUEUE 16
 
-#define TESTS FLAG_SLIST | FLAG_DLIST | FLAG_TQUEUE
+#define TESTS FLAG_TQUEUE | FLAG_TDQUEUE
 
 void test_slist(void);
-void test_dlis(void);
+void test_dlist(void);
 void test_tqueue(void);
+void test_tdqueue(void);
 
 int main(void)
 {
 	serial_init();
 
-#if TESTS & FLAG_SLIST
-	serial_printl_p(PSTR("queue"));
-	test_slist();
-#endif
+// #if TESTS & FLAG_SLIST
+// 	serial_printl_p(PSTR("queue"));
+// 	test_slist();
+// #endif
 
-#if TESTS & FLAG_DLIST
-	serial_printl_p(PSTR("queue/dequeue dlist"));
-	test_dlis();
-#endif
+// #if TESTS & FLAG_DLIST
+// 	serial_printl_p(PSTR("queue/dequeue dlist"));
+// 	test_dlist();
+// #endif
 
 	// todo raw api
 
@@ -45,6 +48,11 @@ int main(void)
 #if TESTS & FLAG_TQUEUE
 	serial_printl_p(PSTR("tqueue"));
 	test_tqueue();
+#endif
+
+#if TESTS & FLAG_TDQUEUE
+	serial_printl_p(PSTR("tdqueue"));
+	test_tdqueue();
 #endif
 }
 
@@ -169,7 +177,7 @@ static void test_dlist_dequeue(struct dnode *dlist)
 	}
 }
 
-void test_dlis(void)
+void test_dlist(void)
 {
 	print_dlist(&dlist, print_dlist_item);
 	dlist_append(&dlist, &ditems[0].i);
@@ -215,8 +223,8 @@ void test_tqueue(void)
 {
 	struct titem *root = NULL;
 
-	for (uint8_t i = 0; i < 5; i++) {
-		z_tqueue_schedule(&root, &titems[4 - i].tie);
+	for (uint8_t i = 0; i < ARRAY_SIZE(titems); i++) {
+		z_tqueue_schedule(&root, &titems[ARRAY_SIZE(titems) - 1 - i].tie);
 	}
 
 	print_tqueue(root);
@@ -255,4 +263,87 @@ void test_tqueue(void)
 	tqueue_remove(&root, &titems[3].tie);
 
 	print_tqueue(root);
+}
+
+
+//
+// TDQUEUE
+//
+
+struct item4 {
+	const char chr;
+	struct tditem tie;
+};
+
+static struct item4 tditems[] = {
+	{'A', {100}}, {'B', {25}}, {'C', {35}}, {'D', {35}}, {'E', {25}}};
+
+void print_tditem(struct tditem *item)
+{
+	struct item4 *i = CONTAINER_OF(item, struct item4, tie);
+	serial_transmit(i->chr);
+	serial_transmit('[');
+	serial_u16(i->tie.delay_shift);
+	serial_transmit(']');
+}
+
+void print_tdqueue(dlist_t *queue)
+{
+	serial_print_p(PSTR("| "));
+	for (struct dnode *node = queue->head; node != queue; node = node->next) {
+		struct tditem *item = CONTAINER_OF(node, struct tditem, node);
+		print_tditem(item);
+		serial_transmit(' ');
+	}
+	serial_transmit('\n');
+}
+
+void test_tdqueue(void)
+{
+	DEFINE_TDQUEUE(tdqueue);
+
+	print_tdqueue(&tdqueue);
+
+	for (uint8_t i = 0; i < ARRAY_SIZE(tditems); i++) {
+		struct item4 *item = &tditems[ARRAY_SIZE(tditems) - 1 - i];
+		printf("Adding %c (%u ms)\n", item->chr, item->tie.delay_shift);
+		z_tdqueue_schedule(&tdqueue, &item->tie);
+	}
+
+	print_tdqueue(&tdqueue);
+
+	tdqueue_shift(&tdqueue, 20);
+
+	print_tdqueue(&tdqueue);
+
+	tdqueue_shift(&tdqueue, 20);
+
+	print_tdqueue(&tdqueue);
+
+	struct tditem *pop = tdqueue_pop(&tdqueue);
+	print_tditem(pop);
+	serial_transmit('\n');
+	pop = tdqueue_pop(&tdqueue);
+	print_tditem(pop);
+	serial_transmit('\n');
+
+	tdqueue_shift(&tdqueue, 20);
+
+	print_tdqueue(&tdqueue);
+
+	tdqueue_remove(&tdqueue, &tditems[2].tie);
+
+	print_tdqueue(&tdqueue);
+
+	tdqueue_remove(&tdqueue, &tditems[2].tie);
+
+	print_tdqueue(&tdqueue);
+
+	tdqueue_remove(&tdqueue, &tditems[0].tie);
+
+	print_tdqueue(&tdqueue);
+
+	tdqueue_remove(&tdqueue, &tditems[3].tie);
+
+	print_tdqueue(&tdqueue);
 }
