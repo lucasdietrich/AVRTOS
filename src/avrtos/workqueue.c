@@ -156,7 +156,7 @@ bool k_system_workqueue_submit(struct k_work *work)
 #error "CONFIG_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS"
 #endif
 
-static void delayable_work_trigger(struct k_event *event)
+void z_delayable_work_trigger(struct k_event *event)
 {
 	struct k_work_delayable *const dwork =
 		CONTAINER_OF(event, struct k_work_delayable, _event);
@@ -173,7 +173,7 @@ void k_work_delayable_init(struct k_work_delayable *dwork, k_work_handler_t hand
 	__ASSERT_NOTNULL(handler);
 
 	k_work_init(&dwork->work, handler);
-	k_event_init(&dwork->_event, delayable_work_trigger);
+	k_event_init(&dwork->_event, z_delayable_work_trigger);
 	dwork->_workqueue = NULL;
 }
 
@@ -197,7 +197,7 @@ int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
 	}
 
 	/* By the use of the lock We make ensure _workqueue is not written while the
-	 * work item is being sent from delayable_work_trigger.
+	 * work item is being sent from z_delayable_work_trigger.
 	 */
 	dwork->_workqueue = workqueue;
 
