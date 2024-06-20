@@ -22,6 +22,10 @@ struct k_timer;
 
 /**
  * @brief Timer handler function prototype
+ * 
+ * @param timer Timer instance
+ * 
+ * @return int 0 to keep the timer running, non-zero to stop it
  *
  * @warning Never call any k_yield(), k_yield_from_isr(),
  * k_yield_from_isr_cond() from a timer handler.
