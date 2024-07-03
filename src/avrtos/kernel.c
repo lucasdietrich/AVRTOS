@@ -694,7 +694,7 @@ __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
 	__ASSERT_NOTNULL(waitqueue);
 
 	struct k_thread *pending_thread = z_unpend_first_thread(waitqueue);
-	if ((pending_thread != NULL) && (set_swap_data != NULL)) {
+	if (pending_thread != NULL) {
 		pending_thread->swap_data = set_swap_data;
 	}
 	return pending_thread;
