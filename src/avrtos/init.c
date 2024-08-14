@@ -49,7 +49,7 @@ z_save_mcusr:
 #endif
 
 void z_avrtos_init(void)
-{
+{	
 #if CONFIG_KERNEL_CLEAR_WDT_ON_INIT
 	/* Page 52 (ATmega328p datasheet) :
 	 *	Note: If the Watchdog is accidentally enabled, for example by a

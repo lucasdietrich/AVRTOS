@@ -1,0 +1,138 @@
+#!/usr/bin/sh
+
+bindgen src/avrtos_all.h \
+    --no-layout-tests \
+    --use-core \
+    --formatter rustfmt \
+    --default-enum-style moduleconsts \
+    --generate functions,types,methods \
+    --explicit-padding \
+    --no-size_t-is-usize \
+    --allowlist-function k_.* \
+    --allowlist-function z_.* \
+    --allowlist-function dlist_.* \
+    --allowlist-function slist.* \
+    --allowlist-function tqueue_.* \
+    --allowlist-function led_.* \
+    --allowlist-function serial_.* \
+    --allowlist-function atomic_.* \
+    --allowlist-function __fault \
+    --allowlist-function __assert \
+    --allowlist-function print_slist \
+    --allowlist-function print_dlist \
+    --allowlist-function print_tqueue \
+    --allowlist-function gpio_.* \
+    --allowlist-function i2c_.* \
+    --allowlist-function spi_.* \
+    --allowlist-function ll_.* \
+    --allowlist-function timer_.* \
+    --allowlist-function timer8_.* \
+    --allowlist-function timer16_.* \
+    --allowlist-function usart_.* \
+    --allowlist-function exti_.* \
+    --allowlist-function tcn75_.* \
+    --allowlist-type EXTI_Ctrl_Device \
+    --allowlist-type PCI_Ctrl_Device \
+    --allowlist-type SPI_Device \
+    --allowlist-type timer2_prescaler_t \
+    --allowlist-type timer_prescaler_t \
+    --allowlist-type timer16_interrupt_t \
+    --allowlist-type z_callsaved_ctx \
+    --allowlist-type z_callused_ctx \
+    --allowlist-type z_intctx \
+    -o \
+    rust-avrtos-sys/src/bindings.rs \
+    -- \
+    -I /usr/avr/include \
+    -I src \
+    -I src/avrtos \
+    --target=avr \
+    -mmcu=atmega2560 \
+    -Os \
+    -D__AVR_3_BYTE_PC__ \
+    -DF_CPU=16000000UL \
+    -DCONFIG_RUST=1 \
+    -DCONFIG_AVRTOS_LINKER_SCRIPT=1 \
+    -DCONFIG_ARDUINO_FRAMEWORK=0 \
+    -DCONFIG_PLATFORMIO_IDE=0 \
+    -DCONFIG_THREAD_MAIN_COOPERATIVE=1 \
+    -DCONFIG_INTERRUPT_POLICY=1 \
+    -DCONFIG_THREAD_EXPLICIT_MAIN_STACK=0 \
+    -DCONFIG_THREAD_MAIN_STACK_SIZE=0x200 \
+    -DCONFIG_USE_STDLIB_HEAP_MALLOC_MAIN=0 \
+    -DCONFIG_USE_STDLIB_HEAP_MALLOC_THREAD=0 \
+    -DCONFIG_THREAD_DEFAULT_SREG=128 \
+    -DCONFIG_KERNEL_THREAD_TERMINATION_TYPE=0 \
+    -DCONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH=1 \
+    -DCONFIG_KERNEL_COOPERATIVE_THREADS=1 \
+    -DCONFIG_KERNEL_SYSCLOCK_PERIOD_US=1000llu \
+    -DCONFIG_KERNEL_TIME_SLICE_US=1000llu \
+    -DCONFIG_KERNEL_SYSLOCK_HW_TIMER=1 \
+    -DCONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS=1 \
+    -DCONFIG_KERNEL_DELAY_OBJECT_U32=1 \
+    -DCONFIG_KERNEL_AUTO_INIT=1 \
+    -DCONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE=0 \
+    -DCONFIG_KERNEL_CLEAR_WDT_ON_INIT=0 \
+    -DCONFIG_KERNEL_THREAD_IDLE=1 \
+    -DCONFIG_KERNEL_THREAD_IDLE_ADD_STACK=0x50 \
+    -DCONFIG_THREAD_IDLE_COOPERATIVE=0 \
+    -DCONFIG_IDLE_HOOK=0 \
+    -DCONFIG_THREAD_CANARIES=0 \
+    -DCONFIG_THREAD_CANARIES_SYMBOL=0xAA \
+    -DCONFIG_THREAD_STACK_SENTINEL=0 \
+    -DCONFIG_THREAD_STACK_SENTINEL_SIZE=1 \
+    -DCONFIG_THREAD_STACK_SENTINEL_SYMBOL=0x55 \
+    -DCONFIG_THREAD_MONITOR=0 \
+    -DCONFIG_THREAD_MAIN_MONITOR=0 \
+    -DCONFIG_SYSTEM_WORKQUEUE_ENABLE=0 \
+    -DCONFIG_SYSTEM_WORKQUEUE_STACK_SIZE=0x200 \
+    -DCONFIG_SYSTEM_WORKQUEUE_COOPERATIVE=0 \
+    -DCONFIG_WORKQUEUE_DELAYABLE=0 \
+    -DCONFIG_KERNEL_ASSERT=0 \
+    -DCONFIG_KERNEL_ARGS_CHECKS=0 \
+    -DCONFIG_KERNEL_TIMERS=0 \
+    -DCONFIG_KERNEL_EVENTS=0 \
+    -DCONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT=1 \
+    -DCONFIG_THREAD_ERRNO=0 \
+    -DCONFIG_SERIAL_AUTO_INIT=0u \
+    -DCONFIG_SERIAL_USART_BAUDRATE=500000lu \
+    -DCONFIG_STDIO_PRINTF_TO_USART=-1 \
+    -DCONFIG_LOGGING_SUBSYSTEM=1 \
+    -DCONFIG_KERNEL_UPTIME=0 \
+    -DCONFIG_KERNEL_TIME_API=0 \
+    -DCONFIG_KERNEL_TIME_API_MS_PRECISION=0 \
+    -DCONFIG_KERNEL_ATOMIC_API=1 \
+    -DCONFIG_KERNEL_DEBUG_PREEMPT_UART=0 \
+    -DCONFIG_KERNEL_API_NOINLINE=0 \
+    -DCONFIG_KERNEL_DEBUG=0 \
+    -DCONFIG_KERNEL_SCHEDULER_DEBUG=0 \
+    -DCONFIG_FD_MAX_COUNT=0 \
+    -DCONFIG_KERNEL_REENTRANCY=0 \
+    -DCONFIG_DRIVERS_USART0_ASYNC=0 \
+    -DCONFIG_DRIVERS_USART1_ASYNC=0 \
+    -DCONFIG_DRIVERS_USART2_ASYNC=0 \
+    -DCONFIG_DRIVERS_USART3_ASYNC=0 \
+    -DCONFIG_DRIVERS_TIMER0_API=0 \
+    -DCONFIG_DRIVERS_TIMER1_API=0 \
+    -DCONFIG_DRIVERS_TIMER2_API=0 \
+    -DCONFIG_DRIVERS_TIMER3_API=0 \
+    -DCONFIG_DRIVERS_TIMER4_API=0 \
+    -DCONFIG_DRIVERS_TIMER5_API=0 \
+    -DCONFIG_KERNEL_SYSTICK_GPIOB_DEBUG=0 \
+    -DCONFIG_KERNEL_STATS=0 \
+    -DCONFIG_KERNEL_FAULT_VERBOSITY=1 \
+    -DCONFIG_KERNEL_DEBUG_GPIO=0 \
+    -DCONFIG_KERNEL_DEBUG_GPIO_SYSTICK=1 \
+    -DCONFIG_SPI_ASYNC=0 \
+    -DCONFIG_AVRTOS_BANNER_ENABLE=0 \
+    -DCONFIG_AVRTOS_BANNER="*** AVRTOS ***\n" \
+    -DCONFIG_I2C_DRIVER_ENABLE=1 \
+    -DCONFIG_I2C0_ENABLED=1 \
+    -DCONFIG_I2C1_ENABLED=0 \
+    -DCONFIG_I2C_INTERRUPT_DRIVEN=0 \
+    -DCONFIG_I2C_FREQ=400000 \
+    -DCONFIG_I2C_BLOCKING=1 \
+    -DCONFIG_I2C_MAX_BUF_LEN_BITS=3u \
+    -DCONFIG_I2C_LAST_ERROR=1 \
+    -DCONFIG_I2C_DEBUG=0
+    
