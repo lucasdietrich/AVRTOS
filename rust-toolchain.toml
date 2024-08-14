@@ -1,0 +1,10 @@
+[toolchain]
+channel = "nightly"
+
+# doesn't work on my side
+# channel = "nightly-2024-03-22"
+
+components = ["rust-src", "rustfmt", "clippy"]
+profile = "default"
+# profile = "minimal"
+# targets = ["avr"]

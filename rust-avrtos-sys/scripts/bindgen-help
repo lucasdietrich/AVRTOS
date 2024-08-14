@@ -1,0 +1,231 @@
+Generates Rust bindings from C/C++ headers.
+
+Usage: bindgen <FLAGS> <OPTIONS> <HEADER> -- <CLANG_ARGS>...
+
+Arguments:
+  [HEADER]         C or C++ header file
+  [CLANG_ARGS]...  Arguments to be passed straight through to clang
+
+Options:
+      --depfile <DEPFILE>
+          Path to write depfile to
+      --default-enum-style <STYLE>
+          The default STYLE of code used to generate enums
+      --bitfield-enum <REGEX>
+          Mark any enum whose name matches REGEX as a set of bitfield flags
+      --newtype-enum <REGEX>
+          Mark any enum whose name matches REGEX as a newtype
+      --newtype-global-enum <REGEX>
+          Mark any enum whose name matches REGEX as a global newtype
+      --rustified-enum <REGEX>
+          Mark any enum whose name matches REGEX as a Rust enum
+      --constified-enum <REGEX>
+          Mark any enum whose name matches REGEX as a series of constants
+      --constified-enum-module <REGEX>
+          Mark any enum whose name matches REGEX as a module of constants
+      --default-macro-constant-type <TYPE>
+          The default signed/unsigned TYPE for C macro constants
+      --default-alias-style <STYLE>
+          The default STYLE of code used to generate typedefs
+      --normal-alias <REGEX>
+          Mark any typedef alias whose name matches REGEX to use normal type aliasing
+      --new-type-alias <REGEX>
+          Mark any typedef alias whose name matches REGEX to have a new type generated for it
+      --new-type-alias-deref <REGEX>
+          Mark any typedef alias whose name matches REGEX to have a new type with Deref and DerefMut to the inner type
+      --default-non-copy-union-style <STYLE>
+          The default STYLE of code used to generate unions with non-Copy members. Note that ManuallyDrop was first stabilized in Rust 1.20.0
+      --bindgen-wrapper-union <REGEX>
+          Mark any union whose name matches REGEX and who has a non-Copy member to use a bindgen-generated wrapper for fields
+      --manually-drop-union <REGEX>
+          Mark any union whose name matches REGEX and who has a non-Copy member to use ManuallyDrop (stabilized in Rust 1.20.0) for fields
+      --blocklist-type <TYPE>
+          Mark TYPE as hidden
+      --blocklist-function <FUNCTION>
+          Mark FUNCTION as hidden
+      --blocklist-item <ITEM>
+          Mark ITEM as hidden
+      --blocklist-file <FILE>
+          Mark FILE as hidden
+      --no-layout-tests
+          Avoid generating layout tests for any type
+      --no-derive-copy
+          Avoid deriving Copy on any type
+      --no-derive-debug
+          Avoid deriving Debug on any type
+      --impl-debug
+          Create a Debug implementation if it cannot be derived automatically
+      --impl-partialeq
+          Create a PartialEq implementation if it cannot be derived automatically
+      --with-derive-default
+          Derive Default on any type
+      --with-derive-hash
+          Derive Hash on any type
+      --with-derive-partialeq
+          Derive PartialEq on any type
+      --with-derive-partialord
+          Derive PartialOrd on any type
+      --with-derive-eq
+          Derive Eq on any type
+      --with-derive-ord
+          Derive Ord on any type
+      --no-doc-comments
+          Avoid including doc comments in the output, see: <https://github.com/rust-lang/rust-bindgen/issues/426>
+      --no-recursive-allowlist
+          Disable allowlisting types recursively. This will cause bindgen to emit Rust code that won't compile! See the `bindgen::Builder::allowlist_recursively` method's documentation for details
+      --objc-extern-crate
+          Use extern crate instead of use for objc
+      --generate-block
+          Generate block signatures instead of void pointers
+      --generate-cstr
+          Generate string constants as `&CStr` instead of `&[u8]`
+      --block-extern-crate
+          Use extern crate instead of use for block
+      --distrust-clang-mangling
+          Do not trust the libclang-provided mangling
+      --builtins
+          Output bindings for builtin definitions, e.g. __builtin_va_list
+      --ctypes-prefix <PREFIX>
+          Use the given PREFIX before raw types instead of ::std::os::raw
+      --anon-fields-prefix <PREFIX>
+          Use the given PREFIX for anonymous fields [default: __bindgen_anon_]
+      --time-phases
+          Time the different bindgen phases and print to stderr
+      --emit-clang-ast
+          Output the Clang AST for debugging purposes
+      --emit-ir
+          Output our internal IR for debugging purposes
+      --emit-ir-graphviz <PATH>
+          Dump a graphviz dot file to PATH
+      --enable-cxx-namespaces
+          Enable support for C++ namespaces
+      --disable-name-namespacing
+          Disable namespacing via mangling, causing bindgen to generate names like `Baz` instead of `foo_bar_Baz` for an input name `foo::bar::Baz`
+      --disable-nested-struct-naming
+          Disable nested struct naming, causing bindgen to generate names like `bar` instead of `foo_bar` for a nested definition `struct foo { struct bar { } b; };`
+      --disable-untagged-union
+          Disable support for native Rust unions
+      --disable-header-comment
+          Suppress insertion of bindgen's version identifier into generated bindings
+      --ignore-functions
+          Do not generate bindings for functions or methods. This is useful when you only care about struct layouts
+      --generate <GENERATE>
+          Generate only given items, split by commas. Valid values are `functions`,`types`, `vars`, `methods`, `constructors` and `destructors`
+      --ignore-methods
+          Do not generate bindings for methods
+      --no-convert-floats
+          Do not automatically convert floats to f32/f64
+      --no-prepend-enum-name
+          Do not prepend the enum name to constant or newtype variants
+      --no-include-path-detection
+          Do not try to detect default include paths
+      --fit-macro-constant-types
+          Try to fit macro constants into types smaller than u32/i32
+      --opaque-type <TYPE>
+          Mark TYPE as opaque
+  -o, --output <OUTPUT>
+          Write Rust bindings to OUTPUT
+      --raw-line <RAW_LINE>
+          Add a raw line of Rust code at the beginning of output
+      --module-raw-line <MODULE_NAME> <RAW_LINE>
+          Add a RAW_LINE of Rust code to a given module with name MODULE_NAME
+      --rust-target <RUST_TARGET>
+          Version of the Rust compiler to target. Valid options are: ["1.71", "1.68", "1.64", "1.59", "1.47", "1.40", "1.36", "1.33", "1.30", "1.28", "1.27", "1.26", "1.25", "1.21", "1.20", "1.19", "1.17", "1.0"]. Defaults to 1.71.
+      --use-core
+          Use types from Rust core instead of std
+      --conservative-inline-namespaces
+          Conservatively generate inline namespaces to avoid name conflicts
+      --allowlist-function <REGEX>
+          Allowlist all the free-standing functions matching REGEX. Other non-allowlisted functions will not be generated
+      --generate-inline-functions
+          Generate inline functions
+      --allowlist-type <REGEX>
+          Only generate types matching REGEX. Other non-allowlisted types will not be generated
+      --allowlist-var <REGEX>
+          Allowlist all the free-standing variables matching REGEX. Other non-allowlisted variables will not be generated
+      --allowlist-file <PATH>
+          Allowlist all contents of PATH
+      --allowlist-item <REGEX>
+          Allowlist all items matching REGEX. Other non-allowlisted items will not be generated
+      --verbose
+          Print verbose error messages
+      --dump-preprocessed-input
+          Preprocess and dump the input header files to disk. Useful when debugging bindgen, using C-Reduce, or when filing issues. The resulting file will be named something like `__bindgen.i` or `__bindgen.ii`
+      --no-record-matches
+          Do not record matching items in the regex sets. This disables reporting of unused items
+      --no-size_t-is-usize
+          Do not bind size_t as usize (useful on platforms where those types are incompatible)
+      --no-rustfmt-bindings
+          Do not format the generated bindings with rustfmt. This option is deprecated, please use `--formatter=none` instead
+      --formatter <FORMATTER>
+          Which FORMATTER should be used for the bindings
+      --rustfmt-configuration-file <PATH>
+          The absolute PATH to the rustfmt configuration file. The configuration file will be used for formatting the bindings. This parameter sets `formatter` to `rustfmt`
+      --no-partialeq <REGEX>
+          Avoid deriving PartialEq for types matching REGEX
+      --no-copy <REGEX>
+          Avoid deriving Copy and Clone for types matching REGEX
+      --no-debug <REGEX>
+          Avoid deriving Debug for types matching REGEX
+      --no-default <REGEX>
+          Avoid deriving/implementing Default for types matching REGEX
+      --no-hash <REGEX>
+          Avoid deriving Hash for types matching REGEX
+      --must-use-type <REGEX>
+          Add `#[must_use]` annotation to types matching REGEX
+      --enable-function-attribute-detection
+          Enables detecting unexposed attributes in functions (slow). Used to generate `#[must_use]` annotations
+      --use-array-pointers-in-arguments
+          Use `*const [T; size]` instead of `*const T` for C arrays
+      --wasm-import-module-name <NAME>
+          The NAME to be used in a #[link(wasm_import_module = ...)] statement
+      --dynamic-loading <NAME>
+          Use dynamic loading mode with the given library NAME
+      --dynamic-link-require-all
+          Require successful linkage to all functions in the library
+      --prefix-link-name <PREFIX_LINK_NAME>
+          Prefix the name of exported symbols
+      --respect-cxx-access-specs
+          Makes generated bindings `pub` only for items if the items are publically accessible in C++
+      --translate-enum-integer-types
+          Always translate enum integer types to native Rust integer types
+      --c-naming
+          Generate types with C style naming
+      --explicit-padding
+          Always output explicit padding fields
+      --vtable-generation
+          Enables generation of vtable functions
+      --sort-semantically
+          Enables sorting of code generation in a predefined manner
+      --merge-extern-blocks
+          Deduplicates extern blocks
+      --override-abi <OVERRIDE>
+          Overrides the ABI of functions matching REGEX. The OVERRIDE value must be of the shape REGEX=ABI where ABI can be one of C, stdcall, efiapi, fastcall, thiscall, aapcs, win64 or C-unwind<.>
+      --wrap-unsafe-ops
+          Wrap unsafe operations in unsafe blocks
+      --with-derive-custom <CUSTOM>
+          Derive custom traits on any kind of type. The CUSTOM value must be of the shape REGEX=DERIVE where DERIVE is a coma-separated list of derive macros
+      --with-derive-custom-struct <CUSTOM>
+          Derive custom traits on a `struct`. The CUSTOM value must be of the shape REGEX=DERIVE where DERIVE is a coma-separated list of derive macros
+      --with-derive-custom-enum <CUSTOM>
+          Derive custom traits on an `enum. The CUSTOM value must be of the shape REGEX=DERIVE where DERIVE is a coma-separated list of derive macros
+      --with-derive-custom-union <CUSTOM>
+          Derive custom traits on a `union`. The CUSTOM value must be of the shape REGEX=DERIVE where DERIVE is a coma-separated list of derive macros
+      --wrap-static-fns
+          Generate wrappers for `static` and `static inline` functions
+      --wrap-static-fns-path <PATH>
+          Sets the PATH for the source file that must be created due to the presence of `static` and `static inline` functions
+      --wrap-static-fns-suffix <SUFFIX>
+          Sets the SUFFIX added to the extern wrapper functions generated for `static` and `static inline` functions
+      --default-visibility <VISIBILITY>
+          Set the default VISIBILITY of fields, including bitfields and accessor methods for bitfields. This flag is ignored if the `--respect-cxx-access-specs` flag is used
+      --emit-diagnostics
+          Whether to emit diagnostics or not
+      --generate-shell-completions <SHELL>
+          Generates completions for the specified SHELL, sends them to `stdout` and exits [possible values: bash, elvish, fish, powershell, zsh]
+      --experimental
+          Enables experimental features
+  -V, --version
+          Prints the version, and exits
+  -h, --help
+          Print help
