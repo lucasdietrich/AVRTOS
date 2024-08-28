@@ -29,7 +29,7 @@ extern "C" {
  */
 __always_inline void swap_endianness(void **addr)
 {
-    *addr = (void *)HTONS(*addr);
+	*addr = (void *)HTONS(*addr);
 }
 
 /**
@@ -43,7 +43,7 @@ __always_inline void swap_endianness(void **addr)
  */
 __always_inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
 {
-    thread->flags = (thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
+	thread->flags = (thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
 }
 
 /**
@@ -57,7 +57,7 @@ __always_inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
  */
 __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
 {
-    return thread->flags & Z_THREAD_STATE_MSK;
+	return thread->flags & Z_THREAD_STATE_MSK;
 }
 
 /**
@@ -106,16 +106,16 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  * will resume execution when the object becomes available or when the specified timeout
  * expires.
  *
- * If the timeout is `K_FOREVER`, the thread will be awakened when the object becomes available.
- * If the timeout is `K_NO_WAIT`, the thread will return immediately.
+ * If the timeout is `K_FOREVER`, the thread will be awakened when the object becomes
+ * available. If the timeout is `K_NO_WAIT`, the thread will return immediately.
  *
  * Assumptions:
  * - The interrupt flag is cleared when this function is called.
  *
  * @param waitqueue Pointer to the wait queue to add the thread to.
  * @param timeout The timeout period to wait for the object.
- * @return 0 if the object became available, ETIMEDOUT if the timeout expired, or a negative
- *         error code in other cases.
+ * @return 0 if the object became available, ETIMEDOUT if the timeout expired, or a
+ * negative error code in other cases.
  */
 __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
 
@@ -123,8 +123,8 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
  * @brief Wake up the first thread waiting on an object and switch to it.
  *
  * This function wakes up the first thread that is waiting on the specified object and
- * switches to that thread. The `swap_data` parameter can be set with information about the
- * available object.
+ * switches to that thread. The `swap_data` parameter can be set with information about
+ * the available object.
  *
  * Assumptions:
  * - The interrupt flag is cleared when this function is called.
@@ -135,7 +135,8 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
  * @param swap_data Pointer to the object information to set (if any).
  * @return Pointer to the thread that received the object, or NULL if no thread was woken.
  */
-__kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue, void *swap_data);
+__kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
+												  void *swap_data);
 
 /**
  * @brief Wake up the first thread waiting on an object.

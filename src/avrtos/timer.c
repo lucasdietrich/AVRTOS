@@ -5,7 +5,9 @@
  */
 
 #include "timer.h"
+
 #include <util/atomic.h>
+
 #include "kernel.h"
 #include "misc/serial.h"
 
@@ -74,7 +76,7 @@ void z_timers_process(void)
 
 		/* Reschedule the timer if it is not stopped */
 		if (timer->tie.timeout != K_TIMER_STOPPED) {
-			timer->tie.next = NULL;
+			timer->tie.next	   = NULL;
 			timer->tie.timeout = timer->timeout.value;
 			z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
 		}
@@ -109,7 +111,7 @@ bool k_timer_started(struct k_timer *timer)
 	bool ret;
 
 	const uint8_t key = irq_lock();
-	ret = timer->tie.timeout != K_TIMER_STOPPED;
+	ret				  = timer->tie.timeout != K_TIMER_STOPPED;
 	irq_unlock(key);
 
 	return ret;

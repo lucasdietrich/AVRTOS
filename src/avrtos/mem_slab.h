@@ -9,7 +9,7 @@
  *
  * A memory slab is a memory management mechanism that provides a pool of fixed-size
  * memory blocks. Each slab is initialized with a predefined number of blocks, all of
- * which are of the same size. Memory slabs provides deterministic allocation and 
+ * which are of the same size. Memory slabs provides deterministic allocation and
  * deallocation times (O(1)).
  *
  * Example with a memory slab containing 4 blocks of 32 bytes each:

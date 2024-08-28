@@ -5,6 +5,7 @@
  */
 
 #include "stdio.h"
+
 #include "misc/serial.h"
 
 #if CONFIG_STDIO_PRINTF_TO_USART == 0
@@ -23,7 +24,7 @@ static int uart_putchar(char c, FILE *stream)
 	return 0;
 }
 
-/** 
+/**
  * @brief File stream for USART0 output.
  *
  * This file stream is used to direct standard output (`stdout`) to USART0.
