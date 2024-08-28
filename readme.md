@@ -232,7 +232,7 @@ board = pro16MHzatmega328
 
 upload_port = COM3
 monitor_port = COM3
-monitor_speed = 500000
+monitor_speed = 115200
 
 build_src_filter = 
 	+<AVRTOS/src/>
@@ -295,7 +295,7 @@ make -C build upload_sample_minimal_example
 
 Monitor the serial console with `miniterm`:
 ```bash
-BAUDRATE=500000 make monitor
+BAUDRATE=115200 make monitor
 ```
 
 ### Custom target (Cmake)
