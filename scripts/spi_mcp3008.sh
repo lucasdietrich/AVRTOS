@@ -16,7 +16,7 @@ make -C build_slave
 if [ "$1" == "flash" ]; then
 	make -C build_mcp3008 upload
 elif [ "$1" == "monitor" ]; then
-	python3 -m serial.tools.miniterm /dev/ttyACM0 500000 --raw --eol LF
+	python3 -m serial.tools.miniterm /dev/ttyACM0 115200 --raw --eol LF
 elif [ "$1" == "clean" ]; then
 	rm -rf build_mcp3008
 fi

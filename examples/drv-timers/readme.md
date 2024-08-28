@@ -42,8 +42,8 @@ Expected result:
 - Led should be blinking at 10Hz.
 
 ```
-python3 -m serial.tools.miniterm /dev/ttyACM2 500000
---- Miniterm on /dev/ttyACM2  500000,8,N,1 ---
+python3 -m serial.tools.miniterm /dev/ttyACM2 115200
+--- Miniterm on /dev/ttyACM2  115200,8,N,1 ---
 --- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
 11111111:01 [1.000 s] : 1111111
 00:00:00 [0.000 s] : 1111111111
