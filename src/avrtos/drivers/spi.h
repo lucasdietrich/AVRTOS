@@ -207,6 +207,10 @@ int8_t spi_slave_init(struct spi_slave *slave,
 					  uint8_t active_state,
 					  const struct spi_regs *regs);
 
+void spi_slave_select(const struct spi_slave *slave);
+
+void spi_slave_unselect(const struct spi_slave *slave);
+
 /**
  * @brief Initialize a SPI chip select pin for the slave.
  *

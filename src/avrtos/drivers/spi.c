@@ -121,18 +121,18 @@ void spi_transceive_buf(char *rxtx, uint8_t len)
 	}
 }
 
-__always_inline void slave_select(const struct spi_slave *slave)
-{
-	/* Apply SPI regs for slave */
-	spi_regs_restore(&slave->regs);
+// __always_inline void slave_select(const struct spi_slave *slave)
+// {
+// 	/* Apply SPI regs for slave */
+// 	spi_regs_restore(&slave->regs);
 
-	gpio_pin_write_state(slave->cs_port, slave->cs_pin, slave->active_state);
-}
+// 	gpio_pin_write_state(slave->cs_port, slave->cs_pin, slave->active_state);
+// }
 
-__always_inline void slave_unselect(const struct spi_slave *slave)
-{
-	gpio_pin_write_state(slave->cs_port, slave->cs_pin, 1u - slave->active_state);
-}
+// __always_inline void slave_unselect(const struct spi_slave *slave)
+// {
+// 	gpio_pin_write_state(slave->cs_port, slave->cs_pin, 1u - slave->active_state);
+// }
 
 int8_t spi_slave_init(struct spi_slave *slave,
 					  GPIO_Device *cs_port,
@@ -150,6 +150,16 @@ int8_t spi_slave_init(struct spi_slave *slave,
 	return 0;
 }
 
+void spi_slave_select(const struct spi_slave *slave)
+{
+	gpio_pin_write_state(slave->cs_port, slave->cs_pin, slave->active_state);
+}
+
+void spi_slave_unselect(const struct spi_slave *slave)
+{
+	gpio_pin_write_state(slave->cs_port, slave->cs_pin, 1u - slave->active_state);
+}
+
 int8_t spi_slave_ss_init(const struct spi_slave *slave)
 {
 	Z_ARGS_CHECK(slave) return -EINVAL;
@@ -164,11 +174,11 @@ char spi_slave_transceive(const struct spi_slave *slave, char tx)
 {
 	char rx;
 
-	slave_select(slave);
+	spi_slave_select(slave);
 
 	rx = spi_transceive(tx);
 
-	slave_unselect(slave);
+	spi_slave_unselect(slave);
 
 	return rx;
 }
