@@ -56,7 +56,8 @@
 //
 
 //
-// Indicates whether the AVRTOS linker script was provided, allowing kernel sections to be used to reference and initialize kernel objects during RTOS initialization.
+// Indicates whether the AVRTOS linker script was provided, allowing kernel sections to be
+// used to reference and initialize kernel objects during RTOS initialization.
 //
 // Note: If disabled, all kernel objects must be initialized manually.
 // - K_THREAD_DEFINE() is disabled and must be replaced by
@@ -69,15 +70,19 @@
 // Note: The Arduino framework with Arduino IDE requires this option to be disabled,
 // as it is not possible to provide a custom linker script.
 //
-// 0: The AVRTOS linker script is not provided. Kernel sections are not used. Kernel objects must be initialized manually.
-// 1: The AVRTOS linker script is provided. Kernel sections are used. Kernel objects are initialized automatically.
+// 0: The AVRTOS linker script is not provided. Kernel sections are not used. Kernel
+// objects must be initialized manually. 1: The AVRTOS linker script is provided. Kernel
+// sections are used. Kernel objects are initialized automatically.
 //
 // Additional notes:
 //
 // If CONFIG_AVRTOS_LINKER_SCRIPT is explicitly set by the user, its value is used.
-// Otherwise, the presence of the linker script is inferred. This is the purpose of specific configuration files like "avrtos_arduinoide_conf.h":
-// - If using the Arduino framework with the Arduino IDE, the AVRTOS linker will not be used, so assume that sections are not available.
-// - If using the Arduino framework with PlatformIO IDE, the AVRTOS linker can and should be used, so assume that sections are available.
+// Otherwise, the presence of the linker script is inferred. This is the purpose of
+// specific configuration files like "avrtos_arduinoide_conf.h":
+// - If using the Arduino framework with the Arduino IDE, the AVRTOS linker will not be
+// used, so assume that sections are not available.
+// - If using the Arduino framework with PlatformIO IDE, the AVRTOS linker can and should
+// be used, so assume that sections are available.
 //
 #ifndef CONFIG_AVRTOS_LINKER_SCRIPT
 #define CONFIG_AVRTOS_LINKER_SCRIPT 1
@@ -105,14 +110,18 @@
 #endif
 
 //
-// Indicates whether the main stack location is at RAMEND (0) or allocated in a dedicated buffer (1).
+// Indicates whether the main stack location is at RAMEND (0) or allocated in a dedicated
+// buffer (1).
 //
 // 0: The main stack is allocated at RAMEND (size is undetermined).
 // 1: The main stack is allocated in a dedicated buffer (size is known at compile time).
 //
-// IMPORTANT NOTE: If you are using the heap, you must set this to 0, as the standard library's malloc uses the stack pointer to check the remaining heap size.
-// i.e., With an explicit main stack, a buffer is allocated (for the main thread's stack) before the heap. The standard library's malloc() will then consistently fail if the stack pointer exceeds the limit (actually on the other side of the heap).
-// The checker expects the main stack to be near RAMEND, in the upper memory regions.
+// IMPORTANT NOTE: If you are using the heap, you must set this to 0, as the standard
+// library's malloc uses the stack pointer to check the remaining heap size. i.e., With an
+// explicit main stack, a buffer is allocated (for the main thread's stack) before the
+// heap. The standard library's malloc() will then consistently fail if the stack pointer
+// exceeds the limit (actually on the other side of the heap). The checker expects the
+// main stack to be near RAMEND, in the upper memory regions.
 //
 #ifndef CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define CONFIG_THREAD_EXPLICIT_MAIN_STACK 0
@@ -122,11 +131,14 @@
 // This configuration option defines the size of the main stack.
 // If canaries are enabled, the entire stack will be filled with the canary value.
 //
-// If CONFIG_THREAD_EXPLICIT_MAIN_STACK is enabled, the main stack is allocated in a dedicated buffer in the .data section.
+// If CONFIG_THREAD_EXPLICIT_MAIN_STACK is enabled, the main stack is allocated in a
+// dedicated buffer in the .data section.
 //
-// If CONFIG_THREAD_EXPLICIT_MAIN_STACK is enabled, ensure the main stack size does not exceed the remaining RAM size.
+// If CONFIG_THREAD_EXPLICIT_MAIN_STACK is enabled, ensure the main stack size does not
+// exceed the remaining RAM size.
 //
-// If the heap grows downward, canaries might be invalidated if the expected stack size is too large.
+// If the heap grows downward, canaries might be invalidated if the expected stack size is
+// too large.
 //
 #ifndef CONFIG_THREAD_MAIN_STACK_SIZE
 #define CONFIG_THREAD_MAIN_STACK_SIZE 0x200
@@ -135,7 +147,8 @@
 //
 // Indicates whether malloc is expected to be used in the main thread.
 //
-// This option is a safeguard to ensure you set DEFAULT_THREAD_EXPLICIT_MAIN_STACK=1 when using malloc in the main thread.
+// This option is a safeguard to ensure you set DEFAULT_THREAD_EXPLICIT_MAIN_STACK=1 when
+// using malloc in the main thread.
 //
 // 0: malloc is not used in the main thread.
 // 1: malloc is used in the main thread.
@@ -164,7 +177,9 @@
 //  Read/Write R/W R/W R/W R/W R/W R/W R/W R/W
 //  Initial Value 0 0 0 0 0 0 0 0
 //
-// It is highly recommended to keep interrupts enabled when starting other threads; otherwise, interrupts should be re-enabled in the thread code if time-critical operations are performed.
+// It is highly recommended to keep interrupts enabled when starting other threads;
+// otherwise, interrupts should be re-enabled in the thread code if time-critical
+// operations are performed.
 //
 // 0: Interrupts are disabled when threads start (other than the main thread).
 // (1 << SREG_I): Interrupts are enabled when threads start (other than the main thread).
@@ -175,7 +190,8 @@
 
 //
 // Allow or disallow thread termination.
-// Disabling this option (0) saves up to 2-3 bytes of stack per thread (depending on the architecture).
+// Disabling this option (0) saves up to 2-3 bytes of stack per thread (depending on the
+// architecture).
 //
 // 0: Thread termination is not handled (CPU exception).
 // 1: Thread termination is enabled.
@@ -186,7 +202,8 @@
 #endif
 
 //
-// Compare thread addresses before a thread switch to avoid unnecessary switches to the same context.
+// Compare thread addresses before a thread switch to avoid unnecessary switches to the
+// same context.
 //
 // Note: Inefficient if at least two threads are always ready.
 //
@@ -198,7 +215,8 @@
 #endif
 
 //
-// Enable or disable cooperative threads. This feature allows threads to not be preempted by the scheduler when they are ready.
+// Enable or disable cooperative threads. This feature allows threads to not be preempted
+// by the scheduler when they are ready.
 //
 // 0: Cooperative threads are disabled.
 // 1: Cooperative threads are enabled.
@@ -285,9 +303,10 @@
 //
 // Kernel auto-initialization.
 //
-// This option might not work if AVRTOS is linked as a library in some environments (e.g., PlatformIO). In this case, you should either call
-// kernel_init() manually or use the z_avrtos_init() function manually.
-// Alternatively, link the auto-initialization function with the K_KERNEL_LINK_AVRTOS_INIT() macro.
+// This option might not work if AVRTOS is linked as a library in some environments (e.g.,
+// PlatformIO). In this case, you should either call kernel_init() manually or use the
+// z_avrtos_init() function manually. Alternatively, link the auto-initialization function
+// with the K_KERNEL_LINK_AVRTOS_INIT() macro.
 //
 // 0: Kernel auto-initialization is disabled.
 // 1: Kernel auto-initialization is enabled.
@@ -332,7 +351,9 @@
 #endif
 
 //
-// Indicates whether the kernel should define an idle thread to enable other threads to sleep. If disabled, at least one thread must always be ready; otherwise, a fault will be triggered.
+// Indicates whether the kernel should define an idle thread to enable other threads to
+// sleep. If disabled, at least one thread must always be ready; otherwise, a fault will
+// be triggered.
 //
 // 0: Kernel idle thread is disabled.
 // 1: Kernel idle thread is enabled.
@@ -364,7 +385,8 @@
 #endif
 
 //
-// Indicates whether the kernel should define an idle hook to be executed when no thread is ready. This hook is executed in the context of the idle thread.
+// Indicates whether the kernel should define an idle hook to be executed when no thread
+// is ready. This hook is executed in the context of the idle thread.
 //
 // 0: Kernel idle hook is disabled.
 // 1: Kernel idle hook is enabled.

@@ -8,6 +8,7 @@
 #define _AVRTOS_STDIO_H_
 
 #include <stdio.h>
+
 #include "kernel.h"
 
 #ifdef __cplusplus

@@ -9,17 +9,16 @@
  *
  * This header file provides functions for retrieving the system uptime and
  * getting retrieving and setting the current system time (e.g. UTC or local time)
- * within the AVRTOS kernel. 
+ * within the AVRTOS kernel.
  * It supports operations for accessing the current time, checking if the time is set.
  *
  * Related configuration options:
  * - CONFIG_KERNEL_UPTIME: Uptime feature must be enabled to use the time API.
  * - CONFIG_KERNEL_TIME_API: Time API must be enabled to use the system time functions.
- * - CONFIG_KERNEL_TIME_API_MS_PRECISION: Set to 1 to enable millisecond precision in the time API, 
- * 	otherwise the time will be truncated to seconds.
+ * - CONFIG_KERNEL_TIME_API_MS_PRECISION: Set to 1 to enable millisecond precision in the
+ * time API, otherwise the time will be truncated to seconds.
  * - CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS: Set to 1 to enable 40-bit tick counter.
  */
-
 
 #ifndef _AVRTOS_TIME_H_
 #define _AVRTOS_TIME_H_
@@ -33,7 +32,6 @@ extern "C" {
 /**
  * Uptime API
  */
-
 
 /**
  * @brief Get the current system uptime in 32-bit ticks.
@@ -56,7 +54,7 @@ __kernel uint32_t k_ticks_get_32(void);
  */
 __always_inline uint32_t k_ticks_get(void)
 {
-    return k_ticks_get_32();
+	return k_ticks_get_32();
 }
 
 /**
@@ -64,7 +62,7 @@ __always_inline uint32_t k_ticks_get(void)
  *
  * This function returns the uptime in kernel ticks, represented as a 64-bit
  * value. It is meaningful only if `CONFIG_KERNEL_TICKS_COUNTER_40BITS` is
- * enabled in the configuration; otherwise, it behaves identically to 
+ * enabled in the configuration; otherwise, it behaves identically to
  * `k_ticks_get_32`.
  *
  * @return Kernel ticks value (64-bit).
@@ -85,7 +83,7 @@ __kernel uint32_t k_uptime_get_ms32(void);
  * @brief Get the current system uptime in milliseconds (64-bit).
  *
  * This function returns the uptime in milliseconds as a 64-bit value. It should
- * be used if `CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS` is enabled in the 
+ * be used if `CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS` is enabled in the
  * configuration. Otherwise, use `k_uptime_get_ms32`.
  *
  * @return Uptime in milliseconds (64-bit).
@@ -165,7 +163,7 @@ __kernel uint32_t k_time_get(void);
 /**
  * @brief Get the current time in milliseconds.
  *
- * This function returns the current system time in milliseconds. If 
+ * This function returns the current system time in milliseconds. If
  * `CONFIG_KERNEL_TIME_API_MS_PRECISION` is set to 0, the return value
  * will be truncated to seconds.
  *

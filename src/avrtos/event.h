@@ -30,9 +30,9 @@
  *   expire.
  *
  * Limitations:
- * - Like software timers (timer.h), the main limitation is that the events are processed 
- *   within the tick interrupt handler (kernel code), the code executed in the handler must then 
- *   be compliant with the constraints of the interrupt context.
+ * - Like software timers (timer.h), the main limitation is that the events are processed
+ *   within the tick interrupt handler (kernel code), the code executed in the handler
+ * must then be compliant with the constraints of the interrupt context.
  *
  * Related configuration options:
  *  - CONFIG_KERNEL_EVENTS: Enables the event handling system.

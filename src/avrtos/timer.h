@@ -10,18 +10,18 @@
 /*
  * Software Timers (timer.h)
  *
- * Software timers in AVRTOS are used for scheduling tasks period tasks. 
+ * Software timers in AVRTOS are used for scheduling tasks period tasks.
  *
  * Key Concepts:
  * - **Timer Initialization**: Define and initialize timers with specific timeouts
  *   and handler functions.
  * - **Timer Operations**: Start and stop timers, and check their status.
  * - **Timer Handlers**: Define functions that are called when timers expire.
- * 
+ *
  * Limitations:
- * - Like events (event.h), the main limitation is that the timers are processed 
- * within the tick interrupt handler (kernel code), the code executed in the handler must then 
- * be compliant with the constraints of the interrupt context.
+ * - Like events (event.h), the main limitation is that the timers are processed
+ * within the tick interrupt handler (kernel code), the code executed in the handler must
+ * then be compliant with the constraints of the interrupt context.
  */
 
 #include "dstruct/tqueue.h"
@@ -52,9 +52,9 @@ typedef int (*k_timer_handler_t)(struct k_timer *);
  * timeout value, the handler function, and a queue item for scheduling.
  */
 struct k_timer {
-	struct titem tie;                  /**< Queue item for scheduling. */
-	k_timeout_t timeout;               /**< Timer timeout duration. */
-	k_timer_handler_t handler;         /**< Function to call when timer expires. */
+	struct titem tie;		   /**< Queue item for scheduling. */
+	k_timeout_t timeout;	   /**< Timer timeout duration. */
+	k_timer_handler_t handler; /**< Function to call when timer expires. */
 };
 
 /**
@@ -67,10 +67,10 @@ struct k_timer {
  * @param timeout_ms Timer timeout duration in milliseconds.
  * @param starting_delay Initial delay before the timer starts.
  */
-#define Z_TIMER_INIT(timer_handler, timeout_ms, starting_delay)                      \
-	{                                                                                  \
-		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms,                      \
-		.handler = timer_handler,                                                      \
+#define Z_TIMER_INIT(timer_handler, timeout_ms, starting_delay)                          \
+	{                                                                                    \
+		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms,                        \
+		.handler = timer_handler,                                                        \
 	}
 
 /**
@@ -84,11 +84,11 @@ struct k_timer {
  * @param timeout_ms Timer timeout duration in milliseconds.
  * @param starting_delay Initial delay before the timer starts.
  */
-#define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay)              \
-	Z_LINK_KERNEL_SECTION(.k_timers)                                                   \
+#define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay)                  \
+	Z_LINK_KERNEL_SECTION(.k_timers)                                                     \
 	static struct k_timer timer_name = Z_TIMER_INIT(handler, timeout_ms, starting_delay)
 
-/** 
+/**
  * @brief Value indicating a stopped timer.
  *
  * This constant represents a timer that has been stopped.
