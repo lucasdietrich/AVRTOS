@@ -262,6 +262,14 @@ struct k_work_delayable {
 	struct k_workqueue *_workqueue; ///< Workqueue that will process the work item.
 };
 
+/** Internal function triggered by the event object associated with the delayable work
+ * item,
+ *
+ * It must be declared extern to allow the k_work_delayable object to be defined
+ * statically.
+ */
+extern void z_delayable_work_trigger(struct k_event *event);
+
 /**
  * @brief Statically initialize a delayable work item.
  *
@@ -271,8 +279,8 @@ struct k_work_delayable {
  */
 #define K_WORK_DELAYABLE_INIT(work_handler)                                              \
 	{                                                                                    \
-		.work	= K_WORK_INIT(work_handler),                                             \
-		._event = K_EVENT_INIT(z_delayable_work_trigger), ._workqueue = NULL,            \
+		.work	= Z_WORK_INIT(work_handler),                                             \
+		._event = Z_EVENT_INIT(z_delayable_work_trigger), ._workqueue = NULL,            \
 	}
 
 /**
