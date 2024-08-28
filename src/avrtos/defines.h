@@ -50,6 +50,7 @@
 #if CONFIG_KERNEL_ARGS_CHECKS
 #define Z_ARGS_CHECK(_cond) if (!(_cond))
 #else
+// TODO fallback to ASSERT
 #define Z_ARGS_CHECK(_cond) if (0)
 #endif
 

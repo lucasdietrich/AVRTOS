@@ -44,6 +44,7 @@
  * workqueue.
  *  - CONFIG_WORKQUEUE_DELAYABLE: Enable support for delayable work items in workqueues.
  * 	  							  Requires CONFIG_KERNEL_EVENT.
+ *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks for workqueue functions.
  */
 
 #ifndef _AVRTOS_WORKQUEUE_H_
@@ -159,7 +160,7 @@ __kernel void z_workqueue_entry(struct k_workqueue *const workqueue);
  * @brief Create a workqueue thread at runtime.
  *
  * This function initializes a workqueue and creates a thread to process work items.
- * 
+ *
  * Safety: This function is safe but discouraged to call from an ISR context.
  *
  * @param workqueue Pointer to the workqueue structure.
@@ -183,7 +184,7 @@ __kernel int8_t k_workqueue_create(struct k_workqueue *workqueue,
  *
  * This function initializes a work item with the specified handler function.
  * Work items can also be defined statically using `K_WORK_DEFINE`.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param work Pointer to the work item structure.
@@ -212,7 +213,7 @@ __kernel bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work);
  * This function configures the workqueue to yield the CPU after each work item
  * is processed. This is useful for preventing a cooperative thread workqueue
  * from monopolizing the CPU if there are many work items to process.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param workqueue Pointer to the workqueue structure.
@@ -224,7 +225,7 @@ __kernel void k_workqueue_enable_yieldeach(struct k_workqueue *workqueue);
  *
  * This function configures the workqueue to continue processing work items without
  * yielding the CPU between items, if there are more items to process.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param workqueue Pointer to the workqueue structure.
@@ -239,7 +240,7 @@ __kernel void k_workqueue_disable_yieldeach(struct k_workqueue *workqueue);
  * @brief Submit a work item to the system workqueue.
  *
  * This function submits a work item to the system-wide workqueue for processing.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param work Pointer to the work item to submit.
@@ -270,7 +271,7 @@ struct k_work_delayable {
  */
 #define Z_WORK_DELAYABLE_INIT(work_handler)                                              \
 	{                                                                                    \
-		.work = Z_WORK_INIT(work_handler), ._event = K_EVENT_INIT(NULL),                 \
+		.work = Z_WORK_INIT(work_handler), ._event = Z_EVENT_INIT(NULL),                 \
 		._workqueue = NULL,                                                              \
 	}
 
@@ -290,7 +291,7 @@ struct k_work_delayable {
  *
  * This function initializes a delayable work item with the specified handler function.
  * Delayable work items can also be defined statically using `K_WORK_DELAYABLE_DEFINE`.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param dwork Pointer to the delayable work item structure.
@@ -305,7 +306,7 @@ __kernel void k_work_delayable_init(struct k_work_delayable *dwork,
  * This function schedules a delayable work item to be added to the workqueue after
  * the specified timeout. If the work item is already scheduled or queued, the function
  * returns -EBUSY.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param workqueue Pointer to the workqueue structure.
@@ -322,7 +323,7 @@ __kernel int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
  *
  * This function schedules a delayable work item to be added to the system workqueue
  * after the specified timeout.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param dwork Pointer to the delayable work item.
@@ -338,7 +339,7 @@ __kernel int8_t k_system_work_delayable_schedule(struct k_work_delayable *dwork,
  * This function cancels a delayable work item that has been scheduled but not yet queued
  * for processing. If the work item is in the queue or already being processed, the
  * function returns -EBUSY.
- * 
+ *
  * Safety: This function is safe to call from an ISR context.
  *
  * @param dwork Pointer to the delayable work item.

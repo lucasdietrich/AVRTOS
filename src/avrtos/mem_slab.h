@@ -9,9 +9,8 @@
  *
  * A memory slab is a memory management mechanism that provides a pool of fixed-size
  * memory blocks. Each slab is initialized with a predefined number of blocks, all of
- * which are of the same size. Memory slabs are particularly useful in systems where
- * dynamic memory allocation is not desirable or feasible, providing deterministic
- * allocation and deallocation times.
+ * which are of the same size. Memory slabs provides deterministic allocation and 
+ * deallocation times (O(1)).
  *
  * Example with a memory slab containing 4 blocks of 32 bytes each:
  *
@@ -33,7 +32,7 @@
  *
  * Related configuration options:
  *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
- *  - CONFIG_AVRTOS_LINKER_SCRIPT: Enable linker script support
+ *  - CONFIG_AVRTOS_LINKER_SCRIPT: Enables the use of the linker script
  */
 
 #ifndef _AVRTOS_MEM_SLAB_H_

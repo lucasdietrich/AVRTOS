@@ -35,7 +35,7 @@
 #include "canaries.h"
 #include "stack_sentinel.h"
 #include "prng.h"
-#include "time.h"
+#include "systime.h"
 
 #include "workqueue.h"
 #include "mutex.h"
@@ -47,7 +47,7 @@
 #include "mem_slab.h"
 #include "msgq.h"
 
-#include "io.h"
+#include "stdio.h"
 
 // clang-format on
 

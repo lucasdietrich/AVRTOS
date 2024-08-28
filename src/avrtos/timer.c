@@ -5,9 +5,7 @@
  */
 
 #include "timer.h"
-
 #include <util/atomic.h>
-
 #include "kernel.h"
 #include "misc/serial.h"
 
@@ -21,6 +19,12 @@ static struct titem *z_timers_runqueue = NULL;
 extern struct k_timer __k_timers_start;
 extern struct k_timer __k_timers_end;
 
+/**
+ * @brief Initialize all defined timers in the module.
+ *
+ * This function iterates through all timer instances defined in the linker script.
+ * Timers with a non-stopped timeout value are started with their initial timeout.
+ */
 void z_timer_init_module(void)
 {
 	const uint8_t timers_count = &__k_timers_end - &__k_timers_start;
@@ -42,6 +46,13 @@ void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
 	irq_unlock(key);
 }
 
+/**
+ * @brief Process all timers in the run queue.
+ *
+ * This function processes timers that have expired. Each timer's handler is invoked,
+ * and if the handler returns a non-zero value, the timer is stopped. Otherwise, the
+ * timer is rescheduled with its original timeout.
+ */
 void z_timers_process(void)
 {
 	struct titem *item;
@@ -56,14 +67,14 @@ void z_timers_process(void)
 
 		int ret = timer->handler(timer);
 
-		/* stop timer if handler returns non-zero */
+		/* Stop the timer if the handler returns a non-zero value */
 		if (ret != 0) {
 			timer->tie.timeout = K_TIMER_STOPPED;
 		}
 
-		/* reschedule if not stopped */
+		/* Reschedule the timer if it is not stopped */
 		if (timer->tie.timeout != K_TIMER_STOPPED) {
-			timer->tie.next	   = NULL;
+			timer->tie.next = NULL;
 			timer->tie.timeout = timer->timeout.value;
 			z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
 		}
@@ -75,8 +86,7 @@ int8_t k_timer_init(struct k_timer *timer,
 					k_timeout_t timeout,
 					k_timeout_t starting_delay)
 {
-	__ASSERT_NOTNULL(timer);
-	__ASSERT_NOTNULL(handler);
+	Z_ARGS_CHECK(timer && handler) return -EINVAL;
 
 	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
 
@@ -94,12 +104,12 @@ int8_t k_timer_init(struct k_timer *timer,
 
 bool k_timer_started(struct k_timer *timer)
 {
-	__ASSERT_NOTNULL(timer);
+	Z_ARGS_CHECK(timer) return false;
 
 	bool ret;
 
 	const uint8_t key = irq_lock();
-	ret				  = timer->tie.timeout != K_TIMER_STOPPED;
+	ret = timer->tie.timeout != K_TIMER_STOPPED;
 	irq_unlock(key);
 
 	return ret;
@@ -107,7 +117,7 @@ bool k_timer_started(struct k_timer *timer)
 
 int8_t k_timer_stop(struct k_timer *timer)
 {
-	__ASSERT_NOTNULL(timer);
+	Z_ARGS_CHECK(timer) return -EINVAL;
 
 	int ret;
 
@@ -126,7 +136,7 @@ int8_t k_timer_stop(struct k_timer *timer)
 
 int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
 {
-	__ASSERT_NOTNULL(timer);
+	Z_ARGS_CHECK(timer) return -EINVAL;
 
 	if (k_timer_started(timer)) {
 		return -1;

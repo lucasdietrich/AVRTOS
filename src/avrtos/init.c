@@ -8,7 +8,7 @@
 
 #include "canaries.h"
 #include "debug.h"
-#include "io.h"
+#include "stdio.h"
 #include "kernel.h"
 #include "kernel_private.h"
 #include "mem_slab.h"

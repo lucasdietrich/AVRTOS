@@ -535,57 +535,6 @@ __always_inline void k_yield_from_isr_cond(struct k_thread *thread)
 	}
 }
 
-/**
- * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
- *
- * @return Kernel ticks value (32 bits)
- */
-__kernel uint32_t k_ticks_get_32(void);
-
-/**
- * @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled
- *
- * @see k_ticks_get_32
- *
- * @return uint32_t
- */
-__always_inline uint32_t k_ticks_get(void)
-{
-	return k_ticks_get_32();
-}
-
-/**
- * @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled.
- * Meaningful only if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS is enabled,
- * otherwise, this function is equivalent to k_ticks_get_32.
- *
- * @return Kernel ticks value (64 bits)
- */
-__kernel uint64_t k_ticks_get_64(void);
-
-/**
- * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled
- *
- * @return Uptime in milliseconds
- */
-__kernel uint32_t k_uptime_get_ms32(void);
-
-/**
- * @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.
- *
- * Should be used if KERNEL_UPTIME_40BITS is enabled.
- *
- * @return Uptime in milliseconds (64 bits)
- */
-__kernel uint64_t k_uptime_get_ms64(void);
-
-/**
- * @brief Get uptime in seconds, if KERNEL_UPTIME is enabled
- *
- * @return Uptime in seconds
- */
-__kernel uint32_t k_uptime_get(void);
-
 #ifdef __cplusplus
 }
 #endif

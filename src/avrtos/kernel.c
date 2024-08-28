@@ -19,6 +19,7 @@
 #include "kernel_private.h"
 #include "stack_sentinel.h"
 #include "timer.h"
+#include "systime.h"
 
 #define K_MODULE K_MODULE_KERNEL
 
@@ -991,36 +992,3 @@ void yield(void)
 	k_yield();
 }
 #endif
-
-#if CONFIG_KERNEL_UPTIME
-
-uint32_t k_uptime_get(void)
-{
-#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-	return k_ticks_get_64() / K_TICKS_PER_SECOND;
-#else
-	return k_ticks_get_32() / K_TICKS_PER_SECOND;
-#endif /* CONFIG_KERNEL_UPTIME */
-}
-
-uint32_t k_uptime_get_ms32(void)
-{
-#if CONFIG_KERNEL_TICKS_COUNTER
-	return k_ticks_get_32() / K_TICKS_PER_MS;
-#else
-	return 0;
-#endif /* CONFIG_KERNEL_UPTIME */
-}
-
-uint64_t k_uptime_get_ms64(void)
-{
-#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-	return k_ticks_get_64() / K_TICKS_PER_MS;
-#elif CONFIG_KERNEL_TICKS_COUNTER
-	return k_ticks_get_32() / K_TICKS_PER_MS;
-#else
-	return 0;
-#endif /* CONFIG_KERNEL_UPTIME */
-}
-
-#endif /* CONFIG_KERNEL_UPTIME */
