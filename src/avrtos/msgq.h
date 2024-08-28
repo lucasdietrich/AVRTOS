@@ -98,6 +98,8 @@ struct k_msgq {
  * This function initializes a message queue with the given buffer, message size,
  * and maximum number of messages.
  *
+ * Safety: This function is safe to call from an ISR context.
+ *
  * @param msgq Pointer to the message queue structure to be initialized.
  * @param buffer Pointer to the buffer where messages will be stored.
  * @param msg_size Size of each message in the queue.
@@ -125,8 +127,8 @@ __kernel int8_t k_msgq_init(struct k_msgq *msgq,
  * the calling thread can wait until space becomes available, depending on the
  * timeout value.
  *
- * Safety: This function is generally not safe to call from an ISR context.
- * 		   It becomes safe when the given timeout is K_NO_WAIT.
+ * Safety: This function is generally not safe to call from an ISR context
+ *         if the timeout is different from K_NO_WAIT.
  *
  * @param msgq Pointer to the message queue structure.
  * @param data Pointer to the message data to be added to the queue.
@@ -157,8 +159,8 @@ __kernel int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t ti
  * @param data Pointer to the buffer where the retrieved message will be stored.
  * @param timeout Timeout value specifying how long to wait if the queue is empty.
  *
- * Safety: This function is generally not safe to call from an ISR context.
- * 		   It becomes safe when the given timeout is K_NO_WAIT.
+ * Safety: This function is generally not safe to call from an ISR context
+ *         if the timeout is different from K_NO_WAIT.
  *
  * @return 0 on success
  * 		   -EINVAL if msgq or data is NULL
@@ -180,18 +182,21 @@ __kernel int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
  * This function cancels all threads that are currently waiting on the message queue
  * (either for reading or writing) and resets the queue to an empty state.
  *
+ * Safety: This function is safe to call from an ISR context.
+ *
  * @param msgq Pointer to the message queue structure.
  *
- * @return The number of threads that were canceled.
- *
+ * @return The number of threads that were canceled
  */
-__kernel uint8_t k_msgq_purge(struct k_msgq *msgq);
+__kernel int8_t k_msgq_purge(struct k_msgq *msgq);
 
 /**
  * @brief Peek the first message in the queue without removing it.
  *
  * This function retrieves the first message from the queue without removing it,
  * allowing the message to remain in the queue.
+ *
+ * Safety: This function is safe to call from an ISR context.
  *
  * @param msgq Pointer to the message queue structure.
  * @param data Pointer to the buffer where the peeked message will be stored.
@@ -207,6 +212,8 @@ __kernel int8_t k_msgq_peek(struct k_msgq *msgq, void *data);
  *
  * This function returns the number of available message slots in the queue.
  *
+ * Safety: This function is safe to call from an ISR context.
+ *
  * @param msgq Pointer to the message queue structure.
  *
  * @return The number of free message slots in the queue.
@@ -217,6 +224,8 @@ __kernel uint8_t k_msgq_num_free_get(struct k_msgq *msgq);
  * @brief Get the number of used message slots in the queue.
  *
  * This function returns the number of messages currently in the queue.
+ *
+ * Safety: This function is safe to call from an ISR context.
  *
  * @param msgq Pointer to the message queue structure.
  *

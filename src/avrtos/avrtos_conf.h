@@ -1023,4 +1023,18 @@
 #define CONFIG_I2C_DEBUG 0
 #endif
 
+
+//
+// Define the size of the flags of the flags subsystem (k_flags_* functions)
+//
+// 1: 8 bits (default)
+// 2: 16 bits
+// 4: 32 bits
+// 8: 64 bits
+//
+
+#ifndef CONFIG_KERNEL_FLAGS_SIZE
+#define CONFIG_KERNEL_FLAGS_SIZE 1
+#endif
+
 #endif

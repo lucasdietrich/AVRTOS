@@ -46,9 +46,10 @@ struct k_signal sig;
 
 ISR(INT0_vect)
 {
-	struct k_thread *thread = k_signal_raise(&sig, 1u);
+	int ret = k_signal_raise(&sig, 1u);
 
-	k_yield_from_isr_cond(thread);
+	/* Yield if more than one thread was woken up */
+	if (ret > 0) k_yield_from_isr();
 }
 
 #endif
