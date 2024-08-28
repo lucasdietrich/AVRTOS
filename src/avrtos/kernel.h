@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+/* Address to the current thread structure */
+extern struct k_thread *z_current;
+
 /**
  * @brief Define a new thread at runtime and initialize its stack.
  *
@@ -98,7 +101,6 @@ void z_thread_entry(void *context);
  */
 __always_inline struct k_thread *k_thread_get_current(void)
 {
-	extern struct k_thread *z_current;
 	return z_current;
 }
 
@@ -448,8 +450,6 @@ extern void z_assert_thread_ready(struct k_thread *thread);
  */
 __always_inline void k_yield_from_isr(void)
 {
-	extern struct k_thread *z_current;
-
 	// ASSERT ISR CONTEXT
 	// ASSERT IRQ LOCKED
 	// ASSERT NOT kernel context
