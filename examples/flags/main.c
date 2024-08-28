@@ -75,19 +75,22 @@ int main(void)
 
 	for (;;) {
 		printf_P(PSTR("<main> poll\n"));
-		int ret = k_flags_poll(&flags, 0xFEu, K_FLAGS_SET_ANY, K_FOREVER);
-		printf_P(PSTR("<main> ret: %d\n"), ret);
+		uint8_t val = 0xFE;
+		int ret = k_flags_poll(&flags, &val, K_FLAGS_SET_ANY, K_FOREVER);
+		printf_P(PSTR("<main> ret: %d val: %u\n"), ret, val);
 
 		k_dump_stack_canaries();
-		k_sleep(K_SECONDS(5u));
+		
+		k_sleep(K_SECONDS(1u));
 	}
 }
 
 void thread(void *arg)
 {
 	for (;;) {
+		uint8_t val = 0x0F;
 		int ret = k_flags_poll(
-			&flags, 0x0Fu, K_FLAGS_SET_ANY | K_FLAGS_CONSUME, K_FOREVER);
-		printf_P(PSTR("<thread> ret: %d\n"), ret);
+			&flags, &val, K_FLAGS_SET_ANY | K_FLAGS_CONSUME, K_FOREVER);
+		printf_P(PSTR("<thread> ret: %d val: %u\n"), ret, val);
 	}
 }

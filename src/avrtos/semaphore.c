@@ -12,6 +12,8 @@
 #include "kernel.h"
 #include "kernel_private.h"
 
+#define K_MODULE K_MODULE_SEMAPHORE
+
 int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 {
 	Z_ARGS_CHECK(sem && limit) return -EINVAL;
@@ -25,45 +27,43 @@ int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 
 int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 {
-	int8_t get = 0x00;
+	Z_ARGS_CHECK(sem) return -EINVAL;
 
+	int8_t ret		  = 0;
 	const uint8_t key = irq_lock();
 
-	if (sem->count != 0) {
+	if (sem->count > 0) {
+		/* Semaphore is available, decrement count */
 		sem->count--;
 	} else {
-		get = z_pend_current(&sem->waitqueue, timeout);
+		/* Semaphore is not available, wait for it */
+		ret = z_pend_current(&sem->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
 
-	if (get == 0) {
+	if (ret == 0) {
 		__K_DBG_SEM_TAKE(z_current);
 	}
 
-	return get;
+	return ret;
 }
 
 struct k_thread *k_sem_give(struct k_sem *sem)
 {
-	struct k_thread *thread;
+	Z_ARGS_CHECK(sem) return NULL;
 
-	const uint8_t key = irq_lock();
+	struct k_thread *thread = NULL;
+	const uint8_t key		= irq_lock();
 
 	__K_DBG_SEM_GIVE(z_current);
 
-	/* if a thread is thread is pending on a semaphore
-	 * it means that its count is necessary 0. So we don't
-	 * need to check if we reached the limit.
-	 */
-
+	/* Wake up the first thread in the wait queue if any */
 	thread = z_unpend_first_thread(&sem->waitqueue);
 
-	/* If there is a thread pending on a semaphore,
-	 * we to give the semaphore directly to the thread
-	 */
 	if (thread == NULL) {
-		if (sem->count != sem->limit) {
+		/* No threads are waiting, increment the semaphore count */
+		if (sem->count < sem->limit) {
 			sem->count++;
 		}
 	}

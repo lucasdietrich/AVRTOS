@@ -154,8 +154,8 @@ __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
  * is available and a timeout is provided, the function will block until a block
  * becomes available or the timeout expires.
  *
- * Safety: This function is generally not safe to call from an ISR context.
- * 		   It becomes safe when the given timeout is K_NO_WAIT.
+ * Safety: This function is generally not safe to call from an ISR context
+ *         if the timeout is different from K_NO_WAIT.
  *
  * @param slab Pointer to the memory slab structure.
  * @param mem Pointer to the variable that will receive the allocated memory block.

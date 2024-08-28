@@ -24,31 +24,31 @@ int8_t k_signal_init(struct k_signal *sig)
 	return 0;
 }
 
-struct k_thread *k_signal_raise(struct k_signal *sig, uint8_t value)
+int8_t k_signal_raise(struct k_signal *sig, uint8_t value)
 {
-	__ASSERT_NOTNULL(sig);
+	Z_ARGS_CHECK(sig) return -EINVAL;
 
-	struct k_thread *thread;
-
+	int8_t ret		  = 0;
 	const uint8_t key = irq_lock();
 
 	sig->signal = value;
 	sig->flags |= K_POLL_STATE_SIGNALED;
 
-	/* TODO: unpend all threads */
-	thread = z_unpend_first_thread(&sig->waitqueue);
+	/* Wake up all threads waiting on the signal */
+	while (z_unpend_first_thread(&sig->waitqueue) != NULL) {
+		ret++;
+	}
 
 	irq_unlock(key);
 
-	return thread;
+	return ret;
 }
 
 int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 {
-	__ASSERT_NOTNULL(sig);
+	Z_ARGS_CHECK(sig) return -EINVAL;
 
 	int8_t ret;
-
 	const uint8_t key = irq_lock();
 
 	if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
@@ -62,15 +62,14 @@ int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 	return ret;
 }
 
-uint8_t k_poll_cancel_wait(struct k_signal *sig)
+int8_t k_poll_cancel_wait(struct k_signal *sig)
 {
-	__ASSERT_NOTNULL(sig);
+	Z_ARGS_CHECK(sig) return -EINVAL;
 
 	int8_t ret;
-
 	const uint8_t key = irq_lock();
 
-	ret = z_cancel_all_pending(&sig->waitqueue);
+	ret = (int8_t)z_cancel_all_pending(&sig->waitqueue);
 
 	irq_unlock(key);
 

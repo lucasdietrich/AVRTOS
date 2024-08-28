@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2022-2024 Lucas Dietrich <ld.adecy@gmail.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,9 +7,21 @@
 /*
  * Mutexes
  *
+ * A mutex (short for mutual exclusion) is a synchronization primitive used to
+ * protect shared resources from concurrent access, ensuring that only one thread
+ * can access the resource at a time. This is critical in preventing race conditions
+ * and ensuring data integrity in multithreaded environments.
+ *
+ * Mutexes can be locked and unlocked by threads. If a thread attempts to lock a
+ * mutex that is already locked by another thread, the calling thread will be put
+ * into a waiting state until the mutex becomes available.
+ *
+ * Mutexes can be configured to allow reentrant locking, where the same thread
+ * can lock the mutex multiple times and must unlock it the same number of times.
+ *
  * Related configuration options:
- * - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
- * - CONFIG_KERNEL_REENTRANCY: Enable reentrant mutexes
+ *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
+ *  - CONFIG_KERNEL_REENTRANCY: Enable reentrant mutexes
  */
 
 #ifndef _AVRTOS_MUTEX_H_
@@ -87,6 +99,8 @@ struct k_mutex {
  * This function initializes a mutex structure, setting its lock status
  * to unlocked, initializing the wait queue, and setting the owner to NULL.
  *
+ * Safety: This function is safe to call from an ISR context.
+ *
  * @param mutex Pointer to the mutex structure to be initialized.
  * @return 0 on success, or -EINVAL if the mutex pointer is NULL.
  */
@@ -103,8 +117,8 @@ int8_t k_mutex_init(struct k_mutex *mutex);
  * the mutex multiple times, and must unlock it the same number of times.
  * Otherwise, a thread SHALL NOT lock a mutex it already owns.
  *
- * Safety: This function is generally not safe to call from an ISR context.
- * 		   It becomes safe when the given timeout is K_NO_WAIT.
+ * Safety: This function is generally not safe to call from an ISR context
+ *         if the timeout is different from K_NO_WAIT.
  *
  * @param mutex Pointer to the mutex structure.
  * @param timeout Maximum time to wait for the mutex to become available.
@@ -139,6 +153,8 @@ __kernel struct k_thread *k_mutex_unlock(struct k_mutex *mutex);
  *
  * This function cancels all threads currently waiting for the mutex,
  * removing them from the wait queue.
+ *
+ * Safety: This function is safe to call from an ISR context.
  *
  * @param mutex Pointer to the mutex structure.
  * @return 0 on success, or an error code otherwise.

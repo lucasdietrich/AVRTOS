@@ -44,7 +44,7 @@ struct k_workqueue {
 
 #define K_WORKQUEUE_DEFINE(_name, _stack_size, _prio_flags, _symbol)                     \
 	struct k_workqueue _name = {                                                         \
-		.q	   = K_FIFO_INIT(_name.q),                                                   \
+		.q	   = Z_FIFO_INIT(_name.q),                                                   \
 		.flags = 0u,                                                                     \
 	};                                                                                   \
 	K_THREAD_DEFINE(z_workq_##_name, z_workqueue_entry, _stack_size, _prio_flags,        \

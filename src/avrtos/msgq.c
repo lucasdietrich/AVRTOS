@@ -137,11 +137,11 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 	return ret;
 }
 
-uint8_t k_msgq_purge(struct k_msgq *msgq)
+int8_t k_msgq_purge(struct k_msgq *msgq)
 {
 	Z_ARGS_CHECK(msgq) return -EINVAL;
 
-	uint8_t ret;
+	int8_t ret;
 
 	const uint8_t key = irq_lock();
 
@@ -151,7 +151,7 @@ uint8_t k_msgq_purge(struct k_msgq *msgq)
 
 	/* Cancel all pending threads. Pending threads will be woken up
 	 * with -ECANCELED. */
-	ret = z_cancel_all_pending(&msgq->waitqueue);
+	ret = (int8_t)z_cancel_all_pending(&msgq->waitqueue);
 
 	irq_unlock(key);
 
