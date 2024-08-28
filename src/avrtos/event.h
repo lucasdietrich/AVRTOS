@@ -7,7 +7,7 @@
 /*
  * Event Handling
  *
- * The event handling system in AVRTOS provides a mechanism for scheduling
+ * The event handling system provides a mechanism for scheduling
  * and managing events that occur after a specified delay or at regular intervals.
  * Events are typically used to trigger specific actions at a later time, such as
  * handling timeouts, periodic tasks, or deferred processing.

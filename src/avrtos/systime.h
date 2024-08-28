@@ -9,7 +9,7 @@
  *
  * This header file provides functions for retrieving the system uptime and
  * getting retrieving and setting the current system time (e.g. UTC or local time)
- * within the AVRTOS kernel.
+ * within the kernel.
  * It supports operations for accessing the current time, checking if the time is set.
  *
  * Related configuration options:

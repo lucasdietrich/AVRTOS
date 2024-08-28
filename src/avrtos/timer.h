@@ -10,7 +10,7 @@
 /*
  * Software Timers (timer.h)
  *
- * Software timers in AVRTOS are used for scheduling tasks period tasks.
+ * Software timers are used for scheduling tasks period tasks.
  *
  * Key Concepts:
  * - **Timer Initialization**: Define and initialize timers with specific timeouts

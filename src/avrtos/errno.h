@@ -10,12 +10,8 @@
 /*
  * Error Codes (errno.h)
  *
- * This header file defines a set of standard error codes used throughout the AVRTOS
- * operating system. These error codes are used to indicate the success or failure
- * of operations.
- *
- * The error codes defined in this file follow the conventions of standard POSIX error
- * codes.
+ * This header file defines a set of standard error codes.
+ * The error codes follow the conventions of standard POSIX error codes.
  */
 
 /* EIO (5): Input/output error.

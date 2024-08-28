@@ -7,7 +7,7 @@
 /*
  * Idle
  *
- * The idle module in AVRTOS is responsible for managing the system's idle thread,
+ * The idle module is responsible for managing the system's idle thread,
  * which runs when no other threads are ready to execute.
  *
  * Key Features:
