@@ -5,9 +5,7 @@
  */
 
 #include "workqueue.h"
-
 #include <util/atomic.h>
-
 #include "kernel.h"
 
 #define K_MODULE K_MODULE_WORKQUEUE
@@ -45,7 +43,7 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 	for (;;) {
 		item = k_fifo_get(&workqueue->q, K_FOREVER);
 
-		/* we cannot cancel a workqueue pending on a work item */
+		/* Ensure that the work item is valid */
 		__ASSERT_NOTNULL(item);
 
 		work = CONTAINER_OF(item, struct k_work, _tie);
@@ -53,21 +51,19 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		const k_work_handler_t handler = work->handler;
 
 		/*
-		 * Set the work item as "submittable" again.
-		 * This only means that the work item can be submitted again
-		 * (even during the being processed handler)
-		 *
+		 * Mark the work item as submittable again.
+		 * This allows the work item to be resubmitted even while it is being processed.
+		 * 
 		 * However, we can't do any assumption regarding the context of
-		 * the work item. Proper synchronization must be done by the
-		 * user.
-		 **/
+		 * the work item, proper synchronization is the user's responsibility.
+		 */
 		const uint8_t key = irq_lock();
-		item->next		  = NULL;
+		item->next = NULL;
 		irq_unlock(key);
 
 		handler(work);
 
-		/* yield if "yieldeach" option is enabled */
+		/* Yield if the "yieldeach" option is enabled */
 		if (workqueue->flags & Z_WQ_YIELDEACH_MSK) {
 			k_yield();
 		}
@@ -80,13 +76,12 @@ void k_work_init(struct k_work *work, k_work_handler_t handler)
 }
 
 /**
- * @brief Tells whether the work item is submittable or not.
+ * @brief Check if the work item is ready to be submitted.
  *
- * Requires interrupts to be disabled.
+ * This function requires interrupts to be disabled.
  *
- * @param work
- * @return true if submittable
- * @return false if in already in queue
+ * @param work Pointer to the work item.
+ * @return true if the work item can be submitted, false if it is already in the queue.
  */
 __always_inline bool z_work_submittable(struct k_work *work)
 {
@@ -106,7 +101,7 @@ bool k_work_submit(struct k_workqueue *workqueue, struct k_work *work)
 
 	bool ret = false;
 
-	/* if item not already in queue */
+	/* Check if the work item is not already in the queue */
 	const uint8_t key = irq_lock();
 	if (z_work_submittable(work)) {
 		z_work_submit(workqueue, work);
@@ -161,9 +156,7 @@ static void delayable_work_trigger(struct k_event *event)
 	struct k_work_delayable *const dwork =
 		CONTAINER_OF(event, struct k_work_delayable, _event);
 
-	/* - work item and _workqueue should remain valid until here
-	 * - work item is necessarily submittable, so no need to check
-	 */
+	/* Submit the work item to the associated workqueue */
 	z_work_submit(dwork->_workqueue, &dwork->work);
 }
 
@@ -185,20 +178,16 @@ int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
 {
 	Z_ARGS_CHECK(workqueue && dwork) return -EINVAL;
 
-	int8_t ret		   = 0;
+	int8_t ret = 0;
 	const uint8_t lock = irq_lock();
 
-	/* Ensure the work item is not already pending for submission or already in
-	 * queue.
-	 */
+	/* Ensure the work item is not already pending or in the queue */
 	if (dwork->_event.scheduled || !z_work_submittable(&dwork->work)) {
 		ret = -EBUSY;
 		goto exit;
 	}
 
-	/* By the use of the lock We make ensure _workqueue is not written while the
-	 * work item is being sent from delayable_work_trigger.
-	 */
+	/* Safely assign the workqueue, ensuring it is not modified during submission */
 	dwork->_workqueue = workqueue;
 
 	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
@@ -206,6 +195,7 @@ int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
 	} else {
 		z_event_schedule(&dwork->_event, timeout);
 	}
+
 exit:
 	irq_unlock(lock);
 	return ret;
@@ -213,17 +203,14 @@ exit:
 
 int8_t k_work_delayable_cancel(struct k_work_delayable *dwork)
 {
-	Z_ARGS_CHECK(workqueue && dwork) return -EINVAL;
+	Z_ARGS_CHECK(dwork) return -EINVAL;
 
 	int8_t ret = k_event_cancel(&dwork->_event);
 	if (ret == -EAGAIN) {
 		const uint8_t lock = irq_lock();
 
-		/* In case the work was not pending for submission, we need to check if
-		 * the work item is pending for processing. This is purely informative.
-		 */
+		/* If the work item is not pending, check if it is already in the queue */
 		if (!z_work_submittable(&dwork->work)) {
-			/* If yes, we consider the work item as busy */
 			ret = -EBUSY;
 		}
 

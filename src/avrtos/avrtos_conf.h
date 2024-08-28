@@ -568,16 +568,6 @@
 #endif
 
 //
-// Enabled thread errno
-//
-// 0: Thread errno is disabled
-// 1: Thread errno is enabled
-//
-#ifndef CONFIG_THREAD_ERRNO
-#define CONFIG_THREAD_ERRNO 0
-#endif
-
-//
 // Automatic initialization of the serial console
 //
 #ifndef CONFIG_SERIAL_AUTO_INIT
@@ -1022,7 +1012,6 @@
 #ifndef CONFIG_I2C_DEBUG
 #define CONFIG_I2C_DEBUG 0
 #endif
-
 
 //
 // Define the size of the flags of the flags subsystem (k_flags_* functions)
