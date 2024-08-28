@@ -12,6 +12,7 @@
  * with each message being of a constant size.
  * Threads can put messages into the queue or retrieve messages from it, with
  * synchronization ensuring safe concurrent access.
+ * Allocation and deallocation operations are performed in constant time (O(1)).
  *
  * Example with a message queue (msgq) containing 4 messages of 16 bytes each and the flow
  * of messages:

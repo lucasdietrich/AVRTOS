@@ -5,7 +5,9 @@
  */
 
 #include "workqueue.h"
+
 #include <util/atomic.h>
+
 #include "kernel.h"
 
 #define K_MODULE K_MODULE_WORKQUEUE
@@ -53,12 +55,12 @@ void z_workqueue_entry(struct k_workqueue *const workqueue)
 		/*
 		 * Mark the work item as submittable again.
 		 * This allows the work item to be resubmitted even while it is being processed.
-		 * 
+		 *
 		 * However, we can't do any assumption regarding the context of
 		 * the work item, proper synchronization is the user's responsibility.
 		 */
 		const uint8_t key = irq_lock();
-		item->next = NULL;
+		item->next		  = NULL;
 		irq_unlock(key);
 
 		handler(work);
@@ -178,7 +180,7 @@ int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
 {
 	Z_ARGS_CHECK(workqueue && dwork) return -EINVAL;
 
-	int8_t ret = 0;
+	int8_t ret		   = 0;
 	const uint8_t lock = irq_lock();
 
 	/* Ensure the work item is not already pending or in the queue */
