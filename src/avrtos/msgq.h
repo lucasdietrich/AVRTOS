@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2022-2024 Lucas Dietrich <ld.adecy@gmail.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,10 +25,14 @@
  *       |                    |                   |
  *       |                    |                   |
  *       v                    v                   v
- *  Outgoing Message    Stored Messages      Incoming Message
+ *  Outgoing Message    Stored Message       Incoming Message would
+ * 	would be copied here  				     be copied here
  *
  * Threads can block on either write or read operations depending on the availability
  * of space or messages, ensuring efficient data exchange without data loss.
+ *
+ * Related configuration options:
+ *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
  */
 
 #ifndef _AVRTOS_MSGQ_H_
@@ -121,6 +125,9 @@ __kernel int8_t k_msgq_init(struct k_msgq *msgq,
  * the calling thread can wait until space becomes available, depending on the
  * timeout value.
  *
+ * Safety: This function is generally not safe to call from an ISR context.
+ * 		   It becomes safe when the given timeout is K_NO_WAIT.
+ *
  * @param msgq Pointer to the message queue structure.
  * @param data Pointer to the message data to be added to the queue.
  * @param timeout Timeout value specifying how long to wait if the queue is full.
@@ -149,6 +156,9 @@ __kernel int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t ti
  * @param msgq Pointer to the message queue structure.
  * @param data Pointer to the buffer where the retrieved message will be stored.
  * @param timeout Timeout value specifying how long to wait if the queue is empty.
+ *
+ * Safety: This function is generally not safe to call from an ISR context.
+ * 		   It becomes safe when the given timeout is K_NO_WAIT.
  *
  * @return 0 on success
  * 		   -EINVAL if msgq or data is NULL

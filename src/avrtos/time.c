@@ -72,7 +72,7 @@ static struct {
 } z_time_ref = {
 	.timestamp = 0u,
 	.uptime	   = 0u,
-	.mutex	   = K_MUTEX_INIT(z_time_ref.mutex),
+	.mutex	   = Z_MUTEX_INIT(z_time_ref.mutex),
 };
 
 void k_time_set(uint32_t sec)
