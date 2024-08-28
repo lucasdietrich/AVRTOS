@@ -114,6 +114,11 @@
 #define CONFIG_KERNEL_ARGS_CHECKS 0
 #endif
 
+/* Auto init serial */
+#ifndef CONFIG_SERIAL_AUTO_INIT
+#define CONFIG_SERIAL_AUTO_INIT 1
+#endif
+
 /* Default serial baudrate */
 #ifndef CONFIG_SERIAL_USART_BAUDRATE
 #define CONFIG_SERIAL_USART_BAUDRATE 9600lu
