@@ -60,8 +60,6 @@
 #define Z_PRIVATE(_member) _##_member
 #endif
 
-/*___________________________________________________________________________*/
-
 // Timing
 
 #if CONFIG_KERNEL_UPTIME
@@ -158,8 +156,6 @@ typedef struct {
 
 #define K_IMMEDIATE K_NEXT_TICK
 
-/*___________________________________________________________________________*/
-
 // MCU specific fixups
 
 #if !defined(USART0_RX_vect) && defined(USART_RX_vect)
@@ -197,8 +193,6 @@ typedef struct {
 #else
 #define Z_STACK_SENTINEL_REGISTER(stack_symb)
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
-
-/*___________________________________________________________________________*/
 
 // 31 registers (31) + SREG (1) + return address (2 or 3)
 
@@ -340,8 +334,6 @@ typedef struct {
 #define Z_THREAD_IS_MONITORED(thread) ((thread) != &z_thread_main)
 #endif
 
-/*___________________________________________________________________________*/
-
 /* Note: Willingly not adding unsigned "u" suffix to numbers
  * because these flags are used in assembly code
  */
@@ -406,7 +398,5 @@ typedef struct {
 
 /* Default thread priority level */
 #define K_PRIO_DEFAULT (K_COOPERATIVE | Z_THREAD_PRIO_LOW)
-
-/*___________________________________________________________________________*/
 
 #endif

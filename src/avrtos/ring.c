@@ -14,12 +14,14 @@ int8_t k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
 
 int8_t k_ring_push(struct k_ring *ring, char data)
 {
+	Z_ARGS_CHECK(ring) return -EINVAL;
+
 	const uint8_t r	  = ring->r;
 	uint8_t w		  = ring->w;
 	const uint8_t rem = ring->size - (w - r) - 1u;
 
 	if (!rem) {
-		return -EAGAIN;
+		return -ENOMEM;
 	}
 
 	ring->buffer[w] = data;
@@ -37,6 +39,8 @@ int8_t k_ring_push(struct k_ring *ring, char data)
 
 int8_t k_ring_pop(struct k_ring *ring, char *data)
 {
+	Z_ARGS_CHECK(ring && data) return -EINVAL;
+	
 	const uint8_t w = ring->w;
 	uint8_t r		= ring->r;
 

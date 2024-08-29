@@ -91,10 +91,11 @@ struct k_thread {
  * @brief Structure representing the call-saved registers plus the program counter (PC).
  *
  * The `struct z_callsaved_ctx` structure represents the registers that must be saved
- * during a context switch in AVR architecture. It includes:
+ * during a context switch. It includes:
  * - The status register (`sreg`).
  * - Registers `r7` to `r29`, which are saved as part of the context.
- * - The stack pointer and program counter, depending on the AVR architecture.
+ * - The stack pointer and program counter, depending on the AVR architecture
+ *   (with/without 3 byte wide PC).
  *
  * This structure is used to save the context of a thread when it is preempted or
  * voluntarily yields the CPU.

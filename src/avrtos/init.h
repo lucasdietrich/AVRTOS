@@ -39,7 +39,7 @@ __always_inline uint8_t z_get_mcusr(void)
  *
  * This macro defines a function that initializes the stack pointer (SP) to
  * point to the end of the main stack, as defined by `CONFIG_THREAD_MAIN_STACK_SIZE`.
- * This function is placed in the `.init3` section of the AVR program, ensuring
+ * This function is placed in the `.init3` section of the program, ensuring
  * it is executed early in the startup sequence (before the C++ constructors).
  */
 #define K_KERNEL_LINK_SP_INIT()                                                          \
@@ -62,7 +62,7 @@ __always_inline uint8_t z_get_mcusr(void)
  *
  * This macro defines a function that calls `z_avrtos_init`, the main initialization
  * function for the AVRTOS kernel. This function is placed in the `.init8` section
- * of the AVR program, not strong requirements but it is executed after the
+ * of the program, not strong requirements but it is executed after the
  * copy of the `.data` and `.bss` sections and before the main function.
  */
 #define K_KERNEL_LINK_AVRTOS_INIT()                                                      \

@@ -7,6 +7,10 @@
 #ifndef _AVRTOS_DEBUG_H
 #define _AVRTOS_DEBUG_H
 
+/**
+ * Debugging utilities
+ */
+
 #include <avr/pgmspace.h>
 
 #include "kernel.h"
@@ -18,61 +22,57 @@
 extern "C" {
 #endif
 
-/*___________________________________________________________________________*/
-
 //
 // Kernel Debug Macros
 //
 
-#define __K_DBG_HELPER_TH(thread, chr)                                                   \
+#define __Z_DBG_HELPER_TH(thread, chr)                                                   \
 	serial_transmit(chr);                                                                \
 	serial_transmit(thread->symbol)
 
-#define __K_DBG_HELPER_TH_R(thread, chr)                                                 \
+#define __Z_DBG_HELPER_TH_R(thread, chr)                                                 \
 	serial_transmit(thread->symbol);                                                     \
 	serial_transmit(chr)
 
 #if CONFIG_KERNEL_SCHEDULER_DEBUG
 
-#define __K_DBG_SCHED_LOCK(thread)		__K_DBG_HELPER_TH(thread, '[')
-#define __K_DBG_SCHED_UNLOCK()			serial_transmit(']')
-#define __K_DBG_SCHED_EVENT(thread)		__K_DBG_HELPER_TH(thread, '!')
-#define __K_DBG_SCHED_SUSPENDED(thread) serial_transmit('~')
-#define __K_DBG_SCHED_NEXT_THREAD()		serial_transmit('>')
-#define __K_DBG_SCHED_SKIP_IDLE()		serial_print_p(PSTR("p"))
-#define __K_DBG_SCHED_NEXT(thread)		serial_transmit(thread->symbol)
-#define __K_DBG_WAKEUP(thread)			__K_DBG_HELPER_TH(thread, '@')
+#define __Z_DBG_SCHED_LOCK(thread)		__Z_DBG_HELPER_TH(thread, '[')
+#define __Z_DBG_SCHED_UNLOCK()			serial_transmit(']')
+#define __Z_DBG_SCHED_EVENT(thread)		__Z_DBG_HELPER_TH(thread, '!')
+#define __Z_DBG_SCHED_SUSPENDED(thread) serial_transmit('~')
+#define __Z_DBG_SCHED_NEXT_THREAD()		serial_transmit('>')
+#define __Z_DBG_SCHED_SKIP_IDLE()		serial_print_p(PSTR("p"))
+#define __Z_DBG_SCHED_NEXT(thread)		serial_transmit(thread->symbol)
+#define __Z_DBG_WAKEUP(thread)			__Z_DBG_HELPER_TH(thread, '@')
 
-#define __K_DBG_MUTEX_LOCKED(thread)   __K_DBG_HELPER_TH(thread, '}')
-#define __K_DBG_MUTEX_UNLOCKED(thread) __K_DBG_HELPER_TH_R(thread, '{')
-#define __K_DBG_MUTEX_WAIT(thread)	   __K_DBG_HELPER_TH(thread, '#')
+#define __Z_DBG_MUTEX_LOCKED(thread)   __Z_DBG_HELPER_TH(thread, '}')
+#define __Z_DBG_MUTEX_UNLOCKED(thread) __Z_DBG_HELPER_TH_R(thread, '{')
+#define __Z_DBG_MUTEX_WAIT(thread)	   __Z_DBG_HELPER_TH(thread, '#')
 
-#define __K_DBG_SEM_TAKE(thread) __K_DBG_HELPER_TH(thread, ')')
-#define __K_DBG_SEM_GIVE(thread) __K_DBG_HELPER_TH_R(thread, '(')
-#define __K_DBG_SEM_WAIT(thread) __K_DBG_HELPER_TH(thread, '$')
+#define __Z_DBG_SEM_TAKE(thread) __Z_DBG_HELPER_TH(thread, ')')
+#define __Z_DBG_SEM_GIVE(thread) __Z_DBG_HELPER_TH_R(thread, '(')
+#define __Z_DBG_SEM_WAIT(thread) __Z_DBG_HELPER_TH(thread, '$')
 
 #else
 
-#define __K_DBG_SCHED_LOCK(thread)
-#define __K_DBG_SCHED_UNLOCK()
-#define __K_DBG_SCHED_EVENT(thread)
-#define __K_DBG_SCHED_SUSPENDED(thread)
-#define __K_DBG_SCHED_NEXT_THREAD()
-#define __K_DBG_SCHED_SKIP_IDLE()
-#define __K_DBG_SCHED_NEXT(thread)
-#define __K_DBG_WAKEUP(thread)
+#define __Z_DBG_SCHED_LOCK(thread)
+#define __Z_DBG_SCHED_UNLOCK()
+#define __Z_DBG_SCHED_EVENT(thread)
+#define __Z_DBG_SCHED_SUSPENDED(thread)
+#define __Z_DBG_SCHED_NEXT_THREAD()
+#define __Z_DBG_SCHED_SKIP_IDLE()
+#define __Z_DBG_SCHED_NEXT(thread)
+#define __Z_DBG_WAKEUP(thread)
 
-#define __K_DBG_MUTEX_LOCKED(thread)
-#define __K_DBG_MUTEX_UNLOCKED(thread)
-#define __K_DBG_MUTEX_WAIT(thread)
+#define __Z_DBG_MUTEX_LOCKED(thread)
+#define __Z_DBG_MUTEX_UNLOCKED(thread)
+#define __Z_DBG_MUTEX_WAIT(thread)
 
-#define __K_DBG_SEM_TAKE(thread)
-#define __K_DBG_SEM_GIVE(thread)
-#define __K_DBG_SEM_WAIT(thread)
+#define __Z_DBG_SEM_TAKE(thread)
+#define __Z_DBG_SEM_GIVE(thread)
+#define __Z_DBG_SEM_WAIT(thread)
 
 #endif
-
-/*___________________________________________________________________________*/
 
 /* Kernel GPIO Debug */
 
@@ -175,8 +175,6 @@ extern "C" {
 #error "Invalid CONFIG_KERNEL_DEBUG_GPIO_SYSTICK value"
 #endif
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Current thread stack usage
  *
@@ -254,8 +252,6 @@ void *z_thread_get_return_addr(struct k_thread *thread);
 // int8_t k_thread_copy_registers(struct k_thread *thread, uint8_t * buffer, const
 // size_t size);
 
-/*___________________________________________________________________________*/
-
 /**
  * @brief Return the stack pointer value (after CALL)
  *
@@ -309,8 +305,6 @@ uint8_t z_read_sreg(void);
 	serial_u8(SREG >> 7);                                                                \
 	serial_transmit(']');
 
-/*___________________________________________________________________________*/
-
 void z_thread_symbol_runqueue(struct dnode *item);
 
 void z_thread_symbol_events_queue(struct titem *item);
@@ -319,23 +313,17 @@ void z_print_events_queue(void);
 
 void z_print_runqueue(void);
 
-/*___________________________________________________________________________*/
-
 //
 // Debug mutex
 //
 
 void z_mutex_debug(struct k_mutex *mutex);
 
-/*___________________________________________________________________________*/
-
 //
 // Debug mutex
 //
 
 void z_sem_debug(struct k_sem *sem);
-
-/*___________________________________________________________________________*/
 
 #ifdef __cplusplus
 }

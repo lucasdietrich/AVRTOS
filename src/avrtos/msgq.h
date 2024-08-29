@@ -10,15 +10,17 @@
  * A message queue is a communication mechanism used by threads to exchange data
  * asynchronously. The message queue structure holds a fixed number of messages,
  * with each message being of a constant size.
+ *
  * Threads can put messages into the queue or retrieve messages from it, with
  * synchronization ensuring safe concurrent access.
+ *
  * Allocation and deallocation operations are performed in constant time (O(1)).
  *
  * Example with a message queue (msgq) containing 4 messages of 16 bytes each and the flow
  * of messages:
  *
- *  | Slot 1	      | Slot 2          | Slot 3          | Slot 4
- *  | 0x0000		  | 0x0010          | 0x0020          | 0x0030
+ *  | Slot 1          | Slot 2          | Slot 3          | Slot 4
+ *  | 0x0000          | 0x0010          | 0x0020          | 0x0030
  *  +-----------------+-----------------+-----------------+-----------------+
  *  |   Message 1     |    Message 2    |   Message 3     |   Unoccupied    |
  *  |   Read Cursor   |                 |   Write Cursor  |                 |
@@ -30,7 +32,7 @@
  * 	would be copied here  				     be copied here
  *
  * Threads can block on either write or read operations depending on the availability
- * of space or messages, ensuring efficient data exchange without data loss.
+ * of space or messages.
  *
  * Related configuration options:
  *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
@@ -50,10 +52,6 @@ extern "C" {
 
 /**
  * @brief Kernel Message Queue structure
- *
- * This structure represents a message queue that can hold a certain number of
- * fixed-size messages. The message queue supports thread synchronization, allowing
- * threads to wait for messages or for space to put messages.
  */
 struct k_msgq {
 	struct dnode waitqueue; /* Waitqueue for threads waiting for a message */

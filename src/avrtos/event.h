@@ -24,10 +24,7 @@
  * - **Immediate Execution Option**: Events can be executed immediately if no delay
  *   is needed, bypassing the scheduling mechanism.
  * - **Interrupt-safe Operations**: Events can be scheduled and canceled from interrupt
- *   context, ensuring that time-sensitive operations can be managed reliably.
- * - **Efficient Event Queue Management**: The event queue processes events in a
- *   time-ordered manner, ensuring that events are handled as soon as their timeouts
- *   expire.
+ *   context.
  *
  * Limitations:
  * - Like software timers (timer.h), the main limitation is that the events are processed
@@ -71,10 +68,6 @@ typedef void (*k_event_handler_t)(struct k_event *);
 
 /**
  * @brief Event structure.
- *
- * The `k_event` structure represents an event that can be scheduled to occur after
- * a specified timeout. It includes a handler function that is called when the event
- * is triggered.
  */
 struct k_event {
 	struct titem tie;		   ///< Timer queue item for scheduling the event.

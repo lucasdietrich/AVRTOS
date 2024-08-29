@@ -399,7 +399,7 @@ __kernel void z_wake_up(struct k_thread *thread)
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
 
-	__K_DBG_WAKEUP(thread); // @
+	__Z_DBG_WAKEUP(thread); // @
 
 	z_cancel_scheduled_wake_up(thread);
 
@@ -509,7 +509,7 @@ void z_handle_timeouts(void)
 	while ((ready = tqueue_pop(&z_timeouts_queue)) != NULL) {
 		struct k_thread *const thread = Z_THREAD_FROM_EVENTQUEUE(ready);
 
-		__K_DBG_SCHED_EVENT(thread); // !
+		__Z_DBG_SCHED_EVENT(thread); // !
 
 		/* Set the ready thread expired flag */
 		thread->flags |= Z_THREAD_TIMER_EXPIRED_MSK;
@@ -567,8 +567,8 @@ struct k_thread *z_scheduler(void)
 	/* Fetch the next thread to execute */
 	z_current = CONTAINER_OF(z_runq, struct k_thread, tie.runqueue);
 
-	__K_DBG_SCHED_NEXT_THREAD();
-	__K_DBG_SCHED_NEXT(z_current);
+	__Z_DBG_SCHED_NEXT_THREAD();
+	__Z_DBG_SCHED_NEXT(z_current);
 
 #if CONFIG_THREAD_MONITOR
 	z_thread_monitor(z_current);
@@ -626,7 +626,7 @@ static void z_suspend(struct k_thread *thread)
 			z_runq = thread->tie.runqueue.next->prev;
 		}
 
-		__K_DBG_SCHED_SUSPENDED(z_current);
+		__Z_DBG_SCHED_SUSPENDED(z_current);
 	}
 }
 
@@ -867,7 +867,7 @@ void k_sched_lock(void)
 	z_current->sched_lock_cnt++;
 #endif /* CONFIG_KERNEL_REENTRANCY */
 
-	__K_DBG_SCHED_LOCK(z_current);
+	__Z_DBG_SCHED_LOCK(z_current);
 }
 
 void k_sched_unlock(void)
@@ -887,7 +887,7 @@ void k_sched_unlock(void)
 	z_current->flags &= ~Z_THREAD_SCHED_LOCKED_MSK;
 	irq_unlock(key);
 
-	__K_DBG_SCHED_UNLOCK();
+	__Z_DBG_SCHED_UNLOCK();
 }
 
 __always_inline uint8_t z_current_flags_get(void)

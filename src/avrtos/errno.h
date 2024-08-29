@@ -11,7 +11,7 @@
  * Error Codes (errno.h)
  *
  * This header file defines a set of standard error codes.
- * The error codes follow the conventions of standard POSIX error codes.
+ * The error codes *mostly* follow the values of standard POSIX error codes.
  */
 
 /* EIO (5): Input/output error.

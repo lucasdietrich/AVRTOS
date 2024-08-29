@@ -20,11 +20,11 @@
  *  | Free Block       | Free Block       | Allocated Block  | Allocated Block  |
  *  |                  | Next Free Block  |                  |                  |
  *  +------------------+------------------+------------------+------------------+
- *                             |                    |				     |
- *                             |                    |				     |
- *                             v                    v				     v
+ *                             |                    |                   |
+ *                             |                    |                   |
+ *                             v                    v                   v
  *                        Next block     Second allocated block  First allocated block
- *                        in free list          is here				is here
+ *                        in free list          is here              is here
  *
  * Threads can allocate blocks from the slab when available, and free them when no
  * longer needed. If no blocks are available, threads can block until a block becomes
@@ -58,8 +58,7 @@ extern "C" {
  * This implementation is inspired by the Zephyr RTOS memory slab implementation.
  *
  * @note Maximum number of blocks is 255.
- * @note Maximum block size is 65535 bytes (though this may be constrained by
- *       the architecture, particularly on AVR platforms).
+ * @note Maximum block size is 65535 bytes
  */
 struct k_mem_slab {
 	void *buffer;			 /**< Pointer to the memory buffer */

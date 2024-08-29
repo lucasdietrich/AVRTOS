@@ -49,10 +49,6 @@ extern "C" {
 
 /**
  * @brief Kernel Signal structure
- *
- * This structure represents a signal, which is a synchronization primitive
- * used to notify one or more threads of an event. Threads can poll on the signal
- * and be woken up when the signal is raised.
  */
 struct k_signal {
 	/**

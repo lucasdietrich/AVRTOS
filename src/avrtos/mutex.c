@@ -50,7 +50,7 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 
 	if (ret == 0) {
 		/* Successfully acquired the mutex */
-		__K_DBG_MUTEX_LOCKED(z_current);
+		__Z_DBG_MUTEX_LOCKED(z_current);
 		mutex->owner = z_current;
 	}
 
@@ -77,7 +77,7 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 #endif /* CONFIG_KERNEL_REENTRANCY */
 	}
 
-	__K_DBG_MUTEX_UNLOCKED(z_current);
+	__Z_DBG_MUTEX_UNLOCKED(z_current);
 
 	/* There is a new owner, we don't need to unlock the mutex as
 	 * the mutex owner is changed when returning from the

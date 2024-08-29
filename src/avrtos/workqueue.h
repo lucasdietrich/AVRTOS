@@ -24,8 +24,6 @@
  *   timing.
  * - **System and Custom Workqueues**: The system provides a global workqueue, but
  *   users can also define custom workqueues tailored to specific application needs.
- * - **Flexible Configuration**: Workqueues can be configured to yield the CPU after
- *   processing each item, preventing long-running workqueues from blocking other tasks.
  * - **Interrupt-Safe Submission**: Work items can be submitted from interrupt contexts.
  *
  * Example Usage:

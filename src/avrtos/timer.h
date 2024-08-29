@@ -47,9 +47,6 @@ typedef int (*k_timer_handler_t)(struct k_timer *);
 
 /**
  * @brief Timer structure definition.
- *
- * This structure contains information about a timer, including the
- * timeout value, the handler function, and a queue item for scheduling.
  */
 struct k_timer {
 	struct titem tie;		   /**< Queue item for scheduling. */

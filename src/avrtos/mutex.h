@@ -9,8 +9,7 @@
  *
  * A mutex (short for mutual exclusion) is a synchronization primitive used to
  * protect shared resources from concurrent access, ensuring that only one thread
- * can access the resource at a time. This is critical in preventing race conditions
- * and ensuring data integrity in multithreaded environments.
+ * can access the resource at a time.
  *
  * Mutexes can be locked and unlocked by threads. If a thread attempts to lock a
  * mutex that is already locked by another thread, the calling thread will be put
@@ -39,11 +38,6 @@ extern "C" {
 
 /**
  * @brief Kernel Mutex structure
- *
- * This structure represents a mutex, which is a synchronization
- * primitive used to protect shared resources. The mutex can be locked
- * or unlocked, with a wait queue for threads that need to wait until
- * the mutex becomes available.
  */
 struct k_mutex {
 	/**

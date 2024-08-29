@@ -4,6 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/*
+ * AVR architectures have very limited support for atomic instructions.
+ * As a result, atomic operations must be implemented by temporarily disabling
+ * interrupts to ensure that operations are not interrupted.
+ */
+
 #ifndef _AVRTOS_ATOMIC_H_
 #define _AVRTOS_ATOMIC_H_
 
@@ -18,12 +24,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*
- * AVR architectures have very limited support for atomic instructions.
- * As a result, atomic operations must be implemented by temporarily disabling
- * interrupts to ensure that operations are not interrupted.
- */
 
 #define K_ATOMIC_INIT(val)		   ((atomic_t)(val))
 #define K_ATOMIC_DEFINE(name, val) atomic_t name = K_ATOMIC_INIT(val)

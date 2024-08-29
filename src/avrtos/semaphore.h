@@ -17,6 +17,9 @@
  * Semaphores are useful for controlling access to a finite number of identical
  * resources, such as memory blocks or connection slots.
  *
+ * They can also be used to synchronize threads (or thread with irq), as an
+ * alternative to signals.
+ *
  * Related configuration options:
  *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
  */
@@ -36,12 +39,6 @@ extern "C" {
 
 /**
  * @brief Kernel Semaphore structure
- *
- * This structure represents a semaphore, which is a synchronization
- * primitive used to manage access to shared resources. The semaphore
- * maintains a count that represents the number of available resources.
- * It also has a limit that sets the maximum count. Threads that need
- * to wait for the semaphore are placed in a wait queue.
  */
 struct k_sem {
 	/**
