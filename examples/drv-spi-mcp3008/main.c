@@ -8,19 +8,19 @@
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/spi.h>
 
-#define VREF 4.886f
+#define VREF		   4.886f
 #define ADC_RESOLUTION 10u
-#define ADC_MAX_VALUE ((1u << ADC_RESOLUTION) - 1u)
+#define ADC_MAX_VALUE  ((1u << ADC_RESOLUTION) - 1u)
 
 int main(void)
 {
 	serial_init();
 
 	const struct spi_config cfg = {
-		.mode	     = SPI_MODE_MASTER,
-		.polarity    = SPI_CLOCK_POLARITY_RISING,
-		.phase	     = SPI_CLOCK_PHASE_SAMPLE,
-		.prescaler   = SPI_PRESCALER_X32,
+		.mode		 = SPI_MODE_MASTER,
+		.polarity	 = SPI_CLOCK_POLARITY_RISING,
+		.phase		 = SPI_CLOCK_PHASE_SAMPLE,
+		.prescaler	 = SPI_PRESCALER_X32,
 		.irq_enabled = 0u,
 	};
 
@@ -30,7 +30,7 @@ int main(void)
 	// initialize PB0 as CS
 	gpiol_pin_init(GPIOB, PIN0, GPIO_MODE_OUTPUT, GPIO_HIGH);
 
-	const uint8_t channel = 0u;
+	const uint8_t channel  = 0u;
 	const uint8_t sgl_diff = 1u; /* Single-ended */
 
 	for (;;) {
@@ -46,8 +46,8 @@ int main(void)
 		uint16_t value = ((msb & 0x7u) << 8u) | lsb;
 		float voltage  = (value * VREF) / (1 << ADC_RESOLUTION);
 
-		printf_P(PSTR("ADC value: %u,\tvoltage: %.3f V (%.2f %%)\n"), value,
-			 voltage, (100.0f * value / ADC_MAX_VALUE));
+		printf_P(PSTR("ADC value: %u,\tvoltage: %.3f V (%.2f %%)\n"), value, voltage,
+				 (100.0f * value / ADC_MAX_VALUE));
 
 		k_sleep(K_MSEC(100u));
 	}

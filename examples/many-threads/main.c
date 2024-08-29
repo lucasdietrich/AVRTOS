@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/usart.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/drivers/usart.h>
 
 #include <avr/io.h>
 
@@ -17,7 +17,7 @@ K_THREAD_DEFINE(ts, stats, 0x80, K_COOPERATIVE, NULL, '-');
 K_THREAD_DEFINE(tc, calc, 0x60, K_PREEMPTIVE, NULL, 'c');
 
 #define AVAILABLE_SRAM                                                                   \
-	(RAMEND - RAMSTART - CONFIG_THREAD_MAIN_STACK_SIZE - Z_THREAD_STACK_SIZE(ts) -   \
+	(RAMEND - RAMSTART - CONFIG_THREAD_MAIN_STACK_SIZE - Z_THREAD_STACK_SIZE(ts) -       \
 	 Z_THREAD_STACK_SIZE(tc) - 100)
 
 #define THREAD_STACK_SIZE 0x60
@@ -34,13 +34,8 @@ int main(void)
 	printf_P(PSTR("Many threads sample\n"));
 
 	for (uint8_t i = 0u; i < THREADS_COUNT; i++) {
-		k_thread_create(&threads[i],
-				task,
-				stacks[i],
-				THREAD_STACK_SIZE,
-				K_COOPERATIVE,
-				NULL,
-				'A' + i);
+		k_thread_create(&threads[i], task, stacks[i], THREAD_STACK_SIZE, K_COOPERATIVE,
+						NULL, 'A' + i);
 		k_thread_start(&threads[i]);
 	}
 

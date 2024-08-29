@@ -11,8 +11,8 @@
 
 /* Footprint (Release for ATmega2560)
 	Memory region         Used Size  Region Size  %age Used
-	            text:        1408 B       256 KB      0.54%
-	            data:          31 B         8 KB      0.38%
+				text:        1408 B       256 KB      0.54%
+				data:          31 B         8 KB      0.38%
 */
 int main(void)
 {

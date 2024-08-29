@@ -20,7 +20,7 @@ void setup(void)
 
 	/* Create thread_led handling LED, then start it */
 	k_thread_create(&thread_led, thread_led_task, thread_led_stack,
-			sizeof(thread_led_stack), K_PREEMPTIVE, NULL, 'L');
+					sizeof(thread_led_stack), K_PREEMPTIVE, NULL, 'L');
 	k_thread_start(&thread_led);
 
 	/* Make main thread_led preemptive, so that the LED thread_led can run

@@ -98,6 +98,7 @@ run_qemu:
 
 format:
 	find src -iname *.h -o -iname *.c -o -iname *.cpp | xargs clang-format -i
+	find examples -iname *.h -o -iname *.c -o -iname *.cpp -o -iname *.ino | xargs clang-format -i
 
 clean:
 	rm -rf build

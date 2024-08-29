@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -62,12 +62,8 @@ int main(void)
 	serial_init();
 
 #if WORKQ_RUNTIME_INIT
-	k_workqueue_create(&workqueue,
-			   &workqueue_thread,
-			   workqueue_stack,
-			   sizeof(workqueue_stack),
-			   K_PREEMPTIVE,
-			   'W');
+	k_workqueue_create(&workqueue, &workqueue_thread, workqueue_stack,
+					   sizeof(workqueue_stack), K_PREEMPTIVE, 'W');
 #endif
 
 	k_thread_dump_all();

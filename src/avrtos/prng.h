@@ -7,8 +7,8 @@
 /*
  * Pseudo-random number generator (PRNG)
  *
- * This module provides an implementation of a PRNG based on the LFSR algorithm as described in
- * the following sources:
+ * This module provides an implementation of a PRNG based on the LFSR algorithm as
+ * described in the following sources:
  * - https://www.microchip.com/forums/tm.aspx?m=1117824&mpage=1
  * - https://www.maximintegrated.com/en/design/technical-documents/app-notes/4/4400.html
  *
@@ -19,7 +19,9 @@
 #define _AVRTOS_PRNG_H
 
 #include <stdint.h>
+
 #include <avr/io.h>
+
 #include "kernel.h"
 
 #ifdef __cplusplus
@@ -39,7 +41,7 @@ struct k_prng {
 #define K_PRNG_POLY_MASK_31 0x7A5BC2E3 /**< Polynomial mask for the 31-bit LFSR */
 
 /* Default seed values for the LFSRs */
-#define K_PRNG_DEFAULT_LFSR32 0x000ABCDE    /**< Default seed value for the 32-bit LFSR */
+#define K_PRNG_DEFAULT_LFSR32 0x000ABCDE /**< Default seed value for the 32-bit LFSR */
 #define K_PRNG_DEFAULT_LFSR31 0x23456789 /**< Default seed value for the 31-bit LFSR */
 
 /**
@@ -94,7 +96,8 @@ __kernel uint32_t k_prng_get_u32(struct k_prng *prng);
 /**
  * @brief Fill a buffer with pseudo-random data.
  *
- * This function fills the provided buffer with the specified length of pseudo-random data.
+ * This function fills the provided buffer with the specified length of pseudo-random
+ * data.
  *
  * @param prng Pointer to the PRNG structure.
  * @param buffer Pointer to the buffer where the random data will be stored.

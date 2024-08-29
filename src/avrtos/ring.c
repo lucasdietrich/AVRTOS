@@ -40,7 +40,7 @@ int8_t k_ring_push(struct k_ring *ring, char data)
 int8_t k_ring_pop(struct k_ring *ring, char *data)
 {
 	Z_ARGS_CHECK(ring && data) return -EINVAL;
-	
+
 	const uint8_t w = ring->w;
 	uint8_t r		= ring->r;
 

@@ -7,9 +7,9 @@
 /* This example demonstrates how to periodically toggle pins PB5, PB6, PB7 at a
  * certain frequency using the CTC mode of the timer 1 */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>

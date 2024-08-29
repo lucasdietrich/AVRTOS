@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/exti.h>
-#include <avrtos/drivers/gpio.h>
 #include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
+#include <avrtos/drivers/exti.h>
+#include <avrtos/drivers/gpio.h>
 #include <avrtos/misc/led.h>
 
 void __fault_hook(void)

@@ -6,8 +6,8 @@
 
 #include <stdio.h>
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/serial.h>
 
 #include <util/delay.h>

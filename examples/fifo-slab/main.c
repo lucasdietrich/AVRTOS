@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/dstruct/debug.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -22,7 +22,7 @@ struct block {
 };
 
 #define BLOCK_COUNT 10u
-#define BLOCK_SIZE  sizeof(struct block)
+#define BLOCK_SIZE	sizeof(struct block)
 
 void block_read(uint8_t *buffer, uint16_t size)
 {

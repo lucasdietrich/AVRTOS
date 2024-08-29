@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 
@@ -66,7 +66,7 @@ int main(void)
 	ll_timer16_channel_configure(TIMER1_DEVICE, TIMER_CHANNEL_C, &comp_conf);
 
 	ll_timer_set_enable_int_mask(timer_get_index(TIMER1_DEVICE),
-				     0x2Fu); /* Enable all interupts */
+								 0x2Fu); /* Enable all interupts */
 
 	for (;;) {
 		k_sleep(K_MSEC(500u));

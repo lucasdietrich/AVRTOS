@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avr/interrupt.h>
-#include <avr/io.h>
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
 #include <util/delay.h>
 
 void thread_blink(void *p);

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -48,7 +48,8 @@ int main(void)
 	k_thread_dump_all();
 
 	for (uint8_t i = 0; i < ARRAY_SIZE(tasks); i++) {
-		k_timer_init(&tasks[i].timer, periodic_task_handler, K_MSEC(100lu * (i + 1)), K_NO_WAIT);
+		k_timer_init(&tasks[i].timer, periodic_task_handler, K_MSEC(100lu * (i + 1)),
+					 K_NO_WAIT);
 	}
 
 	for (;;) {

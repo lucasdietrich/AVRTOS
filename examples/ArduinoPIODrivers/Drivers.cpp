@@ -4,23 +4,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <Arduino.h>
-
-#include <avrtos.h>
-#include <avrtos/drivers/usart.h>
-#include <avrtos/drivers/timer.h>
-#include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/exti.h>
+#include <avrtos/drivers/gpio.h>
+#include <avrtos/drivers/timer.h>
+#include <avrtos/drivers/usart.h>
+
+#include <Arduino.h>
+#include <avrtos.h>
 
 #if defined(__AVR_ATmega2560__)
-#	define INT0_PORT GPIOD
-#	define INT0_PIN 0u
+#define INT0_PORT GPIOD
+#define INT0_PIN  0u
 #elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__)
-#	define INT0_PORT GPIOD
-#	define INT0_PIN 2u
+#define INT0_PORT GPIOD
+#define INT0_PIN  2u
 #else
-#	error "Unsupported MCU for this example"
-#endif 
+#error "Unsupported MCU for this example"
+#endif
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -52,14 +52,14 @@ void setup(void)
 
 	/* UART initialisation */
 	const struct usart_config usart_config = {
-		.baudrate    = CONFIG_SERIAL_USART_BAUDRATE,
-		.receiver    = 1u,
+		.baudrate	 = CONFIG_SERIAL_USART_BAUDRATE,
+		.receiver	 = 1u,
 		.transmitter = 1u,
-		.mode	     = USART_MODE_ASYNCHRONOUS,
-		.parity	     = USART_PARITY_NONE,
-		.stopbits    = USART_STOP_BITS_1,
-		.databits    = USART_DATA_BITS_8,
-		.speed_mode  = USART_SPEED_MODE_NORMAL,
+		.mode		 = USART_MODE_ASYNCHRONOUS,
+		.parity		 = USART_PARITY_NONE,
+		.stopbits	 = USART_STOP_BITS_1,
+		.databits	 = USART_DATA_BITS_8,
+		.speed_mode	 = USART_SPEED_MODE_NORMAL,
 	};
 	usart_init(USART0_DEVICE, &usart_config);
 
@@ -68,10 +68,8 @@ void setup(void)
 
 	/* Timer initialisation */
 	const struct timer_config timer_config {
-		.mode = TIMER_MODE_CTC,
-		.prescaler = TIMER_PRESCALER_1024,
-		.counter = TIMER_CALC_COUNTER_VALUE(1000000lu, 1024lu),
-		.timsk = BIT(OCIEnA),
+		.mode = TIMER_MODE_CTC, .prescaler = TIMER_PRESCALER_1024,
+		.counter = TIMER_CALC_COUNTER_VALUE(1000000lu, 1024lu), .timsk = BIT(OCIEnA),
 	};
 	timer16_init(TIMER1_DEVICE, &timer_config);
 

@@ -7,12 +7,13 @@
 /*
  * Naive ring buffer
  *
- * A ring buffer is a fixed-size buffer that wraps around when the end of the buffer is reached.
+ * A ring buffer is a fixed-size buffer that wraps around when the end of the buffer is
+ * reached.
  *
  * Limitations:
  * - This implementation is currently not thread/interrupt-safe. For concurrent
  * environments, proper synchronization mechanisms must be implemented.
- * 
+ *
  * TODOs:
  * - Introduce support for concurrent writers and readers:
  * - Optimize for power-of-two buffer sizes
@@ -33,11 +34,11 @@
 struct k_ring {
 	uint8_t *buffer; /**< Pointer to the buffer array used by the ring buffer */
 
-	uint8_t r;       /**< Read cursor, indicating the position of the next byte to read */
+	uint8_t r; /**< Read cursor, indicating the position of the next byte to read */
 
-	uint8_t w;       /**< Write cursor, indicating the position of the next byte to write */
+	uint8_t w; /**< Write cursor, indicating the position of the next byte to write */
 
-	uint8_t size;    /**< Size of the buffer (total number of elements it can hold) */
+	uint8_t size; /**< Size of the buffer (total number of elements it can hold) */
 };
 
 /**
