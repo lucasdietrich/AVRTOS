@@ -40,7 +40,7 @@ Z_THREAD_DEFINE(z_thread_idle,
 				Z_THREAD_IDLE_PRIORITY,
 				NULL,
 				'I',
-				0 /* Do not start the idle thread at initialization */
+				0 /* Do not start the idle thread at startup */
 );
 #else
 __noinit uint8_t z_thread_idle_stack[Z_THREAD_IDLE_STACK_SIZE];
