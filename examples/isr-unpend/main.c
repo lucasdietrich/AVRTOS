@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 
 K_SEM_DEFINE(sem, 0, 1);
 

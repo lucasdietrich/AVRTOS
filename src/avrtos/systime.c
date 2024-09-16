@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "time.h"
+#include "systime.h"
 
 #include <avr/pgmspace.h>
 
@@ -12,7 +12,36 @@
 
 #if CONFIG_KERNEL_UPTIME
 
-void k_timespec_get(struct timespec *ts)
+uint32_t k_uptime_get(void)
+{
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
+	return k_ticks_get_64() / K_TICKS_PER_SECOND;
+#else
+	return k_ticks_get_32() / K_TICKS_PER_SECOND;
+#endif /* CONFIG_KERNEL_UPTIME */
+}
+
+uint32_t k_uptime_get_ms32(void)
+{
+#if CONFIG_KERNEL_TICKS_COUNTER
+	return k_ticks_get_32() / K_TICKS_PER_MS;
+#else
+	return 0;
+#endif /* CONFIG_KERNEL_UPTIME */
+}
+
+uint64_t k_uptime_get_ms64(void)
+{
+#if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
+	return k_ticks_get_64() / K_TICKS_PER_MS;
+#elif CONFIG_KERNEL_TICKS_COUNTER
+	return k_ticks_get_32() / K_TICKS_PER_MS;
+#else
+	return 0;
+#endif /* CONFIG_KERNEL_UPTIME */
+}
+
+void k_uptime_as_timespec_get(struct timespec *ts)
 {
 	if (ts == NULL) {
 		return;
@@ -27,7 +56,7 @@ void k_timespec_get(struct timespec *ts)
 void k_show_uptime(void)
 {
 	struct timespec ts;
-	k_timespec_get(&ts);
+	k_uptime_as_timespec_get(&ts);
 
 	uint32_t seconds = ts.tv_sec;
 	uint32_t minutes = seconds / 60;
@@ -72,7 +101,7 @@ static struct {
 } z_time_ref = {
 	.timestamp = 0u,
 	.uptime	   = 0u,
-	.mutex	   = K_MUTEX_INIT(z_time_ref.mutex),
+	.mutex	   = Z_MUTEX_INIT(z_time_ref.mutex),
 };
 
 void k_time_set(uint32_t sec)

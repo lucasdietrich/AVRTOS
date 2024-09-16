@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 int timer_handler(struct k_timer *timer)
 {
 	printf("uptime: %lu seconds\n", k_uptime_get());
-	
+
 	return 0;
 }
 

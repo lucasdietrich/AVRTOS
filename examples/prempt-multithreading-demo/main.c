@@ -22,8 +22,8 @@
  *
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 

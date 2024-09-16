@@ -20,8 +20,8 @@
  * [K] CANARIES until @051F [found 26], MAX usage = 36 / 62
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -50,13 +50,8 @@ int main(void)
 
 	k_dump_stack_canaries();
 
-	k_thread_create(&dthread,
-			dthread_entry,
-			dthread_stack,
-			sizeof(dthread_stack),
-			K_PREEMPTIVE,
-			&dthread,
-			'D');
+	k_thread_create(&dthread, dthread_entry, dthread_stack, sizeof(dthread_stack),
+					K_PREEMPTIVE, &dthread, 'D');
 	k_thread_start(&dthread);
 
 	k_sleep(K_FOREVER);

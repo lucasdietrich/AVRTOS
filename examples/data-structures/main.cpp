@@ -8,16 +8,16 @@
 #include <avrtos/dstruct/debug.h>
 #include <avrtos/dstruct/dlist.h>
 #include <avrtos/dstruct/slist.h>
-#include <avrtos/dstruct/tqueue.h>
 #include <avrtos/dstruct/tdqueue.h>
+#include <avrtos/dstruct/tqueue.h>
 #include <avrtos/misc/serial.h>
 
-#include <avr/pgmspace.h>
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 
-#define FLAG_SLIST  1
-#define FLAG_DLIST  4
-#define FLAG_TQUEUE 8
+#define FLAG_SLIST	 1
+#define FLAG_DLIST	 4
+#define FLAG_TQUEUE	 8
 #define FLAG_TDQUEUE 16
 
 #define TESTS FLAG_TQUEUE | FLAG_TDQUEUE
@@ -31,15 +31,15 @@ int main(void)
 {
 	serial_init();
 
-// #if TESTS & FLAG_SLIST
-// 	serial_printl_p(PSTR("queue"));
-// 	test_slist();
-// #endif
+	// #if TESTS & FLAG_SLIST
+	// 	serial_printl_p(PSTR("queue"));
+	// 	test_slist();
+	// #endif
 
-// #if TESTS & FLAG_DLIST
-// 	serial_printl_p(PSTR("queue/dequeue dlist"));
-// 	test_dlist();
-// #endif
+	// #if TESTS & FLAG_DLIST
+	// 	serial_printl_p(PSTR("queue/dequeue dlist"));
+	// 	test_dlist();
+	// #endif
 
 	// todo raw api
 
@@ -66,11 +66,11 @@ struct item {
 };
 
 #define ITEM(name)                                                                       \
-	{                                                                                \
-		name,                                                                    \
-		{                                                                        \
-			0                                                                \
-		}                                                                        \
+	{                                                                                    \
+		name,                                                                            \
+		{                                                                                \
+			0                                                                            \
+		}                                                                                \
 	}
 #define ITEM_OF(snode) ((struct item *)CONTAINER_OF(snode, struct item, i))
 #define NAME_OF(snode) ITEM_OF(snode)->name
@@ -140,11 +140,11 @@ struct item2 {
 };
 
 #define DITEM(name)                                                                      \
-	{                                                                                \
-		name,                                                                    \
-		{                                                                        \
-			0, 0                                                             \
-		}                                                                        \
+	{                                                                                    \
+		name,                                                                            \
+		{                                                                                \
+			0, 0                                                                         \
+		}                                                                                \
 	}
 #define DITEM_OF(item) ((struct item2 *)CONTAINER_OF(item, struct item2, i))
 #define DNAME_OF(item) DITEM_OF(item)->name
@@ -264,7 +264,6 @@ void test_tqueue(void)
 
 	print_tqueue(root);
 }
-
 
 //
 // TDQUEUE

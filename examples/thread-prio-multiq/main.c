@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/usart.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/drivers/usart.h>
 
 int main(void)
 {

@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
-#include <avrtos/drivers/spi.h>
+#include <avrtos/debug.h>
 #include <avrtos/drivers/exti.h>
+#include <avrtos/drivers/spi.h>
 
 /* Button should be wired to PD0 (INT0) on Arduino Mega 2560,
  * with a pull-up resistor.
@@ -18,7 +18,7 @@
 #define MEASURE_STATS 1u
 
 #if MEASURE_STATS
-volatile uint32_t rx_count = 0u;
+volatile uint32_t rx_count	= 0u;
 volatile uint16_t err_count = 0u;
 #endif
 
@@ -46,9 +46,10 @@ struct k_signal sig;
 
 ISR(INT0_vect)
 {
-	struct k_thread *thread = k_signal_raise(&sig, 1u);
+	int ret = k_signal_raise(&sig, 1u);
 
-	k_yield_from_isr_cond(thread);
+	/* Yield if more than one thread was woken up */
+	if (ret > 0) k_yield_from_isr();
 }
 
 #endif
@@ -59,9 +60,9 @@ int main(void)
 
 	/* Advised configuration */
 	const struct spi_config cfg = {
-		.mode	     = SPI_MODE_SLAVE,
-		.polarity    = SPI_CLOCK_POLARITY_RISING,
-		.phase	     = SPI_CLOCK_PHASE_SAMPLE,
+		.mode		 = SPI_MODE_SLAVE,
+		.polarity	 = SPI_CLOCK_POLARITY_RISING,
+		.phase		 = SPI_CLOCK_PHASE_SAMPLE,
 		.irq_enabled = 0u,
 	};
 
@@ -120,23 +121,23 @@ void calculate_datarate(void *arg)
 	for (;;) {
 		k_sleep(K_SECONDS(1));
 
-		now  = k_uptime_get_ms32();
+		now	 = k_uptime_get_ms32();
 		diff = now - last;
 		last = now;
 
 		irq_disable();
-		rx	 = rx_count;
-		rx_count = 0u;
-		er	 = err_count;
+		rx		  = rx_count;
+		rx_count  = 0u;
+		er		  = err_count;
 		err_count = 0u;
 		irq_enable();
 
-		const uint32_t dr_bps = rx * 1000lu / diff;
-		const uint16_t dr_kbps = dr_bps / 1000lu;
+		const uint32_t dr_bps		= rx * 1000lu / diff;
+		const uint16_t dr_kbps		= dr_bps / 1000lu;
 		const uint16_t dr_kbps_frac = dr_bps % 1000lu;
 
-		printf_P(PSTR("Data rate: %u.%03u B/s err: %u (%u %%)\n"), dr_kbps,
-			 dr_kbps_frac, er, er * 100lu / rx);
+		printf_P(PSTR("Data rate: %u.%03u B/s err: %u (%u %%)\n"), dr_kbps, dr_kbps_frac,
+				 er, er * 100lu / rx);
 	}
 }
 

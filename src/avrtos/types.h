@@ -17,10 +17,10 @@
  * @brief Thread entry point function type.
  *
  * The `k_thread_entry_t` type is a function pointer type representing a thread
- * entry point function. A thread entry point function is a function that serves
+ * entry point function. A thread entry point function is the function that serves
  * as the starting point for the execution of a thread. It takes a single
- * `void*` parameter used to pass the thread context when the entry function is
- * called.
+ * `void*` parameter, which is typically used to pass the thread's context or
+ * other initial data when the thread begins execution.
  *
  * @param context A pointer to the context data for the thread.
  */
@@ -29,70 +29,88 @@ typedef void (*k_thread_entry_t)(void *);
 /**
  * @brief Structure representing a thread.
  *
- * The `struct k_thread` structure represents a thread and defines various
- * properties associated with it, including the stack pointer, thread priority,
- * stack location and size, local storage pointer, and other relevant fields.
+ * The `struct k_thread` structure represents a thread within the kernel. It contains
+ * various fields that define the state and properties of the thread, including:
+ * - The stack pointer (`sp`)
+ * - The thread's flags, which indicate the thread's current state or behavior.
+ * - A union of structures for managing the thread within different kernel queues
+ * (runqueue, events queue, or pending queues for various kernel objects like mutexes,
+ * semaphores, etc.).
+ * - A `swap_data` field, which stores data returned by kernel APIs when the thread is
+ *   unpended.
+ * - A stack structure that defines the stack's end address and size.
+ * - A symbol character that can be used to represent the thread in debugging or
+ * visualization tools.
  *
- * This structure is 16 bytes long in its minimal form.
+ * This structure is designed to be lightweight, with a minimal size of 16 bytes in its
+ * basic form.
  */
 struct k_thread {
-	void *sp; // stack pointer, TO KEEP it at the beginning of the structure !
+	void *sp; ///< Stack pointer, must be the first member of the structure !!
 
-	uint8_t flags; // thread flags
-
-	union {
-		struct dnode runqueue; // represent the thread in the runqueue (4B)
-		struct titem event;	   // represent the thread in the events queue (4B)
-	} tie; // the thread cannot be in the events_queue and the runqueue at
-		   // the same time
+	uint8_t flags; ///< Thread flags indicating the state or attributes of the thread.
 
 	union {
-		struct dnode wany;	 // represent the thread pending on a generic
-							 // object
-		struct dnode wmutex; // represent the thread pending on an mutex
-		struct dnode wsem;	 // represent the thread pending on an semaphore
-		struct dnode wsig;	 // represent the thread pending on an signal
-		struct dnode wfifo;	 // represent the thread pending on a fifo item
-		struct dnode wmsgq;	 // represent the thread pending on a msgq item
-		struct dnode wflags; // represent the thread pending on a flags item
-	};
-	void *swap_data; // data returned by kernel API's when calling
-					 // z_unpend_first_thread
+		struct dnode
+			runqueue; ///< Node for the runqueue (used when the thread is runnable).
+		struct titem
+			event; ///< Node for the events queue (used for delayed or timed events).
+	} tie; ///< Union that holds the queue information, ensuring the thread is in only one
+		   ///< queue at a time.
+
+	union {
+		struct dnode wany;	 ///< Node for waiting on a generic object.
+		struct dnode wmutex; ///< Node for waiting on a mutex.
+		struct dnode wsem;	 ///< Node for waiting on a semaphore.
+		struct dnode wsig;	 ///< Node for waiting on a signal.
+		struct dnode wfifo;	 ///< Node for waiting on a FIFO item.
+		struct dnode wmsgq;	 ///< Node for waiting on a message queue item.
+		struct dnode wflags; ///< Node for waiting on flags.
+	}; ///< Union that allows the thread to be pending on different types of kernel
+	   ///< objects.
+
+	void *swap_data; ///< Data returned by kernel APIs when the thread is unpended.
 
 	struct {
-		void *end;	 // stack end
-		size_t size; // stack size
-	} stack;		 // thread stack definition
-	char symbol;	 // 1-letter symbol to name the thread, reserver M (main),
-					 // idle : I (idle)
+		void *end;	 ///< End of the stack memory.
+		size_t size; ///< Size of the stack.
+	} stack;		 ///< Stack information for the thread.
+
+	char symbol; ///< A single character symbol representing the thread, reserved symbols:
+				 ///< 'M' for main, 'I' for idle.
 
 #if CONFIG_KERNEL_REENTRANCY
 	/**
-	 * @brief Depth of calls to k_sched_lock()
+	 * @brief Depth of nested calls to k_sched_lock().
 	 */
 	uint8_t sched_lock_cnt;
 #endif /* CONFIG_KERNEL_REENTRANCY */
-
-#if CONFIG_THREAD_ERRNO
-	uint8_t errno; // Thread errno
-#endif			   /* CONFIG_THREAD_ERRNO */
 };
 
 /**
- * @brief Structure representing the call-saved registers + PC (size=19 bytes)
+ * @brief Structure representing the call-saved registers plus the program counter (PC).
  *
- * Read "Call-used registers" of the AVR GCC manual for more information:
- * https://gcc.gnu.org/wiki/avr-gcc#Call-Saved_Registers
+ * The `struct z_callsaved_ctx` structure represents the registers that must be saved
+ * during a context switch. It includes:
+ * - The status register (`sreg`).
+ * - Registers `r7` to `r29`, which are saved as part of the context.
+ * - The stack pointer and program counter, depending on the AVR architecture
+ *   (with/without 3 byte wide PC).
+ *
+ * This structure is used to save the context of a thread when it is preempted or
+ * voluntarily yields the CPU.
+ *
+ * For more information, refer to the "Call-Saved Registers" section in the AVR GCC
+ * manual: https://gcc.gnu.org/wiki/avr-gcc#Call-Saved_Registers
  */
 struct z_callsaved_ctx {
-	uint8_t sreg;
+	uint8_t sreg; ///< Status register.
 
 	union {
-		uint8_t regs[13];
+		uint8_t regs[13]; ///< Array to access all saved registers.
 		struct {
 			uint8_t r29;
 			uint8_t r28;
-
 			uint8_t r17;
 			uint8_t r16;
 			uint8_t r15;
@@ -106,23 +124,26 @@ struct z_callsaved_ctx {
 			uint8_t r7;
 		};
 	};
+
 	union {
-		uint8_t r6;
-		uint8_t init_sreg;
+		uint8_t r6;		   ///< Register r6.
+		uint8_t init_sreg; ///< Initial status register value.
 	};
+
 	union {
 		struct {
 			uint8_t r5;
 			uint8_t r4;
 		};
-		k_thread_entry_t thread_entry;
+		k_thread_entry_t thread_entry; ///< Thread entry point function.
 	};
+
 	union {
 		struct {
 			uint8_t r3;
 			uint8_t r2;
 		};
-		void *thread_context;
+		void *thread_context; ///< Pointer to the thread's context data.
 	};
 
 	/*
@@ -135,17 +156,20 @@ struct z_callsaved_ctx {
 
 	struct {
 #if Z_ARCH_PC_SIZE == 3
-		uint8_t pch;
-#endif /* Z_ARCH_PC_SIZE == 3 */
-
-		void *pc;
+		uint8_t pch; ///< High byte of the program counter, if using a 3-byte PC.
+#endif				 /* Z_ARCH_PC_SIZE == 3 */
+		void *pc;	 ///< Program counter (PC) value.
 	};
 };
 
 /**
- * @brief Structure representing the call-used register of a function call.
+ * @brief Structure representing the call-used registers of a function call.
  *
- * Read "Call-used registers" of the AVR GCC manual for more information:
+ * The `struct z_callused_ctx` structure holds the registers that are used during a
+ * function call but are not preserved across function calls. These registers must
+ * be saved by the caller if their values are needed after a function call.
+ *
+ * For more information, refer to the "Call-Used Registers" section in the AVR GCC manual:
  * https://gcc.gnu.org/wiki/avr-gcc#Call-Used_Registers
  */
 struct z_callused_ctx {
@@ -164,20 +188,27 @@ struct z_callused_ctx {
 };
 
 /**
- * @brief Represent the registers to be saved during an interrupt before calling
- * the ISR.
+ * @brief Structure representing the context saved during an interrupt.
+ *
+ * The `struct z_intctx` structure represents the registers and program counter (PC)
+ * that are saved when an interrupt occurs. This context includes the program counter,
+ * status register, and the call-used registers.
+ *
+ * The structure is used by the ISR to restore the thread's context once the interrupt
+ * has been handled.
  */
 struct z_intctx {
 #if Z_ARCH_PC_SIZE == 3
-	uint8_t pch;
-#endif /* Z_ARCH_PC_SIZE == 3 */
-	void *pc;
+	uint8_t pch; ///< High byte of the program counter, if using a 3-byte PC.
+#endif			 /* Z_ARCH_PC_SIZE == 3 */
+	void *pc;	 ///< Program counter (PC) value at the time of the interrupt.
 
-	uint8_t r1;
-	uint8_t r0;
-	uint8_t sreg;
+	uint8_t r1;	  ///< Register r1.
+	uint8_t r0;	  ///< Register r0.
+	uint8_t sreg; ///< Status register.
 
-	struct z_callused_ctx callused_reg;
+	struct z_callused_ctx
+		callused_reg; ///< Call-used registers saved during the interrupt.
 };
 
 #endif /* _AVRTOS_KERNEL_TYPES_H */

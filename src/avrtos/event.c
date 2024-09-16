@@ -14,16 +14,37 @@
 
 #if CONFIG_KERNEL_EVENTS
 
+/**
+ * @brief Event queue structure.
+ *
+ * This structure holds the first event in the queue, which is used to manage
+ * scheduled events in a time-ordered manner.
+ */
 struct k_event_q {
-	struct titem *first;
+	struct titem *first; ///< Pointer to the first event in the queue.
 };
 
-#define K_EVENT_Q_INIT()                                                                 \
+/**
+ * @brief Macro to initialize the event queue.
+ */
+#define Z_EVENT_Q_INIT()                                                                 \
 	{                                                                                    \
 		.first = NULL,                                                                   \
 	}
-#define K_EVENT_Q_DEFINE(name) struct k_event_q name = K_EVENT_Q_INIT()
 
+/**
+ * @brief Macro to define and initialize an event queue.
+ *
+ * This macro defines a global event queue named `name` and initializes it using
+ * `Z_EVENT_Q_INIT()`.
+ */
+#define K_EVENT_Q_DEFINE(name) struct k_event_q name = Z_EVENT_Q_INIT()
+
+/**
+ * @brief Global event queue instance.
+ *
+ * This is the main event queue used for scheduling and processing events.
+ */
 K_EVENT_Q_DEFINE(z_event_q);
 
 int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
@@ -37,15 +58,13 @@ int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
 }
 
 /**
- * @brief Inner function of k_event_schedule.
- * Requires interrupts to be disabled.
+ * @brief Internal function to schedule an event.
  *
- * Schedule the event to be triggered after timeout (in ms).
- * Can be called from an interrupt.
+ * This function schedules an event to be triggered after a specified timeout.
+ * It requires interrupts to be disabled.
  *
- * @param event
- * @param timeout
- * @return int
+ * @param event Pointer to the event structure.
+ * @param timeout Timeout in ticks after which the event will be triggered.
  */
 void z_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
@@ -59,6 +78,7 @@ void z_event_schedule(struct k_event *event, k_timeout_t timeout)
 int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
 	Z_ARGS_CHECK(event) return -EINVAL;
+
 #if !CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT
 	Z_ARGS_CHECK(!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
 #endif
@@ -73,7 +93,7 @@ int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)
 
 	if (CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT && K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		/* If no wait is requested, execute the handler immediately
-		 * without scheduling it */
+		 * without scheduling it. */
 		event->handler(event);
 	} else {
 		z_event_schedule(event, timeout);
@@ -117,15 +137,17 @@ void z_event_q_process(void)
 
 	__ASSERT_NOINTERRUPT();
 
+	/* Shift the event queue forward by the configured time slice */
 	tqueue_shift(&z_event_q.first, K_EVENTS_PERIOD_TICKS);
 
+	/* Process all expired events in the queue */
 	while ((tie = tqueue_pop(&z_event_q.first)) != NULL) {
 		struct k_event *event = CONTAINER_OF(tie, struct k_event, tie);
 
-		/* Clear scheduled flag here so that we can schedule the same
-		 * event directly from the handler */
+		/* Clear the scheduled flag to allow rescheduling from the handler */
 		event->scheduled = 0;
 
+		/* Execute the event handler */
 		event->handler(event);
 	}
 }

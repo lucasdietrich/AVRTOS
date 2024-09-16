@@ -6,9 +6,8 @@
 
 #include <string.h>
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
-
+#include <avrtos/debug.h>
 
 K_MEM_SLAB_DEFINE(stacks, 0x80, 4U);
 
@@ -18,16 +17,15 @@ typedef void (*task_func_t)(Task &task);
 
 class Task
 {
-      public:
+  public:
 	Task(const char name[],
-	     task_func_t entry,
-	     uint8_t priority = Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
+		 task_func_t entry,
+		 uint8_t priority = Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
 	{
 
 		void *stack;
 		k_mem_slab_alloc(&stacks, &stack, K_NO_WAIT);
-		k_thread_create(
-			&_ctx, _wrap_entry, stack, 0x80, priority, this, ++cnt + '0');
+		k_thread_create(&_ctx, _wrap_entry, stack, 0x80, priority, this, ++cnt + '0');
 
 		memcpy(_name, name, sizeof(_name));
 		_entry = entry;
@@ -47,7 +45,7 @@ class Task
 		serial_transmit('\n');
 	}
 
-      private:
+  private:
 	static uint8_t cnt;
 	static void _wrap_entry(void *arg)
 	{

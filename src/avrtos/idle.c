@@ -10,23 +10,23 @@
 
 #define K_MODULE K_MODULE_IDLE
 
-extern struct dnode *z_runq;
 extern uint8_t z_ready_count;
 
 #if CONFIG_KERNEL_THREAD_IDLE
 
 static void z_thread_idle_entry(void *context);
+
 #if defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE != 0)
 #warning "QEMU doesn't work well with CONFIG_THREAD_IDLE_COOPERATIVE, TODO"
 #endif
 
 #if CONFIG_THREAD_IDLE_COOPERATIVE
-/* Z_THREAD_STACK_MIN_SIZE without interrupts */
+/* Minimum stack size for the idle thread when configured as cooperative */
 #define Z_THREAD_IDLE_STACK_SIZE                                                         \
 	(Z_THREAD_STACK_MIN_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
 #define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_COOP | Z_THREAD_PRIO_LOW)
 #else
-/* If IDLE thread can be preempted, plan additionnal stack */
+/* Additional stack space required for the idle thread if it can be preempted */
 #define Z_THREAD_IDLE_STACK_SIZE                                                         \
 	(Z_THREAD_STACK_MIN_SIZE + Z_INTCTX_SIZE + CONFIG_KERNEL_THREAD_IDLE_ADD_STACK)
 #define Z_THREAD_IDLE_PRIORITY (Z_THREAD_PRIO_PREEMPT | Z_THREAD_PRIO_LOW)
@@ -39,7 +39,7 @@ Z_THREAD_DEFINE(z_thread_idle,
 				Z_THREAD_IDLE_PRIORITY,
 				NULL,
 				'I',
-				0 // don't start IDLE thread at init
+				0 /* Do not start the idle thread at startup */
 );
 #else
 __noinit uint8_t z_thread_idle_stack[Z_THREAD_IDLE_STACK_SIZE];
@@ -53,7 +53,10 @@ void z_thread_idle_create(void)
 
 #if CONFIG_IDLE_HOOK
 /**
- * @brief Idle thread hook
+ * @brief Idle thread hook function.
+ *
+ * This weak function can be overridden by the user to implement custom behavior
+ * when the system is idle.
  */
 __attribute__((weak)) void z_idle_hook(void)
 {
@@ -61,9 +64,13 @@ __attribute__((weak)) void z_idle_hook(void)
 #endif
 
 /**
- * @brief Idle thread entry function
+ * @brief Entry function for the idle thread.
  *
- * @param context : ignored for now
+ * This function runs in an infinite loop, performing the idle task. Depending on
+ * the configuration, it may yield the CPU to other threads or put the CPU into
+ * sleep mode when no other threads are ready to run.
+ *
+ * @param context Ignored in this implementation.
  */
 static void z_thread_idle_entry(void *context)
 {
@@ -74,15 +81,15 @@ static void z_thread_idle_entry(void *context)
 
 #if CONFIG_THREAD_IDLE_COOPERATIVE
 #warning                                                                                 \
-	"CONFIG_THREAD_IDLE_COOPERATIVE is deprecated, prefer use of k_yield_from_isr_cond() instead"
+	"CONFIG_THREAD_IDLE_COOPERATIVE is deprecated; prefer using k_yield_from_isr_cond() instead"
 		k_yield();
 		// z_yield_from_idle_thread();
 #endif /* CONFIG_THREAD_IDLE_COOPERATIVE */
 
-		/* A bit buggy on QEMU but normally works fine */
-#if !defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE == 0)
-		/* only an interrupt can wake up the CPU after this instruction
+		/* Enter sleep mode if no other threads are ready to run.
+		 * This is typically used in non-cooperative idle threads.
 		 */
+#if !defined(__QEMU__) && (CONFIG_THREAD_IDLE_COOPERATIVE == 0)
 		sleep_cpu();
 #endif /* __QEMU__ */
 	}
@@ -101,7 +108,7 @@ bool k_is_cpu_idle(void)
 
 void k_idle(void)
 {
-	/* if others thread are ready, yield the CPU */
+	/* If other threads are ready, yield the CPU */
 	if (z_ready_count != 0u) {
 		k_yield();
 	} else {

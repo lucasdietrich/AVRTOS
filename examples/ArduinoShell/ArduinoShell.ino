@@ -4,19 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos.h>
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
-
+#include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
+#include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-
-#include <avrtos/logging.h>
+#include <avrtos.h>
 #define LOG_LEVEL LOG_LEVEL_WRN
 
 void consumer(void *context);
@@ -36,7 +34,7 @@ K_FIFO_DEFINE(myfifo);
 void push(struct in **mem)
 {
 	struct k_thread *thread = k_fifo_put(&myfifo, *(snode **)mem);
-	*mem			= NULL;
+	*mem					= NULL;
 	k_yield_from_isr_cond(thread);
 }
 
@@ -113,19 +111,15 @@ static void cmd_threads(void);
 static void cmd_canaries(void);
 
 #define CMD(_name, _func)                                                                \
-	{                                                                                \
-		_name, sizeof(_name) - 1u, _func                                         \
+	{                                                                                    \
+		_name, sizeof(_name) - 1u, _func                                                 \
 	}
 
 const struct command commands[] PROGMEM = {
-	CMD("help", cmd_help),
-	CMD("version", cmd_version),
-	CMD("uptime", k_show_uptime),
-	CMD("ticks", k_show_ticks),
-	CMD("sleep", cmd_sleep),
-	CMD("canaries", cmd_canaries),
-	CMD("threads", cmd_threads),
-	CMD("led", led_toggle),
+	CMD("help", cmd_help),		  CMD("version", cmd_version),
+	CMD("uptime", k_show_uptime), CMD("ticks", k_show_ticks),
+	CMD("sleep", cmd_sleep),	  CMD("canaries", cmd_canaries),
+	CMD("threads", cmd_threads),  CMD("led", led_toggle),
 };
 
 const struct command *find_command(const char *name)
@@ -160,10 +154,8 @@ static void cmd_help(void)
 
 static void cmd_version(void)
 {
-	printf_P(PSTR("version: %02u.%02u.%02u"),
-		 AVRTOS_VERSION_MAJOR,
-		 AVRTOS_VERSION_MINOR,
-		 AVRTOS_VERSION_REVISION);
+	printf_P(PSTR("version: %02u.%02u.%02u"), AVRTOS_VERSION_MAJOR, AVRTOS_VERSION_MINOR,
+			 AVRTOS_VERSION_REVISION);
 }
 
 static void cmd_sleep(void)
@@ -184,7 +176,6 @@ static void cmd_canaries(void)
 	k_print_stack_canaries(&z_thread_idle);
 	k_print_stack_canaries(&consumer_thread);
 }
-
 
 void consumer(void *context)
 {
@@ -214,7 +205,8 @@ void setup(void)
 	serial_init_baud(9600u);
 
 	k_mem_slab_init(&myslab, myslab.buffer, myslab.block_size, myslab.count);
-	k_thread_create(&consumer_thread, consumer, consumer_stack, sizeof(consumer_stack), K_PREEMPTIVE, NULL, 'A');
+	k_thread_create(&consumer_thread, consumer, consumer_stack, sizeof(consumer_stack),
+					K_PREEMPTIVE, NULL, 'A');
 	k_thread_start(&consumer_thread);
 
 	cmd_threads();

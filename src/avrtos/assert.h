@@ -4,6 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/*
+ * Assertions
+ *
+ * This file provides a set of macros and functions to perform runtime assertions.
+ *
+ * Multiple assertion codes and modules are defined to facilitate identifying
+ * the source of the assertion and the condition that failed.
+ *
+ * Assertions have a huge impact on the code size and execution time, so they
+ * should be used with caution.
+ *
+ * Related configuration options:
+ * - CONFIG_KERNEL_ASSERT: Enable runtime assertions (default: disabled)
+ */
+
 #ifndef _AVRTOS_ASSERT_H_
 #define _AVRTOS_ASSERT_H_
 
@@ -13,9 +28,6 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stddef.h>
-
-#include <avr/io.h>
-#include <util/atomic.h>
 
 #include "kernel.h"
 #include "kernel_private.h"
@@ -111,12 +123,18 @@ extern "C" {
 #define __ASSERT_THREAD_CONTEXT()
 
 /**
- * @brief Assert evaluated expression is not zero
+ * @brief Assert that the evaluated expression is not zero
  *
- * @param expression Expression to evaluate
- * @param module Module whithin the assertion is made (K_MODULE_*)
- * @param acode Assertion code (K_ASSERT_*)
- * @param line Line number of the assertion within the source file
+ * If an assertion fails, the interrupts are disabled, some debug information is
+ * is printed to the system serial port, and the program execution is halted:
+ * 1. cli
+ * 2. * print debug information *
+ * 3. jmp _exit
+ *
+ * @param expression The expression to evaluate
+ * @param module The module where the assertion is made (K_MODULE_*)
+ * @param acode The assertion code (K_ASSERT_*)
+ * @param line The line number of the assertion within the source file
  */
 void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line);
 

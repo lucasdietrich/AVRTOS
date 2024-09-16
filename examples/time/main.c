@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -40,9 +40,8 @@ int main(void)
 
 		k_show_uptime();
 
-		printf_P(PSTR(" %lu 64ms - %lu 32ms - "),
-			 (uint32_t)k_uptime_get_ms64(),
-			 k_uptime_get_ms32());
+		printf_P(PSTR(" %lu 64ms - %lu 32ms - "), (uint32_t)k_uptime_get_ms64(),
+				 k_uptime_get_ms32());
 
 		printf_P(PSTR("%lu s - "), k_uptime_get());
 

@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
@@ -16,9 +16,9 @@
 
 #define IPC_MAX_DATA_SIZE 0x10U
 
-#define IPC_START_FRAME_DELIMITER      ((uint32_t)0xAAAAAAAALU)
+#define IPC_START_FRAME_DELIMITER	   ((uint32_t)0xAAAAAAAALU)
 #define IPC_START_FRAME_DELIMITER_SIZE 4U
-#define IPC_END_FRAME_DELIMITER	       ((uint32_t)0x55555555LU)
+#define IPC_END_FRAME_DELIMITER		   ((uint32_t)0x55555555LU)
 #define IPC_END_FRAME_DELIMITER_SIZE   4U
 
 #define IPC_FRAME_SIZE ((size_t)sizeof(ipc_frame_t))
@@ -37,14 +37,14 @@ typedef struct {
 } __attribute__((packed)) ipc_frame_t;
 
 const struct usart_config usart_ipc_cfg = {
-	.baudrate    = USART_BAUD_500000,
-	.receiver    = 1,
+	.baudrate	 = USART_BAUD_500000,
+	.receiver	 = 1,
 	.transmitter = 1,
-	.mode	     = USART_MODE_ASYNCHRONOUS,
-	.parity	     = USART_PARITY_NONE,
-	.stopbits    = USART_STOP_BITS_1,
-	.databits    = USART_DATA_BITS_8,
-	.speed_mode  = USART_SPEED_MODE_NORMAL,
+	.mode		 = USART_MODE_ASYNCHRONOUS,
+	.parity		 = USART_PARITY_NONE,
+	.stopbits	 = USART_STOP_BITS_1,
+	.databits	 = USART_DATA_BITS_8,
+	.speed_mode	 = USART_SPEED_MODE_NORMAL,
 };
 
 uint8_t rx_buffer[IPC_FRAME_SIZE];
@@ -69,9 +69,9 @@ K_PRNG_DEFINE_DEFAULT(prng);
 static void build_tx_frame(ipc_frame_t *frame)
 {
 	frame->start_delimiter = IPC_START_FRAME_DELIMITER;
-	frame->seq	       = 0U;
-	frame->data.size       = IPC_MAX_DATA_SIZE;
-	frame->crc32	       = 0xBBBBBBBBLU;
+	frame->seq			   = 0U;
+	frame->data.size	   = IPC_MAX_DATA_SIZE;
+	frame->crc32		   = 0xBBBBBBBBLU;
 	frame->end_delimiter   = IPC_END_FRAME_DELIMITER;
 
 	for (uint32_t i = 0; i < IPC_MAX_DATA_SIZE; i++) {

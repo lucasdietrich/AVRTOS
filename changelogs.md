@@ -8,13 +8,23 @@ Key features:
   read data in a single transaction.
   - Rename `i2c_master_transmit())` to `i2c_master_write()`.
   - Rename `i2c_master_receive()` to `i2c_master_read()`.
+  - Add option to configure the speed of the I2C bus on initialization.
 
 Minor changes:
 - Introduce `CONFIG_KERNEL_REENTRANCY` configuration option to enable/disable
   reentrancy support for kernel objects, such as mutexes and sched lock/unlock.
+- Change code style, update `.clang-format` and format the codebase.
+- Improve stack sentinel verification by introducing a thread monitoring mecanism.
+- Introduce `CONFIG_THREAD_MONITOR` and `CONFIG_THREAD_MAIN_MONITOR` configuration
+  options to enable/disable thread monitoring.
+- Introduce `CONFIG_THREAD_STACK_SENTINEL_AUTO_VERIFY` configuration option to
+  enable/disable automatic stack sentinel verification.
+- Improve `timers` subsystem.
 
 Bug fixes:
 - Fix returned error code in `i2c_master_write()` and `i2c_master_read()`.
+- Fix `K_MSEC` macro with big values of `CONFIG_KERNEL_SYSCLOCK_PERIOD_US`.
+- Fix `K_WORK_DELAYABLE_INIT` macro.
 
 ## avrtos v1.2.0
 

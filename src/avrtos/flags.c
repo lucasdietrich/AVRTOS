@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "flags.h"
 
 #include "kernel.h"
@@ -8,19 +14,31 @@
 #define KERNEL_FLAGS_OPT_CLR_ALL_ENABLED 0
 #define KERNEL_FLAGS_OPT_CLR_ANY_ENABLED 1
 
-#define Z_SWAP_DATA_GET_OPTIONS(swapd)	 ((uint8_t)(((uint16_t)swapd) >> 8u))
-#define Z_SWAP_DATA_GET_PEND_MASK(swapd) ((uint8_t)(((uint16_t)swapd) & 0xFFu))
-#define Z_SWAP_DATA_GET_TRIG_MASK(swapd) ((uint8_t)(((uint16_t)swapd) & 0xFFu))
+/**
+ * @brief Macros to handle swap_data, used for storing both options and the mask.
+ * The swap_data is split into an options byte (upper 8 bits) and a mask byte (lower 8
+ * bits).
+ */
+#define Z_SWAP_DATA_GET_OPTIONS(swapd)	 ((uint8_t)(((uint16_t)(swapd)) >> 8u))
+#define Z_SWAP_DATA_GET_PEND_MASK(swapd) ((uint8_t)(((uint16_t)(swapd)) & 0xFFu))
+#define Z_SWAP_DATA_GET_TRIG_MASK(swapd) ((uint8_t)(((uint16_t)(swapd)) & 0xFFu))
 
-#define Z_SWAP_DATA_INIT_TRIG_MASK(trig) ((void *)(((uint16_t)trig) & 0xFFu))
+/**
+ * @brief Initialize swap_data with the trigger mask only.
+ */
+#define Z_SWAP_DATA_INIT_TRIG_MASK(trig) ((void *)(((uint16_t)(trig)) & 0xFFu))
+
+/**
+ * @brief Initialize swap_data with both options and mask.
+ */
 #define Z_SWAP_DATA_INIT_OPT_N_MASK(opt, mask)                                           \
-	((void *)((((uint16_t)opt) << 8u) | ((uint16_t)mask)))
+	((void *)((((uint16_t)(opt)) << 8u) | ((uint16_t)(mask))))
 
-int8_t k_flags_init(struct k_flags *flags, uint8_t value)
+int8_t k_flags_init(struct k_flags *flags, k_flags_value_t value)
 {
 	Z_ARGS_CHECK(flags) return -EINVAL;
 
-	dlist_init(&flags->_waitqueue);
+	dlist_init(&flags->waitqueue);
 	flags->flags	   = value;
 	flags->reset_value = value;
 
@@ -28,45 +46,46 @@ int8_t k_flags_init(struct k_flags *flags, uint8_t value)
 }
 
 int k_flags_poll(struct k_flags *flags,
-				 uint8_t mask,
+				 k_flags_value_t *mask,
 				 k_flags_options_t options,
 				 k_timeout_t timeout)
 {
-	int ret = -EAGAIN;
+	int ret = 0;
 
-	Z_ARGS_CHECK(flags) return -EINVAL;
-	Z_ARGS_CHECK((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u)
-	{
-		return -ENOTSUP;
-	}
+	Z_ARGS_CHECK(flags && mask) return -EINVAL;
+	Z_ARGS_CHECK((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u) return -ENOTSUP;
 
-	if (mask == 0u) {
-		ret = 0;
+	k_flags_value_t mask_val = *mask;
+	if (mask_val == 0u) {
 		goto exit;
 	}
 
 	const uint8_t lock = irq_lock();
 
-	uint8_t value	   = flags->flags;
-	const uint8_t trig = value & mask;
+	k_flags_value_t value = flags->flags;
+	k_flags_value_t trig  = value & mask_val;
 
 	if (trig == 0u) {
-		/* Set into swap_data flags the thread in pending on and
-		 * K_FLAGS_CONSUME option */
-		z_current->swap_data = Z_SWAP_DATA_INIT_OPT_N_MASK(options, mask);
+		/* No matching flags set, prepare to wait
+		 *
+		 * This is the limitation for having CONFIG_KERNEL_FLAGS_SIZE greater than
+		 * 1 byte. The swap_data is used to store the mask (1 byte) and the options
+		 * (1 byte).
+		 */
+		z_current->swap_data = Z_SWAP_DATA_INIT_OPT_N_MASK(options, mask_val);
 
-		ret = z_pend_current(&flags->_waitqueue, timeout);
+		ret = z_pend_current(&flags->waitqueue, timeout);
 		if (ret == 0) {
-			/* Bits that made the thread ready are stored in
-			 * swap_data */
-			ret = Z_SWAP_DATA_GET_TRIG_MASK(z_current->swap_data);
+			/* Retrieve the flags that caused the wake-up */
+			*mask = Z_SWAP_DATA_GET_TRIG_MASK(z_current->swap_data);
 		}
 	} else {
 		if ((options & K_FLAGS_CONSUME) != 0u) {
-			value &= ~mask;
+			value &= ~mask_val; /* Clear the flags if K_FLAGS_CONSUME is set */
 			flags->flags = value;
 		}
-		ret = trig;
+		*mask = trig;
+		ret	  = 0; /* Successfully matched flags */
 	}
 
 	irq_unlock(lock);
@@ -75,34 +94,33 @@ exit:
 	return ret;
 }
 
-int8_t
-k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_t options)
+int8_t k_flags_notify(struct k_flags *flags,
+					  k_flags_value_t notify_value,
+					  k_flags_options_t options)
 {
 	int8_t ret = 0;
 	struct dnode *thread_handle;
 
 	Z_ARGS_CHECK(flags) return -EINVAL;
-	Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u)
-	return -ENOTSUP;
+	Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u) return -ENOTSUP;
 
 	const uint8_t lock = irq_lock();
 
-	thread_handle = flags->_waitqueue.head;
+	thread_handle = flags->waitqueue.head;
 	notify_value  = ~flags->flags & notify_value;
 
 	while (notify_value != 0u) {
-		if (!DITEM_VALID(&flags->_waitqueue, thread_handle)) {
-			/* No more threads, save remaining value to notify
-			 * into k_flags structure */
+		if (!DITEM_VALID(&flags->waitqueue, thread_handle)) {
+			/* No more threads waiting; store remaining flags */
 			flags->flags |= notify_value;
 			break;
 		}
 
 		struct k_thread *const thread =
 			CONTAINER_OF(thread_handle, struct k_thread, wflags);
-		const uint16_t swap_data = (uint16_t)thread->swap_data;
-		const uint8_t mask		 = Z_SWAP_DATA_GET_PEND_MASK(swap_data);
-		const uint8_t trig		 = notify_value & mask;
+		const uint16_t swap_data   = (uint16_t)thread->swap_data;
+		const k_flags_value_t mask = Z_SWAP_DATA_GET_PEND_MASK(swap_data);
+		const k_flags_value_t trig = notify_value & mask;
 
 		if (trig != 0u) {
 			thread->swap_data = Z_SWAP_DATA_INIT_TRIG_MASK(trig);
@@ -115,15 +133,14 @@ k_flags_notify(struct k_flags *flags, uint8_t notify_value, k_flags_options_t op
 				notify_value &= ~trig;
 			}
 
-			/* Increment number of thread notified */
-			ret++;
+			ret++; /* Increment the number of notified threads */
 		}
 
 		thread_handle = thread_handle->next;
 	}
 
 	if ((ret > 0) && (options & K_FLAGS_SCHED)) {
-		z_yield();
+		z_yield(); /* Yield if any thread was notified and scheduling is requested */
 	}
 
 	irq_unlock(lock);
@@ -137,7 +154,7 @@ int8_t k_flags_reset(struct k_flags *flags)
 
 	const uint8_t lock = irq_lock();
 
-	int8_t ret	 = z_cancel_all_pending(&flags->_waitqueue);
+	int8_t ret	 = (int8_t)z_cancel_all_pending(&flags->waitqueue);
 	flags->flags = flags->reset_value;
 
 	irq_unlock(lock);

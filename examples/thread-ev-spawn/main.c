@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/usart.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/drivers/usart.h>
 #include <avrtos/logging.h>
 #define LOG_LEVEL LOG_LEVEL_INFO
 
@@ -21,12 +21,12 @@ struct task {
 	uint64_t counter;
 };
 
-#define BLOCK_SIZE   sizeof(struct task)
+#define BLOCK_SIZE sizeof(struct task)
 
 #if defined(__AVR_ATmega2560__)
-#	define BLOCKS_COUNT 32u
+#define BLOCKS_COUNT 32u
 #else
-#	define BLOCKS_COUNT 10u
+#define BLOCKS_COUNT 10u
 #endif
 
 K_MEM_SLAB_DEFINE(tasks_pool, BLOCK_SIZE, BLOCKS_COUNT);
@@ -98,16 +98,11 @@ static void handle_data(char data)
 		struct task *task;
 		if (k_mem_slab_alloc(&tasks_pool, (void **)&task, K_NO_WAIT) == 0) {
 
-			task->id      = thread_id++;
+			task->id	  = thread_id++;
 			task->counter = 0u;
 
-			k_thread_create(&task->thread,
-					thread_entry,
-					task->stack,
-					STACK_SIZE,
-					K_PREEMPTIVE,
-					task,
-					't');
+			k_thread_create(&task->thread, thread_entry, task->stack, STACK_SIZE,
+							K_PREEMPTIVE, task, 't');
 			slist_append(&allocated_threads, &task->_handle);
 			k_thread_start(&task->thread);
 
@@ -132,10 +127,8 @@ static void handle_data(char data)
 		struct snode *node = allocated_threads.head;
 		while (node) {
 			struct task *task = CONTAINER_OF(node, struct task, _handle);
-			LOG_INF("TASK id: %u counter: %08lx%08lx",
-				task->id,
-				(uint32_t)(task->counter >> 32u),
-				(uint32_t)(task->counter));
+			LOG_INF("TASK id: %u counter: %08lx%08lx", task->id,
+					(uint32_t)(task->counter >> 32u), (uint32_t)(task->counter));
 			node = node->next;
 		}
 		break;
@@ -163,7 +156,7 @@ int main(void)
 	for (;;) {
 		k_sem_take(&sem, K_FOREVER);
 
-		key	     = irq_lock();
+		key			 = irq_lock();
 		counter_copy = counter;
 		irq_unlock(key);
 

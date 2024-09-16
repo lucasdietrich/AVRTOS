@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -18,7 +18,7 @@
 void thread(void *p);
 void thread_time(void *ctx);
 
-#define STACK_SIZE  0x80
+#define STACK_SIZE	0x80
 #define THREAD_PRIO K_PREEMPTIVE
 
 K_THREAD_DEFINE(w0, thread, STACK_SIZE, THREAD_PRIO, NULL, '0');
@@ -42,10 +42,7 @@ static uint8_t ms(struct k_prng *prng)
 
 static void debug(void *mem, int8_t rc)
 {
-	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"),
-		 z_current->symbol,
-		 (unsigned int)mem,
-		 rc);
+	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), z_current->symbol, (unsigned int)mem, rc);
 }
 
 static void *alloc(k_timeout_t timeout)

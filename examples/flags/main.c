@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/usart.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/drivers/usart.h>
 
 #include <avr/io.h>
 
@@ -61,33 +61,36 @@ ISR(USART0_RX_vect)
 int main(void)
 {
 	const struct usart_config usart_config = {
-		.baudrate    = USART_BAUD_500000,
-		.receiver    = 1u,
+		.baudrate	 = USART_BAUD_500000,
+		.receiver	 = 1u,
 		.transmitter = 1u,
-		.mode	     = USART_MODE_ASYNCHRONOUS,
-		.parity	     = USART_PARITY_NONE,
-		.stopbits    = USART_STOP_BITS_1,
-		.databits    = USART_DATA_BITS_8,
-		.speed_mode  = USART_SPEED_MODE_NORMAL,
+		.mode		 = USART_MODE_ASYNCHRONOUS,
+		.parity		 = USART_PARITY_NONE,
+		.stopbits	 = USART_STOP_BITS_1,
+		.databits	 = USART_DATA_BITS_8,
+		.speed_mode	 = USART_SPEED_MODE_NORMAL,
 	};
 	ll_usart_init(USART0_DEVICE, &usart_config);
 	ll_usart_enable_rx_isr(USART0_DEVICE);
 
 	for (;;) {
 		printf_P(PSTR("<main> poll\n"));
-		int ret = k_flags_poll(&flags, 0xFEu, K_FLAGS_SET_ANY, K_FOREVER);
-		printf_P(PSTR("<main> ret: %d\n"), ret);
+		uint8_t val = 0xFE;
+		int ret		= k_flags_poll(&flags, &val, K_FLAGS_SET_ANY, K_FOREVER);
+		printf_P(PSTR("<main> ret: %d val: %u\n"), ret, val);
 
 		k_dump_stack_canaries();
-		k_sleep(K_SECONDS(5u));
+
+		k_sleep(K_SECONDS(1u));
 	}
 }
 
 void thread(void *arg)
 {
 	for (;;) {
-		int ret = k_flags_poll(
-			&flags, 0x0Fu, K_FLAGS_SET_ANY | K_FLAGS_CONSUME, K_FOREVER);
-		printf_P(PSTR("<thread> ret: %d\n"), ret);
+		uint8_t val = 0x0F;
+		int ret =
+			k_flags_poll(&flags, &val, K_FLAGS_SET_ANY | K_FLAGS_CONSUME, K_FOREVER);
+		printf_P(PSTR("<thread> ret: %d val: %u\n"), ret, val);
 	}
 }

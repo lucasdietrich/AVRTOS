@@ -4,18 +4,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
+#include <string.h>
+
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-#include <string.h>
 
 #define BLOCKS_COUNT 2
-#define BLOCK_SIZE   100
+#define BLOCK_SIZE	 100
 
 K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
 
@@ -50,4 +51,3 @@ int main(void)
 
 	k_stop();
 }
-

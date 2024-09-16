@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 
 #define PINn PIN7
 #define GPIO GPIOB_DEVICE

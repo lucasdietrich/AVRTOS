@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
+
+#include <avrtos.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
 
 K_MSGQ_DEFINE(usart_msgq, 1u, 16u);
@@ -32,24 +33,24 @@ ISR(USART0_RX_vect)
 void setup(void)
 {
 	const struct usart_config usart_config = {
-		.baudrate    = USART_BAUD_9600,
-		.receiver    = 1u,
+		.baudrate	 = USART_BAUD_9600,
+		.receiver	 = 1u,
 		.transmitter = 1u,
-		.mode	     = USART_MODE_ASYNCHRONOUS,
-		.parity	     = USART_PARITY_NONE,
-		.stopbits    = USART_STOP_BITS_1,
-		.databits    = USART_DATA_BITS_8,
-		.speed_mode  = USART_SPEED_MODE_NORMAL,
+		.mode		 = USART_MODE_ASYNCHRONOUS,
+		.parity		 = USART_PARITY_NONE,
+		.stopbits	 = USART_STOP_BITS_1,
+		.databits	 = USART_DATA_BITS_8,
+		.speed_mode	 = USART_SPEED_MODE_NORMAL,
 	};
 	ll_usart_init(USART0_DEVICE, &usart_config);
 	ll_usart_enable_rx_isr(USART0_DEVICE);
 
 	led_init();
-	
+
 	k_thread_create(&thread_usart, thread_usart_task, thread_usart_stack,
-			sizeof(thread_usart_stack), K_COOPERATIVE, NULL, 'X');
+					sizeof(thread_usart_stack), K_COOPERATIVE, NULL, 'X');
 	k_thread_create(&thread_led, thread_led_task, thread_led_stack,
-			sizeof(thread_led_stack), K_COOPERATIVE, NULL, 'L');
+					sizeof(thread_led_stack), K_COOPERATIVE, NULL, 'L');
 
 	LOG_INF("Application started");
 
@@ -62,8 +63,8 @@ void setup(void)
 
 void loop(void)
 {
-	/* loop() is executed in the context of the main thread which is cooperative, 
-	 * therefore we need to give the other threads a chance to run, this is done 
+	/* loop() is executed in the context of the main thread which is cooperative,
+	 * therefore we need to give the other threads a chance to run, this is done
 	 * through the k_idle() function.
 	 */
 	k_idle();
@@ -89,8 +90,8 @@ static void thread_led_task(void *arg)
 
 		/* As serial baudrate is very slow, the thread will take a lot of time
 		 * to print the uptime and debug message, therefore the LED will blink
-		 * slower than 2Hz. 
-		 * 
+		 * slower than 2Hz.
+		 *
 		 * I advise to use a faster baudrate (e.g. 115200) or comment out the
 		 * k_show_uptime() and LOG_DBG() calls.
 		 */

@@ -4,16 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/sleep.h>
 
 void thread(void *p);
 
-K_THREAD_DEFINE(
-	t1, thread, Z_THREAD_STACK_MIN_SIZE + 100, K_PREEMPTIVE, NULL, '1');
+K_THREAD_DEFINE(t1, thread, Z_THREAD_STACK_MIN_SIZE + 100, K_PREEMPTIVE, NULL, '1');
 
 void write_stack(uint16_t size, uint8_t pattern)
 {
