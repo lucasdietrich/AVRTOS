@@ -10,7 +10,6 @@
 
 #define K_MODULE K_MODULE_IDLE
 
-extern struct dnode *z_runq;
 extern uint8_t z_ready_count;
 
 #if CONFIG_KERNEL_THREAD_IDLE
