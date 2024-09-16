@@ -27,7 +27,7 @@
 #define I2C0_DEVICE_ENABLED 0
 #endif
 
-#define FREQ_CALC(_prescaler, _twbr) (F_CPU / (16 + 2 * (_twbr)*I2C_PRESCALER_VALUE(_prescaler))
+#define FREQ_CALC(_prescaler, _twbr) (F_CPU / (16 + 2 * (_twbr)*I2C_PRESCALER_VALUE(_prescaler)))
 #define FREQ_MIN FREQ_CALC(I2C_PRESCALER_64, 255)
 #define FREQ_MAX 400000lu
 
