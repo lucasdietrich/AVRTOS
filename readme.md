@@ -26,7 +26,7 @@ AVRTOS offers an extensive list of features, including:
 - Configurable system clock with support for all hardware timers (e.g. 0-2 for ATmega328p and 0-5 for ATmega2560)
 - Synchronization objects like mutexes, semaphores, workqueues (+delayables), FIFOs, message queues, memory slabs, flags, signals
 - Drivers for UART, timers, GPIO, SPI, I2C and external interrupts
-- Devices drivers for TCN75
+- Devices drivers for TCN75, MCP2515
 - Thread sleep with up to 65-second duration in simple mode (extendable using high-precision time objects)
 - Scheduler lock/unlock to temporarily prevent preemption for preemptive threads
 - Thread switching from interrupts

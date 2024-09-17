@@ -368,7 +368,7 @@ int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
 {
 	__ASSERT_NOTNULL(mcp);
 
-	/* Only support 6 filters supported */
+	/* Support 6 filters */
 	if (index > 5) {
 		return -EINVAL;
 	}
@@ -417,7 +417,7 @@ mcp2515_set_mask(struct mcp2515_device *mcp, uint8_t index, uint8_t is_ext, uint
 {
 	__ASSERT_NOTNULL(mcp);
 
-	/* Only support 2 masks supported */
+	/* Support 2 masks  */
 	if (index > 1) {
 		return -EINVAL;
 	}
