@@ -61,8 +61,15 @@ typedef enum {
 } spi_prescaler_t;
 
 typedef enum {
-	SPI_MODE_MASTER = 0u,
-	SPI_MODE_SLAVE	= 1u
+	SPI_ROLE_MASTER = 0u,
+	SPI_ROLE_SLAVE	= 1u
+} spi_role_t;
+
+typedef enum {
+	SPI_MODE_0 = 0u, /* CPOL = 0, CPHA = 0 */
+	SPI_MODE_1 = 1u, /* CPOL = 0, CPHA = 1 */
+	SPI_MODE_2 = 2u, /* CPOL = 1, CPHA = 0 */
+	SPI_MODE_3 = 3u	 /* CPOL = 1, CPHA = 1 */
 } spi_mode_t;
 
 /* Leading edge */
@@ -80,7 +87,7 @@ typedef enum {
 /** SPI configuration (1 byte) */
 struct spi_config {
 	/* Master or slave */
-	spi_mode_t mode : 1u;
+	spi_role_t role : 1u;
 
 	/* Clock polarity */
 	spi_clock_polarity_t polarity : 1u;
@@ -103,18 +110,18 @@ struct spi_regs {
 	uint8_t spsr;
 };
 
-/* 4Mhz SPI Master in mode 0,0 */
+/* 4Mhz SPI Master in mode 0 */
 #define SPI_CONFIG_MASTER_DEFAULTS                                                       \
 	{                                                                                    \
-		.mode = SPI_MODE_MASTER, .polarity = SPI_CLOCK_POLARITY_FALLING,                 \
+		.mode = SPI_ROLE_MASTER, .polarity = SPI_CLOCK_POLARITY_RISING,                  \
 		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
 		.prescaler = SPI_PRESCALER_4,                                                    \
 	}
 
-/* 4Mhz SPI Slave in mode 0,0 */
+/* 4Mhz SPI Slave in mode 0 */
 #define SPI_CONFIG_SLAVE_DEFAULTS                                                        \
 	{                                                                                    \
-		.mode = SPI_MODE_SLAVE, .polarity = SPI_CLOCK_POLARITY_FALLING,                  \
+		.mode = SPI_ROLE_SLAVE, .polarity = SPI_CLOCK_POLARITY_RISING,                   \
 		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
 	}
 

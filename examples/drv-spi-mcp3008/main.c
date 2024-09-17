@@ -17,7 +17,7 @@ int main(void)
 	serial_init();
 
 	const struct spi_config cfg = {
-		.mode		 = SPI_MODE_MASTER,
+		.role		 = SPI_ROLE_MASTER,
 		.polarity	 = SPI_CLOCK_POLARITY_RISING,
 		.phase		 = SPI_CLOCK_PHASE_SAMPLE,
 		.prescaler	 = SPI_PRESCALER_X32,

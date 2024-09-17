@@ -60,7 +60,7 @@ int main(void)
 
 	/* Advised configuration */
 	const struct spi_config cfg = {
-		.mode		 = SPI_MODE_SLAVE,
+		.mode		 = SPI_ROLE_SLAVE,
 		.polarity	 = SPI_CLOCK_POLARITY_RISING,
 		.phase		 = SPI_CLOCK_PHASE_SAMPLE,
 		.irq_enabled = 0u,

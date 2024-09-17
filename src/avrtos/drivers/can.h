@@ -23,6 +23,9 @@ typedef struct can_frame {
 	uint32_t id : 29u;
 	uint32_t rtr : 1u;
 	uint32_t is_ext : 1u;
+
+	/* Reserved usage */
+	uint32_t _reserved : 1u;
 } __attribute__((packed)) can_frame_t;
 
 #endif /* _AVRTOS_DRIVERS_CAN */

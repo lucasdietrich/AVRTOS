@@ -72,3 +72,17 @@ struct k_thread *k_sem_give(struct k_sem *sem)
 
 	return thread;
 }
+
+__kernel int8_t k_sem_cancel_wait(struct k_sem *sem)
+{
+	__ASSERT_NOTNULL(sem);
+
+	int8_t ret;
+	const uint8_t key = irq_lock();
+
+	ret = (int8_t)z_cancel_all_pending(&sem->waitqueue);
+
+	irq_unlock(key);
+
+	return ret;
+}

@@ -7,12 +7,12 @@ GENERATOR_COMMAND?="ninja"
 GENERATOR_ARGS?=
 
 DEVICE?=/dev/ttyUSB0
-# SAMPLE?=drv-spi-can-mcp2515
-# TOOLCHAIN_FILE?=cmake/avr5-board-caniot-tiny-pb.cmake
-SAMPLE?=hello-world
-TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
+SAMPLE?=drv-spi-can-mcp2515
+TOOLCHAIN_FILE?=cmake/avr5-board-caniot-tiny-pb.cmake
+# SAMPLE?=hello-world
+# TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
 BAUDRATE?=115200
-QEMU?=ON
+QEMU?=OFF
 
 # if QEMU is enabled, set CMAKE_BUILD_TYPE to Debug by default
 ifeq ($(QEMU),ON)

@@ -5,18 +5,43 @@
  */
 
 #include <avrtos/avrtos.h>
+#include <avrtos/devices/mcp2515.h>
+#include <avrtos/devices/mcp2515_priv.h>
+#include <avrtos/drivers/can.h>
+#include <avrtos/drivers/exti.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/spi.h>
-#include <avrtos/drivers/can.h>
-#include <avrtos/devices/mcp2515.h>
+
+static struct mcp2515_device mcp;
+
+K_SEM_DEFINE(can_int_sem, 0u, 10u);
+
+ISR(INT0_vect)
+{
+	serial_transmit('!');
+	k_yield_from_isr_cond(k_sem_give(&can_int_sem));
+	// mcp2515_handle_interrupt(&mcp);
+}
+
+static void print_can_frame(struct can_frame *frame)
+{
+	// oneline
+	printf("id: %x%x, len: %d, rtr: %d, is_ext: %d / ", (uint16_t)(frame->id >> 16), (uint16_t)frame->id, frame->len, frame->rtr,
+		   frame->is_ext);
+	for (uint8_t i = 0; i < frame->len; i++) {
+		printf(" 0x%02X ", frame->data[i]);
+	}
+	printf("\n");
+}
 
 int main(void)
 {
+	int ret;
 	serial_init_baud(115200u);
 
-	const struct spi_config cfg = {
-		.mode		 = SPI_MODE_MASTER,
-		.polarity	 = SPI_CLOCK_POLARITY_FALLING,
+	const struct spi_config spi_cfg = {
+		.role		 = SPI_ROLE_MASTER,
+		.polarity	 = SPI_CLOCK_POLARITY_RISING,
 		.phase		 = SPI_CLOCK_PHASE_SAMPLE,
 		.prescaler	 = SPI_PRESCALER_4,
 		.irq_enabled = 0u,
@@ -26,24 +51,47 @@ int main(void)
 		.cs_port	  = GPIOB_DEVICE,
 		.cs_pin		  = 2u,
 		.active_state = GPIO_LOW,
-		.regs		  = spi_config_into_regs(cfg),
+		.regs		  = spi_config_into_regs(spi_cfg),
 	};
 
-	const struct mcp2515_config mcp2515_cfg = {
-		.can_speed = MCP2515_CAN_SPEED_500KBPS,
+	gpio_pin_init(GPIOB_DEVICE, 1u, GPIO_MODE_OUTPUT, GPIO_HIGH);
+
+	const struct mcp2515_config mcp_cfg = {
+		.can_speed	 = MCP2515_CAN_SPEED_500KBPS,
 		.clock_speed = MCP2515_CLOCK_SET_16MHZ,
+		.flags		 = MCP2515_INT_RX, // MCP2515_INT_TX
 	};
 
-	spi_init(cfg);
+	spi_init(spi_cfg);
 
-	struct mcp2515_device mcp2515_dev;
-	mcp2515_init(&mcp2515_dev, &mcp2515_cfg, &spi_slave);
+	ret = mcp2515_init(&mcp, &mcp_cfg, &spi_slave);
+	printf("mcp2515_init: %d\n", ret);
 
-	uint16_t i = 0;
+	gpio_pin_init(GPIOD_DEVICE, 2u, GPIO_MODE_INPUT, GPIO_INPUT_PULLUP);
+
+	exti_clear_flag(INT0);
+	exti_configure(INT0, ISC_FALLING);
+	exti_enable(INT0);
+
 	for (;;) {
-		mcp2515_reset(&mcp2515_dev);
-		uint8_t status = mcp2515_read_status(&mcp2515_dev);
-		printf("%u: MCP2515 status: 0x%02X\n", i++, status);
-		k_sleep(K_SECONDS(1));
+		struct can_frame frame = {0};
+
+		k_sem_take(&can_int_sem, K_FOREVER);
+
+		int8_t ret = mcp2515_recv(&mcp, &frame);
+		printf("mcp2515_recv: %d\n", ret);
+
+		if (ret == 0) {
+			print_can_frame(&frame);
+
+			// Send back the received frame
+			ret = mcp2515_send(&mcp, &frame);
+			printf("mcp2515_send: %d\n", ret);
+		}
 	}
+
+	ret = mcp2515_deinit(&mcp);
+	printf("mcp2515_deinit: %d\n", ret);
+
+	k_sleep(K_FOREVER);
 }

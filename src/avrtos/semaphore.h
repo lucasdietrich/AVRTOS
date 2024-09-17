@@ -148,6 +148,19 @@ __kernel int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout);
  */
 __kernel struct k_thread *k_sem_give(struct k_sem *sem);
 
+/**
+ * @brief Cancel waiting threads on a semaphore.
+ *
+ * This function cancels all threads currently waiting for the semaphore,
+ * removing them from the wait queue.
+ *
+ * Safety: This function is safe to call from an ISR context.
+ *
+ * @param sem Pointer to the semaphore structure.
+ * @return 0 on success, or an error code otherwise.
+ */
+__kernel int8_t k_sem_cancel_wait(struct k_sem *sem);
+
 #ifdef __cplusplus
 }
 #endif
