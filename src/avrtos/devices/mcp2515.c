@@ -7,13 +7,14 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <avrtos/logging.h>
 #include <avrtos/subsys/ioctl.h>
 #include <avrtos/subsys/poll.h>
 
-#include <avrtos/logging.h>
-
 #include "mcp2515.h"
 #include "mcp2515_priv.h"
+
+#define K_MODULE  K_MODULE_DEVICE
 #define LOG_LEVEL LOG_LEVEL_INF
 
 #if !defined(CONFIG_MCP2515_DELAY_MS)
@@ -132,11 +133,6 @@ static int8_t config_dr(struct mcp2515_device *mcp,
 	write_register(mcp, MCP_R_CNF3, cfg3);
 
 	return 0;
-}
-
-static void write_inte(struct mcp2515_device *mcp, uint8_t inte)
-{
-	write_register(mcp, MCP_R_CANINTE, inte);
 }
 
 int8_t mcp2515_init(struct mcp2515_device *mcp,
@@ -310,25 +306,25 @@ int8_t mcp2515_send(struct mcp2515_device *mcp, const struct can_frame *frame)
 
 	k_mutex_lock(&mcp->_mutex, K_FOREVER);
 
-	int8_t ret = 0;
+	int8_t ret	  = 0;
 	uint8_t txreq = read_status(mcp) & MCP_STATUS_TXREQ_MASK;
-	uint8_t reg_txnif; // TXnIF flag to clear in CANINTF
+	uint8_t reg_txnif;	// TXnIF flag to clear in CANINTF
 	uint8_t reg_txload; // Register to load TX buffer
-	uint8_t reg_txrts; // Register to start transmission
+	uint8_t reg_txrts;	// Register to start transmission
 
 	/* Find a free TX buffer */
 	if ((txreq & MCP_STATUS_TX0REQ) == 0) {
-		reg_txnif = MCP_CANINTF_TX0IF;
+		reg_txnif  = MCP_CANINTF_TX0IF;
 		reg_txload = MCP_LOAD_TX_AT_TXB0SIDH;
-		reg_txrts = MCP_RTS_TXB0;
+		reg_txrts  = MCP_RTS_TXB0;
 	} else if ((txreq & MCP_STATUS_TX1REQ) == 0) {
-		reg_txnif = MCP_CANINTF_TX1IF;
+		reg_txnif  = MCP_CANINTF_TX1IF;
 		reg_txload = MCP_LOAD_TX_AT_TXB1SIDH;
-		reg_txrts = MCP_RTS_TXB1;
+		reg_txrts  = MCP_RTS_TXB1;
 	} else if ((txreq & MCP_STATUS_TX2REQ) == 0) {
-		reg_txnif = MCP_CANINTF_TX2IF;
+		reg_txnif  = MCP_CANINTF_TX2IF;
 		reg_txload = MCP_LOAD_TX_AT_TXB2SIDH;
-		reg_txrts = MCP_RTS_TXB2;
+		reg_txrts  = MCP_RTS_TXB2;
 	} else {
 		/* All TX buffers are busy */
 		ret = -EBUSY;
@@ -368,8 +364,7 @@ exit:
 	return ret;
 }
 
-int8_t
-mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame)
+int8_t mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame)
 {
 	__ASSERT_NOTNULL(mcp);
 	__ASSERT_NOTNULL(frame);
@@ -378,6 +373,8 @@ mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame)
 
 	int8_t ret;
 	uint8_t status = read_status(mcp);
+
+	LOG_INF("status: 0x%02X", status);
 
 	if (status & MCP_STATUS_RX0IF) {
 		read_rx_buf(mcp, frame, MCP_READ_RX_AT_RXB0SIDH);
@@ -394,4 +391,92 @@ mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame)
 	k_mutex_unlock(&mcp->_mutex);
 
 	return ret;
+}
+
+int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
+						  uint8_t index,
+						  uint8_t is_ext,
+						  uint32_t filter)
+{
+	__ASSERT_NOTNULL(mcp);
+
+	/* Only support 6 filters supported */
+	if (index > 5) {
+		return -EINVAL;
+	}
+
+	k_mutex_lock(&mcp->_mutex, K_FOREVER);
+
+	set_mode(mcp, MCP_MODE_CONFIG);
+	k_msleep(CONFIG_MCP2515_DELAY_MS);
+
+	uint8_t id[4];
+	can_id_to_buf(id, filter, is_ext);
+
+	switch (index) {
+	case 0:
+		write_registers(mcp, MCP_R_RXF0SIDH, id, 4);
+		break;
+	case 1:
+		write_registers(mcp, MCP_R_RXF1SIDH, id, 4);
+		break;
+	case 2:
+		write_registers(mcp, MCP_R_RXF2SIDH, id, 4);
+		break;
+	case 3:
+		write_registers(mcp, MCP_R_RXF3SIDH, id, 4);
+		break;
+	case 4:
+		write_registers(mcp, MCP_R_RXF4SIDH, id, 4);
+		break;
+	case 5:
+		write_registers(mcp, MCP_R_RXF5SIDH, id, 4);
+		break;
+	default:
+		break;
+	}
+
+	set_mode(mcp, MCP_MODE_NORMAL);
+	k_msleep(CONFIG_MCP2515_DELAY_MS);
+
+	k_mutex_unlock(&mcp->_mutex);
+
+	return 0;
+}
+
+int8_t
+mcp2515_set_mask(struct mcp2515_device *mcp, uint8_t index, uint8_t is_ext, uint32_t mask)
+{
+	__ASSERT_NOTNULL(mcp);
+
+	/* Only support 2 masks supported */
+	if (index > 1) {
+		return -EINVAL;
+	}
+
+	k_mutex_lock(&mcp->_mutex, K_FOREVER);
+
+	set_mode(mcp, MCP_MODE_CONFIG);
+	k_msleep(CONFIG_MCP2515_DELAY_MS);
+
+	uint8_t id[4];
+	can_id_to_buf(id, mask, is_ext);
+
+	switch (index) {
+	case 0:
+		write_registers(mcp, MCP_R_RXM0SIDH, id, 4);
+		break;
+	case 1:
+		write_registers(mcp, MCP_R_RXM1SIDH, id, 4);
+		break;
+	default:
+		break;
+	}
+
+	set_mode(mcp, MCP_MODE_NORMAL);
+	k_msleep(CONFIG_MCP2515_DELAY_MS);
+
+	k_mutex_unlock(&mcp->_mutex);
+
+	return 0;
 }

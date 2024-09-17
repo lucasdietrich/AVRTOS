@@ -50,6 +50,8 @@
 #define MCP_RXB_DLC_DLC_MASK 0x0F
 #define MCP_RXB_DLC_RTR_MASK 0x40
 
+// registers
+
 #define MCP_R_CANSTAT 0x0E
 #define MCP_R_CANCTRL 0x0F
 #define MCP_R_CANINTE 0x2B
@@ -71,6 +73,16 @@
 
 #define MCP_R_RXB0SIDH 0x61
 #define MCP_R_RXB1SIDH 0x71
+
+#define MCP_R_RXF0SIDH 0x00
+#define MCP_R_RXF1SIDH 0x04
+#define MCP_R_RXF2SIDH 0x08
+#define MCP_R_RXF3SIDH 0x10
+#define MCP_R_RXF4SIDH 0x14
+#define MCP_R_RXF5SIDH 0x18
+
+#define MCP_R_RXM0SIDH 0x20
+#define MCP_R_RXM1SIDH 0x24
 
 // RXB0CTRL Register Bits/Masks
 

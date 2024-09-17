@@ -67,6 +67,16 @@ int main(void)
 	ret = mcp2515_init(&mcp, &mcp_cfg, &spi_slave);
 	printf("mcp2515_init: %d\n", ret);
 
+	mcp2515_set_mask(&mcp, 0u, CAN_STD_ID, 0x3FF);
+	mcp2515_set_filter(&mcp, 0u, CAN_STD_ID, 0x0000);
+	mcp2515_set_filter(&mcp, 1u, CAN_STD_ID, 0x0000);
+
+	mcp2515_set_mask(&mcp, 1u, CAN_STD_ID, 0x123lu);
+	mcp2515_set_filter(&mcp, 2u, CAN_STD_ID, 0x123lu);
+	mcp2515_set_filter(&mcp, 3u, CAN_STD_ID, 0x123lu);
+	mcp2515_set_filter(&mcp, 4u, CAN_STD_ID, 0x123lu);
+	mcp2515_set_filter(&mcp, 5u, CAN_STD_ID, 0x123lu);
+
 	gpio_pin_init(GPIOD_DEVICE, 2u, GPIO_MODE_INPUT, GPIO_INPUT_PULLUP);
 
 	exti_clear_flag(INT0);

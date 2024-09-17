@@ -11,13 +11,12 @@
 #include <stdint.h>
 
 #include <avrtos/drivers/can.h>
-#include <avrtos/subsys/canq.h>
-
 #include <avrtos/drivers/spi.h>
 #include <avrtos/kernel.h>
 #include <avrtos/msgq.h>
 #include <avrtos/mutex.h>
 #include <avrtos/semaphore.h>
+#include <avrtos/subsys/canq.h>
 #include <avrtos/workqueue.h>
 
 typedef enum mcp2515_can_speed {
@@ -76,6 +75,16 @@ int8_t mcp2515_deinit(struct mcp2515_device *mcp);
 int8_t mcp2515_send(struct mcp2515_device *mcp, const struct can_frame *frame);
 
 int8_t mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame);
+
+int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
+						  uint8_t index,
+						  uint8_t is_ext,
+						  uint32_t filter);
+
+int8_t mcp2515_set_mask(struct mcp2515_device *mcp,
+						uint8_t index,
+						uint8_t is_ext,
+						uint32_t mask);
 
 #ifdef __cplusplus
 }

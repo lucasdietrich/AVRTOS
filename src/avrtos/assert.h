@@ -51,6 +51,7 @@ extern "C" {
 
 #define K_MODULE_DRIVERS_USART	19
 #define K_MODULE_DRIVERS_TIMERS 20
+#define K_MODULE_DEVICE			21
 
 #define K_MODULE_APPLICATION 32
 

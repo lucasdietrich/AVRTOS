@@ -12,6 +12,12 @@
 
 #include <avrtos/drivers.h>
 
+#define CAN_STD_ID_MASK 0x7FFu
+#define CAN_EXT_ID_MASK 0x1FFFFFFFu
+
+#define CAN_STD_ID 0u
+#define CAN_EXT_ID 1u
+
 typedef struct can_filter {
 	uint32_t id;
 	uint32_t mask;
