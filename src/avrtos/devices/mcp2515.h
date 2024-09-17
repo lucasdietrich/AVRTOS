@@ -13,11 +13,7 @@
 #include <avrtos/drivers/can.h>
 #include <avrtos/drivers/spi.h>
 #include <avrtos/kernel.h>
-#include <avrtos/msgq.h>
 #include <avrtos/mutex.h>
-#include <avrtos/semaphore.h>
-#include <avrtos/subsys/canq.h>
-#include <avrtos/workqueue.h>
 
 typedef enum mcp2515_can_speed {
 	MCP2515_CAN_SPEED_10KBPS  = 0u,

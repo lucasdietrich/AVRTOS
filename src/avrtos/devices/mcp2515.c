@@ -8,8 +8,6 @@
 #include <string.h>
 
 #include <avrtos/logging.h>
-#include <avrtos/subsys/ioctl.h>
-#include <avrtos/subsys/poll.h>
 
 #include "mcp2515.h"
 #include "mcp2515_priv.h"
@@ -374,7 +372,7 @@ int8_t mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame)
 	int8_t ret;
 	uint8_t status = read_status(mcp);
 
-	LOG_INF("status: 0x%02X", status);
+	LOG_DBG("status: 0x%02X", status);
 
 	if (status & MCP_STATUS_RX0IF) {
 		read_rx_buf(mcp, frame, MCP_READ_RX_AT_RXB0SIDH);
