@@ -20,11 +20,9 @@
 #endif
 
 #define MCP_SELECT(_dev)                                                                 \
-	spi_slave_select(&_dev->slave);                                                      \
-	gpio_pin_write_state(GPIOB_DEVICE, 1u, GPIO_LOW)
+	spi_slave_select(&_dev->slave);
 #define MCP_UNSELECT(_dev)                                                               \
-	spi_slave_unselect(&_dev->slave);                                                    \
-	gpio_pin_write_state(GPIOB_DEVICE, 1u, GPIO_HIGH)
+	spi_slave_unselect(&_dev->slave);
 
 #define spi_read() spi_transceive(0x00)
 
