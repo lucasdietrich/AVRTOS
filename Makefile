@@ -6,11 +6,9 @@ GENERATOR?="Ninja"
 GENERATOR_COMMAND?="ninja"
 GENERATOR_ARGS?=
 
-DEVICE?=/dev/ttyUSB0
-SAMPLE?=drv-spi-can-mcp2515
-TOOLCHAIN_FILE?=cmake/avr5-board-caniot-tiny-pb.cmake
-# SAMPLE?=hello-world
-# TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
+DEVICE?=/dev/ttyACM0
+SAMPLE?=shell
+TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
 BAUDRATE?=115200
 QEMU?=OFF
 

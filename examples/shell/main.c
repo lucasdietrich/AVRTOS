@@ -47,7 +47,7 @@ void free_in(struct in *mem)
 	k_mem_slab_free(&myslab, mem);
 }
 
-__always_inline void input(const char rx)
+void input(const char rx)
 {
 	static struct in *mem = NULL;
 

@@ -12,6 +12,8 @@
 #include "mcp2515.h"
 #include "mcp2515_priv.h"
 
+#warning "MCP2515 driver is experimental and has limitations"
+
 #define K_MODULE  K_MODULE_DEVICE
 #define LOG_LEVEL LOG_LEVEL_INF
 
@@ -19,35 +21,10 @@
 #define CONFIG_MCP2515_DELAY_MS 10u
 #endif
 
-#define MCP_SELECT(_dev)                                                                 \
-	spi_slave_select(&_dev->slave);
-#define MCP_UNSELECT(_dev)                                                               \
-	spi_slave_unselect(&_dev->slave);
+#define MCP_SELECT(_dev)   spi_slave_select(&_dev->slave);
+#define MCP_UNSELECT(_dev) spi_slave_unselect(&_dev->slave);
 
 #define spi_read() spi_transceive(0x00)
-
-static uint8_t read_register(struct mcp2515_device *mcp, uint8_t reg_addr)
-{
-	MCP_SELECT(mcp);
-	spi_transceive(MCP_READ);
-	spi_transceive(reg_addr);
-	uint8_t reg_val = spi_read();
-	MCP_UNSELECT(mcp);
-
-	return reg_val;
-}
-
-static void
-read_registers(struct mcp2515_device *mcp, uint8_t reg_addr, uint8_t *buf, size_t len)
-{
-	MCP_SELECT(mcp);
-	spi_transceive(MCP_READ);
-	spi_transceive(reg_addr);
-	while (len--) {
-		*buf++ = spi_read();
-	}
-	MCP_UNSELECT(mcp);
-}
 
 static void write_register(struct mcp2515_device *mcp, uint8_t reg_addr, uint8_t reg_val)
 {
@@ -81,11 +58,6 @@ modify_register(struct mcp2515_device *mcp, uint8_t reg_addr, uint8_t mask, uint
 	spi_transceive(mask);
 	spi_transceive(data);
 	MCP_UNSELECT(mcp);
-}
-
-static uint8_t get_mode(struct mcp2515_device *mcp)
-{
-	return read_register(mcp, MCP_R_CANSTAT) & MCP_MASK_MODE;
 }
 
 static void set_mode(struct mcp2515_device *mcp, uint8_t new_mode)

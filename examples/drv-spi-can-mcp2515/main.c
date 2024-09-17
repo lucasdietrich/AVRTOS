@@ -6,7 +6,6 @@
 
 #include <avrtos/avrtos.h>
 #include <avrtos/devices/mcp2515.h>
-#include <avrtos/devices/mcp2515_priv.h>
 #include <avrtos/drivers/can.h>
 #include <avrtos/drivers/exti.h>
 #include <avrtos/drivers/gpio.h>
@@ -20,14 +19,13 @@ ISR(INT0_vect)
 {
 	serial_transmit('!');
 	k_yield_from_isr_cond(k_sem_give(&can_int_sem));
-	// mcp2515_handle_interrupt(&mcp);
 }
 
 static void print_can_frame(struct can_frame *frame)
 {
 	// oneline
-	printf("id: %x%x, len: %d, rtr: %d, is_ext: %d / ", (uint16_t)(frame->id >> 16), (uint16_t)frame->id, frame->len, frame->rtr,
-		   frame->is_ext);
+	printf("id: %x%x, len: %d, rtr: %d, is_ext: %d / ", (uint16_t)(frame->id >> 16),
+		   (uint16_t)frame->id, frame->len, frame->rtr, frame->is_ext);
 	for (uint8_t i = 0; i < frame->len; i++) {
 		printf(" 0x%02X ", frame->data[i]);
 	}
@@ -94,7 +92,7 @@ int main(void)
 		if (ret == 0) {
 			print_can_frame(&frame);
 
-			// Send back the received frame
+			// Echo received frame back
 			ret = mcp2515_send(&mcp, &frame);
 			printf("mcp2515_send: %d\n", ret);
 		}

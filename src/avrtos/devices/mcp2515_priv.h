@@ -16,7 +16,7 @@
 #define MCP_READ_RX_BUFFER(n, m)	(0x90 | ((n) << 2) | ((m) << 1))
 #define MCP_WRITE					0x02
 #define MCP_LOAD_TX_BUFFER(a, b, c) (0x40 | ((a) << 5) | ((b) << 6) | ((c) << 7))
-#define MCP_RTS(tx0, tx1, tx2)				(0x80 | (tx0) | ((tx1) << 1) | ((tx2) << 2))
+#define MCP_RTS(tx0, tx1, tx2)		(0x80 | (tx0) | ((tx1) << 1) | ((tx2) << 2))
 #define MCP_READ_STATUS				0xA0
 #define MCP_RX_STATUS				0xB0
 #define MCP_BIT_MODIFY				0x05
@@ -36,7 +36,7 @@
 #define MCP_RTS_TXB0 MCP_RTS(1, 0, 0)
 #define MCP_RTS_TXB1 MCP_RTS(0, 1, 0)
 #define MCP_RTS_TXB2 MCP_RTS(0, 0, 1)
-#define MCP_RTS_ALL  MCP_RTS(1, 1, 1)
+#define MCP_RTS_ALL	 MCP_RTS(1, 1, 1)
 
 // RXB Buffers offsets and masks
 #define MCP_RXB_SIDH 0
@@ -102,16 +102,16 @@
 
 // READ STATUS Register Bits
 
-#define MCP_STATUS_RX0IF 0x01
-#define MCP_STATUS_RX1IF 0x02
+#define MCP_STATUS_RX0IF  0x01
+#define MCP_STATUS_RX1IF  0x02
 #define MCP_STATUS_TX0REQ 0x04
-#define MCP_STATUS_TX0IF 0x08
+#define MCP_STATUS_TX0IF  0x08
 #define MCP_STATUS_TX1REQ 0x10
-#define MCP_STATUS_TX1IF 0x20
+#define MCP_STATUS_TX1IF  0x20
 #define MCP_STATUS_TX2REQ 0x40
-#define MCP_STATUS_TX2IF 0x80
+#define MCP_STATUS_TX2IF  0x80
 
-#define MCP_STATUS_RXIF_MASK (MCP_STATUS_RX0IF | MCP_STATUS_RX1IF)
+#define MCP_STATUS_RXIF_MASK  (MCP_STATUS_RX0IF | MCP_STATUS_RX1IF)
 #define MCP_STATUS_TXREQ_MASK (MCP_STATUS_TX0REQ | MCP_STATUS_TX1REQ | MCP_STATUS_TX2REQ)
 
 // CANINTE Register Bits
