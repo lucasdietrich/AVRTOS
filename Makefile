@@ -80,7 +80,7 @@ drv-i2c-tcn75:
 		-DCMAKE_BUILD_TYPE=Release
 	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
 
-upload: all
+upload:
 	$(GENERATOR_COMMAND) -C build upload $(GENERATOR_ARGS)
 
 flash: upload
