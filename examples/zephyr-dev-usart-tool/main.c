@@ -37,7 +37,7 @@ typedef struct {
 } __attribute__((packed)) ipc_frame_t;
 
 const struct usart_config usart_ipc_cfg = {
-	.baudrate	 = USART_BAUD_500000,
+	.baudrate	 = USART_BAUD_115200,
 	.receiver	 = 1,
 	.transmitter = 1,
 	.mode		 = USART_MODE_ASYNCHRONOUS,

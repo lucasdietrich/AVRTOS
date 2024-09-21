@@ -9,7 +9,7 @@
 
 int main(void)
 {
-	const struct usart_config cfg = USART_CONFIG_DEFAULT_500000();
+	const struct usart_config cfg = USART_CONFIG_DEFAULT_115200();
 	usart_init(USART0_DEVICE, &cfg);
 
 	uint32_t u = 0u;
