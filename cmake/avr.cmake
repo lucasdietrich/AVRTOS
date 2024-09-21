@@ -137,7 +137,7 @@ function(target_prepare_env target)
 		# - Regenerate and copy launch.json each time we run the target
 		add_custom_target(qemu_${target} 
 			COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/launch.${target}.json ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.vscode/launch.json
-			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic ${QEMU_ARGS}
+			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -s -S -nographic ${QEMU_ARGS} -icount auto
 			USES_TERMINAL 
 			DEPENDS 
 				${target} 
@@ -146,7 +146,7 @@ function(target_prepare_env target)
 
 		# generate custom target for run in qemu
 		add_custom_target(run_${target} 
-			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic ${QEMU_ARGS}
+			COMMAND ${QEMU_SYSTEM_AVR} -M ${QEMU_MCU} -bios ${ELF_PATH} -nographic ${QEMU_ARGS} -icount auto
 			USES_TERMINAL 
 			DEPENDS ${target}
 		)
