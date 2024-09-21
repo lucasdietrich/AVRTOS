@@ -12,6 +12,9 @@
 
 #define K_MODULE K_MODULE_WORKQUEUE
 
+/* Make sure the work item is at the beginning of the structure */
+__STATIC_ASSERT_NOMSG(offsetof(struct k_work_delayable, work) == 0u);
+
 #define Z_WQ_YIELDEACH_POS 0u
 #define Z_WQ_YIELDEACH_MSK (1u << Z_WQ_YIELDEACH_POS)
 #define Z_WQ_YIELDEACH(_x) (((_x) << Z_WQ_YIELDEACH_POS) & Z_WQ_YIELDEACH_MSK)

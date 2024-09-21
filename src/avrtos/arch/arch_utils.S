@@ -28,23 +28,23 @@ z_interrupts:
 k_ticks_get_32:
 	lds	r26, SREG
 	cli
-	lds 	r22, z_ticks
-	lds 	r23, z_ticks + 1
-	lds 	r24, z_ticks + 2
+	lds 	r22, z_ker + 2
+	lds 	r23, z_ker + 3
+	lds 	r24, z_ker + 4
 	sts	SREG, r26
-	lds 	r25, z_ticks + 3
+	lds 	r25, z_ker + 5
 	ret
 
 k_ticks_get_64:
 	lds	r26, SREG
 	cli
-	lds 	r18, z_ticks
-	lds 	r19, z_ticks + 1
-	lds 	r20, z_ticks + 2
-	lds 	r21, z_ticks + 3
+	lds 	r18, z_ker
+	lds 	r19, z_ker + 3
+	lds 	r20, z_ker + 4
+	lds 	r21, z_ker + 5
 	sts	SREG, r26
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-	lds	r22, z_ticks + 4
+	lds	r22, z_ker + 5
 #else
 	ldi	r22, 0x00
 #endif /* CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS */

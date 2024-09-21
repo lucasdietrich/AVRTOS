@@ -13,7 +13,7 @@
 
 #define AVRTOS_VERSION_MAJOR	1
 #define AVRTOS_VERSION_MINOR	2
-#define AVRTOS_VERSION_REVISION 0
+#define AVRTOS_VERSION_REVISION 1
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN && CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #error                                                                                   \

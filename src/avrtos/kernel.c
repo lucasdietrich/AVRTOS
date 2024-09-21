@@ -23,6 +23,20 @@
 
 #define K_MODULE K_MODULE_KERNEL
 
+/* Make sure the members are at the expected offsets for k_thread and k_kernel
+ * these members are accessed directly in assembly code 
+ */
+__STATIC_ASSERT_NOMSG(offsetof(struct k_thread, sp) == 0);
+__STATIC_ASSERT_NOMSG(offsetof(struct k_thread, flags) == sizeof(void *));
+__STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, current) == 0);
+#if CONFIG_KERNEL_TICKS_COUNTER
+__STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, ticks) == sizeof(struct k_thread *));
+#endif
+#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+__STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, sched_ticks_remaining) ==
+					  sizeof(struct k_thread *) + sizeof(z_ticks_t));
+#endif
+
 #if CONFIG_KERNEL_ASSERT
 #warning "Assertions are globally enabled"
 #endif
@@ -108,110 +122,21 @@ K_THREAD struct k_thread z_thread_main = {
 	.symbol = 'M' // Default main thread symbol
 };
 
-/**
- * @brief Pointer to the thread currently holding the CPU (context set).
- *
- * @note There are cases where z_runq and z_current do not refer to the same
- * thread. This is because the next thread to be scheduled is already set, but the
- * context hasn't been switched yet.
- */
-struct k_thread *z_current = &z_thread_main;
-
-/**
- * @brief Number of threads (excluding IDLE) in the runqueue(s).
- *
- * The IDLE thread is not included in this count.
- *
- * This variable represents the count of threads currently in the runqueue(s),
- * indicating the number of threads that are ready to run. It is initialized to
- * 1 during startup, indicating that only the main thread is running initially.
- *
- * The possible values and their meanings are as follows:
- * - 0: Indicates that only the IDLE thread is running.
- * - 1: Indicates that a single thread is running.
- * - n > 1: Indicates that multiple threads are running.
- */
-uint8_t z_ready_count = 1u;
-
-/**
- * @brief Pointer to the currently running thread in the runqueue.
- *
- * This variable represents a pointer to the thread (node) in the runqueue,
- * which is currently running. The runqueue is implemented as a doubly-linked
- * list, where each node represents a thread. During startup, this variable is
- * initialized with the pointer to the node corresponding to the main thread.
- *
- * The runqueue is structured as a circular doubly-linked list, where each node
- * contains a pointer to the next and previous nodes. The illustration below
- * demonstrates the relationship between the nodes in the runqueue:
- *
- *         A     B     C
- *     -> n --> n --> n --   (n for next, p for previous)
- *     -- p <-- p <-- p <-
- *             /\
- *  ___________|
- *  z_runq points to the thread currently running, here B
- *
- * By maintaining a pointer to the currently running thread (node) in z_runq, it
- * becomes convenient to execute the next thread by simply setting z_runq to
- * z_runq->next.
- */
-struct dnode *z_runq = &z_thread_main.tie.runqueue;
-
-/**
- * @brief Pointer to the head of the timeouts queue.
- *
- * This variable represents a pointer to the head of the timeouts queue. The
- * timeouts queue is a linked list that holds the pending threads in the system.
- * Each thread in the list corresponds to a timeout event and is represented by
- * a `struct titem`.
- */
-struct titem *z_timeouts_queue = NULL;
-
-#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
-/**
- * @brief Number of ticks remaining in the current time slice.
- *
- * This variable represents the number of ticks remaining in the current time
- * slice. A time slice is a predetermined time duration allocated to each thread
- * for execution before being preempted and giving control to another thread.
- *
- * The variable `z_sched_ticks_remaining` is initialized with the value
- * specified in `CONFIG_KERNEL_TIME_SLICE_TICKS`, which indicates the length of
- * the time slice in ticks. As the thread runs and consumes ticks, the value of
- * this variable decreases. When it reaches zero, the thread may be preempted,
- * and control is given to another thread.
- */
-uint8_t z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
-#endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
-
-#if CONFIG_KERNEL_ASSERT
-/**
- * @brief Flag indicating execution context.
- *
- * This flag is used to indicate whether the kernel code is currently being
- * executed. Its purpose is to detect if a user handler is being executed from a
- * kernel context, such as within kernel timer or kernel event handlers.
- *
- * The variable `z_kernel_mode` is initially set to 0, indicating that the
- * kernel code is not being executed. When the kernel code is entered, this flag
- * is set to 1.
- */
-uint8_t z_kernel_mode = 0u;
-#endif
-
+struct z_kernel z_ker = {
+	.current = &z_thread_main,
+	.ready_count = 1u,
+	.run_queue = &z_thread_main.tie.runqueue,
+	.timeouts_queue = NULL,
 #if CONFIG_KERNEL_TICKS_COUNTER
-
-typedef char z_ticks_t[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
-/**
- * @brief Ticks counter for the kernel.
- *
- * This array represents the ticks counter used by the kernel to keep track of
- * time. The counter is implemented as an array of bytes with a specific size
- * determined by `CONFIG_KERNEL_TICKS_COUNTER_SIZE`.
- */
-z_ticks_t z_ticks = {0u};
+	.ticks = {0u},
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
+#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+	.sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS,
+#endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
+#if CONFIG_KERNEL_ASSERT
+	.kernel_mode = 0u,
+#endif
+};
 
 /**
  * @brief Start and end pointers for the kernel thread array.
@@ -302,10 +227,10 @@ __kernel static void z_schedule(struct k_thread *thread)
 	/* Mark this thread as READY */
 	z_set_thread_state(thread, Z_THREAD_STATE_READY);
 
-	if (z_ready_count == 0u) {
+	if (z_ker.ready_count == 0u) {
 		/* Resume from IDLE */
 		dlist_init(&thread->tie.runqueue);
-		z_runq = &thread->tie.runqueue;
+		z_ker.run_queue = &thread->tie.runqueue;
 	} else {
 		/* Woken up threads should be executed before any
 		 * already running preemptive thread, so prepend
@@ -313,10 +238,10 @@ __kernel static void z_schedule(struct k_thread *thread)
 		 * Call k_yield_from_isr_cond() to switch to the woken-up thread
 		 * if called from ISR
 		 */
-		dlist_prepend(z_runq, &thread->tie.runqueue);
+		dlist_prepend(z_ker.run_queue, &thread->tie.runqueue);
 	}
 
-	z_ready_count++;
+	z_ker.ready_count++;
 }
 
 /**
@@ -358,13 +283,13 @@ __kernel static void z_schedule(struct k_thread *thread)
 __kernel static void z_schedule_wake_up(k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
-	__ASSERT_TRUE((z_current->flags & Z_THREAD_WAKEUP_SCHED_MSK) == 0);
+	__ASSERT_TRUE((z_ker.current->flags & Z_THREAD_WAKEUP_SCHED_MSK) == 0);
 
 	if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
-		z_current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
-		z_current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
-		z_current->tie.event.next	 = NULL;
-		z_tqueue_schedule(&z_timeouts_queue, &z_current->tie.event);
+		z_ker.current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
+		z_ker.current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
+		z_ker.current->tie.event.next	 = NULL;
+		z_tqueue_schedule(&z_ker.timeouts_queue, &z_ker.current->tie.event);
 	}
 }
 
@@ -380,7 +305,7 @@ static void z_cancel_scheduled_wake_up(struct k_thread *thread)
 	/* Remove the thread from the events queue */
 	if (thread->flags & Z_THREAD_WAKEUP_SCHED_MSK) {
 		thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
-		tqueue_remove(&z_timeouts_queue, &thread->tie.event);
+		tqueue_remove(&z_ker.timeouts_queue, &thread->tie.event);
 	}
 }
 
@@ -464,8 +389,8 @@ void z_init_threads(void)
 
 		/* Only auto-start threads must be added to the runqueue */
 		if (z_get_thread_state(thread) == Z_THREAD_STATE_READY) {
-			z_ready_count++;
-			dlist_append(z_runq, &thread->tie.runqueue);
+			z_ker.ready_count++;
+			dlist_append(z_ker.run_queue, &thread->tie.runqueue);
 		}
 
 		z_thread_finalize_stack_init(thread);
@@ -488,25 +413,25 @@ __STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
  *
  * Assumptions: The interrupt flag is cleared when called.
  */
-void z_handle_timeouts(void)
+void z_sched_enter(void)
 {
 	__Z_DBG_SYSTICK_ENTER();
 
 #if CONFIG_KERNEL_ASSERT
-	__ASSERT(!z_kernel_mode, K_ASSERT_USER_MODE);
-	z_kernel_mode = 1u;
+	__ASSERT(!z_ker.kernel_mode, K_ASSERT_USER_MODE);
+	z_ker.kernel_mode = 1u;
 #endif
 
 	__ASSERT_NOINTERRUPT();
 
-	tqueue_shift(&z_timeouts_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
+	tqueue_shift(&z_ker.timeouts_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
 
 #if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
-	z_sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
+	z_ker.sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
 #endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
 	struct titem *ready;
-	while ((ready = tqueue_pop(&z_timeouts_queue)) != NULL) {
+	while ((ready = tqueue_pop(&z_ker.timeouts_queue)) != NULL) {
 		struct k_thread *const thread = Z_THREAD_FROM_EVENTQUEUE(ready);
 
 		__Z_DBG_SCHED_EVENT(thread); // !
@@ -527,7 +452,7 @@ void z_handle_timeouts(void)
 #endif /* CONFIG_KERNEL_EVENTS */
 
 #if CONFIG_KERNEL_ASSERT
-	z_kernel_mode = 0u;
+	z_ker.kernel_mode = 0u;
 #endif
 
 	__Z_DBG_SYSTICK_EXIT();
@@ -546,7 +471,7 @@ struct k_thread *z_scheduler(void)
 {
 	__ASSERT_NOINTERRUPT();
 
-	struct k_thread *const prev = z_current;
+	struct k_thread *const prev = z_ker.current;
 
 #if CONFIG_THREAD_MONITOR
 	z_thread_monitor(prev);
@@ -559,19 +484,19 @@ struct k_thread *z_scheduler(void)
 	 * it already removed itself from the runqueue, so we don't need
 	 * to do it here
 	 */
-	if (z_get_thread_state(z_current) == Z_THREAD_STATE_READY) {
+	if (z_get_thread_state(z_ker.current) == Z_THREAD_STATE_READY) {
 		/* Rotate the runqueue, set the next thread to the first position */
-		z_runq = z_runq->next;
+		z_ker.run_queue = z_ker.run_queue->next;
 	}
 
 	/* Fetch the next thread to execute */
-	z_current = CONTAINER_OF(z_runq, struct k_thread, tie.runqueue);
+	z_ker.current = CONTAINER_OF(z_ker.run_queue, struct k_thread, tie.runqueue);
 
 	__Z_DBG_SCHED_NEXT_THREAD();
-	__Z_DBG_SCHED_NEXT(z_current);
+	__Z_DBG_SCHED_NEXT(z_ker.current);
 
 #if CONFIG_THREAD_MONITOR
-	z_thread_monitor(z_current);
+	z_thread_monitor(z_ker.current);
 #endif
 
 	return prev;
@@ -606,10 +531,10 @@ static void z_suspend(struct k_thread *thread)
 		dlist_remove(&thread->tie.runqueue);
 
 		/* Decrement the number of threads in the runqueue */
-		z_ready_count--;
+		z_ker.ready_count--;
 
 		/* Check if there is at least one thread running */
-		if (z_ready_count == 0) {
+		if (z_ker.ready_count == 0) {
 #if CONFIG_KERNEL_THREAD_IDLE == 0u
 			/* Assert */
 			__ASSERT_LEASTONE_RUNNING();
@@ -618,15 +543,15 @@ static void z_suspend(struct k_thread *thread)
 			__fault(K_FAULT_KERNEL_HALT);
 #else
 			/* Switch to the IDLE thread */
-			z_runq = &z_thread_idle.tie.runqueue;
+			z_ker.run_queue = &z_thread_idle.tie.runqueue;
 #endif
-		} else if (thread == z_current) {
+		} else if (thread == z_ker.current) {
 			/* Set the runqueue pointer so that it points to the next thread
 			 * to be executed */
-			z_runq = thread->tie.runqueue.next->prev;
+			z_ker.run_queue = thread->tie.runqueue.next->prev;
 		}
 
-		__Z_DBG_SCHED_SUSPENDED(z_current);
+		__Z_DBG_SCHED_SUSPENDED(z_ker.current);
 	}
 }
 
@@ -638,16 +563,16 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 	int8_t err = -EBUSY;
 	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		/* Queue the thread to the pending queue of the object */
-		dlist_append(waitqueue, &z_current->wany);
+		dlist_append(waitqueue, &z_ker.current->wany);
 
 		/* Suspend the thread */
-		z_suspend(z_current);
+		z_suspend(z_ker.current);
 
 		/* Schedule thread wake-up if timeout is set */
 		z_schedule_wake_up(timeout);
 
 		/* Mark this thread as pending */
-		z_set_thread_state(z_current, Z_THREAD_STATE_PENDING);
+		z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
 
 		/* Call scheduler */
 		z_yield();
@@ -655,10 +580,10 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 		/* If the timer expired, we manually remove the thread from
 		 * the pending queue
 		 */
-		if (z_current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
-			dlist_remove(&z_current->wany);
+		if (z_ker.current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
+			dlist_remove(&z_ker.current->wany);
 			err = -ETIMEDOUT;
-		} else if (z_current->flags & Z_THREAD_PEND_CANCELED_MSK) {
+		} else if (z_ker.current->flags & Z_THREAD_PEND_CANCELED_MSK) {
 			err = -ECANCELED;
 		} else {
 			err = 0;
@@ -826,7 +751,7 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
 
 	z_set_thread_state(thread, Z_THREAD_STATE_STOPPED);
 
-	if (thread == z_current) z_yield();
+	if (thread == z_ker.current) z_yield();
 
 	/* Unlock in all cases:
 	 * - if we stopped ourselves, in which case we need to unlock in any case
@@ -840,7 +765,7 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
 
 void k_stop()
 {
-	k_thread_stop(z_current);
+	k_thread_stop(z_ker.current);
 }
 
 void k_thread_set_priority(struct k_thread *thread, uint8_t prio)
@@ -854,37 +779,37 @@ void k_thread_set_priority(struct k_thread *thread, uint8_t prio)
 
 uint8_t k_ready_count(void)
 {
-	return z_ready_count;
+	return z_ker.ready_count;
 }
 
 void k_sched_lock(void)
 {
 	const uint8_t key = irq_lock();
-	z_current->flags |= Z_THREAD_SCHED_LOCKED_MSK;
+	z_ker.current->flags |= Z_THREAD_SCHED_LOCKED_MSK;
 	irq_unlock(key);
 
 #if CONFIG_KERNEL_REENTRANCY
-	z_current->sched_lock_cnt++;
+	z_ker.current->sched_lock_cnt++;
 #endif /* CONFIG_KERNEL_REENTRANCY */
 
-	__Z_DBG_SCHED_LOCK(z_current);
+	__Z_DBG_SCHED_LOCK(z_ker.current);
 }
 
 void k_sched_unlock(void)
 {
 #if CONFIG_KERNEL_REENTRANCY
-	if (z_current->sched_lock_cnt == 0) {
+	if (z_ker.current->sched_lock_cnt == 0) {
 		return;
-	} else if (z_current->sched_lock_cnt == 1) {
-		z_current->sched_lock_cnt = 0;
+	} else if (z_ker.current->sched_lock_cnt == 1) {
+		z_ker.current->sched_lock_cnt = 0;
 	} else {
-		z_current->sched_lock_cnt--;
+		z_ker.current->sched_lock_cnt--;
 		return;
 	}
 #endif /* CONFIG_KERNEL_REENTRANCY */
 
 	const uint8_t key = irq_lock();
-	z_current->flags &= ~Z_THREAD_SCHED_LOCKED_MSK;
+	z_ker.current->flags &= ~Z_THREAD_SCHED_LOCKED_MSK;
 	irq_unlock(key);
 
 	__Z_DBG_SCHED_UNLOCK();
@@ -892,7 +817,7 @@ void k_sched_unlock(void)
 
 __always_inline uint8_t z_current_flags_get(void)
 {
-	return z_current->flags;
+	return z_ker.current->flags;
 }
 
 bool k_sched_locked(void)
@@ -918,13 +843,13 @@ void k_sleep(k_timeout_t timeout)
 		const uint8_t key = irq_lock();
 
 		/* Suspend the thread */
-		z_suspend(z_current);
+		z_suspend(z_ker.current);
 
 		/* Schedule thread wake-up if timeout is set */
 		z_schedule_wake_up(timeout);
 
 		/* Mark this thread as pending */
-		z_set_thread_state(z_current, Z_THREAD_STATE_PENDING);
+		z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
 
 		/* Call scheduler */
 		z_yield();

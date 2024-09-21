@@ -32,11 +32,9 @@
 .global z_yield
 .global TIMERn_COMPA_vect
 
+.extern z_ker
 .extern z_scheduler			; struct k_thread *(void)
-.extern z_current			; struct k_thread *
-.extern z_ticks 			; u32/u40
-.extern z_sched_ticks_remaining 	; u8
-.extern z_handle_timeouts		; void (void)
+.extern z_sched_enter		; void (void)
 .extern k_stop				; void (struct k_thread *)
 .extern __fault				; void (uint8_t)
 
@@ -71,30 +69,30 @@ TIMERn_COMPA_vect:
 	 */
 	ldi r18, 0x01			; 1 cycle
 
-	lds r0, z_ticks			; 2 cycles
+	lds r0, z_ker + 2			; 2 cycles
 	add r0, r18			; 1 cycle
-	sts z_ticks, r0			; 2 cycles
+	sts z_ker + 2, r0			; 2 cycles
 
-	lds r0, z_ticks + 1		; 2 cycles
+	lds r0, z_ker + 3		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts z_ticks + 1, r0		; 2 cycles
+	sts z_ker + 3, r0		; 2 cycles
 	
-	lds r0, z_ticks + 2		; 2 cycles
+	lds r0, z_ker + 4		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts z_ticks + 2, r0		; 2 cycles
+	sts z_ker + 4, r0		; 2 cycles
 
-	lds r0, z_ticks + 3		; 2 cycles
+	lds r0, z_ker + 5		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts z_ticks + 3, r0		; 2 cycles
+	sts z_ker + 5, r0		; 2 cycles
 
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
 	/*
 	 * In case we have a 40-bit counter, increment the upper 32:40 bits
 	 * of the counter.
 	 */
-	lds r0, z_ticks + 4		; 2 cycles
+	lds r0, z_ker + 6		; 2 cycles
 	adc r0, r1			; 1 cycle
-	sts z_ticks + 4, r0		; 2 cycles
+	sts z_ker + 6, r0		; 2 cycles
 #endif
 #endif
 
@@ -104,7 +102,7 @@ TIMERn_COMPA_vect:
 	 * (i.e. is a multiple of the system tick period), decrement
 	 * the number of ticks remaining for the current thread.
 	 */
-	lds r18, z_sched_ticks_remaining
+	lds r18, z_ker + 2 + CONFIG_KERNEL_TICKS_COUNTER_SIZE
 	subi r18, 0x01
 
 	/*
@@ -113,7 +111,7 @@ TIMERn_COMPA_vect:
 	 * 
 	 * Otherwise, we just exit the interrupt.
 	 */
-	sts z_sched_ticks_remaining, r18
+	sts z_ker + 2 + CONFIG_KERNEL_TICKS_COUNTER_SIZE, r18
 	brne __intctx_restore_minimal
 #endif 
 
@@ -142,18 +140,18 @@ TIMERn_COMPA_vect:
 #endif
 
 	/*
-	 * Evaluate timeouts for threads/timers and events.
+	 * Call scheduler to evaluate timeouts for threads/timers and events.
 	 * Schedule threads consequently. 
 	 */
-	call z_handle_timeouts
+	call z_sched_enter
 
 #if CONFIG_KERNEL_COOPERATIVE_THREADS
 	/* 
 	 * Determine if the current thread is eligible for preemption, 
 	 * meaning it is neither a cooperative thread nor the scheduler is locked.
 	 */
-	lds ZL, z_current       ; load current thread addr in Z
-	lds ZH, z_current + 1
+	lds ZL, z_ker       ; load current thread addr in Z
+	lds ZH, z_ker + 1
 	ldd r18, Z + 2      	; read current thread flags
 	andi r18, Z_THREAD_PRIO_COOP | Z_THREAD_SCHED_LOCKED_MSK
 
@@ -225,15 +223,15 @@ z_yield:
 
 	movw r26, r24 ; r24 contains previous thread
 	
-	lds r30, z_current ; Z contains current thread
-	lds r31, z_current + 1
+	lds r30, z_ker ; Z contains current thread
+	lds r31, z_ker + 1
 
 #if CONFIG_KERNEL_SCHEDULER_COMPARE_THREADS_BEFORE_SWITCH
 	/* 
 	 * Compare thread addresses after the scheduler call to prevent a thread 
 	 * switch to the same thread. 
 	 * 
-	 * i.e. Thread switch should only occur if the "previous" and "z_current" 
+	 * i.e. Thread switch should only occur if the "previous" and "z_ker.current" 
 	 * threads are different. 
 	 * 
 	 * This approach may be inefficient if at least two threads are always 

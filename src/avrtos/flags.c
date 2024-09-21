@@ -72,12 +72,12 @@ int k_flags_poll(struct k_flags *flags,
 		 * 1 byte. The swap_data is used to store the mask (1 byte) and the options
 		 * (1 byte).
 		 */
-		z_current->swap_data = Z_SWAP_DATA_INIT_OPT_N_MASK(options, mask_val);
+		z_ker.current->swap_data = Z_SWAP_DATA_INIT_OPT_N_MASK(options, mask_val);
 
 		ret = z_pend_current(&flags->waitqueue, timeout);
 		if (ret == 0) {
 			/* Retrieve the flags that caused the wake-up */
-			*mask = Z_SWAP_DATA_GET_TRIG_MASK(z_current->swap_data);
+			*mask = Z_SWAP_DATA_GET_TRIG_MASK(z_ker.current->swap_data);
 		}
 	} else {
 		if ((options & K_FLAGS_CONSUME) != 0u) {

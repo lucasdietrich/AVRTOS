@@ -27,7 +27,7 @@ void __fault(uint8_t reason)
 	serial_print_p(PSTR("\r\nreason="));
 	serial_hex(reason);
 	serial_print_p(PSTR("\tth: 0x"));
-	serial_hex16((const uint16_t)z_current);
+	serial_hex16((const uint16_t)z_ker.current);
 #elif CONFIG_KERNEL_FAULT_VERBOSITY >= 2
 	serial_print_p(PSTR("\n***** Kernel "));
 	switch (reason) {
@@ -55,7 +55,7 @@ void __fault(uint8_t reason)
 	}
 	serial_print_p(PSTR(" *****\n"));
 
-	k_thread_dump(z_current);
+	k_thread_dump(z_ker.current);
 #endif /* CONFIG_KERNEL_FAULT_VERBOSITY */
 
 	asm("jmp _exit");

@@ -5,12 +5,11 @@
  */
 
 #include "idle.h"
+#include "kernel_private.h"
 
 #include <avr/sleep.h>
 
 #define K_MODULE K_MODULE_IDLE
-
-extern uint8_t z_ready_count;
 
 #if CONFIG_KERNEL_THREAD_IDLE
 
@@ -100,7 +99,7 @@ static void z_thread_idle_entry(void *context)
 bool k_is_cpu_idle(void)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
-	return z_ready_count == 0;
+	return z_ker.ready_count == 0;
 #else
 	return false;
 #endif /* CONFIG_KERNEL_THREAD_IDLE */
@@ -109,7 +108,7 @@ bool k_is_cpu_idle(void)
 void k_idle(void)
 {
 	/* If other threads are ready, yield the CPU */
-	if (z_ready_count != 0u) {
+	if (z_ker.ready_count != 0u) {
 		k_yield();
 	} else {
 #ifndef __QEMU__

@@ -18,6 +18,8 @@
 extern "C" {
 #endif
 
+extern struct z_kernel z_ker;
+
 /**
  * @brief Swap the endianness of a memory address.
  *

@@ -73,7 +73,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 		/* Specifies where the data should be copied from
 		 * when space becomes available in the msgq.
 		 */
-		z_current->swap_data = (void *)data;
+		z_ker.current->swap_data = (void *)data;
 
 		/* Suspend the current thread until a consumer retrieves a message. */
 		ret = z_pend_current(&msgq->waitqueue, timeout);
@@ -127,7 +127,7 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 		/* Specifies where the data should be copied
 		 * when a new message becomes available in the msgq.
 		 */
-		z_current->swap_data = data;
+		z_ker.current->swap_data = data;
 
 		ret = z_pend_current(&msgq->waitqueue, timeout);
 	}

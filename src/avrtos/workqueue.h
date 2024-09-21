@@ -255,7 +255,8 @@ bool k_system_workqueue_submit(struct k_work *work);
  * will process the work.
  */
 struct k_work_delayable {
-	struct k_work work;				///< Underlying work item.
+	struct k_work work; ///< Underlying work item, it must be the first member to allow
+						///< casting from k_work_delayable to k_work.
 	struct k_event _event;			///< Event object to trigger the work item.
 	struct k_workqueue *_workqueue; ///< Workqueue that will process the work item.
 };

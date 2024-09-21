@@ -96,7 +96,7 @@ static void thread(void *p)
 	struct mystruct *ms = (struct mystruct *)p;
 
 	/* protect with K_SCHED_LOCK_CONTEXT if threads are preemptive */
-	printf_P(PSTR("Thread %c started\n"), z_current->symbol);
+	printf_P(PSTR("Thread %c started\n"), k_thread_get_current()->symbol);
 
 	for (;;) {
 		rdm_ms = random() % MAX_DELAY_MS;
@@ -110,7 +110,7 @@ static void thread(void *p)
 			 * preemptive */
 			printf_P(PSTR("%c : signaled after %u ms [counter = "
 						  "%lu]\n"),
-					 z_current->symbol, rdm_ms, ++counter);
+					 k_thread_get_current()->symbol, rdm_ms, ++counter);
 		} else {
 			__ASSERT_TRUE(false);
 		}

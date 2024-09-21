@@ -50,7 +50,7 @@ void thread(struct k_prng *prng)
 	for (;;) {
 		number = k_prng_get(prng);
 
-		serial_transmit(z_current->symbol);
+		serial_transmit(k_thread_get_current()->symbol);
 		serial_print_p(PSTR(" : "));
 		serial_hex16(number);
 		serial_transmit('\n');

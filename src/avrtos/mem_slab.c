@@ -109,7 +109,7 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 		ret = z_pend_current(&slab->waitqueue, timeout);
 		if (ret == 0) {
 			/* Retrieve the memory block available */
-			*mem = z_current->swap_data;
+			*mem = z_ker.current->swap_data;
 		}
 	}
 

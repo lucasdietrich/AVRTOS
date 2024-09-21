@@ -43,7 +43,7 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 	irq_unlock(key);
 
 	if (ret == 0) {
-		__Z_DBG_SEM_TAKE(z_current);
+		__Z_DBG_SEM_TAKE(z_ker.current);
 	}
 
 	return ret;
@@ -56,7 +56,7 @@ struct k_thread *k_sem_give(struct k_sem *sem)
 	struct k_thread *thread = NULL;
 	const uint8_t key		= irq_lock();
 
-	__Z_DBG_SEM_GIVE(z_current);
+	__Z_DBG_SEM_GIVE(z_ker.current);
 
 	/* Wake up the first thread in the wait queue if any */
 	thread = z_unpend_first_thread(&sem->waitqueue);

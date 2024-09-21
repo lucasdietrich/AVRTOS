@@ -49,7 +49,7 @@ int main(void)
 
 void thread_entry(void *_c)
 {
-	s_thread = z_current;
+	s_thread = k_thread_get_current();
 
 	for (uint_fast8_t i = 0; i < 5; i++) {
 		serial_printl_p(PSTR("Hello !"));

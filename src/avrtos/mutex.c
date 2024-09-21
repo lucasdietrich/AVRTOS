@@ -37,7 +37,7 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	if (mutex->lock == Z_MUTEX_UNLOCKED_VALUE) {
 		/* Mutex is available, acquire it */
 		mutex->lock = 1u;
-	} else if (mutex->owner == z_current) {
+	} else if (mutex->owner == z_ker.current) {
 #if CONFIG_KERNEL_REENTRANCY
 		/* Mutex is already owned by the current thread, increment lock count */
 		mutex->lock++;
@@ -50,8 +50,8 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 
 	if (ret == 0) {
 		/* Successfully acquired the mutex */
-		__Z_DBG_MUTEX_LOCKED(z_current);
-		mutex->owner = z_current;
+		__Z_DBG_MUTEX_LOCKED(z_ker.current);
+		mutex->owner = z_ker.current;
 	}
 
 exit:
@@ -66,7 +66,7 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 	struct k_thread *thread = NULL;
 	const uint8_t key		= irq_lock();
 
-	if (mutex->owner != z_current) {
+	if (mutex->owner != z_ker.current) {
 		/* Current thread does not own the mutex, cannot unlock */
 		goto exit;
 #if CONFIG_KERNEL_REENTRANCY
@@ -77,7 +77,7 @@ struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 #endif /* CONFIG_KERNEL_REENTRANCY */
 	}
 
-	__Z_DBG_MUTEX_UNLOCKED(z_current);
+	__Z_DBG_MUTEX_UNLOCKED(z_ker.current);
 
 	/* There is a new owner, we don't need to unlock the mutex as
 	 * the mutex owner is changed when returning from the

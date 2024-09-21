@@ -5,17 +5,16 @@
  */
 
 #include "assert.h"
+#include "kernel_private.h"
 
 #include <avr/pgmspace.h>
 
 #include "misc/serial.h"
 
-extern uint8_t z_kernel_mode;
-
 #if CONFIG_KERNEL_ASSERT
 void z_assert_user_context(void)
 {
-	__assert(!z_kernel_mode, K_MODULE_KERNEL, K_ASSERT_USER_MODE,
+	__assert(!z_ker.kernel_mode, K_MODULE_KERNEL, K_ASSERT_USER_MODE,
 			 K_ASSERT_UNDEFINED_LINE);
 }
 

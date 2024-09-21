@@ -27,9 +27,6 @@
 extern "C" {
 #endif
 
-/* Address to the current thread structure */
-extern struct k_thread *z_current;
-
 /**
  * @brief Define a new thread at runtime and initialize its stack.
  *
@@ -101,7 +98,8 @@ void z_thread_entry(void *context);
  */
 __always_inline struct k_thread *k_thread_get_current(void)
 {
-	return z_current;
+	extern struct z_kernel z_ker;
+	return z_ker.current;
 }
 
 /**
@@ -458,8 +456,10 @@ __always_inline void k_yield_from_isr(void)
 	z_assert_user_context();
 #endif
 
+	extern struct z_kernel z_ker;
+
 	/* Check whether the current thread can be preempted */
-	if ((z_current->flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) == 0u) {
+	if ((z_ker.current->flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) == 0u) {
 		z_yield();
 	}
 }

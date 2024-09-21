@@ -48,7 +48,7 @@ void task(void *arg)
 	ARG_UNUSED(arg);
 
 	for (;;) {
-		printf_P(PSTR("%c"), z_current->symbol);
+		printf_P(PSTR("%c"), k_thread_get_current()->symbol);
 		k_sleep(K_MSEC(1000u));
 	}
 }

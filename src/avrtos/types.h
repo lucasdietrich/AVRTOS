@@ -88,6 +88,122 @@ struct k_thread {
 };
 
 /**
+ * @brief Define the size of the kernel ticks counter.
+ */
+typedef char z_ticks_t[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
+
+typedef struct z_kernel {
+	/**
+	 * @brief Pointer to the thread currently holding the CPU (context set).
+	 *
+	 * @note There are cases where *runqueue* and *current* do not refer to the same
+	 * thread. This is because the next thread to be scheduled is already set, but the
+	 * context hasn't been switched yet.
+	 * 
+	 * @note *current* member must not be moved within the structure.
+	 */
+	struct k_thread *current;
+
+#if CONFIG_KERNEL_TICKS_COUNTER
+	/**
+	 * @brief Ticks counter for the kernel.
+	 *
+	 * This array represents the ticks counter used by the kernel to keep track of
+	 * time. The counter is implemented as an array of bytes with a specific size
+	 * determined by `CONFIG_KERNEL_TICKS_COUNTER_SIZE`.
+	 * 
+	 * @note *ticks* member must not be moved within the structure.
+	 */
+	z_ticks_t ticks;
+#endif
+
+#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+	/**
+	 * @brief Number of ticks remaining in the current time slice.
+	 *
+	 * This variable represents the number of ticks remaining in the current time
+	 * slice. A time slice is a predetermined time duration allocated to each thread
+	 * for execution before being preempted and giving control to another thread.
+	 *
+	 * The variable `sched_ticks_remaining` is initialized with the value
+	 * specified in `CONFIG_KERNEL_TIME_SLICE_TICKS`, which indicates the length of
+	 * the time slice in ticks. As the thread runs and consumes ticks, the value of
+	 * this variable decreases. When it reaches zero, the thread may be preempted,
+	 * and control is given to another thread.
+	 */
+	uint8_t sched_ticks_remaining;
+#endif
+
+	/**
+	 * @brief Number of threads (excluding IDLE) in the runqueue(s).
+	 *
+	 * The IDLE thread is not included in this count.
+	 *
+	 * This variable represents the count of threads currently in the runqueue(s),
+	 * indicating the number of threads that are ready to run. It is initialized to
+	 * 1 during startup, indicating that only the main thread is running initially.
+	 *
+	 * The possible values and their meanings are as follows:
+	 * - 0: Indicates that only the IDLE thread is running.
+	 * - 1: Indicates that a single thread is running.
+	 * - n > 1: Indicates that multiple threads are running.
+	 */
+	uint8_t ready_count;
+
+	/**
+	 * @brief Pointer to the currently running thread in the runqueue.
+	 *
+	 * This variable represents a pointer to the thread (node) in the runqueue,
+	 * which is currently running. The runqueue is implemented as a doubly-linked
+	 * list, where each node represents a thread. During startup, this variable is
+	 * initialized with the pointer to the node corresponding to the main thread.
+	 *
+	 * The runqueue is structured as a circular doubly-linked list, where each node
+	 * contains a pointer to the next and previous nodes. The illustration below
+	 * demonstrates the relationship between the nodes in the runqueue:
+	 *
+	 *         A     B     C
+	 *     -> n --> n --> n --   (n for next, p for previous)
+	 *     -- p <-- p <-- p <-
+	 *             /\
+	 *  ___________|
+	 *  run_queue points to the thread currently running, here B
+	 *
+	 * By maintaining a pointer to the currently running thread (node) in run_queue, it
+	 * becomes convenient to execute the next thread by simply setting run_queue to
+	 * run_queue->next.
+	 */
+	struct dnode *run_queue;
+
+	/**
+	 * @brief Pointer to the head of the timeouts queue.
+	 *
+	 * This variable represents a pointer to the head of the timeouts queue. The
+	 * timeouts queue is a linked list that holds the pending threads in the system.
+	 * Each thread in the list corresponds to a timeout event and is represented by
+	 * a `struct titem`.
+	 */
+	struct titem *timeouts_queue;
+
+#if CONFIG_KERNEL_ASSERT
+	/**
+	 * @brief Flag indicating execution context.
+	 *
+	 * This flag is used to indicate whether the kernel code is currently being
+	 * executed. Its purpose is to detect if a user handler is being executed from a
+	 * kernel context, such as within kernel timer or kernel event handlers.
+	 *
+	 * Initially set to 0, indicating that the
+	 * kernel code is not being executed. When the kernel code is entered, this flag
+	 * is set to 1.
+	 */
+	uint8_t kernel_mode;
+#endif
+} z_kernel_t;
+
+/* ARCHITECTURE-SPECIFIC TYPES */
+
+/**
  * @brief Structure representing the call-saved registers plus the program counter (PC).
  *
  * The `struct z_callsaved_ctx` structure represents the registers that must be saved

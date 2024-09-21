@@ -76,7 +76,7 @@ void thread_processing(void *p)
 
 		if ((counter & 0xFFFFF) == 0) {
 			k_sched_lock();
-			serial_transmit(z_current->symbol);
+			serial_transmit(k_thread_get_current()->symbol);
 			serial_print_p(PSTR(": "));
 			serial_hex16(counter >> 16);
 			serial_print_p(PSTR("0000\n"));
