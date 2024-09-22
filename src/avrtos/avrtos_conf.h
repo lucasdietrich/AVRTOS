@@ -671,8 +671,8 @@
 // 0: Kernel Debug is disabled
 // 1: Kernel Debug is enabled
 //
-#ifndef CONFIG_KERNEL_DEBUG
-#define CONFIG_KERNEL_DEBUG 0
+#ifndef CONFIG_KERNEL_SYSCLOCK_DEBUG
+#define CONFIG_KERNEL_SYSCLOCK_DEBUG 0
 #endif
 
 //

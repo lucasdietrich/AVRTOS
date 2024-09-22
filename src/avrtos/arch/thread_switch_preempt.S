@@ -96,7 +96,7 @@ TIMERn_COMPA_vect:
 #endif
 #endif
 
-#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+#if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	/*
 	 * If the time slice is doesn't match the system tick period,
 	 * (i.e. is a multiple of the system tick period), decrement
@@ -130,7 +130,7 @@ TIMERn_COMPA_vect:
 	push	r30
 	push	r31
 
-#if CONFIG_KERNEL_DEBUG
+#if CONFIG_KERNEL_SYSCLOCK_DEBUG
 	/*
 	 * Write a dot '.' to the serial port to indicate that a
 	 * call to the scheduler is being made.
