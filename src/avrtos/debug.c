@@ -5,8 +5,6 @@
  */
 
 #include "debug.h"
-#include "kernel_private.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -16,6 +14,7 @@
 
 #include "dstruct/debug.h"
 #include "dstruct/dlist.h"
+#include "kernel_private.h"
 
 uint16_t k_thread_usage(struct k_thread *thread)
 {

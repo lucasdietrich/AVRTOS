@@ -5,9 +5,10 @@
  */
 
 #include "idle.h"
-#include "kernel_private.h"
 
 #include <avr/sleep.h>
+
+#include "kernel_private.h"
 
 #define K_MODULE K_MODULE_IDLE
 

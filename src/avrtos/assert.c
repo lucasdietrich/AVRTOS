@@ -5,10 +5,10 @@
  */
 
 #include "assert.h"
-#include "kernel_private.h"
 
 #include <avr/pgmspace.h>
 
+#include "kernel_private.h"
 #include "misc/serial.h"
 
 #if CONFIG_KERNEL_ASSERT

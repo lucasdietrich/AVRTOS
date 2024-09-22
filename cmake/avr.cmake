@@ -12,7 +12,7 @@ find_program(AVR_OBJDUMP avr-objdump REQUIRED)
 find_program(AVR_READELF avr-readelf REQUIRED)
 find_program(AVR_NM avr-nm REQUIRED)
 find_program(AVR_SIZE avr-size REQUIRED)
-find_program(QEMU_SYSTEM_AVR qemu-system-avr OPTIONAL)
+find_program(QEMU_SYSTEM_AVR qemu-system-avr REQUIRED)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR avr)
@@ -154,7 +154,7 @@ function(target_prepare_env target)
 
 	if (DEFINED ENABLE_SINGLE_SAMPLE)
 		add_custom_target(upload DEPENDS upload_${target})
-		add_custom_target(monitor DEPENDS monitor_${target})
+		add_custom_target(monitor  DEPENDS monitor_${target})
 
 		if (QEMU)
 			add_custom_target(qemu DEPENDS qemu_${target})
