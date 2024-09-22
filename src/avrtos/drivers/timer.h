@@ -443,11 +443,20 @@ __always_inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
 {
 	/**
 	 * To do a 16-bit write, the high byte must be written before the low
-	 * byte. For a 16-bit read, the low byte must be read before the high
 	 * byte.
 	 */
 	dev->TCNTnH = val >> 8;
 	dev->TCNTnL = val & 0xffU;
+}
+
+__always_inline uint16_t ll_timer16_get_tcnt(TIMER16_Device *dev)
+{
+	/**
+	 * For a 16-bit read, the low byte must be read before the high byte.
+	 */
+	uint32_t ll = dev->TCNTnL;
+	uint32_t lh = dev->TCNTnH;
+	return (lh << 8) | ll;
 }
 
 __always_inline void ll_timer16_stop(TIMER16_Device *dev)
@@ -464,7 +473,7 @@ __always_inline void ll_timer16_counter_reset(TIMER16_Device *dev)
 __always_inline void ll_timer16_start(TIMER16_Device *dev, uint8_t prescaler)
 {
 	/* timer starts counting at the timer prescaler is set*/
-	dev->TCCRnB |= prescaler < CSn0;
+	dev->TCCRnB |= prescaler << CSn0;
 }
 
 __always_inline void ll_timer_stop(void *dev)
