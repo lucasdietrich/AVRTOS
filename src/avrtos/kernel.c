@@ -417,14 +417,14 @@ void z_sched_enter(void)
 {
 	__Z_DBG_SYSTICK_ENTER();
 
+	__ASSERT_NOINTERRUPT();
+
 #if CONFIG_KERNEL_ASSERT
 	__ASSERT(!z_ker.kernel_mode, K_ASSERT_USER_MODE);
 	z_ker.kernel_mode = 1u;
 #endif
 
-	__ASSERT_NOINTERRUPT();
-
-	tqueue_shift(&z_ker.timeouts_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
+	tqueue_shift(&z_ker.timeouts_queue, Z_KERNEL_TIME_SLICE_TICKS);
 
 #if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	z_ker.sched_ticks_remaining = Z_KERNEL_TIME_SLICE_TICKS;
@@ -559,36 +559,46 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 
-	/* In case of returning without waiting */
-	int8_t err = -EBUSY;
-	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-		/* Queue the thread to the pending queue of the object */
-		dlist_append(waitqueue, &z_ker.current->wany);
-
-		/* Suspend the thread */
-		z_suspend(z_ker.current);
-
-		/* Schedule thread wake-up if timeout is set */
-		z_schedule_wake_up(timeout);
-
-		/* Mark this thread as pending */
-		z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
-
-		/* Call scheduler */
-		z_yield();
-
-		/* If the timer expired, we manually remove the thread from
-		 * the pending queue
-		 */
-		if (z_ker.current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
-			dlist_remove(&z_ker.current->wany);
-			err = -ETIMEDOUT;
-		} else if (z_ker.current->flags & Z_THREAD_PEND_CANCELED_MSK) {
-			err = -ECANCELED;
-		} else {
-			err = 0;
-		}
+	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+		return -EAGAIN;
 	}
+
+	int err;
+
+	/* Queue the thread to the pending queue of the object */
+	if (waitqueue != NULL) {
+		dlist_append(waitqueue, &z_ker.current->wany);
+	}
+
+	/* Suspend the thread */
+	z_suspend(z_ker.current);
+
+	/* Schedule thread wake-up if timeout is set */
+	z_schedule_wake_up(timeout);
+
+#if CONFIG_KERNEL_TICKLESS
+	/* Set the time slice to the thread soonest timeout */
+	z_set_sched_point(z_ker.timeouts_queue, timeout);
+#endif
+
+	/* Mark this thread as pending */
+	z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
+
+	/* Call scheduler */
+	z_yield();
+
+	/* If the timer expired, we manually remove the thread from
+	 * the pending queue
+	 */
+	if (z_ker.current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
+		dlist_remove(&z_ker.current->wany);
+		err = -ETIMEDOUT;
+	} else if (z_ker.current->flags & Z_THREAD_PEND_CANCELED_MSK) {
+		err = -ECANCELED;
+	} else {
+		err = 0;
+	}
+
 	return err;
 }
 
@@ -839,23 +849,13 @@ bool k_cur_is_coop(void)
 
 void k_sleep(k_timeout_t timeout)
 {
-	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-		const uint8_t key = irq_lock();
+	const uint8_t key = irq_lock();
 
-		/* Suspend the thread */
-		z_suspend(z_ker.current);
+	/* z_pend_current should return -ETIMEDOUT or -EAGAIN depending on the timeout value
+	 */
+	(void)z_pend_current(NULL, timeout);
 
-		/* Schedule thread wake-up if timeout is set */
-		z_schedule_wake_up(timeout);
-
-		/* Mark this thread as pending */
-		z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
-
-		/* Call scheduler */
-		z_yield();
-
-		irq_unlock(key);
-	}
+	irq_unlock(key);
 }
 
 #if CONFIG_KERNEL_UPTIME
