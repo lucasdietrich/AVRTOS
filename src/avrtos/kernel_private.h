@@ -110,10 +110,10 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  *
  * If the timeout is `K_FOREVER`, the thread will be awakened when the object becomes
  * available.
- * 
+ *
  * If the timeout is `K_NO_WAIT`, the function returns immediately without waiting
  * with -EAGAIN as the return value.
- * 
+ *
  * If waitqueue is NULL, the thread is suspended but not added to any wait queue.
  * Consequently, the thread must be woken up manually using `z_wake_up()`.
  *

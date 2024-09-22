@@ -88,7 +88,7 @@
 #endif
 
 #if CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US <= 255
-#define Z_KERNEL_TIME_SLICE_TICKS                                                   \
+#define Z_KERNEL_TIME_SLICE_TICKS                                                        \
 	(CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
 #else
 #error "Time slice too different compared to CONFIG_KERNEL_SYSCLOCK_PERIOD_US\
@@ -96,7 +96,7 @@
 #endif
 #else
 #define Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS 0
-#define Z_KERNEL_TIME_SLICE_TICKS			1
+#define Z_KERNEL_TIME_SLICE_TICKS		   1
 #endif /* CONFIG_KERNEL_TIME_SLICE_US != CONFIG_KERNEL_SYSCLOCK_PERIOD_US */
 
 #define KERNEL_TICK_PERIOD_US CONFIG_KERNEL_SYSCLOCK_PERIOD_US

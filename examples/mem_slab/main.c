@@ -42,7 +42,8 @@ static uint8_t ms(struct k_prng *prng)
 
 static void debug(void *mem, int8_t rc)
 {
-	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), k_thread_get_current()->symbol, (unsigned int)mem, rc);
+	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), k_thread_get_current()->symbol,
+			 (unsigned int)mem, rc);
 }
 
 static void *alloc(k_timeout_t timeout)

@@ -24,7 +24,7 @@
 #define K_MODULE K_MODULE_KERNEL
 
 /* Make sure the members are at the expected offsets for k_thread and k_kernel
- * these members are accessed directly in assembly code 
+ * these members are accessed directly in assembly code
  */
 __STATIC_ASSERT_NOMSG(offsetof(struct k_thread, sp) == 0);
 __STATIC_ASSERT_NOMSG(offsetof(struct k_thread, flags) == sizeof(void *));
@@ -123,9 +123,9 @@ K_THREAD struct k_thread z_thread_main = {
 };
 
 struct z_kernel z_ker = {
-	.current = &z_thread_main,
-	.ready_count = 1u,
-	.run_queue = &z_thread_main.tie.runqueue,
+	.current		= &z_thread_main,
+	.ready_count	= 1u,
+	.run_queue		= &z_thread_main.tie.runqueue,
 	.timeouts_queue = NULL,
 #if CONFIG_KERNEL_TICKS_COUNTER
 	.ticks = {0u},

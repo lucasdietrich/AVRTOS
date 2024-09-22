@@ -99,7 +99,7 @@ typedef struct z_kernel {
 	 * @note There are cases where *runqueue* and *current* do not refer to the same
 	 * thread. This is because the next thread to be scheduled is already set, but the
 	 * context hasn't been switched yet.
-	 * 
+	 *
 	 * @note *current* member must not be moved within the structure.
 	 */
 	struct k_thread *current;
@@ -111,7 +111,7 @@ typedef struct z_kernel {
 	 * This array represents the ticks counter used by the kernel to keep track of
 	 * time. The counter is implemented as an array of bytes with a specific size
 	 * determined by `CONFIG_KERNEL_TICKS_COUNTER_SIZE`.
-	 * 
+	 *
 	 * @note *ticks* member must not be moved within the structure.
 	 */
 	z_ticks_t ticks;
