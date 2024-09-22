@@ -109,15 +109,23 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  * expires.
  *
  * If the timeout is `K_FOREVER`, the thread will be awakened when the object becomes
- * available. If the timeout is `K_NO_WAIT`, the thread will return immediately.
+ * available.
+ * 
+ * If the timeout is `K_NO_WAIT`, the function returns immediately without waiting
+ * with -EAGAIN as the return value.
+ * 
+ * If waitqueue is NULL, the thread is suspended but not added to any wait queue.
+ * Consequently, the thread must be woken up manually using `z_wake_up()`.
  *
  * Assumptions:
  * - The interrupt flag is cleared when this function is called.
  *
  * @param waitqueue Pointer to the wait queue to add the thread to.
  * @param timeout The timeout period to wait for the object.
- * @return 0 if the object became available, ETIMEDOUT if the timeout expired, or a
- * negative error code in other cases.
+ * @return 0 if the object became available
+ * @return -EAGAIN if the timeout is K_NO_WAIT
+ * @return -ETIMEDOUT if the timeout expired
+ * @return -ECANCELED if the wait was canceled
  */
 __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
 
