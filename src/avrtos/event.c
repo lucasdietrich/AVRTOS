@@ -14,6 +14,8 @@
 
 #if CONFIG_KERNEL_EVENTS
 
+#define Z_EVENTS_PERIOD_TICKS Z_KERNEL_TIME_SLICE_TICKS
+
 /**
  * @brief Event queue structure.
  *
@@ -138,7 +140,7 @@ void z_event_q_process(void)
 	__ASSERT_NOINTERRUPT();
 
 	/* Shift the event queue forward by the configured time slice */
-	tqueue_shift(&z_event_q.first, K_EVENTS_PERIOD_TICKS);
+	tqueue_shift(&z_event_q.first, Z_EVENTS_PERIOD_TICKS);
 
 	/* Process all expired events in the queue */
 	while ((tie = tqueue_pop(&z_event_q.first)) != NULL) {

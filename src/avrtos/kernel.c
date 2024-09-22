@@ -32,7 +32,7 @@ __STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, current) == 0);
 #if CONFIG_KERNEL_TICKS_COUNTER
 __STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, ticks) == sizeof(struct k_thread *));
 #endif
-#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+#if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 __STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, sched_ticks_remaining) ==
 					  sizeof(struct k_thread *) + sizeof(z_ticks_t));
 #endif
@@ -130,9 +130,9 @@ struct z_kernel z_ker = {
 #if CONFIG_KERNEL_TICKS_COUNTER
 	.ticks = {0u},
 #endif /* CONFIG_KERNEL_TICKS_COUNTER */
-#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
-	.sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS,
-#endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
+#if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+	.sched_ticks_remaining = Z_KERNEL_TIME_SLICE_TICKS,
+#endif /* Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 #if CONFIG_KERNEL_ASSERT
 	.kernel_mode = 0u,
 #endif
@@ -398,13 +398,13 @@ void z_init_threads(void)
 #endif
 }
 
-__STATIC_ASSERT_NOMSG(CONFIG_KERNEL_TIME_SLICE_TICKS != 0);
+__STATIC_ASSERT_NOMSG(Z_KERNEL_TIME_SLICE_TICKS != 0);
 
 /*
  * Evaluate timeouts for threads/timers and events.
  * Schedule threads accordingly.
  *
- * If CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the
+ * If Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS is enabled and we are in the
  * IDLE thread, the expired thread will be rescheduled only after the current
  * time slice interval finishes. As a result, we may lose a few ticks in the
  * IDLE thread.
@@ -426,9 +426,9 @@ void z_sched_enter(void)
 
 	tqueue_shift(&z_ker.timeouts_queue, CONFIG_KERNEL_TIME_SLICE_TICKS);
 
-#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
-	z_ker.sched_ticks_remaining = CONFIG_KERNEL_TIME_SLICE_TICKS;
-#endif /* CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
+#if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+	z_ker.sched_ticks_remaining = Z_KERNEL_TIME_SLICE_TICKS;
+#endif /* Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
 	struct titem *ready;
 	while ((ready = tqueue_pop(&z_ker.timeouts_queue)) != NULL) {

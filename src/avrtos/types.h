@@ -117,7 +117,7 @@ typedef struct z_kernel {
 	z_ticks_t ticks;
 #endif
 
-#if CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS
+#if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	/**
 	 * @brief Number of ticks remaining in the current time slice.
 	 *
@@ -126,7 +126,7 @@ typedef struct z_kernel {
 	 * for execution before being preempted and giving control to another thread.
 	 *
 	 * The variable `sched_ticks_remaining` is initialized with the value
-	 * specified in `CONFIG_KERNEL_TIME_SLICE_TICKS`, which indicates the length of
+	 * specified in `Z_KERNEL_TIME_SLICE_TICKS`, which indicates the length of
 	 * the time slice in ticks. As the thread runs and consumes ticks, the value of
 	 * this variable decreases. When it reaches zero, the thread may be preempted,
 	 * and control is given to another thread.

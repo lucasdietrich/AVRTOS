@@ -13,6 +13,8 @@
 
 #if CONFIG_KERNEL_TIMERS
 
+#define Z_TIMERS_PERIOD_TICKS Z_KERNEL_TIME_SLICE_TICKS
+
 #define K_MODULE K_MODULE_TIMER
 
 static struct titem *z_timers_runqueue = NULL;
@@ -62,7 +64,7 @@ void z_timers_process(void)
 
 	__ASSERT_NOINTERRUPT();
 
-	tqueue_shift(&z_timers_runqueue, K_TIMERS_PERIOD_TICKS);
+	tqueue_shift(&z_timers_runqueue, Z_TIMERS_PERIOD_TICKS);
 
 	while (!!(item = tqueue_pop(&z_timers_runqueue))) {
 		timer = CONTAINER_OF(item, struct k_timer, tie);
