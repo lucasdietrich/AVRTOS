@@ -12,6 +12,8 @@
 #include "mcp2515.h"
 #include "mcp2515_priv.h"
 
+#if CONFIG_DEVICE_MCP2515
+
 #warning "MCP2515 driver is experimental and has limitations"
 
 #define K_MODULE  K_MODULE_DEVICE
@@ -448,3 +450,5 @@ mcp2515_set_mask(struct mcp2515_device *mcp, uint8_t index, uint8_t is_ext, uint
 
 	return 0;
 }
+
+#endif /* CONFIG_DEVICE_MCP2515 */

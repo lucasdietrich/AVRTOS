@@ -1020,4 +1020,14 @@
 #define CONFIG_KERNEL_FLAGS_SIZE 1
 #endif
 
+//
+// Enable support for the MCP2515 CAN controller
+//
+// 0: MCP2515 driver is disabled
+// 1: MCP2515 driver is enabled
+//
+#ifndef CONFIG_DEVICE_MCP2515
+#define CONFIG_DEVICE_MCP2515 0
+#endif
+
 #endif
