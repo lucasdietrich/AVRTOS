@@ -38,13 +38,13 @@ k_ticks_get_32:
 k_ticks_get_64:
 	lds	r26, SREG
 	cli
-	lds 	r18, z_ker
+	lds 	r18, z_ker + 2
 	lds 	r19, z_ker + 3
 	lds 	r20, z_ker + 4
 	lds 	r21, z_ker + 5
 	sts	SREG, r26
 #if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS
-	lds	r22, z_ker + 5
+	lds	r22, z_ker + 6
 #else
 	ldi	r22, 0x00
 #endif /* CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS */
