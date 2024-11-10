@@ -8,6 +8,8 @@
 
 #include <Arduino.h>
 #include <avrtos.h>
+#include <avrtos/misc/led.h>
+
 // Change the log level (LOG_LEVEL_DBG, LOG_LEVEL_INF, LOG_LEVEL_WRN or LOG_LEVEL_ERR)
 #define LOG_LEVEL LOG_LEVEL_WRN
 
@@ -303,7 +305,7 @@ static Philosopher philosophers[5u] = {
 	Philosopher(forks[1u], forks[2u], "Kant"),
 	Philosopher(forks[2u], forks[3u], "Buddha"),
 	Philosopher(forks[3u], forks[4u], "Marx"),
-	Philosopher(forks[0u], forks[4u], "Russel"),
+	Philosopher(forks[4u], forks[0u], "Russel"),
 };
 
 struct k_timer timer;
@@ -319,7 +321,8 @@ int timer_handler(struct k_timer *timer)
 void setup(void)
 {
 	/* LED initialisation */
-	pinMode(LED_BUILTIN, OUTPUT);
+	led_init();
+	led_off();
 
 	/* Serial initialisation */
 	Serial.begin(9600u);
@@ -350,6 +353,13 @@ void loop(void)
 
 	for (Philosopher &phil : philosophers) {
 		phil_state_t state = phil.GetState();
+
+		/* Turn on the LED if one philosopher is starving */
+		if (state == PHIL_STATE_STARVING) {
+			if (led_get() == 0u) {
+				led_on();
+			}
+		}
 
 		printf_P(PSTR("%s "), phil_state_to_string(state));
 	}
