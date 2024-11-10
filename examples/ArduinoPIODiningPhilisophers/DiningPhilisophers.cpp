@@ -5,10 +5,10 @@
  */
 
 #include <avrtos/logging.h>
+#include <avrtos/misc/led.h>
 
 #include <Arduino.h>
 #include <avrtos.h>
-#include <avrtos/misc/led.h>
 
 // Change the log level (LOG_LEVEL_DBG, LOG_LEVEL_INF, LOG_LEVEL_WRN or LOG_LEVEL_ERR)
 #define LOG_LEVEL LOG_LEVEL_WRN
@@ -233,7 +233,7 @@ class Philosopher
 		if (has_right_fork) {
 			LOG_INF("%s got forks", m_name);
 		} else {
-			LOG_WRN("%s failed to get right fork", m_name);
+			LOG_WRN("%s failed to get right fork, releasing left fork", m_name);
 			m_left_fork.Unlock();
 			goto exit;
 		}
@@ -342,7 +342,7 @@ void setup(void)
 	}
 
 	k_sem_init(&sem, 1u, 1u);
-	k_timer_init(&timer, timer_handler, K_MSEC(100u), K_NO_WAIT);
+	k_timer_init(&timer, timer_handler, K_MSEC(500u), K_NO_WAIT);
 }
 
 void loop(void)
@@ -364,5 +364,5 @@ void loop(void)
 		printf_P(PSTR("%s "), phil_state_to_string(state));
 	}
 
-	printf_P(PSTR("\n"));
+	printf_P(LOG_LEVEL >= LOG_LEVEL_INF ? PSTR("\n") : PSTR("\r"));
 }
