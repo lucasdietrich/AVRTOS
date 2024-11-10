@@ -558,7 +558,7 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
 /**
  * @brief Suspend the current thread and wait until the timeout expires or the
  * thread is woken up.
- * 
+ *
  * @param timeout The timeout value for the sleep.
  */
 __kernel void z_pend_current(k_timeout_t timeout)
