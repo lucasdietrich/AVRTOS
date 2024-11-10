@@ -37,7 +37,7 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 		sem->count--;
 	} else {
 		/* Semaphore is not available, wait for it */
-		ret = z_pend_current(&sem->waitqueue, timeout);
+		ret = z_pend_current_on(&sem->waitqueue, timeout);
 	}
 
 	irq_unlock(key);

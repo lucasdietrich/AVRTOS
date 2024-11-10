@@ -106,7 +106,7 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 		ret = -ENOMEM;
 	} else {
 		/* Wait for a block to become available */
-		ret = z_pend_current(&slab->waitqueue, timeout);
+		ret = z_pend_current_on(&slab->waitqueue, timeout);
 		if (ret == 0) {
 			/* Retrieve the memory block available */
 			*mem = z_ker.current->swap_data;

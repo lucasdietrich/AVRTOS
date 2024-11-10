@@ -63,7 +63,7 @@ struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 	struct snode *item = slist_get(&fifo->queue);
 
 	if (item == NULL) {
-		if (z_pend_current(&fifo->waitqueue, timeout) == 0) {
+		if (z_pend_current_on(&fifo->waitqueue, timeout) == 0) {
 			item = (struct snode *)z_ker.current->swap_data;
 		}
 	}
