@@ -74,7 +74,7 @@ int k_flags_poll(struct k_flags *flags,
 		 */
 		z_ker.current->swap_data = Z_SWAP_DATA_INIT_OPT_N_MASK(options, mask_val);
 
-		ret = z_pend_current(&flags->waitqueue, timeout);
+		ret = z_pend_current_on(&flags->waitqueue, timeout);
 		if (ret == 0) {
 			/* Retrieve the flags that caused the wake-up */
 			*mask = Z_SWAP_DATA_GET_TRIG_MASK(z_ker.current->swap_data);

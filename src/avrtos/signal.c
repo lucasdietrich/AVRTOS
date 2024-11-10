@@ -54,7 +54,7 @@ int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 	if (TEST_BIT(sig->flags, K_POLL_STATE_SIGNALED)) {
 		ret = 0;
 	} else {
-		ret = z_pend_current(&sig->waitqueue, timeout);
+		ret = z_pend_current_on(&sig->waitqueue, timeout);
 	}
 
 	irq_unlock(key);

@@ -45,7 +45,7 @@ int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 		goto exit;
 	} else {
 		/* Mutex is locked by another thread, wait for it to become available */
-		ret = z_pend_current(&mutex->waitqueue, timeout);
+		ret = z_pend_current_on(&mutex->waitqueue, timeout);
 	}
 
 	if (ret == 0) {
