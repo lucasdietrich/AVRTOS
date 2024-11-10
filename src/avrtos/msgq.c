@@ -76,7 +76,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 		z_ker.current->swap_data = (void *)data;
 
 		/* Suspend the current thread until a consumer retrieves a message. */
-		ret = z_pend_current(&msgq->waitqueue, timeout);
+		ret = z_pend_current_on(&msgq->waitqueue, timeout);
 	}
 
 	irq_unlock(key);
@@ -129,7 +129,7 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 		 */
 		z_ker.current->swap_data = data;
 
-		ret = z_pend_current(&msgq->waitqueue, timeout);
+		ret = z_pend_current_on(&msgq->waitqueue, timeout);
 	}
 
 	irq_unlock(key);

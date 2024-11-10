@@ -272,28 +272,6 @@ __kernel static void z_schedule(struct k_thread *thread)
  */
 
 /**
- * @brief Schedule a thread wake-up with a timeout.
- *
- * This function schedules the wake-up of the current
- * thread. The function assumes that the thread is currently suspended
- * (Z_PENDING) and not in the runqueue.
- *
- * @param timeout The timeout value for the wake-up.
- */
-__kernel static void z_schedule_wake_up(k_timeout_t timeout)
-{
-	__ASSERT_NOINTERRUPT();
-	__ASSERT_TRUE((z_ker.current->flags & Z_THREAD_WAKEUP_SCHED_MSK) == 0);
-
-	if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
-		z_ker.current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
-		z_ker.current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
-		z_ker.current->tie.event.next	 = NULL;
-		z_tqueue_schedule(&z_ker.timeouts_queue, &z_ker.current->tie.event);
-	}
-}
-
-/**
  * @brief Cancel a scheduled thread wake-up.
  *
  * This function cancels a previously scheduled wake-up for the specified thread.
@@ -555,7 +533,50 @@ static void z_suspend(struct k_thread *thread)
 	}
 }
 
-__kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
+/**
+ * @brief Schedule a thread wake-up with a timeout.
+ *
+ * This function schedules the wake-up of the current
+ * thread. The function assumes that the thread is currently suspended
+ * (Z_PENDING) and not in the runqueue.
+ *
+ * @param timeout The timeout value for the wake-up.
+ */
+static inline void z_schedule_wake_up(k_timeout_t timeout)
+{
+	__ASSERT_NOINTERRUPT();
+	__ASSERT_TRUE((z_ker.current->flags & Z_THREAD_WAKEUP_SCHED_MSK) == 0);
+
+	if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
+		z_ker.current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
+		z_ker.current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
+		z_ker.current->tie.event.next	 = NULL;
+		z_tqueue_schedule(&z_ker.timeouts_queue, &z_ker.current->tie.event);
+	}
+}
+
+/**
+ * @brief Suspend the current thread and wait until the timeout expires or the
+ * thread is woken up.
+ *
+ * @param timeout The timeout value for the sleep.
+ */
+__kernel void z_pend_current(k_timeout_t timeout)
+{
+	/* Suspend the thread */
+	z_suspend(z_ker.current);
+
+	/* Schedule thread wake-up if timeout is set */
+	z_schedule_wake_up(timeout);
+
+	/* Mark this thread as pending */
+	z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
+
+	/* Call scheduler */
+	z_yield();
+}
+
+__kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
 
@@ -566,26 +587,10 @@ __kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout)
 	int err;
 
 	/* Queue the thread to the pending queue of the object */
-	if (waitqueue != NULL) {
-		dlist_append(waitqueue, &z_ker.current->wany);
-	}
+	dlist_append(waitqueue, &z_ker.current->wany);
 
-	/* Suspend the thread */
-	z_suspend(z_ker.current);
-
-	/* Schedule thread wake-up if timeout is set */
-	z_schedule_wake_up(timeout);
-
-#if CONFIG_KERNEL_TICKLESS
-	/* Set the time slice to the thread soonest timeout */
-	z_set_sched_point(z_ker.timeouts_queue, timeout);
-#endif
-
-	/* Mark this thread as pending */
-	z_set_thread_state(z_ker.current, Z_THREAD_STATE_PENDING);
-
-	/* Call scheduler */
-	z_yield();
+	/* Make the thread until wake-up */
+	z_pend_current(timeout);
 
 	/* If the timer expired, we manually remove the thread from
 	 * the pending queue
@@ -851,9 +856,8 @@ void k_sleep(k_timeout_t timeout)
 {
 	const uint8_t key = irq_lock();
 
-	/* z_pend_current should return -ETIMEDOUT or -EAGAIN depending on the timeout value
-	 */
-	(void)z_pend_current(NULL, timeout);
+	/* Make the thread until wake-up */
+	z_pend_current(timeout);
 
 	irq_unlock(key);
 }

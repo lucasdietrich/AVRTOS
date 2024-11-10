@@ -1,5 +1,52 @@
 # Changelog
 
+## avrtos v1.3.0
+
+Key Features:
+- (experimental feature) New MCP2515 CAN driver: Introduced a new CAN driver for 
+  the MCP2515 controller, 
+  enabling CAN bus communication over SPI. Introduce `CONFIG_DEVICE_MCP2515` 
+  configuration option to enable or disable the MCP2515 driver.
+- Documentation Overhaul: Improved documentation across multiple modules, including 
+  mutexes, semaphores, signals, FIFOs, flags, standard I/O, system time, timers, 
+  events, atomic operations, idle thread, and various kernel headers.
+- Kernel State Structure: Introduced the `z_kernel` structure to centralize all 
+  kernel state variables.
+- Thread Sleep Improvement: Reworked the `z_pend_current()` function and modified 
+  `k_sleep()` to utilize it.
+- Semaphore Enhancement: Added `k_sem_cancel_wait()` function to allow cancellation 
+  of threads waiting on a semaphore.
+- Renamed macros:
+  - Configuration Options Renaming
+    - Renamed several configuration macros for better consistency and clarity:
+      - `CONFIG_KERNEL_DEBUG` to `CONFIG_KERNEL_SYSCLOCK_DEBUG=0`
+      - `CONFIG_KERNEL_TIME_SLICE_TICKS` to `CONFIG_KERNEL_TIME_SLICE_US`
+      - `K_EVENTS_PERIOD_TICKS` to `Z_EVENTS_PERIOD_TICKS`
+      - `K_TIMERS_PERIOD_TICKS` to `Z_TIMERS_PERIOD_TICKS`
+  - SPI Driver Update: Renamed `spi_mode_t` to `spi_role_t` and introduced a new 
+    `spi_mode_t` for better clarity in the SPI driver.
+
+Minor changes:
+- New Sample: Introduced a `hello-world` sample to help new users 
+  get started quickly.
+- Function Relocation: Moved uptime functions to the `systime.c` file.
+- UART Configuration: Changed the default UART baud rate to 115200 bps for 
+  consistency across the platform.
+- QEMU Configuration: Defined `icount auto` in QEMU settings.
+- Makefile Upload Behavior: Adjusted the Makefile to flash the most recently 
+  built sample when uploading
+
+Bug fixes:
+- I2C Driver Frequency Calculation Fix: Corrected the `FREQ_CALC` macro to ensure 
+  accurate frequency settings in the I2C driver.
+- Timer Driver Function Correction: Fixed `ll_timer16_start()` and introduced 
+  `ll_timer16_get_tcnt()`.
+- Workqueue Module Macro Fix: Fixed the `K_WORK_DELAYABLE_INIT` macro and 
+  reintroduced `z_delayable_work_trigger()` to restore delayable workqueue functionality.
+- Kernel Synchronization:
+  - Scheduler Lock Improvement: Modified the kernel to lock the scheduler only 
+    if it is not already locked, preventing potential deadlocks.
+
 ## avrtos v1.2.1
 
 Key features:
@@ -30,13 +77,17 @@ Bug fixes:
 
 Key Features:
 - **I2C**: Introduced a comprehensive I2C driver, and a minimal TCN75 device driver.
-- **SPI Driver Refactor**: Enhanced the SPI driver by introducing the `spi_regs` intermediate structure, which holds SPI registers.
-- **Work Queue**: Added support for delayable work queue items, with a sample demonstrating this feature.
+- **SPI Driver Refactor**: Enhanced the SPI driver by introducing the `spi_regs` 
+  intermediate structure, which holds SPI registers.
+- **Work Queue**: Added support for delayable work queue items, with a sample 
+  demonstrating this feature.
 
 Minor Changes:
-- Stored MCUSR at startup using the `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` option.
+- Stored MCUSR at startup using the `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` 
+  option.
 - Introduced new configuration options:
-  - Management of reset cause with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` and `CONFIG_KERNEL_CLEAR_WDT_ON_INIT`.
+  - Management of reset cause with `CONFIG_KERNEL_MINICORE_SAVE_RESET_CAUSE` and 
+    `CONFIG_KERNEL_CLEAR_WDT_ON_INIT`.
   - Addition of an idle hook through `CONFIG_IDLE_HOOK`.
   - Enabling of the delayable work feature with `CONFIG_WORKQUEUE_DELAYABLE`.
   - `CONFIG_SERIAL_AUTO_INIT`.
@@ -48,7 +99,8 @@ Minor Changes:
 - Improved overall error code returns and extended support for `CONFIG_KERNEL_ARGS_CHECK`.
 
 Bug Fixes:
-- Fixed `CONFIG_KERNEL_AUTO_INIT` with the Arduino framework by utilizing the `initVariant()` function.
+- Fixed `CONFIG_KERNEL_AUTO_INIT` with the Arduino framework by utilizing the 
+  `initVariant()` function.
 
 Documentation and Samples:
 - Enhanced documentation.

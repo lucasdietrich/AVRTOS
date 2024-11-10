@@ -127,7 +127,7 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  * @return -ETIMEDOUT if the timeout expired
  * @return -ECANCELED if the wait was canceled
  */
-__kernel int8_t z_pend_current(struct dnode *waitqueue, k_timeout_t timeout);
+__kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout);
 
 /**
  * @brief Wake up the first thread waiting on an object and switch to it.
