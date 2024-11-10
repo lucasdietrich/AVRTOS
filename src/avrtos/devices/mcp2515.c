@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "mcp2515.h"
 #include <stdint.h>
 #include <string.h>
 
 #include <avrtos/logging.h>
 
-#include "mcp2515.h"
 #include "mcp2515_priv.h"
 
 #if CONFIG_DEVICE_MCP2515

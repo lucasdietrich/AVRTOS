@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <Arduino.h>
+
+#include <avrtos.h>
 #include <avrtos/avrtos.h>
 #include <avrtos/misc/led.h>
-
-#include <Arduino.h>
-#include <avrtos.h>
 
 void setup(void)
 {

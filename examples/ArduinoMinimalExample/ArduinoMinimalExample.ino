@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
-
-#include <avrtos.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
 
 K_MSGQ_DEFINE(usart_msgq, 1u, 16u);
