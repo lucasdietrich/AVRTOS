@@ -579,6 +579,7 @@ __kernel void z_pend_current(k_timeout_t timeout)
 __kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout)
 {
 	__ASSERT_NOINTERRUPT();
+	__ASSERT_NOTNULL(waitqueue);
 
 	if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		return -EAGAIN;
