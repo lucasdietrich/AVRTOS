@@ -11,7 +11,7 @@
 .extern z_main_stack
 .extern z_avrtos_init
 
-#if (CONFIG_KERNEL_AUTO_INIT == 1) && (CONFIG_ARDUINO_FRAMEWORK == 0)
+#if (CONFIG_KERNEL_AUTO_INIT == 1) && (Z_CONFIG_ARDUINO_FRAMEWORK == 0)
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 .section .init3,"ax",@progbits

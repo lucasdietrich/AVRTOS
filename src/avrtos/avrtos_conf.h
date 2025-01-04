@@ -19,8 +19,10 @@
 //
 // This option is set to 1 if the ARDUINO macro is detected.
 //
-#ifndef CONFIG_ARDUINO_FRAMEWORK
-#define CONFIG_ARDUINO_FRAMEWORK defined(ARDUINO)
+#if defined(ARDUINO)
+#define Z_CONFIG_ARDUINO_FRAMEWORK 1
+#else
+#define Z_CONFIG_ARDUINO_FRAMEWORK 0
 #endif
 
 //
@@ -31,8 +33,10 @@
 //
 // This option is set to 1 if the PLATFORMIO macro is detected.
 //
-#ifndef CONFIG_PLATFORMIO_IDE
-#define CONFIG_PLATFORMIO_IDE defined(PLATFORMIO)
+#if defined(PLATFORMIO)
+#define Z_CONFIG_PLATFORMIO_IDE 1
+#else
+#define Z_CONFIG_PLATFORMIO_IDE 0
 #endif
 
 /* Include Arduino-specific configuration if the Arduino framework is used
@@ -40,7 +44,7 @@
  *
  * This configuration is adapted for beginners.
  */
-#if CONFIG_ARDUINO_FRAMEWORK && !CONFIG_PLATFORMIO_IDE
+#if Z_CONFIG_ARDUINO_FRAMEWORK && !Z_CONFIG_PLATFORMIO_IDE
 #include "avrtos_arduinoide_conf.h"
 #endif
 
@@ -71,8 +75,9 @@
 // as it is not possible to provide a custom linker script.
 //
 // 0: The AVRTOS linker script is not provided. Kernel sections are not used. Kernel
-// objects must be initialized manually. 1: The AVRTOS linker script is provided. Kernel
-// sections are used. Kernel objects are initialized automatically.
+//    objects must be initialized manually.
+// 1: The AVRTOS linker script is provided. Kernel sections are used. Kernel objects
+//    are initialized automatically.
 //
 // Additional notes:
 //

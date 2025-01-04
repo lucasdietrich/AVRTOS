@@ -139,7 +139,7 @@ void z_avrtos_init(void)
  * This function is called automatically by the Arduino framework to initialize
  * the AVRTOS kernel if the auto-initialization option is enabled (it wiLL be).
  */
-#if CONFIG_ARDUINO_FRAMEWORK && CONFIG_KERNEL_AUTO_INIT
+#if Z_CONFIG_ARDUINO_FRAMEWORK && CONFIG_KERNEL_AUTO_INIT
 void initVariant(void)
 {
 	z_avrtos_init();

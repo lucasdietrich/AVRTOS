@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/avrtos.h>
-
 #include <Arduino.h>
+#include <avrtos.h>
 
 static uint16_t counter = 0;
 
