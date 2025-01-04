@@ -92,7 +92,7 @@ struct k_thread {
  */
 typedef char z_ticks_t[CONFIG_KERNEL_TICKS_COUNTER_SIZE];
 
-typedef struct z_kernel {
+typedef struct __packed z_kernel {
 	/**
 	 * @brief Pointer to the thread currently holding the CPU (context set).
 	 *

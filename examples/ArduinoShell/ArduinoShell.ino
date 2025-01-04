@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos.h>
 #include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
@@ -14,7 +15,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <avrtos.h>
 #define LOG_LEVEL LOG_LEVEL_WRN
 
 void consumer(void *context);

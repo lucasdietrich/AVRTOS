@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <Arduino.h>
+
+#include <avrtos.h>
 #include <avrtos/drivers/exti.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
 #include <avrtos/drivers/usart.h>
-
-#include <Arduino.h>
-#include <avrtos.h>
 
 #if defined(__AVR_ATmega2560__)
 #define INT0_PORT GPIOD

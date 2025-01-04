@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <Arduino.h>
+
+#include <avrtos.h>
 #include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
-
-#include <Arduino.h>
-#include <avrtos.h>
 
 // Change the log level (LOG_LEVEL_DBG, LOG_LEVEL_INF, LOG_LEVEL_WRN or LOG_LEVEL_ERR)
 #define LOG_LEVEL LOG_LEVEL_WRN

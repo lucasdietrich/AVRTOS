@@ -1,5 +1,10 @@
 # Changelog
 
+## avrtos v1.3.1
+
+Key features:
+- Fix Arduino build
+
 ## avrtos v1.3.0
 
 Key Features:
