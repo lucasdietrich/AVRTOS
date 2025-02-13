@@ -74,5 +74,5 @@ void k_print_stack_canaries(struct k_thread *thread)
 
 void k_print_current_canaries(void)
 {
-	k_print_stack_canaries(z_current);
+	k_print_stack_canaries(z_ker.current);
 }

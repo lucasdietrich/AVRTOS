@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -14,7 +14,7 @@
 #include <util/delay.h>
 
 #define BLOCKS_COUNT 10
-#define BLOCK_SIZE   0x20
+#define BLOCK_SIZE	 0x20
 
 K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
 
@@ -43,7 +43,7 @@ void writer(struct k_msgq *msgq)
 		(*(uint16_t *)buf)++;
 
 		ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
-		serial_transmit(z_current->symbol);
+		serial_transmit(k_thread_get_current()->symbol);
 
 		if (ret == 0) {
 			serial_transmit(' ');
@@ -66,7 +66,7 @@ void reader(struct k_msgq *msgq)
 
 	for (;;) {
 		ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
-		serial_transmit(z_current->symbol);
+		serial_transmit(k_thread_get_current()->symbol);
 		if (ret == 0) {
 
 			serial_transmit(' ');
@@ -97,4 +97,3 @@ int main(void)
 		k_msgq_purge(&msgq);
 	}
 }
-

@@ -5,8 +5,9 @@
  */
 
 #include <avrtos.h>
-
 #include <avrtos/logging.h>
+#include <avrtos/misc/led.h>
+
 // Change the log level (LOG_LEVEL_DBG, LOG_LEVEL_INF, LOG_LEVEL_WRN or LOG_LEVEL_ERR)
 #define LOG_LEVEL LOG_LEVEL_WRN
 
@@ -18,8 +19,8 @@
 #define FORKS MUTEX
 
 #define PHIL_THINKING_DURATION_MAX_MS 5000u
-#define PHIL_EATING_DURATION_MAX_MS   5000u
-#define PHIL_DURATION_TO_STARVE_MS    15000u
+#define PHIL_EATING_DURATION_MAX_MS	  5000u
+#define PHIL_DURATION_TO_STARVE_MS	  15000u
 
 typedef enum {
 	PHIL_STATE_NONE = 0u,
@@ -33,12 +34,12 @@ typedef enum {
 const char *phil_state_to_string(phil_state_t state)
 {
 	static const char *states_char[] = {
-		[PHIL_STATE_NONE]		= "-",
-		[PHIL_STATE_THINKING]		= "THINKING  ",
+		[PHIL_STATE_NONE]				= "-",
+		[PHIL_STATE_THINKING]			= "THINKING  ",
 		[PHIL_STATE_PENDING_LEFT_FORK]	= "PEND_LEFT ",
 		[PHIL_STATE_PENDING_RIGHT_FORK] = "PEND_RIGHT",
-		[PHIL_STATE_EATING]		= "EATING    ",
-		[PHIL_STATE_STARVING]		= "STARVING  ",
+		[PHIL_STATE_EATING]				= "EATING    ",
+		[PHIL_STATE_STARVING]			= "STARVING  ",
 	};
 
 	if (state >= ARRAY_SIZE(states_char)) {
@@ -67,11 +68,11 @@ static uint16_t get_random_duration_ms(uint16_t min_duration_ms, uint16_t max_du
 
 class Fork
 {
-public:
+  public:
 	Fork() = default;
 
 	virtual bool Lock(k_timeout_t timeout) = 0;
-	virtual void Unlock(void)	       = 0;
+	virtual void Unlock(void)			   = 0;
 };
 
 #if FORKS == MUTEX
@@ -80,7 +81,7 @@ public:
 
 class MutexFork : public Fork
 {
-public:
+  public:
 	MutexFork(void)
 	{
 		/* Create a mutex for the fork */
@@ -97,7 +98,7 @@ public:
 		k_mutex_unlock(&m_mutex);
 	}
 
-private:
+  private:
 	/* Mutex for the fork */
 	struct k_mutex m_mutex;
 };
@@ -108,7 +109,7 @@ private:
 
 class SemaphoreFork : public Fork
 {
-public:
+  public:
 	SemaphoreFork(void)
 	{
 		/* Create a semaphore for the fork */
@@ -125,7 +126,7 @@ public:
 		k_sem_give(&m_sem);
 	}
 
-private:
+  private:
 	/* Mutex for the fork */
 	struct k_sem m_sem;
 };
@@ -136,7 +137,7 @@ private:
 
 class FifoFork : public Fork
 {
-public:
+  public:
 	FifoFork(void)
 	{
 		/* Create a fifo for the fork */
@@ -156,7 +157,7 @@ public:
 		k_fifo_put(&m_fifo, &m_node);
 	}
 
-private:
+  private:
 	/* Mutex for the fork */
 	struct k_fifo m_fifo;
 	struct snode m_node;
@@ -166,17 +167,12 @@ private:
 
 class Philosopher
 {
-public:
+  public:
 	Philosopher(Fork &left, Fork &right, const char *name)
 		: m_left_fork(left), m_right_fork(right), m_name(name)
 	{
-		k_thread_create(&m_thread,
-				reinterpret_cast<k_thread_entry_t>(Philosopher::Live),
-				m_stack,
-				sizeof(m_stack),
-				K_COOPERATIVE,
-				this,
-				m_name[0u]);
+		k_thread_create(&m_thread, reinterpret_cast<k_thread_entry_t>(Philosopher::Live),
+						m_stack, sizeof(m_stack), K_COOPERATIVE, this, m_name[0u]);
 
 		m_state = PHIL_STATE_NONE;
 
@@ -199,7 +195,7 @@ public:
 		return m_state;
 	}
 
-private:
+  private:
 	void Think(void)
 	{
 		m_state = PHIL_STATE_THINKING;
@@ -212,14 +208,14 @@ private:
 
 	bool GetForks(void)
 	{
-		bool has_left_fork  = false;
+		bool has_left_fork	= false;
 		bool has_right_fork = false;
-		uint16_t time_left  = PHIL_DURATION_TO_STARVE_MS;
-		uint32_t now	    = k_uptime_get_ms32();
+		uint16_t time_left	= PHIL_DURATION_TO_STARVE_MS;
+		uint32_t now		= k_uptime_get_ms32();
 
 		LOG_INF("%s is trying to get forks", m_name);
 
-		m_state	      = PHIL_STATE_PENDING_LEFT_FORK;
+		m_state		  = PHIL_STATE_PENDING_LEFT_FORK;
 		has_left_fork = m_left_fork.Lock(K_MSEC(time_left));
 
 		if (has_left_fork) {
@@ -229,13 +225,13 @@ private:
 			goto exit;
 		}
 
-		m_state	       = PHIL_STATE_PENDING_RIGHT_FORK;
+		m_state		   = PHIL_STATE_PENDING_RIGHT_FORK;
 		has_right_fork = m_right_fork.Lock(K_MSEC(time_left));
 
 		if (has_right_fork) {
 			LOG_INF("%s got forks", m_name);
 		} else {
-			LOG_WRN("%s failed to get right fork", m_name);
+			LOG_WRN("%s failed to get right fork, releasing left fork", m_name);
 			m_left_fork.Unlock();
 			goto exit;
 		}
@@ -246,9 +242,8 @@ private:
 
 	void Eat(void)
 	{
-		m_state = PHIL_STATE_EATING;
-		const uint16_t duration =
-			get_random_duration_ms(0u, PHIL_EATING_DURATION_MAX_MS);
+		m_state					= PHIL_STATE_EATING;
+		const uint16_t duration = get_random_duration_ms(0u, PHIL_EATING_DURATION_MAX_MS);
 		LOG_INF("%s is eating for %u ms", m_name, duration);
 		k_sleep(K_MSEC(duration));
 
@@ -308,7 +303,7 @@ static Philosopher philosophers[5u] = {
 	Philosopher(forks[1u], forks[2u], "Kant"),
 	Philosopher(forks[2u], forks[3u], "Buddha"),
 	Philosopher(forks[3u], forks[4u], "Marx"),
-	Philosopher(forks[0u], forks[4u], "Russel"),
+	Philosopher(forks[4u], forks[0u], "Russel"),
 };
 
 struct k_timer timer;
@@ -321,11 +316,11 @@ int timer_handler(struct k_timer *timer)
 	return 0; // continue
 }
 
-
 void setup(void)
 {
 	/* LED initialisation */
-	pinMode(LED_BUILTIN, OUTPUT);
+	led_init();
+	led_off();
 
 	/* Serial initialisation */
 	Serial.begin(9600u);
@@ -345,7 +340,7 @@ void setup(void)
 	}
 
 	k_sem_init(&sem, 1u, 1u);
-	k_timer_init(&timer, timer_handler, K_MSEC(100u), K_NO_WAIT);
+	k_timer_init(&timer, timer_handler, K_MSEC(500u), K_NO_WAIT);
 }
 
 void loop(void)
@@ -357,8 +352,15 @@ void loop(void)
 	for (Philosopher &phil : philosophers) {
 		phil_state_t state = phil.GetState();
 
+		/* Turn on the LED if one philosopher is starving */
+		if (state == PHIL_STATE_STARVING) {
+			if (led_get() == 0u) {
+				led_on();
+			}
+		}
+
 		printf_P(PSTR("%s "), phil_state_to_string(state));
 	}
 
-	printf_P(PSTR("\n"));
+	printf_P(LOG_LEVEL >= LOG_LEVEL_INF ? PSTR("\n") : PSTR("\r"));
 }

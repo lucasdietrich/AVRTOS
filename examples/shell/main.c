@@ -4,16 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
+#include <avrtos/logging.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-
-#include <avrtos/logging.h>
 #define LOG_LEVEL LOG_LEVEL_WRN
 
 #define K_MODULE K_MODULE_APPLICATION
@@ -34,7 +33,7 @@ K_FIFO_DEFINE(myfifo);
 void push(struct in **mem)
 {
 	struct k_thread *thread = k_fifo_put(&myfifo, *(void **)mem);
-	*mem			= NULL;
+	*mem					= NULL;
 	k_yield_from_isr_cond(thread);
 }
 
@@ -48,7 +47,7 @@ void free_in(struct in *mem)
 	k_mem_slab_free(&myslab, mem);
 }
 
-__always_inline void input(const char rx)
+void input(const char rx)
 {
 	static struct in *mem = NULL;
 
@@ -112,8 +111,8 @@ static void cmd_reboot(void);
 static void cmd_sleep(void);
 
 #define CMD(_name, _func)                                                                \
-	{                                                                                \
-		.name = _name, .name_len = sizeof(_name) - 1u, .func = _func             \
+	{                                                                                    \
+		.name = _name, .name_len = sizeof(_name) - 1u, .func = _func                     \
 	}
 
 const struct command commands[] PROGMEM = {
@@ -160,10 +159,8 @@ static void cmd_help(void)
 
 static void cmd_version(void)
 {
-	printf_P(PSTR("version: %02u.%02u.%02u"),
-		 AVRTOS_VERSION_MAJOR,
-		 AVRTOS_VERSION_MINOR,
-		 AVRTOS_VERSION_REVISION);
+	printf_P(PSTR("version: %02u.%02u.%02u"), AVRTOS_VERSION_MAJOR, AVRTOS_VERSION_MINOR,
+			 AVRTOS_VERSION_REVISION);
 }
 
 static void cmd_reboot(void)

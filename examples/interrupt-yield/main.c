@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -86,8 +86,7 @@ void waiting_thread(void *p)
 
 			k_mem_slab_free(&myslab, mem);
 		} else {
-			serial_printl_p(
-				PSTR("Didn't get a letter from the UART in time."));
+			serial_printl_p(PSTR("Didn't get a letter from the UART in time."));
 		}
 	}
 }

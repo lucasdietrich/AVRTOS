@@ -4,6 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * Platform macros and definitions.
+ *
+ * The architecture, the language and the compiler defines the platform in the
+ * current context:
+ * - AVR / C / avr-gcc
+ */
+
 #ifndef _AVRTOS_COMMON_H
 #define _AVRTOS_COMMON_H
 

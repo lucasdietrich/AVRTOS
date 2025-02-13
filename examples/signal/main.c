@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -19,9 +19,9 @@ ISR(USART0_RX_vect)
 	const char rx = UDR0;
 	serial_transmit(rx);
 
-	struct k_thread *thread = k_signal_raise(&sig, rx);
+	int8_t ret = k_signal_raise(&sig, rx);
 
-	k_yield_from_isr_cond(thread);
+	if (ret > 0) k_yield_from_isr();
 }
 
 int main(void)

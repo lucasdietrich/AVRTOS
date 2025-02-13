@@ -40,32 +40,29 @@ def to_camel_case(snake_str):
     components = re.split(r"[-_]", snake_str)
     return "".join(x.title() for x in components)
 
-# refer to src/avrtos/avrtos_arduinoide_conf.h
-arduino_examples_options = [
-	"CONFIG_AVRTOS_LINKER_SCRIPT=0",
-	"CONFIG_KERNEL_AUTO_INIT=1",
-	"CONFIG_KERNEL_TIMERS=1",
-	"CONFIG_KERNEL_EVENTS=1",
-	"CONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT=1",
-	"CONFIG_KERNEL_ATOMIC_API=1",
-	"CONFIG_SYSTEM_WORKQUEUE_ENABLE=0",
-	"CONFIG_STDIO_PRINTF_TO_USART=0",
-	"CONFIG_THREAD_MAIN_STACK_SIZE=512",
-	"CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN=1",
-	"CONFIG_KERNEL_THREAD_TERMINATION_TYPE=1",
-	"CONFIG_KERNEL_SYSLOCK_HW_TIMER=2",
-	"CONFIG_KERNEL_DELAY_OBJECT_U32=1",
-	"CONFIG_KERNEL_THREAD_IDLE_ADD_STACK=96",
-	"CONFIG_THREAD_CANARIES=1",
-	"CONFIG_THREAD_STACK_SENTINEL=0",
-	"CONFIG_KERNEL_ASSERT=0",
-	"CONFIG_KERNEL_ARGS_CHECKS=0",
-    f"CONFIG_SERIAL_USART_BAUDRATE={DEFAULT_ARDUINO_SPEED}lu",
-    "CONFIG_THREAD_MAIN_COOPERATIVE=1",
-    "CONFIG_KERNEL_UPTIME=1",
-    "CONFIG_KERNEL_SYSCLOCK_PERIOD_US=1000lu",
-    "CONFIG_KERNEL_TIME_SLICE_US=1000lu",
-]
+def get_arduino_default_configuration(arduino_conf_file = "src/avrtos/avrtos_arduinoide_conf.h"):
+    re_config_option = re.compile(r"^#define (?P<option>CONFIG_([A-Z0-9_]+)) (?P<value>.*)$")
+
+    options = list()
+
+    with open(arduino_conf_file) as f:
+        lines = f.readlines()
+        for line in lines:
+            m = re_config_option.match(line)
+            if m:
+                key = m.group("option")
+                val = m.group("value")
+
+                if key == "CONFIG_SERIAL_USART_BAUDRATE":
+                    options.append(f"{key}={DEFAULT_ARDUINO_SPEED}lu")
+                else:
+                    options.append(m.group("option") + "=" + m.group("value"))
+            
+    return options
+
+arduino_examples_options = get_arduino_default_configuration()
+print("Arduino default configuration:")
+pprint(arduino_examples_options)
 
 def generate_pio_env(env_name: str, example_path: str, options: List[str], isarduino: bool) -> str:
     options = "\n".join(["\t-D" + x for x in options])

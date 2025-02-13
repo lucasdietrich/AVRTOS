@@ -16,5 +16,5 @@ make -C build_master
 if [ "$1" == "flash" ]; then
 	make -C build_master upload
 elif [ "$1" == "monitor" ]; then
-	python3 -m serial.tools.miniterm /dev/ttyACM1 500000 --raw --eol LF
+	python3 -m serial.tools.miniterm /dev/ttyACM1 115200 --raw --eol LF
 fi

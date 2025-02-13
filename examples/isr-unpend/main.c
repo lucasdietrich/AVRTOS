@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/timer.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 
 K_SEM_DEFINE(sem, 0, 1);
 
@@ -36,7 +36,7 @@ int main(void)
 	};
 	ll_timer16_init(TIMER3_DEVICE, timer_get_index(TIMER3_DEVICE), &timer_cfg);
 
-	const struct usart_config usart_cfg = USART_CONFIG_DEFAULT_500000();
+	const struct usart_config usart_cfg = USART_CONFIG_DEFAULT_115200();
 	ll_usart_init(USART0_DEVICE, &usart_cfg);
 
 	for (;;) {

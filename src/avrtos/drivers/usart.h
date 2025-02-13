@@ -164,7 +164,7 @@ struct usart_config {
 		.speed_mode = USART_SPEED_MODE_NORMAL                                            \
 	}
 
-#define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_500000
+#define USART_CONFIG_DEFAULT USART_CONFIG_DEFAULT_115200
 
 // drivers API
 __kernel void ll_usart_init(UART_Device *dev, const struct usart_config *config);

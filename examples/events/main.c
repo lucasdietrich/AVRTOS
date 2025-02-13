@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/serial.h>
 
 #include <util/delay.h>
@@ -42,13 +42,8 @@ int main(void)
 	for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
 		k_event_init(&ms->ev, event_handler);
 		k_signal_init(&ms->sig);
-		k_thread_create(&ms->thread,
-				thread,
-				ms->stack,
-				sizeof(ms->stack),
-				K_COOPERATIVE,
-				ms,
-				'0' + (ms - threads));
+		k_thread_create(&ms->thread, thread, ms->stack, sizeof(ms->stack), K_COOPERATIVE,
+						ms, '0' + (ms - threads));
 		k_thread_start(&ms->thread);
 	}
 
@@ -97,16 +92,16 @@ static void event_handler(struct k_event *ev)
 static void thread(void *p)
 {
 	uint16_t rdm_ms;
-	uint32_t counter    = 0;
+	uint32_t counter	= 0;
 	struct mystruct *ms = (struct mystruct *)p;
 
 	/* protect with K_SCHED_LOCK_CONTEXT if threads are preemptive */
-	printf_P(PSTR("Thread %c started\n"), z_current->symbol);
+	printf_P(PSTR("Thread %c started\n"), k_thread_get_current()->symbol);
 
 	for (;;) {
 		rdm_ms = random() % MAX_DELAY_MS;
 		k_event_schedule(&ms->ev,
-				 K_MSEC(MAX(rdm_ms, 1))); /* make sure timeout is not 0 */
+						 K_MSEC(MAX(rdm_ms, 1))); /* make sure timeout is not 0 */
 
 		if (k_poll_signal(&ms->sig, K_FOREVER) == 0) {
 			K_SIGNAL_SET_UNREADY(&ms->sig);
@@ -114,10 +109,8 @@ static void thread(void *p)
 			/* protect with K_SCHED_LOCK_CONTEXT if threads are
 			 * preemptive */
 			printf_P(PSTR("%c : signaled after %u ms [counter = "
-				      "%lu]\n"),
-				 z_current->symbol,
-				 rdm_ms,
-				 ++counter);
+						  "%lu]\n"),
+					 k_thread_get_current()->symbol, rdm_ms, ++counter);
 		} else {
 			__ASSERT_TRUE(false);
 		}

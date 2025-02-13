@@ -62,7 +62,7 @@ extern "C" {
 /**
  * @brief TCN75 context
  */
-struct tcn75_context {
+struct tcn75_device {
 	/* TCN75 device address, of the form TCN75_ADDR_BASE + 0b000_0xxx */
 	uint8_t addr;
 	/* TCN75 configuration register, e.g. TCN75_DEFAULT_CONFIG */
@@ -80,7 +80,7 @@ struct tcn75_context {
  * @param i2c I2C device the TCN75 is connected to
  * @return int8_t 0 if success, negative value otherwise
  */
-int8_t tcn75_init_context(struct tcn75_context *tcn75,
+int8_t tcn75_init_context(struct tcn75_device *tcn75,
 						  uint8_t addr_lsb,
 						  uint8_t config,
 						  I2C_Device *i2c);
@@ -91,7 +91,7 @@ int8_t tcn75_init_context(struct tcn75_context *tcn75,
  * @param tcn75 initialized TCN75 context
  * @return int8_t 0 if success, negative value otherwise
  */
-int8_t tcn75_configure(struct tcn75_context *tcn75);
+int8_t tcn75_configure(struct tcn75_device *tcn75);
 
 /**
  * @brief Select the temperature register of a TCN75 device.
@@ -99,7 +99,7 @@ int8_t tcn75_configure(struct tcn75_context *tcn75);
  * @param tcn75 initialized TCN75 context
  * @return int8_t 0 if success, negative value otherwise
  */
-int8_t tcn75_select_data_register(struct tcn75_context *tcn75);
+int8_t tcn75_select_data_register(struct tcn75_device *tcn75);
 
 /**
  * @brief Read the temperature from a TCN75 device.
@@ -107,7 +107,7 @@ int8_t tcn75_select_data_register(struct tcn75_context *tcn75);
  * @param tcn75 initialized TCN75 context
  * @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error
  */
-int16_t tcn75_read(struct tcn75_context *tcn75);
+int16_t tcn75_read(struct tcn75_device *tcn75);
 
 /**
  * @brief Select the temperature register of a TCN75 device and read the temperature.
@@ -115,7 +115,7 @@ int16_t tcn75_read(struct tcn75_context *tcn75);
  * @param tcn75 initialized TCN75 context
  * @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error
  */
-int16_t tcn75_select_read(struct tcn75_context *tcn75);
+int16_t tcn75_select_read(struct tcn75_device *tcn75);
 
 #ifdef __cplusplus
 }

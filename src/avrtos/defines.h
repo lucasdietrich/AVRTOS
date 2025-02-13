@@ -11,9 +11,15 @@
 #include "errno.h"
 #include "sys.h"
 
+// AVRTOS version 1.3.1
 #define AVRTOS_VERSION_MAJOR	1
-#define AVRTOS_VERSION_MINOR	2
-#define AVRTOS_VERSION_REVISION 0
+#define AVRTOS_VERSION_MINOR	3
+#define AVRTOS_VERSION_REVISION 1
+#define AVRTOS_VERSION                                                                   \
+	((AVRTOS_VERSION_MAJOR << 16) | (AVRTOS_VERSION_MINOR << 8) | AVRTOS_VERSION_REVISION)
+#define AVRTOS_VERSION_STRING "1.3.1"
+#define AVRTOS_VERSION_STRING_FULL                                                       \
+	"AVRTOS v" AVRTOS_VERSION_STRING " (c) 2021-2024 Lucas Dietrich"
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN && CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #error                                                                                   \
@@ -50,6 +56,7 @@
 #if CONFIG_KERNEL_ARGS_CHECKS
 #define Z_ARGS_CHECK(_cond) if (!(_cond))
 #else
+// TODO fallback to ASSERT
 #define Z_ARGS_CHECK(_cond) if (0)
 #endif
 
@@ -58,8 +65,6 @@
 #else
 #define Z_PRIVATE(_member) _##_member
 #endif
-
-/*___________________________________________________________________________*/
 
 // Timing
 
@@ -82,26 +87,23 @@
 #if CONFIG_KERNEL_TIME_SLICE_US < CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #error[UNSUPPORTED] CONFIG_KERNEL_TIME_SLICE_US < CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #elif CONFIG_KERNEL_TIME_SLICE_US > CONFIG_KERNEL_SYSCLOCK_PERIOD_US
-#define CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS 1
+#define Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS 1
 
 #if CONFIG_KERNEL_TIME_SLICE_US % CONFIG_KERNEL_SYSCLOCK_PERIOD_US != 0
 #warning[WARNING] CONFIG_KERNEL_TIME_SLICE_US must be a multiple of CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #endif
 
 #if CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US <= 255
-#define CONFIG_KERNEL_TIME_SLICE_TICKS                                                   \
+#define Z_KERNEL_TIME_SLICE_TICKS                                                        \
 	(CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
 #else
 #error "Time slice too different compared to CONFIG_KERNEL_SYSCLOCK_PERIOD_US\
 		CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US > 255"
 #endif
 #else
-#define CONFIG_KERNEL_TIME_SLICE_MULTIPLE_TICKS 0
-#define CONFIG_KERNEL_TIME_SLICE_TICKS			1
+#define Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS 0
+#define Z_KERNEL_TIME_SLICE_TICKS		   1
 #endif /* CONFIG_KERNEL_TIME_SLICE_US != CONFIG_KERNEL_SYSCLOCK_PERIOD_US */
-
-#define K_EVENTS_PERIOD_TICKS CONFIG_KERNEL_TIME_SLICE_TICKS
-#define K_TIMERS_PERIOD_TICKS CONFIG_KERNEL_TIME_SLICE_TICKS
 
 #define KERNEL_TICK_PERIOD_US CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #define KERNEL_TICK_PERIOD_MS (KERNEL_TICK_PERIOD_US / 1000ULL)
@@ -157,8 +159,6 @@ typedef struct {
 
 #define K_IMMEDIATE K_NEXT_TICK
 
-/*___________________________________________________________________________*/
-
 // MCU specific fixups
 
 #if !defined(USART0_RX_vect) && defined(USART_RX_vect)
@@ -196,8 +196,6 @@ typedef struct {
 #else
 #define Z_STACK_SENTINEL_REGISTER(stack_symb)
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
-
-/*___________________________________________________________________________*/
 
 // 31 registers (31) + SREG (1) + return address (2 or 3)
 
@@ -339,8 +337,6 @@ typedef struct {
 #define Z_THREAD_IS_MONITORED(thread) ((thread) != &z_thread_main)
 #endif
 
-/*___________________________________________________________________________*/
-
 /* Note: Willingly not adding unsigned "u" suffix to numbers
  * because these flags are used in assembly code
  */
@@ -405,7 +401,5 @@ typedef struct {
 
 /* Default thread priority level */
 #define K_PRIO_DEFAULT (K_COOPERATIVE | Z_THREAD_PRIO_LOW)
-
-/*___________________________________________________________________________*/
 
 #endif

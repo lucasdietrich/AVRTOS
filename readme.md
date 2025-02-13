@@ -28,7 +28,7 @@ AVRTOS offers an extensive list of features, including:
 - Configurable system clock with support for all hardware timers (e.g. 0-2 for ATmega328p and 0-5 for ATmega2560)
 - Synchronization objects like mutexes, semaphores, workqueues (+delayables), FIFOs, message queues, memory slabs, flags, signals
 - Drivers for UART, timers, GPIO, SPI, I2C and external interrupts
-- Devices drivers for TCN75
+- Devices drivers for TCN75, MCP2515
 - Thread sleep with up to 65-second duration in simple mode (extendable using high-precision time objects)
 - Scheduler lock/unlock to temporarily prevent preemption for preemptive threads
 - Thread switching from interrupts
@@ -141,7 +141,7 @@ ISR(USART0_RX_vect)
 int main(void)
 {
 	const struct usart_config usart_config = {
-		.baudrate    = USART_BAUD_500000,
+		.baudrate    = USART_BAUD_115200,
 		.receiver    = 1u,
 		.transmitter = 1u,
 		.mode	     = USART_MODE_ASYNCHRONOUS,
@@ -234,7 +234,7 @@ board = pro16MHzatmega328
 
 upload_port = COM3
 monitor_port = COM3
-monitor_speed = 500000
+monitor_speed = 115200
 
 build_src_filter = 
 	+<AVRTOS/src/>
@@ -297,7 +297,7 @@ make -C build upload_sample_minimal_example
 
 Monitor the serial console with `miniterm`:
 ```bash
-BAUDRATE=500000 make monitor
+BAUDRATE=115200 make monitor
 ```
 
 ### Custom target (Cmake)

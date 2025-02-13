@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/gpio.h>
 #include <avrtos/drivers/spi.h>
-#include <avrtos/avrtos.h>
+
 #include <util/crc16.h>
 
 #define DELAY_US 25u
@@ -18,10 +19,10 @@ int main(void)
 
 	/* Advised configuration */
 	const struct spi_config cfg = {
-		.mode	     = SPI_MODE_MASTER,
-		.polarity    = SPI_CLOCK_POLARITY_RISING,
-		.phase	     = SPI_CLOCK_PHASE_SAMPLE,
-		.prescaler   = SPI_PRESCALER_4,
+		.role		 = SPI_ROLE_MASTER,
+		.polarity	 = SPI_CLOCK_POLARITY_RISING,
+		.phase		 = SPI_CLOCK_PHASE_SAMPLE,
+		.prescaler	 = SPI_PRESCALER_4,
 		.irq_enabled = 0u,
 	};
 

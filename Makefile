@@ -80,7 +80,7 @@ drv-i2c-tcn75:
 		-DCMAKE_BUILD_TYPE=Release
 	$(GENERATOR_COMMAND) -C build $(GENERATOR_ARGS)
 
-upload: all
+upload:
 	$(GENERATOR_COMMAND) -C build upload $(GENERATOR_ARGS)
 
 flash: upload
@@ -98,6 +98,7 @@ run_qemu:
 
 format:
 	find src -iname *.h -o -iname *.c -o -iname *.cpp | xargs clang-format -i
+	find examples -iname *.h -o -iname *.c -o -iname *.cpp -o -iname *.ino | xargs clang-format -i
 
 clean:
 	rm -rf build

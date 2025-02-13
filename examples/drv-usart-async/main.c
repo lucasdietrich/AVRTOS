@@ -6,9 +6,9 @@
 
 // For ATmega328PB or ATmega2560
 
+#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/misc/serial.h>
 
 #include <avr/interrupt.h>
@@ -102,9 +102,7 @@ void consumer(void *context)
 			serial_u8(mem->len);
 			serial_print_p(PSTR(" : "));
 
-			for (uint8_t *c = (uint8_t *)mem->buffer;
-			     c < mem->buffer + mem->len;
-			     c++) {
+			for (uint8_t *c = (uint8_t *)mem->buffer; c < mem->buffer + mem->len; c++) {
 				serial_transmit(*c);
 			}
 		}
@@ -114,13 +112,13 @@ void consumer(void *context)
 
 // IPC uart
 const struct usart_config usart_ipc_cfg PROGMEM = {.baudrate	= USART_BAUD_1000000,
-						   .receiver	= 1,
-						   .transmitter = 1,
-						   .mode	= USART_MODE_ASYNCHRONOUS,
-						   .parity	= USART_PARITY_NONE,
-						   .stopbits	= USART_STOP_BITS_1,
-						   .databits	= USART_DATA_BITS_8,
-						   .speed_mode = USART_SPEED_MODE_NORMAL};
+												   .receiver	= 1,
+												   .transmitter = 1,
+												   .mode		= USART_MODE_ASYNCHRONOUS,
+												   .parity		= USART_PARITY_NONE,
+												   .stopbits	= USART_STOP_BITS_1,
+												   .databits	= USART_DATA_BITS_8,
+												   .speed_mode = USART_SPEED_MODE_NORMAL};
 
 #define BUFFER_SIZE 16
 

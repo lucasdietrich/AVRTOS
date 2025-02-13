@@ -14,15 +14,13 @@
 
 #include "dstruct/debug.h"
 #include "dstruct/dlist.h"
-
-extern struct dnode *z_runq;
-extern struct titem *z_timeouts_queue;
+#include "kernel_private.h"
 
 uint16_t k_thread_usage(struct k_thread *thread)
 {
 	if (NULL == thread->sp) {
 		return 0u;
-	} else if (thread == z_current) {
+	} else if (thread == z_ker.current) {
 		// stack pointer refers to the first empty addr (from end)
 		// empty stack : thread->stack.end == thread->sp
 		uint16_t sp;
@@ -114,7 +112,7 @@ void k_thread_dump(struct k_thread *thread)
 
 void *z_thread_get_return_addr(struct k_thread *thread)
 {
-	if (thread == z_current) {
+	if (thread == z_ker.current) {
 		uint16_t return_addr_reverted = *((uint16_t *)((uint16_t)thread->stack.end - 2u));
 
 		return (void *)K_SWAP_ENDIANNESS(return_addr_reverted);
@@ -139,7 +137,7 @@ void z_print_runqueue(void)
 
 void z_print_events_queue(void)
 {
-	print_tqueue(z_timeouts_queue, z_thread_symbol_events_queue);
+	print_tqueue(z_ker.timeouts_queue, z_thread_symbol_events_queue);
 }
 
 void z_sem_debug(struct k_sem *sem)

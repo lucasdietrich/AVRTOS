@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -32,7 +32,7 @@ int main(void)
 void thread_led(void *p)
 {
 	while (1) {
-		k_thread_dump(z_current);
+		k_thread_dump(k_thread_get_current());
 
 		led_on();
 		k_sleep(K_MSEC(PERIOD));

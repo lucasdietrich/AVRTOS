@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -42,12 +42,12 @@ int main(void)
 
 void waiting_thread(k_timeout_t *timeout)
 {
-	serial_transmit(z_current->symbol);
+	serial_transmit(k_thread_get_current()->symbol);
 	serial_printl_p(PSTR(": starting"));
 
 	uint8_t locked = k_mutex_lock(&mymutex, *timeout);
 
-	serial_transmit(z_current->symbol);
+	serial_transmit(k_thread_get_current()->symbol);
 	if (locked == 0) {
 		serial_printl_p(PSTR(": locked the mutex !"));
 	} else {

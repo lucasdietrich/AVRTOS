@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/exti.h>
-#include <avrtos/drivers/gpio.h>
 #include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
+#include <avrtos/drivers/exti.h>
+#include <avrtos/drivers/gpio.h>
 #include <avrtos/misc/led.h>
 
 K_SEM_DEFINE(button_sem, 0, 1);
@@ -17,7 +17,7 @@ ISR(INT0_vect)
 	struct k_thread *thread;
 
 	led_toggle();
-	
+
 	thread = k_sem_give(&button_sem);
 
 	k_yield_from_isr_cond(thread);

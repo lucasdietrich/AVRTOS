@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/drivers/gpio.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/drivers/gpio.h>
 
 #include <util/delay.h>
 

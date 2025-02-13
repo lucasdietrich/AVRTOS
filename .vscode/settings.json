@@ -14,16 +14,5 @@
 		"*.bb": "shellscript",
 		"*.bbclass": "shellscript",
 		"*.inc": "shellscript",
-		"rust.h": "c",
-		"defines.h": "c",
-		"avrtos.h": "c",
-		"rust_helpers.h": "c",
-		"system_error": "c",
-		"array": "c",
-		"functional": "c",
-		"tuple": "c",
-		"type_traits": "c",
-		"utility": "c",
-		"kernel.h": "c"
 	},
 }

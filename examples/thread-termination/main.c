@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/debug.h>
 #include <avrtos/avrtos.h>
+#include <avrtos/debug.h>
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
@@ -37,13 +37,9 @@ int main(void)
 		serial_transmit('\n');
 
 		/* rebuild stack */
-		k_thread_create(s_thread,
-				thread_entry,
-				K_STACK_START(s_thread->stack.end, s_thread->stack.size),
-				s_thread->stack.size,
-				K_PREEMPTIVE,
-				NULL,
-				'T');
+		k_thread_create(s_thread, thread_entry,
+						K_STACK_START(s_thread->stack.end, s_thread->stack.size),
+						s_thread->stack.size, K_PREEMPTIVE, NULL, 'T');
 		serial_printl_p(PSTR("Thread started again"));
 		k_thread_start(s_thread);
 	}
@@ -53,7 +49,7 @@ int main(void)
 
 void thread_entry(void *_c)
 {
-	s_thread = z_current;
+	s_thread = k_thread_get_current();
 
 	for (uint_fast8_t i = 0; i < 5; i++) {
 		serial_printl_p(PSTR("Hello !"));

@@ -19,29 +19,41 @@ static void z_create_free_list(struct k_mem_slab *slab)
 	uint8_t *p		= slab->buffer;
 
 	for (uint8_t i = 0u; i < slab->count; i++) {
-		/* equivalent to "*(void**) p = slab->free_list;" */
+		/* Link the current block to the next free block in the list */
 		((struct snode *)p)->next = slab->free_list;
 
+		/* Update the head of the free list to the current block */
 		slab->free_list = (struct snode *)p;
-		p += slab->block_size;
+		p += slab->block_size; /* Move to the next block */
 	}
 }
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
-
 extern struct k_mem_slab __k_mem_slabs_start;
 extern struct k_mem_slab __k_mem_slabs_end;
 
-/* TODO Set always inline */
+/**
+ * This function is called during avrtos initialization to initialize all known memory
+ * slabs that are defined using the linker section.
+ */
 void z_mem_slab_init_module(void)
 {
-	/* must be called during MCU initialization, in order to initialize
-	 * known memory slabs using the linker section defined
-	 */
+	/* Calculate the number of memory slabs defined in the linker script */
 	const uint8_t mem_slabs_count = &__k_mem_slabs_end - &__k_mem_slabs_start;
 	for (uint8_t i = 0; i < mem_slabs_count; i++) {
+		/* Initialize each slab's free list */
 		z_create_free_list(&(&__k_mem_slabs_start)[i]);
 	}
+}
+#else
+/**
+ * This function is used to complete the initialization of a memory slab when it
+ * is declared without the linker script.
+ */
+__kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab)
+{
+	/* Re-create the free list for the slab */
+	z_create_free_list(slab);
 }
 #endif
 
@@ -50,43 +62,28 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 					   size_t block_size,
 					   uint8_t num_blocks)
 {
-	/* we need at least 2 bytes to store the next
-	 * free block address if not allocated
+	/* Validate the arguments: buffer must be non-null, block size must be at least 2
+	 * bytes, and there must be at least one block.
 	 */
 	Z_ARGS_CHECK(buffer && (block_size >= 2) && num_blocks) return -EINVAL;
 
+	/* Initialize the wait queue for threads waiting on this slab */
 	dlist_init(&slab->waitqueue);
 
+	/* Set the slab properties */
 	slab->block_size = block_size;
 	slab->count		 = num_blocks;
 	slab->buffer	 = buffer;
 
+	/* Create the free list for the slab */
 	z_create_free_list(slab);
 
 	return 0;
 }
 
-#if !CONFIG_AVRTOS_LINKER_SCRIPT
-__kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab)
-{
-	z_create_free_list(slab);
-}
-#endif
-
-/**
- * @brief Internal function to allocate a block
- *
- * Assumptions :
- * - slab not null
- * - mem not null
- * - interrupts are disabled
- *
- * @param slab
- * @param mem
- * @return 0
- */
 __always_inline int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 {
+	/* Allocate a block from the free list */
 	*mem			= (uint8_t *)slab->free_list;
 	slab->free_list = slab->free_list->next;
 
@@ -95,27 +92,24 @@ __always_inline int8_t z_mem_slab_alloc(struct k_mem_slab *slab, void **mem)
 
 int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout)
 {
-	__ASSERT_NOTNULL(slab);
-	__ASSERT_NOTNULL(mem);
+	Z_ARGS_CHECK(slab && mem) return -EINVAL;
 
 	int8_t ret;
 
 	const uint8_t key = irq_lock();
 
 	if (slab->free_list != NULL) {
-		/* there are fre memory blocks,
-		 * so we allocate one directly */
+		/* There are free memory blocks, allocate one directly */
 		ret = z_mem_slab_alloc(slab, mem);
 	} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-		/* we don't wait for a block to available and there no
-		 * one left, we return an error */
+		/* No blocks available and the thread doesn't want to wait */
 		ret = -ENOMEM;
 	} else {
-		/* we wait for a block being available */
-		ret = z_pend_current(&slab->waitqueue, timeout);
+		/* Wait for a block to become available */
+		ret = z_pend_current_on(&slab->waitqueue, timeout);
 		if (ret == 0) {
-			/* we retrieve the memory block available */
-			*mem = z_current->swap_data;
+			/* Retrieve the memory block available */
+			*mem = z_ker.current->swap_data;
 		}
 	}
 
@@ -124,26 +118,12 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 	return ret;
 }
 
-/**
- * @brief Internal function to free a block
- *
- * Assumptions :
- * - slab not null
- * - mem not null
- * - interrupts are disabled
- * - mem is currently "allocated"
- *
- * @param slab
- * @param mem
- * @return 0
- */
 __kernel static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
 	__ASSERT_NOTNULL(slab);
 	__ASSERT_NOTNULL(mem);
 
-	/* eq to "**(struct snode***)mem = slab->free_list;" */
-
+	/* Add the block back to the free list */
 	((struct snode *)mem)->next = slab->free_list;
 	slab->free_list				= (struct snode *)mem;
 
@@ -152,23 +132,22 @@ __kernel static int8_t z_mem_slab_free(struct k_mem_slab *slab, void *mem)
 
 struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
-	__ASSERT_NOTNULL(slab);
+	Z_ARGS_CHECK(slab && mem) return NULL;
 
 	struct k_thread *thread = NULL;
 
 	if (mem == NULL) {
+		/* If the memory block is NULL, there's nothing to free */
 		goto ret;
 	}
 
 	const uint8_t key = irq_lock();
 
-	/* if a thread is pending on a memory slab we give the block
-	 * directly to the thread (using thread->swap_data)
-	 */
+	/* If a thread is pending on the memory slab, give the block directly to the thread */
 	thread = z_unpend_first_and_swap(&slab->waitqueue, mem);
 
 	if (thread == NULL) {
-		/* otherwise we free the block */
+		/* Otherwise, free the block */
 		z_mem_slab_free(slab, mem);
 	}
 

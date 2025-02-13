@@ -26,7 +26,7 @@ int main(void)
 	printf("i2c_init: %d last_error: %d\n", ret, i2c_last_error(I2C_DEVICE));
 	k_msleep(100);
 
-	struct tcn75_context tcn75;
+	struct tcn75_device tcn75;
 	ret = tcn75_init_context(&tcn75, TCN75A_ADDR_LSb, TCN75_DEFAULT_CONFIG, I2C_DEVICE);
 	printf("tcn75_init_context: %d last_error: %d\n", ret, i2c_last_error(I2C_DEVICE));
 
