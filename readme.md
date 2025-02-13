@@ -453,10 +453,11 @@ Major steps are:
 - Provide examples to demonstrate the usage of AVRTOS in Rust using a real board and QEMU, this will take place in the `avrtos-examples` crate.
 - Extend the support to other boards (e.g. ATmega328p).
 
-External resources:
+External (resources):
 
 - [avr-hal-template](https://github.com/Rahix/avr-hal-template/tree/main)
 - [avr-hal](https://github.com/Rahix/avr-hal/blob/main/rust-toolchain.toml)
+- [Compiler Weekly: LLVM to AVR](https://schroer.ca/2021/11/07/cw-avr-target/)
 
 Note about current development:
 
@@ -592,6 +593,9 @@ Loop consists of a `rjmp .+0` instruction, which actually refers to the instruct
 at the address following the `rjmp` instruction which is the start of the `__udivmodsi4` function.
 
 This issue appears in most of infinite `loop` I've experienced.
+
+This seems to be solved in LLVM 17: <https://github.com/llvm/llvm-project/commit/697a162fa63df328ec9ca334636c5e85390b2bf0>
+Rust `nightly-2025-02-13` does not longer generate invalid assembly.
 
 #### Float conversion or arguments passing ?
 

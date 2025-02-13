@@ -4,8 +4,9 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+#![feature(core_intrinsics)]
 
-use core::ffi::c_char;
+use core::{ffi::c_char, intrinsics::unreachable};
 
 use avrtos_sys::{
     serial_init_baud, serial_print

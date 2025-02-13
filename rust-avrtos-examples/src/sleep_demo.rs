@@ -24,36 +24,10 @@ fn main() -> ! {
         led_init();
     }
 
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    sleep_1s();
-    unsafe {
-        led_toggle();
-    }
-    
     loop {
+        sleep_1s();
+        unsafe {
+            led_toggle();
+        }
     }
-
 }
