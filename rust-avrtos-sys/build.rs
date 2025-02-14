@@ -6,32 +6,38 @@ const SOURCES: &[&str] = &[
     "../src/avrtos/arch/debug_utils.S",
     "../src/avrtos/arch/init_sections.S",
     "../src/avrtos/arch/thread_switch_preempt.S",
-    "../src/avrtos/assert.c",
-    "../src/avrtos/atomic.c",
-    "../src/avrtos/canaries.c",
-    "../src/avrtos/debug.c",
+
     "../src/avrtos/devices/tcn75.c",
+    "../src/avrtos/devices/mcp2515.c",
+
     "../src/avrtos/drivers/exti.c",
     "../src/avrtos/drivers/gpio.c",
     "../src/avrtos/drivers/i2c.c",
     "../src/avrtos/drivers/spi.c",
     "../src/avrtos/drivers/timer.c",
     "../src/avrtos/drivers/usart.c",
+
     "../src/avrtos/dstruct/debug.c",
     "../src/avrtos/dstruct/dlist.c",
     "../src/avrtos/dstruct/slist.c",
     "../src/avrtos/dstruct/tqueue.c",
+    "../src/avrtos/dstruct/tdqueue.c",
+
+    "../src/avrtos/misc/led.c",
+    "../src/avrtos/misc/serial.c",
+
+    "../src/avrtos/assert.c",
+    "../src/avrtos/atomic.c",
+    "../src/avrtos/canaries.c",
+    "../src/avrtos/debug.c",
     "../src/avrtos/event.c",
     "../src/avrtos/fault.c",
     "../src/avrtos/fifo.c",
     "../src/avrtos/flags.c",
     "../src/avrtos/idle.c",
     "../src/avrtos/init.c",
-    "../src/avrtos/io.c",
     "../src/avrtos/kernel.c",
     "../src/avrtos/mem_slab.c",
-    "../src/avrtos/misc/led.c",
-    "../src/avrtos/misc/serial.c",
     "../src/avrtos/msgq.c",
     "../src/avrtos/mutex.c",
     "../src/avrtos/prng.c",
@@ -39,24 +45,19 @@ const SOURCES: &[&str] = &[
     "../src/avrtos/semaphore.c",
     "../src/avrtos/signal.c",
     "../src/avrtos/stack_sentinel.c",
+    "../src/avrtos/stdout.c",
     "../src/avrtos/sysclock.c",
-    "../src/avrtos/time.c",
     "../src/avrtos/timer.c",
     "../src/avrtos/workqueue.c",
+
     "../src/avrtos/rust_helpers.c",
 ];
 
 const HEADERS: &[&str] = &[
-    "../src/avrtos.h",
-    "../src/avrtos/assert.h",
-    "../src/avrtos/atomic.h",
-    "../src/avrtos/avrtos.h",
-    "../src/avrtos/avrtos_arduinoide_conf.h",
-    "../src/avrtos/avrtos_conf.h",
-    "../src/avrtos/canaries.h",
-    "../src/avrtos/debug.h",
-    "../src/avrtos/defines.h",
     "../src/avrtos/devices/tcn75.h",
+    "../src/avrtos/devices/mcp2515.h",
+    "../src/avrtos/devices/mcp2515_priv.h",
+
     "../src/avrtos/drivers.h",
     "../src/avrtos/drivers/exti.h",
     "../src/avrtos/drivers/gpio.h",
@@ -66,10 +67,25 @@ const HEADERS: &[&str] = &[
     "../src/avrtos/drivers/timer.h",
     "../src/avrtos/drivers/timer_defs.h",
     "../src/avrtos/drivers/usart.h",
+
     "../src/avrtos/dstruct/debug.h",
     "../src/avrtos/dstruct/dlist.h",
     "../src/avrtos/dstruct/slist.h",
     "../src/avrtos/dstruct/tqueue.h",
+    "../src/avrtos/dstruct/tdqueue.h",
+    
+    "../src/avrtos/misc/led.h",
+    "../src/avrtos/misc/serial.h",
+
+    "../src/avrtos.h",
+    "../src/avrtos/assert.h",
+    "../src/avrtos/atomic.h",
+    "../src/avrtos/avrtos.h",
+    "../src/avrtos/avrtos_arduinoide_conf.h",
+    "../src/avrtos/avrtos_conf.h",
+    "../src/avrtos/canaries.h",
+    "../src/avrtos/defines.h",
+    "../src/avrtos/debug.h",
     "../src/avrtos/errno.h",
     "../src/avrtos/event.h",
     "../src/avrtos/fault.h",
@@ -77,13 +93,10 @@ const HEADERS: &[&str] = &[
     "../src/avrtos/flags.h",
     "../src/avrtos/idle.h",
     "../src/avrtos/init.h",
-    "../src/avrtos/io.h",
     "../src/avrtos/kernel.h",
     "../src/avrtos/kernel_private.h",
     "../src/avrtos/logging.h",
     "../src/avrtos/mem_slab.h",
-    "../src/avrtos/misc/led.h",
-    "../src/avrtos/misc/serial.h",
     "../src/avrtos/msgq.h",
     "../src/avrtos/mutex.h",
     "../src/avrtos/prng.h",
@@ -91,11 +104,13 @@ const HEADERS: &[&str] = &[
     "../src/avrtos/semaphore.h",
     "../src/avrtos/signal.h",
     "../src/avrtos/stack_sentinel.h",
+    "../src/avrtos/io.h",
     "../src/avrtos/sys.h",
-    "../src/avrtos/time.h",
+    "../src/avrtos/sysclock.h",
     "../src/avrtos/timer.h",
     "../src/avrtos/types.h",
     "../src/avrtos/workqueue.h",
+
     "../src/avrtos/rust_helpers.h",
 ];
 
@@ -109,10 +124,10 @@ const INCLUDES: &[&str] = &[
     "../src/avrtos/misc",
 ];
 
-const FEATURE_KERNEL_DEBUG: bool = true;
+const FEATURE_KERNEL_DEBUG: bool = false;
 
 // TODO reset to default value (1000us)
-const FEATURE_KERNEL_SYSCLOCK_PERIOD_US: u32 = 100000;
+const FEATURE_KERNEL_SYSCLOCK_PERIOD_US: u32 = 1000;
 
 fn compile_avrtos_sources() {
     let mut build = cc::Build::new();
@@ -173,9 +188,9 @@ fn compile_avrtos_sources() {
 
         // Default config (must match what is in the bindgen script avrtos-sys/scripts/gen.sh at any cost)
         .flag("-DCONFIG_RUST=1")
+        .flag("-DZ_CONFIG_ARDUINO_FRAMEWORK=0")
+        .flag("-DZ_CONFIG_PLATFORMIO_IDE=0")
         .flag(format!("-DCONFIG_AVRTOS_LINKER_SCRIPT={}", linker_script))
-        .flag("-DCONFIG_ARDUINO_FRAMEWORK=0")
-        .flag("-DCONFIG_PLATFORMIO_IDE=0")
         .flag("-DCONFIG_THREAD_MAIN_COOPERATIVE=1")
         .flag("-DCONFIG_INTERRUPT_POLICY=1")
         .flag("-DCONFIG_THREAD_EXPLICIT_MAIN_STACK=0")
@@ -214,9 +229,8 @@ fn compile_avrtos_sources() {
         .flag("-DCONFIG_KERNEL_TIMERS=0")
         .flag("-DCONFIG_KERNEL_EVENTS=0")
         .flag("-DCONFIG_KERNEL_EVENTS_ALLOW_NO_WAIT=1")
-        .flag("-DCONFIG_THREAD_ERRNO=0")
         .flag("-DCONFIG_SERIAL_AUTO_INIT=0u")
-        .flag("-DCONFIG_SERIAL_USART_BAUDRATE=500000lu")
+        .flag("-DCONFIG_SERIAL_USART_BAUDRATE=115200u")
         .flag("-DCONFIG_STDIO_PRINTF_TO_USART=-1")
         .flag("-DCONFIG_LOGGING_SUBSYSTEM=1")
         .flag("-DCONFIG_KERNEL_UPTIME=0")
@@ -225,7 +239,7 @@ fn compile_avrtos_sources() {
         .flag("-DCONFIG_KERNEL_ATOMIC_API=1")
         .flag("-DCONFIG_KERNEL_DEBUG_PREEMPT_UART=0")
         .flag("-DCONFIG_KERNEL_API_NOINLINE=0")
-        .flag(format!("-DCONFIG_KERNEL_DEBUG={}", FEATURE_KERNEL_DEBUG as u8))
+        .flag(format!("-DCONFIG_KERNEL_SYSCLOCK_DEBUG={}", FEATURE_KERNEL_DEBUG as u8))
         .flag(format!("-DCONFIG_KERNEL_SCHEDULER_DEBUG={}", FEATURE_KERNEL_DEBUG as u8))
         .flag("-DCONFIG_FD_MAX_COUNT=0")
         .flag("-DCONFIG_KERNEL_REENTRANCY=0")
@@ -246,7 +260,7 @@ fn compile_avrtos_sources() {
         .flag("-DCONFIG_KERNEL_DEBUG_GPIO_SYSTICK=1")
         .flag("-DCONFIG_SPI_ASYNC=0")
         .flag("-DCONFIG_AVRTOS_BANNER_ENABLE=0")
-        .flag("-DCONFIG_AVRTOS_BANNER=\"*** AVRTOS ***\\n\"")
+        .flag("-DCONFIG_AVRTOS_BANNER=\"*** AVRTOS RUST ***\\n\"")
         .flag("-DCONFIG_I2C_DRIVER_ENABLE=1")
         .flag("-DCONFIG_I2C0_ENABLED=1")
         .flag("-DCONFIG_I2C1_ENABLED=0")
@@ -255,7 +269,9 @@ fn compile_avrtos_sources() {
         .flag("-DCONFIG_I2C_BLOCKING=1")
         .flag("-DCONFIG_I2C_MAX_BUF_LEN_BITS=3u")
         .flag("-DCONFIG_I2C_LAST_ERROR=1")
-        .flag("-DCONFIG_I2C_DEBUG");
+        .flag("-DCONFIG_I2C_DEBUG")
+        .flag("-DCONFIG_KERNEL_FLAGS_SIZE=1")
+        .flag("-DCONFIG_DEVICE_MCP2515=0");
 
     // build
     //     .flag("-Wl,--gc-sections")

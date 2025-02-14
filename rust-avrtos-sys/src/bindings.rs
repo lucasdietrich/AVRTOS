@@ -177,48 +177,66 @@ extern "C" {
     #[doc = " @brief Remove an item from the time queue.\n Item->next attribute is set to null if found.\n\n Note: this function is very expensive in term of time if there are a\n  lot of items in the titem queue.\n\n Assumptions :\n  - root is not null\n  - item is not null\n  - item is in root tqueue\n\n @param root\n @param item Item to remove if exists in the time queue."]
     pub fn tqueue_remove(root: *mut *mut titem, item: *mut titem);
 }
-#[doc = " @brief Thread entry point function type.\n\n The `k_thread_entry_t` type is a function pointer type representing a thread\n entry point function. A thread entry point function is a function that serves\n as the starting point for the execution of a thread. It takes a single\n `void*` parameter used to pass the thread context when the entry function is\n called.\n\n @param context A pointer to the context data for the thread."]
+#[doc = " @brief Thread entry point function type.\n\n The `k_thread_entry_t` type is a function pointer type representing a thread\n entry point function. A thread entry point function is the function that serves\n as the starting point for the execution of a thread. It takes a single\n `void*` parameter, which is typically used to pass the thread's context or\n other initial data when the thread begins execution.\n\n @param context A pointer to the context data for the thread."]
 pub type k_thread_entry_t =
     ::core::option::Option<unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void)>;
-#[doc = " @brief Structure representing a thread.\n\n The `struct k_thread` structure represents a thread and defines various\n properties associated with it, including the stack pointer, thread priority,\n stack location and size, local storage pointer, and other relevant fields.\n\n This structure is 16 bytes long in its minimal form."]
+#[doc = " @brief Structure representing a thread.\n\n The `struct k_thread` structure represents a thread within the kernel. It contains\n various fields that define the state and properties of the thread, including:\n - The stack pointer (`sp`)\n - The thread's flags, which indicate the thread's current state or behavior.\n - A union of structures for managing the thread within different kernel queues\n (runqueue, events queue, or pending queues for various kernel objects like mutexes,\n semaphores, etc.).\n - A `swap_data` field, which stores data returned by kernel APIs when the thread is\n   unpended.\n - A stack structure that defines the stack's end address and size.\n - A symbol character that can be used to represent the thread in debugging or\n visualization tools.\n\n This structure is designed to be lightweight, with a minimal size of 16 bytes in its\n basic form."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_thread {
+    #[doc = "< Stack pointer, must be the first member of the structure !!"]
     pub sp: *mut ::core::ffi::c_void,
+    #[doc = "< Thread flags indicating the state or attributes of the thread."]
     pub flags: u8,
+    #[doc = "< Union that holds the queue information, ensuring the thread is in only one\n< queue at a time."]
     pub tie: k_thread__bindgen_ty_1,
     pub __bindgen_anon_1: k_thread__bindgen_ty_2,
+    #[doc = "< Data returned by kernel APIs when the thread is unpended."]
     pub swap_data: *mut ::core::ffi::c_void,
+    #[doc = "< Stack information for the thread."]
     pub stack: k_thread__bindgen_ty_3,
+    #[doc = "< A single character symbol representing the thread, reserved symbols:\n< 'M' for main, 'I' for idle."]
     pub symbol: ::core::ffi::c_char,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union k_thread__bindgen_ty_1 {
+    #[doc = "< Node for the runqueue (used when the thread is runnable)."]
     pub runqueue: dnode,
+    #[doc = "< Node for the events queue (used for delayed or timed events)."]
     pub event: titem,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union k_thread__bindgen_ty_2 {
+    #[doc = "< Node for waiting on a generic object."]
     pub wany: dnode,
+    #[doc = "< Node for waiting on a mutex."]
     pub wmutex: dnode,
+    #[doc = "< Node for waiting on a semaphore."]
     pub wsem: dnode,
+    #[doc = "< Node for waiting on a signal."]
     pub wsig: dnode,
+    #[doc = "< Node for waiting on a FIFO item."]
     pub wfifo: dnode,
+    #[doc = "< Node for waiting on a message queue item."]
     pub wmsgq: dnode,
+    #[doc = "< Node for waiting on flags."]
     pub wflags: dnode,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct k_thread__bindgen_ty_3 {
+    #[doc = "< End of the stack memory."]
     pub end: *mut ::core::ffi::c_void,
+    #[doc = "< Size of the stack."]
     pub size: size_t,
 }
-#[doc = " @brief Structure representing the call-saved registers + PC (size=19 bytes)\n\n Read \"Call-used registers\" of the AVR GCC manual for more information:\n https://gcc.gnu.org/wiki/avr-gcc#Call-Saved_Registers"]
+#[doc = " @brief Structure representing the call-saved registers plus the program counter (PC).\n\n The `struct z_callsaved_ctx` structure represents the registers that must be saved\n during a context switch. It includes:\n - The status register (`sreg`).\n - Registers `r7` to `r29`, which are saved as part of the context.\n - The stack pointer and program counter, depending on the AVR architecture\n   (with/without 3 byte wide PC).\n\n This structure is used to save the context of a thread when it is preempted or\n voluntarily yields the CPU.\n\n For more information, refer to the \"Call-Saved Registers\" section in the AVR GCC\n manual: https://gcc.gnu.org/wiki/avr-gcc#Call-Saved_Registers"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct z_callsaved_ctx {
+    #[doc = "< Status register."]
     pub sreg: u8,
     pub __bindgen_anon_1: z_callsaved_ctx__bindgen_ty_1,
     pub __bindgen_anon_2: z_callsaved_ctx__bindgen_ty_2,
@@ -229,6 +247,7 @@ pub struct z_callsaved_ctx {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union z_callsaved_ctx__bindgen_ty_1 {
+    #[doc = "< Array to access all saved registers."]
     pub regs: [u8; 13usize],
     pub __bindgen_anon_1: z_callsaved_ctx__bindgen_ty_1__bindgen_ty_1,
 }
@@ -252,13 +271,16 @@ pub struct z_callsaved_ctx__bindgen_ty_1__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union z_callsaved_ctx__bindgen_ty_2 {
+    #[doc = "< Register r6."]
     pub r6: u8,
+    #[doc = "< Initial status register value."]
     pub init_sreg: u8,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union z_callsaved_ctx__bindgen_ty_3 {
     pub __bindgen_anon_1: z_callsaved_ctx__bindgen_ty_3__bindgen_ty_1,
+    #[doc = "< Thread entry point function."]
     pub thread_entry: k_thread_entry_t,
 }
 #[repr(C)]
@@ -271,6 +293,7 @@ pub struct z_callsaved_ctx__bindgen_ty_3__bindgen_ty_1 {
 #[derive(Copy, Clone)]
 pub union z_callsaved_ctx__bindgen_ty_4 {
     pub __bindgen_anon_1: z_callsaved_ctx__bindgen_ty_4__bindgen_ty_1,
+    #[doc = "< Pointer to the thread's context data."]
     pub thread_context: *mut ::core::ffi::c_void,
 }
 #[repr(C)]
@@ -282,10 +305,12 @@ pub struct z_callsaved_ctx__bindgen_ty_4__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct z_callsaved_ctx__bindgen_ty_5 {
+    #[doc = "< High byte of the program counter, if using a 3-byte PC."]
     pub pch: u8,
+    #[doc = "< Program counter (PC) value."]
     pub pc: *mut ::core::ffi::c_void,
 }
-#[doc = " @brief Structure representing the call-used register of a function call.\n\n Read \"Call-used registers\" of the AVR GCC manual for more information:\n https://gcc.gnu.org/wiki/avr-gcc#Call-Used_Registers"]
+#[doc = " @brief Structure representing the call-used registers of a function call.\n\n The `struct z_callused_ctx` structure holds the registers that are used during a\n function call but are not preserved across function calls. These registers must\n be saved by the caller if their values are needed after a function call.\n\n For more information, refer to the \"Call-Used Registers\" section in the AVR GCC manual:\n https://gcc.gnu.org/wiki/avr-gcc#Call-Used_Registers"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct z_callused_ctx {
@@ -302,70 +327,76 @@ pub struct z_callused_ctx {
     pub r30: u8,
     pub r31: u8,
 }
-#[doc = " @brief Represent the registers to be saved during an interrupt before calling\n the ISR."]
+#[doc = " @brief Structure representing the context saved during an interrupt.\n\n The `struct z_intctx` structure represents the registers and program counter (PC)\n that are saved when an interrupt occurs. This context includes the program counter,\n status register, and the call-used registers.\n\n The structure is used by the ISR to restore the thread's context once the interrupt\n has been handled."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct z_intctx {
+    #[doc = "< High byte of the program counter, if using a 3-byte PC."]
     pub pch: u8,
+    #[doc = "< Program counter (PC) value at the time of the interrupt."]
     pub pc: *mut ::core::ffi::c_void,
+    #[doc = "< Register r1."]
     pub r1: u8,
+    #[doc = "< Register r0."]
     pub r0: u8,
+    #[doc = "< Status register."]
     pub sreg: u8,
+    #[doc = "< Call-used registers saved during the interrupt."]
     pub callused_reg: z_callused_ctx,
 }
 extern "C" {
-    #[doc = " @brief Perform a thread switch (assembly function).\n\n This function performs a context switch between two threads. The steps\n involved in the thread switch are as follows:\n\n 1. Save the context of the first thread.\n 2. Store the stack pointer (SP) of the first thread to its structure.\n 3. Restore the stack pointer (SP) of the second thread from its structure.\n 4. Restore the context of the second thread.\n\n @param from Pointer to the thread structure of the first thread.\n @param to Pointer to the thread structure of the second thread."]
+    #[doc = " @brief Perform a context switch between two threads (assembly function).\n\n This function performs a context switch from one thread to another. The context\n of the first thread is saved, and then the context of the second thread is restored.\n\n @param from Pointer to the thread structure of the current thread.\n @param to Pointer to the thread structure of the thread to switch to."]
     pub fn z_thread_switch(from: *mut k_thread, to: *mut k_thread);
 }
 extern "C" {
-    #[doc = " @brief Make the current thread waiting/pending for an object being available.\n\n Suspend the thread and add it to the waitqueue.\n The function will return if the thread is awakaned or on timeout.\n\n If timeout is K_FOREVER, the thread should we awakaned.\n If timeout is K_NO_WAIT, the thread returns immediately\n\n Assumptions :\n  - interrupt flag is cleared when called.\n\n @param waitqueue\n @param timeout\n @return 0 on success (object available), ETIMEDOUT on timeout, negative error\n  in other cases."]
-    pub fn z_pend_current(waitqueue: *mut dnode, timeout: k_timeout_t) -> i8;
+    #[doc = " @brief Suspend the current thread and wait for an object to become available.\n\n This function suspends the current thread and adds it to the wait queue. The thread\n will resume execution when the object becomes available or when the specified timeout\n expires.\n\n If the timeout is `K_FOREVER`, the thread will be awakened when the object becomes\n available.\n\n If the timeout is `K_NO_WAIT`, the function returns immediately without waiting\n with -EAGAIN as the return value.\n\n If waitqueue is NULL, the thread is suspended but not added to any wait queue.\n Consequently, the thread must be woken up manually using `z_wake_up()`.\n\n Assumptions:\n - The interrupt flag is cleared when this function is called.\n\n @param waitqueue Pointer to the wait queue to add the thread to.\n @param timeout The timeout period to wait for the object.\n @return 0 if the object became available\n @return -EAGAIN if the timeout is K_NO_WAIT\n @return -ETIMEDOUT if the timeout expired\n @return -ECANCELED if the wait was canceled"]
+    pub fn z_pend_current_on(waitqueue: *mut dnode, timeout: k_timeout_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Wake up the first thread pending on an object.\n Switch thread before returning.\n\n Assumptions :\n - interrupt flag is cleared when called\n - waitqueue is not null\n - Thread in the runqueue is suspended\n\n @param waitqueue\n @param swap_data : available object information\n @return uint8_t return 0 if a thread got the object, any other value\n otherwise"]
-    pub fn z_unpend_first_thread(waitqueue: *mut dnode) -> *mut k_thread;
-}
-extern "C" {
-    #[doc = " @brief Wake up the first thread pending on an object.\n Set the first pending thread swap_data parameter if set.\n Switch thread before returning.\n\n @see z_unpend_first_thread\n\n Assumptions :\n - interrupt flag is cleared when called\n - waitqueue is not null\n - Thread in the runqueue is suspended\n\n @param waitqueue\n @param set_swap_data\n @return thread pointer if a thread got the object, NULL otherwise"]
+    #[doc = " @brief Wake up the first thread waiting on an object and switch to it.\n\n This function wakes up the first thread that is waiting on the specified object and\n switches to that thread. The `swap_data` parameter can be set with information about\n the available object.\n\n Assumptions:\n - The interrupt flag is cleared when this function is called.\n - The wait queue is not null.\n - The thread in the run queue is suspended.\n\n @param waitqueue Pointer to the wait queue to wake a thread from.\n @param swap_data Pointer to the object information to set (if any).\n @return Pointer to the thread that received the object, or NULL if no thread was woken."]
     pub fn z_unpend_first_and_swap(
         waitqueue: *mut dnode,
-        set_swap_data: *mut ::core::ffi::c_void,
+        swap_data: *mut ::core::ffi::c_void,
     ) -> *mut k_thread;
 }
 extern "C" {
-    #[doc = " @brief Cancel the first pending thread on a waitqueue.\n\n Raise \"pend_canceled\" flag on the thread, any wait function will return\n with -ECANCELED.\n\n @param waitqueue"]
+    #[doc = " @brief Wake up the first thread waiting on an object.\n\n This function wakes up the first thread waiting on the specified object. The thread\n will be added to the run queue, and a context switch will occur if necessary.\n\n Assumptions:\n - The interrupt flag is cleared when this function is called.\n - The wait queue is not null.\n - The thread in the run queue is suspended.\n\n @param waitqueue Pointer to the wait queue to wake a thread from.\n @return Pointer to the thread that received the object, or NULL if no thread was woken."]
+    pub fn z_unpend_first_thread(waitqueue: *mut dnode) -> *mut k_thread;
+}
+extern "C" {
+    #[doc = " @brief Cancel the first pending thread on a wait queue.\n\n This function sets the \"pend_canceled\" flag on the first thread pending on the\n specified wait queue. Any wait function for that thread will return with -ECANCELED.\n\n @param waitqueue Pointer to the wait queue from which to cancel the pending thread."]
     pub fn z_cancel_first_pending(waitqueue: *mut dnode);
 }
 extern "C" {
-    #[doc = " @brief Cancel all pending threads on a waitqueue.\n\n Raise \"pend_canceled\" flag on the thread, any wait function will return\n with -ECANCELED.\n\n @param waitqueue\n @return Number of canceled threads"]
+    #[doc = " @brief Cancel all pending threads on a wait queue.\n\n This function sets the \"pend_canceled\" flag on all threads pending on the\n specified wait queue. Any wait function for these threads will return with -ECANCELED.\n\n @param waitqueue Pointer to the wait queue from which to cancel all pending threads.\n @return The number of threads that were canceled."]
     pub fn z_cancel_all_pending(waitqueue: *mut dnode) -> u8;
 }
 extern "C" {
-    #[doc = " @brief Wake up a thread.\n\n Cancel scheduled wake up if any and add the thread to the runqueue.\n\n @param thread"]
+    #[doc = " @brief Wake up a thread.\n\n This function cancels any scheduled wake-up for the specified thread and adds it to\n the run queue. A context switch may occur if necessary.\n\n @param thread Pointer to the thread to wake up."]
     pub fn z_wake_up(thread: *mut k_thread);
 }
 extern "C" {
-    #[doc = " @brief Helper function\n\n @return true, interrupt flag is set\n @return false, interrupt flag is cleared"]
+    #[doc = " @brief Check if interrupts are enabled.\n\n This helper function checks whether interrupts are currently enabled.\n\n @return true if interrupts are enabled, false otherwise."]
     pub fn z_interrupts() -> bool;
 }
 extern "C" {
-    #[doc = " @brief Initialize stack sentinel byte(s) for all threads.\n"]
+    #[doc = " @brief Initialize stack sentinel bytes for all threads.\n\n This function sets up stack sentinel bytes for all threads in the system. Stack\n sentinel bytes are used to detect stack overflows."]
     pub fn z_init_stacks_sentinel();
 }
 extern "C" {
-    #[doc = " @brief Initialize stack sentinel byte(s) for specified thread.\n\n @param thread"]
+    #[doc = " @brief Initialize stack sentinel bytes for a specific thread.\n\n This function sets up stack sentinel bytes for the specified thread. Stack sentinel\n bytes are used to detect stack overflows.\n\n @param thread Pointer to the thread whose stack sentinel bytes are to be initialized."]
     pub fn z_init_thread_stack_sentinel(thread: *mut k_thread);
 }
 extern "C" {
-    #[doc = " @brief Verify if stack sentinel byte(s) is(are) still intact for given thread.\n\n @param thread The thread to verify\n @return true\n @return false"]
+    #[doc = " @brief Verify if the stack sentinel bytes are intact for a given thread.\n\n This function checks if the stack sentinel bytes are still intact for the specified\n thread. Stack sentinel bytes are used to detect stack overflows.\n\n @param thread Pointer to the thread whose stack sentinel bytes are to be verified.\n @return true if the stack sentinel bytes are intact, false otherwise."]
     pub fn z_thread_verify_sent(thread: *mut k_thread) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Assert evaluated expression is not zero\n\n @param expression Expression to evaluate\n @param module Module whithin the assertion is made (K_MODULE_*)\n @param acode Assertion code (K_ASSERT_*)\n @param line Line number of the assertion within the source file"]
+    #[doc = " @brief Assert that the evaluated expression is not zero\n\n If an assertion fails, the interrupts are disabled, some debug information is\n is printed to the system serial port, and the program execution is halted:\n 1. cli\n 2. * print debug information *\n 3. jmp _exit\n\n @param expression The expression to evaluate\n @param module The module where the assertion is made (K_MODULE_*)\n @param acode The assertion code (K_ASSERT_*)\n @param line The line number of the assertion within the source file"]
     pub fn __assert(expression: u8, module: u8, acode: u8, line: u16);
 }
 extern "C" {
-    #[doc = " @brief Define a new thread at runtime and initialize its stack\n\n @param thread hread structure pointer\n @param entry thread entry function\n @param stack thread stack start location\n @param stack_size thread stack size\n @param priority thread priority\n @param context_p thread context passed to entry function\n @param symbol thread symbol letter\n @return int8_t 0 on success"]
+    #[doc = " @brief Define a new thread at runtime and initialize its stack.\n\n @param thread Pointer to the thread structure.\n @param entry Entry function for the thread.\n @param stack Start location of the thread's stack.\n @param stack_size Size of the thread's stack.\n @param priority Priority of the thread.\n @param context_p Pointer to the context data passed to the entry function.\n @param symbol Symbol representing the thread.\n @return int8_t Returns 0 on success."]
     pub fn k_thread_create(
         thread: *mut k_thread,
         entry: k_thread_entry_t,
@@ -377,99 +408,79 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Start the execution of the given thread.\n\n @param thread The thread to start execution.\n @return 0 if successful, otherwise a negative error code."]
+    #[doc = " @brief Start the execution of the specified thread.\n\n @param thread Pointer to the thread to be started.\n @return int8_t Returns 0 on success, or a negative error code on failure."]
     pub fn k_thread_start(thread: *mut k_thread) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Stop the execution of the specified thread.\n\n @param thread The thread to stop execution.\n @return 0 if successful, otherwise a negative error code."]
+    #[doc = " @brief Stop the execution of the specified thread.\n\n @param thread Pointer to the thread to be stopped.\n @return int8_t Returns 0 on success, or a negative error code on failure."]
     pub fn k_thread_stop(thread: *mut k_thread) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Stop the execution of the current thread.\n\n @see k_thread_stop\n\n @param thread The ready/pending thread to start."]
+    #[doc = " @brief Stop the execution of the current thread.\n\n This function stops the currently executing thread."]
     pub fn k_stop();
 }
 extern "C" {
-    #[doc = " @brief Set the priority of the specified thread.\n\n This function allows you to change the priority of a given thread. The prio\n parameter can be set to either K_COOPERATIVE or K_PREEMPTIVE.\n\n @param thread The thread for which to change the priority.\n @param prio The desired priority (K_COOPERATIVE or K_PREEMPTIVE).\n @return The status code indicating the success or failure of the operation."]
+    #[doc = " @brief Set the priority of the specified thread.\n\n This function changes the priority of a given thread. The `prio` parameter can be set\n to either `K_COOPERATIVE` or `K_PREEMPTIVE`.\n\n @param thread Pointer to the thread whose priority is to be changed.\n @param prio The desired priority (`K_COOPERATIVE` or `K_PREEMPTIVE`)."]
     pub fn k_thread_set_priority(thread: *mut k_thread, prio: u8);
 }
 extern "C" {
-    #[doc = " @brief Thread entry point function.\n\n This function serves as the entry point for a new thread. It is responsible\n for executing the code within the thread and receives a context pointer as an\n argument.\n\n @param context A pointer to the context data for the thread."]
+    #[doc = " @brief Thread entry point function.\n\n This function serves as the entry point for a new thread. It is responsible for\n executing the code within the thread and receives a context pointer as an argument.\n\n @param context Pointer to the context data for the thread."]
     pub fn z_thread_entry(context: *mut ::core::ffi::c_void);
 }
 extern "C" {
-    #[doc = " @brief Lock the scheduler for the current thread.\n\n This function sets the current thread as a cooperative thread until the\n function k_sched_unlock is called. The scheduler continues to execute system\n tasks and handle timeout. However, for cooperative threads, it is recommended\n that the execution time is kept short to avoid delaying other threads and\n potentially impacting time-sensitivethreads.\n\n Locking and unlocking the scheduler has no effect on cooperative threads.\n\n This function cannot be called from an interrupt routine.\n\n If CONFIG_KERNEL_REENTRANCY is defined, k_sched_unlock() can be\n called recursively. In this case, the maximum number of calls to k_sched_lock\n without calling k_sched_unlock() is 255.\n\n Note: Locking the scheduler doesn't have an impact on functions that\n explicitely yields the CPU, such as k_yield(), k_sleep(), or any kernel\n function waiting for an event to be signaled (e.g., k_sem_take(),\n k_mutex_lock() with delay), is called."]
+    #[doc = " @brief Lock the scheduler for the current thread.\n\n This function sets the current thread as cooperative until `k_sched_unlock` is called.\n The scheduler continues to execute system tasks and handle timeouts. However, for\n cooperative threads, it is recommended to keep the execution time short to avoid\n delaying other threads and potentially impacting time-sensitive operations.\n\n Locking and unlocking the scheduler has no effect on cooperative threads.\n\n This function cannot be called from an interrupt routine.\n\n If `CONFIG_KERNEL_REENTRANCY` is defined, `k_sched_unlock()` can be called recursively.\n The maximum number of calls to `k_sched_lock` without calling `k_sched_unlock()` is\n 255.\n\n Note: Locking the scheduler does not affect functions that explicitly yield the CPU,\n such as `k_yield()`, `k_sleep()`, or any kernel function waiting for an event to be\n signaled (e.g., `k_sem_take()`, `k_mutex_lock()` with delay)."]
     pub fn k_sched_lock();
 }
 extern "C" {
-    #[doc = " @brief Unlock the scheduler for the current thread and set it as preemptive.\n\n This function unlocks the scheduler for the current thread, allowing it to be\n preempted by other threads.\n\n For cooperative threads, locking and unlocking the scheduler has no effect.\n\n This function cannot be called from an interrupt routine.\n\n @see k_sched_lock()"]
+    #[doc = " @brief Unlock the scheduler for the current thread and set it as preemptive.\n\n This function unlocks the scheduler for the current thread, allowing it to be preempted\n by other threads.\n\n Locking and unlocking the scheduler has no effect on cooperative threads.\n\n This function cannot be called from an interrupt routine.\n\n @see k_sched_lock()"]
     pub fn k_sched_unlock();
 }
 extern "C" {
-    #[doc = " @brief Check if the scheduler is locked by the current thread.\n\n This function determines whether the scheduler is locked by the current\n thread or if the thread is a cooperative thread.\n\n @see k_sched_lock()\n @see k_sched_unlock()\n\n @return true if the scheduler is locked for the current thread or if the\n thread is cooperative.\n @return false otherwise."]
+    #[doc = " @brief Check if the scheduler is locked by the current thread.\n\n This function determines whether the scheduler is locked by the current thread or if\n the thread is cooperative.\n\n @return bool True if the scheduler is locked for the current thread or if the thread is\n cooperative, false otherwise."]
     pub fn k_sched_locked() -> bool;
 }
 extern "C" {
-    #[doc = " @brief Check if the current thread is preemptive.\n\n This function determines whether the current thread is preemptive.\n\n @return true if the current thread is preemptive."]
+    #[doc = " @brief Check if the current thread is preemptive.\n\n @return bool True if the current thread is preemptive."]
     pub fn k_cur_is_preempt() -> bool;
 }
 extern "C" {
-    #[doc = " @brief Check if the current thread is cooperative.\n\n This function determines whether the current thread is cooperative.\n\n @return true if the current thread is cooperative."]
+    #[doc = " @brief Check if the current thread is cooperative.\n\n @return bool True if the current thread is cooperative."]
     pub fn k_cur_is_coop() -> bool;
 }
 extern "C" {
-    #[doc = " @brief Suspend the execution of the current thread for the specified amount\n of time.\n\n This function schedules the current thread to be woken up after the specified\n amount of time.\n\n If the timeout is set to K_FOREVER, the thread will not be executed again\n until explicitly resumed with z_wake_up() or z_schedule().\n\n If the timeout is set to K_NO_WAIT, the function has no effect.\n\n @see k_yield\n\n @param timeout The duration of the sleep in milliseconds."]
+    #[doc = " @brief Suspend the execution of the current thread for a specified amount of time.\n\n This function schedules the current thread to be woken up after the specified amount of\n time.\n\n If the timeout is set to `K_FOREVER`, the thread will not be executed again until\n explicitly resumed with `z_wake_up()` or `z_schedule()`.\n\n If the timeout is set to `K_NO_WAIT`, the function has no effect.\n\n @param timeout The duration of the sleep in milliseconds."]
     pub fn k_sleep(timeout: k_timeout_t);
 }
 extern "C" {
-    #[doc = " @brief Make the thread wait for the specified amount of time in milliseconds,\n but keep it ready (in opposite to k_sleep which suspends the thread).\n\n The function must poll the elapsed time and is in charge to exit to continu\n the execution of the current thread.\n\n This function doesn't disable interrupts and doesn't break system time.\n However the choosen mode can affect the execution of other threads.\n\n Note: This function can always be used without an IDLE thread (with\n CONFIG_KERNEL_THREAD_IDLE disabled).\n\n Note: Requires KERNEL_UPTIME to be enabled.\n\n @param timeout The duration to wait in milliseconds.\n @param mode The wait mode (K_WAIT_MODE_IDLE, K_WAIT_MODE_ACTIVE,\n K_WAIT_MODE_BLOCK)"]
-    pub fn k_wait(delay: k_timeout_t, mode: u8);
+    #[doc = " @brief Make the thread wait for a specified amount of time in milliseconds while\n keeping it ready.\n\n Unlike `k_sleep`, this function keeps the thread in the ready state while waiting. The\n function polls the elapsed time and resumes execution when the wait time has passed.\n\n This function does not disable interrupts or break system time, but the chosen mode can\n affect the execution of other threads.\n\n Note: This function can be used without an IDLE thread (with\n `CONFIG_KERNEL_THREAD_IDLE` disabled).\n\n Note: Requires `KERNEL_UPTIME` to be enabled.\n\n @param timeout The duration to wait in milliseconds.\n @param mode The wait mode (`K_WAIT_MODE_IDLE`, `K_WAIT_MODE_ACTIVE`, or\n `K_WAIT_MODE_BLOCK`)."]
+    pub fn k_wait(timeout: k_timeout_t, mode: u8);
 }
 extern "C" {
-    #[doc = " @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time\n in microseconds.\n\n Note: consider using this function only for very short delays.\n Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds),\n otherwise the system uptime may be delayed.\n\n This function relies on _delay_us() from <util/delay.h> which can only be\n used in release mode(not in debug mode).\n\n @param delay_us The duration to block in microseconds."]
+    #[doc = " @brief Block the RTOS (scheduler + SYSCLOCK) for a specified amount of time in\n microseconds.\n\n This function blocks the RTOS for a short delay. It should not be used for delays\n longer than `CONFIG_KERNEL_SYSCLOCK_PERIOD_US` (converted to milliseconds), as it may\n delay system uptime.\n\n This function relies on `_delay_us()` from `<util/delay.h>`, which can only be used in\n release mode (not in debug mode).\n\n @param delay_us The duration to block in microseconds."]
     pub fn z_cpu_block_us(delay_us: u32);
 }
 extern "C" {
-    #[doc = " @brief Block the RTOS (scheduler + SYSCLOCK) for the specified amount of time\n in milliseconds.\n\n Note: consider using this function only for very short delays.\n Do not exceed CONFIG_KERNEL_SYSCLOCK_PERIOD_US (converted to milliseconds),\n otherwise the system uptime may be delayed.\n\n This function relies on _delay_ms() from <util/delay.h> which can only be\n used in release mode(not in debug mode).\n\n @param delay_ms The duration to block in milliseconds."]
+    #[doc = " @brief Block the RTOS (scheduler + SYSCLOCK) for a specified amount of time in\n milliseconds.\n\n This function blocks the RTOS for a short delay. It should not be used for delays\n longer than `CONFIG_KERNEL_SYSCLOCK_PERIOD_US` (converted to milliseconds), as it may\n delay system uptime.\n\n This function relies on `_delay_ms()` from `<util/delay.h>`, which can only be used in\n release mode (not in debug mode).\n\n @param delay_ms The duration to block in milliseconds."]
     pub fn z_cpu_block_ms(delay_ms: u32);
 }
 extern "C" {
-    #[doc = " @brief Get the number of currently ready threads.\n\n This function returns the count of threads that are currently in the ready\n state, meaning they are eligible for execution. If the CPU is in the IDLE\n state with no threads ready for execution, the function will return 0.\n\n @return The number of currently ready threads."]
+    #[doc = " @brief Get the number of currently ready threads.\n\n This function returns the count of threads that are currently in the ready state,\n meaning they are eligible for execution. If no threads are ready and the CPU is in the\n IDLE state, it returns 0.\n\n @return uint8_t The number of currently ready threads."]
     pub fn k_ready_count() -> u8;
 }
 extern "C" {
-    #[doc = " @brief Yield the CPU to another ready thread, assuming interrupts are\n disabled.\n\n The behavior is similar to k_yield(), but with the additional assumption that\n interrupts are already disabled.\n\n @see k_yield"]
+    #[doc = " @brief Yield the CPU to another ready thread, assuming interrupts are disabled.\n\n This function yields the CPU to another thread while assuming that interrupts are\n already disabled. It is similar to `k_yield()` but with this additional assumption.\n\n @see k_yield"]
     pub fn z_yield();
 }
 extern "C" {
-    #[doc = " @brief Assertion helper to check if the code is running in user context.\n\n This function is an assertion helper that checks if the code is executing in\n user context. It can be used to verify that certain operations or code paths\n are only accessed in user context. If the code is not running in user\n context, an assertion failure or error can be triggered."]
+    #[doc = " @brief Assertion helper to check if the code is running in user context.\n\n This function checks if the code is executing in user context. It is used to verify\n that certain operations or code paths are accessed only in user context."]
     pub fn z_assert_user_context();
 }
 extern "C" {
-    #[doc = " @brief Assertion helper to check if a thread is in the ready state.\n\n This function is an assertion helper that checks if a given thread is in the\n ready state, indicating that it is eligible for execution.\n\n If the thread is not in the ready state, an assertion failure or error can be\n triggered.\n\n @param thread The thread to check."]
+    #[doc = " @brief Assertion helper to check if a thread is in the ready state.\n\n This function checks if a given thread is in the ready state, meaning it is eligible\n for execution. If the thread is not in the ready state, an assertion failure or error\n is triggered.\n\n @param thread The thread to check."]
     pub fn z_assert_thread_ready(thread: *mut k_thread);
 }
 extern "C" {
-    #[doc = " @brief Get uptime in ticks (32 bit), if KERNEL_TICKS is enabled\n\n @return Kernel ticks value (32 bits)"]
-    pub fn k_ticks_get_32() -> u32;
-}
-extern "C" {
-    #[doc = " @brief Get uptime in ticks (64 bits), if KERNEL_TICKS is enabled.\n Meaningful only if CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS is enabled,\n otherwise, this function is equivalent to k_ticks_get_32.\n\n @return Kernel ticks value (64 bits)"]
-    pub fn k_ticks_get_64() -> u64;
-}
-extern "C" {
-    #[doc = " @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled\n\n @return Uptime in milliseconds"]
-    pub fn k_uptime_get_ms32() -> u32;
-}
-extern "C" {
-    #[doc = " @brief Get uptime in milliseconds, if KERNEL_UPTIME is enabled.\n\n Should be used if KERNEL_UPTIME_40BITS is enabled.\n\n @return Uptime in milliseconds (64 bits)"]
-    pub fn k_uptime_get_ms64() -> u64;
-}
-extern "C" {
-    #[doc = " @brief Get uptime in seconds, if KERNEL_UPTIME is enabled\n\n @return Uptime in seconds"]
-    pub fn k_uptime_get() -> u32;
-}
-extern "C" {
-    #[doc = " @brief Manual user AVRTOS init"]
+    #[doc = " @brief Perform manual initialization of the AVRTOS kernel.\n\n This function is the main entry point for manually initializing the AVRTOS\n kernel. It must be called if automatic initialization is disabled, when:\n - `CONFIG_AVRTOS_LINKER_SCRIPT` is disabled\n - or  `CONFIG_KERNEL_AUTO_INIT` is disabled\n - or the framework does not provide a mechanism to call the `k_avrtos_init`\n function early (Arduino does through `initVariant`)."]
     pub fn z_avrtos_init();
 }
 #[doc = " @brief Optimized queue data structure with head/tail entries.\n\n queue/dequeue actions are O(1)"]
@@ -574,239 +585,291 @@ extern "C" {
 pub type atomic_val_t = u8;
 pub type atomic_t = u8;
 extern "C" {
-    #[doc = " @brief Get the current value of an atomic variable.\n\n Note: This function is equivalent to directly read the 1 byte address\n\n @param target\n @return Value of the atomic variable."]
+    #[doc = " @brief Get the current value of an atomic variable.\n\n Note: This function is equivalent to directly reading the 1-byte address.\n\n @param target Pointer to the atomic variable.\n @return The current value of the atomic variable."]
     pub fn atomic_get(target: *mut atomic_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Set the value of an atomic variable.\n\n Note: This function is equivalent to directly write the 1 byte address\n\n @param target\n @return Old value of the atomic variable."]
+    #[doc = " @brief Set the value of an atomic variable.\n\n Note: This function is equivalent to directly writing to the 1-byte address.\n\n @param target Pointer to the atomic variable.\n @param value The value to set.\n @return The old value of the atomic variable."]
     pub fn atomic_set(target: *mut atomic_t, value: u32) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Clear the value of an atomic variable but do not return the old value.\n\n @param target"]
+    #[doc = " @brief Clear the value of an atomic variable without returning the old value.\n\n @param target Pointer to the atomic variable."]
     pub fn atomic_blind_clear(target: *mut atomic_t);
 }
 extern "C" {
-    #[doc = " @brief Clear the value of an atomic variable.\n\n @param target\n @return Return the old value."]
+    #[doc = " @brief Clear the value of an atomic variable and return the old value.\n\n @param target Pointer to the atomic variable.\n @return The old value of the atomic variable."]
     pub fn atomic_clear(target: *mut atomic_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Calculate the OR of value and the atomic variable,\n  and store the result in the atomic variable.\n\n @param target\n @param value\n @return Return the old value."]
+    #[doc = " @brief Perform a bitwise OR on the atomic variable with the given value.\n        Store the result in the atomic variable.\n\n @param target Pointer to the atomic variable.\n @param value Value to OR with the atomic variable.\n @return The old value of the atomic variable."]
     pub fn atomic_or(target: *mut atomic_t, value: atomic_val_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Calculate the XOR of value and the atomic variable,\n  and store the result in the atomic variable.\n\n @param target\n @param value\n @return Return the old value."]
+    #[doc = " @brief Perform a bitwise XOR on the atomic variable with the given value.\n        Store the result in the atomic variable.\n\n @param target Pointer to the atomic variable.\n @param value Value to XOR with the atomic variable.\n @return The old value of the atomic variable."]
     pub fn atomic_xor(target: *mut atomic_t, value: atomic_val_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Calculate the AND of value and the atomic variable,\n  and store the result in the atomic variable.\n\n @param target\n @param value\n @return Return the old value."]
+    #[doc = " @brief Perform a bitwise AND on the atomic variable with the given value.\n        Store the result in the atomic variable.\n\n @param target Pointer to the atomic variable.\n @param value Value to AND with the atomic variable.\n @return The old value of the atomic variable."]
     pub fn atomic_and(target: *mut atomic_t, value: atomic_val_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Increment the atomic variable by one.\n  Return the current value.\n\n Note: return value is not the old value.\n\n @param target\n @return Return the new value."]
+    #[doc = " @brief Increment the atomic variable by one and return the new value.\n\n Note: The return value is the new value, not the old value.\n\n @param target Pointer to the atomic variable.\n @return The new value of the atomic variable."]
     pub fn atomic_inc(target: *mut atomic_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Decrement the atomic variable by one.\n  Return the current value.\n\n Note: return value is not the old value.\n\n @param target\n @return Return the new value."]
+    #[doc = " @brief Decrement the atomic variable by one and return the new value.\n\n Note: The return value is the new value, not the old value.\n\n @param target Pointer to the atomic variable.\n @return The new value of the atomic variable."]
     pub fn atomic_dec(target: *mut atomic_t) -> atomic_val_t;
 }
 extern "C" {
-    #[doc = " @brief Clear the bit at position @p bit in the atomic variable.\n\n @param target\n @param bit"]
+    #[doc = " @brief Clear the bit at the specified position in the atomic variable.\n\n @param target Pointer to the atomic variable.\n @param bit The bit position to clear."]
     pub fn atomic_clear_bit(target: *mut atomic_t, bit: u8);
 }
 extern "C" {
-    #[doc = " @brief Set the bit at position @p bit in the atomic variable.\n\n @param target\n @param bit"]
+    #[doc = " @brief Set the bit at the specified position in the atomic variable.\n\n @param target Pointer to the atomic variable.\n @param bit The bit position to set."]
     pub fn atomic_set_bit(target: *mut atomic_t, bit: u8);
 }
 extern "C" {
-    #[doc = " @brief Set the bit at position @p bit to value @p val in the atomic variable.\n\n @param target\n @param bit\n @param val"]
+    #[doc = " @brief Set the bit at the specified position to the given value in the atomic variable.\n\n @param target Pointer to the atomic variable.\n @param bit The bit position to modify.\n @param val The value to set (true to set, false to clear)."]
     pub fn atomic_set_bit_to(target: *mut atomic_t, bit: u8, val: bool);
 }
 extern "C" {
-    #[doc = " @brief Test the bit at position @p bit in the atomic variable.\n\n @param target\n @param bit\n @return Return true if the bit is set, false otherwise."]
+    #[doc = " @brief Test whether the bit at the specified position in the atomic variable is set.\n\n @param target Pointer to the atomic variable.\n @param bit The bit position to test.\n @return True if the bit is set, false otherwise."]
     pub fn atomic_test_bit(target: *mut atomic_t, bit: u8) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Test the bit at position @p bit in the atomic variable and clear it.\n\n @param target\n @param bit\n @return Return true if the bit was set, false otherwise."]
+    #[doc = " @brief Test whether the bit at the specified position in the atomic variable is set\n        and clear it.\n\n @param target Pointer to the atomic variable.\n @param bit The bit position to test and clear.\n @return True if the bit was set before clearing, false otherwise."]
     pub fn atomic_test_and_clear_bit(target: *mut atomic_t, bit: u8) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Test the bit at position @p bit in the atomic variable and set it.\n\n @param target\n @param bit\n @return Return true if the bit was set, false otherwise."]
+    #[doc = " @brief Test whether the bit at the specified position in the atomic variable is set\n        and set it.\n\n @param target Pointer to the atomic variable.\n @param bit The bit position to test and set.\n @return True if the bit was set before setting, false otherwise."]
     pub fn atomic_test_and_set_bit(target: *mut atomic_t, bit: u8) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Compare and set, Compare the atomic variable value with @p cmd value\n \t- If equal update the atomic variable value with @p val value\n \t- Left the atomic variable value unchanged if not equal\n\n @param target\n @param value\n @return Return true if the atomic variable value was updated, false\n otherwise."]
+    #[doc = " @brief Compare and set operation. Compares the atomic variable value with the provided\n        command value. If equal, updates the atomic variable with the provided value.\n        If not equal, leaves the atomic variable unchanged.\n\n @param target Pointer to the atomic variable.\n @param cmd The value to compare against.\n @param val The value to set if the comparison is successful.\n @return True if the atomic variable was updated, false otherwise."]
     pub fn atomic_cas(target: *mut atomic_t, cmd: atomic_val_t, val: atomic_val_t) -> bool;
 }
 extern "C" {
-    #[doc = " @brief see atomic_cas\n\n @param target\n @param cmd\n @param val\n @return Return true if the atomic variable value was updated, false\n otherwise."]
+    #[doc = " @brief Alternate implementation of compare and set.\n\n @see atomic_cas\n\n @param target Pointer to the atomic variable.\n @param cmd The value to compare against.\n @param val The value to set if the comparison is successful.\n @return True if the atomic variable was updated, false otherwise."]
     pub fn atomic_cas2(target: *mut atomic_t, cmd: atomic_val_t, val: atomic_val_t) -> bool;
 }
+#[doc = " @brief Structure representing a ring buffer.\n\n The ring buffer structure contains pointers to the buffer, along with read and write\n cursors to manage data access. The size of the buffer is also stored to control the\n buffer's wrap-around behavior."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct k_ring {
+    #[doc = "< Pointer to the buffer array used by the ring buffer"]
     pub buffer: *mut u8,
+    #[doc = "< Read cursor, indicating the position of the next byte to read"]
     pub r: u8,
+    #[doc = "< Write cursor, indicating the position of the next byte to write"]
     pub w: u8,
+    #[doc = "< Size of the buffer (total number of elements it can hold)"]
     pub size: u8,
 }
 extern "C" {
-    #[doc = " @brief Initialize a ring buffer\n\n @param ring\n @param buffer\n @param size\n @return int8_t"]
+    #[doc = " @brief Initialize a ring buffer with a given buffer and size.\n\n This function initializes the ring buffer structure with the provided buffer and size.\n\n @param ring Pointer to the ring buffer structure to initialize.\n @param buffer Pointer to the buffer array to be used by the ring buffer.\n @param size Size of the buffer array.\n @return int8_t Returns 0 on success\n @return -EINVAL if the ring pointer or buffer pointer is NULL."]
     pub fn k_ring_init(ring: *mut k_ring, buffer: *mut u8, size: u8) -> i8;
 }
 extern "C" {
+    #[doc = " @brief Push a byte of data into the ring buffer.\n\n This function adds a byte of data to the ring buffer at the current write cursor\n position and advances the write cursor. If the buffer is full, the function will\n overwrite the oldest data.\n\n @param ring Pointer to the ring buffer structure.\n @param data Byte of data to push into the buffer.\n @return int8_t Returns 0 on success\n @return -EINVAL if the ring pointer is NULL.\n @return -ENOMEM if the buffer is full."]
     pub fn k_ring_push(ring: *mut k_ring, data: ::core::ffi::c_char) -> i8;
 }
 extern "C" {
+    #[doc = " @brief Pop a byte of data from the ring buffer.\n\n This function retrieves a byte of data from the ring buffer at the current read cursor\n position and advances the read cursor. If the buffer is empty, the function will return\n an error.\n\n @param ring Pointer to the ring buffer structure.\n @param data Pointer to the variable where the popped data will be stored.\n @return int8_t Returns 0 on success\n @return -EINVAL if the ring pointer or data pointer is NULL.\n @return -EAGAIN if the buffer is empty."]
     pub fn k_ring_pop(ring: *mut k_ring, data: *mut ::core::ffi::c_char) -> i8;
 }
 extern "C" {
+    #[doc = " @brief Reset the ring buffer.\n\n This function resets the ring buffer, clearing any data and resetting the read and\n write cursors to their initial positions.\n\n @param ring Pointer to the ring buffer structure.\n @return int8_t Returns 0 on success, or a negative error code on failure."]
     pub fn k_ring_reset(ring: *mut k_ring) -> i8;
 }
+pub type k_flags_value_t = u8;
+#[doc = " @brief Kernel Flags structure\n\n A flags object manages and synchronizes thread operations based on the setting\n or clearing of specific bits (flags). Threads can wait for specific flags to\n be set or cleared and can be notified when a change occurs."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_flags {
-    pub _waitqueue: dnode,
-    pub flags: u8,
-    pub reset_value: u8,
+    #[doc = "< Wait queue for threads waiting on the flags"]
+    pub waitqueue: dnode,
+    #[doc = "< Current flags state"]
+    pub flags: k_flags_value_t,
+    #[doc = "< Reset value for the flags"]
+    pub reset_value: k_flags_value_t,
 }
 pub mod k_flags_options_t {
+    #[doc = " @brief Options for flag operations.\n\n These options control how flags are polled and notified."]
     pub type Type = ::core::ffi::c_uint;
+    #[doc = "< Wait for any bit of the flags to be set"]
     pub const K_FLAGS_SET_ANY: Type = 1;
-    pub const K_FLAGS_SET_ALL: Type = 4;
-    pub const K_FLAGS_CLR_ALL: Type = 4;
-    pub const K_FLAGS_CLR_ANY: Type = 8;
+    pub const K_FLAGS_SET_ALL: Type = 2;
+    pub const K_FLAGS_CLR_ANY: Type = 4;
+    pub const K_FLAGS_CLR_ALL: Type = 8;
+    #[doc = "< Consume the flags after notification"]
     pub const K_FLAGS_CONSUME: Type = 16;
+    #[doc = "< Set the flags"]
     pub const K_FLAGS_SET: Type = 32;
+    #[doc = "< Clear the flags (not supported)"]
     pub const K_FLAGS_CLR: Type = 64;
+    #[doc = "< Call the scheduler if a task was woken up"]
     pub const K_FLAGS_SCHED: Type = 128;
 }
 extern "C" {
-    #[doc = " @brief Initialize a flags object\n\n @param flags Flags object\n @param value Initial value\n @return int"]
-    pub fn k_flags_init(flags: *mut k_flags, value: u8) -> i8;
+    #[doc = " @brief Initialize a flags object at runtime.\n\n This function initializes a flags object with a specified initial value.\n\n Safety: This function is safe to call from an ISR context.\n\n @param flags Pointer to the flags object to initialize.\n @param value Initial value of the flags.\n @return 0 on success, or -EINVAL if the flags pointer is NULL."]
+    pub fn k_flags_init(flags: *mut k_flags, value: k_flags_value_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Poll for any bit of the flags to be set\n\n @param flags Flags object\n @param mask Mask of bits to wait for\n @param options Options\n \t\tK_FLAGS_SET_ANY (required): Wait for any bit of the flags to be\n set K_FLAGS_CONSUME: Consume the flags after notification\n @param timeout Timeout to wait for if flags are not set\n @return int positive value on success: Mask of bits that made the thread wake\n up\n @return  -EINVAL if flags is NULL\n @return  -ENOTSUP if options is not supported\n @return  -EAGAIN if timeout is reached"]
+    #[doc = " @brief Poll for specified flags to be set or cleared.\n\n This function allows a thread to wait for specific flags to be set\n according to the provided mask and options. If the flags are already\n set as required, the function returns immediately. Otherwise, the\n thread will block until the condition is met or the timeout expires.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param flags Pointer to the flags object.\n @param mask Mask of bits to wait for.\n @param options Polling options, e.g., K_FLAGS_SET_ANY and K_FLAGS_CONSUME.\n @param timeout Timeout value to wait for the flags.\n @return Positive value indicating the bits that caused the wake-up, or\n a negative error code on failure.\n @retval -EINVAL if the flags pointer is NULL.\n @retval -ENOTSUP if the options are not supported.\n @retval -EAGAIN if the timeout expires before the flags are set."]
     pub fn k_flags_poll(
         flags: *mut k_flags,
-        mask: u8,
+        mask: *mut k_flags_value_t,
         options: k_flags_options_t::Type,
         timeout: k_timeout_t,
     ) -> ::core::ffi::c_int;
 }
 extern "C" {
-    #[doc = " @brief Notify a flags object\n\n @param flags Flags object\n @param mask Mask of bits to notify\n @param options Options\n \t\tK_FLAGS_SET (required): Set the flags\n \t\tK_FLAGS_SCHED: Call the scheduler if task have been wake up\n after notify()\n\n Note: K_FLAGS_SCHED SHOULD NOT be used in ISR context. Use return value to\n check if a task have been wake up. Call k_yield_from_isr_cond() if return\n value is strictly positive.\n\n @return int Number of tasks that have been wake up, negative value on error\n @return  -EINVAL if flags object is NULL\n @return  -ENOTSUP if options is not supported"]
+    #[doc = " @brief Notify a flags object to set or clear specific bits.\n\n This function sets or clears bits in the flags object according to the\n provided mask and options. It can optionally wake up threads waiting\n on the flags and invoke the scheduler if required.\n\n @param flags Pointer to the flags object.\n @param notify_value Value of the bits to set or clear.\n @param options Notification options, e.g., K_FLAGS_SET and K_FLAGS_SCHED.\n @return Number of threads that were woken up, or a negative error code on failure.\n @retval -EINVAL if the flags pointer is NULL.\n @retval -ENOTSUP if the options are not supported.\n\n Safety:  This function is generally safe to call from an ISR context but\n K_FLAGS_SCHED should not be used. Instead, use the\n return value to check if a task was woken up, and call k_yield_from_isr_cond()\n if the return value is greater than 0."]
     pub fn k_flags_notify(
         flags: *mut k_flags,
-        notify_value: u8,
+        notify_value: k_flags_value_t,
         options: k_flags_options_t::Type,
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Reset a flags object\n\n Cancel all pending waiters and reset the flags to the initial value\n\n @param flags\n @return int"]
+    #[doc = " @brief Reset a flags object to its initial state.\n\n This function resets the flags object to its initial value and cancels\n all pending threads waiting on the flags.\n\n Safety: This function is safe to call from an ISR context.\n\n @param flags Pointer to the flags object.\n @return 0 on success, or a negative error code on failure."]
     pub fn k_flags_reset(flags: *mut k_flags) -> i8;
 }
 extern "C" {
+    #[doc = " @brief Fault handler function\n\n The `__fault` function disables interrupts, print some debug information using\n the system serial port, and the program execution is halted:\n 1. cli\n 2. * print debug information *\n 3. jmp _exit\n\n @param reason The fault code indicating the type of fault."]
     pub fn __fault(reason: u8);
 }
 extern "C" {
-    #[doc = " @brief Tells whether the runqueue contains the thread IDLE\n\n @return true\n @return false"]
+    #[doc = " @brief Check if the CPU is idle.\n\n This function checks whether the runqueue contains only the idle thread,\n indicating that the CPU is currently idle.\n\n @return true if the CPU is idle, false otherwise."]
     pub fn k_is_cpu_idle() -> bool;
 }
 extern "C" {
-    #[doc = " @brief IDLE the CPU.\n\n This function can be called from any thread to make it behave as an IDLE\n thread.\n\n This function shouldn't be called from an ISR.\n\n If others thread a ready, the function will call k_yield() to give them\n a chance to run. If no other thread is ready, the MCU is put in sleep mode\n until an interrupt occurs.\n\n The function keeps the thread as \"ready\". This means that if an interrupt\n occurs or other threads finished to consume their time slice,\n the thread will be scheduled to run again.\n\n Note: This function requires interrupts to be enabled."]
+    #[doc = " @brief Enter idle mode.\n\n This function can be called from any thread to make it behave like an idle\n thread. It should not be called from an ISR.\n\n When called, the function checks if other threads are ready to run:\n - If other threads are ready, it calls `k_yield()` to allow them to run.\n - If no other threads are ready, the MCU is put into sleep mode until an\n   interrupt occurs.\n\n The function keeps the thread as \"ready,\" meaning that if an interrupt\n occurs or other threads finish their time slice, the thread calling k_idle()\n will be scheduled to run again in the first place.\n Except if k_yield_from_isr() is called from an ISR context and the current\n thread is PREEMPTIVE.\n\n @note This function requires interrupts to be enabled."]
     pub fn k_idle();
 }
 extern "C" {
-    #[doc = " @brief Initialize canaries in thread stack.\n\n @param thread"]
+    #[doc = " @brief Initialize stack canaries for a specific thread.\n\n This function initializes the stack canaries for the given thread.\n\n @param thread Pointer to the thread whose stack canaries are to be initialized."]
     pub fn z_init_thread_stack_canaries(thread: *mut k_thread);
 }
 extern "C" {
-    #[doc = " @brief Automatically initialize thread canaries in stack\n if configuration option CONFIG_THREAD_CANARIES is enabled.\n\n Stack is filled with symbol CONFIG_THREAD_CANARIES_SYMBOL\n\n Default THREAD_CANARIES_SYMBOl = 0xAA = 0b10101010"]
+    #[doc = " @brief Automatically initialize stack canaries for all threads.\n\n This function automatically initializes stack canaries for all threads\n defined in the .k_threads section."]
     pub fn z_init_stacks_canaries();
 }
 extern "C" {
-    #[doc = " @brief Get the address of the furthest stack location used by the thread.\n i.e. We loop until we found canaries for the thread {thread}.\n\n @param thread\n @return void* Address of byte following the last found canary.\n (Address of the furthest stack location used by the thread.)"]
+    #[doc = " @brief Get the address of the furthest used stack location in a thread.\n\n This function checks the stack of the specified thread and returns the\n address of the byte following the last found canary. This represents\n the furthest stack location that has been used by the thread, which\n helps in determining stack usage.\n\n The stack usage can then be calculated with:\n\n   stack_usage = Z_STACK_SIZE_USABLE(thread->stack.size) - z_stack_canaries(thread);\n\n @param thread Pointer to the thread whose stack usage is to be checked.\n @return void* Address of the byte following the last canary found,\n representing the furthest used stack location."]
     pub fn z_stack_canaries(thread: *mut k_thread) -> *mut ::core::ffi::c_void;
 }
 extern "C" {
-    #[doc = " @brief Pretty print found canaries in thread {thread}\n\n @param thread thread to check"]
+    #[doc = " @brief Print stack canary information for a specific thread.\n\n This function prints detailed information about the stack canaries\n found in the specified thread.\n\n @param thread Pointer to the thread whose stack canaries are to be printed."]
     pub fn k_print_stack_canaries(thread: *mut k_thread);
 }
 extern "C" {
-    #[doc = " @brief Pretty print found canaries in the current thread\n\n [M] CANARIES until @07CE [found 468], MAX usage = 44 / 512"]
+    #[doc = " @brief Print stack canary information for the current thread.\n\n This function prints detailed information about the stack canaries\n found in the current thread."]
     pub fn k_print_current_canaries();
 }
 extern "C" {
-    #[doc = " @brief Pretty print found canaries in all threads\n\n [M] CANARIES until @07CE [found 468], MAX usage = 44 / 512\n [2] CANARIES until @010B [found 6], MAX usage = 506 / 512\n [1] CANARIES until @03C7 [found 194], MAX usage = 62 / 256\n [L] CANARIES until @04DE [found 217], MAX usage = 39 / 256\n [K] CANARIES until @051F [found 26], MAX usage = 36 / 62\n"]
+    #[doc = " @brief Print stack canary information for all threads.\n\n This function prints detailed information about the stack canaries\n found in all threads defined in the .k_threads section."]
     pub fn k_dump_stack_canaries();
 }
 extern "C" {
-    #[doc = " @brief Verify if stack sentinel byte(s) is(are) still intact.\n\n @param thread\n @return true\n @return false"]
+    #[doc = " @brief Verify the integrity of the stack sentinel for a specific thread.\n\n This function checks if the stack sentinel byte(s) for the given thread\n are still intact.\n\n @param thread Pointer to the thread whose stack sentinel is to be verified.\n @return true if the stack sentinel is intact, false if it has been corrupted."]
     pub fn k_verify_stack_sentinel(thread: *mut k_thread) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Check all registered stack sentinel bytes and fault on error.\n\n @param thread\n @return true\n @return false"]
+    #[doc = " @brief Verify the integrity of stack sentinels for all registered threads.\n\n This function checks the stack sentinel byte(s) for all threads defined in the\n .k_threads section."]
     pub fn k_assert_registered_stack_sentinel();
 }
+#[doc = " @brief Structure representing the state of the PRNG."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct k_prng {
+    #[doc = "< 32-bit LFSR state"]
     pub lfsr32: u32,
+    #[doc = "< 31-bit LFSR state"]
     pub lfsr31: u32,
 }
 extern "C" {
+    #[doc = " @brief Get a 16-bit pseudo-random number from the PRNG.\n\n This function returns a 16-bit pseudo-random number generated by the PRNG.\n\n @param prng Pointer to the PRNG structure.\n @return A 16-bit pseudo-random number."]
     pub fn k_prng_get(prng: *mut k_prng) -> u16;
 }
 extern "C" {
+    #[doc = " @brief Get a 32-bit pseudo-random number from the PRNG.\n\n This function returns a 32-bit pseudo-random number generated by the PRNG.\n\n @param prng Pointer to the PRNG structure.\n @return A 32-bit pseudo-random number."]
     pub fn k_prng_get_u32(prng: *mut k_prng) -> u32;
 }
 extern "C" {
+    #[doc = " @brief Fill a buffer with pseudo-random data.\n\n This function fills the provided buffer with the specified length of pseudo-random\n data.\n\n @param prng Pointer to the PRNG structure.\n @param buffer Pointer to the buffer where the random data will be stored.\n @param len Length of the buffer in bytes."]
     pub fn k_prng_get_buffer(prng: *mut k_prng, buffer: *mut u8, len: u16);
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct timespec {
-    pub tv_sec: u32,
-    pub tv_msec: u16,
+extern "C" {
+    #[doc = " @brief Get the current system uptime in 32-bit ticks.\n\n This function returns the uptime in kernel ticks, represented as a 32-bit\n value.\n\n @return Kernel ticks value (32-bit)."]
+    pub fn k_ticks_get_32() -> u32;
 }
 extern "C" {
-    #[doc = " @brief Get the current time.\n\n @param ts\n @return __kernel"]
-    pub fn k_timespec_get(ts: *mut timespec);
+    #[doc = " @brief Get the current system uptime in 64-bit ticks.\n\n This function returns the uptime in kernel ticks, represented as a 64-bit\n value. It is meaningful only if `CONFIG_KERNEL_TICKS_COUNTER_40BITS` is\n enabled in the configuration; otherwise, it behaves identically to\n `k_ticks_get_32`.\n\n @return Kernel ticks value (64-bit)."]
+    pub fn k_ticks_get_64() -> u64;
 }
 extern "C" {
-    #[doc = " @brief Set the current time.\n\n @param ts\n @return __kernel"]
-    pub fn k_time_set(sec: u32);
+    #[doc = " @brief Get the current system uptime in milliseconds (32-bit).\n\n This function returns the uptime in milliseconds as a 32-bit value, and is\n meaningful only if `CONFIG_KERNEL_UPTIME` is enabled in the configuration.\n\n @return Uptime in milliseconds (32-bit)."]
+    pub fn k_uptime_get_ms32() -> u32;
 }
 extern "C" {
-    #[doc = " @brief Check if the time is set.\n\n @return __kernel"]
-    pub fn k_time_is_set() -> bool;
+    #[doc = " @brief Get the current system uptime in milliseconds (64-bit).\n\n This function returns the uptime in milliseconds as a 64-bit value. It should\n be used if `CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS` is enabled in the\n configuration. Otherwise, use `k_uptime_get_ms32`.\n\n @return Uptime in milliseconds (64-bit)."]
+    pub fn k_uptime_get_ms64() -> u64;
 }
 extern "C" {
-    #[doc = " @brief Get the current time in seconds.\n\n @return __kernel"]
-    pub fn k_time_get() -> u32;
+    #[doc = " @brief Get the current system uptime in seconds.\n\n This function returns the uptime in seconds. It is meaningful only if\n `KERNEL_UPTIME` is enabled in the configuration.\n\n @return Uptime in seconds."]
+    pub fn k_uptime_get() -> u32;
 }
 extern "C" {
-    #[doc = " @brief Get the current time in milliseconds.\n\n IF CONFIG_KERNEL_TIME_API_MS_PRECISION is set to 0, the return value is\n truncated to seconds.\n\n @return __kernel"]
-    pub fn k_time_get_ms() -> u64;
-}
-extern "C" {
-    #[doc = " @brief Unset the current time.\n\n @return __kernel"]
-    pub fn k_time_unset();
-}
-extern "C" {
-    #[doc = " @brief Print to serial the current uptime in seconds.\n\n @return __kernel"]
+    #[doc = " @brief Print the current uptime in seconds to the serial output.\n\n This function prints the uptime of the system in seconds."]
     pub fn k_show_uptime();
 }
 extern "C" {
-    #[doc = " @brief Print to serial the current uptime in ticks.\n\n @return __kernel"]
+    #[doc = " @brief Print the current uptime in ticks to the serial output.\n\n This function prints the uptime of the system in ticks."]
     pub fn k_show_ticks();
 }
-#[doc = " @brief Event handler function.\n\n @warning Never call any k_yield(), k_yield_from_isr(),\n k_yield_from_isr_cond() from a timer handler.\n\n @param event Event that triggered the handler."]
+#[doc = " @brief Structure to represent time in seconds and milliseconds."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct timespec {
+    #[doc = "< Seconds component of the time."]
+    pub tv_sec: u32,
+    #[doc = "< Milliseconds component of the time."]
+    pub tv_msec: u16,
+}
+extern "C" {
+    #[doc = " @brief Retrieve the current uptime as a `timespec` structure.\n\n @param ts Pointer to a `timespec` structure where the current time will be stored."]
+    pub fn k_uptime_as_timespec_get(ts: *mut timespec);
+}
+extern "C" {
+    #[doc = " @brief Set the current time.\n\n This function sets the system time to the specified number of seconds since epoch.\n\n @param sec The number of seconds to set the system time to."]
+    pub fn k_time_set(sec: u32);
+}
+extern "C" {
+    #[doc = " @brief Check if the system time is set.\n\n This function checks whether the system time has been initialized.\n\n @return `true` if the system time is set, `false` otherwise."]
+    pub fn k_time_is_set() -> bool;
+}
+extern "C" {
+    #[doc = " @brief Get the current time in seconds.\n\n This function returns the current system time in seconds since epoch.\n\n @return The current time in seconds."]
+    pub fn k_time_get() -> u32;
+}
+extern "C" {
+    #[doc = " @brief Get the current time in milliseconds.\n\n This function returns the current system time in milliseconds. If\n `CONFIG_KERNEL_TIME_API_MS_PRECISION` is set to 0, the return value\n will be truncated to seconds.\n\n @return The current time in milliseconds."]
+    pub fn k_time_get_ms() -> u64;
+}
+extern "C" {
+    #[doc = " @brief Unset the current time.\n\n This function clears the system time, effectively unsetting it."]
+    pub fn k_time_unset();
+}
+#[doc = " @brief Event handler function type.\n\n This type defines the function signature for event handlers. Event handlers\n are functions that are called when an event is triggered.\n\n @warning Event handlers should never call `k_yield()`, `k_yield_from_isr()`,\n or `k_yield_from_isr_cond()` from a timer handler.\n\n @param event Pointer to the event that triggered the handler."]
 pub type k_event_handler_t = ::core::option::Option<unsafe extern "C" fn(arg1: *mut k_event)>;
+#[doc = " @brief Event structure."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_event {
+    #[doc = "< Timer queue item for scheduling the event."]
     pub tie: titem,
+    #[doc = "< Function to handle the event when triggered."]
     pub handler: k_event_handler_t,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
@@ -834,82 +897,92 @@ impl k_event {
     }
 }
 extern "C" {
-    #[doc = " @brief Initialize an event.\n\n @param event\n @param handler\n @return int"]
+    #[doc = " @brief Initialize an event at runtime.\n\n This function initializes a `k_event` structure with the specified handler function.\n\n Safety: This function is safe to call from an ISR context.\n\n @param event Pointer to the event structure.\n @param handler Function to handle the event when triggered.\n @return 0 on success, or a negative error code on failure."]
     pub fn k_event_init(event: *mut k_event, handler: k_event_handler_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Schedule the event to be triggered after timeout (in ms).\n\n Can be called from an interrupt.\n\n @param event\n @param timeout\n @return int"]
+    #[doc = " @brief Schedule an event to be triggered after a timeout.\n\n This function schedules the specified event to occur after the given timeout.\n It can be called from an interrupt context.\n\n Safety: This function is safe to call from an ISR context.\n\n @param event Pointer to the event structure.\n @param timeout Timeout in milliseconds after which the event will be triggered.\n @return 0 on success, or a negative error code on failure."]
     pub fn k_event_schedule(event: *mut k_event, timeout: k_timeout_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Unschedule the event.\n\n Can be called from an interrupt.\n\n @param event\n @return int8_t Return 0 if the event was pending, -EAGAIN otherwise."]
+    #[doc = " @brief Cancel a scheduled event.\n\n This function cancels a previously scheduled event. It can be called from\n an interrupt context.\n\n Safety: This function is safe to call from an ISR context.\n\n @param event Pointer to the event structure.\n @return 0 if the event was successfully canceled, or -EAGAIN if the event was not\n pending."]
     pub fn k_event_cancel(event: *mut k_event) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Unschedule the event.\n\n Can be called from an interrupt.\n\n @param event\n @return int"]
+    #[doc = " @brief Check if an event is pending.\n\n This function checks if the specified event is currently scheduled.\n\n Safety: This function is safe to call from an ISR context.\n\n @param event Pointer to the event structure.\n @return true if the event is pending, false otherwise."]
     pub fn k_event_pending(event: *mut k_event) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Internal function shifting the event queue and executing the handlers\n for the events that have expired.\n\n The call periodicity is constant and equals CONFIG_KERNEL_TIME_SLICE_US."]
+    #[doc = " @brief Process the event queue and execute handlers for expired events.\n\n This internal function processes the event queue, executing the handlers for\n any events whose timeouts have expired. It is called periodically with a frequency\n defined by `CONFIG_KERNEL_TIME_SLICE_US`."]
     pub fn z_event_q_process();
 }
-#[doc = " @brief Structure representing a fifo.\n\n Queue lists all items added to the fifo in order.\n\n Waitqueue list contains all threads pending for a fifo item."]
+#[doc = " @brief Kernel FIFO structure\n\n A FIFO (First-In, First-Out) queue is a data structure used to manage\n ordered sequences of elements. Items are added to the end of the queue\n and removed from the front. The FIFO structure also contains a wait queue\n for threads that are waiting for an item to become available."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_fifo {
+    #[doc = "< FIFO reference to the head item"]
     pub queue: slist,
+    #[doc = "< Wait queue for threads waiting for a FIFO item"]
     pub waitqueue: dnode,
 }
 extern "C" {
-    #[doc = " @brief Initialize a fifo if it wasn't defined using the macro K_FIFO_DEFINE.\n\n @param fifo"]
+    #[doc = " @brief Initialize a FIFO at runtime.\n\n This function initializes a FIFO structure, setting up its queue and wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure to be initialized.\n @return 0 on success, or -EINVAL if the FIFO pointer is NULL."]
     pub fn k_fifo_init(fifo: *mut k_fifo) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Add an item to the fifo.\n\n Wake up the first thread pending on a fifo item.\n\n Can be called from an interrupt routine.\n\n IMPORTANT : first two bytes of the memory space {item_tie} are reserved\n for internal usage and cannot be use to store data.\n\n Note :\n Actually it's not the item itself which is added to the fifo but its \"tie\"\n member `item_tie` (first 2 bytes). As for workqueue we're using the\n CONTAINER_OF paragigm. For each item added to the fifo, you must define a\n structure containing this \"tie\" and the actual item data. See example\n \"fifo-slab\" or \"interrupt-yield\".\n\n Reference design :\n\n struct\n {\n  struct snode tie;\n  uint8_t value;\n } block1;\n block1.value = 17u;\n k_fifo_put(&myfifo, &block1);\n\n Note : in Zephyr RTOS project, there are two functions :\n - k_fifo_put : which needs the first word of the data to be reserved\n  -\n https://github.com/zephyrproject-rtos/zephyr/blob/main/include/kernel.h#L2074-L2088\n\n - k_fifo_alloc_put : which implicitely allocate this internal \"tie\" member.\n  -\n https://github.com/zephyrproject-rtos/zephyr/blob/main/include/kernel.h#L2095-L2111\n\n @param fifo pointer to the fifo\n @param item_tie pointer to the \"tie\" member of the item to add\n @return Thread that was woken up or NULL if no thread was pending"]
+    #[doc = " @brief Add an item to the FIFO.\n\n This function adds an item to the end of the FIFO queue. If there are threads\n waiting for an item, the first thread in the wait queue is woken up.\n\n @note The first two bytes of the item's memory space (item_tie) are reserved\n for internal use and cannot store data.\n\n Safety: This function is safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure.\n @param item_tie Pointer to the \"tie\" member of the item to add.\n @return Pointer to the thread that was woken up, or NULL if no thread was pending."]
     pub fn k_fifo_put(fifo: *mut k_fifo, item_tie: *mut snode) -> *mut k_thread;
 }
 extern "C" {
-    #[doc = " @brief @see k_fifo_put\n\n Assume interrupts are disabled\n\n @param fifo\n @param item\n @return Thread that was woken up or NULL if no thread was pending"]
+    #[doc = " @brief Add an item to the FIFO, assuming interrupts are disabled.\n\n This is a variant of k_fifo_put() that should be used when interrupts are disabled.\n\n Safety: This function is not safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure.\n @param item Pointer to the item to add.\n @return Pointer to the thread that was woken up, or NULL if no thread was pending."]
     pub fn z_fifo_put(fifo: *mut k_fifo, item: *mut snode) -> *mut k_thread;
 }
 extern "C" {
-    #[doc = " @brief Get and remove an item from the fifo.\n\n If there is no item in the fifo and timeout is different from K_NO_WAIT,\n the function is blocking until a item is added or timeout.\n\n Cannot be called from an interrupt routine\n if timeout is different from K_NO_WAIT.\n\n @param fifo\n @param timeout\n @return struct* not null if success"]
+    #[doc = " @brief Get and remove an item from the FIFO.\n\n This function removes an item from the front of the FIFO queue. If the FIFO\n is empty and the timeout is different from K_NO_WAIT, the calling thread\n will block until an item is added or the timeout expires.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param fifo Pointer to the FIFO structure.\n @param timeout Maximum time to wait for an item to become available.\n @return Pointer to the item if successful, or NULL on timeout or error."]
     pub fn k_fifo_get(fifo: *mut k_fifo, timeout: k_timeout_t) -> *mut snode;
 }
 extern "C" {
-    #[doc = " @brief Cancel pending on a fifo queue.\n This routine causes first thread pending on fifo, if any,\n to return from k_fifo_get() call with NULL value (as if timeout expired).\n\n @param fifo\n @return Number of threads woken up"]
-    pub fn k_fifo_cancel_wait(fifo: *mut k_fifo) -> u8;
+    #[doc = " @brief Cancel pending threads waiting on the FIFO.\n\n This function causes the first thread pending on the FIFO, if any, to return\n from k_fifo_get() with a NULL value, as if the timeout expired.\n\n Safety: This function is safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure.\n @return The number of threads that were woken up."]
+    pub fn k_fifo_cancel_wait(fifo: *mut k_fifo) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Tells if the fifo is empty.\n\n @param fifo\n @return True if empty, false otherwise"]
+    #[doc = " @brief Check if the FIFO is empty.\n\n This function returns true if the FIFO is empty, and false otherwise.\n\n Safety: This function is safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure.\n @return True if the FIFO is empty, false otherwise."]
     pub fn k_fifo_is_empty(fifo: *mut k_fifo) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Get without removing the first item in the fifo.\n\n @param fifo\n @return struct* head item, NULL if empty"]
+    #[doc = " @brief Peek at the head of the FIFO without removing the item.\n\n This function returns a pointer to the first item in the FIFO without removing it.\n\n Safety: This function is safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure.\n @return Pointer to the head item, or NULL if the FIFO is empty."]
     pub fn k_fifo_peek_head(fifo: *mut k_fifo) -> *mut snode;
 }
 extern "C" {
-    #[doc = " @brief Get without removing the last item in the fifo.\n\n @param fifo\n @return  struct* tail item, NULL if empty"]
+    #[doc = " @brief Peek at the tail of the FIFO without removing the item.\n\n This function returns a pointer to the last item in the FIFO without removing it.\n\n Safety: This function is safe to call from an ISR context.\n\n @param fifo Pointer to the FIFO structure.\n @return Pointer to the tail item, or NULL if the FIFO is empty."]
     pub fn k_fifo_peek_tail(fifo: *mut k_fifo) -> *mut snode;
 }
+#[doc = " @brief Work handler function type.\n\n This function type defines the signature for work handler functions that\n are executed by a workqueue when a work item is processed.\n\n @param work Pointer to the work item being processed."]
 pub type k_work_handler_t = ::core::option::Option<unsafe extern "C" fn(arg1: *mut k_work)>;
+#[doc = " @brief Work item structure.\n\n A `k_work` structure represents a unit of work to be processed by a workqueue.\n It contains a handler function that is invoked when the work item is processed."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct k_work {
+    #[doc = "< Node for linking work items in the queue."]
     pub _tie: snode,
+    #[doc = "< Handler function to process the work item."]
     pub handler: k_work_handler_t,
 }
+#[doc = " @brief Workqueue structure.\n\n A workqueue is responsible for managing and processing a queue of work items.\n It runs in its own thread and processes items in the order they are submitted."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_workqueue {
+    #[doc = "< Queue for storing work items."]
     pub q: k_fifo,
+    #[doc = "< Workqueue flags for configuration."]
     pub flags: u8,
 }
 extern "C" {
+    #[doc = " @brief Entry function for workqueue threads.\n\n This function runs in the context of the workqueue's thread and processes\n work items from the workqueue's queue.\n\n @param workqueue Pointer to the workqueue structure."]
     pub fn z_workqueue_entry(workqueue: *mut k_workqueue);
 }
 extern "C" {
-    #[doc = " @brief Create a workqueue thread at runtime.\n\n @param workqueue workqueue struct\n @param thread thread struct\n @param stack stack buffer\n @param stack_size stack size\n @param prio_flags thread priority and flags\n @param symbol thread symbol\n @return __kernel 0 if success, negative error code otherwise"]
+    #[doc = " @brief Create a workqueue thread at runtime.\n\n This function initializes a workqueue and creates a thread to process work items.\n\n Safety: This function is safe but discouraged to call from an ISR context.\n\n @param workqueue Pointer to the workqueue structure.\n @param thread Pointer to the thread structure to be used for the workqueue.\n @param stack Pointer to the stack memory for the workqueue thread.\n @param stack_size Size of the stack memory.\n @param prio_flags Priority and flags for the workqueue thread.\n @param symbol Symbol to represent the workqueue thread.\n @return 0 on success, or a negative error code on failure.\n @return -EINVAL if any of the arguments are invalid."]
     pub fn k_workqueue_create(
         workqueue: *mut k_workqueue,
         thread: *mut k_thread,
@@ -920,31 +993,34 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Initialize a workqueue item at runtime.\n k_work items can also be defined at compilation time using K_WORK_DEFINE\n\n @param work work item\n @param handler handler"]
+    #[doc = " @brief Initialize a work item at runtime.\n\n This function initializes a work item with the specified handler function.\n Work items can also be defined statically using `K_WORK_DEFINE`.\n\n Safety: This function is safe to call from an ISR context.\n\n @param work Pointer to the work item structure.\n @param handler Function to handle the work item."]
     pub fn k_work_init(work: *mut k_work, handler: k_work_handler_t);
 }
 extern "C" {
-    #[doc = " @brief Submit a work item to the desired workqueue.\n\n If the work item has already been queued but didn't get processed, the\n work is not sent a new time.\n\n A work item started being processed can be submitted again.\n\n A work item can be sent from an interrupt handler.\n With \"signals\", this is the recommanded way to handle interrupts.\n\n Assumptions :\n  - workqueue is not null\n  - work is not null\n  - work->handler is not null\n\n @param workqueue\n @param work"]
+    #[doc = " @brief Submit a work item to a workqueue.\n\n This function submits a work item to the specified workqueue for processing.\n If the work item is already in the queue and has not been processed, it will\n not be added again. A work item that has started processing can be resubmitted.\n\n Safety: This function is safe to call from an ISR context.\n\n @param workqueue Pointer to the workqueue structure.\n @param work Pointer to the work item to submit.\n @return `true` if the work item was successfully submitted, `false` otherwise."]
     pub fn k_work_submit(workqueue: *mut k_workqueue, work: *mut k_work) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Configure the workqueue to release the cpu after each work item\n being processed.\n\n Prevent cooperative thread workqueue from keeping the cpu for too long\n if a lot of work items need to be processed.\n\n @param workqueue"]
+    #[doc = " @brief Enable yield after each work item is processed.\n\n This function configures the workqueue to yield the CPU after each work item\n is processed. This is useful for preventing a cooperative thread workqueue\n from monopolizing the CPU if there are many work items to process.\n\n Safety: This function is safe to call from an ISR context.\n\n @param workqueue Pointer to the workqueue structure."]
     pub fn k_workqueue_enable_yieldeach(workqueue: *mut k_workqueue);
 }
 extern "C" {
-    #[doc = " @brief Configure the workqueue to not release the cpu after each work\n item if there are more to be processed.\n\n Assumptions :\n  - work is not null\n  - work->handler is not null\n\n @see Undo k_workqueue_enable_yieldeach\n\n @param workqueue"]
+    #[doc = " @brief Disable yield after each work item is processed.\n\n This function configures the workqueue to continue processing work items without\n yielding the CPU between items, if there are more items to process.\n\n Safety: This function is safe to call from an ISR context.\n\n @param workqueue Pointer to the workqueue structure."]
     pub fn k_workqueue_disable_yieldeach(workqueue: *mut k_workqueue);
 }
 extern "C" {
-    #[doc = " @brief Send a work item to the system workqueue\n\n @param work"]
+    #[doc = " @brief Submit a work item to the system workqueue.\n\n This function submits a work item to the system-wide workqueue for processing.\n\n Safety: This function is safe to call from an ISR context.\n\n @param work Pointer to the work item to submit.\n @return `true` if the work item was successfully submitted, `false` otherwise."]
     pub fn k_system_workqueue_submit(work: *mut k_work) -> bool;
 }
-#[doc = " @brief Delayable workqueue item.\n - Underlying work item to queue after timeout\n - Event object triggering the work item\n - Workqueue to queue the work item"]
+#[doc = " @brief Delayable work item structure.\n\n A delayable work item allows for a work item to be scheduled to run after a\n specified timeout. The delayable work item includes the underlying work item,\n an event object for triggering the work, and a pointer to the workqueue that\n will process the work."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_work_delayable {
+    #[doc = "< Underlying work item, it must be the first member to allow\n< casting from k_work_delayable to k_work."]
     pub work: k_work,
+    #[doc = "< Event object to trigger the work item."]
     pub _event: k_event,
+    #[doc = "< Workqueue that will process the work item."]
     pub _workqueue: *mut k_workqueue,
 }
 extern "C" {
@@ -952,11 +1028,11 @@ extern "C" {
     pub fn z_delayable_work_trigger(event: *mut k_event);
 }
 extern "C" {
-    #[doc = " @brief Initialize a delayable workqueue item at runtime.\n k_work_delayable items can also be defined at compilation time using\n K_WORK_DELAYABLE_DEFINE\n\n @param work work item\n @param handler handler"]
+    #[doc = " @brief Initialize a delayable work item at runtime.\n\n This function initializes a delayable work item with the specified handler function.\n Delayable work items can also be defined statically using `K_WORK_DELAYABLE_DEFINE`.\n\n Safety: This function is safe to call from an ISR context.\n\n @param dwork Pointer to the delayable work item structure.\n @param handler Function to handle the work item."]
     pub fn k_work_delayable_init(dwork: *mut k_work_delayable, handler: k_work_handler_t);
 }
 extern "C" {
-    #[doc = " @brief Schedule a delayable work item to be queued after the given timeout.\n\n If the work item has already been scheduled or queued for processing, the\n work is not sent a new time and the function returns -EAGAIN.\n\n @param workqueue Workqueue to queue the work item\n @param dwork Delayable work item\n @param timeout Timeout before the work item is queued\n @return 0 if success, negative error code otherwise"]
+    #[doc = " @brief Schedule a delayable work item to be queued after a timeout.\n\n This function schedules a delayable work item to be added to the workqueue after\n the specified timeout. If the work item is already scheduled or queued, the function\n returns -EBUSY.\n\n Safety: This function is safe to call from an ISR context.\n\n @param workqueue Pointer to the workqueue structure.\n @param dwork Pointer to the delayable work item.\n @param timeout Timeout before the work item is queued.\n @return 0 on success, or a negative error code on failure."]
     pub fn k_work_delayable_schedule(
         workqueue: *mut k_workqueue,
         dwork: *mut k_work_delayable,
@@ -964,88 +1040,98 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Schedule a delayable work item for the system workqueue.\n\n @see k_work_delayable_schedule\n\n @param dwork\n @param timeout\n @return __kernel"]
+    #[doc = " @brief Schedule a delayable work item for the system workqueue.\n\n This function schedules a delayable work item to be added to the system workqueue\n after the specified timeout.\n\n Safety: This function is safe to call from an ISR context.\n\n @param dwork Pointer to the delayable work item.\n @param timeout Timeout before the work item is queued.\n @return 0 on success, or a negative error code on failure."]
     pub fn k_system_work_delayable_schedule(
         dwork: *mut k_work_delayable,
         timeout: k_timeout_t,
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Cancel a delayable work item which has been scheduled but not already\n queued for processing.\n\n If the work item is not yet scheduled, the function returns -EAGAIN.\n - If the work item is scheduled, the submission is cancelled and the function\n returns 0.\n - If the work item not schedule but still in the queue for processing, the\n function returns -EBUSY.\n - If the work item is not schedule and not in the queue for processing, the\n function returns -EAGAIN.\n\n @param dwork\n @return 0 if success, negative error code otherwise"]
+    #[doc = " @brief Cancel a scheduled delayable work item.\n\n This function cancels a delayable work item that has been scheduled but not yet queued\n for processing. If the work item is in the queue or already being processed, the\n function returns -EBUSY.\n\n Safety: This function is safe to call from an ISR context.\n\n @param dwork Pointer to the delayable work item.\n @return 0 on success, or a negative error code on failure."]
     pub fn k_work_delayable_cancel(dwork: *mut k_work_delayable) -> i8;
 }
-#[doc = " @brief Structure representing a mutex, \"lock\" parameter tells\n if the current is locked or not (0 if lock, 0xFF otherwise).\n\n Waitqueue list contains all threads pending for the mutex,\n first thread to wake up when mutex is unlocked is first in the queue."]
+#[doc = " @brief Kernel Mutex structure"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_mutex {
+    #[doc = " @brief Lock status of the mutex.\n\n 0 indicates the mutex is unlocked, any other value indicates it is locked.\n If the CONFIG_KERNEL_REENTRANCY feature is enabled, this value represents\n the number of times the mutex has been locked by the owning thread."]
     pub lock: u8,
+    #[doc = " @brief Wait queue for threads waiting to acquire the mutex.\n\n Threads waiting for the mutex are stored in this list, with the first\n thread to be woken up at the head of the queue."]
     pub waitqueue: dnode,
+    #[doc = " @brief Pointer to the thread that currently owns the mutex.\n\n This field is NULL if the mutex is not currently owned by any thread."]
     pub owner: *mut k_thread,
 }
 extern "C" {
-    #[doc = " @brief Initialize a mutex\n\n @param mutex address of the mutex structure"]
+    #[doc = " @brief Initialize a mutex at runtime.\n\n This function initializes a mutex structure, setting its lock status\n to unlocked, initializing the wait queue, and setting the owner to NULL.\n\n Safety: This function is safe to call from an ISR context.\n\n @param mutex Pointer to the mutex structure to be initialized.\n @return 0 on success, or -EINVAL if the mutex pointer is NULL."]
     pub fn k_mutex_init(mutex: *mut k_mutex) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Lock a mutex, return immediately if mutex is available,\n otherwise wait until the mutex is unlocked or timeout.\n\n If the mutex is available, the scheduler is minot called.\n\n If the mutex ic locked, the current thread is unscheduled and\n added to the pending queue (\"waitqueue\") of the mutex,\n it will be woke up when the thread reach the top of this\n waitqueue and the mutex is available again.\n\n If timeout is different from K_FOREVER,\n the thread will be woke up when the timeout expires, in this case\n the function will check again for the mutex availability.\n (current thread is removed from the pending queue).\n\n Don't lock a mutex from an interrupt routine !\n\n If timeout is K_NO_WAIT, this function returns immediately.\n\n @param mutex address of the mutex structure\n @param timeout time pending the mutex (K_NO_WAIT, K_MSEC(1000), K_FOREVER)\n @return uint8_t 0 if mutex locked any other value otherwise"]
+    #[doc = " @brief Lock a mutex, with optional timeout.\n\n This function attempts to lock a mutex. If the mutex is already locked,\n the calling thread can wait until the mutex becomes available or until\n the specified timeout expires.\n\n If the CONFIG_KERNEL_REENTRANCY feature is enabled, a thread can lock\n the mutex multiple times, and must unlock it the same number of times.\n Otherwise, a thread SHALL NOT lock a mutex it already owns.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param mutex Pointer to the mutex structure.\n @param timeout Maximum time to wait for the mutex to become available.\n                Use K_NO_WAIT for non-blocking operation, or K_FOREVER to wait\n indefinitely.\n @return 0 if the mutex was successfully locked, or an error code otherwise:\n         - -EINVAL if the mutex pointer is NULL.\n         - -ETIMEDOUT if the timeout expired before the mutex became available."]
     pub fn k_mutex_lock(mutex: *mut k_mutex, timeout: k_timeout_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Unlock a mutex, wake up the first pending thread if the pending queue\n is not empty.\n\n Switch thread before returning if a thread is pending on the mutex.\n\n This function doesn't check if the current thread\n actually own the mutex. This function sets interrupt flag when returning.\n\n Don't unlock a mutex from an interrupt routine !\n\n @param mutex : address of the mutex structure"]
+    #[doc = " @brief Unlock a mutex.\n\n This function releases the mutex, allowing other threads waiting on the mutex\n to acquire it. If there are threads waiting in the wait queue, the first thread\n in the queue is woken up.\n\n This function should only be called by the thread that currently owns the mutex.\n Otherwise, no action is taken and the function returns NULL.\n\n Safety: This function is safe to call from an ISR context.\n\n @param mutex Pointer to the mutex structure.\n @return Pointer to the thread that was woken up, or NULL if no threads were waiting\n \t\t   , argument checks failed or the current thread does not own the mutex."]
     pub fn k_mutex_unlock(mutex: *mut k_mutex) -> *mut k_thread;
 }
 extern "C" {
+    #[doc = " @brief Cancel waiting threads on a mutex.\n\n This function cancels all threads currently waiting for the mutex,\n removing them from the wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param mutex Pointer to the mutex structure.\n @return 0 on success, or an error code otherwise."]
     pub fn k_mutex_cancel_wait(mutex: *mut k_mutex) -> i8;
 }
-extern "C" {
-    #[doc = " @brief Arch lock a mutex, doesn't clear the interrupt flag (if set)\n and set it to its original state when finished.\n\n @param mutex address of the mutex structure\n @return uint8_t 0 if mutex locked any other value otherwise"]
-    pub fn z_mutex_lock(mutex: *mut k_mutex) -> u8;
-}
-extern "C" {
-    #[doc = " @brief Arch unlock a mutex, don't need the interrupt flag to be disabled\n\n @param mutex"]
-    pub fn z_mutex_unlock(mutex: *mut k_mutex) -> *mut k_thread;
-}
-#[doc = " @brief Structure describing a semaphore, \"count\" parameter tells the number\n of available semaphore, \"limit\" describe the maximum number of semaphores.\n\n Waitqueue list contains all threads pending for the semaphore,\n first thread to wake up when a semaphore is available is at the\n first element of the queue."]
+#[doc = " @brief Kernel Semaphore structure"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_sem {
+    #[doc = " @brief Current count of available semaphores.\n\n This value indicates how many semaphores are currently available.\n If this count is greater than 0, a semaphore can be taken."]
     pub count: u8,
+    #[doc = " @brief Maximum limit of semaphores.\n\n This value represents the maximum number of semaphores that can\n be available at any time."]
     pub limit: u8,
+    #[doc = " @brief Wait queue for threads waiting to acquire the semaphore.\n\n Threads waiting for the semaphore are stored in this list, with\n the first thread to be woken up at the head of the queue."]
     pub waitqueue: dnode,
 }
 extern "C" {
-    #[doc = " @brief Initialize a semaphore\n\n @param sem : structure representing the semaphore"]
+    #[doc = " @brief Initialize a semaphore at runtime.\n\n This function initializes a semaphore structure, setting its initial count,\n maximum limit, and initializing the wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sem Pointer to the semaphore structure to be initialized.\n @param initial_count Initial count of the semaphore.\n @param limit Maximum count limit of the semaphore.\n @return 0 on success, or -EINVAL if the semaphore pointer is NULL."]
     pub fn k_sem_init(sem: *mut k_sem, initial_count: u8, limit: u8) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Take a semaphore, return immediately if a semaphore is available,\n otherwise wait until a semaphore is given or timeout.\n\n If a semaphore is available, the scheduler is not called.\n\n If no semaphore is available, the current thread is unscheduled and added\n to the pending queue (\"waitqueue\") of the semaphore,  it will be woke up\n when the thread reach the top of this waitqueue and a semaphore is available.\n\n If timeout is different from K_FOREVER, the thread will be woke up\n when the timeout expires, in this case the function will check\n again for a semaphore availability.\n (current thread is removed from the pending queue).\n\n Cannot be called from an interrupt routine\n if timeout is different from K_NO_WAIT.\n\n @param sem address of the semaphore structure\n @param timeout time waiting the semaphore (e.g. K_NO_WAIT, K_MSEC(1000),\n K_FOREVER)\n @return uint8_t 0 if a semaphore is taken any other value otherwise"]
+    #[doc = " @brief Take a semaphore, with optional timeout.\n\n This function attempts to take a semaphore. If a semaphore is available,\n it is taken immediately. If no semaphore is available, the calling thread\n can wait until a semaphore is given or until the specified timeout expires.\n\n If timeout is different from K_FOREVER, the thread will be woken up when\n the timeout expires, and it will check again for semaphore availability.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param sem Pointer to the semaphore structure.\n @param timeout Maximum time to wait for a semaphore to become available.\n                Use K_NO_WAIT for non-blocking operation, or K_FOREVER to wait\n indefinitely.\n @return 0 if a semaphore was successfully taken, or an error code otherwise:\n         - -EINVAL if the semaphore pointer is NULL.\n         - -ETIMEDOUT if the timeout expired before a semaphore became available."]
     pub fn k_sem_take(sem: *mut k_sem, timeout: k_timeout_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Give a semaphore, wake up the first pending thread if the pending\n queue is not empty.\n\n Switch thread before returning if a thread is pending on a semaphore.\n\n This function sets interrupt flag when returning.\n\n Give a semaphore if the \"limit\" is reached will have no effect.\n\n Can be called from an interrupt routine.\n\n @param sem : address of the semaphore structure\n\n @return thread that was woken up, NULL otherwise"]
+    #[doc = " @brief Give a semaphore.\n\n This function releases a semaphore, potentially waking up a thread\n waiting for the semaphore. If there are threads waiting in the wait queue,\n the first thread in the queue is woken up.\n\n If the semaphore count is at its limit, giving a semaphore has no effect.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sem Pointer to the semaphore structure.\n @return Pointer to the thread that was woken up, or NULL if no threads were waiting."]
     pub fn k_sem_give(sem: *mut k_sem) -> *mut k_thread;
 }
-#[doc = " @brief Timer handler function prototype\n\n @param timer Timer instance\n\n @return int 0 to keep the timer running, non-zero to stop it\n\n @warning Never call any k_yield(), k_yield_from_isr(),\n k_yield_from_isr_cond() from a timer handler.\n"]
+extern "C" {
+    #[doc = " @brief Cancel waiting threads on a semaphore.\n\n This function cancels all threads currently waiting for the semaphore,\n removing them from the wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sem Pointer to the semaphore structure.\n @return 0 on success, or an error code otherwise."]
+    pub fn k_sem_cancel_wait(sem: *mut k_sem) -> i8;
+}
+#[doc = " @brief Timer handler function prototype.\n\n This function is called when a timer expires. The handler should\n not call any of the following functions: `k_yield()`, `k_yield_from_isr()`,\n or `k_yield_from_isr_cond()`.\n\n @param timer Pointer to the `k_timer` structure associated with the timer.\n @return Return value is implementation-dependent."]
 pub type k_timer_handler_t =
     ::core::option::Option<unsafe extern "C" fn(arg1: *mut k_timer) -> ::core::ffi::c_int>;
-#[doc = " @brief Requires additionnal stack (IDLE thread for example)"]
+#[doc = " @brief Timer structure definition."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_timer {
+    #[doc = "< Queue item for scheduling."]
     pub tie: titem,
+    #[doc = "< Timer timeout duration."]
     pub timeout: k_timeout_t,
+    #[doc = "< Function to call when timer expires."]
     pub handler: k_timer_handler_t,
 }
 extern "C" {
+    #[doc = " @brief Initialize the timer module.\n\n This function must be called to initialize the timer subsystem."]
     pub fn z_timer_init_module();
 }
 extern "C" {
+    #[doc = " @brief Process scheduled timers.\n\n This function processes all timers that are due to expire. It should be called\n periodically, typically from the main loop or a periodic task."]
     pub fn z_timers_process();
 }
 extern "C" {
+    #[doc = " @brief Start a timer.\n\n This function starts a timer with a specified initial delay.\n\n @param timer Pointer to the `k_timer` structure.\n @param starting_delay Initial delay before the timer starts."]
     pub fn z_timer_start(timer: *mut k_timer, starting_delay: k_timeout_t);
 }
 extern "C" {
+    #[doc = " @brief Initialize a timer.\n\n This function initializes a timer with the specified handler, timeout, and\n starting delay.\n\n @param timer Pointer to the `k_timer` structure.\n @param handler The function to call when the timer expires.\n @param timeout Timer timeout duration.\n @param starting_delay Initial delay before the timer starts.\n @return Status code indicating success or failure."]
     pub fn k_timer_init(
         timer: *mut k_timer,
         handler: k_timer_handler_t,
@@ -1054,54 +1140,65 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
+    #[doc = " @brief Check if a timer is started.\n\n This function checks whether the specified timer is currently active.\n\n @param timer Pointer to the `k_timer` structure.\n @return `true` if the timer is started, `false` otherwise."]
     pub fn k_timer_started(timer: *mut k_timer) -> bool;
 }
 extern "C" {
-    #[doc = " @brief Stop a timer\n\n Note: Usage of this function is discouraged in timer handlers.\n Prefer returning any non-zero value from the handler to stop the timer.\n\n @param timer\n @return __kernel"]
+    #[doc = " @brief Stop a timer.\n\n This function stops a running timer. Note that stopping a timer from within\n a timer handler is discouraged. Instead, return a non-zero value from the\n handler to stop the timer.\n\n @param timer Pointer to the `k_timer` structure.\n @return Status code indicating success or failure."]
     pub fn k_timer_stop(timer: *mut k_timer) -> i8;
 }
 extern "C" {
+    #[doc = " @brief Start a timer with a specified initial delay.\n\n This function starts a timer with a given initial delay.\n\n @param timer Pointer to the `k_timer` structure.\n @param starting_delay Initial delay before the timer starts.\n @return Status code indicating success or failure."]
     pub fn k_timer_start(timer: *mut k_timer, starting_delay: k_timeout_t) -> i8;
 }
+#[doc = " @brief Kernel Signal structure"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_signal {
+    #[doc = " @brief The signal value.\n\n This value can be set when the signal is raised and is used to pass\n information to the waiting thread(s)."]
     pub signal: u8,
+    #[doc = " @brief Flags indicating the current state of the signal.\n\n This field indicates whether the signal is in the \"signaled\" state or not."]
     pub flags: u8,
+    #[doc = " @brief Wait queue for threads polling on the signal.\n\n Threads waiting for the signal are stored in this list, with the first\n thread to be woken up at the head of the queue."]
     pub waitqueue: dnode,
 }
 extern "C" {
-    #[doc = " @brief Initialize a signal object.\n\n @param sig"]
+    #[doc = " @brief Initialize a signal object at runtime.\n\n This function initializes a signal structure, setting its initial signal\n value to 0, its state to not ready, and initializing the wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sig Pointer to the signal structure to be initialized.\n @return 0 on success, or -EINVAL if the signal pointer is NULL."]
     pub fn k_signal_init(sig: *mut k_signal) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Wake up the first thread (TODO all threads) polling on the signal.\n\n @param sig\n @param value\n @return The thread that was woken up, NULL otherwise."]
-    pub fn k_signal_raise(sig: *mut k_signal, value: u8) -> *mut k_thread;
+    #[doc = " @brief Raise a signal, waking up waiting threads.\n\n This function sets the signal value and wakes up any threads that are\n waiting on the signal. The signal remains in the signaled state until manually reset.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sig Pointer to the signal structure.\n @param value The value to set for the signal.\n @return The number of threads that were woken up.\n \t\t   - -EINVAL if the signal pointer is NULL.\n \t\t   - 0 if no threads were woken up.\n \t\t   - >0 if one or more threads were woken up."]
+    pub fn k_signal_raise(sig: *mut k_signal, value: u8) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Poll on a signal.\n\n Signal must be cleared manually with K_SIGNAL_SET_UNREADY.\n\n TODO: Return the signal value that made the thread ready.\n\n @param sig\n @param timeout\n @return 0 on success, negative error code otherwise."]
+    #[doc = " @brief Poll on a signal, with optional timeout.\n\n This function allows a thread to wait for a signal to be raised. If the signal\n is already in the signaled state, the function returns immediately. Otherwise,\n the thread waits until the signal is raised or the specified timeout expires.\n\n Note: The signal must be manually reset using K_SIGNAL_SET_UNREADY after it is handled.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param sig Pointer to the signal structure.\n @param timeout Maximum time to wait for the signal. Use K_NO_WAIT for non-blocking\n operation, or K_FOREVER to wait indefinitely.\n @return 0 on success, or an error code otherwise:\n         - -EINVAL if the signal pointer is NULL.\n         - -ETIMEDOUT if the timeout expired before the signal was raised."]
     pub fn k_poll_signal(sig: *mut k_signal, timeout: k_timeout_t) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Cancel the wait of all threads polling on the signal.\n\n @param sig\n @return Number of threads that were woken up."]
-    pub fn k_poll_cancel_wait(sig: *mut k_signal) -> u8;
+    #[doc = " @brief Cancel the wait for all threads polling on the signal.\n\n This function cancels the wait for all threads currently polling on the signal,\n removing them from the wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sig Pointer to the signal structure.\n @return The number of threads that were woken up."]
+    pub fn k_poll_cancel_wait(sig: *mut k_signal) -> i8;
 }
-#[doc = " @brief Structure representing a memory slab.\n\n buffer : buffer from which all blocks will be allocated.\n count : numbers of blocks\n block_size : _block_size of a block\n free_list : list of all free blocks\n waitqueue : list contains all threads pending on a fifo item.\n\n Note : sizeof(buffer) must equals count * block_size"]
+#[doc = " @brief Memory Slab Structure\n\n A memory slab is a pool of fixed-size memory blocks that can be allocated\n and freed. The memory blocks are managed using a singly linked list that\n tracks the free blocks.\n\n Allocation and deallocation operations are performed in constant time (O(1)).\n This implementation is inspired by the Zephyr RTOS memory slab implementation.\n\n @note Maximum number of blocks is 255.\n @note Maximum block size is 65535 bytes"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_mem_slab {
+    #[doc = "< Pointer to the memory buffer"]
     pub buffer: *mut ::core::ffi::c_void,
+    #[doc = "< Total number of blocks in the slab"]
     pub count: u8,
+    #[doc = "< Size of each block in bytes"]
     pub block_size: u16,
+    #[doc = "< Pointer to the list of free blocks"]
     pub free_list: *mut snode,
+    #[doc = "< Wait queue for threads pending on a block"]
     pub waitqueue: dnode,
 }
 extern "C" {
-    #[doc = " @brief This function is called on start up to initialize all memory\n slabs defined at runtime using the macro K_MEM_SLAB_DEFINE"]
+    #[doc = " @brief Initialize all statically defined memory slabs.\n\n This function is called at startup to initialize all memory slabs that\n were defined using the K_MEM_SLAB_DEFINE macro."]
     pub fn z_mem_slab_init_module();
 }
 extern "C" {
-    #[doc = " @brief Initialize a memory slab at runtime\n\n @param slab address of the slab structure\n @param buffer address of the buffer\n @param block_size\n @param blocks_count\n @return return 0 on success else error code"]
+    #[doc = " @brief Initialize a memory slab at runtime.\n\n This function initializes a memory slab with the specified buffer, block size,\n and number of blocks.\n\n @param slab Pointer to the memory slab structure.\n @param buffer Pointer to the buffer used by the memory slab.\n @param block_size Size of each block in the memory slab.\n @param blocks_count Total number of blocks in the memory slab.\n @return 0 on success, or an error code on failure."]
     pub fn k_mem_slab_init(
         slab: *mut k_mem_slab,
         buffer: *mut ::core::ffi::c_void,
@@ -1110,11 +1207,11 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Finalize the initialization of a memory slab when declared using\n K_MEM_SLAB_DEFINE and CONFIG_AVRTOS_LINKER_SCRIPT is disabled.\n\n @param slab"]
+    #[doc = " @brief Finalize the initialization of a statically defined memory slab.\n\n This function completes the initialization of a memory slab that was declared\n using the K_MEM_SLAB_DEFINE macro, particularly when CONFIG_AVRTOS_LINKER_SCRIPT\n is disabled.\n\n @param slab Pointer to the memory slab structure."]
     pub fn z_mem_slab_finalize_init(slab: *mut k_mem_slab);
 }
 extern "C" {
-    #[doc = " @brief Allocate a memory block.\n\n If there is no block available timeout is different from K_NO_WAIT,\n the function is blocking until a block is freed or timeout.\n\n Can be called from an interrupt routine with timeout equals to K_NO_WAIT.\n\n Assumptions :\n - slab not null\n - mem not null\n\n @param slab\n @param mem\n @param timeout\n @return 0 on success else error code\n - ENOMEM : no block available\n - ETIMEDOUT : timeout expired\n - EINTR : interrupted by a signal\n - ECANCELED : wait aborted"]
+    #[doc = " @brief Allocate a memory block from a slab.\n\n This function allocates a memory block from the specified slab. If no block\n is available and a timeout is provided, the function will block until a block\n becomes available or the timeout expires.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param slab Pointer to the memory slab structure.\n @param mem Pointer to the variable that will receive the allocated memory block.\n @param timeout Maximum time to wait for a block to become available.\n @return 0 on success, or an error code on failure:\n         - ENOMEM: No block available.\n         - ETIMEDOUT: Timeout expired.\n         - ECANCELED: Wait aborted."]
     pub fn k_mem_slab_alloc(
         slab: *mut k_mem_slab,
         mem: *mut *mut ::core::ffi::c_void,
@@ -1122,9 +1219,10 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Free a memory block and notify the first pending thread that\n a mem slab is available.\n\n Switch thread before returning if a thread is pending on a block.\n\n Can be called from an interrupt routine.\n\n Assumptions :\n - slab not null\n - mem not null\n - mem is currently \"allocated\"\n\n @param slab\n @param mem\n @return The thread that was woken up or NULL if no thread was woken up."]
+    #[doc = " @brief Free a memory block back to a slab.\n\n This function returns a memory block to the specified slab and notifies the first\n thread in the wait queue that a block has become available.\n\n Safety: This function is safe to call from an ISR context.\n\n @param slab Pointer to the memory slab structure.\n @param mem Pointer to the memory block being freed.\n @return The thread that was woken up, or NULL if no threads were waiting."]
     pub fn k_mem_slab_free(slab: *mut k_mem_slab, mem: *mut ::core::ffi::c_void) -> *mut k_thread;
 }
+#[doc = " @brief Kernel Message Queue structure"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct k_msgq {
@@ -1138,16 +1236,16 @@ pub struct k_msgq {
     pub write_cursor: *mut ::core::ffi::c_void,
 }
 extern "C" {
-    #[doc = " @brief Initialize a MsgQ\n\n @param msgq\n @param buffer\n @param msg_size\n @param max_msgs"]
+    #[doc = " @brief Initialize a message queue.\n\n This function initializes a message queue with the given buffer, message size,\n and maximum number of messages.\n\n Safety: This function is safe to call from an ISR context.\n\n @param msgq Pointer to the message queue structure to be initialized.\n @param buffer Pointer to the buffer where messages will be stored.\n @param msg_size Size of each message in the queue.\n @param max_msgs Maximum number of messages that can be stored in the queue.\n\n @return 0 on success\n \t\t   -EINVAL if msgq, buffer, msg_size, or max_msgs is NULL\n\n Example usage:\n @code\n  struct k_msgq my_msgq;\n  char my_buffer[10 * sizeof(int)];\n  k_msgq_init(&my_msgq, my_buffer, sizeof(int), 10);\n @endcode"]
     pub fn k_msgq_init(
         msgq: *mut k_msgq,
         buffer: *mut ::core::ffi::c_char,
         msg_size: size_t,
-        max_msgs: u32,
+        max_msgs: u8,
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Try to append the message @a data to the MsgQ @a msgq.\n\n Try until timeout.\n\n Don't call from an ISR with timeout != K_NO_WAIT.\n\n @param msgq\n @param data\n @param timeout\n @return 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled\n      ENOMEM on MsgQ full)"]
+    #[doc = " @brief Try to append a message to the message queue.\n\n This function attempts to add a message to the queue. If the queue is full,\n the calling thread can wait until space becomes available, depending on the\n timeout value.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param msgq Pointer to the message queue structure.\n @param data Pointer to the message data to be added to the queue.\n @param timeout Timeout value specifying how long to wait if the queue is full.\n\n @return 0 on success\n \t\t   -EINVAL if msgq or data is NULL\n \t\t   -ETIMEDOUT on timeout\n \t\t   -ECANCELED if canceled\n \t\t   -ENOMEM if no space in the queue\n\n Example usage:\n @code\n  int my_data = 42;\n  k_msgq_put(&my_msgq, &my_data, K_NO_WAIT);\n @endcode"]
     pub fn k_msgq_put(
         msgq: *mut k_msgq,
         data: *const ::core::ffi::c_void,
@@ -1155,7 +1253,7 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Try to get a message @a data to the MsgQ @a msgq.\n\n  Try until timeout.\n\n Don't call from an ISR with timeout != K_NO_WAIT.\n\n @param msgq\n @param data\n @param timeout\n @return 0 on success (ETIMEDOUT on timeout, ECANCELED on canceled\n      ENOMSG on no message)"]
+    #[doc = " @brief Try to retrieve a message from the message queue.\n\n This function attempts to get a message from the queue. If the queue is empty,\n the calling thread can wait until a message is available, depending on the timeout\n value.\n\n @param msgq Pointer to the message queue structure.\n @param data Pointer to the buffer where the retrieved message will be stored.\n @param timeout Timeout value specifying how long to wait if the queue is empty.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @return 0 on success\n \t\t   -EINVAL if msgq or data is NULL\n \t\t   -ETIMEDOUT on timeout\n \t\t   -ECANCELED if canceled\n \t\t   -ENOMSG if no message available\n\n Example usage:\n @code\n  int my_data;\n  k_msgq_get(&my_msgq, &my_data, K_NO_WAIT);\n @endcode"]
     pub fn k_msgq_get(
         msgq: *mut k_msgq,
         data: *mut ::core::ffi::c_void,
@@ -1163,23 +1261,20 @@ extern "C" {
     ) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Cancel all thread pending on the MsgQ (reading or writing).\n And reset the MsgQ state\n\n @param msgq\n @return Number of canceled threads"]
-    pub fn k_msgq_purge(msgq: *mut k_msgq) -> u8;
+    #[doc = " @brief Cancel all pending threads on the message queue and reset the queue.\n\n This function cancels all threads that are currently waiting on the message queue\n (either for reading or writing) and resets the queue to an empty state.\n\n Safety: This function is safe to call from an ISR context.\n\n @param msgq Pointer to the message queue structure.\n\n @return The number of threads that were canceled"]
+    pub fn k_msgq_purge(msgq: *mut k_msgq) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Peek the first message of the MsgQ without removing it.\n\n @param msgq\n @param data\n @return 0 on success (ENOMSG on no message)"]
+    #[doc = " @brief Peek the first message in the queue without removing it.\n\n This function retrieves the first message from the queue without removing it,\n allowing the message to remain in the queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param msgq Pointer to the message queue structure.\n @param data Pointer to the buffer where the peeked message will be stored.\n\n @return 0 on success\n \t\t   -EINVAL if msgq or data is NULL\n \t\t   -ENOMSG if no message available"]
     pub fn k_msgq_peek(msgq: *mut k_msgq, data: *mut ::core::ffi::c_void) -> i8;
 }
 extern "C" {
-    #[doc = " @brief Get number of free messages in the MsgQ\n\n @param msgq\n @return Number of free messages in the MsgQ"]
+    #[doc = " @brief Get the number of free message slots in the queue.\n\n This function returns the number of available message slots in the queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param msgq Pointer to the message queue structure.\n\n @return The number of free message slots in the queue."]
     pub fn k_msgq_num_free_get(msgq: *mut k_msgq) -> u8;
 }
 extern "C" {
-    #[doc = " @brief Get the number of used messages in the MsgQ\n\n @param msgq\n @return Number of used messages in the MsgQ"]
+    #[doc = " @brief Get the number of used message slots in the queue.\n\n This function returns the number of messages currently in the queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param msgq Pointer to the message queue structure.\n\n @return The number of used message slots in the queue."]
     pub fn k_msgq_num_used_get(msgq: *mut k_msgq) -> u8;
-}
-extern "C" {
-    pub fn k_set_stdio_usart0();
 }
 extern "C" {
     pub fn k_sleep_1s();
@@ -1193,18 +1288,26 @@ extern "C" {
 extern "C" {
     pub fn z_rust_sys(sys: u16) -> u16;
 }
+extern "C" {
+    #[doc = " @brief Set up the standard I/O to use USART0.\n\n This function configures the standard I/O to communicate via USART0. This allows\n the function `printf`, to use USART0 for input and output.\n\n The configuration option `CONFIG_STDIO_PRINTF_TO_USART` automatically selects the\n USART to use for standard I/O."]
+    pub fn k_set_stdio_usart0();
+}
+#[doc = " @brief Structure for controlling external interrupts."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct EXTI_Ctrl_Device {
+    #[doc = "< External Interrupt Control Registers"]
     pub EICRn: [u8; 2usize],
 }
+#[doc = " @brief Structure for controlling pin change interrupts."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PCI_Ctrl_Device {
+    #[doc = "< Pin Change Mask Registers"]
     pub PCMSK: [u8; 3usize],
 }
 extern "C" {
-    #[doc = " @brief Configure an external interrupt\n\n @param exti EXTI number\n @param isc\n @return int8_t 0 on success, -EINVAL if EXTI number is invalid\n\n Example for ATmega328P :\n\n ```c\n #include <avr/io.h>\n #include <avrtos/drivers/exti.h>\n exti_configure(INT0, ISC_FALLING);\n exti_clear_flag(INT0);\n exti_enable(INT0);\n ```"]
+    #[doc = " @brief Configure an external interrupt.\n\n Configures an external interrupt with the specified interrupt sense control (ISC) mode.\n\n @param exti EXTI number (e.g., INT0 or INT1 for ATmega328P).\n @param isc Interrupt sense control mode (e.g., ISC_FALLING, ISC_RISING).\n @return int8_t 0 on success, -EINVAL if EXTI number is invalid.\n\n Example for ATmega328P:\n\n ```c\n #include <avr/io.h>\n #include <avrtos/drivers/exti.h>\n exti_configure(INT0, ISC_FALLING);\n exti_clear_flag(INT0);\n exti_enable(INT0);\n ```"]
     pub fn exti_configure(exti: u8, isc: u8) -> i8;
 }
 #[repr(C)]
@@ -1354,10 +1457,10 @@ pub mod spi_prescaler_t {
     pub const SPI_PRESCALER_X32: Type = 6;
     pub const SPI_PRESCALER_X64: Type = 7;
 }
-pub mod spi_mode_t {
+pub mod spi_role_t {
     pub type Type = ::core::ffi::c_uint;
-    pub const SPI_MODE_MASTER: Type = 0;
-    pub const SPI_MODE_SLAVE: Type = 1;
+    pub const SPI_ROLE_MASTER: Type = 0;
+    pub const SPI_ROLE_SLAVE: Type = 1;
 }
 pub mod spi_clock_polarity_t {
     pub type Type = ::core::ffi::c_uint;
@@ -1378,11 +1481,11 @@ pub struct spi_config {
 }
 impl spi_config {
     #[inline]
-    pub fn mode(&self) -> spi_mode_t::Type {
+    pub fn role(&self) -> spi_role_t::Type {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u16) }
     }
     #[inline]
-    pub fn set_mode(&mut self, val: spi_mode_t::Type) {
+    pub fn set_role(&mut self, val: spi_role_t::Type) {
         unsafe {
             let val: u16 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
@@ -1434,7 +1537,7 @@ impl spi_config {
     }
     #[inline]
     pub fn new_bitfield_1(
-        mode: spi_mode_t::Type,
+        role: spi_role_t::Type,
         polarity: spi_clock_polarity_t::Type,
         phase: spi_clock_phase_t::Type,
         irq_enabled: u8,
@@ -1442,8 +1545,8 @@ impl spi_config {
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let mode: u16 = unsafe { ::core::mem::transmute(mode) };
-            mode as u64
+            let role: u16 = unsafe { ::core::mem::transmute(role) };
+            role as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
             let polarity: u16 = unsafe { ::core::mem::transmute(polarity) };
@@ -1557,6 +1660,12 @@ extern "C" {
         active_state: u8,
         regs: *const spi_regs,
     ) -> i8;
+}
+extern "C" {
+    pub fn spi_slave_select(slave: *const spi_slave);
+}
+extern "C" {
+    pub fn spi_slave_unselect(slave: *const spi_slave);
 }
 extern "C" {
     #[doc = " @brief Initialize a SPI chip select pin for the slave.\n\n @param slave Pointer to the slave structure.\n @return int8_t 0 on success, negative on error."]
@@ -2072,7 +2181,7 @@ extern "C" {
 #[doc = " @brief TCN75 context"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct tcn75_context {
+pub struct tcn75_device {
     pub addr: u8,
     pub config: u8,
     pub i2c: *mut I2C_Device,
@@ -2080,7 +2189,7 @@ pub struct tcn75_context {
 extern "C" {
     #[doc = " @brief Initialize a TCN75 context.\n\n @param tcn75 TCN75 context to initialize\n @param addr Address of the device\n @param config TCN75 configuration register\n @param i2c I2C device the TCN75 is connected to\n @return int8_t 0 if success, negative value otherwise"]
     pub fn tcn75_init_context(
-        tcn75: *mut tcn75_context,
+        tcn75: *mut tcn75_device,
         addr_lsb: u8,
         config: u8,
         i2c: *mut I2C_Device,
@@ -2088,19 +2197,19 @@ extern "C" {
 }
 extern "C" {
     #[doc = " @brief Configure a TCN75 device using its configuration register.\n\n @param tcn75 initialized TCN75 context\n @return int8_t 0 if success, negative value otherwise"]
-    pub fn tcn75_configure(tcn75: *mut tcn75_context) -> i8;
+    pub fn tcn75_configure(tcn75: *mut tcn75_device) -> i8;
 }
 extern "C" {
     #[doc = " @brief Select the temperature register of a TCN75 device.\n\n @param tcn75 initialized TCN75 context\n @return int8_t 0 if success, negative value otherwise"]
-    pub fn tcn75_select_data_register(tcn75: *mut tcn75_context) -> i8;
+    pub fn tcn75_select_data_register(tcn75: *mut tcn75_device) -> i8;
 }
 extern "C" {
     #[doc = " @brief Read the temperature from a TCN75 device.\n\n @param tcn75 initialized TCN75 context\n @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error"]
-    pub fn tcn75_read(tcn75: *mut tcn75_context) -> i16;
+    pub fn tcn75_read(tcn75: *mut tcn75_device) -> i16;
 }
 extern "C" {
     #[doc = " @brief Select the temperature register of a TCN75 device and read the temperature.\n\n @param tcn75 initialized TCN75 context\n @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error"]
-    pub fn tcn75_select_read(tcn75: *mut tcn75_context) -> i16;
+    pub fn tcn75_select_read(tcn75: *mut tcn75_device) -> i16;
 }
 extern "C" {
     #[doc = " @brief Init builtin LED"]

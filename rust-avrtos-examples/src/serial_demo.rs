@@ -8,7 +8,7 @@
 use core::ffi::c_char;
 
 use avrtos_sys::{
-    k_sleep, k_timeout_t, led_init, led_off, led_on, led_toggle, my_yield, serial_hex16, serial_init_baud, serial_print, sleep, sleep_1s, z_avrtos_init, z_rust_sys, z_yield
+    k_sleep, k_sleep_1s, k_timeout_t, led_init, led_off, led_on, led_toggle, rust_sleep, rust_yield, serial_hex16, serial_init_baud, serial_print, z_avrtos_init, z_rust_sys, z_yield
 };
 use panic_halt as _;
 
@@ -34,8 +34,9 @@ fn main() -> ! {
             serial_hex16(counter);
             serial_print(msg.as_ptr() as *const c_char);
         }
-
-        sleep_1s();
+        unsafe {
+            k_sleep_1s();
+        }
     }
     
 }

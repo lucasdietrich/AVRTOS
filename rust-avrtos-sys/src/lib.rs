@@ -8,16 +8,13 @@ mod bindings;
 
 pub use bindings::*;
 
-pub fn sleep(ms: u32) {
-    let timeout = k_timeout_t { value: ms };
+pub fn rust_sleep() {
+    // Doing this is highly BROKEN and I don't know why !!!
+    let timeout = k_timeout_t { value: 1000 };
     unsafe { k_sleep(timeout)}
 }
 
-pub fn sleep_1s() {
-    unsafe { k_sleep_1s() }
-}
-
-pub fn my_yield() {
+pub fn rust_yield() {
     unsafe {
         let key = z_rust_irq_lock();
         z_yield();

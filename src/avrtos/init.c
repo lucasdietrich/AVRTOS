@@ -12,7 +12,7 @@
 #include "kernel_private.h"
 #include "mem_slab.h"
 #include "stack_sentinel.h"
-#include "stdio.h"
+#include "stdout.h"
 #include "timer.h"
 
 extern void z_init_sysclock(void);

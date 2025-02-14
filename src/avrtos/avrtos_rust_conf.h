@@ -26,4 +26,8 @@
 #define CONFIG_KERNEL_DELAY_OBJECT_U32 1
 #endif
 
+#ifndef CONFIG_AVRTOS_BANNER
+#define CONFIG_AVRTOS_BANNER "*** AVRTOS RUST ***\n"
+#endif
+
 #endif /* _AVRTOS_SYS_RUST_DEFAULT_CONFIG_H */

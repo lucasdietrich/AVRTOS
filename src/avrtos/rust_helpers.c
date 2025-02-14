@@ -10,11 +10,7 @@
 
 void k_sleep_1s(void)
 {
-	k_timeout_t timeout = {
-		.value = 10,
-	};
-	
-	k_sleep(timeout);
+	k_msleep(1000);
 }
 
 uint8_t z_rust_irq_lock(void)

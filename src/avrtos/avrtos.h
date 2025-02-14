@@ -48,7 +48,7 @@
 #include "msgq.h"
 
 #include "rust_helpers.h"
-#include "stdio.h"
+#include "stdout.h"
 
 // clang-format on
 
