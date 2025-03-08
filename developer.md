@@ -91,32 +91,32 @@ K_SIGNAL_DEFINE(my_signal);
 K_ATOMIC_DEFINE(my_atomic, 0);
 
 void setup() {
-        /* Your setup code here */
-        serial_init();
-        led_init();
+    /* Your setup code here */
+    serial_init();
+    led_init();
 
-        k_thread_create(&my_thread, my_thread_task, my_thread_stack,
+    k_thread_create(&my_thread, my_thread_task, my_thread_stack,
                         sizeof(my_thread_stack), K_COOPERATIVE, NULL, 'X');
-        k_thread_start(&my_thread);
+    k_thread_start(&my_thread);
 
-        // k_thread_set_priority(k_thread_get_main(), K_PREEMPTIVE);
+    // k_thread_set_priority(k_thread_get_main(), K_PREEMPTIVE);
 }
 
 void loop() {
-        /* Your loop code here */
+    /* Your loop code here */
 
-        /* Make sure to call k_yield() at least once per loop or make the main thread
-        * preemptive with k_thread_set_priority(k_thread_get_main(), K_PREEMPTIVE);
-        */
-        k_idle();
+    /* Make sure to call k_yield() at least once per loop or make the main thread
+    * preemptive with k_thread_set_priority(k_thread_get_main(), K_PREEMPTIVE);
+    */
+    k_idle();
 }
 
 void my_thread_task(void *arg) {
-        /* Your thread code here */
-        for (;;) {
-                k_sleep(K_SECONDS(1));
-                led_toggle();
-        }
+    /* Your thread code here */
+    for (;;) {
+        k_sleep(K_SECONDS(1));
+        led_toggle();
+    }
 }
 ```
 
@@ -133,13 +133,24 @@ void my_thread_task(void *arg) {
 
 ## My versions
 
-```
-avr-gcc (Fedora 11.2.0-1.fc36) 11.2.0
-avr-gdb: GNU gdb (GDB) 12.1
-QEMU emulator version 7.0.0 (v7.0.0)
-avrdude version 6.4
-cmake version 3.25.1
-ninja 1.10.2
-GNU Make 4.3
-Python 3.10.9
-```
+=== "Fedora"
+
+    ```
+    avr-gcc (Fedora 11.2.0-1.fc36) 11.2.0
+    avr-gdb: GNU gdb (GDB) 12.1
+    QEMU emulator version 7.0.0 (v7.0.0)
+    avrdude version 6.4
+    cmake version 3.25.1
+    ninja 1.10.2
+    GNU Make 4.3
+    Python 3.10.9
+    ```
+
+=== "Debian"
+
+    Requirements:
+    
+    sudo apt install gcc-avr gdb-avr avr-libc avrdude cmake ninja-build python3 python3-pip
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r scripts/requirements.txt
