@@ -6,13 +6,7 @@
 		"CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/avr6-atmega2560.cmake",
 	},
 	"rust-analyzer.cargo.buildScripts.enable": false,
+	"python.defaultInterpreterPath": ".venv/bin/python",
 	"editor.tabSize": 4,
-	"editor.rulers": [80],
-	"files.associations": {
-		"*.jinja": "python",
-		"*.asm": "avr",
-		"*.bb": "shellscript",
-		"*.bbclass": "shellscript",
-		"*.inc": "shellscript",
-	},
+	"editor.rulers": [80]
 }
