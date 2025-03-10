@@ -10,8 +10,8 @@ pub use bindings::*;
 
 pub fn rust_sleep() {
     // Doing this is highly BROKEN and I don't know why !!!
-    let timeout = k_timeout_t { value: 1000 };
-    unsafe { k_sleep(timeout)}
+    let timeout = k_timeout_t { value: 0 };
+    unsafe { k_sleep(timeout) }
 }
 
 pub fn rust_yield() {

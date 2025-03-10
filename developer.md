@@ -131,6 +131,33 @@ void my_thread_task(void *arg) {
 - Arduino library specification: https://arduino.github.io/arduino-cli/0.31/library-specification/
 - Arduino library manager FAQ: https://github.com/arduino/library-registry/blob/main/FAQ.md#submission-requirements
 
+## Crosstoold-ng
+
+avr-gcc version >= 11.2.0 is recommanded, if you this version of the package `avr-gcc`
+is not available in your distribution, you should consider building it from source
+with [crosstool-ng](https://crosstool-ng.github.io/).
+
+Steps to build avr-gcc with crosstool-ng:
+
+```bash
+git clone https://github.com/crosstool-ng/crosstool-ng
+cd crosstool-ng
+git checkout crosstool-ng-1.26.0
+./bootstrap
+./configure --prefix=/opt/crosstool-ng
+make
+make install
+export PATH="${PATH}:/opt/crosstool-ng/bin"
+./ct-ng avr
+./ct-ng build
+```
+
+Use the generated toolchain in `~/x-tools/avr` in your project with:
+
+```bash
+export PATH="~/x-tools/avr/bin:${PATH}"
+```
+
 ## My versions
 
 === "Fedora"

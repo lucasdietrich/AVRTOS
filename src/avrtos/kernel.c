@@ -898,6 +898,7 @@ void k_wait(k_timeout_t delay, uint8_t mode)
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 
+#if !CONFIG_RUST
 void z_cpu_block_us(uint32_t delay_us)
 {
 	const uint8_t key = irq_lock();
@@ -915,6 +916,7 @@ void z_cpu_block_ms(uint32_t delay_ms)
 
 	irq_unlock(key);
 }
+#endif
 
 #if Z_CONFIG_ARDUINO_FRAMEWORK
 /**

@@ -41,6 +41,7 @@ extern "C" {
 #define K_FAULT_MEMORY			  3 // Memory-related fault
 #define K_FAULT_THREAD_TERMINATED 4 // Thread terminated unexpectedly
 #define K_FAULT_KERNEL_HALT		  5 // Kernel halt due to critical error
+#define K_FAULT_RUST_PANIC        6 // Rust panic
 
 #define K_FAULT_ANY 0xFF
 

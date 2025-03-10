@@ -2,8 +2,8 @@
 resolver = "2"
 members = [
     "rust-avrtos-sys",
-    "rust-avrtos-core",
-    "rust-avrtos-examples",
+    "rust-avrtos",
+    "examples/rs-examples",
 ]
 
 [profile.dev]

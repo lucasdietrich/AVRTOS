@@ -11,10 +11,6 @@ avrtos-linker-script = []
 qemu = []
 
 [dependencies]
-panic-halt = "0.2.0"
-ufmt = "0.2.0"
-nb = "1.1.0"
-arduino-hal ={ git = "https://github.com/rahix/avr-hal", rev = "ravedude-0.1.6", features = ["arduino-mega2560"] }
 
 [build-dependencies]
 cc = "1.1"

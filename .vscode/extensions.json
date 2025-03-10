@@ -4,9 +4,11 @@
     "recommendations": [
         "ms-vscode.cpptools",
         "platformio.platformio-ide",
-        "xaver.clang-format"
+        "xaver.clang-format",
+        "tamasfe.even-better-toml",
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "ms-python.python",
+        "josetr.cmake-language-support-vscode"
     ],
-    "unwantedRecommendations": [
-        "ms-vscode.cpptools-extension-pack"
-    ]
 }

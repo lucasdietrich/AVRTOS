@@ -1,5 +1,5 @@
 [package]
-name = "avrtos-core"
+name = "avrtos"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,6 +8,9 @@ edition = "2021"
 [features]
 
 [dependencies]
+ufmt = "0.2.0"
+nb = "1.1.0"
 avrtos-sys = { path = "../rust-avrtos-sys" }
+arduino-hal ={ git = "https://github.com/rahix/avr-hal", rev = "ravedude-0.1.6", features = ["arduino-mega2560"] }
 
 [build-dependencies]

@@ -12,3 +12,5 @@
 /misra.json
 
 /target
+
+.env

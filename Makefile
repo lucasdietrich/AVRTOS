@@ -10,7 +10,7 @@ DEVICE?=/dev/ttyACM0
 SAMPLE?=shell
 TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
 BAUDRATE?=115200
-QEMU?=OFF
+QEMU?=ON
 
 # if QEMU is enabled, set CMAKE_BUILD_TYPE to Debug by default
 ifeq ($(QEMU),ON)
@@ -120,11 +120,11 @@ metrics:
 publish: piogen arduino_gen format clean multiple metrics arduino_lint
 
 rust_bindgen:
-	./rust-avrtos-sys/scripts/gen.sh
+	./rust-avrtos-sys/scripts/bindgen.sh
 	
 rust_build:
-	cargo build --package rust-avrtos-examples --release --bin loop_invalid_assembly
+	cargo build --package rust-avrtos-examples --release --bin serial
 	python3 scripts/rustdis.py
 
 rust:
-	cargo run --package rust-avrtos-examples --release --bin loop_invalid_assembly
+	cargo run --package rust-avrtos-examples --release --bin serial

@@ -468,7 +468,11 @@ Note about current development:
 
 ### Generate Rust bindings
 
-Script [rust-avrtos-sys/scripts/gen.sh](rust-avrtos-sys/scripts/gen.sh) generates the Rust bindings for the C API. It takes care only `avrtos` API is generated (mainly structures and functions).
+Install bindgen with:
+
+	- `cargo install bindgen-cli`
+
+Script [rust-avrtos-sys/scripts/bindgen.sh](rust-avrtos-sys/scripts/bindgen.sh) generates the Rust bindings for the C API. It takes care only `avrtos` API is generated (mainly structures and functions).
 The bindgen targets the `atmega2560` cpu variant only, bingen relies on clang which
 has a *experimental* support for AVR. Default configuration constants are provided, 
 most of the constants are not used by the headers, only constants which enable/disable
@@ -499,7 +503,7 @@ The goal is to be to able most of the avrtos features with a fully safe rust API
 
 Build current examples with:
 
-- `cargo run --package rust-avrtos-examples --release --bin loop_invalid_assembly`
+- `cargo run --package rust-avrtos-examples --release --bin loop_invalid_asm`
 - `cargo run --package rust-avrtos-examples --release --bin sleep_demo`
 
 Feel free to test the binary by configuring the `runner` in the [.cargo/config.toml](.cargo/config.toml) file:
@@ -560,9 +564,9 @@ The generated assembly of the `main` function is invalid:
 000001b2 <main>:
 
 #[arduino_hal::entry]
- 1b2:	0e 94 db 00 	call	0x1b6	; 0x1b6 <_ZN21loop_invalid_assembly20__avr_device_rt_main17h75ecf0a9a15b5945E>
+ 1b2:	0e 94 db 00 	call	0x1b6	; 0x1b6 <_ZN21loop_invalid_asm20__avr_device_rt_main17h75ecf0a9a15b5945E>
 
-000001b6 <_ZN21loop_invalid_assembly20__avr_device_rt_main17h75ecf0a9a15b5945E>:
+000001b6 <_ZN21loop_invalid_asm20__avr_device_rt_main17h75ecf0a9a15b5945E>:
 fn main() -> ! {
  1b6:	60 e0       	ldi	r22, 0x00	; 0
  1b8:	72 ec       	ldi	r23, 0xC2	; 194

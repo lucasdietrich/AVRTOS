@@ -1,5 +1,5 @@
-#![no_std]
 #![no_main]
+#![no_std]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -8,10 +8,8 @@
 
 use core::{ffi::c_char, intrinsics::unreachable};
 
-use avrtos_sys::{
-    serial_init_baud, serial_print
-};
-use panic_halt as _;
+use avrtos::arduino_hal;
+use avrtos::sys::{k_sleep_1s, serial_init_baud, serial_print, z_avrtos_init};
 
 const boot: &'static str = "avrtos starting\n\x00";
 
@@ -22,6 +20,5 @@ fn main() -> ! {
         serial_print(boot.as_ptr() as *const c_char);
     }
 
-    loop {
-    }
+    loop {}
 }

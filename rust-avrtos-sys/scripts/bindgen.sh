@@ -5,7 +5,7 @@ bindgen src/avrtos_all.h \
     --use-core \
     --formatter rustfmt \
     --default-enum-style moduleconsts \
-    --generate functions,types,methods \
+    --generate functions,types,methods,vars \
     --explicit-padding \
     --no-size_t-is-usize \
     --allowlist-function k_.* \
@@ -40,6 +40,8 @@ bindgen src/avrtos_all.h \
     --allowlist-type z_callsaved_ctx \
     --allowlist-type z_callused_ctx \
     --allowlist-type z_intctx \
+    --allowlist-type K_* \
+    --allowlist-type Z_* \
     -o \
     rust-avrtos-sys/src/bindings.rs \
     -- \
@@ -52,3 +54,6 @@ bindgen src/avrtos_all.h \
     -D__AVR_3_BYTE_PC__ \
     -DF_CPU=16000000UL \
     -DCONFIG_RUST=1
+
+# todo evaluate:
+# --translate-enum-integer-types

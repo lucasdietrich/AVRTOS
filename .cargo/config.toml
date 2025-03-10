@@ -6,7 +6,8 @@ build-std = ["core"]
 
 [target.'cfg(target_arch = "avr")']
 # runner = "./scripts/qemu-runner.sh"
-runner = "ravedude -cb 115200 mega2560"
+runner = "./scripts/qemu-debug.sh"
+#runner = "ravedude -cb 115200 mega2560"
 
 # runner = "ravedude -cb 57600 mega2560 -P /dev/ttyACM0"
 
