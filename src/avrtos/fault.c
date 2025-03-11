@@ -50,7 +50,7 @@ void __fault(uint8_t reason)
 		serial_print_p(PSTR("Halt"));
 		break;
 	default:
-		serial_print_p(PSTR("Fault"));
+		serial_print_p(PSTR("Other"));
 		break;
 	}
 	serial_print_p(PSTR(" *****\n"));
@@ -58,6 +58,7 @@ void __fault(uint8_t reason)
 	k_thread_dump(z_ker.current);
 #endif /* CONFIG_KERNEL_FAULT_VERBOSITY */
 
+	// TODO: prefer a infinite loop here with a dedicated symbol
 	asm("jmp _exit");
 
 	__builtin_unreachable();

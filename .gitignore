@@ -10,7 +10,6 @@
 *.dump
 /scripts/misra-rules.txt
 /misra.json
-
 /target
 
 .env

@@ -193,6 +193,16 @@
 #endif
 
 //
+// Enable global (default) allocator and set its size.
+//
+// 0: Global allocator is disabled
+// n: Global allocator enabled with capacity of n bytes
+//
+#ifndef CONFIG_KERNEL_GLOBAL_ALLOCATOR_SIZE
+#define CONFIG_KERNEL_GLOBAL_ALLOCATOR_SIZE 0
+#endif
+
+//
 // Default SREG value for other threads on stack creation.
 // The main thread's default SREG is always 0.
 //

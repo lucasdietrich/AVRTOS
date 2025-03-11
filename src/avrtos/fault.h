@@ -45,6 +45,11 @@ extern "C" {
 
 #define K_FAULT_ANY 0xFF
 
+/**
+ * @brief fault function alias
+ */
+#define panic __fault(K_FAULT_ANY)
+
 #if !defined(__ASSEMBLER__)
 
 /**
