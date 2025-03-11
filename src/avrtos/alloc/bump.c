@@ -12,11 +12,13 @@
 #include "alloc_private.h"
 #include "bump.h"
 
+#define K_MODULE K_MODULE_ALLOC
+
 int8_t k_bump_init(struct k_bump_allocator *a, uint8_t *buf, size_t size)
 {
 	__ASSERT_NOTNULL(a);
 	__ASSERT_NOTNULL(buf);
-	__ASSERT_NOTNULL(size);
+	__ASSERT_TRUE(size > 0);
 	
 	a->buf = buf;
 	a->size = size;
@@ -28,7 +30,7 @@ int8_t k_bump_init(struct k_bump_allocator *a, uint8_t *buf, size_t size)
 void *k_bump_alloc(struct k_bump_allocator *a, size_t size, uint8_t align)
 {
 	__ASSERT_NOTNULL(a);
-	__ASSERT_NOTNULL(size);
+	__ASSERT_TRUE((size > 0) && (align > 0));
 
 	uint8_t *const ptr = ALIGN_PTR(a->next, align);
 

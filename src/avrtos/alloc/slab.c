@@ -14,6 +14,8 @@
 #include "alloc_private.h"
 #include "slab.h"
 
+#define K_MODULE K_MODULE_ALLOC
+
 static void z_create_free_list(struct k_slab_allocator *a)
 {
 	a->free_list = NULL;

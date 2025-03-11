@@ -99,9 +99,13 @@ int8_t k_bump_init(struct k_bump_allocator *a, uint8_t *buf, size_t size);
 
 /**
  * @brief Allocate memory from bump allocator
+ * 
+ * @note
+ * 	 - size must be greater than 0
+ * 	 - align must a power of 2 greater than 0
  *
  * @param a Pointer to bump allocator structure
- * @param size Size of memory to allocate
+ * @param size Size of memory to allocate (in bytes)
  * @param align Alignment of memory
  * @return void* Pointer to allocated memory, NULL on error
  */
