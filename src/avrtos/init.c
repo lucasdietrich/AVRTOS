@@ -111,7 +111,10 @@ void z_avrtos_init(void)
 
 #if CONFIG_THREAD_CANARIES && CONFIG_AVRTOS_LINKER_SCRIPT
 	/* Initialize stack canaries */
-	z_init_stacks_canaries();
+
+	// CONFIG_THREAD_CANARIES breaks this !!!
+	#warning "CONFIG_THREAD_CANARIES breaks this !!!"
+	// z_init_stacks_canaries();
 #endif
 
 #if CONFIG_THREAD_STACK_SENTINEL

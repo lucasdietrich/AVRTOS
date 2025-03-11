@@ -715,6 +715,8 @@ int8_t k_thread_create(struct k_thread *thread,
 		return -EINVAL;
 	}
 
+	printf("k_thread_create %p\n", thread);
+
 	thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
 	thread->stack.size = stack_size;
 

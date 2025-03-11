@@ -123,8 +123,8 @@ rust_bindgen:
 	./rust-avrtos-sys/scripts/bindgen.sh
 	
 rust_build:
-	cargo build --package rust-avrtos-examples --release --bin serial
+	cargo build --package rs-examples --release --bin $(SAMPLE)
 	python3 scripts/rustdis.py
 
 rust:
-	cargo run --package rust-avrtos-examples --release --bin serial
+	cargo run --package rs-examples --release --bin $(SAMPLE)

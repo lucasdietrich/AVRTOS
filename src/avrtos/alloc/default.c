@@ -12,6 +12,8 @@
 #include "alloc_private.h"
 #include "bump.h"
 
+#include <avrtos/misc/serial.h>
+
 #if CONFIG_KERNEL_GLOBAL_ALLOCATOR_SIZE > 0
 #warning "Global allocator is enabled and uses the bump allocator implementation"
 

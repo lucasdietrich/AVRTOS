@@ -752,7 +752,7 @@ pub struct k_flags {
 }
 pub mod k_flags_options_t {
     #[doc = " @brief Options for flag operations.\n\n These options control how flags are polled and notified."]
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     #[doc = "< Wait for any bit of the flags to be set"]
     pub const K_FLAGS_SET_ANY: Type = 1;
     pub const K_FLAGS_SET_ALL: Type = 2;
@@ -1428,7 +1428,7 @@ pub struct I2C_Device {
     pub TWAMRn: u8,
 }
 pub mod i2c_prescaler_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const I2C_PRESCALER_1: Type = 0;
     pub const I2C_PRESCALER_4: Type = 1;
     pub const I2C_PRESCALER_16: Type = 2;
@@ -1488,7 +1488,7 @@ impl i2c_config {
 }
 pub mod i2c_error {
     #[doc = " @brief I2C driver error codes"]
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const I2C_ERROR_NONE: Type = 0;
     pub const I2C_ERROR_BUS: Type = 1;
     pub const I2C_ERROR_ADDR: Type = 2;
@@ -1548,7 +1548,7 @@ pub struct SPI_Device {
     pub SPDRn: u8,
 }
 pub mod spi_prescaler_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const SPI_PRESCALER_4: Type = 0;
     pub const SPI_PRESCALER_16: Type = 1;
     pub const SPI_PRESCALER_64: Type = 2;
@@ -1559,17 +1559,17 @@ pub mod spi_prescaler_t {
     pub const SPI_PRESCALER_X64: Type = 7;
 }
 pub mod spi_role_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const SPI_ROLE_MASTER: Type = 0;
     pub const SPI_ROLE_SLAVE: Type = 1;
 }
 pub mod spi_clock_polarity_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const SPI_CLOCK_POLARITY_RISING: Type = 0;
     pub const SPI_CLOCK_POLARITY_FALLING: Type = 1;
 }
 pub mod spi_clock_phase_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const SPI_CLOCK_PHASE_SAMPLE: Type = 0;
     pub const SPI_CLOCK_PHASE_SETUP: Type = 1;
 }
@@ -2020,7 +2020,7 @@ pub struct TIMER8_Device {
     pub OCRnB: u8,
 }
 pub mod timer_mode_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const TIMER_MODE_NORMAL: Type = 0;
     pub const TIMER_MODE_PWM_PC_8bit: Type = 1;
     pub const TIMER_MODE_PWM_PC_9bit: Type = 2;
@@ -2039,7 +2039,7 @@ pub mod timer_mode_t {
     pub const TIMER_MODE_FAST_PWM_OCR1A: Type = 15;
 }
 pub mod timer2_prescaler_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const TIMER2_STOPPED: Type = 0;
     pub const TIMER2_PRESCALER_1: Type = 1;
     pub const TIMER2_PRESCALER_8: Type = 2;
@@ -2050,7 +2050,7 @@ pub mod timer2_prescaler_t {
     pub const TIMER2_PRESCALER_1024: Type = 7;
 }
 pub mod timer_prescaler_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const TIMER_STOPPED: Type = 0;
     pub const TIMER_PRESCALER_1: Type = 1;
     pub const TIMER_PRESCALER_8: Type = 2;
@@ -2061,7 +2061,7 @@ pub mod timer_prescaler_t {
     pub const TIMER_EXT_RISING: Type = 7;
 }
 pub mod timer16_interrupt_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const TIMER16_OVERFLOW_INTERRUPT: Type = 0;
     pub const TIMER16_OUTPUT_COMPARE_MATCH_A_INTERRUPT: Type = 1;
     pub const TIMER16_OUTPUT_COMPARE_MATCH_B_INTERRUPT: Type = 2;
@@ -2069,14 +2069,14 @@ pub mod timer16_interrupt_t {
     pub const TIMER16_INPUT_CAPTURE_INTERRUPT: Type = 5;
 }
 pub mod timer_channel_com_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const TIMER_CHANNEL_COMP_MODE_NORMAL: Type = 0;
     pub const TIMER_CHANNEL_COMP_MODE_TOGGLE: Type = 1;
     pub const TIMER_CHANNEL_COMP_MODE_CLEAR: Type = 2;
     pub const TIMER_CHANNEL_COMP_MODE_SET: Type = 3;
 }
 pub mod timer_channel_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const TIMER_CHANNEL_A: Type = 0;
     pub const TIMER_CHANNEL_B: Type = 1;
     pub const TIMER_CHANNEL_C: Type = 2;
@@ -2256,24 +2256,24 @@ pub struct UART_Device {
     pub _reserved2: u8,
 }
 pub mod usart_mode_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const USART_MODE_ASYNCHRONOUS: Type = 0;
     pub const USART_MODE_SYNCHRONOUS: Type = 1;
     pub const USART_MODE_MSPI: Type = 2;
 }
 pub mod usart_parity_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const USART_PARITY_NONE: Type = 0;
     pub const USART_PARITY_EVEN: Type = 2;
     pub const USART_PARITY_ODD: Type = 3;
 }
 pub mod usart_stop_bits_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const USART_STOP_BITS_1: Type = 0;
     pub const USART_STOP_BITS_2: Type = 1;
 }
 pub mod usart_data_bits_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const USART_DATA_BITS_5: Type = 0;
     pub const USART_DATA_BITS_6: Type = 1;
     pub const USART_DATA_BITS_7: Type = 2;
@@ -2281,7 +2281,7 @@ pub mod usart_data_bits_t {
     pub const USART_DATA_BITS_9: Type = 7;
 }
 pub mod usart_speed_mode_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const USART_SPEED_MODE_NORMAL: Type = 0;
     pub const USART_SPEED_MODE_DOUBLE: Type = 1;
 }
@@ -2585,7 +2585,7 @@ unsafe extern "C" {
     pub fn usart_send(dev: *mut UART_Device, buf: *const ::core::ffi::c_char, len: size_t) -> i8;
 }
 pub mod usart_event_t {
-    pub type Type = u16;
+    pub type Type = ::core::ffi::c_uint;
     pub const USART_EVENT_RX_COMPLETE: Type = 0;
     pub const USART_EVENT_TX_COMPLETE: Type = 1;
     pub const USART_EVENT_ERROR: Type = 2;
@@ -2663,6 +2663,68 @@ unsafe extern "C" {
 unsafe extern "C" {
     #[doc = " @brief Select the temperature register of a TCN75 device and read the temperature.\n\n @param tcn75 initialized TCN75 context\n @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error"]
     pub fn tcn75_select_read(tcn75: *mut tcn75_device) -> i16;
+}
+unsafe extern "C" {
+    #[doc = " @brief Allocate memory using default allocator\n\n @param size Size of memory to allocate\n @return void* Pointer to allocated memory\n @return NULL on error"]
+    pub fn k_malloc(size: size_t) -> *mut ::core::ffi::c_void;
+}
+unsafe extern "C" {
+    #[doc = " @brief Free memory using default allocator\n\n @param ptr Pointer to memory to free"]
+    pub fn k_free(ptr: *mut ::core::ffi::c_void);
+}
+unsafe extern "C" {
+    #[doc = " @brief Allocate aligned memory using default allocator\n\n @param size Size of memory to allocate\n @param align Alignment of memory\n  - 1: No alignment\n  - 2: Align to 2 bytes\n  - 4: Align to 4 bytes\n  - 8: Align to 8 bytes\n - 16: Align to 16 bytes\n - 32: Align to 32 bytes\n - 64: Align to 64 bytes\n @return void* Pointer to allocated memory\n @return NULL on error"]
+    pub fn z_malloc(size: size_t, align: u8) -> *mut ::core::ffi::c_void;
+}
+unsafe extern "C" {
+    #[doc = " @brief Reset the default allocator\n\n @note This function should be used with caution !\n\n This function resets the default allocator, freeing all memory."]
+    pub fn z_global_allocator_reset();
+}
+unsafe extern "C" {
+    #[doc = " @brief Get statistics of the default allocator\n\n @param stats Pointer to a structure to store statistics"]
+    pub fn k_global_allocator_stats_get(total: *mut size_t, used: *mut size_t, free: *mut size_t);
+}
+#[doc = " @brief Allocator statistics structure"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct k_alloc_stats {
+    #[doc = " @brief Total allocator memory size"]
+    pub total: size_t,
+    #[doc = " @brief Amount of allocated memory"]
+    pub used: size_t,
+    #[doc = " @brief Amount of free (unallocated) memory"]
+    pub free: size_t,
+}
+#[doc = " @brief Bump allocator structure"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct k_bump_allocator {
+    #[doc = " @brief Pointer to memory buffer"]
+    pub buf: *mut u8,
+    #[doc = " @brief Size of memory buffer"]
+    pub size: size_t,
+    #[doc = " @brief Next free memory location"]
+    pub next: *mut u8,
+}
+unsafe extern "C" {
+    #[doc = " @brief Initialize bump allocator at runtime\n\n @param a Pointer to bump allocator structure\n @param buf Pointer to memory buffer\n @param size Size of memory buffer\n @return int8_t 0 on success, -1 on error"]
+    pub fn k_bump_init(a: *mut k_bump_allocator, buf: *mut u8, size: size_t) -> i8;
+}
+unsafe extern "C" {
+    #[doc = " @brief Allocate memory from bump allocator\n\n @param a Pointer to bump allocator structure\n @param size Size of memory to allocate\n @param align Alignment of memory\n @return void* Pointer to allocated memory, NULL on error"]
+    pub fn k_bump_alloc(
+        a: *mut k_bump_allocator,
+        size: size_t,
+        align: u8,
+    ) -> *mut ::core::ffi::c_void;
+}
+unsafe extern "C" {
+    #[doc = " @brief Reset bump allocator\n\n @param a Pointer to bump allocator structure"]
+    pub fn k_bump_reset(a: *mut k_bump_allocator);
+}
+unsafe extern "C" {
+    #[doc = " @brief Get bump allocator statistics\n\n @param a Pointer to bump allocator structure\n @param stats Pointer to statistics structure"]
+    pub fn k_bump_stats(a: *mut k_bump_allocator, stats: *mut k_alloc_stats);
 }
 unsafe extern "C" {
     #[doc = " @brief Init builtin LED"]

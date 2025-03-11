@@ -8,8 +8,9 @@ members = [
 
 [profile.dev]
 panic = "abort"
-lto = true
-opt-level = "s"
+lto = false
+opt-level = 1
+debug = true
 
 [profile.release]
 panic = "abort"

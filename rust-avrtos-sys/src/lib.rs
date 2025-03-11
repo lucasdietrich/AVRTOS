@@ -16,6 +16,7 @@ pub fn rust_sleep() {
 
 pub fn rust_yield() {
     unsafe {
+        // TODO create critical section object like Cs or smthing similar
         let key = z_rust_irq_lock();
         z_yield();
         z_rust_irq_unlock(key);

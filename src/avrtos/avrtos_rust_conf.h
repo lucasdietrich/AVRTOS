@@ -30,4 +30,19 @@
 #define CONFIG_AVRTOS_BANNER "*** AVRTOS RUST ***\n"
 #endif
 
+#ifndef CONFIG_THREAD_CANARIES
+// Enabling this option breaks the execution
+#define CONFIG_THREAD_CANARIES 1
+#endif
+
+// TODO how to configure ??
+#ifndef CONFIG_KERNEL_GLOBAL_ALLOCATOR_SIZE
+#define CONFIG_KERNEL_GLOBAL_ALLOCATOR_SIZE 2048
+#endif
+
+// TODO keep ??
+#ifndef CONFIG_STDIO_PRINTF_TO_USART
+#define CONFIG_STDIO_PRINTF_TO_USART 0
+#endif
+
 #endif /* _AVRTOS_SYS_RUST_DEFAULT_CONFIG_H */

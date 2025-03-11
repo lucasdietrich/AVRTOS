@@ -39,4 +39,8 @@ impl Kernel {
 
         Some(Self {})
     }
+
+    pub fn yeet(&self) {
+        ll::rust_yield();
+    }
 }

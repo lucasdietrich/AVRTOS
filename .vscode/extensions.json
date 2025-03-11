@@ -6,7 +6,6 @@
         "platformio.platformio-ide",
         "xaver.clang-format",
         "tamasfe.even-better-toml",
-        "rust-lang.rust-analyzer",
         "vadimcn.vscode-lldb",
         "ms-python.python",
         "josetr.cmake-language-support-vscode"

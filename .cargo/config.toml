@@ -2,7 +2,7 @@
 target = "avr-atmega2560.json" # architecture/avr/
 
 [unstable]
-build-std = ["core"]
+build-std = ["core", "alloc"]
 
 [target.'cfg(target_arch = "avr")']
 # runner = "./scripts/qemu-runner.sh"

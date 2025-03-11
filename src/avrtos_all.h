@@ -9,5 +9,9 @@
 
 #include <avrtos/devices/tcn75.h>
 
+#include <avrtos/alloc/alloc.h>
+#include <avrtos/alloc/api.h>
+#include <avrtos/alloc/bump.h>
+
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>

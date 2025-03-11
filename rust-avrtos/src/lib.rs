@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(try_with_capacity)]
 
 pub use avrtos_sys as sys;
 
@@ -9,6 +10,12 @@ pub mod panic;
 pub mod serial;
 pub mod stdio;
 pub mod thread;
+
+#[cfg(feature = "alloc")]
+pub mod kalloc;
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 const THREAD_STATE_POS: u8 = 0;
 const THREAD_SCHED_LOCKED_POS: u8 = 2;

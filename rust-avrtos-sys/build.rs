@@ -22,6 +22,8 @@ const SOURCES: &[&str] = &[
     "../src/avrtos/dstruct/slist.c",
     "../src/avrtos/dstruct/tqueue.c",
     "../src/avrtos/dstruct/tdqueue.c",
+    "../src/avrtos/alloc/default.c",
+    "../src/avrtos/alloc/bump.c",
     "../src/avrtos/misc/led.c",
     "../src/avrtos/misc/serial.c",
     "../src/avrtos/assert.c",
@@ -70,6 +72,10 @@ const HEADERS: &[&str] = &[
     "../src/avrtos/dstruct/tdqueue.h",
     "../src/avrtos/misc/led.h",
     "../src/avrtos/misc/serial.h",
+    "../src/avrtos/alloc/api.h",
+    "../src/avrtos/alloc/alloc.h",
+    "../src/avrtos/alloc/bump.h",
+    "../src/avrtos/alloc/alloc_private.h",
     "../src/avrtos.h",
     "../src/avrtos/assert.h",
     "../src/avrtos/atomic.h",
@@ -162,7 +168,7 @@ fn compile_avrtos_sources(cenv: CompileEnv) {
         // .flag("-Og")
         .flag("-gdwarf-3")
         // .flag("-gstrict-dwarf")
-        .flag("-Os")
+        // .flag("-Os")
         // disable strict warnings
         .flag("-Wno-expansion-to-defined")
         .flag("-Wno-implicit-fallthrough")
