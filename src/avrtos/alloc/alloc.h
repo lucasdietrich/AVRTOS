@@ -58,10 +58,13 @@ void k_free(void *ptr);
  *
  * @param size Size of memory to allocate
  * @param align Alignment of memory
- *  - 0: No alignment
- *  - 1: Align to 2 bytes
- *  - 2: Align to 4 bytes
- *  - 3: Align to 8 bytes
+ *  - 1: No alignment
+ *  - 2: Align to 2 bytes
+ *  - 4: Align to 4 bytes
+ *  - 8: Align to 8 bytes
+ * - 16: Align to 16 bytes
+ * - 32: Align to 32 bytes
+ * - 64: Align to 64 bytes
  * @return void* Pointer to allocated memory
  * @return NULL on error
  */
