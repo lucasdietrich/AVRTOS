@@ -300,6 +300,13 @@ __kernel void z_wake_up(struct k_thread *thread)
 {
 	__ASSERT_NOTNULL(thread);
 	__ASSERT_NOINTERRUPT();
+	#warning "z_wake_up() 
+
+	/* Kernel panic with sample mem_slab !!
+	*** K assert ! ***
+	m=x01 L=303 c=4
+	*/
+	#warning "TOFIX Kernel panic with sample mem_slab !!"
 	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
 
 	__Z_DBG_WAKEUP(thread); // @
