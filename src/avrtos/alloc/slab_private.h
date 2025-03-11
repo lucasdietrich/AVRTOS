@@ -52,4 +52,15 @@
 	static struct k_mem_slab _slab_name =                                                \
 		Z_SLAB_INIT(_slab_name, Z_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
+/**
+ * @brief Finalize the initialization of a statically defined memory slab.
+ *
+ * This function completes the initialization of a memory slab that was declared
+ * using the Z_SLAB_DEFINE macro, particularly when CONFIG_AVRTOS_LINKER_SCRIPT
+ * is disabled.
+ *
+ * @param slab Pointer to the memory slab structure.
+ */
+void z_slab_alloc_finalize_init(struct k_slab_allocator *a);
+
 #endif

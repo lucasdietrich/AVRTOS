@@ -16,7 +16,11 @@
 
 #define K_MODULE K_MODULE_ALLOC
 
-static void z_create_free_list(struct k_slab_allocator *a)
+/**
+ * This function can also be used to complete the initialization of a memory slab when it
+ * is partially initialized at compile time.
+ */
+void z_slab_alloc_finalize_init(struct k_slab_allocator *a)
 {
 	a->free_list = NULL;
 	uint8_t *p	 = a->buffer;
@@ -47,7 +51,7 @@ int8_t k_slab_init(struct k_slab_allocator *a,
 	a->buffer	  = buffer;
 
 	/* Create the free list for the slab */
-	z_create_free_list(a);
+	z_slab_alloc_finalize_init(a);
 
 	return 0;
 }
@@ -89,7 +93,7 @@ void k_slab_reset(struct k_slab_allocator *a)
 	__ASSERT_NOTNULL(a);
 
 	/* Reset the free list */
-	z_create_free_list(a);
+	z_slab_alloc_finalize_init(a);
 }
 
 void k_slab_stats(struct k_slab_allocator *a, struct k_alloc_stats *stats)

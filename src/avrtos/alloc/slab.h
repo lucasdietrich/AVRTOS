@@ -37,7 +37,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#include <avrtos/alloc/alloc_private.h>
+#include <avrtos/dstruct/slist.h>
 #include <avrtos/alloc/api.h>
 
 /**

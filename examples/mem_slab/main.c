@@ -42,8 +42,8 @@ static uint8_t ms(struct k_prng *prng)
 
 static void debug(void *mem, int8_t rc)
 {
-	printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), k_thread_get_current()->symbol,
-			 (unsigned int)mem, rc);
+	// printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), k_thread_get_current()->symbol,
+	// 		 (unsigned int)mem, rc);
 }
 
 static void *alloc(k_timeout_t timeout)
@@ -95,6 +95,7 @@ int main(void)
 		while (count < BLOCKS) {
 			k_sleep(K_SECONDS(3));
 			blocks[count++] = alloc(K_FOREVER);
+			printf_P(PSTR("Collected 1 more memory slab (%d/%d) !\n"), count, BLOCKS);
 		}
 
 		printf_P(PSTR("Collected all memory slabs !\n"));
