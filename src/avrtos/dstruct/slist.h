@@ -58,6 +58,22 @@ inline struct snode *slist_peek_tail(struct slist *list)
 	return list->tail;
 }
 
+#define slist_foreach(_node, _list)                                                        \
+	for (_node = (_list)->head; _node != NULL; _node = (_node)->next)
+
+static inline uint8_t slist_count(struct slist *list)
+{
+	uint8_t count = 0;
+	struct snode *node;
+
+	slist_foreach(node, list)
+	{
+		count++;
+	}
+
+	return count;
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -14,6 +14,10 @@
 
 int8_t k_bump_init(struct k_bump_allocator *a, uint8_t *buf, size_t size)
 {
+	__ASSERT_NOTNULL(a);
+	__ASSERT_NOTNULL(buf);
+	__ASSERT_NOTNULL(size);
+	
 	a->buf = buf;
 	a->size = size;
 	a->next = buf;
@@ -39,11 +43,16 @@ void *k_bump_alloc(struct k_bump_allocator *a, size_t size, uint8_t align)
 
 void k_bump_reset(struct k_bump_allocator *a)
 {
+	__ASSERT_NOTNULL(a);
+
 	a->next = a->buf;
 }
 
 void k_bump_stats(struct k_bump_allocator *a, struct k_alloc_stats *stats)
 {
+	__ASSERT_NOTNULL(a);
+	__ASSERT_NOTNULL(stats);
+
 	stats->total = a->size;
 	stats->used	 = a->next - a->buf;
 	stats->free	 = a->size - stats->used;

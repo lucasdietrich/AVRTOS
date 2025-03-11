@@ -31,10 +31,6 @@
  *                                         ^
  *                                         |
  *                              Next allocation starts here
- *
- * Unlike a memory slab allocator, the bump allocator does not track individual blocks,
- * making it lightweight but suitable for scenarios where memory is allocated once and
- * freed only as a whole (e.g., temporary buffers, frame allocations).
  */
 
 #ifndef _AVRTOS_ALLOC_BUMP_H
