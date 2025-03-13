@@ -38,7 +38,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 					   size_t block_size,
 					   uint8_t num_blocks)
 {
-	int8_t ret = k_slab_init(&slab->allocator, buffer, block_size, num_blocks);
+	int8_t ret = slab_init(&slab->allocator, buffer, block_size, num_blocks);
 
 	if (ret == 0) {
 		/* Initialize the wait queue for threads waiting on this slab */
@@ -57,7 +57,7 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 	const uint8_t key = irq_lock();
 
 	/* Try to allocate a block directly */
-	void *ptr = k_slab_alloc(&slab->allocator);
+	void *ptr = slab_alloc(&slab->allocator);
 	if (ptr != NULL) {
 		*mem = ptr;
 		ret = 0;
@@ -96,7 +96,7 @@ struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 
 	if (thread == NULL) {
 		/* Otherwise, free the block */
-		k_slab_free(&slab->allocator, mem);
+		slab_free(&slab->allocator, mem);
 	}
 
 	irq_unlock(key);

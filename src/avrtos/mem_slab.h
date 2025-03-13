@@ -39,7 +39,7 @@ extern "C" {
  * Memory slab subsystem enables synchronization over memory slab allocator.
  */
 struct k_mem_slab {
-	struct k_slab_allocator allocator; /**< Slab allocator */
+	struct slab_allocator allocator; /**< Slab allocator */
 	struct dnode waitqueue;	 /**< Wait queue for threads pending on a block */
 };
 

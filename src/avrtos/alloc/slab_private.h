@@ -61,6 +61,6 @@
  *
  * @param slab Pointer to the memory slab structure.
  */
-void z_slab_alloc_finalize_init(struct k_slab_allocator *a);
+void z_slab_alloc_finalize_init(struct slab_allocator *a);
 
 #endif

@@ -19,7 +19,7 @@ extern "C" {
 /**
  * @brief Allocator statistics structure
  */
-struct k_alloc_stats {
+struct alloc_stats {
 	/**
 	 * @brief Total allocator memory size
 	 */
@@ -36,10 +36,10 @@ struct k_alloc_stats {
 	size_t free;
 };
 
-typedef struct k_allocator_api {
+typedef struct allocator_api {
 	/**
 	 * @brief Allocate memory
-	 * 
+	 *
 	 * @note The function should never be called with size 0
 	 *
 	 * @param void* Pointer to allocator
@@ -69,8 +69,8 @@ typedef struct k_allocator_api {
 	 * @param void* Pointer to allocator
 	 * @param stats Pointer to statistics structure
 	 */
-	int8_t (*stats)(void *a, struct k_alloc_stats *stats);
-} k_allocator_api_t;
+	int8_t (*stats)(void *a, struct alloc_stats *stats);
+} allocator_api_t;
 
 #ifdef __cplusplus
 }

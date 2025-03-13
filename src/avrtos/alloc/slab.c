@@ -5,11 +5,11 @@
  */
 
 #include <stdint.h>
-#include <avrtos/defines.h>
-#include <avrtos/errno.h>
-#include <avrtos/assert.h>
 
+#include <avrtos/assert.h>
+#include <avrtos/defines.h>
 #include <avrtos/dstruct/slist.h>
+#include <avrtos/errno.h>
 
 #include "alloc_private.h"
 #include "slab.h"
@@ -20,7 +20,7 @@
  * This function can also be used to complete the initialization of a memory slab when it
  * is partially initialized at compile time.
  */
-void z_slab_alloc_finalize_init(struct k_slab_allocator *a)
+void z_slab_alloc_finalize_init(struct slab_allocator *a)
 {
 	a->free_list = NULL;
 	uint8_t *p	 = a->buffer;
@@ -35,10 +35,8 @@ void z_slab_alloc_finalize_init(struct k_slab_allocator *a)
 	}
 }
 
-int8_t k_slab_init(struct k_slab_allocator *a,
-				   void *buffer,
-				   size_t block_size,
-				   uint8_t blocks_count)
+int8_t
+slab_init(struct slab_allocator *a, void *buffer, size_t block_size, uint8_t blocks_count)
 {
 	/* Validate the arguments: buffer must be non-null, block size must be at least 2
 	 * bytes (to hold at least one pointer), and there must be at least one block.
@@ -56,7 +54,7 @@ int8_t k_slab_init(struct k_slab_allocator *a,
 	return 0;
 }
 
-void *k_slab_alloc(struct k_slab_allocator *a)
+void *slab_alloc(struct slab_allocator *a)
 {
 	__ASSERT_NOTNULL(a);
 
@@ -78,7 +76,7 @@ void *k_slab_alloc(struct k_slab_allocator *a)
 	return mem;
 }
 
-void k_slab_free(struct k_slab_allocator *a, void *ptr)
+void slab_free(struct slab_allocator *a, void *ptr)
 {
 	__ASSERT_NOTNULL(a);
 	__ASSERT_NOTNULL(ptr);
@@ -88,7 +86,7 @@ void k_slab_free(struct k_slab_allocator *a, void *ptr)
 	a->free_list				= (struct snode *)ptr;
 }
 
-void k_slab_reset(struct k_slab_allocator *a)
+void slab_reset(struct slab_allocator *a)
 {
 	__ASSERT_NOTNULL(a);
 
@@ -96,7 +94,7 @@ void k_slab_reset(struct k_slab_allocator *a)
 	z_slab_alloc_finalize_init(a);
 }
 
-void k_slab_stats(struct k_slab_allocator *a, struct k_alloc_stats *stats)
+void slab_stats(struct slab_allocator *a, struct alloc_stats *stats)
 {
 	__ASSERT_NOTNULL(a);
 	__ASSERT_NOTNULL(stats);

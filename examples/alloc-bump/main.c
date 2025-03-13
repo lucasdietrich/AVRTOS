@@ -12,7 +12,7 @@
 
 #include <avr/io.h>
 
-struct k_bump_allocator bump;
+struct bump_allocator bump;
 
 uint8_t buf[256u];
 
@@ -20,38 +20,38 @@ int main(void)
 {
 	int8_t ret = 0;
 
-	ret = k_bump_init(&bump, buf, sizeof(buf));
-	printf("k_bump_init (buf: %p): %d\n", buf, ret);
+	ret = bump_init(&bump, buf, sizeof(buf));
+	printf("bump_init (buf: %p): %d\n", buf, ret);
 
-	void *ptr = k_bump_alloc(&bump, 16, K_NO_ALIGN);
-	printf("k_bump_alloc: %p\n", ptr);
+	void *ptr = bump_alloc(&bump, 16, Z_NO_ALIGN);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 1, K_NO_ALIGN);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 1, Z_NO_ALIGN);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 16, K_ALIGN_2);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 16, Z_ALIGN_2);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 1, K_NO_ALIGN);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 1, Z_NO_ALIGN);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 16, K_ALIGN_4);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 16, Z_ALIGN_4);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 16, K_ALIGN_8);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 16, Z_ALIGN_8);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 16, K_ALIGN_16);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 16, Z_ALIGN_16);
+	printf("bump_alloc: %p\n", ptr);
 
-	struct k_alloc_stats stats;
-	k_bump_stats(&bump, &stats);
+	struct alloc_stats stats;
+	bump_stats(&bump, &stats);
 
 	printf("total: %u used: %u free: %u\n", stats.total, stats.used, stats.free);
 
-	ptr = k_bump_alloc(&bump, stats.free, K_NO_ALIGN);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, stats.free, Z_NO_ALIGN);
+	printf("bump_alloc: %p\n", ptr);
 
-	ptr = k_bump_alloc(&bump, 1, K_NO_ALIGN);
-	printf("k_bump_alloc: %p\n", ptr);
+	ptr = bump_alloc(&bump, 1, Z_NO_ALIGN);
+	printf("bump_alloc: %p\n", ptr);
 }

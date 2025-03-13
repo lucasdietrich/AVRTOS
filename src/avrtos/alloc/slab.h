@@ -37,8 +37,8 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#include <avrtos/dstruct/slist.h>
 #include <avrtos/alloc/api.h>
+#include <avrtos/dstruct/slist.h>
 
 /**
  * @brief Memory Slab Structure
@@ -52,7 +52,7 @@ extern "C" {
  * @note Maximum number of blocks is 255.
  * @note Maximum block size is 65535 bytes
  */
-struct k_slab_allocator {
+struct slab_allocator {
 	void *buffer;			 /**< Pointer to the memory buffer */
 	uint8_t count;			 /**< Total number of blocks in the slab */
 	uint16_t block_size;	 /**< Size of each block in bytes */
@@ -68,10 +68,10 @@ struct k_slab_allocator {
  * @param blocks_count Number of memory blocks
  * @return int8_t 0 on success, or an error code on failure
  */
-int8_t k_slab_init(struct k_slab_allocator *a,
-				   void *buffer,
-				   size_t block_size,
-				   uint8_t blocks_count);
+int8_t slab_init(struct slab_allocator *a,
+				 void *buffer,
+				 size_t block_size,
+				 uint8_t blocks_count);
 
 /**
  * @brief Allocate a slab
@@ -79,7 +79,7 @@ int8_t k_slab_init(struct k_slab_allocator *a,
  * @param a Pointer to slab allocator structure
  * @return void* Pointer to allocated slab, NULL on error
  */
-void *k_slab_alloc(struct k_slab_allocator *a);
+void *slab_alloc(struct slab_allocator *a);
 
 /**
  * @brief Free a slab
@@ -87,14 +87,14 @@ void *k_slab_alloc(struct k_slab_allocator *a);
  * @param a Pointer to slab allocator structure
  * @param ptr Pointer to slab to free
  */
-void k_slab_free(struct k_slab_allocator *a, void *ptr);
+void slab_free(struct slab_allocator *a, void *ptr);
 
 /**
  * @brief Reset slab allocator
  *
  * @param a Pointer to slab allocator structure
  */
-void k_slab_reset(struct k_slab_allocator *a);
+void slab_reset(struct slab_allocator *a);
 
 /**
  * @brief Get slab allocator statistics
@@ -102,7 +102,7 @@ void k_slab_reset(struct k_slab_allocator *a);
  * @param a Pointer to slab allocator structure
  * @param stats Pointer to statistics structure
  */
-void k_slab_stats(struct k_slab_allocator *a, struct k_alloc_stats *stats);
+void slab_stats(struct slab_allocator *a, struct alloc_stats *stats);
 
 #ifdef __cplusplus
 }
