@@ -209,7 +209,6 @@ static void z_thread_monitor(struct k_thread *thread)
  * to the top of the runqueue.
  *
  * Preconditions:
- * - The thread is in the Z_READY state.
  * - The thread is not already in the runqueue.
  *
  * @param thread Pointer to the `thread.tie.runqueue` item of the thread.
@@ -242,78 +241,6 @@ __kernel static void z_schedule(struct k_thread *thread)
 	}
 
 	z_ker.ready_count++;
-}
-
-/**
- * @brief Schedule wake-up of the current thread.
- *
- * This function schedules the wake-up of the current
- * thread. The function assumes that the thread is currently suspended
- * (Z_PENDING) and not in the runqueue.
- *
- * The function takes two parameters:
- * - @p thread: Pointer to the current thread.
- * - @p timeout: Timeout value indicating the time at which the wake-up should
- * occur.
- *
- * Preconditions:
- * - The thread is suspended (Z_PENDING).
- * - The thread is not in the runqueue.
- *
- * Postconditions:
- * - If the @p timeout value is not K_FOREVER, the current thread is marked for
- * wake-up by setting the Z_THREAD_WAKEUP_SCHED_MSK flag.
- * - The current thread is added to the timeouts queue for wake-up event
- * scheduling using the provided @p timeout value.
- *
- * Note: This is an assembly function implemented in assembly language, and it
- * performs low-level operations required for scheduling the wake-up of a
- * suspended thread.
- */
-
-/**
- * @brief Cancel a scheduled thread wake-up.
- *
- * This function cancels a previously scheduled wake-up for the specified thread.
- *
- * @param thread Pointer to the thread
- */
-static void z_cancel_scheduled_wake_up(struct k_thread *thread)
-{
-	/* Remove the thread from the events queue */
-	if (thread->flags & Z_THREAD_WAKEUP_SCHED_MSK) {
-		thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
-		tqueue_remove(&z_ker.timeouts_queue, &thread->tie.event);
-	}
-}
-
-/**
- * @brief Wake up a thread that is pending an event.
- *
- * This function wakes up a thread that is pending an event. It assumes that
- * the thread is in Z_PENDING mode, not in the runqueue, and may be in the
- * events queue. It also assumes that the interrupt flag is cleared when called.
- *
- * @param thread Pointer to the thread to wake up.
- */
-__kernel void z_wake_up(struct k_thread *thread)
-{
-	__ASSERT_NOTNULL(thread);
-	__ASSERT_NOINTERRUPT();
-	#warning "z_wake_up() 
-
-	/* Kernel panic with sample mem_slab !!
-	*** K assert ! ***
-	m=x01 L=303 c=4
-	*/
-	#warning "TOFIX Kernel panic with sample mem_slab !!"
-	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
-
-	__Z_DBG_WAKEUP(thread); // @
-
-	z_cancel_scheduled_wake_up(thread);
-
-	z_schedule(thread);
 }
 
 /**
@@ -425,6 +352,19 @@ void z_sched_enter(void)
 		thread->flags |= Z_THREAD_TIMER_EXPIRED_MSK;
 		thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
 
+		/*
+		 * This step is not always necessary, it is only required
+		 * if the thread is also pending on a wait queue.
+		 *
+		 * TODO: this could be optimized by checking if the thread is
+		 * pending on a wait queue by the use of a flag ?
+		 * - The concrete cases where this is not necessary is when calling
+		 *   a k_sleep() function, which is indeed not pending on a wait queue.
+		 * - The flag should be set when calling z_pend_current_on() and
+		 *   cleared here. It should not be set when calling z_pend_current().
+		 */
+		dlist_remove(&thread->wany);
+
 		z_schedule(thread);
 	}
 
@@ -485,6 +425,22 @@ struct k_thread *z_scheduler(void)
 #endif
 
 	return prev;
+}
+
+/**
+ * @brief Cancel a scheduled thread wake-up.
+ *
+ * This function cancels a previously scheduled wake-up for the specified thread.
+ *
+ * @param thread Pointer to the thread
+ */
+static void z_cancel_scheduled_wake_up(struct k_thread *thread)
+{
+	/* Remove the thread from the events queue */
+	if (thread->flags & Z_THREAD_WAKEUP_SCHED_MSK) {
+		thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
+		tqueue_remove(&z_ker.timeouts_queue, &thread->tie.event);
+	}
 }
 
 /**
@@ -600,19 +556,40 @@ __kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout)
 	/* Make the thread until wake-up */
 	z_pend_current(timeout);
 
-	/* If the timer expired, we manually remove the thread from
-	 * the pending queue
-	 */
+
 	if (z_ker.current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
-		dlist_remove(&z_ker.current->wany);
+		/* Timer expired */
 		err = -ETIMEDOUT;
 	} else if (z_ker.current->flags & Z_THREAD_PEND_CANCELED_MSK) {
+		/* Thread was canceled */
 		err = -ECANCELED;
 	} else {
 		err = 0;
 	}
 
 	return err;
+}
+
+/**
+ * @brief Wake up a thread that is pending an event.
+ *
+ * This function wakes up a thread that is pending an event. It assumes that
+ * the thread is in Z_PENDING mode, not in the runqueue, and may be in the
+ * events queue. It also assumes that the interrupt flag is cleared when called.
+ *
+ * @param thread Pointer to the thread to wake up.
+ */
+__kernel void z_wake_up(struct k_thread *thread)
+{
+	__ASSERT_NOTNULL(thread);
+	__ASSERT_NOINTERRUPT();
+	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
+	
+	__Z_DBG_WAKEUP(thread); // @
+
+	z_cancel_scheduled_wake_up(thread);
+
+	z_schedule(thread);
 }
 
 __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
@@ -625,6 +602,13 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 
 	if (DITEM_VALID(waitqueue, tie)) {
 		pending_thread = Z_THREAD_FROM_WAITQUEUE(tie);
+
+		/* Explicity clear the pending_thread->wany pointer
+		 * to make sure the *waitqueue* is not corrupted
+		 * while calling dlist_remove(&thread->wany)
+		 * when it expires for whatever reason after this call
+		 */
+		dlist_init(&pending_thread->wany);
 
 		/* Immediate wake-up is no longer required because
 		 * with the swap model, the object is already reserved for the

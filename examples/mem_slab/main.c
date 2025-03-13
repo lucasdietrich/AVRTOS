@@ -21,6 +21,10 @@ void thread_time(void *ctx);
 #define STACK_SIZE	0x80
 #define THREAD_PRIO K_PREEMPTIVE
 
+// in ms
+#define THREAD_MAX_WAIT 255
+#define COLLECT_BLOCK_START_DELAY 3000
+
 K_THREAD_DEFINE(w0, thread, STACK_SIZE, THREAD_PRIO, NULL, '0');
 K_THREAD_DEFINE(w1, thread, STACK_SIZE, THREAD_PRIO, NULL, '1');
 K_THREAD_DEFINE(w2, thread, STACK_SIZE, THREAD_PRIO, NULL, '2');
@@ -30,14 +34,14 @@ K_THREAD_DEFINE(w5, thread, STACK_SIZE, THREAD_PRIO, NULL, '5');
 K_THREAD_DEFINE(w6, thread, STACK_SIZE, THREAD_PRIO, NULL, '6');
 K_THREAD_DEFINE(w7, thread, STACK_SIZE, THREAD_PRIO, NULL, '7');
 K_THREAD_DEFINE(w8, thread, STACK_SIZE, THREAD_PRIO, NULL, '8');
-// K_THREAD_DEFINE(w9, thread, STACK_SIZE, THREAD_PRIO, NULL, '9');
+K_THREAD_DEFINE(w9, thread, STACK_SIZE, THREAD_PRIO, NULL, '9');
 K_THREAD_DEFINE(time, thread_time, 0x80, K_COOPERATIVE, NULL, 'T');
 
 K_MEM_SLAB_DEFINE(myslab, 0x10, BLOCKS);
 
 static uint8_t ms(struct k_prng *prng)
 {
-	return k_prng_get(prng) & 0xFF; /* set 0x7 to test perfomance */
+	return k_prng_get(prng) & THREAD_MAX_WAIT; /* set 0x7 to test perfomance */
 }
 
 static void debug(void *mem, int8_t rc)
@@ -93,7 +97,7 @@ int main(void)
 	for (;;) {
 		/* collect all blocks */
 		while (count < BLOCKS) {
-			k_sleep(K_SECONDS(3));
+			k_sleep(K_MSEC(COLLECT_BLOCK_START_DELAY));
 			blocks[count++] = alloc(K_FOREVER);
 			printf_P(PSTR("Collected 1 more memory slab (%d/%d) !\n"), count, BLOCKS);
 		}
@@ -105,7 +109,7 @@ int main(void)
 
 		k_dump_stack_canaries();
 
-		_delay_ms(15000);
+		K_SECONDS(1);
 
 		/* free all blocks */
 		for (uint8_t i = 0; i < BLOCKS; i++) {
