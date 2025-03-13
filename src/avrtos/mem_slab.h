@@ -110,17 +110,6 @@ __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
 								uint8_t blocks_count);
 
 /**
- * @brief Finalize the initialization of a statically defined memory slab.
- *
- * This function completes the initialization of a memory slab that was declared
- * using the Z_SLAB_DEFINE macro, particularly when CONFIG_AVRTOS_LINKER_SCRIPT
- * is disabled.
- *
- * @param slab Pointer to the memory slab structure.
- */
-__kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
-
-/**
  * @brief Allocate a memory block from a slab.
  *
  * This function allocates a memory block from the specified slab. If no block

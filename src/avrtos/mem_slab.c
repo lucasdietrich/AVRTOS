@@ -45,7 +45,7 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 		dlist_init(&slab->waitqueue);
 	}
 
-	return 0;
+	return ret;
 }
 
 int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout)
