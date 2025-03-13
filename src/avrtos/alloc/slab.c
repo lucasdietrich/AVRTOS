@@ -99,7 +99,7 @@ void slab_stats(struct slab_allocator *a, struct alloc_stats *stats)
 	__ASSERT_NOTNULL(a);
 	__ASSERT_NOTNULL(stats);
 
-	const uint8_t free_nb = a->free_list ? (slist_count(a->free_list) + 1) : 0;
+	const uint8_t free_nb = a->free_list ? (slist_count((struct slist *)a->free_list) + 1) : 0;
 
 	stats->total = a->block_size * a->count;
 	stats->free	 = free_nb * a->block_size;

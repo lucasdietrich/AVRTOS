@@ -66,7 +66,7 @@ typedef struct dnode dlist_t;
 
 #define DEFINE_DLIST(list_name) struct dnode list_name = DLIST_INIT(list_name)
 
-#define DLIST_EMPTY(_list) (_list->head == _list)
+#define DLIST_EMPTY(_list) ((_list)->head == (_list))
 
 #define DITEM_VALID(_list, _node) (_list != _node)
 #define DITEM_NEXT(_list, _node)  (_node->next)
