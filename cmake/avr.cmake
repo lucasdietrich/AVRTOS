@@ -14,6 +14,20 @@ find_program(AVR_NM avr-nm REQUIRED)
 find_program(AVR_SIZE avr-size REQUIRED)
 find_program(QEMU_SYSTEM_AVR qemu-system-avr REQUIRED)
 
+# get avr-gcc version
+execute_process(
+	COMMAND ${AVR_CC} -dumpversion
+	OUTPUT_VARIABLE AVR_GCC_VERSION
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if (AVR_GCC_VERSION VERSION_LESS 14)
+	set(AVR_SIZE_ARGS "-B")
+	message(WARNING "AVR-GCC version ${AVR_GCC_VERSION} is not deprecated, please consider using version 14 or higher.")
+else()
+	set(AVR_SIZE_ARGS "--mcu=${MCU} -C")
+endif()
+
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR avr)
 set(CMAKE_C_COMPILER ${AVR_CC})
