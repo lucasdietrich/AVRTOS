@@ -1257,10 +1257,30 @@ unsafe extern "C" {
     #[doc = " @brief Cancel the wait for all threads polling on the signal.\n\n This function cancels the wait for all threads currently polling on the signal,\n removing them from the wait queue.\n\n Safety: This function is safe to call from an ISR context.\n\n @param sig Pointer to the signal structure.\n @return The number of threads that were woken up."]
     pub fn k_poll_cancel_wait(sig: *mut k_signal) -> i8;
 }
-#[doc = " @brief Memory Slab Structure\n\n A memory slab is a pool of fixed-size memory blocks that can be allocated\n and freed. The memory blocks are managed using a singly linked list that\n tracks the free blocks.\n\n Allocation and deallocation operations are performed in constant time (O(1)).\n This implementation is inspired by the Zephyr RTOS memory slab implementation.\n\n @note Maximum number of blocks is 255.\n @note Maximum block size is 65535 bytes"]
+unsafe extern "C" {
+    #[doc = " @brief Allocate memory using default allocator\n\n @param size Size of memory to allocate\n @return void* Pointer to allocated memory\n @return NULL on error"]
+    pub fn k_malloc(size: size_t) -> *mut ::core::ffi::c_void;
+}
+unsafe extern "C" {
+    #[doc = " @brief Free memory using default allocator\n\n @param ptr Pointer to memory to free"]
+    pub fn k_free(ptr: *mut ::core::ffi::c_void);
+}
+unsafe extern "C" {
+    #[doc = " @brief Allocate aligned memory using default allocator\n\n @param size Size of memory to allocate\n @param align Alignment of memory\n  - 1: No alignment\n  - 2: Align to 2 bytes\n  - 4: Align to 4 bytes\n  - 8: Align to 8 bytes\n - 16: Align to 16 bytes\n - 32: Align to 32 bytes\n - 64: Align to 64 bytes\n @return void* Pointer to allocated memory\n @return NULL on error"]
+    pub fn z_malloc(size: size_t, align: u8) -> *mut ::core::ffi::c_void;
+}
+unsafe extern "C" {
+    #[doc = " @brief Reset the default allocator\n\n @note This function should be used with caution !\n\n This function resets the default allocator, freeing all memory."]
+    pub fn z_global_allocator_reset();
+}
+unsafe extern "C" {
+    #[doc = " @brief Get statistics of the default allocator\n\n @param stats Pointer to a structure to store statistics"]
+    pub fn k_global_allocator_stats_get(total: *mut size_t, used: *mut size_t, free: *mut size_t);
+}
+#[doc = " @brief Memory Slab Structure\n\n A memory slab is a pool of fixed-size memory blocks that can be allocated\n and freed. The memory blocks are managed using a singly linked list that\n tracks the free blocks.\n\n Allocation and deallocation operations are performed in constant time (O(1)).\n\n @note Maximum number of blocks is 255.\n @note Maximum block size is 65535 bytes"]
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub struct k_mem_slab {
+#[derive(Debug, Copy, Clone)]
+pub struct slab_allocator {
     #[doc = "< Pointer to the memory buffer"]
     pub buffer: *mut ::core::ffi::c_void,
     #[doc = "< Total number of blocks in the slab"]
@@ -1269,6 +1289,17 @@ pub struct k_mem_slab {
     pub block_size: u16,
     #[doc = "< Pointer to the list of free blocks"]
     pub free_list: *mut snode,
+}
+unsafe extern "C" {
+    #[doc = " @brief Finalize the initialization of a statically defined memory slab.\n\n This function completes the initialization of a memory slab that was declared\n using the Z_SLAB_DEFINE macro, particularly when CONFIG_AVRTOS_LINKER_SCRIPT\n is disabled.\n\n @param slab Pointer to the memory slab structure."]
+    pub fn z_slab_alloc_finalize_init(a: *mut slab_allocator);
+}
+#[doc = " @brief Memory Slab Structure\n\n Memory slab subsystem enables synchronization over memory slab allocator."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct k_mem_slab {
+    #[doc = "< Slab allocator"]
+    pub allocator: slab_allocator,
     #[doc = "< Wait queue for threads pending on a block"]
     pub waitqueue: dnode,
 }
@@ -1284,10 +1315,6 @@ unsafe extern "C" {
         block_size: size_t,
         blocks_count: u8,
     ) -> i8;
-}
-unsafe extern "C" {
-    #[doc = " @brief Finalize the initialization of a statically defined memory slab.\n\n This function completes the initialization of a memory slab that was declared\n using the K_MEM_SLAB_DEFINE macro, particularly when CONFIG_AVRTOS_LINKER_SCRIPT\n is disabled.\n\n @param slab Pointer to the memory slab structure."]
-    pub fn z_mem_slab_finalize_init(slab: *mut k_mem_slab);
 }
 unsafe extern "C" {
     #[doc = " @brief Allocate a memory block from a slab.\n\n This function allocates a memory block from the specified slab. If no block\n is available and a timeout is provided, the function will block until a block\n becomes available or the timeout expires.\n\n Safety: This function is generally not safe to call from an ISR context\n         if the timeout is different from K_NO_WAIT.\n\n @param slab Pointer to the memory slab structure.\n @param mem Pointer to the variable that will receive the allocated memory block.\n @param timeout Maximum time to wait for a block to become available.\n @return 0 on success, or an error code on failure:\n         - ENOMEM: No block available.\n         - ETIMEDOUT: Timeout expired.\n         - ECANCELED: Wait aborted."]
@@ -1514,7 +1541,7 @@ unsafe extern "C" {
     pub fn i2c_master_read(dev: *mut I2C_Device, addr: u8, data: *mut u8, len: u8) -> i8;
 }
 unsafe extern "C" {
-    #[doc = " @brief Write w_len bytes to I2C device then read r_len bytes from it as master.\n\n This function is convenient for devices that require a write operation before\n a read operation. It is equivalent to calling i2c_master_write() followed by\n i2c_master_read() but it is more efficient as it does not require to wait for\n the end of the first transmission before starting the second one.\n\n The given buffer must remain valid until the transmission is complete.\n\n If CONFIG_I2C_BLOCKING option is enabled, this function will block until\n the reception is complete, otherwise it will return immediately and the\n user must poll for the end of transmission using i2c_poll_end().\n\n @param dev I2C device\n @param addr Device address\n @param data Data buffer containing the wlen bytes to write, on function return\n \t\t\t\tit will contain the rlen bytes read. Its size must be at least\n \t\t\t\tthe maximum between wlen and rlen.\n @param wlen Number of bytes to write\n @param rlen Number of bytes to read\n @return int8_t Number of bytes written if success, negative value otherwise"]
+    #[doc = " @brief Write w_len bytes to I2C device then read r_len bytes from it as master.\n\n This function is convenient for devices that require a write operation before\n a read operation. It is equivalent to calling i2c_master_write() followed by\n i2c_master_read() but it is more efficient as it does not require to wait for\n the end of the first transmission before starting the second one.\n\n The given buffer must remain valid until the transmission is complete.\n\n If CONFIG_I2C_BLOCKING option is enabled, this function will block until\n the reception is complete, otherwise it will return immediately and the\n user must poll for the end of transmission using i2c_poll_end().\n\n @param dev I2C device\n @param addr Device address\n @param data Data buffer containing the wlen bytes to write, on function return\n \t\t\t    it will contain the rlen bytes read. Its size must be at least\n \t\t\t    the maximum between wlen and rlen.\n @param wlen Number of bytes to write\n @param rlen Number of bytes to read\n @return int8_t Number of bytes written if success, negative value otherwise"]
     pub fn i2c_master_write_read(
         dev: *mut I2C_Device,
         addr: u8,
@@ -2663,68 +2690,6 @@ unsafe extern "C" {
 unsafe extern "C" {
     #[doc = " @brief Select the temperature register of a TCN75 device and read the temperature.\n\n @param tcn75 initialized TCN75 context\n @return int16_t temperature in 0.01°C resolution, returns INT16_MAX if error"]
     pub fn tcn75_select_read(tcn75: *mut tcn75_device) -> i16;
-}
-unsafe extern "C" {
-    #[doc = " @brief Allocate memory using default allocator\n\n @param size Size of memory to allocate\n @return void* Pointer to allocated memory\n @return NULL on error"]
-    pub fn k_malloc(size: size_t) -> *mut ::core::ffi::c_void;
-}
-unsafe extern "C" {
-    #[doc = " @brief Free memory using default allocator\n\n @param ptr Pointer to memory to free"]
-    pub fn k_free(ptr: *mut ::core::ffi::c_void);
-}
-unsafe extern "C" {
-    #[doc = " @brief Allocate aligned memory using default allocator\n\n @param size Size of memory to allocate\n @param align Alignment of memory\n  - 1: No alignment\n  - 2: Align to 2 bytes\n  - 4: Align to 4 bytes\n  - 8: Align to 8 bytes\n - 16: Align to 16 bytes\n - 32: Align to 32 bytes\n - 64: Align to 64 bytes\n @return void* Pointer to allocated memory\n @return NULL on error"]
-    pub fn z_malloc(size: size_t, align: u8) -> *mut ::core::ffi::c_void;
-}
-unsafe extern "C" {
-    #[doc = " @brief Reset the default allocator\n\n @note This function should be used with caution !\n\n This function resets the default allocator, freeing all memory."]
-    pub fn z_global_allocator_reset();
-}
-unsafe extern "C" {
-    #[doc = " @brief Get statistics of the default allocator\n\n @param stats Pointer to a structure to store statistics"]
-    pub fn k_global_allocator_stats_get(total: *mut size_t, used: *mut size_t, free: *mut size_t);
-}
-#[doc = " @brief Allocator statistics structure"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct k_alloc_stats {
-    #[doc = " @brief Total allocator memory size"]
-    pub total: size_t,
-    #[doc = " @brief Amount of allocated memory"]
-    pub used: size_t,
-    #[doc = " @brief Amount of free (unallocated) memory"]
-    pub free: size_t,
-}
-#[doc = " @brief Bump allocator structure"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct k_bump_allocator {
-    #[doc = " @brief Pointer to memory buffer"]
-    pub buf: *mut u8,
-    #[doc = " @brief Size of memory buffer"]
-    pub size: size_t,
-    #[doc = " @brief Next free memory location"]
-    pub next: *mut u8,
-}
-unsafe extern "C" {
-    #[doc = " @brief Initialize bump allocator at runtime\n\n @param a Pointer to bump allocator structure\n @param buf Pointer to memory buffer\n @param size Size of memory buffer\n @return int8_t 0 on success, -1 on error"]
-    pub fn k_bump_init(a: *mut k_bump_allocator, buf: *mut u8, size: size_t) -> i8;
-}
-unsafe extern "C" {
-    #[doc = " @brief Allocate memory from bump allocator\n\n @param a Pointer to bump allocator structure\n @param size Size of memory to allocate\n @param align Alignment of memory\n @return void* Pointer to allocated memory, NULL on error"]
-    pub fn k_bump_alloc(
-        a: *mut k_bump_allocator,
-        size: size_t,
-        align: u8,
-    ) -> *mut ::core::ffi::c_void;
-}
-unsafe extern "C" {
-    #[doc = " @brief Reset bump allocator\n\n @param a Pointer to bump allocator structure"]
-    pub fn k_bump_reset(a: *mut k_bump_allocator);
-}
-unsafe extern "C" {
-    #[doc = " @brief Get bump allocator statistics\n\n @param a Pointer to bump allocator structure\n @param stats Pointer to statistics structure"]
-    pub fn k_bump_stats(a: *mut k_bump_allocator, stats: *mut k_alloc_stats);
 }
 unsafe extern "C" {
     #[doc = " @brief Init builtin LED"]

@@ -12,6 +12,7 @@
 #include <avrtos/alloc/alloc.h>
 #include <avrtos/alloc/api.h>
 #include <avrtos/alloc/bump.h>
+#include <avrtos/alloc/slab.h>
 
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
