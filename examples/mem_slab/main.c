@@ -22,7 +22,7 @@ void thread_time(void *ctx);
 #define THREAD_PRIO K_PREEMPTIVE
 
 // in ms
-#define THREAD_MAX_WAIT 255
+#define THREAD_MAX_WAIT			  255
 #define COLLECT_BLOCK_START_DELAY 3000
 
 K_THREAD_DEFINE(w0, thread, STACK_SIZE, THREAD_PRIO, NULL, '0');

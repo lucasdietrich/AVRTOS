@@ -34,6 +34,7 @@ bash ./scripts/metrics-collect.sh $BUILD_DIR $METRICS_FILE_PATH
 
 echo "toolchain: $TOOLCHAIN_FILE" >> $METRICS_CONFIG_FILE_PATH
 echo "build type: $BUILD_TYPE" >> $METRICS_CONFIG_FILE_PATH
+echo "avr-gcc version: $(avr-gcc --version | head -n 1)" >> $METRICS_CONFIG_FILE_PATH
 
 cp $METRICS_FILE_PATH $METRICS_FILE_REV_PATH
 

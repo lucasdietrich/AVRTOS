@@ -5,8 +5,8 @@
  */
 
 #include <Arduino.h>
-#include <avrtos.h>
 
+#include <avrtos.h>
 #include <avrtos/avrtos.h>
 
 static uint16_t counter = 0;

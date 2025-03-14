@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/avrtos.h>
-#include <avrtos/drivers/usart.h>
-
 #include <avrtos/alloc/alloc.h>
 #include <avrtos/alloc/bump.h>
+#include <avrtos/avrtos.h>
+#include <avrtos/drivers/usart.h>
 
 #include <avr/io.h>
 

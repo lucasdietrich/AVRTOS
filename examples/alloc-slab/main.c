@@ -13,7 +13,7 @@
 
 struct slab_allocator slabspool;
 
-#define BLOCK_SIZE 16u
+#define BLOCK_SIZE	 16u
 #define BLOCKS_COUNT 16u
 
 uint8_t buf[(BLOCK_SIZE) * (BLOCKS_COUNT)];
@@ -32,7 +32,7 @@ int main(void)
 	int8_t ret = slab_init(&slabspool, buf, BLOCK_SIZE, BLOCKS_COUNT);
 	printf("slab_init (buf: %p): %d\n", buf, ret);
 
-	uint8_t ptrs_count = 0;
+	uint8_t ptrs_count		 = 0;
 	void *ptrs[BLOCKS_COUNT] = {0};
 
 	do {
@@ -40,7 +40,7 @@ int main(void)
 
 		ptr = slab_alloc(&slabspool);
 		printf("slab_alloc(): %p\n", ptr);
-		
+
 		if (ptr) {
 			// Store the pointer for later deallocation
 			ptrs[ptrs_count++] = ptr;
@@ -48,7 +48,7 @@ int main(void)
 	} while (ptr);
 
 	print_stats();
-	
+
 	// Free all allocated blocks
 	for (uint8_t i = 0; i < ptrs_count; i++) {
 		slab_free(&slabspool, ptrs[i]);

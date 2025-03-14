@@ -39,7 +39,7 @@ extern "C" {
 #define K_MODULE_THREAD	  4
 #define K_MODULE_IDLE	  5
 
-#define K_MODULE_ALLOC 	   9
+#define K_MODULE_ALLOC	   9
 #define K_MODULE_MUTEX	   10
 #define K_MODULE_SEMAPHORE 11
 #define K_MODULE_SIGNAL	   12

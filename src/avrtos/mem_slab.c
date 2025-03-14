@@ -6,11 +6,11 @@
 
 #include "mem_slab.h"
 
+#include "alloc/slab_private.h"
 #include "dstruct/dlist.h"
 #include "dstruct/slist.h"
 #include "kernel.h"
 #include "kernel_private.h"
-#include "alloc/slab_private.h"
 
 #define K_MODULE K_MODULE_MEMSLAB
 
@@ -60,7 +60,7 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 	void *ptr = slab_alloc(&slab->allocator);
 	if (ptr != NULL) {
 		*mem = ptr;
-		ret = 0;
+		ret	 = 0;
 	} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		/* No blocks available and the thread doesn't want to wait */
 		ret = -ENOMEM;

@@ -7,5 +7,12 @@
 	},
 	"python.defaultInterpreterPath": ".venv/bin/python",
 	"editor.tabSize": 4,
-	"editor.rulers": [80]
+	"editor.rulers": [
+		80
+	],
+	"files.associations": {
+		"*.jinja": "python",
+		"*.c": "c",
+		"*.h": "c",
+	},
 }

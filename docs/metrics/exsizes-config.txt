@@ -1,2 +1,3 @@
 toolchain: cmake/avr6-atmega2560.cmake
 build type: Release
+avr-gcc version: avr-gcc (crosstool-NG 1.27.0) 14.2.0

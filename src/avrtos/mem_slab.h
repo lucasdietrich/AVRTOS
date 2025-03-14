@@ -9,7 +9,7 @@
  *
  * A memory slab is a memory management mechanism that provides a pool of fixed-size
  * memory blocks. Refer to the slab allocator <avrtos/alloc/slab.h> for more information.
- * 
+ *
  * Current API enables synchronization over memory slab allocator. Threads can allocate
  * blocks from the slab when available, and free them when no longer needed. If no blocks
  * are available, threads can block until a block becomes free.
@@ -25,9 +25,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel.h"
 #include "alloc/slab.h"
 #include "alloc/slab_private.h"
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +40,7 @@ extern "C" {
  */
 struct k_mem_slab {
 	struct slab_allocator allocator; /**< Slab allocator */
-	struct dnode waitqueue;	 /**< Wait queue for threads pending on a block */
+	struct dnode waitqueue;			 /**< Wait queue for threads pending on a block */
 };
 
 /**

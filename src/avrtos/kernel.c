@@ -556,7 +556,6 @@ __kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout)
 	/* Make the thread until wake-up */
 	z_pend_current(timeout);
 
-
 	if (z_ker.current->flags & Z_THREAD_TIMER_EXPIRED_MSK) {
 		/* Timer expired */
 		err = -ETIMEDOUT;
@@ -584,7 +583,7 @@ __kernel void z_wake_up(struct k_thread *thread)
 	__ASSERT_NOTNULL(thread);
 	__ASSERT_NOINTERRUPT();
 	__ASSERT_THREAD_STATE(thread, Z_THREAD_STATE_PENDING);
-	
+
 	__Z_DBG_WAKEUP(thread); // @
 
 	z_cancel_scheduled_wake_up(thread);

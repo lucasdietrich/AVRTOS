@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <avrtos/avrtos.h>
 #include <avrtos/alloc/alloc.h>
+#include <avrtos/avrtos.h>
 
 #define INIT_ALLOC_SIZE 128u
 
 int main(void)
 {
 	void *ptr;
-	uint16_t total = 0u;
+	uint16_t total		= 0u;
 	uint16_t alloc_size = INIT_ALLOC_SIZE;
 
 	size_t atotal, used, free;
@@ -24,7 +24,7 @@ int main(void)
 
 		ptr = k_malloc(alloc_size);
 		printf("k_malloc(%u): %p\n", alloc_size, ptr);
-		
+
 		if (ptr) {
 			total += alloc_size;
 		} else if (alloc_size) {
