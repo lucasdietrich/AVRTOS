@@ -40,90 +40,90 @@ extern "C" {
  * @brief SPI device registers.
  */
 typedef struct {
-	__IO uint8_t SPCRn; /* Control register */
-	__IO uint8_t SPSRn; /* Status register */
-	__IO uint8_t SPDRn; /* Data register */
+    __IO uint8_t SPCRn; /* Control register */
+    __IO uint8_t SPSRn; /* Status register */
+    __IO uint8_t SPDRn; /* Data register */
 } SPI_Device;
 
 #define SPI_BASE_ADDR (AVR_IO_BASE_ADDR + 0x004Cu)
-#define SPI_DEVICE	  ((SPI_Device *)SPI_BASE_ADDR)
-#define SPI			  SPI_DEVICE
+#define SPI_DEVICE    ((SPI_Device *)SPI_BASE_ADDR)
+#define SPI           SPI_DEVICE
 
 typedef enum {
-	SPI_PRESCALER_4	  = 0u, /* Maximum recommended speed (for F_CPU=16MHz = 4MHz) */
-	SPI_PRESCALER_16  = 1u,
-	SPI_PRESCALER_64  = 2u,
-	SPI_PRESCALER_128 = 3u,
-	SPI_PRESCALER_X2  = 4u, /* Not recommended (for F_CPU=16MHz = 8Mhz) */
-	SPI_PRESCALER_X8  = 5u,
-	SPI_PRESCALER_X32 = 6u,
-	SPI_PRESCALER_X64 = 7u
+    SPI_PRESCALER_4   = 0u, /* Maximum recommended speed (for F_CPU=16MHz = 4MHz) */
+    SPI_PRESCALER_16  = 1u,
+    SPI_PRESCALER_64  = 2u,
+    SPI_PRESCALER_128 = 3u,
+    SPI_PRESCALER_X2  = 4u, /* Not recommended (for F_CPU=16MHz = 8Mhz) */
+    SPI_PRESCALER_X8  = 5u,
+    SPI_PRESCALER_X32 = 6u,
+    SPI_PRESCALER_X64 = 7u
 } spi_prescaler_t;
 
 typedef enum {
-	SPI_ROLE_MASTER = 0u,
-	SPI_ROLE_SLAVE	= 1u
+    SPI_ROLE_MASTER = 0u,
+    SPI_ROLE_SLAVE  = 1u
 } spi_role_t;
 
 typedef enum {
-	SPI_MODE_0 = 0u, /* CPOL = 0, CPHA = 0 */
-	SPI_MODE_1 = 1u, /* CPOL = 0, CPHA = 1 */
-	SPI_MODE_2 = 2u, /* CPOL = 1, CPHA = 0 */
-	SPI_MODE_3 = 3u	 /* CPOL = 1, CPHA = 1 */
+    SPI_MODE_0 = 0u, /* CPOL = 0, CPHA = 0 */
+    SPI_MODE_1 = 1u, /* CPOL = 0, CPHA = 1 */
+    SPI_MODE_2 = 2u, /* CPOL = 1, CPHA = 0 */
+    SPI_MODE_3 = 3u  /* CPOL = 1, CPHA = 1 */
 } spi_mode_t;
 
 /* Leading edge */
 typedef enum {
-	SPI_CLOCK_POLARITY_RISING  = 0u, /* CPOL = 0, SCK is low when idle */
-	SPI_CLOCK_POLARITY_FALLING = 1u	 /* CPOL = 1, SCK is high when idle */
+    SPI_CLOCK_POLARITY_RISING  = 0u, /* CPOL = 0, SCK is low when idle */
+    SPI_CLOCK_POLARITY_FALLING = 1u  /* CPOL = 1, SCK is high when idle */
 } spi_clock_polarity_t;
 
 /* Leading edge */
 typedef enum {
-	SPI_CLOCK_PHASE_SAMPLE = 0u, /* CPHA = 0, sample on leading edge */
-	SPI_CLOCK_PHASE_SETUP  = 1u	 /* CPHA = 1, sample on trailing edge */
+    SPI_CLOCK_PHASE_SAMPLE = 0u, /* CPHA = 0, sample on leading edge */
+    SPI_CLOCK_PHASE_SETUP  = 1u  /* CPHA = 1, sample on trailing edge */
 } spi_clock_phase_t;
 
 /** SPI configuration (1 byte) */
 struct spi_config {
-	/* Master or slave */
-	spi_role_t role : 1u;
+    /* Master or slave */
+    spi_role_t role : 1u;
 
-	/* Clock polarity */
-	spi_clock_polarity_t polarity : 1u;
+    /* Clock polarity */
+    spi_clock_polarity_t polarity : 1u;
 
-	/* Sample on leading or trailing edge */
-	spi_clock_phase_t phase : 1u;
+    /* Sample on leading or trailing edge */
+    spi_clock_phase_t phase : 1u;
 
-	/* Enable SPI interrupt (ignored if CONFIG_SPI_ASYNC support is enabled) */
-	uint8_t irq_enabled : 1u;
+    /* Enable SPI interrupt (ignored if CONFIG_SPI_ASYNC support is enabled) */
+    uint8_t irq_enabled : 1u;
 
-	/* Clock prescaler (master only)*/
-	spi_prescaler_t prescaler : 3u;
+    /* Clock prescaler (master only)*/
+    spi_prescaler_t prescaler : 3u;
 };
 
 /** SPI registers (2 bytes) */
 struct spi_regs {
-	/* SPI control register */
-	uint8_t spcr;
-	/* SPI status register */
-	uint8_t spsr;
+    /* SPI control register */
+    uint8_t spcr;
+    /* SPI status register */
+    uint8_t spsr;
 };
 
 /* 4Mhz SPI Master in mode 0 */
 #define SPI_CONFIG_MASTER_DEFAULTS                                                       \
-	{                                                                                    \
-		.mode = SPI_ROLE_MASTER, .polarity = SPI_CLOCK_POLARITY_RISING,                  \
-		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
-		.prescaler = SPI_PRESCALER_4,                                                    \
-	}
+    {                                                                                    \
+        .mode = SPI_ROLE_MASTER, .polarity = SPI_CLOCK_POLARITY_RISING,                  \
+        .phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
+        .prescaler = SPI_PRESCALER_4,                                                    \
+    }
 
 /* 4Mhz SPI Slave in mode 0 */
 #define SPI_CONFIG_SLAVE_DEFAULTS                                                        \
-	{                                                                                    \
-		.mode = SPI_ROLE_SLAVE, .polarity = SPI_CLOCK_POLARITY_RISING,                   \
-		.phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
-	}
+    {                                                                                    \
+        .mode = SPI_ROLE_SLAVE, .polarity = SPI_CLOCK_POLARITY_RISING,                   \
+        .phase = SPI_CLOCK_PHASE_SAMPLE, .irq_enabled = 0u,                              \
+    }
 
 /**
  * @brief Initialize SPI peripheral.
@@ -188,14 +188,14 @@ char spi_transceive(char tx);
 void spi_transceive_buf(char *rxtx, uint8_t len);
 
 struct spi_slave {
-	/* Slave chip select port */
-	GPIO_Device *cs_port;
-	/* Slave chip select pin */
-	uint8_t cs_pin : 3u;
-	/* Slave chip select active low */
-	uint8_t active_state : 1u;
-	/* SPI regs */
-	struct spi_regs regs;
+    /* Slave chip select port */
+    GPIO_Device *cs_port;
+    /* Slave chip select pin */
+    uint8_t cs_pin : 3u;
+    /* Slave chip select active low */
+    uint8_t active_state : 1u;
+    /* SPI regs */
+    struct spi_regs regs;
 };
 
 /**
@@ -209,10 +209,10 @@ struct spi_slave {
  * @return int8_t 0 on success, negative on error.
  */
 int8_t spi_slave_init(struct spi_slave *slave,
-					  GPIO_Device *cs_port,
-					  uint8_t cs_pin,
-					  uint8_t active_state,
-					  const struct spi_regs *regs);
+                      GPIO_Device *cs_port,
+                      uint8_t cs_pin,
+                      uint8_t active_state,
+                      const struct spi_regs *regs);
 
 void spi_slave_select(const struct spi_slave *slave);
 

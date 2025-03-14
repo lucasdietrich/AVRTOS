@@ -174,7 +174,7 @@ function(target_prepare_env target)
 		COMMAND ${AVR_READELF} -x .noinit ${output_name} > section_noinit.txt VERBATIM
 		COMMAND ${AVR_READELF} -x .text ${output_name} > section_text.txt VERBATIM
 		COMMAND ${AVR_NM} --print-size --size-sort --radix=x ${output_name} > nm.txt VERBATIM
-		COMMAND ${AVR_SIZE} ${output_name} > size.txt VERBATIM
+		COMMAND ${AVR_SIZE} -B ${output_name} > size.txt VERBATIM
 		DEPENDS ${output_name}
 	)
 endfunction()

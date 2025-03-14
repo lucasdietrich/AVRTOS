@@ -21,22 +21,22 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'L');
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void thread_led(void *p)
 {
-	while (1) {
-		k_thread_dump(k_thread_get_current());
+    while (1) {
+        k_thread_dump(k_thread_get_current());
 
-		led_on();
-		k_sleep(K_MSEC(PERIOD));
-		led_off();
-		k_sleep(K_MSEC(PERIOD));
-	}
+        led_on();
+        k_sleep(K_MSEC(PERIOD));
+        led_off();
+        k_sleep(K_MSEC(PERIOD));
+    }
 }

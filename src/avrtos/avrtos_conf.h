@@ -368,7 +368,7 @@
 // Clear the WDT on kernel initialization.
 //
 //  Page 52 (ATmega328p datasheet):
-// 	Note: If the Watchdog is accidentally enabled, for example by a
+//     Note: If the Watchdog is accidentally enabled, for example by a
 // runaway pointer or brown-out condition, the device will be reset and
 // the Watchdog Timer will remain enabled. If the code is not set up to
 // handle the Watchdog, this might lead to an endless loop of time-out

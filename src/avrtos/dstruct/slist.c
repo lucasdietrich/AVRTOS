@@ -8,34 +8,34 @@
 
 void slist_init(struct slist *list)
 {
-	list->head = NULL;
-	list->tail = NULL;
+    list->head = NULL;
+    list->tail = NULL;
 }
 
 void slist_append(struct slist *list, struct snode *node)
 {
-	/* safely set next item pointer to NULL */
-	node->next = NULL;
+    /* safely set next item pointer to NULL */
+    node->next = NULL;
 
-	if (list->head == NULL) {
-		/* case queue empty */
-		list->head = node;
-	} else {
-		/* case queue not empty */
-		list->tail->next = node;
-	}
-	list->tail = node;
+    if (list->head == NULL) {
+        /* case queue empty */
+        list->head = node;
+    } else {
+        /* case queue not empty */
+        list->tail->next = node;
+    }
+    list->tail = node;
 }
 
 struct snode *slist_get(struct slist *list)
 {
-	struct snode *node = list->head;
-	if (list->head != NULL) {
-		list->head = node->next;
+    struct snode *node = list->head;
+    if (list->head != NULL) {
+        list->head = node->next;
 
-		if (list->head == NULL) {
-			list->tail = NULL;
-		}
-	}
-	return node;
+        if (list->head == NULL) {
+            list->tail = NULL;
+        }
+    }
+    return node;
 }

@@ -23,36 +23,36 @@ K_THREAD_DEFINE(t3, canariesthread, 0x80, K_COOPERATIVE, NULL, 'C');
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	sei();
+    sei();
 
-	while (1) {
-		k_show_uptime();
-		serial_transmit('\n');
-		printf_P(PSTR("%lu ticks : %lu ms\n"), k_ticks_get_32(), k_uptime_get_ms32());
-		k_sleep(K_SECONDS(1));
-	}
+    while (1) {
+        k_show_uptime();
+        serial_transmit('\n');
+        printf_P(PSTR("%lu ticks : %lu ms\n"), k_ticks_get_32(), k_uptime_get_ms32());
+        k_sleep(K_SECONDS(1));
+    }
 }
 
 void mythread(char *ctx)
 {
-	uint32_t i = 0;
+    uint32_t i = 0;
 
-	while (1) {
-		i++;
-		serial_transmit(*ctx);
-		k_sleep(K_SECONDS(1));
-	}
+    while (1) {
+        i++;
+        serial_transmit(*ctx);
+        k_sleep(K_SECONDS(1));
+    }
 }
 
 void canariesthread(void *ctx)
 {
-	while (1) {
-		k_dump_stack_canaries();
-		k_sleep(K_SECONDS(30));
-	}
+    while (1) {
+        k_dump_stack_canaries();
+        k_sleep(K_SECONDS(30));
+    }
 }

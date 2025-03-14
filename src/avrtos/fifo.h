@@ -74,8 +74,8 @@ extern "C" {
  * for threads that are waiting for an item to become available.
  */
 struct k_fifo {
-	struct slist queue;		///< FIFO reference to the head item
-	struct dnode waitqueue; ///< Wait queue for threads waiting for a FIFO item
+    struct slist queue;     ///< FIFO reference to the head item
+    struct dnode waitqueue; ///< Wait queue for threads waiting for a FIFO item
 };
 
 /**
@@ -86,9 +86,9 @@ struct k_fifo {
  * @param fifo The FIFO structure to be initialized.
  */
 #define Z_FIFO_INIT(fifo)                                                                \
-	{                                                                                    \
-		.queue = SLIST_INIT(), .waitqueue = DLIST_INIT(fifo.waitqueue)                   \
-	}
+    {                                                                                    \
+        .queue = SLIST_INIT(), .waitqueue = DLIST_INIT(fifo.waitqueue)                   \
+    }
 
 /**
  * @brief Statically define and initialize a FIFO.

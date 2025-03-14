@@ -19,9 +19,9 @@
  */
 static int uart_putchar(char c, FILE *stream)
 {
-	(void)stream;
-	serial_transmit(c);
-	return 0;
+    (void)stream;
+    serial_transmit(c);
+    return 0;
 }
 
 /**
@@ -41,7 +41,7 @@ static FILE z_stdout_usart = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_W
  */
 void k_set_stdio_usart0(void)
 {
-	stdout = &z_stdout_usart;
+    stdout = &z_stdout_usart;
 }
 
 #elif CONFIG_STDIO_PRINTF_TO_USART > 0

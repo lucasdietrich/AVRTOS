@@ -32,8 +32,8 @@ extern "C" {
  * @brief Structure representing the state of the PRNG.
  */
 struct k_prng {
-	uint32_t lfsr32; /**< 32-bit LFSR state */
-	uint32_t lfsr31; /**< 31-bit LFSR state */
+    uint32_t lfsr32; /**< 32-bit LFSR state */
+    uint32_t lfsr31; /**< 31-bit LFSR state */
 };
 
 /* Polynomial masks for the LFSRs */
@@ -51,9 +51,9 @@ struct k_prng {
  * @param lfsr31_val Seed value for the 31-bit LFSR.
  */
 #define K_PRNG_INITIALIZER(lfsr32_val, lfsr31_val)                                       \
-	{                                                                                    \
-		.lfsr32 = lfsr32_val, .lfsr31 = lfsr31_val                                       \
-	}
+    {                                                                                    \
+        .lfsr32 = lfsr32_val, .lfsr31 = lfsr31_val                                       \
+    }
 
 /**
  * @brief Macro to define a PRNG with specific seed values.
@@ -63,7 +63,7 @@ struct k_prng {
  * @param lfsr31_val Seed value for the 31-bit LFSR.
  */
 #define K_PRNG_DEFINE(prng_name, lfsr32_val, lfsr31_val)                                 \
-	struct k_prng prng_name = K_PRNG_INITIALIZER(lfsr32_val, lfsr31_val)
+    struct k_prng prng_name = K_PRNG_INITIALIZER(lfsr32_val, lfsr31_val)
 
 /**
  * @brief Macro to define a PRNG with default seed values.
@@ -71,7 +71,7 @@ struct k_prng {
  * @param prng_name Name of the PRNG instance.
  */
 #define K_PRNG_DEFINE_DEFAULT(prng_name)                                                 \
-	K_PRNG_DEFINE(prng_name, K_PRNG_DEFAULT_LFSR32, K_PRNG_DEFAULT_LFSR31)
+    K_PRNG_DEFINE(prng_name, K_PRNG_DEFAULT_LFSR32, K_PRNG_DEFAULT_LFSR31)
 
 /**
  * @brief Get a 16-bit pseudo-random number from the PRNG.

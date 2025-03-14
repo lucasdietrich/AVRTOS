@@ -70,9 +70,9 @@ typedef void (*k_event_handler_t)(struct k_event *);
  * @brief Event structure.
  */
 struct k_event {
-	struct titem tie;		   ///< Timer queue item for scheduling the event.
-	k_event_handler_t handler; ///< Function to handle the event when triggered.
-	uint8_t scheduled : 1;	   ///< Flag indicating if the event is currently scheduled.
+    struct titem tie;          ///< Timer queue item for scheduling the event.
+    k_event_handler_t handler; ///< Function to handle the event when triggered.
+    uint8_t scheduled : 1;     ///< Flag indicating if the event is currently scheduled.
 };
 
 /**
@@ -83,9 +83,9 @@ struct k_event {
  * @param hdlr The function that will handle the event.
  */
 #define Z_EVENT_INIT(hdlr)                                                               \
-	{                                                                                    \
-		.tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0                     \
-	}
+    {                                                                                    \
+        .tie = INIT_TITEM_DEFAULT(), .handler = hdlr, .scheduled = 0                     \
+    }
 
 /**
  * @brief Statically define and initialize an event.

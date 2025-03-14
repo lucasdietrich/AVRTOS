@@ -25,28 +25,28 @@
 
 int main(void)
 {
-	serial_init();
+    serial_init();
 
-	const struct timer_config config = {
-		.mode	   = TIMER_MODE_CTC,
-		.counter   = 0u,
-		.prescaler = TIMER_PRESCALER_1024,
-		.timsk	   = 0u,
-	};
+    const struct timer_config config = {
+        .mode      = TIMER_MODE_CTC,
+        .counter   = 0u,
+        .prescaler = TIMER_PRESCALER_1024,
+        .timsk     = 0u,
+    };
 
-	gpiol_pin_init(GPIOB, 5u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
-	gpiol_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
-	gpiol_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+    gpiol_pin_init(GPIOB, 5u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+    gpiol_pin_init(GPIOB, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+    gpiol_pin_init(GPIOB, 7u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
 
-	ll_timer16_init(TIMER_DEVICE, timer_get_index(TIMER_DEVICE), &config);
+    ll_timer16_init(TIMER_DEVICE, timer_get_index(TIMER_DEVICE), &config);
 
-	struct timer_channel_compare_config comp_conf = {
-		.mode  = TIMER_CHANNEL_COMP_MODE_TOGGLE,
-		.value = TIMER_CALC_COUNTER_VALUE(PERIOD_US >> 1u, 1024u),
-	};
-	ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_A, &comp_conf);
-	ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_B, &comp_conf);
-	ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_C, &comp_conf);
+    struct timer_channel_compare_config comp_conf = {
+        .mode  = TIMER_CHANNEL_COMP_MODE_TOGGLE,
+        .value = TIMER_CALC_COUNTER_VALUE(PERIOD_US >> 1u, 1024u),
+    };
+    ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_A, &comp_conf);
+    ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_B, &comp_conf);
+    ll_timer16_channel_configure(TIMER_DEVICE, TIMER_CHANNEL_C, &comp_conf);
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }

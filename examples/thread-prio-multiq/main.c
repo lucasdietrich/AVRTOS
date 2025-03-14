@@ -9,13 +9,13 @@
 
 int main(void)
 {
-	const struct usart_config cfg = USART_CONFIG_DEFAULT_115200();
-	usart_init(USART0_DEVICE, &cfg);
+    const struct usart_config cfg = USART_CONFIG_DEFAULT_115200();
+    usart_init(USART0_DEVICE, &cfg);
 
-	uint32_t u = 0u;
-	for (;;) {
-		printf_P(PSTR("Hello ! %u\n"), u++);
+    uint32_t u = 0u;
+    for (;;) {
+        printf_P(PSTR("Hello ! %u\n"), u++);
 
-		k_sleep(K_SECONDS(1));
-	}
+        k_sleep(K_SECONDS(1));
+    }
 }

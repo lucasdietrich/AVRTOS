@@ -8,27 +8,11 @@
  * Memory Slabs
  *
  * A memory slab is a memory management mechanism that provides a pool of fixed-size
- * memory blocks. Each slab is initialized with a predefined number of blocks, all of
- * which are of the same size. Memory slabs provides deterministic allocation and
- * deallocation times (O(1)).
+ * memory blocks. Refer to the slab allocator <avrtos/alloc/slab.h> for more information.
  *
- * Example with a memory slab containing 4 blocks of 32 bytes each:
- *
- *  | Block 1          | Block 2          | Block 3          | Block 4
- *  | 0x0000           | 0x0020           | 0x0040           | 0x0060
- *  +------------------+------------------+------------------+------------------+
- *  | Free Block       | Free Block       | Allocated Block  | Allocated Block  |
- *  |                  | Next Free Block  |                  |                  |
- *  +------------------+------------------+------------------+------------------+
- *                             |                    |                   |
- *                             |                    |                   |
- *                             v                    v                   v
- *                        Next block     Second allocated block  First allocated block
- *                        in free list          is here              is here
- *
- * Threads can allocate blocks from the slab when available, and free them when no
- * longer needed. If no blocks are available, threads can block until a block becomes
- * free.
+ * Current API enables synchronization over memory slab allocator. Threads can allocate
+ * blocks from the slab when available, and free them when no longer needed. If no blocks
+ * are available, threads can block until a block becomes free.
  *
  * Related configuration options:
  *  - CONFIG_KERNEL_ARGS_CHECKS: Enable argument checks
@@ -41,6 +25,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "alloc/slab.h"
+#include "alloc/slab_private.h"
 #include "kernel.h"
 
 #ifdef __cplusplus
@@ -50,22 +36,11 @@ extern "C" {
 /**
  * @brief Memory Slab Structure
  *
- * A memory slab is a pool of fixed-size memory blocks that can be allocated
- * and freed. The memory blocks are managed using a singly linked list that
- * tracks the free blocks.
- *
- * Allocation and deallocation operations are performed in constant time (O(1)).
- * This implementation is inspired by the Zephyr RTOS memory slab implementation.
- *
- * @note Maximum number of blocks is 255.
- * @note Maximum block size is 65535 bytes
+ * Memory slab subsystem enables synchronization over memory slab allocator.
  */
 struct k_mem_slab {
-	void *buffer;			 /**< Pointer to the memory buffer */
-	uint8_t count;			 /**< Total number of blocks in the slab */
-	uint16_t block_size;	 /**< Size of each block in bytes */
-	struct snode *free_list; /**< Pointer to the list of free blocks */
-	struct dnode waitqueue;	 /**< Wait queue for threads pending on a block */
+    struct slab_allocator allocator; /**< Slab allocator */
+    struct dnode waitqueue;          /**< Wait queue for threads pending on a block */
 };
 
 /**
@@ -79,10 +54,10 @@ struct k_mem_slab {
  * @param _blocks_count Total number of blocks in the memory slab.
  */
 #define Z_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                         \
-	{                                                                                    \
-		.buffer = _buf, .count = _blocks_count, .block_size = _block_size,               \
-		.free_list = NULL, .waitqueue = DLIST_INIT(_slab.waitqueue)                      \
-	}
+    {                                                                                    \
+        .allocator = Z_SLAB_INIT(_slab, _buf, _block_size, _blocks_count),               \
+        .waitqueue = DLIST_INIT(_slab.waitqueue)                                         \
+    }
 
 /**
  * @brief Macro to generate a unique name for the memory slab buffer.
@@ -104,10 +79,10 @@ struct k_mem_slab {
  * @param _blocks_count Total number of blocks in the memory slab.
  */
 #define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                        \
-	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];            \
-	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                                  \
-	static struct k_mem_slab _slab_name = Z_MEM_SLAB_INIT(                               \
-		_slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
+    uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];            \
+    Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                                  \
+    static struct k_mem_slab _slab_name = Z_MEM_SLAB_INIT(                               \
+        _slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
 /**
  * @brief Initialize all statically defined memory slabs.
@@ -130,20 +105,9 @@ __kernel void z_mem_slab_init_module(void);
  * @return 0 on success, or an error code on failure.
  */
 __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
-								void *buffer,
-								size_t block_size,
-								uint8_t blocks_count);
-
-/**
- * @brief Finalize the initialization of a statically defined memory slab.
- *
- * This function completes the initialization of a memory slab that was declared
- * using the K_MEM_SLAB_DEFINE macro, particularly when CONFIG_AVRTOS_LINKER_SCRIPT
- * is disabled.
- *
- * @param slab Pointer to the memory slab structure.
- */
-__kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
+                                void *buffer,
+                                size_t block_size,
+                                uint8_t blocks_count);
 
 /**
  * @brief Allocate a memory block from a slab.
@@ -164,8 +128,8 @@ __kernel void z_mem_slab_finalize_init(struct k_mem_slab *slab);
  *         - ECANCELED: Wait aborted.
  */
 __kernel int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
-								 void **mem,
-								 k_timeout_t timeout);
+                                 void **mem,
+                                 k_timeout_t timeout);
 
 /**
  * @brief Free a memory block back to a slab.

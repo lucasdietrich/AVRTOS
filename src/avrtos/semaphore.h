@@ -41,29 +41,29 @@ extern "C" {
  * @brief Kernel Semaphore structure
  */
 struct k_sem {
-	/**
-	 * @brief Current count of available semaphores.
-	 *
-	 * This value indicates how many semaphores are currently available.
-	 * If this count is greater than 0, a semaphore can be taken.
-	 */
-	uint8_t count;
+    /**
+     * @brief Current count of available semaphores.
+     *
+     * This value indicates how many semaphores are currently available.
+     * If this count is greater than 0, a semaphore can be taken.
+     */
+    uint8_t count;
 
-	/**
-	 * @brief Maximum limit of semaphores.
-	 *
-	 * This value represents the maximum number of semaphores that can
-	 * be available at any time.
-	 */
-	uint8_t limit;
+    /**
+     * @brief Maximum limit of semaphores.
+     *
+     * This value represents the maximum number of semaphores that can
+     * be available at any time.
+     */
+    uint8_t limit;
 
-	/**
-	 * @brief Wait queue for threads waiting to acquire the semaphore.
-	 *
-	 * Threads waiting for the semaphore are stored in this list, with
-	 * the first thread to be woken up at the head of the queue.
-	 */
-	struct dnode waitqueue;
+    /**
+     * @brief Wait queue for threads waiting to acquire the semaphore.
+     *
+     * Threads waiting for the semaphore are stored in this list, with
+     * the first thread to be woken up at the head of the queue.
+     */
+    struct dnode waitqueue;
 };
 
 /**
@@ -77,10 +77,10 @@ struct k_sem {
  * @param count_limit Maximum count limit of the semaphore.
  */
 #define Z_SEM_INIT(sem, initial_count, count_limit)                                      \
-	{                                                                                    \
-		.count = MIN(initial_count, count_limit), .limit = count_limit,                  \
-		.waitqueue = DLIST_INIT(sem.waitqueue)                                           \
-	}
+    {                                                                                    \
+        .count = MIN(initial_count, count_limit), .limit = count_limit,                  \
+        .waitqueue = DLIST_INIT(sem.waitqueue)                                           \
+    }
 
 /**
  * @brief Statically define and initialize a semaphore.
@@ -92,7 +92,7 @@ struct k_sem {
  * @param count_limit Maximum count limit of the semaphore.
  */
 #define K_SEM_DEFINE(sem_name, initial_count, count_limit)                               \
-	struct k_sem sem_name = Z_SEM_INIT(sem_name, initial_count, count_limit)
+    struct k_sem sem_name = Z_SEM_INIT(sem_name, initial_count, count_limit)
 
 /**
  * @brief Initialize a semaphore at runtime.

@@ -40,12 +40,12 @@ extern "C" {
  * @return int8_t Returns 0 on success.
  */
 int8_t k_thread_create(struct k_thread *thread,
-					   k_thread_entry_t entry,
-					   void *stack,
-					   size_t stack_size,
-					   uint8_t priority,
-					   void *context_p,
-					   char symbol);
+                       k_thread_entry_t entry,
+                       void *stack,
+                       size_t stack_size,
+                       uint8_t priority,
+                       void *context_p,
+                       char symbol);
 
 /**
  * @brief Start the execution of the specified thread.
@@ -98,8 +98,8 @@ void z_thread_entry(void *context);
  */
 __always_inline struct k_thread *k_thread_get_current(void)
 {
-	extern struct z_kernel z_ker;
-	return z_ker.current;
+    extern struct z_kernel z_ker;
+    return z_ker.current;
 }
 
 /**
@@ -109,8 +109,8 @@ __always_inline struct k_thread *k_thread_get_current(void)
  */
 __always_inline struct k_thread *k_thread_get_main(void)
 {
-	extern struct k_thread z_thread_main;
-	return &z_thread_main;
+    extern struct k_thread z_thread_main;
+    return &z_thread_main;
 }
 
 /**
@@ -124,7 +124,7 @@ __always_inline struct k_thread *k_thread_get_main(void)
 #define irq_enable sei
 
 #define CRITICAL_SECTION_BEGIN() irq_disable()
-#define CRITICAL_SECTION_END()	 irq_enable()
+#define CRITICAL_SECTION_END()   irq_enable()
 
 /**
  * @brief Lock interrupts and return the previous state.
@@ -133,9 +133,9 @@ __always_inline struct k_thread *k_thread_get_main(void)
  */
 __always_inline uint8_t irq_lock(void)
 {
-	const uint8_t key = SREG;
-	cli();
-	return key;
+    const uint8_t key = SREG;
+    cli();
+    return key;
 }
 
 /**
@@ -145,7 +145,7 @@ __always_inline uint8_t irq_lock(void)
  */
 __always_inline void irq_unlock(uint8_t key)
 {
-	SREG = key;
+    SREG = key;
 }
 
 /**
@@ -219,9 +219,9 @@ __kernel bool k_cur_is_coop(void);
  */
 static __inline__ void z_sched_restore(const uint8_t *__s)
 {
-	k_sched_unlock();
-	memory_barrier();
-	ARG_UNUSED(__s);
+    k_sched_unlock();
+    memory_barrier();
+    ARG_UNUSED(__s);
 }
 
 /**
@@ -234,8 +234,8 @@ static __inline__ void z_sched_restore(const uint8_t *__s)
  */
 static __inline__ uint8_t z_sched_lock_ret(void)
 {
-	k_sched_lock();
-	return 1;
+    k_sched_lock();
+    return 1;
 }
 
 /**
@@ -247,9 +247,9 @@ static __inline__ uint8_t z_sched_lock_ret(void)
  * This macro is inspired by the `ATOMIC_BLOCK(ATOMIC_FORCEON)` macro in `<avr/atomic.h>`.
  */
 #define K_SCHED_LOCK_CONTEXT                                                             \
-	for (uint8_t __k_schedl_x __attribute__((__cleanup__(z_sched_restore))) = 0u,        \
-							  __k_todo = z_sched_lock_ret();                             \
-		 __k_todo; __k_todo			   = 0)
+    for (uint8_t __k_schedl_x __attribute__((__cleanup__(z_sched_restore))) = 0u,        \
+                              __k_todo = z_sched_lock_ret();                             \
+         __k_todo; __k_todo            = 0)
 
 /**
  * @brief Suspend the execution of the current thread for a specified amount of time.
@@ -276,7 +276,7 @@ __kernel void k_sleep(k_timeout_t timeout);
  */
 __always_inline void k_msleep(uint32_t ms)
 {
-	k_sleep(K_MSEC(ms));
+    k_sleep(K_MSEC(ms));
 }
 
 /**
@@ -386,9 +386,9 @@ void z_yield(void);
  */
 __always_inline void k_yield(void)
 {
-	const uint8_t key = irq_lock();
-	z_yield();
-	irq_unlock(key);
+    const uint8_t key = irq_lock();
+    z_yield();
+    irq_unlock(key);
 }
 
 /**
@@ -448,20 +448,20 @@ extern void z_assert_thread_ready(struct k_thread *thread);
  */
 __always_inline void k_yield_from_isr(void)
 {
-	// ASSERT ISR CONTEXT
-	// ASSERT IRQ LOCKED
-	// ASSERT NOT kernel context
+    // ASSERT ISR CONTEXT
+    // ASSERT IRQ LOCKED
+    // ASSERT NOT kernel context
 
 #if CONFIG_KERNEL_ASSERT
-	z_assert_user_context();
+    z_assert_user_context();
 #endif
 
-	extern struct z_kernel z_ker;
+    extern struct z_kernel z_ker;
 
-	/* Check whether the current thread can be preempted */
-	if ((z_ker.current->flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) == 0u) {
-		z_yield();
-	}
+    /* Check whether the current thread can be preempted */
+    if ((z_ker.current->flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) == 0u) {
+        z_yield();
+    }
 }
 
 /**
@@ -492,13 +492,13 @@ __always_inline void k_yield_from_isr(void)
  */
 __always_inline void k_yield_from_isr_cond(struct k_thread *thread)
 {
-	if (thread != NULL) {
+    if (thread != NULL) {
 #if CONFIG_KERNEL_ASSERT
-		z_assert_thread_ready(thread);
+        z_assert_thread_ready(thread);
 #endif
 
-		k_yield_from_isr();
-	}
+        k_yield_from_isr();
+    }
 }
 
 #ifdef __cplusplus

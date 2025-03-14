@@ -16,40 +16,40 @@ K_SIGNAL_DEFINE(sig);
 
 ISR(USART0_RX_vect)
 {
-	const char rx = UDR0;
-	serial_transmit(rx);
+    const char rx = UDR0;
+    serial_transmit(rx);
 
-	int8_t ret = k_signal_raise(&sig, rx);
+    int8_t ret = k_signal_raise(&sig, rx);
 
-	if (ret > 0) k_yield_from_isr();
+    if (ret > 0) k_yield_from_isr();
 }
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	/* enable RX interrupt */
-	SET_BIT(UCSR0B, 1 << RXCIE0);
+    /* enable RX interrupt */
+    SET_BIT(UCSR0B, 1 << RXCIE0);
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void waiter(void *context)
 {
-	printf_P(PSTR("Press any key: "));
+    printf_P(PSTR("Press any key: "));
 
-	k_sleep(K_SECONDS(1));
+    k_sleep(K_SECONDS(1));
 
-	for (;;) {
-		int8_t err = k_poll_signal(&sig, K_SECONDS(3));
-		printf("k_poll_signal returned err = %d\n", err);
-		if (err == 0) {
-			printf("signal value = %d\n", sig.signal);
+    for (;;) {
+        int8_t err = k_poll_signal(&sig, K_SECONDS(3));
+        printf("k_poll_signal returned err = %d\n", err);
+        if (err == 0) {
+            printf("signal value = %d\n", sig.signal);
 
-			sig.flags = K_POLL_STATE_NOT_READY;
-		}
-	}
+            sig.flags = K_POLL_STATE_NOT_READY;
+        }
+    }
 }

@@ -40,29 +40,29 @@ extern "C" {
  * @brief Kernel Mutex structure
  */
 struct k_mutex {
-	/**
-	 * @brief Lock status of the mutex.
-	 *
-	 * 0 indicates the mutex is unlocked, any other value indicates it is locked.
-	 * If the CONFIG_KERNEL_REENTRANCY feature is enabled, this value represents
-	 * the number of times the mutex has been locked by the owning thread.
-	 */
-	uint8_t lock;
+    /**
+     * @brief Lock status of the mutex.
+     *
+     * 0 indicates the mutex is unlocked, any other value indicates it is locked.
+     * If the CONFIG_KERNEL_REENTRANCY feature is enabled, this value represents
+     * the number of times the mutex has been locked by the owning thread.
+     */
+    uint8_t lock;
 
-	/**
-	 * @brief Wait queue for threads waiting to acquire the mutex.
-	 *
-	 * Threads waiting for the mutex are stored in this list, with the first
-	 * thread to be woken up at the head of the queue.
-	 */
-	struct dnode waitqueue;
+    /**
+     * @brief Wait queue for threads waiting to acquire the mutex.
+     *
+     * Threads waiting for the mutex are stored in this list, with the first
+     * thread to be woken up at the head of the queue.
+     */
+    struct dnode waitqueue;
 
-	/**
-	 * @brief Pointer to the thread that currently owns the mutex.
-	 *
-	 * This field is NULL if the mutex is not currently owned by any thread.
-	 */
-	struct k_thread *owner;
+    /**
+     * @brief Pointer to the thread that currently owns the mutex.
+     *
+     * This field is NULL if the mutex is not currently owned by any thread.
+     */
+    struct k_thread *owner;
 };
 
 /**
@@ -74,9 +74,9 @@ struct k_mutex {
  * @param mutex The mutex structure to be initialized.
  */
 #define Z_MUTEX_INIT(mutex)                                                              \
-	{                                                                                    \
-		.lock = 0u, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL              \
-	}
+    {                                                                                    \
+        .lock = 0u, .waitqueue = DLIST_INIT(mutex.waitqueue), .owner = NULL              \
+    }
 
 /**
  * @brief Statically define and initialize a mutex.

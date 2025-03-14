@@ -60,9 +60,9 @@ typedef uint8_t k_flags_value_t;
  * be set or cleared and can be notified when a change occurs.
  */
 struct k_flags {
-	struct dnode waitqueue;		 ///< Wait queue for threads waiting on the flags
-	k_flags_value_t flags;		 ///< Current flags state
-	k_flags_value_t reset_value; ///< Reset value for the flags
+    struct dnode waitqueue;      ///< Wait queue for threads waiting on the flags
+    k_flags_value_t flags;       ///< Current flags state
+    k_flags_value_t reset_value; ///< Reset value for the flags
 };
 
 /**
@@ -75,10 +75,10 @@ struct k_flags {
  * @param initial_value Initial value of the flags.
  */
 #define Z_FLAGS_INIT(flags_name, initial_value)                                          \
-	{                                                                                    \
-		.flags = initial_value, .reset_value = initial_value,                            \
-		.waitqueue = DLIST_INIT(flags_name.waitqueue)                                    \
-	}
+    {                                                                                    \
+        .flags = initial_value, .reset_value = initial_value,                            \
+        .waitqueue = DLIST_INIT(flags_name.waitqueue)                                    \
+    }
 
 /**
  * @brief Statically define and initialize a flags object.
@@ -89,7 +89,7 @@ struct k_flags {
  * @param initial_value Initial value of the flags.
  */
 #define K_FLAGS_DEFINE(flags_name, initial_value)                                        \
-	struct k_flags flags_name = Z_FLAGS_INIT(flags_name, initial_value)
+    struct k_flags flags_name = Z_FLAGS_INIT(flags_name, initial_value)
 
 /**
  * @brief Options for flag operations.
@@ -97,20 +97,20 @@ struct k_flags {
  * These options control how flags are polled and notified.
  */
 typedef enum {
-	/* Polling options */
-	K_FLAGS_SET_ANY = 1 << 0u, ///< Wait for any bit of the flags to be set
-	K_FLAGS_SET_ALL =
-		1 << 1u, ///< Wait for all bits of the flags to be set (not supported)
-	K_FLAGS_CLR_ANY =
-		1 << 2u, ///< Wait for any bit of the flags to be cleared (not supported)
-	K_FLAGS_CLR_ALL =
-		1 << 3u, ///< Wait for all bits of the flags to be cleared (not supported)
-	K_FLAGS_CONSUME = 1 << 4u, ///< Consume the flags after notification
+    /* Polling options */
+    K_FLAGS_SET_ANY = 1 << 0u, ///< Wait for any bit of the flags to be set
+    K_FLAGS_SET_ALL =
+        1 << 1u, ///< Wait for all bits of the flags to be set (not supported)
+    K_FLAGS_CLR_ANY =
+        1 << 2u, ///< Wait for any bit of the flags to be cleared (not supported)
+    K_FLAGS_CLR_ALL =
+        1 << 3u, ///< Wait for all bits of the flags to be cleared (not supported)
+    K_FLAGS_CONSUME = 1 << 4u, ///< Consume the flags after notification
 
-	/* Notification options */
-	K_FLAGS_SET	  = 1 << 5u, ///< Set the flags
-	K_FLAGS_CLR	  = 1 << 6u, ///< Clear the flags (not supported)
-	K_FLAGS_SCHED = 1 << 7u, ///< Call the scheduler if a task was woken up
+    /* Notification options */
+    K_FLAGS_SET   = 1 << 5u, ///< Set the flags
+    K_FLAGS_CLR   = 1 << 6u, ///< Clear the flags (not supported)
+    K_FLAGS_SCHED = 1 << 7u, ///< Call the scheduler if a task was woken up
 } k_flags_options_t;
 
 /**
@@ -148,9 +148,9 @@ int8_t k_flags_init(struct k_flags *flags, k_flags_value_t value);
  * @retval -EAGAIN if the timeout expires before the flags are set.
  */
 int k_flags_poll(struct k_flags *flags,
-				 k_flags_value_t *mask,
-				 k_flags_options_t options,
-				 k_timeout_t timeout);
+                 k_flags_value_t *mask,
+                 k_flags_options_t options,
+                 k_timeout_t timeout);
 
 /**
  * @brief Notify a flags object to set or clear specific bits.
@@ -172,8 +172,8 @@ int k_flags_poll(struct k_flags *flags,
  * if the return value is greater than 0.
  */
 int8_t k_flags_notify(struct k_flags *flags,
-					  k_flags_value_t notify_value,
-					  k_flags_options_t options);
+                      k_flags_value_t notify_value,
+                      k_flags_options_t options);
 
 /**
  * @brief Reset a flags object to its initial state.

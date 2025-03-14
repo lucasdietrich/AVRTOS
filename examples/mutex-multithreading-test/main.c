@@ -25,58 +25,58 @@ K_MUTEX_DEFINE(mymutex);
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	z_print_runqueue();
+    z_print_runqueue();
 
-	k_mutex_lock(&mymutex, K_NO_WAIT);
+    k_mutex_lock(&mymutex, K_NO_WAIT);
 
-	sei();
+    sei();
 
-	k_sleep(K_SECONDS(3));
+    k_sleep(K_SECONDS(3));
 
-	k_mutex_unlock(&mymutex);
+    k_mutex_unlock(&mymutex);
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void thread(void *p)
 {
-	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5)); // change this timeout
+    uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5)); // change this timeout
 
-	serial_transmit(k_thread_get_current()->symbol);
+    serial_transmit(k_thread_get_current()->symbol);
 
-	if (lock) {
-		serial_printl_p(PSTR(" : Didn't get the mutex ..."));
-	} else {
-		serial_printl_p(PSTR(" : Got the mutex !"));
+    if (lock) {
+        serial_printl_p(PSTR(" : Didn't get the mutex ..."));
+    } else {
+        serial_printl_p(PSTR(" : Got the mutex !"));
 
-		k_sleep(K_SECONDS(1));
+        k_sleep(K_SECONDS(1));
 
-		k_mutex_unlock(&mymutex);
-	}
+        k_mutex_unlock(&mymutex);
+    }
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void threadp(void *p)
 {
-	uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9)); // change this timeout
+    uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9)); // change this timeout
 
-	serial_transmit(k_thread_get_current()->symbol);
+    serial_transmit(k_thread_get_current()->symbol);
 
-	if (lock) {
-		serial_printl_p(PSTR(" : Didn't get the mutex ..."));
-	} else {
-		serial_printl_p(PSTR(" : Got the mutex !"));
+    if (lock) {
+        serial_printl_p(PSTR(" : Didn't get the mutex ..."));
+    } else {
+        serial_printl_p(PSTR(" : Got the mutex !"));
 
-		k_sleep(K_SECONDS(1));
+        k_sleep(K_SECONDS(1));
 
-		k_mutex_unlock(&mymutex);
-	}
+        k_mutex_unlock(&mymutex);
+    }
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }

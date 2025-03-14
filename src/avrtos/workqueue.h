@@ -77,8 +77,8 @@ typedef void (*k_work_handler_t)(struct k_work *);
  * It contains a handler function that is invoked when the work item is processed.
  */
 struct k_work {
-	struct snode _tie;		  ///< Node for linking work items in the queue.
-	k_work_handler_t handler; ///< Handler function to process the work item.
+    struct snode _tie;        ///< Node for linking work items in the queue.
+    k_work_handler_t handler; ///< Handler function to process the work item.
 };
 
 /**
@@ -89,9 +89,9 @@ struct k_work {
  * @param work_handler The function that will handle the work item.
  */
 #define Z_WORK_INIT(work_handler)                                                        \
-	{                                                                                    \
-		._tie = SNODE_INIT(), .handler = work_handler,                                   \
-	}
+    {                                                                                    \
+        ._tie = SNODE_INIT(), .handler = work_handler,                                   \
+    }
 
 /**
  * @brief Statically define and initialize a work item.
@@ -102,7 +102,7 @@ struct k_work {
  * @param work_handler Function to handle the work item.
  */
 #define K_WORK_DEFINE(work_name, work_handler)                                           \
-	struct k_work work_name = Z_WORK_INIT(work_handler)
+    struct k_work work_name = Z_WORK_INIT(work_handler)
 
 /**
  * @brief Workqueue structure.
@@ -111,8 +111,8 @@ struct k_work {
  * It runs in its own thread and processes items in the order they are submitted.
  */
 struct k_workqueue {
-	struct k_fifo q; ///< Queue for storing work items.
-	uint8_t flags;	 ///< Workqueue flags for configuration.
+    struct k_fifo q; ///< Queue for storing work items.
+    uint8_t flags;   ///< Workqueue flags for configuration.
 };
 
 /**
@@ -133,12 +133,12 @@ struct k_workqueue {
  * @param _symbol Symbol to represent the workqueue thread.
  */
 #define K_WORKQUEUE_DEFINE(_name, _stack_size, _prio_flags, _symbol)                     \
-	struct k_workqueue _name = {                                                         \
-		.q	   = Z_FIFO_INIT(_name.q),                                                   \
-		.flags = 0u,                                                                     \
-	};                                                                                   \
-	K_THREAD_DEFINE(z_workq_##_name, z_workqueue_entry, _stack_size, _prio_flags,        \
-					&_name, _symbol)
+    struct k_workqueue _name = {                                                         \
+        .q     = Z_FIFO_INIT(_name.q),                                                   \
+        .flags = 0u,                                                                     \
+    };                                                                                   \
+    K_THREAD_DEFINE(z_workq_##_name, z_workqueue_entry, _stack_size, _prio_flags,        \
+                    &_name, _symbol)
 
 //
 // Workqueue internal
@@ -171,11 +171,11 @@ __kernel void z_workqueue_entry(struct k_workqueue *const workqueue);
  * @return -EINVAL if any of the arguments are invalid.
  */
 __kernel int8_t k_workqueue_create(struct k_workqueue *workqueue,
-								   struct k_thread *thread,
-								   uint8_t *stack,
-								   size_t stack_size,
-								   uint8_t prio_flags,
-								   char symbol);
+                                   struct k_thread *thread,
+                                   uint8_t *stack,
+                                   size_t stack_size,
+                                   uint8_t prio_flags,
+                                   char symbol);
 
 /**
  * @brief Initialize a work item at runtime.
@@ -255,10 +255,10 @@ bool k_system_workqueue_submit(struct k_work *work);
  * will process the work.
  */
 struct k_work_delayable {
-	struct k_work work;	   ///< Underlying work item, it must be the first member to allow
-						   ///< casting from k_work_delayable to k_work.
-	struct k_event _event; ///< Event object to trigger the work item.
-	struct k_workqueue *_workqueue; ///< Workqueue that will process the work item.
+    struct k_work work;    ///< Underlying work item, it must be the first member to allow
+                           ///< casting from k_work_delayable to k_work.
+    struct k_event _event; ///< Event object to trigger the work item.
+    struct k_workqueue *_workqueue; ///< Workqueue that will process the work item.
 };
 
 /** Internal function triggered by the event object associated with the delayable work
@@ -277,10 +277,10 @@ extern void z_delayable_work_trigger(struct k_event *event);
  * @param work_handler The function that will handle the work item.
  */
 #define K_WORK_DELAYABLE_INIT(work_handler)                                              \
-	{                                                                                    \
-		.work	= Z_WORK_INIT(work_handler),                                             \
-		._event = Z_EVENT_INIT(z_delayable_work_trigger), ._workqueue = NULL,            \
-	}
+    {                                                                                    \
+        .work   = Z_WORK_INIT(work_handler),                                             \
+        ._event = Z_EVENT_INIT(z_delayable_work_trigger), ._workqueue = NULL,            \
+    }
 
 /**
  * @brief Statically define and initialize a delayable work item.
@@ -291,7 +291,7 @@ extern void z_delayable_work_trigger(struct k_event *event);
  * @param work_handler Function to handle the work item.
  */
 #define K_WORK_DELAYABLE_DEFINE(name, work_handler)                                      \
-	struct k_work_delayable name = Z_WORK_DELAYABLE_INIT(work_handler)
+    struct k_work_delayable name = Z_WORK_DELAYABLE_INIT(work_handler)
 
 /**
  * @brief Initialize a delayable work item at runtime.
@@ -305,7 +305,7 @@ extern void z_delayable_work_trigger(struct k_event *event);
  * @param handler Function to handle the work item.
  */
 __kernel void k_work_delayable_init(struct k_work_delayable *dwork,
-									k_work_handler_t handler);
+                                    k_work_handler_t handler);
 
 /**
  * @brief Schedule a delayable work item to be queued after a timeout.
@@ -322,8 +322,8 @@ __kernel void k_work_delayable_init(struct k_work_delayable *dwork,
  * @return 0 on success, or a negative error code on failure.
  */
 __kernel int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
-										  struct k_work_delayable *dwork,
-										  k_timeout_t timeout);
+                                          struct k_work_delayable *dwork,
+                                          k_timeout_t timeout);
 
 /**
  * @brief Schedule a delayable work item for the system workqueue.
@@ -338,7 +338,7 @@ __kernel int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
  * @return 0 on success, or a negative error code on failure.
  */
 __kernel int8_t k_system_work_delayable_schedule(struct k_work_delayable *dwork,
-												 k_timeout_t timeout);
+                                                 k_timeout_t timeout);
 
 /**
  * @brief Cancel a scheduled delayable work item.

@@ -16,7 +16,7 @@ extern "C" {
 
 #define ALIGN_MASK(align) (align - 1u)
 #define ALIGN_PTR(ptr, align)                                                            \
-	((void *)((((uint16_t)ptr) + ALIGN_MASK(align)) & ~ALIGN_MASK(align)))
+    ((void *)((((uint16_t)ptr) + ALIGN_MASK(align)) & ~ALIGN_MASK(align)))
 
 #define K_NO_ALIGN 1u
 #define K_ALIGN_2  2u

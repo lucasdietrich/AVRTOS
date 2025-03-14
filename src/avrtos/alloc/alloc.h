@@ -4,26 +4,26 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
- /**
- * This header provides EXPERIMENTAL memory allocation functions, including standard 
- * and aligned memory allocation. The current default allocator is a BUMP ALLOCATOR, 
+/**
+ * This header provides EXPERIMENTAL memory allocation functions, including standard
+ * and aligned memory allocation. The current default allocator is a BUMP ALLOCATOR,
  * which means:
- * 
+ *
  *  - Memory is allocated sequentially from a preallocated buffer.
  *  - Individual memory blocks cannot be freed; only a full reset is possible.
  *  - Allocation is fast (O(1)) !
  *
- * @warning **Experimental Feature:** The bump allocator is currently the default 
- * allocator. It does not support freeing 
+ * @warning **Experimental Feature:** The bump allocator is currently the default
+ * allocator. It does not support freeing
  * individual allocations (`k_free` is a no-op in this implementation).
  *
  * ## Memory Space and Configuration
  *
- * The current *heap*  operates within its own dedicated memory region, 
+ * The current *heap*  operates within its own dedicated memory region,
  * i.e. it does not overlap with any other memory region (e.g., thread stacks).
  *
- * @note If precise memory management is required (e.g., frequent allocations and 
- * deallocations), consider implementing a more dynamic allocator or manually managing 
+ * @note If precise memory management is required (e.g., frequent allocations and
+ * deallocations), consider implementing a more dynamic allocator or manually managing
  * memory blocks.
  */
 
@@ -72,7 +72,7 @@ void *z_malloc(size_t size, uint8_t align);
 
 /**
  * @brief Reset the default allocator
- * 
+ *
  * @note This function should be used with caution !
  *
  * This function resets the default allocator, freeing all memory.

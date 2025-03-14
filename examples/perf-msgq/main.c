@@ -16,7 +16,7 @@
 #include <util/delay.h>
 
 #define BLOCKS_COUNT 2
-#define BLOCK_SIZE	 100
+#define BLOCK_SIZE   100
 
 K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
 
@@ -28,26 +28,26 @@ K_THREAD_DEFINE(r0, reader, 0x50, K_PREEMPTIVE, &msgq, 'R');
 
 void writer(struct k_msgq *msgq)
 {
-	static char buf[BLOCK_SIZE];
-	memset(buf, 0xAA, BLOCK_SIZE);
-	for (;;) {
-		k_msgq_put(msgq, buf, K_FOREVER);
-	}
+    static char buf[BLOCK_SIZE];
+    memset(buf, 0xAA, BLOCK_SIZE);
+    for (;;) {
+        k_msgq_put(msgq, buf, K_FOREVER);
+    }
 }
 
 void reader(struct k_msgq *msgq)
 {
-	static char buf[BLOCK_SIZE];
-	uint8_t i = 0;
-	for (;;) {
-		k_msgq_get(msgq, buf, K_FOREVER);
-		if (i++ == 0) serial_transmit('.');
-	}
+    static char buf[BLOCK_SIZE];
+    uint8_t i = 0;
+    for (;;) {
+        k_msgq_get(msgq, buf, K_FOREVER);
+        if (i++ == 0) serial_transmit('.');
+    }
 }
 
 int main(void)
 {
-	serial_init();
+    serial_init();
 
-	k_stop();
+    k_stop();
 }

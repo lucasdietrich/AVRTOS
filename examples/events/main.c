@@ -19,100 +19,100 @@ static void thread(void *);
 static void event_handler(struct k_event *ev);
 
 struct mystruct {
-	struct k_event ev;
-	struct k_signal sig;
-	struct k_thread thread;
-	char stack[0x80];
+    struct k_event ev;
+    struct k_signal sig;
+    struct k_thread thread;
+    char stack[0x80];
 };
 
 struct mystruct threads[THREADS_COUNT];
 
 int main(void)
 {
-	serial_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	struct mystruct *ms;
+    struct mystruct *ms;
 
-	static uint32_t counter = 0;
+    static uint32_t counter = 0;
 
-	irq_enable();
+    irq_enable();
 
-	for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
-		k_event_init(&ms->ev, event_handler);
-		k_signal_init(&ms->sig);
-		k_thread_create(&ms->thread, thread, ms->stack, sizeof(ms->stack), K_COOPERATIVE,
-						ms, '0' + (ms - threads));
-		k_thread_start(&ms->thread);
-	}
+    for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
+        k_event_init(&ms->ev, event_handler);
+        k_signal_init(&ms->sig);
+        k_thread_create(&ms->thread, thread, ms->stack, sizeof(ms->stack), K_COOPERATIVE,
+                        ms, '0' + (ms - threads));
+        k_thread_start(&ms->thread);
+    }
 
-	/* act as IDLE thread */
-	for (;;) {
-		K_SCHED_LOCK_CONTEXT
-		{
-			for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
-				k_print_stack_canaries(&ms->thread);
-			}
-		}
+    /* act as IDLE thread */
+    for (;;) {
+        K_SCHED_LOCK_CONTEXT
+        {
+            for (ms = threads; ms < threads + ARRAY_SIZE(threads); ms++) {
+                k_print_stack_canaries(&ms->thread);
+            }
+        }
 
-		if (counter++ % 6 == 0) {
-			const uint32_t now = k_uptime_get_ms32();
+        if (counter++ % 6 == 0) {
+            const uint32_t now = k_uptime_get_ms32();
 
-			K_SCHED_LOCK_CONTEXT
-			{
-				printf_P(PSTR("Uptime : %lu (ms)\n"), now);
-			}
+            K_SCHED_LOCK_CONTEXT
+            {
+                printf_P(PSTR("Uptime : %lu (ms)\n"), now);
+            }
 
-			const uint8_t key = irq_lock();
-			_delay_ms(2000);
-			irq_unlock(key);
-		}
+            const uint8_t key = irq_lock();
+            _delay_ms(2000);
+            irq_unlock(key);
+        }
 
-		k_wait(K_SECONDS(10), K_WAIT_MODE_IDLE);
-	}
+        k_wait(K_SECONDS(10), K_WAIT_MODE_IDLE);
+    }
 }
 
 static unsigned int random(void)
 {
-	static K_PRNG_DEFINE_DEFAULT(prng);
+    static K_PRNG_DEFINE_DEFAULT(prng);
 
-	/* protect with mutex or K_SCHED_LOCK_CONTEXT if threads are preemptive
-	 */
-	return k_prng_get(&prng);
+    /* protect with mutex or K_SCHED_LOCK_CONTEXT if threads are preemptive
+     */
+    return k_prng_get(&prng);
 }
 
 static void event_handler(struct k_event *ev)
 {
-	struct mystruct *ms = CONTAINER_OF(ev, struct mystruct, ev);
+    struct mystruct *ms = CONTAINER_OF(ev, struct mystruct, ev);
 
-	k_signal_raise(&ms->sig, 0);
+    k_signal_raise(&ms->sig, 0);
 }
 
 static void thread(void *p)
 {
-	uint16_t rdm_ms;
-	uint32_t counter	= 0;
-	struct mystruct *ms = (struct mystruct *)p;
+    uint16_t rdm_ms;
+    uint32_t counter    = 0;
+    struct mystruct *ms = (struct mystruct *)p;
 
-	/* protect with K_SCHED_LOCK_CONTEXT if threads are preemptive */
-	printf_P(PSTR("Thread %c started\n"), k_thread_get_current()->symbol);
+    /* protect with K_SCHED_LOCK_CONTEXT if threads are preemptive */
+    printf_P(PSTR("Thread %c started\n"), k_thread_get_current()->symbol);
 
-	for (;;) {
-		rdm_ms = random() % MAX_DELAY_MS;
-		k_event_schedule(&ms->ev,
-						 K_MSEC(MAX(rdm_ms, 1))); /* make sure timeout is not 0 */
+    for (;;) {
+        rdm_ms = random() % MAX_DELAY_MS;
+        k_event_schedule(&ms->ev,
+                         K_MSEC(MAX(rdm_ms, 1))); /* make sure timeout is not 0 */
 
-		if (k_poll_signal(&ms->sig, K_FOREVER) == 0) {
-			K_SIGNAL_SET_UNREADY(&ms->sig);
+        if (k_poll_signal(&ms->sig, K_FOREVER) == 0) {
+            K_SIGNAL_SET_UNREADY(&ms->sig);
 
-			/* protect with K_SCHED_LOCK_CONTEXT if threads are
-			 * preemptive */
-			printf_P(PSTR("%c : signaled after %u ms [counter = "
-						  "%lu]\n"),
-					 k_thread_get_current()->symbol, rdm_ms, ++counter);
-		} else {
-			__ASSERT_TRUE(false);
-		}
-	}
+            /* protect with K_SCHED_LOCK_CONTEXT if threads are
+             * preemptive */
+            printf_P(PSTR("%c : signaled after %u ms [counter = "
+                          "%lu]\n"),
+                     k_thread_get_current()->symbol, rdm_ms, ++counter);
+        } else {
+            __ASSERT_TRUE(false);
+        }
+    }
 }

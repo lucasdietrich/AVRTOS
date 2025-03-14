@@ -1,4 +1,4 @@
-project(sample_alloc_global)
+project(sample_alloc_bump)
 add_executable(${PROJECT_NAME} main.c)
 
 # AVRTOS Configuration

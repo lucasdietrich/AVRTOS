@@ -11,10 +11,10 @@
 
 int main(void)
 {
-	led_init();
+    led_init();
 
-	for (;;) {
-		led_toggle();
-		k_sleep(K_MSEC(PERIOD_MS));
-	}
+    for (;;) {
+        led_toggle();
+        k_sleep(K_MSEC(PERIOD_MS));
+    }
 }

@@ -32,13 +32,13 @@
  * buffer's wrap-around behavior.
  */
 struct k_ring {
-	uint8_t *buffer; /**< Pointer to the buffer array used by the ring buffer */
+    uint8_t *buffer; /**< Pointer to the buffer array used by the ring buffer */
 
-	uint8_t r; /**< Read cursor, indicating the position of the next byte to read */
+    uint8_t r; /**< Read cursor, indicating the position of the next byte to read */
 
-	uint8_t w; /**< Write cursor, indicating the position of the next byte to write */
+    uint8_t w; /**< Write cursor, indicating the position of the next byte to write */
 
-	uint8_t size; /**< Size of the buffer (total number of elements it can hold) */
+    uint8_t size; /**< Size of the buffer (total number of elements it can hold) */
 };
 
 /**
@@ -50,9 +50,9 @@ struct k_ring {
  * @param _size Size of the buffer array.
  */
 #define Z_RING_INIT(_buf, _size)                                                         \
-	{                                                                                    \
-		.buffer = _buf, .r = 0u, .w = 0u, .size = _size,                                 \
-	}
+    {                                                                                    \
+        .buffer = _buf, .r = 0u, .w = 0u, .size = _size,                                 \
+    }
 
 /**
  * @brief Macro to define and initialize a ring buffer.
@@ -64,8 +64,8 @@ struct k_ring {
  * @param _size Size of the buffer array.
  */
 #define K_RING_DEFINE(_name, _size)                                                      \
-	uint8_t _name##_buf[_size];                                                          \
-	struct k_ring _name = Z_RING_INIT(_name##_buf, _size)
+    uint8_t _name##_buf[_size];                                                          \
+    struct k_ring _name = Z_RING_INIT(_name##_buf, _size)
 
 /**
  * @brief Initialize a ring buffer with a given buffer and size.

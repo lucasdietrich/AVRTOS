@@ -54,7 +54,7 @@ __kernel uint32_t k_ticks_get_32(void);
  */
 __always_inline uint32_t k_ticks_get(void)
 {
-	return k_ticks_get_32();
+    return k_ticks_get_32();
 }
 
 /**
@@ -118,8 +118,8 @@ void k_show_ticks(void);
  * @brief Structure to represent time in seconds and milliseconds.
  */
 struct timespec {
-	uint32_t tv_sec;  /**< Seconds component of the time. */
-	uint16_t tv_msec; /**< Milliseconds component of the time. */
+    uint32_t tv_sec;  /**< Seconds component of the time. */
+    uint16_t tv_msec; /**< Milliseconds component of the time. */
 };
 
 /**

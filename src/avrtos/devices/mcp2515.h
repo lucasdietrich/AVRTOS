@@ -39,49 +39,49 @@ extern "C" {
  * @brief Enum representing possible CAN bus speeds for the MCP2515.
  */
 typedef enum mcp2515_can_speed {
-	MCP2515_CAN_SPEED_10KBPS  = 0u, /**< 10 kbps */
-	MCP2515_CAN_SPEED_20KBPS  = 1u, /**< 20 kbps */
-	MCP2515_CAN_SPEED_50KBPS  = 2u, /**< 50 kbps */
-	MCP2515_CAN_SPEED_100KBPS = 3u, /**< 100 kbps */
-	MCP2515_CAN_SPEED_125KBPS = 4u, /**< 125 kbps */
-	MCP2515_CAN_SPEED_250KBPS = 5u, /**< 250 kbps */
-	MCP2515_CAN_SPEED_500KBPS = 6u, /**< 500 kbps */
-	MCP2515_CAN_SPEED_1MBPS	  = 7u	/**< 1 Mbps */
+    MCP2515_CAN_SPEED_10KBPS  = 0u, /**< 10 kbps */
+    MCP2515_CAN_SPEED_20KBPS  = 1u, /**< 20 kbps */
+    MCP2515_CAN_SPEED_50KBPS  = 2u, /**< 50 kbps */
+    MCP2515_CAN_SPEED_100KBPS = 3u, /**< 100 kbps */
+    MCP2515_CAN_SPEED_125KBPS = 4u, /**< 125 kbps */
+    MCP2515_CAN_SPEED_250KBPS = 5u, /**< 250 kbps */
+    MCP2515_CAN_SPEED_500KBPS = 6u, /**< 500 kbps */
+    MCP2515_CAN_SPEED_1MBPS   = 7u  /**< 1 Mbps */
 } mcp2515_can_speed_t;
 
 /**
  * @brief Enum representing various flags for the MCP2515 configuration.
  */
 typedef enum mcp2515_flags {
-	MCP2515_INT_RX			  = BIT(0u), /**< Enable interrupt on full RX buffer */
-	MCP2515_INT_TX			  = BIT(1u), /**< Enable interrupt on empty TX buffer */
-	MCP2515_DEBUG_NO_ROLLOVER = BIT(2u), /**< Disable rollover for debugging purposes */
-	MCP2515_DEBUG_RX_ANY	  = BIT(3u)	 /**< Disable filtering for debugging purposes */
+    MCP2515_INT_RX            = BIT(0u), /**< Enable interrupt on full RX buffer */
+    MCP2515_INT_TX            = BIT(1u), /**< Enable interrupt on empty TX buffer */
+    MCP2515_DEBUG_NO_ROLLOVER = BIT(2u), /**< Disable rollover for debugging purposes */
+    MCP2515_DEBUG_RX_ANY      = BIT(3u)  /**< Disable filtering for debugging purposes */
 } mcp2515_flags_t;
 
 /**
  * @brief Enum representing possible clock speeds for the MCP2515.
  */
 typedef enum mcp2515_clock_set {
-	MCP2515_CLOCK_SET_8MHZ	= 0u, /**< 8 MHz clock */
-	MCP2515_CLOCK_SET_16MHZ = 1u  /**< 16 MHz clock */
+    MCP2515_CLOCK_SET_8MHZ  = 0u, /**< 8 MHz clock */
+    MCP2515_CLOCK_SET_16MHZ = 1u  /**< 16 MHz clock */
 } mcp2515_clock_set_t;
 
 /**
  * @brief Configuration structure for the MCP2515 device.
  */
 struct mcp2515_config {
-	mcp2515_can_speed_t can_speed : 3u;	  /**< CAN bus speed */
-	mcp2515_clock_set_t clock_speed : 1u; /**< MCP2515 clock speed */
-	uint8_t flags : 4u;					  /**< Flags for interrupt and debug options */
+    mcp2515_can_speed_t can_speed : 3u;   /**< CAN bus speed */
+    mcp2515_clock_set_t clock_speed : 1u; /**< MCP2515 clock speed */
+    uint8_t flags : 4u;                   /**< Flags for interrupt and debug options */
 };
 
 /**
  * @brief MCP2515 device structure.
  */
 struct mcp2515_device {
-	struct spi_slave slave;			 /**< SPI slave structure */
-	struct k_mutex Z_PRIVATE(mutex); /**< Mutex for thread-safe access */
+    struct spi_slave slave;          /**< SPI slave structure */
+    struct k_mutex Z_PRIVATE(mutex); /**< Mutex for thread-safe access */
 };
 
 /**
@@ -95,8 +95,8 @@ struct mcp2515_device {
  * @return int8_t 0 on success, negative value on error.
  */
 int8_t mcp2515_init(struct mcp2515_device *mcp,
-					const struct mcp2515_config *config,
-					struct spi_slave *spi_slave);
+                    const struct mcp2515_config *config,
+                    struct spi_slave *spi_slave);
 
 /**
  * @brief Deinitialize the MCP2515 device.
@@ -142,9 +142,9 @@ int8_t mcp2515_recv(struct mcp2515_device *mcp, struct can_frame *frame);
  * @return int8_t 0 on success, negative value on error.
  */
 int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
-						  uint8_t index,
-						  uint8_t is_ext,
-						  uint32_t filter);
+                          uint8_t index,
+                          uint8_t is_ext,
+                          uint32_t filter);
 
 /**
  * @brief Set a mask for the MCP2515 CAN controller.
@@ -158,9 +158,9 @@ int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
  * @return int8_t 0 on success, negative value on error.
  */
 int8_t mcp2515_set_mask(struct mcp2515_device *mcp,
-						uint8_t index,
-						uint8_t is_ext,
-						uint32_t mask);
+                        uint8_t index,
+                        uint8_t is_ext,
+                        uint32_t mask);
 
 #ifdef __cplusplus
 }

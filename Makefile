@@ -114,7 +114,7 @@ arduino_lint:
 	arduino-lint --compliance strict --library-manager update
 	
 metrics:
-	scripts/metrics-build-examples-default.sh
+	bash ./scripts/metrics-build-examples-default.sh
 
 # Prepare for release
 publish: piogen arduino_gen format clean multiple metrics arduino_lint

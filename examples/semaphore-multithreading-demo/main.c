@@ -34,43 +34,43 @@ K_THREAD_DEFINE(waiter5, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'E');
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	sei();
+    sei();
 
-	while (1) {
-		k_sleep(K_MSEC(PERIOD_SEM_GIVE));
+    while (1) {
+        k_sleep(K_MSEC(PERIOD_SEM_GIVE));
 
-		k_sched_lock();
+        k_sched_lock();
 #if !CONFIG_KERNEL_SCHEDULER_DEBUG
-		serial_print_p(PSTR("M: giving a semaphore "));
+        serial_print_p(PSTR("M: giving a semaphore "));
 #endif
-		// z_sem_debug(&mysem);
-		k_sched_unlock();
+        // z_sem_debug(&mysem);
+        k_sched_unlock();
 
-		k_sem_give(&mysem);
-	}
+        k_sem_give(&mysem);
+    }
 }
 
 void waiter_entry(void *context)
 {
-	while (1) {
-		uint8_t dbg_sem = k_sem_take(&mysem, K_FOREVER);
+    while (1) {
+        uint8_t dbg_sem = k_sem_take(&mysem, K_FOREVER);
 
-		if (dbg_sem == 0) {
-			k_sched_lock();
+        if (dbg_sem == 0) {
+            k_sched_lock();
 #if !CONFIG_KERNEL_SCHEDULER_DEBUG
-			serial_transmit(k_thread_get_current()->symbol);
-			serial_printl_p(PSTR(": got a semaphore !"));
+            serial_transmit(k_thread_get_current()->symbol);
+            serial_printl_p(PSTR(": got a semaphore !"));
 #endif
-			k_sched_unlock();
+            k_sched_unlock();
 
-			k_sleep(K_MSEC(PERIOD_SEM_TAKE));
-		} else {
-			serial_printl_p(PSTR("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM"));
-		}
-	}
+            k_sleep(K_MSEC(PERIOD_SEM_TAKE));
+        } else {
+            serial_printl_p(PSTR("DIDN'T TOOK A SEMAPHORE, KERNEL PROBLEM"));
+        }
+    }
 }

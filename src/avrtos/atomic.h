@@ -25,13 +25,13 @@
 extern "C" {
 #endif
 
-#define K_ATOMIC_INIT(val)		   ((atomic_t)(val))
+#define K_ATOMIC_INIT(val)         ((atomic_t)(val))
 #define K_ATOMIC_DEFINE(name, val) atomic_t name = K_ATOMIC_INIT(val)
 
 #define ATOMIC_SIZE_BITS (sizeof(atomic_val_t) * 8)
 
 /* Macros for bit and byte calculations */
-#define ATOMIC_BIT(bit)		   (1 << (bit))
+#define ATOMIC_BIT(bit)        (1 << (bit))
 #define ATOMIC_BYTE(addr, bit) ((addr) + ((bit) / ATOMIC_SIZE_BITS))
 
 typedef uint8_t atomic_val_t;
