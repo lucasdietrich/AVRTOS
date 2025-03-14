@@ -40,47 +40,47 @@ K_THREAD_DEFINE(task2, thread_processing, 0x100, K_COOPERATIVE, NULL, 'B');
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
-	serial_printl_p(PSTR(" Send a char over the UART to switch thread !"));
+    serial_printl_p(PSTR(" Send a char over the UART to switch thread !"));
 #endif
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void thread_led_toggle(void *p)
 {
-	while (1) {
-		led_on();
+    while (1) {
+        led_on();
 
-		k_sleep(K_MSEC(1000));
-		// if CONFIG_KERNEL_DEBUG_PREEMPT_UART is enabled and
-		// DCONFIG_KERNEL_TIME_SLICE_US=250000 :
-		// - on every 4 chars sent on the UART, the led is toggled
+        k_sleep(K_MSEC(1000));
+        // if CONFIG_KERNEL_DEBUG_PREEMPT_UART is enabled and
+        // DCONFIG_KERNEL_TIME_SLICE_US=250000 :
+        // - on every 4 chars sent on the UART, the led is toggled
 
-		led_off();
+        led_off();
 
-		k_sleep(K_MSEC(1000));
-	}
+        k_sleep(K_MSEC(1000));
+    }
 }
 
 void thread_processing(void *p)
 {
-	uint32_t counter = 0;
-	while (1) {
-		counter++;
+    uint32_t counter = 0;
+    while (1) {
+        counter++;
 
-		if ((counter & 0xFFFFF) == 0) {
-			k_sched_lock();
-			serial_transmit(k_thread_get_current()->symbol);
-			serial_print_p(PSTR(": "));
-			serial_hex16(counter >> 16);
-			serial_print_p(PSTR("0000\n"));
-			k_sched_unlock();
-		}
-	}
+        if ((counter & 0xFFFFF) == 0) {
+            k_sched_lock();
+            serial_transmit(k_thread_get_current()->symbol);
+            serial_print_p(PSTR(": "));
+            serial_hex16(counter >> 16);
+            serial_print_p(PSTR("0000\n"));
+            k_sched_unlock();
+        }
+    }
 }

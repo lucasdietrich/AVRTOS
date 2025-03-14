@@ -50,20 +50,20 @@ extern "C" {
  * @brief Bump allocator structure
  */
 struct bump_allocator {
-	/**
-	 * @brief Pointer to memory buffer
-	 */
-	uint8_t *buf;
+    /**
+     * @brief Pointer to memory buffer
+     */
+    uint8_t *buf;
 
-	/**
-	 * @brief Size of memory buffer
-	 */
-	size_t size;
+    /**
+     * @brief Size of memory buffer
+     */
+    size_t size;
 
-	/**
-	 * @brief Next free memory location
-	 */
-	uint8_t *next;
+    /**
+     * @brief Next free memory location
+     */
+    uint8_t *next;
 };
 
 /**
@@ -73,8 +73,8 @@ struct bump_allocator {
  * @param size Size of memory buffer
  */
 #define BUMP_ALLOC_DEFINE(name, size)                                                    \
-	uint8_t name##_buf[size];                                                            \
-	struct bump_allocator name = BUMP_ALLOC_INIT(name##_buf, size)
+    uint8_t name##_buf[size];                                                            \
+    struct bump_allocator name = BUMP_ALLOC_INIT(name##_buf, size)
 
 /**
  * @brief Initialize bump allocator at compile time
@@ -83,9 +83,9 @@ struct bump_allocator {
  * @param _size Size of memory buffer
  */
 #define BUMP_ALLOC_INIT(_buf, _size)                                                     \
-	{                                                                                    \
-		.buf = _buf, .size = _size, .next = _buf,                                        \
-	}
+    {                                                                                    \
+        .buf = _buf, .size = _size, .next = _buf,                                        \
+    }
 
 /**
  * @brief Initialize bump allocator at runtime

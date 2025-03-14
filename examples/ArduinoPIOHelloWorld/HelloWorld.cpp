@@ -13,11 +13,11 @@ static uint16_t counter = 0;
 
 void setup(void)
 {
-	printf("Hello, World!\n");
+    printf("Hello, World!\n");
 }
 
 void loop(void)
 {
-	printf("Counter: %u\n", counter++);
-	k_sleep(K_MSEC(1000));
+    printf("Counter: %u\n", counter++);
+    k_sleep(K_MSEC(1000));
 }

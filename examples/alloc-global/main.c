@@ -11,34 +11,34 @@
 
 int main(void)
 {
-	void *ptr;
-	uint16_t total		= 0u;
-	uint16_t alloc_size = INIT_ALLOC_SIZE;
+    void *ptr;
+    uint16_t total      = 0u;
+    uint16_t alloc_size = INIT_ALLOC_SIZE;
 
-	size_t atotal, used, free;
+    size_t atotal, used, free;
 
-	for (;;) {
+    for (;;) {
 
-		k_global_allocator_stats_get(&atotal, &used, &free);
-		printf("[ total: %u used: %0.3u free: %0.3u ]\t", atotal, used, free);
+        k_global_allocator_stats_get(&atotal, &used, &free);
+        printf("[ total: %u used: %0.3u free: %0.3u ]\t", atotal, used, free);
 
-		ptr = k_malloc(alloc_size);
-		printf("k_malloc(%u): %p\n", alloc_size, ptr);
+        ptr = k_malloc(alloc_size);
+        printf("k_malloc(%u): %p\n", alloc_size, ptr);
 
-		if (ptr) {
-			total += alloc_size;
-		} else if (alloc_size) {
-			alloc_size >>= 1;
-		} else {
-			break;
-		}
-	}
+        if (ptr) {
+            total += alloc_size;
+        } else if (alloc_size) {
+            alloc_size >>= 1;
+        } else {
+            break;
+        }
+    }
 
-	printf("Total allocates: %u\n", total);
+    printf("Total allocates: %u\n", total);
 
-	z_global_allocator_reset();
-	k_global_allocator_stats_get(&atotal, &used, &free);
-	printf("[ total: %u used: %0.3u free: %0.3u ]\tCleared\n", atotal, used, free);
+    z_global_allocator_reset();
+    k_global_allocator_stats_get(&atotal, &used, &free);
+    printf("[ total: %u used: %0.3u free: %0.3u ]\tCleared\n", atotal, used, free);
 
-	return 0;
+    return 0;
 }

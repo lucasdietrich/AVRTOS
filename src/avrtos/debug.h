@@ -27,27 +27,27 @@ extern "C" {
 //
 
 #define __Z_DBG_HELPER_TH(thread, chr)                                                   \
-	serial_transmit(chr);                                                                \
-	serial_transmit(thread->symbol)
+    serial_transmit(chr);                                                                \
+    serial_transmit(thread->symbol)
 
 #define __Z_DBG_HELPER_TH_R(thread, chr)                                                 \
-	serial_transmit(thread->symbol);                                                     \
-	serial_transmit(chr)
+    serial_transmit(thread->symbol);                                                     \
+    serial_transmit(chr)
 
 #if CONFIG_KERNEL_SCHEDULER_DEBUG
 
-#define __Z_DBG_SCHED_LOCK(thread)		__Z_DBG_HELPER_TH(thread, '[')
-#define __Z_DBG_SCHED_UNLOCK()			serial_transmit(']')
-#define __Z_DBG_SCHED_EVENT(thread)		__Z_DBG_HELPER_TH(thread, '!')
+#define __Z_DBG_SCHED_LOCK(thread)      __Z_DBG_HELPER_TH(thread, '[')
+#define __Z_DBG_SCHED_UNLOCK()          serial_transmit(']')
+#define __Z_DBG_SCHED_EVENT(thread)     __Z_DBG_HELPER_TH(thread, '!')
 #define __Z_DBG_SCHED_SUSPENDED(thread) serial_transmit('~')
-#define __Z_DBG_SCHED_NEXT_THREAD()		serial_transmit('>')
-#define __Z_DBG_SCHED_SKIP_IDLE()		serial_print_p(PSTR("p"))
-#define __Z_DBG_SCHED_NEXT(thread)		serial_transmit(thread->symbol)
-#define __Z_DBG_WAKEUP(thread)			__Z_DBG_HELPER_TH(thread, '@')
+#define __Z_DBG_SCHED_NEXT_THREAD()     serial_transmit('>')
+#define __Z_DBG_SCHED_SKIP_IDLE()       serial_print_p(PSTR("p"))
+#define __Z_DBG_SCHED_NEXT(thread)      serial_transmit(thread->symbol)
+#define __Z_DBG_WAKEUP(thread)          __Z_DBG_HELPER_TH(thread, '@')
 
 #define __Z_DBG_MUTEX_LOCKED(thread)   __Z_DBG_HELPER_TH(thread, '}')
 #define __Z_DBG_MUTEX_UNLOCKED(thread) __Z_DBG_HELPER_TH_R(thread, '{')
-#define __Z_DBG_MUTEX_WAIT(thread)	   __Z_DBG_HELPER_TH(thread, '#')
+#define __Z_DBG_MUTEX_WAIT(thread)     __Z_DBG_HELPER_TH(thread, '#')
 
 #define __Z_DBG_SEM_TAKE(thread) __Z_DBG_HELPER_TH(thread, ')')
 #define __Z_DBG_SEM_GIVE(thread) __Z_DBG_HELPER_TH_R(thread, '(')
@@ -131,9 +131,9 @@ extern "C" {
 #if CONFIG_KERNEL_DEBUG_GPIO > 0
 #include "drivers/gpio.h"
 #define __Z_DBG_GPIO_INIT(_port, _pin)                                                   \
-	gpiol_pin_init(_port, _pin, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_HIGH)
-#define __Z_DBG_GPIO_SET(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 1u)
-#define __Z_DBG_GPIO_CLEAR(_port, _pin)	 gpiol_pin_write_state(_port, _pin, 0u)
+    gpiol_pin_init(_port, _pin, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_HIGH)
+#define __Z_DBG_GPIO_SET(_port, _pin)    gpiol_pin_write_state(_port, _pin, 1u)
+#define __Z_DBG_GPIO_CLEAR(_port, _pin)  gpiol_pin_write_state(_port, _pin, 0u)
 #define __Z_DBG_GPIO_TOGGLE(_port, _pin) gpiol_pin_toggle(_port, _pin)
 #else
 #define __Z_DBG_GPIO_INIT(_port, _pin)
@@ -170,7 +170,7 @@ extern "C" {
 #define __Z_DBG_SYSTICK_EXIT()
 #elif CONFIG_KERNEL_DEBUG_GPIO_SYSTICK == 2
 #define __Z_DBG_SYSTICK_ENTER() __Z_DBG_GPIO_3_SET()
-#define __Z_DBG_SYSTICK_EXIT()	__Z_DBG_GPIO_3_CLEAR()
+#define __Z_DBG_SYSTICK_EXIT()  __Z_DBG_GPIO_3_CLEAR()
 #else
 #error "Invalid CONFIG_KERNEL_DEBUG_GPIO_SYSTICK value"
 #endif
@@ -295,15 +295,15 @@ void z_set_stack_pointer(struct k_thread *thread);
 uint8_t z_read_sreg(void);
 
 #define Z_LOG_SREG()                                                                     \
-	serial_u8(SREG);                                                                     \
-	serial_transmit(';');
+    serial_u8(SREG);                                                                     \
+    serial_transmit(';');
 #define Z_LOG_SREG2()                                                                    \
-	serial_u8(z_read_sreg());                                                            \
-	serial_transmit(';');
+    serial_u8(z_read_sreg());                                                            \
+    serial_transmit(';');
 #define Z_LOG_SREG_I()                                                                   \
-	serial_transmit('[');                                                                \
-	serial_u8(SREG >> 7);                                                                \
-	serial_transmit(']');
+    serial_transmit('[');                                                                \
+    serial_u8(SREG >> 7);                                                                \
+    serial_transmit(']');
 
 void z_thread_symbol_runqueue(struct dnode *item);
 

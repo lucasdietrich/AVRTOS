@@ -13,11 +13,11 @@
 
 #include "kernel.h"
 
-#define LOG_LEVEL_NONE	  0u
-#define LOG_LEVEL_ERROR	  1u
+#define LOG_LEVEL_NONE    0u
+#define LOG_LEVEL_ERROR   1u
 #define LOG_LEVEL_WARNING 2u
-#define LOG_LEVEL_INFO	  3u
-#define LOG_LEVEL_DEBUG	  4u
+#define LOG_LEVEL_INFO    3u
+#define LOG_LEVEL_DEBUG   4u
 
 #define LOG_LEVEL_ERR LOG_LEVEL_ERROR
 #define LOG_LEVEL_WRN LOG_LEVEL_WARNING
@@ -27,22 +27,22 @@
 #if CONFIG_LOGGING_SUBSYSTEM
 
 #define _LOG(level, fmt, ...)                                                            \
-	do {                                                                                 \
-		if ((level) <= (LOG_LEVEL)) {                                                    \
-			printf_P((const char *)PSTR(fmt), ##__VA_ARGS__);                            \
-		}                                                                                \
-	} while (0)
+    do {                                                                                 \
+        if ((level) <= (LOG_LEVEL)) {                                                    \
+            printf_P((const char *)PSTR(fmt), ##__VA_ARGS__);                            \
+        }                                                                                \
+    } while (0)
 
 /* line continuation */
 #define _LOG_HEXDUMP(level, data, len)                                                   \
-	do {                                                                                 \
-		if ((level) <= (LOG_LEVEL)) {                                                    \
-			for (unsigned int i = 0; i < (len); i++) {                                   \
-				printf_P(PSTR("%02x "), ((uint8_t *)data)[i]);                           \
-			}                                                                            \
-			printf_P(PSTR("\n"));                                                        \
-		}                                                                                \
-	} while (0)
+    do {                                                                                 \
+        if ((level) <= (LOG_LEVEL)) {                                                    \
+            for (unsigned int i = 0; i < (len); i++) {                                   \
+                printf_P(PSTR("%02x "), ((uint8_t *)data)[i]);                           \
+            }                                                                            \
+            printf_P(PSTR("\n"));                                                        \
+        }                                                                                \
+    } while (0)
 
 #else
 

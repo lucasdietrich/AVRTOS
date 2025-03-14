@@ -29,38 +29,38 @@ extern "C" {
  */
 
 struct dnode {
-	union {
-		struct dnode *next;
-		struct dnode *head;
-	};
-	union {
-		struct dnode *prev;
-		struct dnode *tail;
-	};
+    union {
+        struct dnode *next;
+        struct dnode *head;
+    };
+    union {
+        struct dnode *prev;
+        struct dnode *tail;
+    };
 };
 
 typedef struct dnode ditem_t;
 typedef struct dnode dlist_t;
 
 #define DITEM_INIT(self)                                                                 \
-	{                                                                                    \
-		{                                                                                \
-			.next = self,                                                                \
-		},                                                                               \
-		{                                                                                \
-			.prev = self,                                                                \
-		}                                                                                \
-	}
+    {                                                                                    \
+        {                                                                                \
+            .next = self,                                                                \
+        },                                                                               \
+        {                                                                                \
+            .prev = self,                                                                \
+        }                                                                                \
+    }
 
 #define DLIST_INIT(_list)                                                                \
-	{                                                                                    \
-		{                                                                                \
-			.head = &_list,                                                              \
-		},                                                                               \
-		{                                                                                \
-			.tail = &_list,                                                              \
-		}                                                                                \
-	}
+    {                                                                                    \
+        {                                                                                \
+            .head = &_list,                                                              \
+        },                                                                               \
+        {                                                                                \
+            .tail = &_list,                                                              \
+        }                                                                                \
+    }
 
 #define DITEM_INIT_NULL() DITEM_INIT(NULL)
 
@@ -73,11 +73,11 @@ typedef struct dnode dlist_t;
 #define DITEM_PREV(_list, _node)  (_node->prev)
 
 #define DLIST_FOREACH(_list, _node)                                                      \
-	for (_node = _list->head; _node != _list; _node = _node->next)
+    for (_node = _list->head; _node != _list; _node = _node->next)
 
 #define DLIST_FOREACH_SAFE(_list, _tmp, _node)                                           \
-	for (_node = _list->head, _tmp = _list->head; _node != _list;                        \
-		 _node = _node->next, _tmp = _node)
+    for (_node = _list->head, _tmp = _list->head; _node != _list;                        \
+         _node = _node->next, _tmp = _node)
 
 /**
  * @brief Initialize a doubly linked list

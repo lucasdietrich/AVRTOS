@@ -29,7 +29,7 @@
  *       |                    |                   |
  *       v                    v                   v
  *  Outgoing Message    Stored Message       Incoming Message would
- * 	would be copied here  				     be copied here
+ *     would be copied here  				     be copied here
  *
  * Threads can block on either write or read operations depending on the availability
  * of space or messages.
@@ -54,23 +54,23 @@ extern "C" {
  * @brief Kernel Message Queue structure
  */
 struct k_msgq {
-	struct dnode waitqueue; /* Waitqueue for threads waiting for a message */
-	size_t msg_size;		/* Size of a message */
-	uint8_t max_msgs;		/* Maximum number of messages */
-	uint8_t used_msgs;		/* Number of used messages */
-	void *buf_start;		/* Pointer to the start of the buffer */
-	void *buf_end;			/* Pointer to the end of the buffer */
-	void *read_cursor;		/* Pointer to the current read position */
-	void *write_cursor;		/* Pointer to the current write position */
+    struct dnode waitqueue; /* Waitqueue for threads waiting for a message */
+    size_t msg_size;        /* Size of a message */
+    uint8_t max_msgs;       /* Maximum number of messages */
+    uint8_t used_msgs;      /* Number of used messages */
+    void *buf_start;        /* Pointer to the start of the buffer */
+    void *buf_end;          /* Pointer to the end of the buffer */
+    void *read_cursor;      /* Pointer to the current read position */
+    void *write_cursor;     /* Pointer to the current write position */
 };
 
 #define Z_MSGQ_INIT(_name, _buffer, _msg_size, _max_msgs)                                \
-	{                                                                                    \
-		.waitqueue = DLIST_INIT(_name.waitqueue), .msg_size = _msg_size,                 \
-		.max_msgs = _max_msgs, .used_msgs = 0, .buf_start = _buffer,                     \
-		.buf_end = _buffer + (_msg_size) * (_max_msgs), .read_cursor = _buffer,          \
-		.write_cursor = _buffer,                                                         \
-	}
+    {                                                                                    \
+        .waitqueue = DLIST_INIT(_name.waitqueue), .msg_size = _msg_size,                 \
+        .max_msgs = _max_msgs, .used_msgs = 0, .buf_start = _buffer,                     \
+        .buf_end = _buffer + (_msg_size) * (_max_msgs), .read_cursor = _buffer,          \
+        .write_cursor = _buffer,                                                         \
+    }
 
 /**
  * @brief Statically define and initialize a message queue.
@@ -88,8 +88,8 @@ struct k_msgq {
  * @endcode
  */
 #define K_MSGQ_DEFINE(_name, _msg_size, _max_msgs)                                       \
-	uint8_t z_msgq_buf_##_name[(_msg_size) * (_max_msgs)];                               \
-	struct k_msgq _name = Z_MSGQ_INIT(_name, z_msgq_buf_##_name, _msg_size, _max_msgs)
+    uint8_t z_msgq_buf_##_name[(_msg_size) * (_max_msgs)];                               \
+    struct k_msgq _name = Z_MSGQ_INIT(_name, z_msgq_buf_##_name, _msg_size, _max_msgs)
 
 /**
  * @brief Initialize a message queue.
@@ -115,9 +115,9 @@ struct k_msgq {
  * @endcode
  */
 __kernel int8_t k_msgq_init(struct k_msgq *msgq,
-							char *buffer,
-							size_t msg_size,
-							uint8_t max_msgs);
+                            char *buffer,
+                            size_t msg_size,
+                            uint8_t max_msgs);
 
 /**
  * @brief Try to append a message to the message queue.

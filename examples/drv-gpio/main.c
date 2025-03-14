@@ -14,12 +14,12 @@
 
 int main(void)
 {
-	irq_enable();
+    irq_enable();
 
-	gpiol_init(GPIO, 0xFF, 0x00);
+    gpiol_init(GPIO, 0xFF, 0x00);
 
-	for (;;) {
-		GPIO->PIN = BIT(PINn);
-		_delay_us(10);
-	}
+    for (;;) {
+        GPIO->PIN = BIT(PINn);
+        _delay_us(10);
+    }
 }

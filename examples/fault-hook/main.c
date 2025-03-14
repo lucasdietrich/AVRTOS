@@ -12,16 +12,16 @@
 
 void __fault_hook(void)
 {
-	serial_transmit('!');
+    serial_transmit('!');
 }
 
 int main(void)
 {
-	serial_init();
-	led_init();
-	led_on();
+    serial_init();
+    led_init();
+    led_on();
 
-	k_sleep(K_MSEC(1000));
+    k_sleep(K_MSEC(1000));
 
-	__fault(K_FAULT_ANY);
+    __fault(K_FAULT_ANY);
 }

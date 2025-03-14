@@ -15,27 +15,27 @@ Z_THREAD_DEFINE(thread1, thread1_entry, 512, K_COOPERATIVE, NULL, '1', 0);
 
 int main(void)
 {
-	serial_init();
+    serial_init();
 
-	k_mutex_lock(&mutex, K_FOREVER);
-	k_mutex_lock(&mutex, K_FOREVER);
-	k_mutex_lock(&mutex, K_FOREVER);
+    k_mutex_lock(&mutex, K_FOREVER);
+    k_mutex_lock(&mutex, K_FOREVER);
+    k_mutex_lock(&mutex, K_FOREVER);
 
-	k_thread_start(&thread1);
-	k_yield();
+    k_thread_start(&thread1);
+    k_yield();
 
-	k_mutex_unlock(&mutex);
-	k_mutex_unlock(&mutex);
-	k_mutex_unlock(&mutex);
+    k_mutex_unlock(&mutex);
+    k_mutex_unlock(&mutex);
+    k_mutex_unlock(&mutex);
 
-	for (;;) {
-		k_msleep(1000);
-	}
+    for (;;) {
+        k_msleep(1000);
+    }
 }
 
 static void thread1_entry(void *context)
 {
-	k_mutex_lock(&mutex, K_FOREVER);
+    k_mutex_lock(&mutex, K_FOREVER);
 
-	serial_print("thread1: mutex locked\n");
+    serial_print("thread1: mutex locked\n");
 }

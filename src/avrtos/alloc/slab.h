@@ -53,10 +53,10 @@ extern "C" {
  * @note Maximum block size is 65535 bytes
  */
 struct slab_allocator {
-	void *buffer;			 /**< Pointer to the memory buffer */
-	uint8_t count;			 /**< Total number of blocks in the slab */
-	uint16_t block_size;	 /**< Size of each block in bytes */
-	struct snode *free_list; /**< Pointer to the list of free blocks */
+    void *buffer;            /**< Pointer to the memory buffer */
+    uint8_t count;           /**< Total number of blocks in the slab */
+    uint16_t block_size;     /**< Size of each block in bytes */
+    struct snode *free_list; /**< Pointer to the list of free blocks */
 };
 
 /**
@@ -69,9 +69,9 @@ struct slab_allocator {
  * @return int8_t 0 on success, or an error code on failure
  */
 int8_t slab_init(struct slab_allocator *a,
-				 void *buffer,
-				 size_t block_size,
-				 uint8_t blocks_count);
+                 void *buffer,
+                 size_t block_size,
+                 uint8_t blocks_count);
 
 /**
  * @brief Allocate a slab

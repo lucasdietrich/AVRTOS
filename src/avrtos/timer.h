@@ -49,9 +49,9 @@ typedef int (*k_timer_handler_t)(struct k_timer *);
  * @brief Timer structure definition.
  */
 struct k_timer {
-	struct titem tie;		   /**< Queue item for scheduling. */
-	k_timeout_t timeout;	   /**< Timer timeout duration. */
-	k_timer_handler_t handler; /**< Function to call when timer expires. */
+    struct titem tie;          /**< Queue item for scheduling. */
+    k_timeout_t timeout;       /**< Timer timeout duration. */
+    k_timer_handler_t handler; /**< Function to call when timer expires. */
 };
 
 /**
@@ -65,10 +65,10 @@ struct k_timer {
  * @param starting_delay Initial delay before the timer starts.
  */
 #define Z_TIMER_INIT(timer_handler, timeout_ms, starting_delay)                          \
-	{                                                                                    \
-		.tie = INIT_TITEM(starting_delay), .timeout = timeout_ms,                        \
-		.handler = timer_handler,                                                        \
-	}
+    {                                                                                    \
+        .tie = INIT_TITEM(starting_delay), .timeout = timeout_ms,                        \
+        .handler = timer_handler,                                                        \
+    }
 
 /**
  * @brief Macro to define and initialize a timer.
@@ -82,8 +82,8 @@ struct k_timer {
  * @param starting_delay Initial delay before the timer starts.
  */
 #define K_TIMER_DEFINE(timer_name, handler, timeout_ms, starting_delay)                  \
-	Z_LINK_KERNEL_SECTION(.k_timers)                                                     \
-	static struct k_timer timer_name = Z_TIMER_INIT(handler, timeout_ms, starting_delay)
+    Z_LINK_KERNEL_SECTION(.k_timers)                                                     \
+    static struct k_timer timer_name = Z_TIMER_INIT(handler, timeout_ms, starting_delay)
 
 /**
  * @brief Value indicating a stopped timer.
@@ -130,9 +130,9 @@ __kernel void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay);
  * @return Status code indicating success or failure.
  */
 __kernel int8_t k_timer_init(struct k_timer *timer,
-							 k_timer_handler_t handler,
-							 k_timeout_t timeout,
-							 k_timeout_t starting_delay);
+                             k_timer_handler_t handler,
+                             k_timeout_t timeout,
+                             k_timeout_t starting_delay);
 
 /**
  * @brief Check if a timer is started.

@@ -26,12 +26,12 @@ extern "C" {
  */
 
 struct titem {
-	union {
-		k_delta_t delay_shift;
-		k_delta_t abs_delay;
-		k_delta_t timeout;
-	};
-	struct titem *next;
+    union {
+        k_delta_t delay_shift;
+        k_delta_t abs_delay;
+        k_delta_t timeout;
+    };
+    struct titem *next;
 };
 
 typedef struct titem titem_t;
@@ -39,12 +39,12 @@ typedef struct titem tqueue_t;
 
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
 #define INIT_TITEM(timeout_ms)                                                           \
-	{                                                                                    \
-		{                                                                                \
-			.timeout = timeout_ms,                                                       \
-		},                                                                               \
-			.next = NULL                                                                 \
-	}
+    {                                                                                    \
+        {                                                                                \
+            .timeout = timeout_ms,                                                       \
+        },                                                                               \
+            .next = NULL                                                                 \
+    }
 #define INIT_TITEM_DEFAULT() INIT_TITEM(0)
 
 #define DEFINE_TITEM(name) struct titem name = INIT_TITEM_DEFAULT()

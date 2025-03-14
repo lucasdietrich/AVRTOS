@@ -51,28 +51,28 @@ extern "C" {
  * @brief Kernel Signal structure
  */
 struct k_signal {
-	/**
-	 * @brief The signal value.
-	 *
-	 * This value can be set when the signal is raised and is used to pass
-	 * information to the waiting thread(s).
-	 */
-	uint8_t signal;
+    /**
+     * @brief The signal value.
+     *
+     * This value can be set when the signal is raised and is used to pass
+     * information to the waiting thread(s).
+     */
+    uint8_t signal;
 
-	/**
-	 * @brief Flags indicating the current state of the signal.
-	 *
-	 * This field indicates whether the signal is in the "signaled" state or not.
-	 */
-	uint8_t flags;
+    /**
+     * @brief Flags indicating the current state of the signal.
+     *
+     * This field indicates whether the signal is in the "signaled" state or not.
+     */
+    uint8_t flags;
 
-	/**
-	 * @brief Wait queue for threads polling on the signal.
-	 *
-	 * Threads waiting for the signal are stored in this list, with the first
-	 * thread to be woken up at the head of the queue.
-	 */
-	struct dnode waitqueue;
+    /**
+     * @brief Wait queue for threads polling on the signal.
+     *
+     * Threads waiting for the signal are stored in this list, with the first
+     * thread to be woken up at the head of the queue.
+     */
+    struct dnode waitqueue;
 };
 
 /**
@@ -84,10 +84,10 @@ struct k_signal {
  * @param sig The signal structure to be initialized.
  */
 #define Z_SIGNAL_INIT(sig)                                                               \
-	{                                                                                    \
-		.signal = 0u, .flags = K_POLL_STATE_NOT_READY,                                   \
-		.waitqueue = DLIST_INIT(sig.waitqueue)                                           \
-	}
+    {                                                                                    \
+        .signal = 0u, .flags = K_POLL_STATE_NOT_READY,                                   \
+        .waitqueue = DLIST_INIT(sig.waitqueue)                                           \
+    }
 
 /**
  * @brief Statically define and initialize a signal.
@@ -97,7 +97,7 @@ struct k_signal {
  * @param signal_name Name of the signal structure.
  */
 #define K_SIGNAL_DEFINE(signal_name)                                                     \
-	struct k_signal signal_name = Z_SIGNAL_INIT(signal_name)
+    struct k_signal signal_name = Z_SIGNAL_INIT(signal_name)
 
 /**
  * @brief Reset a signal to the "not ready" state.

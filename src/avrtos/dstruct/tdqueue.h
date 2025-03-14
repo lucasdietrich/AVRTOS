@@ -25,28 +25,28 @@ extern "C" {
  */
 
 struct tditem {
-	union {
-		k_delta_t delay_shift;
-		k_delta_t abs_delay;
-		k_delta_t timeout;
-	};
-	struct dnode node;
+    union {
+        k_delta_t delay_shift;
+        k_delta_t abs_delay;
+        k_delta_t timeout;
+    };
+    struct dnode node;
 };
 
 typedef struct tditem tditem_t;
 typedef struct tditem tdqueue_t;
 
 #define INIT_TDITEM(self, timeout_ms)                                                    \
-	{                                                                                    \
-		{                                                                                \
-			.timeout = timeout_ms,                                                       \
-		},                                                                               \
-			.node = DITEM_INIT(self.node)                                                \
-	}
+    {                                                                                    \
+        {                                                                                \
+            .timeout = timeout_ms,                                                       \
+        },                                                                               \
+            .node = DITEM_INIT(self.node)                                                \
+    }
 #define INIT_TDITEM_DEFAULT(name) INIT_TDITEM(name, 0)
 
 #define DEFINE_TDQUEUE(name) dlist_t name = DLIST_INIT(name)
-#define DEFINE_TDITEM(name)	 struct tditem name = INIT_TDITEM_DEFAULT(name)
+#define DEFINE_TDITEM(name)  struct tditem name = INIT_TDITEM_DEFAULT(name)
 
 /**
  * @brief Schedule an event by adding it to the list.

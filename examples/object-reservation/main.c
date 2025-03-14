@@ -24,35 +24,35 @@ K_MUTEX_DEFINE(mymutex);
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	k_mutex_lock(&mymutex, K_NO_WAIT);
+    k_mutex_lock(&mymutex, K_NO_WAIT);
 
-	irq_enable();
+    irq_enable();
 
-	k_sleep(K_SECONDS(1));
+    k_sleep(K_SECONDS(1));
 
-	k_mutex_unlock(&mymutex);
+    k_mutex_unlock(&mymutex);
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void waiting_thread(k_timeout_t *timeout)
 {
-	serial_transmit(k_thread_get_current()->symbol);
-	serial_printl_p(PSTR(": starting"));
+    serial_transmit(k_thread_get_current()->symbol);
+    serial_printl_p(PSTR(": starting"));
 
-	uint8_t locked = k_mutex_lock(&mymutex, *timeout);
+    uint8_t locked = k_mutex_lock(&mymutex, *timeout);
 
-	serial_transmit(k_thread_get_current()->symbol);
-	if (locked == 0) {
-		serial_printl_p(PSTR(": locked the mutex !"));
-	} else {
-		serial_printl_p(PSTR(": didn't get the mutex !"));
-	}
+    serial_transmit(k_thread_get_current()->symbol);
+    if (locked == 0) {
+        serial_printl_p(PSTR(": locked the mutex !"));
+    } else {
+        serial_printl_p(PSTR(": didn't get the mutex !"));
+    }
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }

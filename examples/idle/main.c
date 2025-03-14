@@ -24,16 +24,16 @@
 
 int main(void)
 {
-	static uint32_t counter = 0;
-	serial_init();
+    static uint32_t counter = 0;
+    serial_init();
 
-	irq_enable();
+    irq_enable();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	for (;;) {
-		printf_P(PSTR("Hello World, counter = %lx !\n"), counter++);
+    for (;;) {
+        printf_P(PSTR("Hello World, counter = %lx !\n"), counter++);
 
-		k_sleep(K_MSEC(1000));
-	}
+        k_sleep(K_MSEC(1000));
+    }
 }

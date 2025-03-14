@@ -14,7 +14,7 @@
 #include <util/delay.h>
 
 #define BLOCKS_COUNT 10
-#define BLOCK_SIZE	 0x20
+#define BLOCK_SIZE   0x20
 
 K_MSGQ_DEFINE(msgq, BLOCK_SIZE, BLOCKS_COUNT);
 
@@ -36,64 +36,64 @@ K_THREAD_DEFINE(r1, reader, 0x50, K_PREEMPTIVE, &msgq, 'R');
 
 void writer(struct k_msgq *msgq)
 {
-	int8_t ret;
-	char buf[BLOCK_SIZE];
+    int8_t ret;
+    char buf[BLOCK_SIZE];
 
-	for (;;) {
-		(*(uint16_t *)buf)++;
+    for (;;) {
+        (*(uint16_t *)buf)++;
 
-		ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
-		serial_transmit(k_thread_get_current()->symbol);
+        ret = k_msgq_put(msgq, buf, K_MSEC(WRITER_TIMEOUT));
+        serial_transmit(k_thread_get_current()->symbol);
 
-		if (ret == 0) {
-			serial_transmit(' ');
-			serial_u16(*(uint16_t *)buf);
-			serial_transmit('\n');
+        if (ret == 0) {
+            serial_transmit(' ');
+            serial_u16(*(uint16_t *)buf);
+            serial_transmit('\n');
 
-			k_sleep(K_MSEC(WRITER_DELAY));
-		} else if (ret == -ECANCELED) {
-			serial_print_p(PSTR(" canceled\n"));
-		} else {
-			serial_print_p(PSTR(" !\n"));
-		}
-	}
+            k_sleep(K_MSEC(WRITER_DELAY));
+        } else if (ret == -ECANCELED) {
+            serial_print_p(PSTR(" canceled\n"));
+        } else {
+            serial_print_p(PSTR(" !\n"));
+        }
+    }
 }
 
 void reader(struct k_msgq *msgq)
 {
-	int8_t ret;
-	char buf[BLOCK_SIZE];
+    int8_t ret;
+    char buf[BLOCK_SIZE];
 
-	for (;;) {
-		ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
-		serial_transmit(k_thread_get_current()->symbol);
-		if (ret == 0) {
+    for (;;) {
+        ret = k_msgq_get(msgq, buf, K_MSEC(READER_TIMEOUT));
+        serial_transmit(k_thread_get_current()->symbol);
+        if (ret == 0) {
 
-			serial_transmit(' ');
-			serial_u16(*(uint16_t *)buf);
-			serial_transmit('\n');
+            serial_transmit(' ');
+            serial_u16(*(uint16_t *)buf);
+            serial_transmit('\n');
 
-			k_sleep(K_MSEC(READER_DELAY));
-		} else if (ret == -ECANCELED) {
-			serial_print_p(PSTR(" canceled\n"));
-		} else {
-			serial_print_p(PSTR(" !\n"));
-		}
-	}
+            k_sleep(K_MSEC(READER_DELAY));
+        } else if (ret == -ECANCELED) {
+            serial_print_p(PSTR(" canceled\n"));
+        } else {
+            serial_print_p(PSTR(" !\n"));
+        }
+    }
 }
 
 int main(void)
 {
-	/* interrupts are disabled in this thread */
+    /* interrupts are disabled in this thread */
 
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	for (;;) {
-		k_sleep(K_MSEC(PURGE_PERIOD));
+    for (;;) {
+        k_sleep(K_MSEC(PURGE_PERIOD));
 
-		k_msgq_purge(&msgq);
-	}
+        k_msgq_purge(&msgq);
+    }
 }

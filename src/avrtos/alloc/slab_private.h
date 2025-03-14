@@ -20,10 +20,10 @@
  * @param _blocks_count Total number of blocks in the memory slab.
  */
 #define Z_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                             \
-	{                                                                                    \
-		.buffer = _buf, .count = _blocks_count, .block_size = _block_size,               \
-		.free_list = NULL                                                                \
-	}
+    {                                                                                    \
+        .buffer = _buf, .count = _blocks_count, .block_size = _block_size,               \
+        .free_list = NULL                                                                \
+    }
 
 /**
  * @brief Macro to generate a unique name for the memory slab allocator.
@@ -47,10 +47,10 @@
  * @param _section_name Name of the section to place the slab in.
  */
 #define Z_SLAB_DEFINE(_slab_name, _block_size, _blocks_count, _section_name)             \
-	uint8_t Z_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];                \
-	Z_LINK_KERNEL_SECTION(_section_name)                                                 \
-	static struct k_mem_slab _slab_name =                                                \
-		Z_SLAB_INIT(_slab_name, Z_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
+    uint8_t Z_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];                \
+    Z_LINK_KERNEL_SECTION(_section_name)                                                 \
+    static struct k_mem_slab _slab_name =                                                \
+        Z_SLAB_INIT(_slab_name, Z_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
 /**
  * @brief Finalize the initialization of a statically defined memory slab.

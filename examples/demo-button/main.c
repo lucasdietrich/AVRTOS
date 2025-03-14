@@ -14,35 +14,35 @@ K_SEM_DEFINE(button_sem, 0, 1);
 
 ISR(INT0_vect)
 {
-	struct k_thread *thread;
+    struct k_thread *thread;
 
-	led_toggle();
+    led_toggle();
 
-	thread = k_sem_give(&button_sem);
+    thread = k_sem_give(&button_sem);
 
-	k_yield_from_isr_cond(thread);
+    k_yield_from_isr_cond(thread);
 }
 
 int main(void)
 {
-	serial_init();
+    serial_init();
 
-	led_init();
-	led_off();
+    led_init();
+    led_off();
 
-	gpiol_pin_init(GPIOD, PIN0, GPIO_INPUT, PIN_NO_PULLUP);
+    gpiol_pin_init(GPIOD, PIN0, GPIO_INPUT, PIN_NO_PULLUP);
 
-	/* Configure INT0 to trigger on falling edge */
-	exti_configure(INT0, ISC_FALLING);
-	exti_clear_flag(INT0);
-	exti_enable(INT0);
+    /* Configure INT0 to trigger on falling edge */
+    exti_configure(INT0, ISC_FALLING);
+    exti_clear_flag(INT0);
+    exti_enable(INT0);
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	for (;;) {
-		k_sem_take(&button_sem, K_FOREVER);
+    for (;;) {
+        k_sem_take(&button_sem, K_FOREVER);
 
-		k_show_uptime();
-		printf_P(PSTR("Button pressed\n"));
-	}
+        k_show_uptime();
+        printf_P(PSTR("Button pressed\n"));
+    }
 }

@@ -13,23 +13,23 @@
 
 int main(void)
 {
-	serial_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	k_show_uptime();
-	printf_P(PSTR("Startup\n"));
+    k_show_uptime();
+    printf_P(PSTR("Startup\n"));
 
-	for (;;) {
-		k_show_uptime();
-		serial_transmit('\n');
+    for (;;) {
+        k_show_uptime();
+        serial_transmit('\n');
 
-		k_sleep(K_SECONDS(1u));
-		k_wait(K_SECONDS(1u), K_WAIT_MODE_IDLE);
-		k_wait(K_SECONDS(1u), K_WAIT_MODE_ACTIVE);
-		k_wait(K_SECONDS(1u), K_WAIT_MODE_BLOCK);
+        k_sleep(K_SECONDS(1u));
+        k_wait(K_SECONDS(1u), K_WAIT_MODE_IDLE);
+        k_wait(K_SECONDS(1u), K_WAIT_MODE_ACTIVE);
+        k_wait(K_SECONDS(1u), K_WAIT_MODE_BLOCK);
 
-		z_cpu_block_ms(2);
-		z_cpu_block_us(100);
-	}
+        z_cpu_block_ms(2);
+        z_cpu_block_us(100);
+    }
 }

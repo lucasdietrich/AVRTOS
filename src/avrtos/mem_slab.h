@@ -39,8 +39,8 @@ extern "C" {
  * Memory slab subsystem enables synchronization over memory slab allocator.
  */
 struct k_mem_slab {
-	struct slab_allocator allocator; /**< Slab allocator */
-	struct dnode waitqueue;			 /**< Wait queue for threads pending on a block */
+    struct slab_allocator allocator; /**< Slab allocator */
+    struct dnode waitqueue;          /**< Wait queue for threads pending on a block */
 };
 
 /**
@@ -54,10 +54,10 @@ struct k_mem_slab {
  * @param _blocks_count Total number of blocks in the memory slab.
  */
 #define Z_MEM_SLAB_INIT(_slab, _buf, _block_size, _blocks_count)                         \
-	{                                                                                    \
-		.allocator = Z_SLAB_INIT(_slab, _buf, _block_size, _blocks_count),               \
-		.waitqueue = DLIST_INIT(_slab.waitqueue)                                         \
-	}
+    {                                                                                    \
+        .allocator = Z_SLAB_INIT(_slab, _buf, _block_size, _blocks_count),               \
+        .waitqueue = DLIST_INIT(_slab.waitqueue)                                         \
+    }
 
 /**
  * @brief Macro to generate a unique name for the memory slab buffer.
@@ -79,10 +79,10 @@ struct k_mem_slab {
  * @param _blocks_count Total number of blocks in the memory slab.
  */
 #define K_MEM_SLAB_DEFINE(_slab_name, _block_size, _blocks_count)                        \
-	uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];            \
-	Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                                  \
-	static struct k_mem_slab _slab_name = Z_MEM_SLAB_INIT(                               \
-		_slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
+    uint8_t Z_MEM_SLAB_BUF_NAME(_slab_name)[(_block_size) * (_blocks_count)];            \
+    Z_LINK_KERNEL_SECTION(.k_mem_slabs)                                                  \
+    static struct k_mem_slab _slab_name = Z_MEM_SLAB_INIT(                               \
+        _slab_name, Z_MEM_SLAB_BUF_NAME(_slab_name), _block_size, _blocks_count)
 
 /**
  * @brief Initialize all statically defined memory slabs.
@@ -105,9 +105,9 @@ __kernel void z_mem_slab_init_module(void);
  * @return 0 on success, or an error code on failure.
  */
 __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
-								void *buffer,
-								size_t block_size,
-								uint8_t blocks_count);
+                                void *buffer,
+                                size_t block_size,
+                                uint8_t blocks_count);
 
 /**
  * @brief Allocate a memory block from a slab.
@@ -128,8 +128,8 @@ __kernel int8_t k_mem_slab_init(struct k_mem_slab *slab,
  *         - ECANCELED: Wait aborted.
  */
 __kernel int8_t k_mem_slab_alloc(struct k_mem_slab *slab,
-								 void **mem,
-								 k_timeout_t timeout);
+                                 void **mem,
+                                 k_timeout_t timeout);
 
 /**
  * @brief Free a memory block back to a slab.

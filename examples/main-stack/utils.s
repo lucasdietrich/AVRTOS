@@ -1,5 +1,5 @@
 .global inc
 
 inc:
-	inc r24
-	ret
+    inc r24
+    ret

@@ -1,18 +1,19 @@
 {
-	"cmake.configureSettings": {
-		"CMAKE_BUILD_TYPE": "Debug",
-		"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-		"CMAKE_GENERATOR": "Unix Makefiles",
-		"CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/avr6-atmega2560.cmake",
-	},
-	"python.defaultInterpreterPath": ".venv/bin/python",
-	"editor.tabSize": 4,
-	"editor.rulers": [
-		80
-	],
-	"files.associations": {
-		"*.jinja": "python",
-		"*.c": "c",
-		"*.h": "c",
-	},
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_GENERATOR": "Unix Makefiles",
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/avr6-atmega2560.cmake",
+    },
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.rulers": [
+        80
+    ],
+    "files.associations": {
+        "*.jinja": "python",
+        "*.c": "c",
+        "*.h": "c",
+    },
 }

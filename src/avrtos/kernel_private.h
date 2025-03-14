@@ -31,7 +31,7 @@ extern struct z_kernel z_ker;
  */
 __always_inline void swap_endianness(void **addr)
 {
-	*addr = (void *)HTONS(*addr);
+    *addr = (void *)HTONS(*addr);
 }
 
 /**
@@ -45,7 +45,7 @@ __always_inline void swap_endianness(void **addr)
  */
 __always_inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
 {
-	thread->flags = (thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
+    thread->flags = (thread->flags & ~Z_THREAD_STATE_MSK) | (state & Z_THREAD_STATE_MSK);
 }
 
 /**
@@ -59,7 +59,7 @@ __always_inline void z_set_thread_state(struct k_thread *thread, uint8_t state)
  */
 __always_inline uint8_t z_get_thread_state(struct k_thread *thread)
 {
-	return thread->flags & Z_THREAD_STATE_MSK;
+    return thread->flags & Z_THREAD_STATE_MSK;
 }
 
 /**
@@ -146,7 +146,7 @@ __kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout);
  * @return Pointer to the thread that received the object, or NULL if no thread was woken.
  */
 __kernel struct k_thread *z_unpend_first_and_swap(struct dnode *waitqueue,
-												  void *swap_data);
+                                                  void *swap_data);
 
 /**
  * @brief Wake up the first thread waiting on an object.

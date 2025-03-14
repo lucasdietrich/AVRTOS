@@ -43,70 +43,70 @@ K_THREAD_DEFINE(task2, thread_task2, 0x200, K_PREEMPTIVE, NULL, '2');
 
 int main(void)
 {
-	led_init();
-	serial_init();
+    led_init();
+    serial_init();
 
-	k_thread_dump_all();
+    k_thread_dump_all();
 
-	k_dump_stack_canaries();
+    k_dump_stack_canaries();
 
-	k_thread_create(&dthread, dthread_entry, dthread_stack, sizeof(dthread_stack),
-					K_PREEMPTIVE, &dthread, 'D');
-	k_thread_start(&dthread);
+    k_thread_create(&dthread, dthread_entry, dthread_stack, sizeof(dthread_stack),
+                    K_PREEMPTIVE, &dthread, 'D');
+    k_thread_start(&dthread);
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void dthread_entry(void *p)
 {
-	struct k_thread *thread = (struct k_thread *)p;
+    struct k_thread *thread = (struct k_thread *)p;
 
-	(void)thread;
+    (void)thread;
 
-	k_sleep(K_FOREVER);
+    k_sleep(K_FOREVER);
 }
 
 void thread_led(void *p)
 {
-	while (1) {
-		led_on();
+    while (1) {
+        led_on();
 
-		k_sleep(K_MSEC(1000));
+        k_sleep(K_MSEC(1000));
 
-		led_off();
-	}
+        led_off();
+    }
 }
 
 void thread_task1(void *p)
 {
-	while (1) {
-		k_dump_stack_canaries();
+    while (1) {
+        k_dump_stack_canaries();
 
-		k_sleep(K_MSEC(1000));
-	}
+        k_sleep(K_MSEC(1000));
+    }
 }
 
 void thread_task2(void *p)
 {
-	uint16_t blocks = 0;
+    uint16_t blocks = 0;
 
-	while (1) {
-		blocks = (blocks + 1) % (0x200 - 30);
+    while (1) {
+        blocks = (blocks + 1) % (0x200 - 30);
 
-		if (blocks != 0) {
-			cli();
-			SP -= (blocks - 1);
-			*((uint8_t *)SP--) = 0xBB;
-			sei();
+        if (blocks != 0) {
+            cli();
+            SP -= (blocks - 1);
+            *((uint8_t *)SP--) = 0xBB;
+            sei();
 
-			// at this moment we need the most of the stack
-			k_yield();
+            // at this moment we need the most of the stack
+            k_yield();
 
-			cli();
-			SP += blocks;
-			sei();
-		}
+            cli();
+            SP += blocks;
+            sei();
+        }
 
-		k_sleep(K_MSEC(50));
-	}
+        k_sleep(K_MSEC(50));
+    }
 }

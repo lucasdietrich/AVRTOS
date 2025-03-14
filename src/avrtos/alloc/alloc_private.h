@@ -16,7 +16,7 @@ extern "C" {
 
 #define Z_ALIGN_MASK(align) (align - 1u)
 #define Z_ALIGN_PTR(ptr, align)                                                          \
-	((void *)((((uint16_t)ptr) + Z_ALIGN_MASK(align)) & ~Z_ALIGN_MASK(align)))
+    ((void *)((((uint16_t)ptr) + Z_ALIGN_MASK(align)) & ~Z_ALIGN_MASK(align)))
 
 #define Z_NO_ALIGN 1u
 #define Z_ALIGN_2  2u

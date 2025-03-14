@@ -20,56 +20,56 @@ extern "C" {
  * @brief Allocator statistics structure
  */
 struct alloc_stats {
-	/**
-	 * @brief Total allocator memory size
-	 */
-	size_t total;
+    /**
+     * @brief Total allocator memory size
+     */
+    size_t total;
 
-	/**
-	 * @brief Amount of allocated memory
-	 */
-	size_t used;
+    /**
+     * @brief Amount of allocated memory
+     */
+    size_t used;
 
-	/**
-	 * @brief Amount of free (unallocated) memory
-	 */
-	size_t free;
+    /**
+     * @brief Amount of free (unallocated) memory
+     */
+    size_t free;
 };
 
 typedef struct allocator_api {
-	/**
-	 * @brief Allocate memory
-	 *
-	 * @note The function should never be called with size 0
-	 *
-	 * @param void* Pointer to allocator
-	 * @param size Size of memory to allocate in bytes (should never be 0)
-	 * @param align Alignment of memory
-	 * @return void* Pointer to allocated memory
-	 */
-	void *(*alloc)(void *a, size_t size, uint8_t align);
+    /**
+     * @brief Allocate memory
+     *
+     * @note The function should never be called with size 0
+     *
+     * @param void* Pointer to allocator
+     * @param size Size of memory to allocate in bytes (should never be 0)
+     * @param align Alignment of memory
+     * @return void* Pointer to allocated memory
+     */
+    void *(*alloc)(void *a, size_t size, uint8_t align);
 
-	/**
-	 * @brief Free memory
-	 *
-	 * @param void* Pointer to allocator
-	 * @param ptr Pointer to memory to free
-	 */
-	int8_t (*free)(void *a, void *ptr);
+    /**
+     * @brief Free memory
+     *
+     * @param void* Pointer to allocator
+     * @param ptr Pointer to memory to free
+     */
+    int8_t (*free)(void *a, void *ptr);
 
-	/**
-	 * @param void* Pointer to allocator
-	 * @brief Reset allocator
-	 */
-	int8_t (*reset)(void *a);
+    /**
+     * @param void* Pointer to allocator
+     * @brief Reset allocator
+     */
+    int8_t (*reset)(void *a);
 
-	/**
-	 * @brief Get allocator statistics
-	 *
-	 * @param void* Pointer to allocator
-	 * @param stats Pointer to statistics structure
-	 */
-	int8_t (*stats)(void *a, struct alloc_stats *stats);
+    /**
+     * @brief Get allocator statistics
+     *
+     * @param void* Pointer to allocator
+     * @param stats Pointer to statistics structure
+     */
+    int8_t (*stats)(void *a, struct alloc_stats *stats);
 } allocator_api_t;
 
 #ifdef __cplusplus

@@ -26,14 +26,14 @@
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 8LU, TIMER_MAX_COUNTER)
 #define PRESCALER_VALUE 8
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 32LU,                    \
-							  TIMER_MAX_COUNTER) &&                                      \
-	(CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2)
+                              TIMER_MAX_COUNTER) &&                                      \
+    (CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2)
 #define PRESCALER_VALUE 32
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 64LU, TIMER_MAX_COUNTER)
 #define PRESCALER_VALUE 64
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 128LU,                   \
-							  TIMER_MAX_COUNTER) &&                                      \
-	(CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2)
+                              TIMER_MAX_COUNTER) &&                                      \
+    (CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2)
 #define PRESCALER_VALUE 128
 #elif TIMER_COUNTER_VALUE_FIT(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, 256LU, TIMER_MAX_COUNTER)
 #define PRESCALER_VALUE 256
@@ -90,28 +90,28 @@
 #error "QEMU emulator detected, only 16 bits timers are available"
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER >= 4
 #warning                                                                                 \
-	"In order to use timer 4 or 5 with QEMU <= 8.0.2, you'll need to apply patch located at \
+    "In order to use timer 4 or 5 with QEMU <= 8.0.2, you'll need to apply patch located at \
 scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch to qemu"
 #endif
 
 #define COUNTER_VALUE                                                                    \
-	TIMER_CALC_COUNTER_VALUE(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
+    TIMER_CALC_COUNTER_VALUE(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
 
 void z_init_sysclock(void)
 {
-	void *const dev = timer_get_device(CONFIG_KERNEL_SYSLOCK_HW_TIMER);
+    void *const dev = timer_get_device(CONFIG_KERNEL_SYSLOCK_HW_TIMER);
 
-	const struct timer_config cfg = {
-		.mode	   = TIMER_MODE_CTC,
-		.prescaler = PRESCALER_CONFIG,
-		.counter   = COUNTER_VALUE,
-		.timsk	   = BIT(OCIEnA),
-	};
+    const struct timer_config cfg = {
+        .mode      = TIMER_MODE_CTC,
+        .prescaler = PRESCALER_CONFIG,
+        .counter   = COUNTER_VALUE,
+        .timsk     = BIT(OCIEnA),
+    };
 
 #if TIMER_INDEX_IS_16BIT(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
-	ll_timer16_init(dev, CONFIG_KERNEL_SYSLOCK_HW_TIMER, &cfg);
+    ll_timer16_init(dev, CONFIG_KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #elif TIMER_INDEX_IS_8BIT(CONFIG_KERNEL_SYSLOCK_HW_TIMER)
-	ll_timer8_init(dev, CONFIG_KERNEL_SYSLOCK_HW_TIMER, &cfg);
+    ll_timer8_init(dev, CONFIG_KERNEL_SYSLOCK_HW_TIMER, &cfg);
 #else
 #error "invalid timer type"
 #endif

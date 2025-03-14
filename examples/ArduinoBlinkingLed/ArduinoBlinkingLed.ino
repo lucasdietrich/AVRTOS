@@ -10,13 +10,13 @@
 
 void setup(void)
 {
-	pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop(void)
 {
-	digitalWrite(LED_BUILTIN, HIGH);
-	k_sleep(K_MSEC(200u));
-	digitalWrite(LED_BUILTIN, LOW);
-	k_sleep(K_MSEC(200u));
+    digitalWrite(LED_BUILTIN, HIGH);
+    k_sleep(K_MSEC(200u));
+    digitalWrite(LED_BUILTIN, LOW);
+    k_sleep(K_MSEC(200u));
 }
