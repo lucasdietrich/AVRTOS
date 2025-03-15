@@ -20,9 +20,9 @@
 
 #include "assert.h"
 #include "defines.h"
+#include "deprecated.h"
 #include "sys.h"
 #include "types.h"
-#include "deprecated.h"
 
 #ifdef __cplusplus
 extern "C" {

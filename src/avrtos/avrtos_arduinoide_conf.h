@@ -56,8 +56,8 @@
 #endif
 
 /* Allow to use printf() which prints to serial (UART0) */
-#ifndef CONFIG_STDIO_PRINTF_TO_USART
-#define CONFIG_STDIO_PRINTF_TO_USART 0
+#ifndef CONFIG_STDIO_USART
+#define CONFIG_STDIO_USART 0
 #endif
 
 #ifndef CONFIG_THREAD_MAIN_STACK_SIZE

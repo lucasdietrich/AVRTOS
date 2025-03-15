@@ -159,6 +159,17 @@ uint8_t ll_usart_sync_getc(UART_Device *dev)
     return dev->UDRn;
 }
 
+int ll_usart_getc(UART_Device *dev)
+{
+    int ret;
+    if (dev->UCSRnA & BIT(RXCn)) {
+        ret = dev->UDRn;
+    } else {
+        ret = -1;
+    }
+    return ret;
+}
+
 int8_t usart_send(UART_Device *dev, const char *buf, size_t len)
 {
     Z_ARGS_CHECK(dev && (buf || !len)) return -EINVAL;

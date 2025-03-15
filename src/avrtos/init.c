@@ -91,9 +91,9 @@ void z_avrtos_init(void)
     SET_BIT(UCSR0B, BIT(RXCIE0)); // Enable UART receive complete interrupt
 #endif
 
-#if CONFIG_STDIO_PRINTF_TO_USART >= 0
+#if CONFIG_STDIO_USART >= 0
     /* Redirect printf output to USART0 */
-    k_set_stdio_usart0();
+    k_set_stdio_serial();
 #endif
 
     /* Initialize the thread system */

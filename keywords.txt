@@ -180,7 +180,7 @@ k_uptime_get	KEYWORD2
 
 k_verify_stack_sentinel	KEYWORD2
 k_assert_registered_stack_sentinel	KEYWORD2
-k_set_stdio_usart0	KEYWORD2
+k_set_stdio_serial	KEYWORD2
 k_is_cpu_idle	KEYWORD2
 
 k_print_stack_canaries	KEYWORD2
@@ -191,6 +191,7 @@ __assert	KEYWORD2
 
 serial_init	KEYWORD2
 serial_transmit	KEYWORD2
+serial_receive  KEYWORD2
 serial_send	KEYWORD2
 serial_print	KEYWORD2
 serial_printl	KEYWORD2

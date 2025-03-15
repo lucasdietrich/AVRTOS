@@ -605,8 +605,8 @@
 // 5: printf is redirected to USART5, if it exists.
 // 6: printf is redirected to USART6, if it exists.
 //
-#ifndef CONFIG_STDIO_PRINTF_TO_USART
-#define CONFIG_STDIO_PRINTF_TO_USART -1
+#ifndef CONFIG_STDIO_USART
+#define CONFIG_STDIO_USART 0
 #endif
 
 //

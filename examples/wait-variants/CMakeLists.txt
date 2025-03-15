@@ -6,7 +6,7 @@ if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	# AVRTOS Configuration
 	target_compile_definitions(${PROJECT_NAME} PUBLIC
 		CONFIG_KERNEL_UPTIME=1
-		CONFIG_STDIO_PRINTF_TO_USART=0
+		CONFIG_STDIO_USART=0
 	)
 
 	target_link_avrtos(${PROJECT_NAME})
