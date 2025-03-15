@@ -1,7 +1,12 @@
-use core::{ffi::c_void, mem::MaybeUninit, ptr::null_mut};
+use core::{
+    cell::UnsafeCell,
+    ffi::c_void,
+    mem::{self},
+    pin::Pin,
+};
 
 use alloc::{boxed::Box, vec::Vec};
-use avrtos_sys::{self as ll, k_thread, k_thread_start};
+use avrtos_sys::{self as ll};
 
 use crate::{print, println, THREAD_PRIO_COOP, THREAD_PRIO_PREEMPT};
 
@@ -11,20 +16,20 @@ pub struct Stats {
 }
 
 pub struct JoinHandle {
-    thread: Thread,
+    thread: Pin<Box<Thread>>,
 }
 
 impl JoinHandle {
     pub fn join(self) {}
 
-    pub fn as_raw_ptr(&mut self) -> *mut k_thread {
-        &raw mut self.thread.inner
+    pub fn get_thread_ptr(&mut self) -> *mut ll::k_thread {
+        self.thread.inner.get()
     }
 
-    pub fn print_canaries(&mut self)  {
-       unsafe {
-            ll::k_print_stack_canaries(self.as_raw_ptr());
-       }
+    pub fn print_canaries(&mut self) {
+        unsafe {
+            ll::k_print_stack_canaries(self.get_thread_ptr());
+        }
     }
 
     pub fn stats(&self) -> Stats {
@@ -40,7 +45,7 @@ pub enum Priority {
 }
 
 struct Thread {
-    inner: k_thread,
+    inner: UnsafeCell<ll::k_thread>,
 }
 
 impl Thread {
@@ -49,7 +54,7 @@ impl Thread {
         prio: Priority,
         symbol: u8,
         func: Box<dyn FnOnce()>,
-    ) -> Option<Thread> {
+    ) -> Option<Pin<Box<Thread>>> {
         let prio = match prio {
             Priority::Preemptive => THREAD_PRIO_COOP,
             Priority::Cooperative => THREAD_PRIO_PREEMPT,
@@ -62,20 +67,18 @@ impl Thread {
         let func_ptr = Box::into_raw(Box::new(func)); // TODO lifetime ??
 
         // Rust entry
-        unsafe extern "C" fn entry_wrapper(main: *mut c_void) {
-            println!("entry_wrapper main: {:?}", main);
-
-            // The heck
-            let boxed_func = Box::from_raw(main as *mut Box<dyn FnOnce()>);
-            boxed_func()
+        unsafe extern "C" fn entry_wrapper(func: *mut c_void) {
+            // The heck ??
+            let boxed_func = Box::from_raw(func as *mut Box<dyn FnOnce()>);
+            let ret = boxed_func();
         }
 
-        let thread = unsafe {
-            // Where is this allocated ?? On stack, this should be allocated elseware
-            let mut thread_storage = MaybeUninit::<ll::k_thread>::uninit();
+        unsafe {
+            let thread: Pin<Box<Thread>> = Box::pin(mem::zeroed());
+            let thread_ptr = thread.inner.get();
 
             let result = ll::k_thread_create(
-                thread_storage.as_mut_ptr(),
+                thread_ptr,
                 Some(entry_wrapper),
                 stack_ptr as *mut c_void,
                 stack_size,
@@ -87,15 +90,13 @@ impl Thread {
                 return None;
             }
 
-            let result = k_thread_start(thread_storage.as_mut_ptr());
+            let result = ll::k_thread_start(thread_ptr);
             if result != 0 {
                 return None;
             }
 
-            thread_storage.assume_init()
-        };
-
-        Some(Thread { inner: thread })
+            Some(thread)
+        }
     }
 }
 

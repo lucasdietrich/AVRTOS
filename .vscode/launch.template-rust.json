@@ -1,47 +1,12 @@
-// AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
-//
-// PlatformIO Debugging Solution
-//
-// Documentation: https://docs.platformio.org/en/latest/plus/debugging.html
-// Configuration: https://docs.platformio.org/en/latest/projectconf/sections/env/options/debug/index.html
-
 {
     "version": "0.2.0",
     "configurations": [
         {
-			"name": "avr rust QEMU - loop_invalid_asm",
+			"name": "avr rust QEMU",
 			"type": "cppdbg",
 			"request": "launch",
 			"miDebuggerServerAddress": "127.0.0.1:1234",
-			"program": "target/avr-atmega2560/debug/loop_invalid_asm.elf",
-			"args": [],
-			"stopAtEntry": true,
-			"cwd": "${workspaceFolder}",
-			"environment": [],
-			"externalConsole": false,
-			"miDebuggerPath": "avr-gdb",
-			"MIMode": "gdb"
-		},
-        {
-			"name": "avr rust QEMU - sleep_demo",
-			"type": "cppdbg",
-			"request": "launch",
-			"miDebuggerServerAddress": "127.0.0.1:1234",
-			"program": "target/avr-atmega2560/debug/sleep_demo.elf",
-			"args": [],
-			"stopAtEntry": true,
-			"cwd": "${workspaceFolder}",
-			"environment": [],
-			"externalConsole": false,
-			"miDebuggerPath": "avr-gdb",
-			"MIMode": "gdb"
-		},
-        {
-			"name": "avr rust QEMU - serial_demo",
-			"type": "cppdbg",
-			"request": "launch",
-			"miDebuggerServerAddress": "127.0.0.1:1234",
-			"program": "target/avr-atmega2560/debug/serial_demo.elf",
+			"program": "target/avr-atmega2560/debug/examples/thread.elf",
 			"args": [],
 			"stopAtEntry": true,
 			"cwd": "${workspaceFolder}",
