@@ -297,6 +297,19 @@ typedef struct {
     struct z_callsaved_ctx z_stack_buf_##name =                                          \
         Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry)
 
+#if CONFIG_KERNEL_REENTRANCY
+#define Z_THREAD_sched_lock_cnt_INITIALIZER() .sched_lock_cnt = 0u,
+#else
+#define Z_THREAD_sched_lock_cnt_INITIALIZER() /* empty */
+#endif
+
+#if CONFIG_THREAD_JOIN
+#define Z_THREAD_join_waitqueue_INITIALIZER(_name)                                       \
+    .join_waitqueue = DLIST_INIT(_name.join_waitqueue),
+#else
+#define Z_THREAD_join_waitqueue_INITIALIZER(_name) /* empty */
+#endif
+
 #define Z_THREAD_INITIALIZER(_name, stack_size, _flags, sym)                             \
     struct k_thread _name = {                                                            \
         .sp    = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),                   \
@@ -309,7 +322,9 @@ typedef struct {
                 .end  = (void *)Z_STACK_END(Z_THREAD_STACK_START(_name), stack_size),    \
                 .size = (stack_size),                                                    \
             },                                                                           \
-        .symbol = sym}
+        .symbol = sym,                                                                   \
+        Z_THREAD_sched_lock_cnt_INITIALIZER()                                            \
+            Z_THREAD_join_waitqueue_INITIALIZER(_name)}
 
 #if CONFIG_AVRTOS_LINKER_SCRIPT
 #define Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol,           \
@@ -358,7 +373,7 @@ typedef struct {
 #define Z_THREAD_WAKEUP_SCHED_MSK  (1 << Z_THREAD_WAKEUP_SCHED_POS)
 
 /* the thread is not running and is not in the runqueue,
- * it can be stopped/started with k_thread_stop/k_thread_start functions.
+ * it can be stopped/started with k_thread_abort/k_thread_start functions.
  */
 #define Z_THREAD_STATE_STOPPED (0 << Z_THREAD_STATE_POS)
 

@@ -261,6 +261,16 @@
 #endif
 
 //
+// Enable or disable support for joining threads.
+//
+// 0: Thread joining is disabled.
+// 1: Thread joining is enabled.
+//
+#ifndef CONFIG_THREAD_JOIN
+#define CONFIG_THREAD_JOIN 0
+#endif
+
+//
 // Sysclock period when precision mode is disabled ("llu" suffix is important).
 //
 // Reducing this value can cause some precision loss.
@@ -625,8 +635,8 @@
 // 5: printf is redirected to USART5, if it exists.
 // 6: printf is redirected to USART6, if it exists.
 //
-#ifndef CONFIG_STDIO_PRINTF_TO_USART
-#define CONFIG_STDIO_PRINTF_TO_USART -1
+#ifndef CONFIG_STDIO_USART
+#define CONFIG_STDIO_USART 0
 #endif
 
 //

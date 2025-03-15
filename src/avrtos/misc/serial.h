@@ -49,6 +49,13 @@ void serial_print_banner(void);
 void serial_transmit(char data);
 
 /**
+ * @brief Receive a single character over the USART
+ *
+ * @return char
+ */
+int serial_receive(void);
+
+/**
  * @brief Send the buffer of known length over the USART
  *
  * @param buffer

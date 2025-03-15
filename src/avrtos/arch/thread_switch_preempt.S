@@ -35,7 +35,7 @@
 .extern z_ker
 .extern z_scheduler			; struct k_thread *(void)
 .extern z_sched_enter		; void (void)
-.extern k_stop				; void (struct k_thread *)
+.extern k_abort				; void (struct k_thread *)
 .extern __fault				; void (uint8_t)
 
 /*
@@ -342,7 +342,7 @@ z_thread_entry:
 	/*
 	 * Graceful/permitted termination of the thread
 	 */
-    call k_stop
+    call k_abort
 #endif
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART

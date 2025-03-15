@@ -40,6 +40,11 @@ void serial_transmit(char data)
     ll_usart_sync_putc(USART_DEVICE, data);
 }
 
+int serial_receive(void)
+{
+    return ll_usart_sync_getc(USART_DEVICE);
+}
+
 void serial_send(const char *buffer, size_t len)
 {
     usart_send(USART_DEVICE, buffer, len);

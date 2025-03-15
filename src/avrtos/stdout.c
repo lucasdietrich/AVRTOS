@@ -8,7 +8,7 @@
 
 #include "misc/serial.h"
 
-#if CONFIG_STDIO_PRINTF_TO_USART == 0
+#if CONFIG_STDIO_USART == 0
 
 /**
  * @brief Custom character output function for USART.
@@ -25,27 +25,40 @@ static int uart_putchar(char c, FILE *stream)
 }
 
 /**
- * @brief File stream for USART0 output.
+ * @brief Custom character input function for USART.
  *
- * This file stream is used to direct standard output (`stdout`) to USART0.
- * It is initialized with `uart_putchar` as the output function.
+ * @param stream The stream from which the character is read (not used).
+ * @return The received character.
  */
-static FILE z_stdout_usart = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
-
-/**
- * @brief Set standard I/O to use USART0.
- *
- * This function configures the standard I/O library to use USART0 for
- * output operations. It sets `stdout` to the `z_stdout_usart` file stream
- * which directs output to USART0.
- */
-void k_set_stdio_usart0(void)
+static int uart_getchar(FILE *stream)
 {
-    stdout = &z_stdout_usart;
+    (void)stream;
+    return serial_receive();
 }
 
-#elif CONFIG_STDIO_PRINTF_TO_USART > 0
+/**
+ * @brief File stream for USART output.
+ *
+ * This file stream is used to direct standard input and output to configured serial
+ * USART.
+ */
+static FILE z_serial_file = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
-#warning "CONFIG_STDIO_PRINTF_TO_USART > 0 not supported"
+/**
+ * @brief Set standard I/O to use serial USART.
+ *
+ * This function configures the standard I/O library to use USART for
+ * output operations. It sets `stdout` to the `z_serial_file` file stream
+ * which directs output to USART.
+ */
+void k_set_stdio_serial(void)
+{
+    stdout = &z_serial_file;
+    stdin  = &z_serial_file;
+}
 
-#endif /* CONFIG_STDIO_PRINTF_TO_USART */
+#elif CONFIG_STDIO_USART > 0
+
+#warning "CONFIG_STDIO_USART > 0 not supported"
+
+#endif /* CONFIG_STDIO_USART */

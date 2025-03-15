@@ -20,6 +20,7 @@
 
 #include "assert.h"
 #include "defines.h"
+#include "deprecated.h"
 #include "sys.h"
 #include "types.h"
 
@@ -61,14 +62,29 @@ __kernel int8_t k_thread_start(struct k_thread *thread);
  * @param thread Pointer to the thread to be stopped.
  * @return int8_t Returns 0 on success, or a negative error code on failure.
  */
-__kernel int8_t k_thread_stop(struct k_thread *thread);
+__kernel int8_t k_thread_abort(struct k_thread *thread);
+
+/**
+ * @brief Wait for the specified thread to finish execution.
+ *
+ * This function waits for the specified thread to finish execution.
+ *
+ * @param thread Pointer to the thread to wait for.
+ * @param timeout The maximum time to wait for the thread to finish.
+ * @return int8_t Returns 0 on success, or a negative error code on failure.
+ *  - -EINVAL if the thread pointer is NULL.
+ *  - -ETIMEDOUT if the timeout expired before the thread finished.
+ *  - -ECANCELED if the thread was aborted.
+ *  - -EAGAIN if the thread is not finished and the timeout is K_NO_WAIT.
+ */
+__kernel int8_t k_thread_join(struct k_thread *thread, k_timeout_t timeout);
 
 /**
  * @brief Stop the execution of the current thread.
  *
  * This function stops the currently executing thread.
  */
-__kernel void k_stop(void);
+__kernel void k_abort(void);
 
 /**
  * @brief Set the priority of the specified thread.

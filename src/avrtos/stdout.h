@@ -16,15 +16,15 @@ extern "C" {
 #endif
 
 /**
- * @brief Set up the standard I/O to use USART0.
+ * @brief Set up the standard I/O to use serial USART.
  *
- * This function configures the standard I/O to communicate via USART0. This allows
- * the function `printf`, to use USART0 for input and output.
+ * This function configures the standard I/O to communicate via USART. This allows
+ * the function `printf`, to use USART for input and output.
  *
- * The configuration option `CONFIG_STDIO_PRINTF_TO_USART` automatically selects the
+ * The configuration option `CONFIG_STDIO_USART` automatically selects the
  * USART to use for standard I/O.
  */
-__kernel void k_set_stdio_usart0(void);
+__kernel void k_set_stdio_serial(void);
 
 #ifdef __cplusplus
 }

@@ -126,7 +126,7 @@ Bug Fixes:
 - Corrected bad characters in a preprocessor #error message.
 - Resolved anomalies in the implementation of k_flags_notify() consequently,
   refined the flags sample.
-- IRQ are now always enabled when exiting k_thread_stop(), this adjustment
+- IRQ are now always enabled when exiting k_thread_abort(), this adjustment
   ensures threads can be safely resumed using k_thread_start().
 - Fixed a bug in QEMU preventing to use all timers (patch submitted and attached
   here).

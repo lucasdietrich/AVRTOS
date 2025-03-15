@@ -84,7 +84,7 @@ Planned Features (TODOs):
 - make the kernel ISR aware with a dedicated ISR stack (can IDLE thread be reused?)
 - Sample for discovering the I2C bus
 - Doubly linked list implementation for tqueue for optimized removal
-- Set `CONFIG_STDIO_PRINTF_TO_USART=0` by default
+- Set `CONFIG_STDIO_USART=0` by default
 
 ### Description
 
@@ -103,7 +103,7 @@ CONFIG_KERNEL_TIME_SLICE_US=1000
 CONFIG_INTERRUPT_POLICY=1
 CONFIG_KERNEL_THREAD_TERMINATION_TYPE=-1
 CONFIG_THREAD_MAIN_COOPERATIVE=1
-CONFIG_STDIO_PRINTF_TO_USART=0
+CONFIG_STDIO_USART=0
 CONFIG_KERNEL_UPTIME=1
 ```
 
@@ -159,7 +159,7 @@ int main(void)
 
 	k_thread_dump_all();
 
-	k_stop();
+	k_abort();
 }
 
 static void thread_usart(void *arg)

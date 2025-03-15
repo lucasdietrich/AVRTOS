@@ -41,6 +41,10 @@ __STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, sched_ticks_remaining) ==
 #warning "Assertions are globally enabled"
 #endif
 
+#if CONFIG_THREAD_JOIN && (CONFIG_KERNEL_THREAD_TERMINATION_TYPE <= 0)
+#error "CONFIG_THREAD_JOIN requires CONFIG_KERNEL_THREAD_TERMINATION_TYPE to be a positive value"
+#endif
+
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1
 __noinit char z_main_stack[CONFIG_THREAD_MAIN_STACK_SIZE];
 Z_STACK_SENTINEL_REGISTER(z_main_stack);
@@ -119,10 +123,17 @@ K_THREAD struct k_thread z_thread_main = {
              */
             .size = CONFIG_THREAD_MAIN_STACK_SIZE,
         },
-    .symbol = 'M' // Default main thread symbol
+    .symbol = 'M', // Default main thread symbol
+#if CONFIG_KERNEL_REENTRANCY
+    .sched_lock_cnt = 0u,
+#endif
+#if CONFIG_THREAD_JOIN
+    .join_waitqueue = DLIST_INIT(z_thread_main.join_waitqueue),
+#endif
 };
 
 struct z_kernel z_ker = {
+    /* Only the main thread is running on startup */
     .current        = &z_thread_main,
     .ready_count    = 1u,
     .run_queue      = &z_thread_main.tie.runqueue,
@@ -723,6 +734,14 @@ int8_t k_thread_create(struct k_thread *thread,
     thread->symbol    = symbol;
     thread->swap_data = NULL;
 
+#if CONFIG_KERNEL_REENTRANCY
+    thread->sched_lock_cnt = 0u;
+#endif
+
+#if CONFIG_THREAD_JOIN
+    dlist_init(&thread->join_waitqueue);
+#endif
+
     return 0;
 }
 
@@ -743,7 +762,7 @@ int8_t k_thread_start(struct k_thread *thread)
     return ret;
 }
 
-__kernel int8_t k_thread_stop(struct k_thread *thread)
+__kernel int8_t k_thread_abort(struct k_thread *thread)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
     __ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
@@ -757,6 +776,13 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
 
     z_set_thread_state(thread, Z_THREAD_STATE_STOPPED);
 
+#if CONFIG_THREAD_JOIN
+    /* Wake up all threads waiting for this thread */
+    struct k_thread *waiter;
+    while ((waiter = z_unpend_first_thread(&thread->join_waitqueue)) != NULL) {
+    }
+#endif
+
     if (thread == z_ker.current) z_yield();
 
     /* Unlock in all cases:
@@ -769,10 +795,30 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
     return 0;
 }
 
-void k_stop()
+void k_abort()
 {
-    k_thread_stop(z_ker.current);
+    k_thread_abort(z_ker.current);
 }
+
+#if CONFIG_THREAD_JOIN
+int8_t k_thread_join(struct k_thread *thread, k_timeout_t timeout)
+{
+    int8_t ret;
+
+    Z_ARGS_CHECK(thread) return -EINVAL;
+
+    const uint8_t key = irq_lock();
+
+    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) {
+        ret = 0;
+    } else {
+        ret = z_pend_current_on(&thread->join_waitqueue, timeout);
+    }
+
+    irq_unlock(key);
+    return ret;
+}
+#endif /* CONFIG_THREAD_JOIN */
 
 void k_thread_set_priority(struct k_thread *thread, uint8_t prio)
 {

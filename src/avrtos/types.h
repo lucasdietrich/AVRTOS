@@ -86,6 +86,17 @@ struct k_thread {
      */
     uint8_t sched_lock_cnt;
 #endif /* CONFIG_KERNEL_REENTRANCY */
+
+#if CONFIG_THREAD_JOIN
+    /**
+     * @brief Wait queue for threads waiting to join this thread.
+     *
+     * This field represents the wait queue for threads that are waiting to join this
+     * thread. When a thread calls `k_thread_join()` on this thread, it is added to this
+     * wait queue until this thread finishes execution.
+     */
+    struct dnode join_waitqueue;
+#endif
 };
 
 /**

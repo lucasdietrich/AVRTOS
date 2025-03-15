@@ -261,7 +261,7 @@ class Philosopher
         LOG_ERR("%s starved to death", m_name);
 
         /* Stop the thread */
-        k_stop();
+        k_abort();
     }
 
     static void Live(Philosopher *phil)
