@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "sys.h"
 #include "types.h"
+#include "deprecated.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,14 +62,14 @@ __kernel int8_t k_thread_start(struct k_thread *thread);
  * @param thread Pointer to the thread to be stopped.
  * @return int8_t Returns 0 on success, or a negative error code on failure.
  */
-__kernel int8_t k_thread_stop(struct k_thread *thread);
+__kernel int8_t k_thread_abort(struct k_thread *thread);
 
 /**
  * @brief Stop the execution of the current thread.
  *
  * This function stops the currently executing thread.
  */
-__kernel void k_stop(void);
+__kernel void k_abort(void);
 
 /**
  * @brief Set the priority of the specified thread.

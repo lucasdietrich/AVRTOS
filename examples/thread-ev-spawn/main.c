@@ -80,7 +80,7 @@ static void handle_data(char data)
 
         if (node) {
             struct task *task = CONTAINER_OF(node, struct task, _handle);
-            k_thread_stop(&task->thread);
+            k_thread_abort(&task->thread);
             k_mem_slab_free(&tasks_pool, (void *)task);
             LOG_INF("Killed thread: %p", task);
         } else {

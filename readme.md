@@ -157,7 +157,7 @@ int main(void)
 
 	k_thread_dump_all();
 
-	k_stop();
+	k_abort();
 }
 
 static void thread_usart(void *arg)

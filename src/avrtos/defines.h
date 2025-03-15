@@ -358,7 +358,7 @@ typedef struct {
 #define Z_THREAD_WAKEUP_SCHED_MSK  (1 << Z_THREAD_WAKEUP_SCHED_POS)
 
 /* the thread is not running and is not in the runqueue,
- * it can be stopped/started with k_thread_stop/k_thread_start functions.
+ * it can be stopped/started with k_thread_abort/k_thread_start functions.
  */
 #define Z_THREAD_STATE_STOPPED (0 << Z_THREAD_STATE_POS)
 

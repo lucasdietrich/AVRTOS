@@ -203,5 +203,5 @@ int main(void)
 
     SET_BIT(UCSR0B, 1 << RXCIE0);
 
-    k_stop();
+    k_abort();
 }

@@ -743,7 +743,7 @@ int8_t k_thread_start(struct k_thread *thread)
     return ret;
 }
 
-__kernel int8_t k_thread_stop(struct k_thread *thread)
+__kernel int8_t k_thread_abort(struct k_thread *thread)
 {
 #if CONFIG_KERNEL_THREAD_IDLE
     __ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
@@ -769,9 +769,9 @@ __kernel int8_t k_thread_stop(struct k_thread *thread)
     return 0;
 }
 
-void k_stop()
+void k_abort()
 {
-    k_thread_stop(z_ker.current);
+    k_thread_abort(z_ker.current);
 }
 
 void k_thread_set_priority(struct k_thread *thread, uint8_t prio)

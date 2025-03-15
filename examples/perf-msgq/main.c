@@ -49,5 +49,5 @@ int main(void)
 {
     serial_init();
 
-    k_stop();
+    k_abort();
 }
