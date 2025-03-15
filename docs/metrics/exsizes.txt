@@ -59,6 +59,7 @@
 [ atmega2560 ]  sysclock                                flash 2740 B  (1.1 %)   ram 458 B   (5.6 %)
 [ atmega2560 ]  system-workqueue                        flash 3540 B  (1.4 %)   ram 729 B   (8.9 %)
 [ atmega2560 ]  thread-ev-spawn                         flash 5868 B  (2.3 %)   ram 4378 B  (53.4 %)
+[ atmega2560 ]  thread-join                             flash 4972 B  (2.0 %)   ram 540 B   (6.6 %)
 [ atmega2560 ]  thread-prio-multiq                      flash 3244 B  (1.3 %)   ram 184 B   (2.2 %)
 [ atmega2560 ]  thread-termination                      flash 4382 B  (1.7 %)   ram 742 B   (9.1 %)
 [ atmega2560 ]  time                                    flash 6892 B  (2.7 %)   ram 752 B   (9.2 %)
