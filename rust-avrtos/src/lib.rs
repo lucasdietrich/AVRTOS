@@ -2,19 +2,21 @@
 #![feature(try_with_capacity)]
 
 pub use avrtos_sys as sys;
-use avrtos_sys::{k_msleep, k_sleep, k_timeout_t, z_irq_lock, z_irq_unlock, z_yield};
 
 pub use arduino_hal;
-use duration::Duration;
 
+pub mod broken_stuff;
 pub mod critical_section;
 pub mod duration;
+pub mod error;
 pub mod kernel;
 pub mod mutex;
 pub mod panic;
 pub mod serial;
+pub mod signal;
 pub mod stdio;
 pub mod thread;
+pub mod traits;
 
 #[cfg(feature = "alloc")]
 pub mod kalloc;
@@ -31,9 +33,3 @@ const THREAD_WAKEUP_SCHED_POS: u8 = 7;
 
 const THREAD_PRIO_COOP: u8 = 2 << THREAD_PRIO_POS;
 const THREAD_PRIO_PREEMPT: u8 = 0 << THREAD_PRIO_POS;
-
-pub fn sleep_broken() {
-    // Doing this is highly BROKEN and I don't know why !!!
-    let timeout = k_timeout_t { value: 0 };
-    unsafe { k_sleep(timeout) }
-}

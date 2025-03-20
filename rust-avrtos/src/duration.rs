@@ -1,3 +1,5 @@
+use avrtos_sys::{k_ticks_t, k_timeout_t};
+
 pub struct Duration(u32);
 
 impl Duration {
@@ -17,7 +19,17 @@ impl Duration {
         self.0
     }
 
-    pub fn as_ticks(&self) -> u32 {
-        todo!()
+    pub fn as_ticks(&self) -> k_ticks_t {
+        // TODO
+        self.0 as k_ticks_t
+    }
+}
+
+// TODO broken !!!!
+impl Into<k_timeout_t> for Duration {
+    fn into(self) -> k_timeout_t {
+        k_timeout_t {
+            value: self.as_ticks(),
+        }
     }
 }

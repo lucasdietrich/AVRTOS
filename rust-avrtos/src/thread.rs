@@ -70,10 +70,13 @@ impl Thread {
         unsafe extern "C" fn entry_wrapper(func: *mut c_void) {
             // The heck ??
             let boxed_func = Box::from_raw(func as *mut Box<dyn FnOnce()>);
-            let ret = boxed_func();
+            let ret = boxed_func(); // TODO how to get a return value ??
         }
 
         unsafe {
+            // thread_ptr should not move in memory at all costs !!!!!
+            // otherwise this would invalidate all doubly linked nodes tied to it
+            // (i.e. objects waitqueue and kernel whole runqueue)
             let thread: Pin<Box<Thread>> = Box::pin(mem::zeroed());
             let thread_ptr = thread.inner.get();
 
@@ -107,9 +110,8 @@ where
     F: Send,
     F: 'static,
 {
-    // Create entry function
+    // Box the closure
     let main = Box::new(move || {
-        println!("main");
         func();
     });
 
