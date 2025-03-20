@@ -503,8 +503,8 @@ The goal is to be to able most of the avrtos features with a fully safe rust API
 
 Build current examples with:
 
-- `cargo run --package rs-examples --release --bin serial`
-- `cargo run --package rs-examples --release --bin sleep`
+- `cargo run --package rust --release --bin serial`
+- `cargo run --package rust --release --bin sleep`
 
 Feel free to test the binary by configuring the `runner` in the [.cargo/config.toml](.cargo/config.toml) file:
 
