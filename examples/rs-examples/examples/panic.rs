@@ -7,10 +7,10 @@
 
 use avrtos::arduino_hal;
 use avrtos::kernel::Kernel;
-use avrtos::kernel::KernelInitParams;
+use avrtos::kernel::KernelParams;
 #[arduino_hal::entry]
 fn main() -> ! {
-    let kernel = Kernel::init(KernelInitParams {
+    let kernel = Kernel::init_with_params(KernelParams {
         serial_baud: Some(115200),
     });
 

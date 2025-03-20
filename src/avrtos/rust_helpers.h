@@ -9,12 +9,8 @@
 
 #include "kernel.h"
 
-void k_sleep_1s(void);
+uint8_t z_irq_lock(void);
 
-uint8_t z_rust_irq_lock(void);
-
-void z_rust_irq_unlock(uint8_t key);
-
-uint16_t z_rust_sys(uint16_t sys);
+void z_irq_unlock(uint8_t key);
 
 #endif

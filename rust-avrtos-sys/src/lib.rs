@@ -7,18 +7,3 @@
 mod bindings;
 
 pub use bindings::*;
-
-pub fn rust_sleep() {
-    // Doing this is highly BROKEN and I don't know why !!!
-    let timeout = k_timeout_t { value: 0 };
-    unsafe { k_sleep(timeout) }
-}
-
-pub fn rust_yield() {
-    unsafe {
-        // TODO create critical section object like Cs or smthing similar
-        let key = z_rust_irq_lock();
-        z_yield();
-        z_rust_irq_unlock(key);
-    }
-}

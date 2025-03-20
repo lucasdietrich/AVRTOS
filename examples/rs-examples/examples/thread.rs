@@ -5,8 +5,8 @@ extern crate alloc;
 
 use core::mem;
 
-use avrtos::kernel::{Kernel, KernelInitParams};
-use avrtos::sys::{k_sleep_1s, rust_sleep};
+use avrtos::duration::Duration;
+use avrtos::kernel::{sleep, yeet, Kernel, KernelParams};
 use avrtos::thread::JoinHandle;
 use avrtos::{arduino_hal, println, thread};
 
@@ -18,7 +18,7 @@ use alloc::{boxed::Box, vec::Vec};
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let kernel = Box::new(Kernel::init(KernelInitParams::default()).unwrap());
+    let kernel = Box::new(Kernel::init_with_params(KernelParams::default()).unwrap());
 
     // let mut ctx = Context { i: 0 };
     let mut i = 0;
@@ -26,7 +26,7 @@ fn main() -> ! {
     let mut join_handle_1 = thread::spawn(620, thread::Priority::Cooperative, b'1', move || loop {
         i += 1;
         println!("Thread1: i: {}", i);
-        unsafe { k_sleep_1s() };
+        sleep(Duration::from_secs(1));
     })
     .unwrap();
 
@@ -39,13 +39,14 @@ fn main() -> ! {
             if (val & 0xFFFFF) == 0 {
                 println!("Thread2: val: {:x}", val);
             }
-            kernel.yeet();
+            yeet();
         }
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut join_handle_3 = thread::spawn(620, thread::Priority::Cooperative, b'3', move || {
         println!("Thread 3: single operation then exit");
-        unsafe { k_sleep_1s() };
+        sleep(Duration::from_secs(1));
     })
     .unwrap();
 
@@ -71,8 +72,6 @@ fn main() -> ! {
         join_handle_2.print_canaries();
         join_handle_3.print_canaries();
 
-        unsafe {
-            k_sleep_1s();
-        }
+        sleep(Duration::from_secs(1));
     }
 }

@@ -9,7 +9,7 @@
 use core::{ffi::c_char, intrinsics::unreachable};
 
 use avrtos::arduino_hal;
-use avrtos::sys::{k_sleep_1s, serial_init_baud, serial_print, z_avrtos_init};
+use avrtos::sys::{serial_init_baud, serial_print, z_avrtos_init};
 
 const boot: &'static str = "avrtos starting\n\x00";
 

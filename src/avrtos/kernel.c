@@ -893,10 +893,17 @@ void k_sleep(k_timeout_t timeout)
 {
     const uint8_t key = irq_lock();
 
+    printf("k_sleep: %u\n", timeout.value);
+
     /* Make the thread until wake-up */
     z_pend_current(timeout);
 
     irq_unlock(key);
+}
+
+void k_msleep(uint32_t ms)
+{
+    k_sleep(K_MSEC(ms));
 }
 
 #if CONFIG_KERNEL_UPTIME

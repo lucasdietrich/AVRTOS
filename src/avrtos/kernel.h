@@ -290,10 +290,7 @@ __kernel void k_sleep(k_timeout_t timeout);
  *
  * @param ms The duration of the sleep in milliseconds.
  */
-__always_inline void k_msleep(uint32_t ms)
-{
-    k_sleep(K_MSEC(ms));
-}
+__kernel void k_msleep(uint32_t milliseconds);
 
 /**
  * @brief This mode keeps the thread ready but yields the CPU to another thread

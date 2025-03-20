@@ -470,11 +470,15 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     #[doc = " @brief Stop the execution of the specified thread.\n\n @param thread Pointer to the thread to be stopped.\n @return int8_t Returns 0 on success, or a negative error code on failure."]
-    pub fn k_thread_stop(thread: *mut k_thread) -> i8;
+    pub fn k_thread_abort(thread: *mut k_thread) -> i8;
+}
+unsafe extern "C" {
+    #[doc = " @brief Wait for the specified thread to finish execution.\n\n This function waits for the specified thread to finish execution.\n\n @param thread Pointer to the thread to wait for.\n @param timeout The maximum time to wait for the thread to finish.\n @return int8_t Returns 0 on success, or a negative error code on failure.\n  - -EINVAL if the thread pointer is NULL.\n  - -ETIMEDOUT if the timeout expired before the thread finished.\n  - -ECANCELED if the thread was aborted.\n  - -EAGAIN if the thread is not finished and the timeout is K_NO_WAIT."]
+    pub fn k_thread_join(thread: *mut k_thread, timeout: k_timeout_t) -> i8;
 }
 unsafe extern "C" {
     #[doc = " @brief Stop the execution of the current thread.\n\n This function stops the currently executing thread."]
-    pub fn k_stop();
+    pub fn k_abort();
 }
 unsafe extern "C" {
     #[doc = " @brief Set the priority of the specified thread.\n\n This function changes the priority of a given thread. The `prio` parameter can be set\n to either `K_COOPERATIVE` or `K_PREEMPTIVE`.\n\n @param thread Pointer to the thread whose priority is to be changed.\n @param prio The desired priority (`K_COOPERATIVE` or `K_PREEMPTIVE`)."]
@@ -507,6 +511,10 @@ unsafe extern "C" {
 unsafe extern "C" {
     #[doc = " @brief Suspend the execution of the current thread for a specified amount of time.\n\n This function schedules the current thread to be woken up after the specified amount of\n time.\n\n If the timeout is set to `K_FOREVER`, the thread will not be executed again until\n explicitly resumed with `z_wake_up()` or `z_schedule()`.\n\n If the timeout is set to `K_NO_WAIT`, the function has no effect.\n\n @param timeout The duration of the sleep in milliseconds."]
     pub fn k_sleep(timeout: k_timeout_t);
+}
+unsafe extern "C" {
+    #[doc = " @brief Sleep for a specified number of milliseconds.\n\n This function is a convenience wrapper around `k_sleep()` to simplify sleeping for\n milliseconds.\n\n @param ms The duration of the sleep in milliseconds."]
+    pub fn k_msleep(milliseconds: u32);
 }
 unsafe extern "C" {
     #[doc = " @brief Make the thread wait for a specified amount of time in milliseconds while\n keeping it ready.\n\n Unlike `k_sleep`, this function keeps the thread in the ready state while waiting. The\n function polls the elapsed time and resumes execution when the wait time has passed.\n\n This function does not disable interrupts or break system time, but the chosen mode can\n affect the execution of other threads.\n\n Note: This function can be used without an IDLE thread (with\n `CONFIG_KERNEL_THREAD_IDLE` disabled).\n\n Note: Requires `KERNEL_UPTIME` to be enabled.\n\n @param timeout The duration to wait in milliseconds.\n @param mode The wait mode (`K_WAIT_MODE_IDLE`, `K_WAIT_MODE_ACTIVE`, or\n `K_WAIT_MODE_BLOCK`)."]
@@ -572,6 +580,10 @@ unsafe extern "C" {
 unsafe extern "C" {
     #[doc = " @brief Send a single character over the USART\n\n @param data"]
     pub fn serial_transmit(data: ::core::ffi::c_char);
+}
+unsafe extern "C" {
+    #[doc = " @brief Receive a single character over the USART\n\n @return char"]
+    pub fn serial_receive() -> ::core::ffi::c_int;
 }
 unsafe extern "C" {
     #[doc = " @brief Send the buffer of known length over the USART\n\n @param buffer\n @param len"]
@@ -1386,17 +1398,14 @@ unsafe extern "C" {
     pub fn k_sleep_1s();
 }
 unsafe extern "C" {
-    pub fn z_rust_irq_lock() -> u8;
+    pub fn z_irq_lock() -> u8;
 }
 unsafe extern "C" {
-    pub fn z_rust_irq_unlock(key: u8);
+    pub fn z_irq_unlock(key: u8);
 }
 unsafe extern "C" {
-    pub fn z_rust_sys(sys: u16) -> u16;
-}
-unsafe extern "C" {
-    #[doc = " @brief Set up the standard I/O to use USART0.\n\n This function configures the standard I/O to communicate via USART0. This allows\n the function `printf`, to use USART0 for input and output.\n\n The configuration option `CONFIG_STDIO_PRINTF_TO_USART` automatically selects the\n USART to use for standard I/O."]
-    pub fn k_set_stdio_usart0();
+    #[doc = " @brief Set up the standard I/O to use serial USART.\n\n This function configures the standard I/O to communicate via USART. This allows\n the function `printf`, to use USART for input and output.\n\n The configuration option `CONFIG_STDIO_USART` automatically selects the\n USART to use for standard I/O."]
+    pub fn k_set_stdio_serial();
 }
 #[doc = " @brief Structure for controlling external interrupts."]
 #[repr(C)]
@@ -2607,6 +2616,9 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn ll_usart_sync_getc(dev: *mut UART_Device) -> u8;
+}
+unsafe extern "C" {
+    pub fn ll_usart_getc(dev: *mut UART_Device) -> ::core::ffi::c_int;
 }
 unsafe extern "C" {
     pub fn usart_send(dev: *mut UART_Device, buf: *const ::core::ffi::c_char, len: size_t) -> i8;

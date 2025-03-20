@@ -8,38 +8,18 @@
 
 #if CONFIG_RUST
 
-void k_sleep_1s(void)
-{
-	k_msleep(1000);
-}
+#if CONFIG_KERNEL_THREAD_TERMINATION_TYPE <= 0
+#error "CONFIG_KERNEL_THREAD_TERMINATION_TYPE must be configured (> 0) for RUST support"
+#endif
 
-uint8_t z_rust_irq_lock(void)
+uint8_t z_irq_lock(void)
 {
 	return irq_lock();
 }
 
-void z_rust_irq_unlock(uint8_t key)
+void z_irq_unlock(uint8_t key)
 {
 	irq_unlock(key);
-}
-
-uint16_t z_rust_sys(uint16_t sys)
-{
-	switch (sys)
-	{
-	case 1:
-		k_sleep(K_MSEC(1));
-		break;
-
-	case 2:
-		k_sleep(K_SECONDS(1));
-		break;
-	
-	default:
-		break;
-	}
-
-	return sys;
 }
 
 #endif
