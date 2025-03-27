@@ -1,12 +1,13 @@
 use core::alloc::{GlobalAlloc, Layout};
 
-use crate::{println, sys as ll};
+use crate::sys as ll;
 
 struct KernelAlloc;
 
 unsafe impl GlobalAlloc for KernelAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        println!(
+        #[cfg(feature = "debug-alloc")]
+        crate::println!(
             "z_malloc size: {}, align: {}",
             layout.size(),
             layout.align()

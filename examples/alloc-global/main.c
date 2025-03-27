@@ -34,7 +34,7 @@ int main(void)
         }
     }
 
-    printf("Total allocates: %u\n", total);
+    printf("Total allocated: %u\n", total);
 
     z_global_allocator_reset();
     k_global_allocator_stats_get(&atotal, &used, &free);

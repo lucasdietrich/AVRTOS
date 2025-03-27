@@ -121,6 +121,7 @@ void my_thread_task(void *arg) {
 ```
 
 ## Some links :
+
 - More information on data structures : https://en.wikipedia.org/wiki/Linked_list
 - Memory sections on AVR : https://www.nongnu.org/avr-libc/user-manual/mem_sections.html
 - avr-gcc : https://gcc.gnu.org/wiki/avr-gcc
@@ -128,12 +129,13 @@ void my_thread_task(void *arg) {
 - AVR Instruction Set Manual : http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
 - cmake-avr github repository : https://github.com/mkleemann/cmake-avr
 - [`arduino-lint`](https://github.com/arduino/arduino-lint) tool to check Arduino libraries
+    - Install with: <https://arduino.github.io/arduino-lint/1.2/installation/>
 - Arduino library specification: https://arduino.github.io/arduino-cli/0.31/library-specification/
 - Arduino library manager FAQ: https://github.com/arduino/library-registry/blob/main/FAQ.md#submission-requirements
 
 ## Crosstoold-ng
 
-avr-gcc version >= 11.2.0 is recommanded, if you this version of the package `avr-gcc`
+avr-gcc version >= 11.2.0 is recommended, if you this version of the package `avr-gcc`
 is not available in your distribution, you should consider building it from source
 with [crosstool-ng](https://crosstool-ng.github.io/).
 
@@ -158,26 +160,53 @@ Use the generated toolchain in `~/x-tools/avr` in your project with:
 export PATH="~/x-tools/avr/bin:${PATH}"
 ```
 
-## My versions
+## Requirements
 
-=== "Fedora"
+### Debian
 
-    ```
-    avr-gcc (Fedora 11.2.0-1.fc36) 11.2.0
-    avr-gdb: GNU gdb (GDB) 12.1
-    QEMU emulator version 7.0.0 (v7.0.0)
-    avrdude version 6.4
-    cmake version 3.25.1
-    ninja 1.10.2
-    GNU Make 4.3
-    Python 3.10.9
-    ```
+```
+avr-gcc gcc version 14.2.0 (crosstool-NG 1.27.0)
+avr-gdb: GNU gdb (crosstool-NG 1.27.0) 16.2
+QEMU emulator version 9.2.1 (v9.2.1)
+avrdude version 7.1
+cmake version 3.25.1
+ninja 1.11.1
+GNU Make 4.3
+Python 3.11.2
+```
 
-=== "Debian"
+My AVR toolchain version is:
 
-    Requirements:
+```
+(.venv) lucas@zgw:~/AVRTOS$ avr-gcc -v
+Using built-in specs.
+COLLECT_GCC=avr-gcc
+Target: avr
+Configured with: /home/lucas/crosstool-ng/.build/avr/src/gcc/configure --build=x86_64-build_pc-linux-gnu --host=x86_64-build_pc-linux-gnu --target=avr --prefix=/home/lucas/x-tools/avr --exec_prefix=/home/lucas/x-tools/avr --with-local-prefix=/home/lucas/x-tools/avr/avr --with-headers=/home/lucas/x-tools/avr/avr/include --with-newlib --enable-threads=no --disable-shared --with-pkgversion='crosstool-NG 1.27.0' --disable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libstdcxx-verbose --enable-cstdio=stdio_pure --with-gmp=/home/lucas/crosstool-ng/.build/avr/buildtools --with-mpfr=/home/lucas/crosstool-ng/.build/avr/buildtools --with-mpc=/home/lucas/crosstool-ng/.build/avr/buildtools --with-isl=/home/lucas/crosstool-ng/.build/avr/buildtools --enable-lto --enable-target-optspace --disable-plugin --disable-nls --enable-multiarch --enable-languages=c,c++
+Thread model: single
+Supported LTO compression algorithms: zlib zstd
+gcc version 14.2.0 (crosstool-NG 1.27.0)
+```
+
+Requirements:
     
-    sudo apt install gcc-avr gdb-avr avr-libc avrdude cmake ninja-build python3 python3-pip
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r scripts/requirements.txt
+```
+sudo apt install gcc-avr gdb-avr avr-libc avrdude cmake ninja-build python3 python3-pip
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r scripts/requirements.txt
+```
+
+
+### Fedora (prior RUST support)
+    
+```
+avr-gcc (Fedora 11.2.0-1.fc36) 11.2.0
+avr-gdb: GNU gdb (GDB) 12.1
+QEMU emulator version 7.0.0 (v7.0.0)
+avrdude version 6.4
+cmake version 3.25.1
+ninja 1.10.2
+GNU Make 4.3
+Python 3.10.9
+```

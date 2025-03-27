@@ -46,7 +46,7 @@
 [ atmega2560 ]  perf-msgq                               flash 2586 B  (1.0 %)   ram 796 B   (9.7 %)
 [ atmega2560 ]  prempt-multithreading-demo              flash 3536 B  (1.4 %)   ram 1008 B  (12.3 %)
 [ atmega2560 ]  prng                                    flash 3542 B  (1.4 %)   ram 1294 B  (15.8 %)
-[ atmega2560 ]  reentrancy                              flash 3162 B  (1.2 %)   ram 748 B   (9.1 %)
+[ atmega2560 ]  reentrancy                              flash 3166 B  (1.2 %)   ram 748 B   (9.1 %)
 [ atmega2560 ]  ring                                    flash 4080 B  (1.6 %)   ram 858 B   (10.5 %)
 [ atmega2560 ]  ring-demo                               flash 1816 B  (0.7 %)   ram 710 B   (8.7 %)
 [ atmega2560 ]  rt                                      flash 1690 B  (0.7 %)   ram 458 B   (5.6 %)

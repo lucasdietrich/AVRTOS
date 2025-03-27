@@ -1,6 +1,6 @@
 # AVRTOS: An RTOS for 8-bit AVR Microcontrollers
 
-**[Note about rust support in the project](#rust-support)**
+**[Note about rust support in the project](#rust-support-experimental)**
 
 ## Introduction
 
@@ -464,6 +464,8 @@ Note about current development:
 - Prefer `--release` build over debug.
 - Only `atmega2560` is supported
 - [src/avrtos/rust_helpers.c](src/avrtos/rust_helpers.c) servers development purposes but should behave as a bridge between C and avrtos-core in the future.
+- For rust support a very recent version of the AVR compiler is required (14.2.0), 
+  [crosstoold-ng](./developer.md#crosstoold-ng) has been used to build the AVR toolchain.
 
 ### Examples
 
