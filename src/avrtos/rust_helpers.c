@@ -18,17 +18,17 @@
 
 uint8_t z_irq_lock(void)
 {
-	return irq_lock();
+    return irq_lock();
 }
 
 void z_irq_unlock(uint8_t key)
 {
-	irq_unlock(key);
+    irq_unlock(key);
 }
 
 k_timeout_t z_ms_to_ticks(uint32_t ms)
 {
-	return K_MSEC(ms);
+    return K_MSEC(ms);
 }
 
 #endif

@@ -8,7 +8,8 @@ edition = "2021"
 [features]
 default = ["avrtos-linker-script", "qemu"]
 avrtos-linker-script = []
-qemu = []
+qemu = ["debug"]
+debug = []
 
 [dependencies]
 

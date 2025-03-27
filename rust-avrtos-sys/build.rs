@@ -140,7 +140,6 @@ fn compile_avrtos_sources(cenv: CompileEnv) {
         .files(SOURCES.iter())
         .includes(INCLUDES.iter())
         .static_flag(true)
-        .debug(false)
         .no_default_flags(true)
         // mcu
         .flag("-mmcu=atmega2560")
@@ -165,11 +164,7 @@ fn compile_avrtos_sources(cenv: CompileEnv) {
 
     // debug infos
     build
-        .flag("-g")
-        // .flag("-Og")
-        .flag("-gdwarf-3")
         // .flag("-gstrict-dwarf")
-        // .flag("-Os")
         // disable strict warnings
         .flag("-Wno-expansion-to-defined")
         .flag("-Wno-implicit-fallthrough")
@@ -187,6 +182,12 @@ fn compile_avrtos_sources(cenv: CompileEnv) {
     #[cfg(feature = "qemu")]
     {
         build.flag("-D__QEMU__");
+    }
+    if cfg!(feature = "debug") {
+        build.flag("-g");
+        build.flag("-gdwarf-3");
+    } else {
+        build.flag("-Os");
     }
 
     build.ar_flag("v");

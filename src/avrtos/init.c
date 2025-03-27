@@ -48,7 +48,7 @@ z_save_mcusr:
 #endif
 
 void z_avrtos_init(void)
-{	
+{
 #if CONFIG_KERNEL_CLEAR_WDT_ON_INIT
     /* Page 52 (ATmega328p datasheet) :
      *    Note: If the Watchdog is accidentally enabled, for example by a
@@ -111,10 +111,11 @@ void z_avrtos_init(void)
 
 #if CONFIG_THREAD_CANARIES && CONFIG_AVRTOS_LINKER_SCRIPT
     /* Initialize stack canaries */
-
-    // CONFIG_THREAD_CANARIES breaks this !!!
-#warning "CONFIG_THREAD_CANARIES breaks this !!!"
-    // z_init_stacks_canaries();
+#if CONFIG_RUST
+#warning "CONFIG_THREAD_CANARIES with Rust support (CONFIG_RUST) BREAKS THIS !!!"
+#else
+    z_init_stacks_canaries();
+#endif
 #endif
 
 #if CONFIG_THREAD_STACK_SENTINEL

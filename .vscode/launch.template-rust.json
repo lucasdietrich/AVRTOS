@@ -2,18 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-			"name": "avr rust QEMU",
-			"type": "cppdbg",
-			"request": "launch",
-			"miDebuggerServerAddress": "127.0.0.1:1234",
-			"program": "target/avr-atmega2560/debug/examples/thread.elf",
-			"args": [],
-			"stopAtEntry": true,
-			"cwd": "${workspaceFolder}",
-			"environment": [],
-			"externalConsole": false,
-			"miDebuggerPath": "avr-gdb",
-			"MIMode": "gdb"
-		}
+            "name": "avr rust QEMU",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "127.0.0.1:1234",
+            "program": "target/avr-atmega2560/release/examples/serial.elf",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "miDebuggerPath": "avr-gdb",
+            "MIMode": "gdb"
+        },
     ]
 }

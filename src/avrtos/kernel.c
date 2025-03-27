@@ -42,7 +42,8 @@ __STATIC_ASSERT_NOMSG(offsetof(z_kernel_t, sched_ticks_remaining) ==
 #endif
 
 #if CONFIG_THREAD_JOIN && (CONFIG_KERNEL_THREAD_TERMINATION_TYPE <= 0)
-#error "CONFIG_THREAD_JOIN requires CONFIG_KERNEL_THREAD_TERMINATION_TYPE to be a positive value"
+#error                                                                                   \
+    "CONFIG_THREAD_JOIN requires CONFIG_KERNEL_THREAD_TERMINATION_TYPE to be a positive value"
 #endif
 
 #if CONFIG_THREAD_EXPLICIT_MAIN_STACK == 1

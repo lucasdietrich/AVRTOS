@@ -9,8 +9,8 @@
 
 #include <stddef.h>
 
-#include "dstruct/dlist.h"
 #include "defines.h"
+#include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
 
 /**

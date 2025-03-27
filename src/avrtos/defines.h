@@ -153,11 +153,10 @@ typedef struct {
 #define USEC_PER_SEC  (USEC_PER_MSEC * MSEC_PER_SEC)
 
 #if !CONFIG_RUST
-#define K_TIMEOUT_TICKS(t)   ((t).value)
+#define K_TIMEOUT_TICKS(t) ((t).value)
 #else
-#define K_TIMEOUT_TICKS(t)   (t)
+#define K_TIMEOUT_TICKS(t) (t)
 #endif /* !CONFIG_RUST */
-
 
 #define K_TIMEOUT_EQ(t1, t2) (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
 #define K_TIMEOUT_MS(t)      ((uint32_t)(K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
