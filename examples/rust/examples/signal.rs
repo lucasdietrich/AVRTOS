@@ -6,11 +6,10 @@
 #![allow(dead_code)]
 
 use avrtos::duration::Duration;
-use avrtos::kernel::{sleep, yeet, Kernel};
+use avrtos::kernel::{yeet, Kernel};
 use avrtos::signal::Signal;
-use avrtos::thread::Priority;
 use avrtos::traits::SyncPrimitive;
-use avrtos::{arduino_hal, println, thread};
+use avrtos::{arduino_hal, println};
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -34,11 +33,6 @@ fn main() -> ! {
         Ok(value) => println!("Signal acquired: {}", value),
         Err(err) => println!("Error acquiring signal: {:?}", err),
     }
-
-    // let _handle = thread::spawn(0x200, Priority::Cooperative, b'1', move || loop {
-
-    // })
-    // .unwrap();
 
     loop {
         yeet();

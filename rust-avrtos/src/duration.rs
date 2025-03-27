@@ -23,15 +23,12 @@ impl Duration {
     }
 
     pub fn as_ticks(&self) -> k_ticks_t {
-        unsafe {
-            z_ms_to_ticks(self.0)
-        }
+        unsafe { z_ms_to_ticks(self.0) }
     }
 }
 
-// TODO broken !!!!
-impl Into<k_timeout_t> for Duration {
-    fn into(self) -> k_timeout_t {
-       self.as_ticks()
+impl From<Duration> for k_timeout_t {
+    fn from(val: Duration) -> Self {
+        val.as_ticks()
     }
 }

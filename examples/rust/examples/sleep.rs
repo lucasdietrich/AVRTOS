@@ -17,12 +17,7 @@ fn main() -> ! {
     let kernel = Kernel::init_with_params(KernelParams::default()).unwrap();
 
     loop {
-        // Doing this is highly BROKEN and I don't know why !!!
-        // let mut timeout = k_timeout_t { value: 255 };
-        // println!("timeout: {:?}", timeout.value);
-
         sleep(Duration::from_secs(1));
-        yeet();
     }
 
     drop(kernel);

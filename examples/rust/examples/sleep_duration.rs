@@ -5,9 +5,9 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 
-use avrtos::{arduino_hal, println};
 use avrtos::duration::Duration;
 use avrtos::kernel::{sleep, yeet, Kernel, KernelParams};
+use avrtos::{arduino_hal, println};
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -17,7 +17,11 @@ fn main() -> ! {
 
     loop {
         let duration = Duration::from_millis(timeout);
-        println!("Sleeping for {} ms ({} ticks)", duration.as_millis(), duration.as_ticks());
+        println!(
+            "Sleeping for {} ms ({} ticks)",
+            duration.as_millis(),
+            duration.as_ticks()
+        );
         sleep(duration);
 
         timeout += 1000;

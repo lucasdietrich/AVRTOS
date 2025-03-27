@@ -1,4 +1,4 @@
-use avrtos_sys::{self as ll, k_msleep, z_irq_lock, z_irq_unlock, z_yield};
+use avrtos_sys::{self as ll, k_msleep, z_yield};
 
 use crate::{critical_section::critical_section, duration::Duration};
 

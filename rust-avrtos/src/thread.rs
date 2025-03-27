@@ -2,7 +2,7 @@ use core::{
     cell::UnsafeCell,
     ffi::c_void,
     marker::PhantomPinned,
-    mem::{self, transmute, MaybeUninit},
+    mem,
     pin::Pin,
 };
 
@@ -12,7 +12,7 @@ use avrtos_sys::{self as ll};
 use crate::{
     duration::Duration,
     error::{os_error_to_result, OsErr},
-    print, println, THREAD_PRIO_COOP, THREAD_PRIO_PREEMPT,
+    THREAD_PRIO_COOP, THREAD_PRIO_PREEMPT,
 };
 
 pub struct Stats {
