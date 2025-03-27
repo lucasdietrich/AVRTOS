@@ -11,13 +11,13 @@
 #include "errno.h"
 #include "sys.h"
 
-// AVRTOS version 1.3.1
+// AVRTOS version 2.0.0
 #define AVRTOS_VERSION_MAJOR    1
 #define AVRTOS_VERSION_MINOR    3
 #define AVRTOS_VERSION_REVISION 1
 #define AVRTOS_VERSION                                                                   \
     ((AVRTOS_VERSION_MAJOR << 16) | (AVRTOS_VERSION_MINOR << 8) | AVRTOS_VERSION_REVISION)
-#define AVRTOS_VERSION_STRING "1.3.1"
+#define AVRTOS_VERSION_STRING "2.0.0"
 #define AVRTOS_VERSION_STRING_FULL                                                       \
     "AVRTOS v" AVRTOS_VERSION_STRING " (c) 2021-2025 Lucas Dietrich"
 

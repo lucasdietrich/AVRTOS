@@ -1,5 +1,61 @@
 # Changelog
 
+## avrtos v2.0.0: Major Update with Rust Support, Memory Allocation, and More
+
+### Main Features
+
+* **Rust Support (Experimental):**  
+  Introduced experimental support for Rust, including:
+  - Automatic bindings generation via `build.rs`
+  - Basic thread API wrappers and kernel integration
+  - Examples for thread creation, stdio, and memory allocation
+
+* **Memory Allocation API (Experimental):**  
+  - Introduced a **slab allocator** and helper functions
+  - Added **bump allocator** and optional `malloc`-like interface (`CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN`)
+  - Added allocator-related samples and integration with Rust global allocator
+
+* **Thread Join Support:**  
+  - Added support for `k_thread_join()` and corresponding example
+
+* **Signal Handling (Draft):**  
+  - Initial support for synchronization primitives and signals in both C and Rust
+
+* **Standard I/O Improvements:**
+  - Added support for `stdin` with example
+  - Updated stdio configuration:  
+    - `CONFIG_STDIO_USART` (default: USART0)  
+    - Deprecated: `CONFIG_STDIO_PRINTF_TO_USART`
+
+### Bug Fixes
+* Fixed **kernel panic** in `mem_slab` caused by improper wake-up handling
+* Fixed **thread creation** to ensure address stability throughout thread lifetime
+* Fixed **warnings** in slab allocator (`slist_count`)
+* Fixed **`k_mem_slab_init()`** return value and removed outdated functions
+* Fixed compilation issues due to LLVM/Rust struct handling bug (`k_timeout_t`)
+* Corrected warnings for **Arduino IDE** compatibility
+* Resolved issue with **`z_pend_current_on()`** leaving expired threads in queues
+
+### Improvements
+* Improved **project structure** and **documentation**
+* Updated `developer.md`, reformatted README with Rust details
+* Added debug configuration improvements and enforced formatting
+* Updated `parse_size_txt.py` to support **Berkeley format** (GCC 14.2.0)
+* Adapted `avr-size` flags based on detected `avr-gcc` version
+* Updated **code metrics script**
+* Updated **PlatformIO** configuration and targets
+
+### Minor Changes
+* Removed "cc" build dependency for Rust examples
+* Changed tabs to spaces across codebase
+* Removed forced default of `CONFIG_KERNEL_ASSERT = 0`
+* Renamed `k_thread_stop()` and `k_stop()` to `k_thread_abort()` and `k_abort()`
+* Added `sleep`, `yeet`, and **critical section** APIs
+* Added `CONFIG_KERNEL_TIME_API_MS_PRECISION` and improved timer functions
+* Deprecated public `k_work_submittable` API
+* Added internal macros like `Z_THREAD_MAIN_PRIORITY` and `Z_THREAD_MAIN_STACK_END_ADDR`
+* Cleaned up dead code and removed unused file descriptor implementation
+
 ## avrtos v1.3.1
 
 Key features:
