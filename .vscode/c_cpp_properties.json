@@ -1,6 +1,21 @@
 {
 	"configurations": [
 		{
+			"name": "Rust",
+			"intelliSenseMode": "gcc-avr",
+			"browse": {
+				"path": [
+					"${workspaceFolder}"
+				]
+			},
+			"cStandard": "c11",
+			"cppStandard": "c++17",
+			"configurationProvider": "ms-vscode.cmake-tools",
+			"defines": [
+				"CONFIG_RUST=1"
+			]
+		},
+		{
 			"name": "AVR",
 			"compileCommands": "${workspaceRoot}/build/compile_commands.json",
 			"intelliSenseMode": "gcc-avr",

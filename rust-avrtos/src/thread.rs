@@ -1,14 +1,19 @@
 use core::{
     cell::UnsafeCell,
     ffi::c_void,
-    mem::{self},
+    marker::PhantomPinned,
+    mem::{self, transmute, MaybeUninit},
     pin::Pin,
 };
 
 use alloc::{boxed::Box, vec::Vec};
 use avrtos_sys::{self as ll};
 
-use crate::{print, println, THREAD_PRIO_COOP, THREAD_PRIO_PREEMPT};
+use crate::{
+    duration::Duration,
+    error::{os_error_to_result, OsErr},
+    print, println, THREAD_PRIO_COOP, THREAD_PRIO_PREEMPT,
+};
 
 pub struct Stats {
     stack_size: u16,
@@ -20,7 +25,11 @@ pub struct JoinHandle {
 }
 
 impl JoinHandle {
-    pub fn join(self) {}
+    pub fn join(mut self, duration: Duration) -> Result<(), OsErr> {
+        let err = unsafe { ll::k_thread_join(self.get_thread_ptr(), duration.into()) };
+
+        os_error_to_result(err)
+    }
 
     pub fn get_thread_ptr(&mut self) -> *mut ll::k_thread {
         self.thread.inner.get()
@@ -46,6 +55,7 @@ pub enum Priority {
 
 struct Thread {
     inner: UnsafeCell<ll::k_thread>,
+    _pin: PhantomPinned,
 }
 
 impl Thread {
@@ -77,8 +87,23 @@ impl Thread {
             // thread_ptr should not move in memory at all costs !!!!!
             // otherwise this would invalidate all doubly linked nodes tied to it
             // (i.e. objects waitqueue and kernel whole runqueue)
-            let thread: Pin<Box<Thread>> = Box::pin(mem::zeroed());
-            let thread_ptr = thread.inner.get();
+
+            // ideally we should manipulate a Pin<Box<MaybeUninit<Thread>>> and
+            // transform it into a Pin<Box<Thread>> after having called
+            // k_thread_create function.
+            //
+            // Read how they did in the linux kernel:
+            // https://kangrejos.com/Safe%20Pinned%20Initialization%20in%20Rust.pdf
+            let uninit_thread: Thread = Thread {
+                inner: UnsafeCell::new(mem::zeroed()),
+                _pin: PhantomPinned,
+            };
+
+            let pinned_thread = Box::pin(uninit_thread);
+
+            // As we have an UnsafeCell, we can obtain a mutable reference to the inner value
+            // without breaking the pinning guarantees.
+            let thread_ptr = pinned_thread.inner.get();
 
             let result = ll::k_thread_create(
                 thread_ptr,
@@ -98,7 +123,7 @@ impl Thread {
                 return None;
             }
 
-            Some(thread)
+            Some(pinned_thread)
         }
     }
 }

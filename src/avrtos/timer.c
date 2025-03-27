@@ -46,7 +46,7 @@ void z_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
     __ASSERT_NOTNULL(timer);
 
     const uint8_t key = irq_lock();
-    tqueue_schedule(&z_timers_runqueue, &timer->tie, starting_delay.value);
+    tqueue_schedule(&z_timers_runqueue, &timer->tie, K_TIMEOUT_TICKS(starting_delay));
     irq_unlock(key);
 }
 
@@ -79,7 +79,7 @@ void z_timers_process(void)
         /* Reschedule the timer if it is not stopped */
         if (timer->tie.timeout != K_TIMER_STOPPED) {
             timer->tie.next    = NULL;
-            timer->tie.timeout = timer->timeout.value;
+            timer->tie.timeout = K_TIMEOUT_TICKS(timer->timeout);
             z_tqueue_schedule(&z_timers_runqueue, &timer->tie);
         }
     }
@@ -100,7 +100,7 @@ int8_t k_timer_init(struct k_timer *timer,
     if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
         z_timer_start(timer, starting_delay);
     } else {
-        timer->tie.timeout = K_FOREVER.value;
+        timer->tie.timeout = K_TIMEOUT_TICKS(K_FOREVER);
     }
 
     return 0;

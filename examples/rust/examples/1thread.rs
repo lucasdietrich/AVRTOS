@@ -14,11 +14,23 @@ use avrtos::{arduino_hal, println, thread};
 fn main() -> ! {
     let kernel = Kernel::init().unwrap();
 
-    let _handle = thread::spawn(0x200, Priority::Cooperative, b'1', || loop {
-        println!("loop");
+    let mut counter = 5;
+
+    let handle = thread::spawn(0x300, Priority::Cooperative, b'1', move || loop {
+        println!("loop: {}", counter);
         sleep(Duration::from_secs(1));
+
+        if counter == 0 {
+            break;
+        }
+
+        counter -= 1;
     })
     .unwrap();
+
+    handle.join(Duration::FOREVER).unwrap();
+
+    println!("done");
 
     loop {
         yeet();

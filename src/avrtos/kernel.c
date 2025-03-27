@@ -537,8 +537,6 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
  */
 __kernel void z_pend_current(k_timeout_t timeout)
 {
-    printf("z_pend_current: %u\n", timeout.value);
-
     /* Suspend the thread */
     z_suspend(z_ker.current);
 
@@ -894,8 +892,6 @@ bool k_cur_is_coop(void)
 void k_sleep(k_timeout_t timeout)
 {
     const uint8_t key = irq_lock();
-
-    // printf("k_sleep: %u\n", timeout.value);
 
     /* Make the thread until wake-up */
     z_pend_current(timeout);

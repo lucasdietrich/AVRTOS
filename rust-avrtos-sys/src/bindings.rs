@@ -138,13 +138,9 @@ where
     }
 }
 pub type size_t = ::core::ffi::c_uint;
-pub type k_ticks_t = u16;
+pub type k_ticks_t = u32;
+pub type k_timeout_t = u32;
 pub type k_delta_t = k_ticks_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct k_timeout_t {
-    pub value: k_ticks_t,
-}
 #[doc = " - a dnode is already in the list if next != null and prev != null\n - a dnode is not in the list if next == null && prev == null\n - poping the last element of the runqueue doesn't have no any effect"]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -254,6 +250,8 @@ pub struct k_thread {
     pub stack: k_thread__bindgen_ty_3,
     #[doc = "< A single character symbol representing the thread, reserved symbols:\n< 'M' for main, 'I' for idle."]
     pub symbol: ::core::ffi::c_char,
+    #[doc = " @brief Wait queue for threads waiting to join this thread.\n\n This field represents the wait queue for threads that are waiting to join this\n thread. When a thread calls `k_thread_join()` on this thread, it is added to this\n wait queue until this thread finishes execution."]
+    pub join_waitqueue: dnode,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -1395,13 +1393,16 @@ unsafe extern "C" {
     pub fn k_msgq_num_used_get(msgq: *mut k_msgq) -> u8;
 }
 unsafe extern "C" {
-    pub fn k_sleep_1s();
-}
-unsafe extern "C" {
+    #[doc = " Lock the interrupts\n @see irq_lock\n\n @return the key to unlock the interrupts"]
     pub fn z_irq_lock() -> u8;
 }
 unsafe extern "C" {
+    #[doc = " Unlock the interrupts\n @see irq_unlock\n\n @param key the key to unlock the interrupts"]
     pub fn z_irq_unlock(key: u8);
+}
+unsafe extern "C" {
+    #[doc = " Convert milliseconds to ticks\n @see K_MSEC\n\n @param ms the milliseconds to convert\n @return the converted ticks"]
+    pub fn z_ms_to_ticks(ms: u32) -> k_timeout_t;
 }
 unsafe extern "C" {
     #[doc = " @brief Set up the standard I/O to use serial USART.\n\n This function configures the standard I/O to communicate via USART. This allows\n the function `printf`, to use USART for input and output.\n\n The configuration option `CONFIG_STDIO_USART` automatically selects the\n USART to use for standard I/O."]

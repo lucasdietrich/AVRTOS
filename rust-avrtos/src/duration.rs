@@ -1,8 +1,11 @@
-use avrtos_sys::{k_ticks_t, k_timeout_t};
+use avrtos_sys::{k_ticks_t, k_timeout_t, z_ms_to_ticks};
 
 pub struct Duration(u32);
 
 impl Duration {
+    pub const FOREVER: Duration = Duration(u32::MAX);
+    pub const NO_DELAY: Duration = Duration(0);
+
     pub fn from_millis(millis: u32) -> Self {
         Duration(millis)
     }
@@ -20,16 +23,15 @@ impl Duration {
     }
 
     pub fn as_ticks(&self) -> k_ticks_t {
-        // TODO
-        self.0 as k_ticks_t
+        unsafe {
+            z_ms_to_ticks(self.0)
+        }
     }
 }
 
 // TODO broken !!!!
 impl Into<k_timeout_t> for Duration {
     fn into(self) -> k_timeout_t {
-        k_timeout_t {
-            value: self.as_ticks(),
-        }
+       self.as_ticks()
     }
 }

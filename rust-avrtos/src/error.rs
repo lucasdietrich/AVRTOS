@@ -67,3 +67,10 @@ impl OsErr {
         self as i8
     }
 }
+
+pub fn os_error_to_result(err: i8) -> Result<(), OsErr> {
+    match err {
+        0 => Ok(()),
+        _ => Err(OsErr::from_code(err).unwrap()),
+    }
+}

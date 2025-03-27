@@ -98,7 +98,7 @@
     (CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
 #else
 #error "Time slice too different compared to CONFIG_KERNEL_SYSCLOCK_PERIOD_US\
-	    CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US > 255"
+         CONFIG_KERNEL_TIME_SLICE_US / CONFIG_KERNEL_SYSCLOCK_PERIOD_US > 255"
 #endif
 #else
 #define Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS 0
@@ -122,32 +122,56 @@
 
 #if CONFIG_KERNEL_DELAY_OBJECT_U32
 typedef uint32_t k_ticks_t;
+#if CONFIG_RUST
+typedef uint32_t k_timeout_t;
+#endif /* CONFIG_RUST */
 #else
 typedef uint16_t k_ticks_t;
+#if CONFIG_RUST
+typedef uint16_t k_timeout_t;
+#endif /* CONFIG_RUST */
 #endif /* CONFIG_KERNEL_DELAY_OBJECT_U32 */
 
 typedef k_ticks_t k_delta_t;
 
+#if !CONFIG_RUST
+/* In rust, the type k_timeout_t is HEAVILY broken for an unknown reason.
+ * The value is always corrupted, please refer to commit
+ * b6f7dea1148c7357341418c622df08d30efd1fe9 for more information.
+ *
+ * The alternative is to define the type k_timeout_t simply as a k_ticks_t,
+ * instead of a struct containing a k_ticks_t.
+ */
 typedef struct {
     k_ticks_t value;
 } k_timeout_t;
-
+#endif /* !CONFIG_RUST */
 #endif
 
 #define MSEC_PER_SEC  (1000LU)
 #define USEC_PER_MSEC (1000LU)
 #define USEC_PER_SEC  (USEC_PER_MSEC * MSEC_PER_SEC)
 
+#if !CONFIG_RUST
 #define K_TIMEOUT_TICKS(t)   ((t).value)
+#else
+#define K_TIMEOUT_TICKS(t)   (t)
+#endif /* !CONFIG_RUST */
+
+
 #define K_TIMEOUT_EQ(t1, t2) (K_TIMEOUT_TICKS(t1) == K_TIMEOUT_TICKS(t2))
 #define K_TIMEOUT_MS(t)      ((uint32_t)(K_TIMEOUT_TICKS(t) / K_TICKS_PER_MS))
 #define K_TIMEOUT_SECONDS(t) ((uint32_t)(K_TIMEOUT_TICKS(t) / K_TICKS_PER_SECOND))
 
+#if !CONFIG_RUST
 #ifndef __cplusplus
 #define K_TICKS(ticks) ((k_timeout_t){.value = (k_ticks_t)(ticks)})
 #else
 #define K_TICKS(ticks) ((k_timeout_t){.value = static_cast<k_ticks_t>(ticks)})
 #endif /* __cplusplus */
+#else
+#define K_TICKS(ticks) (ticks)
+#endif /* !CONFIG_RUST */
 
 #define K_SECONDS(seconds)   K_TICKS(K_TICKS_PER_SECOND *(seconds))
 #define K_MSEC(milliseconds) K_TICKS(K_TICKS_PER_MS *(milliseconds))
