@@ -8,7 +8,7 @@ use avrtos::{arduino_hal, println};
 fn main() -> ! {
     let _kernel = Kernel::init_with_params(KernelParams::default()).unwrap();
 
-    println!("Hello, world!");
+    println!("Hello, world from rust!");
 
     loop {}
 }

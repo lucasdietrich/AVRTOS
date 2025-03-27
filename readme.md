@@ -461,12 +461,86 @@ External (resources):
 
 Note about current development:
 
-- Sysclock is configured with 100000us period
-- Scheduler debug is active
+- Prefer `--release` build over debug.
 - Only `atmega2560` is supported
 - [src/avrtos/rust_helpers.c](src/avrtos/rust_helpers.c) servers development purposes but should behave as a bridge between C and avrtos-core in the future.
 
-### Generate Rust bindings
+### Examples
+
+A list of examples is provided in the [avrtos-examples](examples/rust/examples) crate.
+
+Build current examples with:
+
+- `cargo run --example hello_world --release`
+- `cargo run --example serial --release`
+- `cargo run --example sleep --release`
+
+Feel free to test the binary by configuring the `runner` in the [.cargo/config.toml](.cargo/config.toml) file:
+
+- The `atmega2560` with `runner = "ravedude -cb 115200 mega2560"` 
+- QEMU with `runner = "./scripts/qemu-runner.sh"`
+- QEMU debug with `runner = "./scripts/qemu-debug.sh"`, also start debugging with `F5`,
+ see [.vscode/launch.json](.vscode/launch.json)
+
+#### Hello world sample
+
+```rs
+#![no_std]
+#![no_main]
+
+use avrtos::kernel::{Kernel, KernelParams};
+use avrtos::{arduino_hal, println};
+
+#[arduino_hal::entry]
+fn main() -> ! {
+    let _kernel = Kernel::init_with_params(KernelParams::default()).unwrap();
+
+    println!("Hello, world from rust!");
+
+    loop {}
+}
+```
+
+#### Threads sample
+
+```rs
+use avrtos::duration::Duration;
+use avrtos::kernel::{sleep, yeet, Kernel};
+use avrtos::thread::Priority;
+use avrtos::{arduino_hal, println, thread};
+
+#[arduino_hal::entry]
+fn main() -> ! {
+    let kernel = Kernel::init().unwrap();
+
+    let mut counter = 5;
+
+    let handle = thread::spawn(0x300, Priority::Cooperative, b'1', move || loop {
+        println!("loop: {}", counter);
+        sleep(Duration::from_secs(1));
+
+        if counter == 0 {
+            break;
+        }
+
+        counter -= 1;
+    })
+    .unwrap();
+
+    handle.join(Duration::FOREVER).unwrap();
+
+    println!("done");
+
+    loop {
+        yeet();
+    }
+}
+
+```
+
+### Generate Rust bindings (outdated)
+
+**Rust bindings are automatically generated during the build process, see [build.rs](rust-avrtos-sys/build.rs).**
 
 Install bindgen with:
 
@@ -499,24 +573,16 @@ Linker script is provided in [architecture/avr/avrtos-avr6.xn](architecture/avr/
 The `avrtos-core` crate will provide an idiomatic API to use AVRTOS in Rust.
 The goal is to be to able most of the avrtos features with a fully safe rust API.
 
-### Provide examples
-
-Build current examples with:
-
-- `cargo run --package rust --release --bin serial`
-- `cargo run --package rust --release --bin sleep`
-
-Feel free to test the binary by configuring the `runner` in the [.cargo/config.toml](.cargo/config.toml) file:
-
-- The `atmega2560` with `runner = "ravedude -cb 115200 mega2560"` 
-- QEMU with `runner = "./scripts/qemu-runner.sh"`, also start debugging with `F5`,
- see [.vscode/launch.json](.vscode/launch.json)
-
 ### Current issues
 
 Below are the current issues I'm facing with the Rust support:
 
-#### Compiler
+#### Float conversion or arguments passing ? (not solved, workaround)
+
+I'm not sure, but float calculations seems to be an issue, any use of the
+macro `K_MSEC` or even calling directly `k_sleep` generates issues.
+
+#### Compiler (solved)
 
 I'm unable to find a correct version for the compiler (see [rust-toolchain.toml](rust-toolchain.toml)):
 
@@ -524,7 +590,7 @@ I'm unable to find a correct version for the compiler (see [rust-toolchain.toml]
 - `nightly-2024-03-22` which was tested with [avr-hal](https://github.com/Rahix/avr-hal/blob/main/rust-toolchain.toml), doesn't work with `cc` or `bindgen`.
 	- Error is exactly described in this [issue (avr-hal: 537)](https://github.com/Rahix/avr-hal/issues/537)
 
-#### Invalid assembly generated
+#### Invalid assembly generated (solved)
 
 Following example generates invalid assembly:
 
@@ -600,8 +666,3 @@ This issue appears in most of infinite `loop` I've experienced.
 
 This seems to be solved in LLVM 17: <https://github.com/llvm/llvm-project/commit/697a162fa63df328ec9ca334636c5e85390b2bf0>
 Rust `nightly-2025-02-13` does not longer generate invalid assembly.
-
-#### Float conversion or arguments passing ?
-
-I'm not sure, but float calculations seems to be an issue, any use of the
-macro `K_MSEC` or even calling directly `k_sleep` generates issues.

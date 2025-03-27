@@ -1,3 +1,5 @@
+use std::{env, path::PathBuf};
+
 const AVR_GCC_DEFAULT: &str = "/home/lucas/x-tools/avr/bin/avr-gcc";
 const AVR_GCC_FLTO: bool = false; // Depending on the version, the LTO is by default enabled or not
 
@@ -124,17 +126,14 @@ const INCLUDES: &[&str] = &[
     "../src/avrtos/misc",
 ];
 
+const INCLUDE_WORLD_FILE: &str = "../src/avrtos_all.h";
+
 pub struct CompileEnv {
     compiler_path: String,
 }
 
 fn compile_avrtos_sources(cenv: CompileEnv) {
     let mut build = cc::Build::new();
-
-    #[cfg(feature = "avrtos-linker-script")]
-    {
-        println!("cargo:rustc-link-arg=-T{}", LINKER_SCRIPT);
-    }
 
     let build = build
         .compiler(cenv.compiler_path)
@@ -201,16 +200,96 @@ fn compile_avrtos_sources(cenv: CompileEnv) {
     for header in HEADERS {
         println!("cargo:rerun-if-changed={}", header);
     }
+}
 
-    // add link args
+fn bindgen() {
+    // Tell cargo to rerun the build script if the header changes
+    println!("cargo:rerun-if-changed={}", INCLUDE_WORLD_FILE);
+
+    let bindings = bindgen::Builder::default()
+        .header(INCLUDE_WORLD_FILE)
+        .layout_tests(false)
+        .use_core()
+        .formatter(bindgen::Formatter::Rustfmt)
+        .default_enum_style(bindgen::EnumVariation::ModuleConsts)
+        .size_t_is_usize(false)
+        .clang_arg("-I/usr/avr/include")
+        .clang_arg("-I../src")
+        .clang_arg("--target=avr")
+        .clang_arg("-mmcu=atmega2560")
+        .clang_arg("-Os")
+        .clang_arg("-D__AVR_3_BYTE_PC__")
+        .clang_arg("-DF_CPU=16000000UL")
+        .clang_arg("-DCONFIG_RUST=1");
+
+    let allowlist_functions = [
+        "k_.*",
+        "z_.*",
+        "dlist_.*",
+        "slist.*",
+        "tqueue_.*",
+        "led_.*",
+        "serial_.*",
+        "atomic_.*",
+        "__fault",
+        "__assert",
+        "print_slist",
+        "print_dlist",
+        "print_tqueue",
+        "gpio_.*",
+        "i2c_.*",
+        "spi_.*",
+        "ll_.*",
+        "timer_.*",
+        "timer8_.*",
+        "timer16_.*",
+        "usart_.*",
+        "exti_.*",
+        "tcn75_.*",
+    ];
+    let allowlist_types = [
+        "EXTI_Ctrl_Device",
+        "PCI_Ctrl_Device",
+        "SPI_Device",
+        "timer2_prescaler_t",
+        "timer_prescaler_t",
+        "timer16_interrupt_t",
+        "z_callsaved_ctx",
+        "z_callused_ctx",
+        "z_intctx",
+        "K_.*",
+        "Z_.*",
+    ];
+
+    let bindings = allowlist_functions
+        .iter()
+        .fold(bindings, |b, func| b.allowlist_function(func));
+
+    let bindings = allowlist_types
+        .iter()
+        .fold(bindings, |b, ty| b.allowlist_type(ty));
+
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    bindings
+        .generate()
+        .expect("Unable to generate bindings")
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Couldn't write bindings!");
+}
+
+fn main() {
+    #[cfg(feature = "avrtos-linker-script")]
+    {
+        println!("cargo:rustc-link-arg=-T{}", LINKER_SCRIPT);
+    }
+
+    // add link args ???
     // println!("cargo:rustc-flag=-Wl,--gc-sections");
     // println!("cargo:rustc-flag=-Wl,-Map,map.out");
     // println!("link-arg=-Wl,--verbose");
 
     println!("cargo:rustc-link-lib=static=avrtos");
-}
 
-fn main() {
     // set AVRTOS_AVR_GCC_PATH if exists
     let compiler_path = match std::env::var("AVRTOS_AVR_GCC_PATH") {
         Ok(path) => path,
@@ -219,5 +298,7 @@ fn main() {
 
     let cenv = CompileEnv { compiler_path };
 
-    compile_avrtos_sources(cenv)
+    compile_avrtos_sources(cenv);
+
+    bindgen();
 }

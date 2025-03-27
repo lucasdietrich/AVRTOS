@@ -1,10 +1,4 @@
-use core::{
-    cell::UnsafeCell,
-    ffi::c_void,
-    marker::PhantomPinned,
-    mem,
-    pin::Pin,
-};
+use core::{cell::UnsafeCell, ffi::c_void, marker::PhantomPinned, mem, pin::Pin};
 
 use alloc::{boxed::Box, vec::Vec};
 use avrtos_sys::{self as ll};

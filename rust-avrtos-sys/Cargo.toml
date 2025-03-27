@@ -14,4 +14,4 @@ qemu = []
 
 [build-dependencies]
 cc = "1.1"
-bindgen = "0.69"
+bindgen = "0.71.1"
