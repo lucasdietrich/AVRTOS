@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-const AVR_GCC_DEFAULT: &str = "/home/lucas/x-tools/avr/bin/avr-gcc";
+const AVR_GCC_DEFAULT: &str = "avr-gcc";
 const AVR_GCC_FLTO: bool = false; // Depending on the version, the LTO is by default enabled or not
 
 const LINKER_SCRIPT: &'static str = "architecture/avr/avrtos-avr6.xn";
