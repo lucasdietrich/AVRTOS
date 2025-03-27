@@ -440,7 +440,7 @@ A [Jenkinsfile](./Jenkinsfile) is provided to build the project in a Jenkins (mu
 
 It is based on the previous Docker container: `devops/fedora-avr-toolchain`
 
-## Rust support
+## Rust support (experimental)
 
 Rust support is currently in development, the goal is to provide a Rust API to
 compile rust programs using AVRTOS.
