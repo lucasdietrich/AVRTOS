@@ -1,6 +1,6 @@
 # Changelog
 
-## avrtos v2.0.0: Major Update with Rust Support, Memory Allocation, and More
+## avrtos v2.0.0: Major Update with Rust Support, Memory Allocators, and More
 
 ### Main Features
 

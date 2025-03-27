@@ -2,6 +2,8 @@
 
 **[Note about rust support in the project](#rust-support-experimental)**
 
+- Rust samples: [avrtos-examples](examples/rust/examples)
+
 ## Introduction
 
 AVRTOS is a real-time operating system (RTOS) crafted for 8-bit AVR microcontrollers.
