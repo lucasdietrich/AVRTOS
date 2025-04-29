@@ -195,8 +195,6 @@ int8_t mcp2515_deinit(struct mcp2515_device *mcp)
 
     mcp_reset(mcp);
 
-    k_msleep(CONFIG_MCP2515_DELAY_MS);
-
     k_mutex_cancel_wait(&mcp->_mutex);
 
     memset(mcp, 0, sizeof(struct mcp2515_device));
