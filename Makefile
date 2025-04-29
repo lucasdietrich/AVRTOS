@@ -119,12 +119,8 @@ metrics:
 # Prepare for release
 publish: piogen arduino_gen format clean multiple metrics arduino_lint
 
-rust_bindgen:
-	./rust-avrtos-sys/scripts/bindgen.sh
-	
-rust_build:
-	cargo build --package rust --release --bin $(SAMPLE)
-	python3 scripts/rustdis.py
+rust_hello_world:
+	cargo run --example hello_world --release
 
-rust:
-	cargo run --package rust --release --bin $(SAMPLE)
+rust_example_thread:
+	cargo run --example thread --release

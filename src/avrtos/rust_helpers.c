@@ -7,6 +7,7 @@
 #include "rust_helpers.h"
 
 #if CONFIG_RUST
+#warning "Rust support is experimental and not fully supported"
 
 #if CONFIG_KERNEL_THREAD_TERMINATION_TYPE <= 0
 #error "CONFIG_KERNEL_THREAD_TERMINATION_TYPE must be configured (> 0) for RUST support"
