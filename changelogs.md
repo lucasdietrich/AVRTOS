@@ -8,7 +8,8 @@
   Introduced experimental support for Rust, including:
   - Automatic bindings generation via `build.rs`
   - Basic thread API wrappers and kernel integration
-  - Examples for thread creation, stdio, and memory allocation
+  - Examples for thread creation, stdio, and memory allocation:
+    build rust hello world with `cargo run --example hello_world --release`
 
 * **Memory Allocation API (Experimental):**  
   - Introduced a **slab allocator** and helper functions
