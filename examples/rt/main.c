@@ -24,6 +24,8 @@ int main(void)
 
 void thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         /* Writing a logic one to PINxn toggles the value of PORTxn,
          * independent on the value of DDRxn. Note that the SBI

@@ -58,8 +58,10 @@ int main(void)
     }
 }
 
-void thread_led(void *p)
+void thread_led(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         led_off();
 #if SET_10kHz_SWITCHING_FREQUENCY

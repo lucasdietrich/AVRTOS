@@ -87,6 +87,8 @@ int main(void)
 
 void thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         uint8_t val = 0x0F;
         int ret =

@@ -11,6 +11,8 @@
 
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 #define K_MODULE K_MODULE_APPLICATION
 
 void thread(void *ctx);
@@ -53,6 +55,8 @@ int main(void)
 
 void thread(void *ctx)
 {
+    ARG_UNUSED(ctx);
+
     uint32_t sec = 100000;
     for (;;) {
         k_time_set(sec);
@@ -65,6 +69,8 @@ void thread(void *ctx)
 
 void processing(void *ctx)
 {
+    ARG_UNUSED(ctx);
+
     for (;;) {
     }
 }

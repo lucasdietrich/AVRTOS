@@ -13,6 +13,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 #define TASKS_COUNT 10u
 
 struct periodic_task {
@@ -33,6 +35,8 @@ static struct periodic_task tasks[TASKS_COUNT];
 
 int mytimer1_handler(struct k_timer *timer)
 {
+    ARG_UNUSED(timer);
+
     printf("mytimer1_handler()\n");
 
     return -1; // stop timer

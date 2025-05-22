@@ -264,6 +264,7 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 
     case TW_MT_DATA_ACK: // Data transmitted, ACK received
         x->cursor++;
+        __fallthrough;
     case TW_MT_SLA_ACK: // SLA+W transmitted, ACK received
         if (x->cursor < x->write_len) {
             dev->TWDRn = x->buf[x->cursor++];
@@ -284,9 +285,10 @@ __always_inline void i2c_state_machine(I2C_Device *dev, struct i2c_context *x)
 
     case TW_MR_DATA_ACK: // Data received, ACK returned
         x->buf[x->cursor++] = dev->TWDRn;
+        __fallthrough;
     case TW_MR_SLA_ACK: // SLA+R transmitted, ACK received
                         /*  ACK if more data is expected (NACK otherwise) */
-        TWI_REPLY(dev, x->read_len - x->cursor > 1u);
+        TWI_REPLY(dev, x->read_len - x->cursor > 1);
         break;
 
     case TW_MR_DATA_NACK: // Data received, NACK returned

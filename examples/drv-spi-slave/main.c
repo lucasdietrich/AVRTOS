@@ -9,6 +9,8 @@
 #include <avrtos/drivers/exti.h>
 #include <avrtos/drivers/spi.h>
 
+#include "avrtos/sys.h"
+
 /* Button should be wired to PD0 (INT0) on Arduino Mega 2560,
  * with a pull-up resistor.
  */
@@ -112,6 +114,8 @@ int main(void)
 #if MEASURE_STATS
 void calculate_datarate(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint32_t last, now, diff;
     uint32_t rx;
     uint16_t er;

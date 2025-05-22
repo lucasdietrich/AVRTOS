@@ -40,10 +40,7 @@ typedef struct titem tqueue_t;
 #define DEFINE_TQUEUE(name) struct titem *name = NULL
 #define INIT_TITEM(timeout_ms)                                                           \
     {                                                                                    \
-        {                                                                                \
-            .timeout = timeout_ms,                                                       \
-        },                                                                               \
-            .next = NULL                                                                 \
+        .timeout = timeout_ms, .next = NULL                                              \
     }
 #define INIT_TITEM_DEFAULT() INIT_TITEM(0)
 

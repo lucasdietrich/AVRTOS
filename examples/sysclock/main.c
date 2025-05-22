@@ -13,6 +13,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 #define PERIOD 1000
 
 void thread_led(void *p);
@@ -29,8 +31,10 @@ int main(void)
     k_sleep(K_FOREVER);
 }
 
-void thread_led(void *p)
+void thread_led(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         k_thread_dump(k_thread_get_current());
 

@@ -53,6 +53,8 @@ int main(void)
 
 static void thread_usart(void *arg)
 {
+    ARG_UNUSED(arg);
+
     char c;
     for (;;) {
         if (k_msgq_get(&usart_msgq, &c, K_FOREVER) >= 0) {
@@ -64,6 +66,8 @@ static void thread_usart(void *arg)
 
 static void thread_led(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_show_uptime();
         led_toggle();

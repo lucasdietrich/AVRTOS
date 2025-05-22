@@ -12,6 +12,8 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+#include "avrtos/sys.h"
+
 #define K_MODULE K_MODULE_APPLICATION
 
 #define IPC_MAX_DATA_SIZE 0x10U
@@ -55,6 +57,8 @@ K_SEM_DEFINE(tx_finished_sem, 1, 1);
 
 void usart_ipc_callback(UART_Device *dev, struct usart_async_context *ctx)
 {
+    ARG_UNUSED(dev);
+
     if (ctx->evt == USART_EVENT_RX_COMPLETE) {
         k_msgq_put(&ipc_msgq, ctx->rx.buf, K_NO_WAIT);
     } else if (ctx->evt == USART_EVENT_TX_COMPLETE) {
@@ -138,6 +142,8 @@ K_THREAD_DEFINE(rx_thread, usart_rx_thread, 0x100, K_COOPERATIVE, &ipc_msgq, 'X'
 
 static void thread_canaries(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_dump_stack_canaries();
         k_sleep(K_SECONDS(30));

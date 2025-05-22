@@ -202,8 +202,13 @@ struct item3 {
     struct titem tie;
 };
 
-struct item3 titems[] = {
-    {'A', {100}}, {'B', {25}}, {'C', {35}}, {'D', {35}}, {'E', {25}}};
+#define LETTER_T(_chr, _delay)                                                           \
+    {                                                                                    \
+        .chr = _chr, .tie = INIT_TITEM(_delay)                                           \
+    }
+
+static item3 titems[] = {LETTER_T('A', 100), LETTER_T('B', 25), LETTER_T('C', 35),
+                         LETTER_T('D', 35), LETTER_T('E', 25)};
 
 void print_titem(struct titem *item)
 {
@@ -274,8 +279,14 @@ struct item4 {
     struct tditem tie;
 };
 
-static struct item4 tditems[] = {
-    {'A', {100}}, {'B', {25}}, {'C', {35}}, {'D', {35}}, {'E', {25}}};
+#define LETTER_TD(_chr, _delay)                                                          \
+    {                                                                                    \
+        .chr = _chr, .tie = {.delay_shift = _delay, .node = DITEM_INIT_NULL() }          \
+    }
+
+static struct item4 tditems[] = {LETTER_TD('A', 100), LETTER_TD('B', 25),
+                                 LETTER_TD('C', 35), LETTER_TD('D', 35),
+                                 LETTER_TD('E', 25)};
 
 void print_tditem(struct tditem *item)
 {

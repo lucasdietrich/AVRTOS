@@ -74,7 +74,7 @@ __kernel int8_t k_thread_abort(struct k_thread *thread);
  * @return int8_t Returns 0 on success, or a negative error code on failure.
  *  - -EINVAL if the thread pointer is NULL.
  *  - -ETIMEDOUT if the timeout expired before the thread finished.
- *  - -ECANCELED if the thread was aborted.
+ *  - -ECANCELED if the thread waiting was aborted.
  *  - -EAGAIN if the thread is not finished and the timeout is K_NO_WAIT.
  */
 __kernel int8_t k_thread_join(struct k_thread *thread, k_timeout_t timeout);

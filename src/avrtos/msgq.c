@@ -57,7 +57,7 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
              * to the msgq buffer. The consumer will copy it later.
              */
             memcpy(msgq->write_cursor, data, msgq->msg_size);
-            msgq->write_cursor = msgq->write_cursor + msgq->msg_size;
+            msgq->write_cursor = (uint8_t *)msgq->write_cursor + msgq->msg_size;
             if (msgq->write_cursor == msgq->buf_end) {
                 msgq->write_cursor = msgq->buf_start;
             }
@@ -96,7 +96,7 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 
         /* Copy the first message from the msgq to the thread. */
         memcpy(data, msgq->read_cursor, msgq->msg_size);
-        msgq->read_cursor = msgq->read_cursor + msgq->msg_size;
+        msgq->read_cursor = sys_ptr_add(msgq->read_cursor, msgq->msg_size);
         if (msgq->read_cursor == msgq->buf_end) {
             msgq->read_cursor = msgq->buf_start;
         }
@@ -107,7 +107,7 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
              * from the thread to the msgq.
              */
             memcpy(msgq->write_cursor, pending_thread->swap_data, msgq->msg_size);
-            msgq->write_cursor = msgq->write_cursor + msgq->msg_size;
+            msgq->write_cursor = sys_ptr_add(msgq->write_cursor, msgq->msg_size);
             if (msgq->write_cursor == msgq->buf_end) {
                 msgq->write_cursor = msgq->buf_start;
             }

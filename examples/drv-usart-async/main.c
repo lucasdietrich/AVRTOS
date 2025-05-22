@@ -14,6 +14,8 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+#include "avrtos/sys.h"
+
 #define K_MODULE K_MODULE_APPLICATION
 
 void consumer(void *context);
@@ -45,9 +47,10 @@ void free_mem(struct in *mem)
     k_mem_slab_free(&myslab, mem);
 }
 
-__always_inline void input(const char rx)
+static struct in *mem = NULL;
+
+void input(const char rx)
 {
-    static struct in *mem = NULL;
     if (mem == NULL) {
         if (alloc(&mem) != 0) {
             __ASSERT_NULL(mem);
@@ -60,6 +63,7 @@ __always_inline void input(const char rx)
     switch (rx) {
     case 0x1A: /* Ctrl + Z -> drop */
         mem->len = 0;
+        __fallthrough;
     case '\n': /* process the packet */
         mem->buffer[mem->len] = '\0';
         push(&mem);
@@ -88,8 +92,10 @@ ISR(USART0_RX_vect)
     input(rx);
 }
 
-void consumer(void *context)
+void consumer(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         serial_print_p(PSTR("\n# "));
         struct in *mem = (struct in *)k_fifo_get(&myfifo, K_FOREVER);
@@ -130,6 +136,8 @@ const uint8_t tx_buffer[] = "Hello World !";
 
 void work_tx(struct k_work *w)
 {
+    ARG_UNUSED(w);
+
     k_sleep(K_SECONDS(1));
     usart_tx(USART1_DEVICE, tx_buffer, sizeof(tx_buffer) - 1);
 }
@@ -138,6 +146,8 @@ K_WORK_DEFINE(tx_work, work_tx);
 
 void usart_ipc_callback(UART_Device *dev, struct usart_async_context *ctx)
 {
+    ARG_UNUSED(dev);
+
     if (ctx->evt == USART_EVENT_RX_COMPLETE) {
         k_msgq_put(&ipc_msgq, ctx->rx.buf, K_NO_WAIT);
     } else if (ctx->evt == USART_EVENT_TX_COMPLETE) {
@@ -185,6 +195,8 @@ K_THREAD_DEFINE(rx_thread, usart_rx_thread, 0x100, K_COOPERATIVE, &ipc_msgq, 'X'
 
 static void thread_canaries(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_dump_stack_canaries();
         k_sleep(K_SECONDS(30));

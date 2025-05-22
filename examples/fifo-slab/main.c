@@ -82,8 +82,10 @@ int main(void)
     }
 }
 
-void consumer_thread(void *context)
+void consumer_thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         struct block *mem = (struct block *)k_fifo_get(&fifo, K_FOREVER);
         if (mem != NULL) {

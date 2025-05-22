@@ -9,8 +9,12 @@
 #include <avrtos/misc/led.h>
 #include <avrtos/misc/serial.h>
 
+#include "avrtos/sys.h"
+
 int timer_handler(struct k_timer *timer)
 {
+    ARG_UNUSED(timer);
+
     printf("uptime: %lu seconds\n", k_uptime_get());
 
     return 0;
@@ -41,6 +45,8 @@ K_THREAD_DEFINE(ta, thread, 0x200, K_PREEMPTIVE, NULL, 'A');
 
 void thread(void *ctx)
 {
+    ARG_UNUSED(ctx);
+
     uint64_t last = 0L;
     uint64_t now  = 0L;
 

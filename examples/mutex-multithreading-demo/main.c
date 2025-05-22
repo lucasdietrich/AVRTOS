@@ -36,8 +36,10 @@ int main(void)
     }
 }
 
-void thread_led_on(void *p)
+void thread_led_on(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         k_mutex_lock(&mymutex, K_FOREVER);
 
@@ -49,8 +51,10 @@ void thread_led_on(void *p)
     }
 }
 
-void thread_led_off(void *p)
+void thread_led_off(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         k_mutex_lock(&mymutex, K_FOREVER);
 

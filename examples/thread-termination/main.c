@@ -11,6 +11,8 @@
 
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 struct k_thread *volatile s_thread = NULL;
 
 void thread_entry(void *_c);
@@ -47,8 +49,10 @@ int main(void)
     k_sleep(K_FOREVER);
 }
 
-void thread_entry(void *_c)
+void thread_entry(void *arg)
 {
+    ARG_UNUSED(arg);
+
     s_thread = k_thread_get_current();
 
     for (uint_fast8_t i = 0; i < 5; i++) {
@@ -62,8 +66,10 @@ void thread_entry(void *_c)
     k_sem_give(&mysem);
 }
 
-void thread_canaries_entry(void *_c)
+void thread_canaries_entry(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_thread_dump_all();
         k_dump_stack_canaries();

@@ -39,10 +39,10 @@ set(CMAKE_GENERATOR "Unix Makefiles")
 set(VERBOSITY "") # --verbose
 
 # -Werror 
-set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -fno-fat-lto-objects \
+set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -Wextra -fno-fat-lto-objects \
     -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
     -fdata-sections -ffunction-sections -fno-split-wide-types \
-    -fno-tree-scev-cprop -flto"
+    -fno-tree-scev-cprop -flto" 
 )
 # -Wall -Wno-main -Wundef -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fdata-sections -ffunction-sections -fno-split-wide-types -fno-tree-scev-cprop
 

@@ -21,6 +21,8 @@ ISR(USART0_RX_vect)
 
 void thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     char chr;
     uint32_t rcvd = 0u;
     for (;;) {

@@ -69,8 +69,10 @@ int main(void)
     k_sleep(K_FOREVER);
 }
 
-void waiting_thread(void *p)
+void waiting_thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         void *mem = k_fifo_get(&myfifo, K_SECONDS(5));
         if (mem != NULL) {
@@ -91,8 +93,10 @@ void waiting_thread(void *p)
     }
 }
 
-void monitoring_thread(void *p)
+void monitoring_thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         k_sleep(K_MSEC(30000));
 

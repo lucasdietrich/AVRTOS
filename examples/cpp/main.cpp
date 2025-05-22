@@ -9,6 +9,9 @@
 #include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 
+#include "avrtos/assert.h"
+#include "avrtos/fault.h"
+
 K_MEM_SLAB_DEFINE(stacks, 0x80, 4U);
 
 class Task;
@@ -24,7 +27,10 @@ class Task
     {
 
         void *stack;
-        k_mem_slab_alloc(&stacks, &stack, K_NO_WAIT);
+        if (k_mem_slab_alloc(&stacks, &stack, K_NO_WAIT) != 0) {
+            __fault(K_FAULT_ASSERT);
+        }
+
         k_thread_create(&_ctx, _wrap_entry, stack, 0x80, priority, this, ++cnt + '0');
 
         memcpy(_name, name, sizeof(_name));

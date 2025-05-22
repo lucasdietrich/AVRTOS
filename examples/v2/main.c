@@ -13,6 +13,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 char chrs[2] = {'a', 'b'};
 void mythread(char *ctx);
 void canariesthread(void *ctx);
@@ -51,6 +53,8 @@ void mythread(char *ctx)
 
 void canariesthread(void *ctx)
 {
+    ARG_UNUSED(ctx);
+
     while (1) {
         k_dump_stack_canaries();
         k_sleep(K_SECONDS(30));

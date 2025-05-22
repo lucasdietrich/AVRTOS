@@ -37,8 +37,10 @@ int main(void)
     k_sleep(K_FOREVER);
 }
 
-void waiter(void *context)
+void waiter(void *arg)
 {
+    ARG_UNUSED(arg);
+
     printf_P(PSTR("Press any key: "));
 
     k_sleep(K_SECONDS(1));

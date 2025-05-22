@@ -46,8 +46,8 @@ static uint8_t ms(struct k_prng *prng)
 
 static void debug(void *mem, int8_t rc)
 {
-    // printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), k_thread_get_current()->symbol,
-    // 		 (unsigned int)mem, rc);
+    printf_P(PSTR("cur=%c mem=0x%x rc=%d\n"), k_thread_get_current()->symbol,
+             (unsigned int)mem, rc);
 }
 
 static void *alloc(k_timeout_t timeout)
@@ -59,8 +59,9 @@ static void *alloc(k_timeout_t timeout)
     return mem;
 }
 
-void thread(void *p)
+void thread(void *arg)
 {
+    ARG_UNUSED(arg);
     K_PRNG_DEFINE_DEFAULT(prng);
 
     for (;;) {
@@ -72,8 +73,10 @@ void thread(void *p)
     }
 }
 
-void thread_time(void *ctx)
+void thread_time(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_show_uptime();
         printf_P(PSTR("\n"));
@@ -109,7 +112,7 @@ int main(void)
 
         k_dump_stack_canaries();
 
-        K_SECONDS(1);
+        k_sleep(K_SECONDS(1));
 
         /* free all blocks */
         for (uint8_t i = 0; i < BLOCKS; i++) {

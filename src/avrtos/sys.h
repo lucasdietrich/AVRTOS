@@ -38,6 +38,7 @@
 #define __noinit                 Z_LINK_SECTION(.noinit)
 #define __bss                    Z_LINK_SECTION(.bss)
 #define __packed                 __attribute__((packed))
+#define __fallthrough            __attribute__((fallthrough))
 #define memory_barrier()         asm volatile("" : : : "memory")
 #define memory_barrier_var(_var) asm volatile("" : : "b"(_var) : "memory")
 
@@ -92,6 +93,9 @@
 
 #define sys_ptr_diff(a, b)           ((uint16_t)((char *)(a) - (char *)(b)))
 #define sys_ptr_add(ptr, offset)     ((void *)((char *)(ptr) + (offset)))
+#define sys_ptr_sub(ptr, offset)     ((void *)((char *)(ptr) - (offset)))
+#define sys_ptr_inc(ptr)             ((void *)((char *)(ptr) + 1))
+#define sys_ptr_dec(ptr)             ((void *)((char *)(ptr)-1))
 #define sys_ptr_shift(ptr_p, offset) (*(ptr_p) = sys_ptr_add(*(ptr_p), offset))
 
 #endif

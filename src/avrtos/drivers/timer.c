@@ -362,7 +362,7 @@ int8_t timer_init(uint8_t tim_idx,
 
     const struct timer_config cfg = {
         .mode      = TIMER_MODE_CTC,
-        .prescaler = (flags & TIMER_API_FLAG_AUTOSTART) ? prescaler_id : 0U,
+        .prescaler = (flags & TIMER_API_FLAG_AUTOSTART) ? prescaler_id : 0,
         .counter   = counter,
         .timsk     = BIT(OCIEnA)};
 

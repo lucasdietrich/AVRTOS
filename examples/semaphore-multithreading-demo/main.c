@@ -55,8 +55,10 @@ int main(void)
     }
 }
 
-void waiter_entry(void *context)
+void waiter_entry(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         uint8_t dbg_sem = k_sem_take(&mysem, K_FOREVER);
 

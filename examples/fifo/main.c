@@ -31,7 +31,12 @@ struct item {
     struct snode tie;
 };
 
-struct item letters[] = {{'1'}, {'2'}, {'3'}, {'4'}, {'5'}};
+#define LETTER(_chr)                                                                     \
+    {                                                                                    \
+        .chr = _chr, .tie = SNODE_INIT()                                                 \
+    }
+
+struct item letters[] = {LETTER('1'), LETTER('2'), LETTER('3'), LETTER('4'), LETTER('5')};
 
 int main(void)
 {

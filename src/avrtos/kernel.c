@@ -11,6 +11,7 @@
 #include <util/delay.h>
 
 #include "assert.h"
+#include "avrtos/sys.h"
 #include "canaries.h"
 #include "debug.h"
 #include "event.h"
@@ -267,7 +268,8 @@ __always_inline void z_thread_finalize_stack_init(struct k_thread *const thread)
      * determined by the linker at compilation time. So we need to
      * do it here.
      */
-    struct z_callsaved_ctx *const ctx = thread->stack.end - Z_CALLSAVED_CTX_SIZE + 1u;
+    struct z_callsaved_ctx *const ctx =
+        sys_ptr_sub(thread->stack.end, Z_CALLSAVED_CTX_SIZE - 1u);
     swap_endianness(&ctx->thread_context);
     swap_endianness((void *)&ctx->thread_entry);
     swap_endianness(&ctx->pc);
@@ -686,18 +688,15 @@ static void z_thread_stack_create(struct k_thread *const thread,
     ctx->sreg           = 0U;
     ctx->init_sreg      = CONFIG_THREAD_DEFAULT_SREG;
     ctx->thread_context = (void *)K_SWAP_ENDIANNESS(context_p);
-    ctx->thread_entry   = (void *)K_SWAP_ENDIANNESS(entry);
+    ctx->thread_entry   = (k_thread_entry_t)K_SWAP_ENDIANNESS(entry);
     ctx->pc             = (void *)K_SWAP_ENDIANNESS(z_thread_entry);
 
 #if defined(__AVR_3_BYTE_PC__)
     ctx->pch = 0;
 #endif
 
-    /* Save SP in the thread structure */
-    thread->sp = ctx;
-
-    /* Adjust the pointer to the top of the stack */
-    thread->sp--;
+    /* Save SP in the thread structure and ajust to the top of the stack */
+    thread->sp = sys_ptr_sub(ctx, 1u);
 }
 
 //

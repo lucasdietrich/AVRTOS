@@ -16,6 +16,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 uint8_t on  = 1u;
 uint8_t off = 0u;
 
@@ -93,8 +95,10 @@ void thread_led(void *p)
     }
 }
 
-void thread_monitor(void *p)
+void thread_monitor(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         serial_printl_p(PSTR("::monitoring"));
 

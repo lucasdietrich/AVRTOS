@@ -8,6 +8,7 @@
 
 #include <avr/pgmspace.h>
 
+#include "avrtos/sys.h"
 #include "fault.h"
 
 extern struct k_thread z_thread_main;
@@ -42,7 +43,8 @@ void k_assert_registered_stack_sentinel(void)
 {
     for (void **loc = &__k_sent_start; loc < &__k_sent_end; loc++) {
         void *sent = pgm_read_ptr(loc);
-        for (void *p = sent; p < sent + CONFIG_THREAD_STACK_SENTINEL_SIZE; p++) {
+        for (void *p = sent; p < sys_ptr_add(sent, CONFIG_THREAD_STACK_SENTINEL_SIZE);
+             p       = sys_ptr_inc(p)) {
             if (*(uint8_t *)p != CONFIG_THREAD_STACK_SENTINEL_SYMBOL) {
                 __fault(K_FAULT_STACK_SENTINEL);
             }

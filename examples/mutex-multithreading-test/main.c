@@ -43,8 +43,10 @@ int main(void)
     k_sleep(K_FOREVER);
 }
 
-void thread(void *p)
+void thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(5)); // change this timeout
 
     serial_transmit(k_thread_get_current()->symbol);
@@ -62,8 +64,10 @@ void thread(void *p)
     k_sleep(K_FOREVER);
 }
 
-void threadp(void *p)
+void threadp(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint8_t lock = k_mutex_lock(&mymutex, K_SECONDS(9)); // change this timeout
 
     serial_transmit(k_thread_get_current()->symbol);

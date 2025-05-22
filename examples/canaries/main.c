@@ -29,6 +29,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 static uint8_t dthread_stack[0x40u];
 static struct k_thread dthread;
 
@@ -66,8 +68,10 @@ void dthread_entry(void *p)
     k_sleep(K_FOREVER);
 }
 
-void thread_led(void *p)
+void thread_led(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         led_on();
 
@@ -77,8 +81,10 @@ void thread_led(void *p)
     }
 }
 
-void thread_task1(void *p)
+void thread_task1(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         k_dump_stack_canaries();
 
@@ -86,8 +92,10 @@ void thread_task1(void *p)
     }
 }
 
-void thread_task2(void *p)
+void thread_task2(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint16_t blocks = 0;
 
     while (1) {

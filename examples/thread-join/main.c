@@ -11,6 +11,8 @@
 
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 void thread_entry(void *_c);
 void thread_canaries_entry(void *_c);
 
@@ -35,8 +37,10 @@ int main(void)
     }
 }
 
-void thread_entry(void *_c)
+void thread_entry(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint8_t limit = 5;
 
     for (uint_fast8_t i = 0; i < 5; i++) {

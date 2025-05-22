@@ -65,6 +65,7 @@ void input(const char rx)
     switch (rx) {
     case 0x1A: /* Ctrl + Z -> drop */
         mem->len = 0;
+        __fallthrough;
     case '\r':
         /* TODO: With QEMU, the \n is not received, so assume EOL on \r */
 #if !defined(__QEMU__)
@@ -174,6 +175,8 @@ static void cmd_sleep(void)
 
 void consumer(void *context)
 {
+    (void)context;
+
     const struct command *cmd;
     struct in *mem;
 

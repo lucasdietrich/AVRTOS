@@ -33,8 +33,10 @@ int main(void)
     }
 }
 
-static void thread1_entry(void *context)
+static void thread1_entry(void *arg)
 {
+    ARG_UNUSED(arg);
+
     k_mutex_lock(&mutex, K_FOREVER);
 
     serial_print("thread1: mutex locked\n");

@@ -44,8 +44,10 @@ int main(void)
     }
 }
 
-void thread_blink(void *p)
+void thread_blink(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         serial_transmit('o');
         led_on();
@@ -59,8 +61,10 @@ void thread_blink(void *p)
     }
 }
 
-void thread_coop(void *p)
+void thread_coop(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         k_sleep(K_MSEC(5000));
 

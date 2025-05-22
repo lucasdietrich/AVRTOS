@@ -10,6 +10,8 @@
 
 #include <avr/sleep.h>
 
+#include "avrtos/sys.h"
+
 void thread(void *p);
 
 K_THREAD_DEFINE(t1, thread, Z_THREAD_STACK_MIN_SIZE + 100, K_PREEMPTIVE, NULL, '1');
@@ -42,8 +44,10 @@ int main(void)
     }
 }
 
-void thread(void *p)
+void thread(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint16_t size = 0;
     for (;;) {
         write_stack(size, 0xFF);

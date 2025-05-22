@@ -264,12 +264,12 @@ typedef struct {
 #define Z_THREAD_STACK_START_USABLE(thread)                                              \
     Z_STACK_START_USABLE(thread->stack.end, thread->stack.size)
 
-#define Z_STACK_END(stack_start, size) ((stack_start) + (size)-1)
-#define Z_STACK_START(stack_end, size) ((stack_end) - (size) + 1)
+#define Z_STACK_END(stack_start, size) sys_ptr_add(stack_start, (size)-1)
+#define Z_STACK_START(stack_end, size) sys_ptr_sub(stack_end, (size)-1)
 
-#define Z_STACK_END_ASM(stack_start, size) Z_STACK_END(stack_start, size)
+#define Z_STACK_END_ASM(stack_start, size) ((stack_start) + (size)-1)
 
-#define Z_STACK_INIT_SP(stack_end) ((stack_end)-Z_CALLSAVED_CTX_SIZE)
+#define Z_STACK_INIT_SP(stack_end) sys_ptr_sub(stack_end, Z_CALLSAVED_CTX_SIZE)
 
 // if not casting this symbol address, the stack pointer will not be correctly
 // set
@@ -299,7 +299,7 @@ typedef struct {
 #endif
 
 #define Z_CORE_CONTEXT_INIT(entry, ctx, _entry)                                          \
-    (struct z_callsaved_ctx)                                                             \
+    (const struct z_callsaved_ctx)                                                       \
     {                                                                                    \
         .sreg = 0x00, {.regs = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U}},    \
         {.init_sreg = CONFIG_THREAD_DEFAULT_SREG},                                       \
@@ -310,7 +310,7 @@ typedef struct {
 #define Z_STACK_INITIALIZER(name, stack_size, entry, ctx)                                \
     struct {                                                                             \
         uint8_t empty[(stack_size)-Z_CALLSAVED_CTX_SIZE];                                \
-        struct z_callsaved_ctx core;                                                     \
+        const struct z_callsaved_ctx core;                                               \
     } z_stack_buf_##name = {                                                             \
         {0x00},                                                                          \
         Z_CORE_CONTEXT_INIT(entry, ctx, z_thread_entry),                                 \

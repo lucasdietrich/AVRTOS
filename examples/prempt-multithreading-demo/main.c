@@ -52,8 +52,10 @@ int main(void)
     k_sleep(K_FOREVER);
 }
 
-void thread_led_toggle(void *p)
+void thread_led_toggle(void *arg)
 {
+    ARG_UNUSED(arg);
+
     while (1) {
         led_on();
 
@@ -68,8 +70,10 @@ void thread_led_toggle(void *p)
     }
 }
 
-void thread_processing(void *p)
+void thread_processing(void *arg)
 {
+    ARG_UNUSED(arg);
+
     uint32_t counter = 0;
     while (1) {
         counter++;

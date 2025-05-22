@@ -50,6 +50,8 @@ int main(void)
 
 static void monitor(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_dump_stack_canaries();
 

@@ -56,6 +56,8 @@ void __fault(uint8_t reason)
     serial_print_p(PSTR(" *****\n"));
 
     k_thread_dump(z_ker.current);
+#else
+    (void)reason;
 #endif /* CONFIG_KERNEL_FAULT_VERBOSITY */
 
     // TODO: prefer a infinite loop here with a dedicated symbol

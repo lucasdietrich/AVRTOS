@@ -13,6 +13,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "avrtos/sys.h"
+
 #define WORKQ_RUNTIME_INIT 0
 
 void tasks_generator(void *p);
@@ -81,6 +83,8 @@ int main(void)
 
 void tasks_generator(void *p)
 {
+    ARG_UNUSED(p);
+
     uint8_t i = 0;
     while (1) {
         if (k_sem_take(&tasks[i].sem, K_NO_WAIT) == 0) {
