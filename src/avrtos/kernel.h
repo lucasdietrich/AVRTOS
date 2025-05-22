@@ -27,6 +27,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/**
+ * @brief Kernel internal structure.
+ *
+ * This external symbol represents the kernel's internal structure, which contains
+ * information about the current state of the kernel, including the current thread,
+ * the run queue, the timeouts queue, and other kernel-related data.
+ */
+extern struct z_kernel z_ker;
+
+/**
+ * @brief Main thread
+ *
+ * This external symbol represents the main thread in the system.
+ */
+extern struct k_thread z_thread_main;
 
 /**
  * @brief Define a new thread at runtime and initialize its stack.
@@ -114,7 +129,6 @@ void z_thread_entry(void *context);
  */
 __always_inline struct k_thread *k_thread_get_current(void)
 {
-    extern struct z_kernel z_ker;
     return z_ker.current;
 }
 
@@ -125,7 +139,6 @@ __always_inline struct k_thread *k_thread_get_current(void)
  */
 __always_inline struct k_thread *k_thread_get_main(void)
 {
-    extern struct k_thread z_thread_main;
     return &z_thread_main;
 }
 
@@ -468,8 +481,6 @@ __always_inline void k_yield_from_isr(void)
 #if CONFIG_KERNEL_ASSERT
     z_assert_user_context();
 #endif
-
-    extern struct z_kernel z_ker;
 
     /* Check whether the current thread can be preempted */
     if ((z_ker.current->flags & (Z_THREAD_SCHED_LOCKED_MSK | Z_THREAD_PRIO_COOP)) == 0u) {

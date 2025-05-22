@@ -11,8 +11,6 @@
 #include "avrtos/sys.h"
 #include "fault.h"
 
-extern struct k_thread z_thread_main;
-
 #if CONFIG_AVRTOS_LINKER_SCRIPT
 extern struct k_thread __k_threads_start;
 extern struct k_thread __k_threads_end;
