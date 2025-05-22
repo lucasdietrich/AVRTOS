@@ -17,7 +17,7 @@
 
 #define K_MODULE K_MODULE_APPLICATION
 
-void consumer(void *context);
+void consumer(void *arg);
 
 K_THREAD_DEFINE(w1, consumer, 0x100, K_PREEMPTIVE, NULL, 'A');
 
@@ -173,9 +173,9 @@ static void cmd_sleep(void)
     k_sleep(K_SECONDS(1));
 }
 
-void consumer(void *context)
+void consumer(void *arg)
 {
-    (void)context;
+    ARG_UNUSED(arg);
 
     const struct command *cmd;
     struct in *mem;

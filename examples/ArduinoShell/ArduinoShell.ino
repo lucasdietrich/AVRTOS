@@ -15,9 +15,11 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+
+#include "avrtos/sys.h"
 #define LOG_LEVEL LOG_LEVEL_WRN
 
-void consumer(void *context);
+void consumer(void *arg);
 
 static struct k_thread consumer_thread;
 static uint8_t consumer_stack[0x100];
@@ -177,8 +179,10 @@ static void cmd_canaries(void)
     k_print_stack_canaries(&consumer_thread);
 }
 
-void consumer(void *context)
+void consumer(void *arg)
 {
+    ARG_UNUSED(arg);
+
     const struct command *cmd;
     struct in *mem;
 
@@ -204,7 +208,8 @@ void setup(void)
     led_init();
     serial_init_baud(9600u);
 
-    k_mem_slab_init(&myslab, myslab.buffer, myslab.block_size, myslab.count);
+    k_mem_slab_init(&myslab, myslab.allocator.buffer, myslab.allocator.block_size,
+                    myslab.allocator.count);
     k_thread_create(&consumer_thread, consumer, consumer_stack, sizeof(consumer_stack),
                     K_PREEMPTIVE, NULL, 'A');
     k_thread_start(&consumer_thread);
