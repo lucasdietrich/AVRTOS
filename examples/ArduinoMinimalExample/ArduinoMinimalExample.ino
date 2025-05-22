@@ -71,6 +71,8 @@ void loop(void)
 
 static void thread_usart_task(void *arg)
 {
+    ARG_UNUSED(arg);
+
     char c;
     for (;;) {
         if (k_msgq_get(&usart_msgq, &c, K_FOREVER) >= 0) {
@@ -82,6 +84,8 @@ static void thread_usart_task(void *arg)
 
 static void thread_led_task(void *arg)
 {
+    ARG_UNUSED(arg);
+
     for (;;) {
         k_show_uptime();
         led_toggle();

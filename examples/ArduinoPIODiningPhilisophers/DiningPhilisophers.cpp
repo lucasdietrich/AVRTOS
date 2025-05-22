@@ -17,7 +17,7 @@
 #define SEMAPHORE 1
 #define FIFO      2
 
-// Cchange the fork implementation (MUTEX, SEMAPHORE or FIFO)
+// Change the fork implementation (MUTEX, SEMAPHORE or FIFO)
 #define FORKS MUTEX
 
 #define PHIL_THINKING_DURATION_MAX_MS 5000u
@@ -313,6 +313,8 @@ struct k_sem sem;
 
 int timer_handler(struct k_timer *timer)
 {
+    ARG_UNUSED(timer);
+
     k_sem_give(&sem);
 
     return 0; // continue
@@ -364,5 +366,5 @@ void loop(void)
         printf_P(PSTR("%s "), phil_state_to_string(state));
     }
 
-    printf_P(LOG_LEVEL >= LOG_LEVEL_INF ? PSTR("\n") : PSTR("\r"));
+    printf_P(LOG_LEVEL >= LOG_LEVEL_INF ? PSTR("\n") : PSTR("\r\n"));
 }
