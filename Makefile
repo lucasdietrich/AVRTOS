@@ -124,3 +124,6 @@ rust_hello_world:
 
 rust_example_thread:
 	cargo run --example thread --release
+
+archive:
+	git archive --format zip --output avrtos.zip HEAD
