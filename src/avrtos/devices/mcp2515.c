@@ -19,8 +19,12 @@
 #define K_MODULE  K_MODULE_DEVICE
 #define LOG_LEVEL LOG_LEVEL_INF
 
-#if !defined(CONFIG_MCP2515_DELAY_MS)
-#define CONFIG_MCP2515_DELAY_MS 10u
+#if !defined(CONFIG_MCP2515_RESET_DELAY_MS)
+#define CONFIG_MCP2515_RESET_DELAY_MS 10u
+#endif
+
+#if !defined(CONFIG_MCP2515_MODE_DELAY_MS)
+#define CONFIG_MCP2515_MODE_DELAY_MS 5u
 #endif
 
 #define MCP_SELECT(_dev)   spi_slave_select(&_dev->slave);
@@ -54,6 +58,8 @@ static void write_registers(struct mcp2515_device *mcp,
 static void
 modify_register(struct mcp2515_device *mcp, uint8_t reg_addr, uint8_t mask, uint8_t data)
 {
+    LOG_DBG("modify_register: reg_addr: 0x%02X, mask: 0x%02X, data: 0x%02X",
+            reg_addr, mask, data);
     MCP_SELECT(mcp);
     spi_transceive(MCP_BIT_MODIFY);
     spi_transceive(reg_addr);
@@ -67,6 +73,9 @@ static void set_mode(struct mcp2515_device *mcp, uint8_t new_mode)
 {
     modify_register(mcp, MCP_R_CANINTF, MCP_CANINTF_WAKIF, 0);
     modify_register(mcp, MCP_R_CANCTRL, MCP_MASK_MODE, new_mode);
+
+    /* Delay to allow mode change */
+    k_msleep(CONFIG_MCP2515_MODE_DELAY_MS);
 }
 
 static inline uint8_t read_status(struct mcp2515_device *mcp)
@@ -83,6 +92,8 @@ static void mcp_reset(struct mcp2515_device *mcp)
     MCP_SELECT(mcp);
     spi_transceive(MCP_RESET);
     MCP_UNSELECT(mcp);
+
+    k_msleep(CONFIG_MCP2515_RESET_DELAY_MS); // wait for reset
 }
 
 static int8_t config_dr(struct mcp2515_device *mcp,
@@ -102,6 +113,8 @@ static int8_t config_dr(struct mcp2515_device *mcp,
     write_register(mcp, MCP_R_CNF2, cfg2);
     write_register(mcp, MCP_R_CNF3, cfg3);
 
+    k_msleep(CONFIG_MCP2515_MODE_DELAY_MS); // wait for config
+
     return 0;
 }
 
@@ -115,17 +128,22 @@ int8_t mcp2515_init(struct mcp2515_device *mcp,
     memcpy(&mcp->slave, spi_slave, sizeof(struct spi_slave));
     k_mutex_init(&mcp->_mutex);
 
+    
+    /* For some reason, this spi_slave_ss_init() must be
+     * called before spi_regs_restore()
+     * otherwise SPI transactions will, sometimes, fail (i.e. timeout)
+     * with the MCP2515.
+     */
+    spi_slave_ss_init(&mcp->slave);
+
     /* Set SPI */
     spi_regs_restore(&spi_slave->regs);
-    spi_slave_ss_init(&mcp->slave);
 
     /* Reset the MCP2515 */
     mcp_reset(mcp);
-    k_msleep(CONFIG_MCP2515_DELAY_MS); // wait for reset
 
     /* Enter configuration mode */
     set_mode(mcp, MCP_MODE_CONFIG);
-    k_msleep(CONFIG_MCP2515_DELAY_MS); // wait for mode change
 
     /* Configure CAN bus speed depending on the clock speed */
     ret = config_dr(mcp, config->can_speed, config->clock_speed);
@@ -133,7 +151,6 @@ int8_t mcp2515_init(struct mcp2515_device *mcp,
         LOG_ERR("config_dr failed: %d", ret);
         return ret;
     }
-    k_msleep(CONFIG_MCP2515_DELAY_MS); // wait for config
 
     /* Init TX buffers
      * Check TXBnCTRL to TXBnDLC
@@ -184,7 +201,6 @@ int8_t mcp2515_init(struct mcp2515_device *mcp,
 
     /* Enter normal mode */
     set_mode(mcp, MCP_MODE_NORMAL);
-    k_msleep(CONFIG_MCP2515_DELAY_MS); // wait for mode change
 
     return ret;
 }
@@ -376,7 +392,6 @@ int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
     k_mutex_lock(&mcp->_mutex, K_FOREVER);
 
     set_mode(mcp, MCP_MODE_CONFIG);
-    k_msleep(CONFIG_MCP2515_DELAY_MS);
 
     uint8_t id[4];
     can_id_to_buf(id, filter, is_ext);
@@ -405,7 +420,6 @@ int8_t mcp2515_set_filter(struct mcp2515_device *mcp,
     }
 
     set_mode(mcp, MCP_MODE_NORMAL);
-    k_msleep(CONFIG_MCP2515_DELAY_MS);
 
     k_mutex_unlock(&mcp->_mutex);
 
@@ -425,7 +439,6 @@ mcp2515_set_mask(struct mcp2515_device *mcp, uint8_t index, uint8_t is_ext, uint
     k_mutex_lock(&mcp->_mutex, K_FOREVER);
 
     set_mode(mcp, MCP_MODE_CONFIG);
-    k_msleep(CONFIG_MCP2515_DELAY_MS);
 
     uint8_t id[4];
     can_id_to_buf(id, mask, is_ext);
@@ -442,7 +455,6 @@ mcp2515_set_mask(struct mcp2515_device *mcp, uint8_t index, uint8_t is_ext, uint
     }
 
     set_mode(mcp, MCP_MODE_NORMAL);
-    k_msleep(CONFIG_MCP2515_DELAY_MS);
 
     k_mutex_unlock(&mcp->_mutex);
 

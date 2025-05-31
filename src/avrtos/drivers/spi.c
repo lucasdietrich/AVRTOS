@@ -152,7 +152,8 @@ int8_t spi_slave_ss_init(const struct spi_slave *slave)
     Z_ARGS_CHECK(slave) return -EINVAL;
 
     gpio_pin_init(slave->cs_port, slave->cs_pin, GPIO_MODE_OUTPUT,
-                  (slave->active_state == GPIO_LOW) ? GPIO_HIGH : GPIO_LOW);
+                  (slave->active_state == GPIO_LOW) ? GPIO_OUTPUT_DRIVEN_HIGH
+                                                    : GPIO_OUTPUT_DRIVEN_LOW);
 
     return 0;
 }
