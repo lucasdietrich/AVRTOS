@@ -132,14 +132,21 @@ void ll_timer16_init(TIMER16_Device *dev,
     dev->TCCRnB |= (config->prescaler << CSn0);
 }
 
+void ll_timer16_channel_set_mode(TIMER16_Device *dev,
+                                  timer_channel_t channel,
+                                  timer_channel_com_t mode)
+{
+    const uint8_t group_shift = (2 * (2 - channel) + 2u);
+    const uint8_t reg_val     = dev->TCCRnA & ~(0x03u << group_shift);
+    dev->TCCRnA               = reg_val | (mode << group_shift);
+}
+
 void ll_timer16_channel_configure(TIMER16_Device *dev,
                                   timer_channel_t channel,
                                   const struct timer_channel_compare_config *config)
 {
-    const uint8_t group_shift = (2 * (2 - channel) + 2u);
-    const uint8_t reg_val     = dev->TCCRnA & ~(0x03u << group_shift);
-    dev->TCCRnA               = reg_val | (config->mode << group_shift);
-    ll_timer16_write_reg16(&dev->OCRnx[channel], config->value);
+    ll_timer16_channel_set_mode(dev, channel, config->mode);
+    ll_timer16_channel_set_compare_register(dev, channel, config->value);
 }
 
 int8_t timer16_init(TIMER16_Device *dev, const struct timer_config *config)
