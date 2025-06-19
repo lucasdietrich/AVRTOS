@@ -83,7 +83,7 @@ drv-i2c-tcn75:
 upload:
 	$(GENERATOR_COMMAND) -C build upload $(GENERATOR_ARGS)
 
-flash: upload
+flash: upload monitor
 
 fm: flash monitor
 
