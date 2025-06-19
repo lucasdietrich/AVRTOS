@@ -92,6 +92,28 @@ void serial_u16(uint16_t val)
     serial_send(&digits[first_digit], 5 - first_digit);
 }
 
+void serial_u32(uint32_t val)
+{
+    // (1<<32)-1 = 4294967295
+    char digits[10u];
+
+    uint8_t first_digit = 9u;
+
+    for (uint_fast8_t p = 0; p < 10; p++) {
+        char cur = figure2hex(val % 10);
+
+        val /= 10;
+
+        digits[9u - p] = cur;
+
+        if (cur != '0') {
+            first_digit = 9u - p;
+        }
+    }
+
+    serial_send(&digits[first_digit], 10 - first_digit);
+}
+
 void serial_s8(const int8_t val)
 {
     uint8_t u8_val;

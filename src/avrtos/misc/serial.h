@@ -100,6 +100,12 @@ void serial_s8(const int8_t val);
 void serial_u16(uint16_t val);
 
 /**
+ * @brief Print an unsigned uint32_t in base 10 over the USART
+ * @param val
+ */
+void serial_u32(uint32_t val);
+
+/**
  * @brief Print an unsigned uint8_t in base 16 over the USART
  *
  * @param val
