@@ -306,6 +306,16 @@
 #endif
 
 //
+// Enable tickless mode debug
+//
+// 0: Tickless mode debug is disabled
+// 1: Tickless mode debug is enabled
+//
+#ifndef CONFIG_KERNEL_TICKLESS_DEBUG
+#define CONFIG_KERNEL_TICKLESS_DEBUG 0
+#endif
+
+//
 // Select the hardware timer used for the kernel sysclock.
 //
 // ATmega328P/...
