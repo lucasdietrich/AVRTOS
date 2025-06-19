@@ -296,6 +296,16 @@
 #endif
 
 //
+// Enable tickless mode
+//
+// 0: Tickless mode is disabled
+// 1: Tickless mode is enabled
+//
+#ifndef CONFIG_KERNEL_TICKLESS
+#define CONFIG_KERNEL_TICKLESS 0
+#endif
+
+//
 // Select the hardware timer used for the kernel sysclock.
 //
 // ATmega328P/...
