@@ -449,6 +449,35 @@ __always_inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
     dev->TCNTnL = val & 0xffU;
 }
 
+/**
+ * @brief Swap the TCNTn register value with the given value
+ * 
+ * This function helps to not miss any timer tick when updating the TCNTn
+ * register. It reads the current value of the TCNTn register, writes the new
+ * value, and returns the old value.
+ * 
+ * @param dev 
+ * @param val 
+ * @return __always_inline 
+ */
+__always_inline uint16_t ll_timer16_swap_tcnt(TIMER16_Device *dev, uint16_t val)
+{
+	/**
+	 * For a 16-bit read, the low byte must be read before the high byte.
+	 */
+	uint8_t ll = dev->TCNTnL;
+	uint8_t lh = dev->TCNTnH;
+
+	/**
+	 * To do a 16-bit write, the high byte must be written before the low
+	 * byte.
+	 */
+	dev->TCNTnH = (uint8_t)(val >> 8);
+	dev->TCNTnL = (uint8_t)val;
+
+	return (lh << 8) | ll;
+}
+
 __always_inline uint16_t ll_timer16_get_tcnt(TIMER16_Device *dev)
 {
     /**
