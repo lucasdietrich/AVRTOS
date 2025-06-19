@@ -124,7 +124,31 @@ extern "C" {
 #define __Z_DBG_GPIO_1_PIN 5u
 #define __Z_DBG_GPIO_2_PIN 6u
 #define __Z_DBG_GPIO_3_PIN 7u
-#elif CONFIG_KERNEL_DEBUG_GPIO >= 9
+#elif CONFIG_KERNEL_DEBUG_GPIO == 9
+#define __Z_DBG_GPIO_PORT  GPIOE_DEVICE
+#define __Z_DBG_GPIO_0_PIN 0u
+#define __Z_DBG_GPIO_1_PIN 1u
+#define __Z_DBG_GPIO_2_PIN 2u
+#define __Z_DBG_GPIO_3_PIN 3u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 10
+#define __Z_DBG_GPIO_PORT  GPIOE_DEVICE
+#define __Z_DBG_GPIO_0_PIN 4u
+#define __Z_DBG_GPIO_1_PIN 5u
+#define __Z_DBG_GPIO_2_PIN 6u
+#define __Z_DBG_GPIO_3_PIN 7u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 11
+#define __Z_DBG_GPIO_PORT  GPIOF_DEVICE
+#define __Z_DBG_GPIO_0_PIN 0u
+#define __Z_DBG_GPIO_1_PIN 1u
+#define __Z_DBG_GPIO_2_PIN 2u
+#define __Z_DBG_GPIO_3_PIN 3u
+#elif CONFIG_KERNEL_DEBUG_GPIO == 12
+#define __Z_DBG_GPIO_PORT  GPIOF_DEVICE
+#define __Z_DBG_GPIO_0_PIN 4u
+#define __Z_DBG_GPIO_1_PIN 5u
+#define __Z_DBG_GPIO_2_PIN 6u
+#define __Z_DBG_GPIO_3_PIN 7u
+#elif CONFIG_KERNEL_DEBUG_GPIO > 12
 #error "Invalid CONFIG_KERNEL_DEBUG_GPIO_PINS_RANGE value"
 #endif
 
