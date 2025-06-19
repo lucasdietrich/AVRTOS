@@ -85,8 +85,10 @@ static uint16_t z_tickless_unwrap_counter = 0u;
 
 ISR(TIMER1_COMPA_vect)
 {
+#if CONFIG_KERNEL_TICKLESS_DEBUG
     gpiol_pin_write_state(GPIOF, 5u, 0u);
     serial_transmit('k');
+#endif
 
     // Disable the interrupt as the event is serviced
     ll_timer16_disable_interrupt(TIMER1_INDEX, OCIEnA);
@@ -105,8 +107,11 @@ ISR(TIMER1_COMPA_vect)
 
 ISR(TIMER1_OVF_vect)
 {
+#if CONFIG_KERNEL_TICKLESS_DEBUG
     gpiol_pin_toggle(GPIOF, 7u);
     serial_transmit('o');
+#endif
+
     z_tickless_counter += 1u;
 
     // If we are in the far scheduling state, we need to decrement the
