@@ -906,6 +906,10 @@
 // 6: GPIO port C pins 4 to 7
 // 7: GPIO port D pins 0 to 3
 // 8: GPIO port D pins 4 to 7
+// 9: GPIO port E pins 0 to 3
+// 10: GPIO port E pins 4 to 7
+// 11: GPIO port F pins 0 to 3
+// 12: GPIO port F pins 4 to 7
 //
 #ifndef CONFIG_KERNEL_DEBUG_GPIO
 #define CONFIG_KERNEL_DEBUG_GPIO 0
