@@ -14,23 +14,23 @@
  * configuration.
  */
 #if CONFIG_KERNEL_SYSLOCK_HW_TIMER == 0
-#define TIMERn_COMPA_vect TIMER0_COMPA_vect
+#define Z_SYSCLOCK_ISR TIMER0_COMPA_vect
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 1
-#define TIMERn_COMPA_vect TIMER1_COMPA_vect
+#define Z_SYSCLOCK_ISR TIMER1_COMPA_vect
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 2
-#define TIMERn_COMPA_vect TIMER2_COMPA_vect
+#define Z_SYSCLOCK_ISR TIMER2_COMPA_vect
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 3
-#define TIMERn_COMPA_vect TIMER3_COMPA_vect
+#define Z_SYSCLOCK_ISR TIMER3_COMPA_vect
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 4
-#define TIMERn_COMPA_vect TIMER4_COMPA_vect
+#define Z_SYSCLOCK_ISR TIMER4_COMPA_vect
 #elif CONFIG_KERNEL_SYSLOCK_HW_TIMER == 5
-#define TIMERn_COMPA_vect TIMER5_COMPA_vect
+#define Z_SYSCLOCK_ISR TIMER5_COMPA_vect
 #endif
 
 .global z_thread_switch
 .global z_thread_entry
 .global z_yield
-.global TIMERn_COMPA_vect
+.global Z_SYSCLOCK_ISR
 
 .extern z_ker
 .extern z_scheduler			; struct k_thread *(void)
@@ -42,7 +42,7 @@
  * This is our system tick interrupt handler, which is called at
  * the period specified by CONFIG_KERNEL_SYSCLOCK_PERIOD_US
  */
-TIMERn_COMPA_vect:
+Z_SYSCLOCK_ISR:
 	/*
 	 * Save the registers that we are going to use for the increment
 	 * of the system tick counter.
@@ -93,8 +93,8 @@ TIMERn_COMPA_vect:
     lds r0, z_ker + 6		; 2 cycles
     adc r0, r1			; 1 cycle
     sts z_ker + 6, r0		; 2 cycles
-#endif
-#endif
+#endif /* CONFIG_CONFIG_KERNEL_TICKS_COUNTER_40BITS */
+#endif /* CONFIG_KERNEL_TICKS_COUNTER */
 
 #if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
 	/*
