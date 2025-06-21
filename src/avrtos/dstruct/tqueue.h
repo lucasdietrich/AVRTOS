@@ -85,6 +85,28 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_t timeout)
 void tqueue_shift(struct titem **root, k_delta_t time_passed);
 
 /**
+ * @brief Advance the time queue to the first item.
+ *
+ * This function will advance the time queue to the first item, 
+ * and mark it as ready to be executed (timeout set to 0).
+ * - If the first item has already expired, nothing will happen.
+ * - If the first item has not expired, its timeout will be set to 0.
+ *
+ * @param root Pointer to the root of the time queue.
+ */
+void tqueue_advance_to_first(struct titem **root);
+
+/**
+ * @brief Advance the time queue to the next non-expired item.
+ *
+ * This function will advance the time queue to the next item
+ * that has not expired.
+ *
+ * @param root Pointer to the root of the time queue.
+ */
+void tqueue_advance_to_next(struct titem **root);
+
+/**
  * @brief Pop an item from the time queue.
  *
  * Note: this function doesn't alter/reset the item->tie nor the item->next members.

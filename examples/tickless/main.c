@@ -12,6 +12,7 @@
 #include <avrtos/drivers/timer.h>
 #include <avrtos/logging.h>
 
+#include "avrtos/defines.h"
 #include "avrtos/deprecated.h"
 #include "avrtos/kernel.h"
 #include "avrtos/tickless.h"
@@ -20,12 +21,19 @@
 
 #define LOG_LEVEL LOG_LEVEL_DBG
 
-// static void task(void *p)
-// {
-//     k_sleep(K_SECONDS(5u));
-// }
+static void task(void *arg)
+{
+    (void)arg;
 
-// K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, NULL, 'B');
+    for (;;) {
+        serial_transmit(k_thread_get_current()->symbol);
+        k_sleep(K_MSEC(100u));
+    }
+}
+
+K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, NULL, 'a');
+K_THREAD_DEFINE(t2, task, 0x100, K_COOPERATIVE, NULL, 'b');
+K_THREAD_DEFINE(t3, task, 0x100, K_COOPERATIVE, NULL, 'c');
 
 void print_time(void)
 {
@@ -51,7 +59,7 @@ int main(void)
     for (;;) {
 		gpiol_pin_toggle(GPIOF, 4);
         k_sleep(K_MSEC(63));
-        print_time();
+        // print_time();
 
 		// uint8_t key = irq_lock();
 		// z_tickless_sched_ms(30);

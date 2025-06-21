@@ -364,6 +364,7 @@ void z_sched_enter(void)
     z_ker.sched_ticks_remaining = Z_KERNEL_TIME_SLICE_TICKS;
 #endif /* Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 
+    uint8_t new_threads = 0u;
     struct titem *ready;
     while ((ready = tqueue_pop(&z_ker.timeouts_queue)) != NULL) {
         struct k_thread *const thread = Z_THREAD_FROM_RUNQUEUE(ready);
@@ -388,6 +389,7 @@ void z_sched_enter(void)
         dlist_remove(&thread->wqhandle.tie);
 
         z_schedule(thread);
+        new_threads = 1u;
     }
 
 #if CONFIG_KERNEL_TICKLESS
@@ -396,7 +398,7 @@ void z_sched_enter(void)
      * If there are no threads, we can disable tickless scheduling.
      * If there are still threads, we need to update the next scheduled point.
      */
-    if (ready == NULL) {
+    if (new_threads == 0u) {
         /* If no threads were ready, the next scheduling point is still valid,
          * so we can continue with the current tickless scheduling configuration.
          */

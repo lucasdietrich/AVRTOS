@@ -561,6 +561,12 @@ __always_inline void ll_timer16_channel_set_compare_register(TIMER16_Device *dev
     ll_timer16_write_reg16(&dev->OCRnx[channel], value);
 }
 
+__always_inline uint16_t ll_timer16_channel_get_compare_register(TIMER16_Device *dev,
+                                                          timer_channel_t channel)
+{
+    return dev->OCRnx[channel];
+}
+
 void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx);
 
 void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx);
