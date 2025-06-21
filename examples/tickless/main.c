@@ -15,16 +15,17 @@
 #include "avrtos/deprecated.h"
 #include "avrtos/kernel.h"
 #include "avrtos/tickless.h"
+#include "gpio.h"
 #include "serial.h"
 
 #define LOG_LEVEL LOG_LEVEL_DBG
 
-static void task(void *p)
-{
-    k_sleep(K_SECONDS(5u));
-}
+// static void task(void *p)
+// {
+//     k_sleep(K_SECONDS(5u));
+// }
 
-K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, NULL, 'B');
+// K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, NULL, 'B');
 
 void print_time(void)
 {
@@ -34,30 +35,27 @@ void print_time(void)
     z_tickless_time_get(&tls);
     z_tickless_spec_convert(&tls, &ts);
 
-    printf_P(PSTR("software counter: "));
-    serial_u32(tls.software_counter);
-    printf_P(PSTR(", hardware counter: %u\n"), tls.hardware_counter);
-
-    // printf_P(PSTR("Tickless time: "));
-    // serial_u32(ts.tv_sec);
-    // printf_P(PSTR("."));
-    // printf_P(PSTR("%03u\n"), ts.tv_msec);
+    printf_P(PSTR("Tickless time: "));
+    serial_u32(ts.tv_sec);
+    printf_P(PSTR("."));
+    printf_P(PSTR("%03u\n"), ts.tv_msec);
 }
 
 int main(void)
 {
-    z_tickless_init();
     serial_init();
+    z_tickless_init();
 
     printf_P(PSTR("AVRTOS Tickless Example\n"));
 
     for (;;) {
-        k_sleep(K_MSEC(100));
-        // print_time();
+		gpiol_pin_toggle(GPIOF, 4);
+        k_sleep(K_MSEC(63));
+        print_time();
 
-		uint8_t key = irq_lock();
-		z_tickless_sched_next_ms(30);
-		irq_unlock(key);
+		// uint8_t key = irq_lock();
+		// z_tickless_sched_ms(30);
+		// irq_unlock(key);
     }
 
     k_stop();
