@@ -42,9 +42,7 @@
 // prescaler = 1024  freq = 61.03515625 Hz (64.0 us)  period = 16384 us
 // Timer 1 : prescaler = 256 , TCNT = 0 : freq = 0.954 Hz -> 1048576 us
 
-#define TICKLESS_MODE_PERFORMANCE 0
-#define TICKLESS_MODE_PRECISION   1
-#define TICKLESS_MODE             1
+#define TICKLESS_MODE TICKLESS_MODE_PRECISION
 
 #if CONFIG_KERNEL_TICKLESS
 
@@ -78,10 +76,10 @@
 #define TICKLESS_TOP_TICK_VALUE                                                          \
     TIMER_CALC_COUNTER_VALUE(TICKLESS_TOP_PERIOD_US, TICKLESS_PRESCALER_VALUE)
 #define TICKLESS_TOP_TICK_VALUE_COMPLEMENT (65535u - TICKLESS_TOP_TICK_VALUE)
-#define TICKLESS_PERIOD_US TICKLESS_TOP_PERIOD_US
+#define TICKLESS_PERIOD_US                 TICKLESS_TOP_PERIOD_US
 #else
 #define TICKLESS_TOP_TICK_VALUE 0xFFFFu
-#define TICKLESS_PERIOD_US TICKLESS_US_PER_PERIOD
+#define TICKLESS_PERIOD_US      TICKLESS_US_PER_PERIOD
 #endif /* TICKLESS_MODE */
 
 static uint32_t z_tickless_counter = 0u;
@@ -192,7 +190,7 @@ void z_tickless_init(void)
     ll_timer16_init(TIMER1_DEVICE, timer_get_index(TIMER1_DEVICE), &config);
 }
 
-static void z_tickless_sched_ms_inner(uint16_t loops, uint16_t offset);
+static void z_tickless_sched_ms_inner(uint16_t loops, uint16_t offset, uint8_t new_ref);
 
 void z_tickless_sched_ms(uint32_t ms)
 {
@@ -215,51 +213,64 @@ void z_tickless_sched_ms(uint32_t ms)
                      1u); // Get the number of loops in the range of 0..65535
     // Try to use __udivmodhi4.
 #else
-    offset      = (uint16_t)ticks; // Get the offset in the range of 0..65535
-    loops       = ticks >> 16u;
+    offset  = (uint16_t)ticks; // Get the offset in the range of 0..65535
+    loops   = ticks >> 16u;
 #endif
 
-    z_tickless_sched_ms_inner(loops, offset);
+    z_tickless_sched_ms_inner(loops, offset, true);
 }
 
-__always_inline static void z_tickless_sched_ms_inner(uint16_t loops, uint16_t offset)
+static __always_inline uint16_t z_tickless_calc_new_comp_ref(uint16_t counter,
+                                                             uint16_t offset)
 {
-    uint16_t new_counter;
+#if (TICKLESS_TOP_TICK_VALUE) != 0xFFFFu
+    /* Ensure that the addition of offset to tcnt does not wrap around 16-bit counter
+     * Calculate 65536 - offset, which is the maximum value
+     * that can be added to TCNT without wrapping around
+     */
+    const uint16_t safe_max_add = (uint16_t)(-offset);
+    if (counter >= safe_max_add) {
+        /* If adding offset would wrap around, split the operation to avoid overflow
+         *
+         * Equivalent to:
+         *   (tcnt + offset) % (TICKLESS_TOP_TICK_VALUE + 1)
+         *
+         * But performed as:
+         *   (tcnt - (65536 - offset)) + (65536 - TICKLESS_TOP_TICK_VALUE + 1)
+         *
+         * Which avoids overflow
+         */
+        counter = counter - safe_max_add;
+        counter = counter + TICKLESS_TOP_TICK_VALUE_COMPLEMENT;
+    } else {
+        /* Safe to add directly without wraparound */
+        counter = (counter + offset) % (TICKLESS_TOP_TICK_VALUE + 1u);
+    }
+#else
+    counter = (counter + offset);
+#endif
 
-    // printf("%u:%u-[", loops, offset);
+    return counter;
+}
 
+__always_inline static void
+z_tickless_sched_ms_inner(uint16_t loops, uint16_t offset, uint8_t new_ref)
+{
     __ASSERT_NOINTERRUPT();
 
     // gpiol_pin_write_state(GPIOF, 6u, 1u);
+
     gpiol_pin_write_state(GPIOF, 5u, 1u);
 
-    const uint16_t tcnt = ll_timer16_get_tcnt(TIMER1_DEVICE);
-#if (TICKLESS_TOP_TICK_VALUE) != 0xFFFFu
-    // Ensure that the addition of offset to tcnt does not wrap around 16-bit counter
-    const uint16_t safe_max_add =
-        (uint16_t)(-offset); // Calculate 65536 - offset, which is the maximum value
-                             // that can be added to TCNT without wrapping around
-    if (tcnt >= safe_max_add) {
-        // If adding offset would wrap around, split the operation to avoid overflow
-        //
-        // Equivalent to:
-        //   (tcnt + offset) % (TICKLESS_TOP_TICK_VALUE + 1)
-        //
-        // But performed as:
-        //   (tcnt - (65536 - offset)) + (65536 - TICKLESS_TOP_TICK_VALUE + 1)
-        //
-        // Which avoids overflow
-        new_counter = tcnt - safe_max_add;
-        new_counter = new_counter + TICKLESS_TOP_TICK_VALUE_COMPLEMENT;
+    uint16_t new_counter, counter;
+    if (new_ref) {
+        counter = ll_timer16_get_tcnt(TIMER1_DEVICE);
     } else {
-        // Safe to add directly without wraparound
-        new_counter = (tcnt + offset) % (TICKLESS_TOP_TICK_VALUE + 1u);
+        counter = ll_timer16_channel_get_compare_register(TIMER1_DEVICE, TIMER_CHANNEL_A);
     }
-#else
-    new_counter = (tcnt + offset);
-#endif
 
-    if (new_counter < tcnt) {
+    new_counter = z_tickless_calc_new_comp_ref(counter, offset);
+    if (new_counter < counter) {
         loops += 1u;
         gpiol_pin_toggle(GPIOF, 6u);
     }
@@ -289,9 +300,30 @@ __always_inline static void z_tickless_sched_ms_inner(uint16_t loops, uint16_t o
 
 void z_tickless_continue_ms(uint32_t ms)
 {
-    // TODO
-    // Write a version of the function which does not use TCNT register,
-    // but rather continue from the current compare match register value.
+    uint16_t loops;
+    uint16_t offset;
+
+    // FIXME remove
+    ms -= 1u;
+
+    // 1ms with 64us tickless quantum becomes is 15.625 ticks which becomes 16 ticks
+    // FIXME: not sure about the +1u.
+    uint32_t ticks = (ms * 1000u) / TICKLESS_US_PER_TICK; // + 1u ?
+
+// use timer full scale (0xFFFFu) amplitude
+#if TICKLESS_MODE
+    // Use partial amplitude (ICR1)
+    offset = ticks % (TICKLESS_TOP_TICK_VALUE + 1u); // Get the offset in the range of
+                                                     // 0..TICKLESS_TOP_TICK_VALUE-1
+    loops = ticks / (TICKLESS_TOP_TICK_VALUE +
+                     1u); // Get the number of loops in the range of 0..65535
+    // Try to use __udivmodhi4.
+#else
+    offset  = (uint16_t)ticks; // Get the offset in the range of 0..65535
+    loops   = ticks >> 16u;
+#endif
+
+    z_tickless_sched_ms_inner(loops, offset, false);
 }
 
 void z_tickless_sched_cancel(void)
@@ -309,12 +341,13 @@ void z_tickless_time_get(struct z_tickless_timespec *tls)
     uint8_t key = irq_lock();
 
     tls->hardware_counter = ll_timer16_get_tcnt(TIMER1_DEVICE);
-    tls->global_counter = z_tickless_counter;
+    tls->global_counter   = z_tickless_counter;
 
     irq_unlock(key);
 }
 
-__noinline void z_tickless_spec_convert(struct z_tickless_timespec *tls, struct timespec *ts)
+__noinline void z_tickless_spec_convert(struct z_tickless_timespec *tls,
+                                        struct timespec *ts)
 {
     __ASSERT_NOTNULL(tls);
     __ASSERT_NOTNULL(ts);
@@ -322,9 +355,9 @@ __noinline void z_tickless_spec_convert(struct z_tickless_timespec *tls, struct 
     // FIXME
     // Prefer 40-bit arithmetic instead of 64-bit.
     uint64_t total_ms = ((uint64_t)tls->global_counter * TICKLESS_PERIOD_US) / 1000u +
-                     ((uint64_t)tls->hardware_counter * TICKLESS_US_PER_TICK) / 1000u;
+                        ((uint64_t)tls->hardware_counter * TICKLESS_US_PER_TICK) / 1000u;
 
-    ts->tv_sec = total_ms / 1000u; // Convert milliseconds to seconds
+    ts->tv_sec  = total_ms / 1000u; // Convert milliseconds to seconds
     ts->tv_msec = total_ms % 1000u; // Get the remaining milliseconds
 }
 

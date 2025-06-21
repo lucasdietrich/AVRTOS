@@ -11,6 +11,9 @@
 #include "kernel.h"
 #include "systime.h"
 
+#define TICKLESS_MODE_PERFORMANCE 0
+#define TICKLESS_MODE_PRECISION   1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
