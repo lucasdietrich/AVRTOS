@@ -11,9 +11,12 @@
 #include <util/delay.h>
 
 #include "assert.h"
+#include "avrtos/defines.h"
 #include "avrtos/sys.h"
+#include "avrtos/tickless.h"
 #include "canaries.h"
 #include "debug.h"
+#include "dlist.h"
 #include "event.h"
 #include "fault.h"
 #include "idle.h"
@@ -382,6 +385,31 @@ void z_sched_enter(void)
         z_schedule(thread);
     }
 
+#if CONFIG_KERNEL_TICKLESS
+    /* After removing all expired threads from the timeouts queue,
+     * we need to check if there are still threads in the queue.
+     * If there are no threads, we can disable tickless scheduling.
+     * If there are still threads, we need to update the next scheduled point.
+     */
+    if (ready == NULL) {
+        /* If no threads were ready, the next scheduling point is still valid,
+         * so we can continue with the current tickless scheduling configuration.
+         */
+    } else if (z_ker.timeouts_queue == NULL) {
+        /* If there are no more threads in the timeouts queue,
+         * we can disable tickless scheduling.
+         */
+        z_tickless_sched_cancel();
+    } else {
+        /* If there are still threads in the timeouts queue,
+         * we need to update the next scheduled point.
+         */
+        // FIXME: make the timeout value consistent with the other call to
+        z_tickless_continue_ms(z_ker.timeouts_queue->timeout / K_TICKS_PER_MS);
+    }
+#endif /* CONFIG_KERNEL_TICKLESS */
+
+#if !CONFIG_KERNEL_TICKLESS
 #if CONFIG_KERNEL_TIMERS
     z_timers_process();
 #endif
@@ -389,6 +417,9 @@ void z_sched_enter(void)
 #if CONFIG_KERNEL_EVENTS
     z_event_q_process();
 #endif /* CONFIG_KERNEL_EVENTS */
+#else
+#warning "Tickless mode is enabled, skipping timers and events processing"
+#endif /* CONFIG_KERNEL_TICKLESS */
 
 #if CONFIG_KERNEL_ASSERT
     z_ker.kernel_mode = 0u;
@@ -452,8 +483,36 @@ static void z_cancel_scheduled_wake_up(struct k_thread *thread)
 {
     /* Remove the thread from the events queue */
     if (thread->flags & Z_THREAD_WAKEUP_SCHED_MSK) {
+#if CONFIG_KERNEL_TICKLESS
+        /* In tickless mode, we need to check whether the canceled thread
+         * was the very first to be woken up.
+         * If so, we need to update the next scheduled point.
+         */
+        uint8_t was_first = z_ker.timeouts_queue == &thread->tie.event;
+#endif
+
         thread->flags &= ~Z_THREAD_WAKEUP_SCHED_MSK;
         tqueue_remove(&z_ker.timeouts_queue, &thread->tie.event);
+
+#if CONFIG_KERNEL_TICKLESS
+        if (was_first) {
+            /* If the canceled thread was the first to be woken up,
+             * we need to update the next scheduled point.
+             */
+            if (z_ker.timeouts_queue == NULL) {
+                /* If there are no more threads in the timeouts queue,
+                 * we can disable the tickless scheduling.
+                 */
+                z_tickless_sched_cancel();
+            } else {
+                /* If there are still threads in the timeouts queue,
+                 * we need to update the next scheduled point.
+                 */
+                // FIXME: make the timeout value cosistent with the other call to z_tickless_sched_ms()
+                z_tickless_sched_ms(z_ker.timeouts_queue->timeout / K_TICKS_PER_MS);
+            }
+        }
+#endif /* CONFIG_KERNEL_TICKLESS */
     }
 }
 
@@ -529,6 +588,22 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
         z_ker.current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
         z_ker.current->tie.event.next    = NULL;
         z_tqueue_schedule(&z_ker.timeouts_queue, &z_ker.current->tie.event);
+
+#if CONFIG_KERNEL_TICKLESS
+        /*
+         * In tickless mode:
+         * Check whether the thread has been queued at the very beginning of the
+         * timeouts queue, if so, it means that the newly scheduled thread
+         * is the first thread to be woken up.
+         *
+         * This is important because in this particular case, we need to update
+         * the next scheduled point earlier.
+         */
+        if (z_ker.timeouts_queue == &z_ker.current->tie.event) {
+            z_tickless_sched_ms(K_TIMEOUT_MS(timeout));
+        }
+
+#endif /* CONFIG_KERNEL_TICKLESS */
     }
 }
 

@@ -28,7 +28,6 @@ extern "C" {
 struct titem {
     union {
         k_delta_t delay_shift;
-        k_delta_t abs_delay;
         k_delta_t timeout;
     };
     struct titem *next;

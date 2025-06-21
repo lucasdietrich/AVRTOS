@@ -468,8 +468,8 @@ __always_inline uint16_t ll_timer16_get_tcnt(TIMER16_Device *dev)
     /**
      * For a 16-bit read, the low byte must be read before the high byte.
      */
-    uint32_t ll = dev->TCNTnL;
-    uint32_t lh = dev->TCNTnH;
+    uint8_t ll = dev->TCNTnL;
+    uint8_t lh = dev->TCNTnH;
     return (lh << 8) | ll;
 }
 

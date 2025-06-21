@@ -116,6 +116,10 @@ void ll_timer16_init(TIMER16_Device *dev,
         /* read 16.9.2 Clear Timer on Compare Match (CTC) Mode */
         dev->OCRnA = config->counter;
         break;
+    case TIMER_MODE_CTC_ICRn:
+        /* read 16.9.3 CTC with ICRn as TOP */
+        dev->IRCN = config->counter;
+        break;
     case TIMER_MODE_FAST_PWM_8bit:  /* TOP 0x00FF */
     case TIMER_MODE_FAST_PWM_9bit:  /* TOP 0x01FF */
     case TIMER_MODE_FAST_PWM_10bit: /* TOP 0x03FF */
@@ -133,8 +137,8 @@ void ll_timer16_init(TIMER16_Device *dev,
 }
 
 void ll_timer16_channel_set_mode(TIMER16_Device *dev,
-                                  timer_channel_t channel,
-                                  timer_channel_com_t mode)
+                                 timer_channel_t channel,
+                                 timer_channel_com_t mode)
 {
     const uint8_t group_shift = (2 * (2 - channel) + 2u);
     const uint8_t reg_val     = dev->TCCRnA & ~(0x03u << group_shift);
