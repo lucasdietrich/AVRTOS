@@ -9,7 +9,7 @@
 
 #include <avrtos/defines.h>
 
-; #if !CONFIG_TICKLESS
+#if !CONFIG_KERNEL_TICKLESS || 1
 
 /*
  * Select the appropriate timer interrupt vector based on the
@@ -212,4 +212,4 @@ __intctx_restore_minimal:
     pop    r1
     reti
 
-; #endif /* !CONFIG_TICKLESS */
+#endif /* !CONFIG_KERNEL_TICKLESS */

@@ -42,11 +42,21 @@
 // prescaler = 1024  freq = 61.03515625 Hz (64.0 us)  period = 16384 us
 // Timer 1 : prescaler = 256 , TCNT = 0 : freq = 0.954 Hz -> 1048576 us
 
-#define TICKLESS_MODE TICKLESS_MODE_PRECISION
+// TICKLESS CONFIGURATION
+#define TICKLESS_WRAP_MODE       TICKLESS_WRAP_MODE_PERFORMANCE
+#define TICKLESS_PRESCALER_VALUE 8u
 
 #if CONFIG_KERNEL_TICKLESS
 
-#if 0
+#if TICKLESS_PRESCALER_VALUE == 1024
+#warning "Using prescaler 1024 for tickless mode, this will result in a 64us tick"
+// prescaler = 1024  freq = 0.2384185791015625 Hz (64.0 us)  period = 4194304 us
+#define TICKLESS_PRESCALER       TIMER_PRESCALER_1024
+#define TICKLESS_PRESCALER_VALUE 1024u
+#define TICKLESS_US_PER_TICK     64u
+#define TICKLESS_US_PER_PERIOD   4194304u
+#define TICKLESS_TOP_PERIOD_US   4000000u
+#elif TICKLESS_PRESCALER_VALUE == 256
 #warning "Using prescaler 256 for tickless mode, this will result in a 16us tick"
 // prescaler = 256  freq = 0.95367431640625 Hz (16.0 us)  period = 1048576 us
 #define TICKLESS_PRESCALER       TIMER_PRESCALER_256
@@ -54,7 +64,7 @@
 #define TICKLESS_US_PER_TICK     16u
 #define TICKLESS_US_PER_PERIOD   1048576u
 #define TICKLESS_TOP_PERIOD_US   1000000u
-#elif 0
+#elif TICKLESS_PRESCALER_VALUE == 64
 #warning "Using prescaler 64 for tickless mode, this will result in a 4us tick"
 // prescaler = 64  freq = 3.814697265625 Hz (4.0 us)  period = 262144 us
 #define TICKLESS_PRESCALER       TIMER_PRESCALER_64
@@ -62,7 +72,7 @@
 #define TICKLESS_US_PER_TICK     4u
 #define TICKLESS_US_PER_PERIOD   262144u
 #define TICKLESS_TOP_PERIOD_US   250000u
-#else
+#elif TICKLESS_PRESCALER_VALUE == 8
 #warning "Using prescaler 8 for tickless mode, this will result in a 0.5 us tick"
 // prescaler = 8  freq = 7812.5 Hz (0.5 us)  period = 128 us
 #define TICKLESS_PRESCALER       TIMER_PRESCALER_8
@@ -70,9 +80,19 @@
 #define TICKLESS_US_PER_TICK     0.5
 #define TICKLESS_US_PER_PERIOD   32768u
 #define TICKLESS_TOP_PERIOD_US   25000u
+#elif TICKLESS_PRESCALER_VALUE == 1
+#warning "Using prescaler 1 for tickless mode, this will result in a 0.0625 us tick"
+// prescaler = 1  freq = 244.140625 Hz (0.0625 us)  period = 4096 us
+#define TICKLESS_PRESCALER       TIMER_PRESCALER_1
+#define TICKLESS_PRESCALER_VALUE 1u
+#define TICKLESS_US_PER_TICK     0.0625
+#define TICKLESS_US_PER_PERIOD   4096u
+#define TICKLESS_TOP_PERIOD_US   4000u
+#else
+#error "Unsupported TICKLESS_PRESCALER_VALUE, must be 1, 8, 64, 256 or 1024"
 #endif
 
-#if TICKLESS_MODE
+#if TICKLESS_WRAP_MODE == TICKLESS_WRAP_MODE_PRECISION
 #define TICKLESS_TOP_TICK_VALUE                                                          \
     TIMER_CALC_COUNTER_VALUE(TICKLESS_TOP_PERIOD_US, TICKLESS_PRESCALER_VALUE)
 #define TICKLESS_TOP_TICK_VALUE_COMPLEMENT (65535u - TICKLESS_TOP_TICK_VALUE)
@@ -80,7 +100,7 @@
 #else
 #define TICKLESS_TOP_TICK_VALUE 0xFFFFu
 #define TICKLESS_PERIOD_US      TICKLESS_US_PER_PERIOD
-#endif /* TICKLESS_MODE */
+#endif /* TICKLESS_WRAP_MODE */
 
 static uint32_t z_tickless_counter = 0u;
 
@@ -97,11 +117,6 @@ enum tickless_state {
     // the timer overflow period.
     TICKLESS_FAR_SCHEDULING,
 };
-
-// FIXME this variable might not be required, but could be deduced from other variables
-static enum tickless_state z_tickless_state = TICKLESS_IDLE;
-
-static uint16_t z_tickless_unwrap_counter = 0u;
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -124,7 +139,7 @@ ISR(TIMER1_COMPA_vect)
 //     gpiol_pin_toggle(GPIOF, 6u);
 // }
 
-#if TICKLESS_MODE
+#if TICKLESS_WRAP_MODE == TICKLESS_WRAP_MODE_PRECISION
 ISR(TIMER1_CAPT_vect)
 #else
 ISR(TIMER1_OVF_vect)
@@ -142,24 +157,24 @@ ISR(TIMER1_OVF_vect)
     // to wait before we can schedule the next tickless event.
     // - If the unwrap counter is 0, we can schedule the next tickless event.
     // - If the unwrap counter is greater than 0, we just decrement it and return.
-    if (z_tickless_state == TICKLESS_FAR_SCHEDULING) {
+    if (z_ker.tickless.flags & Z_TICKLESS_FAR_SCHEDULING) {
 
         // printf_P(PSTR("z_tickless_unwrap_counter: %u\n"), z_tickless_unwrap_counter);
-        if (z_tickless_unwrap_counter > 0u) {
-            z_tickless_unwrap_counter -= 1u;
+        if (z_ker.tickless.unwrap_counter > 0u) {
+            z_ker.tickless.unwrap_counter -= 1u;
             return;
         }
 
         // We can now schedule the next tickless event
         ll_timer16_clear_irq_flag(TIMER1_INDEX, OCIEnA);
         ll_timer16_enable_interrupt(TIMER1_INDEX, OCIEnA);
-        z_tickless_state = TICKLESS_SCHEDULED;
+        z_ker.tickless.flags &= ~Z_TICKLESS_FAR_SCHEDULING;
     }
 }
 
 void z_tickless_init(void)
 {
-#if TICKLESS_MODE
+#if TICKLESS_WRAP_MODE == TICKLESS_WRAP_MODE_PRECISION
     const struct timer_config config = {
         .mode      = TIMER_MODE_CTC_ICRn,
         .counter   = TICKLESS_TOP_TICK_VALUE,
@@ -167,7 +182,7 @@ void z_tickless_init(void)
         .timsk     = BIT(ICIEn), // BIT(TOIEn) // BIT(OCIEnA)  | BIT(OCIEnB) | BIT(OCIEnC)
     };
     printf_P(PSTR("Tickless mode precision (CTC_IRCn), prescaler: %u, top: %u\n"),
-             TICKLESS_PRESCALER, TICKLESS_TOP_TICK_VALUE);
+             TICKLESS_PRESCALER_VALUE, TICKLESS_TOP_TICK_VALUE);
 #else
     const struct timer_config config = {
         .mode      = TIMER_MODE_NORMAL,
@@ -176,7 +191,7 @@ void z_tickless_init(void)
         .timsk     = BIT(TOIEn), // BIT(TOIEn) // BIT(OCIEnA)  | BIT(OCIEnB) | BIT(OCIEnC)
     };
     printf_P(PSTR("Tickless mode performance (NORMAL), prescaler: %u\n"),
-             TICKLESS_PRESCALER);
+             TICKLESS_PRESCALER_VALUE);
 #endif
 
     gpiol_pin_init(GPIOF, 4u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
@@ -205,7 +220,7 @@ void z_tickless_sched_ms(uint32_t ms)
     uint32_t ticks = (ms * 1000u) / TICKLESS_US_PER_TICK; // + 1u ?
 
 // use timer full scale (0xFFFFu) amplitude
-#if TICKLESS_MODE
+#if TICKLESS_WRAP_MODE == TICKLESS_WRAP_MODE_PRECISION
     // Use partial amplitude (ICR1)
     offset = ticks % (TICKLESS_TOP_TICK_VALUE + 1u); // Get the offset in the range of
                                                      // 0..TICKLESS_TOP_TICK_VALUE-1
@@ -288,11 +303,11 @@ z_tickless_sched_ms_inner(uint16_t loops, uint16_t offset, uint8_t new_ref)
         // If the ticks are more than 65536, we cannot schedule it in a single
         // timer compare match register, so we will schedule it in the next
         // overflow event.
-        z_tickless_unwrap_counter = loops - 1u;
-        z_tickless_state          = TICKLESS_FAR_SCHEDULING;
+        z_ker.tickless.unwrap_counter = loops - 1u;
+        z_ker.tickless.flags |= Z_TICKLESS_FAR_SCHEDULING;
     } else {
         ll_timer16_enable_interrupt(TIMER1_INDEX, OCIEnA);
-        z_tickless_state = TICKLESS_SCHEDULED;
+        z_ker.tickless.flags &= ~Z_TICKLESS_FAR_SCHEDULING;
     }
 
     // gpiol_pin_write_state(GPIOF, 6u, 0u);
@@ -311,7 +326,7 @@ void z_tickless_continue_ms(uint32_t ms)
     uint32_t ticks = (ms * 1000u) / TICKLESS_US_PER_TICK; // + 1u ?
 
 // use timer full scale (0xFFFFu) amplitude
-#if TICKLESS_MODE
+#if TICKLESS_WRAP_MODE == TICKLESS_WRAP_MODE_PRECISION
     // Use partial amplitude (ICR1)
     offset = ticks % (TICKLESS_TOP_TICK_VALUE + 1u); // Get the offset in the range of
                                                      // 0..TICKLESS_TOP_TICK_VALUE-1
@@ -331,7 +346,7 @@ void z_tickless_sched_cancel(void)
     // printf_P(PSTR("z_tickless_sched_cancel()\n"));
     // __ASSERT_NOINTERRUPT();
     ll_timer16_disable_interrupt(TIMER1_INDEX, OCIEnA);
-    z_tickless_state = TICKLESS_IDLE;
+    z_ker.tickless.flags &= ~Z_TICKLESS_FAR_SCHEDULING;
 }
 
 void z_tickless_time_get(struct z_tickless_timespec *tls)

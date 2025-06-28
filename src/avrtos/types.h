@@ -147,6 +147,17 @@ struct k_thread {
 #endif
 };
 
+#if CONFIG_KERNEL_TICKLESS
+struct z_tickless_rt {
+    uint8_t flags;
+    k_ticks_t sp_ticks;      // Duration between the last tickless event and the next
+                             // tickless event in ticks.
+    uint16_t unwrap_counter; // Counter used to track the number of timer overflows 
+                              // before the next tickless event can be scheduled
+                              // in the compare match register.
+};
+#endif /* CONFIG_KERNEL_TICKLESS */
+
 /**
  * @brief Define the size of the kernel ticks counter.
  */
@@ -245,6 +256,10 @@ typedef struct __packed z_kernel {
      */
     struct titem *timeouts_queue;
 
+#if CONFIG_KERNEL_TICKLESS
+    struct z_tickless_rt tickless;
+#endif /* CONFIG_KERNEL_TICKLESS */
+
 #if CONFIG_KERNEL_ASSERT
     /**
      * @brief Flag indicating execution context.
@@ -259,6 +274,7 @@ typedef struct __packed z_kernel {
      */
     uint8_t kernel_mode;
 #endif
+
 } z_kernel_t;
 
 /* ARCHITECTURE-SPECIFIC TYPES */
