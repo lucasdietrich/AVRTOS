@@ -9,7 +9,7 @@
 
 #include <avrtos/defines.h>
 
-#if CONFIG_TICKLESS && 0
+#if CONFIG_KERNEL_TICKLESS && 0
 
 #define Z_TICKLESS_ISR TIMER1_COMPA_vect
 
@@ -102,4 +102,4 @@ __intctx_restore:
     pop    r1
     reti
 
-#endif /* CONFIG_TICKLESS */
+#endif /* CONFIG_KERNEL_TICKLESS */

@@ -7,12 +7,15 @@
 #ifndef _AVRTOS_TICKLESS_H_
 #define _AVRTOS_TICKLESS_H_
 
+// FIXME this variable might not be required, but could be deduced from other variables
+#define Z_TICKLESS_FAR_SCHEDULING (1u << 0u)
+
 #include "avrtos/defines.h"
 #include "kernel.h"
 #include "systime.h"
 
-#define TICKLESS_MODE_PERFORMANCE 0
-#define TICKLESS_MODE_PRECISION   1
+#define TICKLESS_WRAP_MODE_PERFORMANCE 0
+#define TICKLESS_WRAP_MODE_PRECISION   1
 
 #ifdef __cplusplus
 extern "C" {

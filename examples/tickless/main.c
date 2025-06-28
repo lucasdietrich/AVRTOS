@@ -51,9 +51,6 @@ void print_time(void)
 
 int main(void)
 {
-    serial_init();
-    z_tickless_init();
-
     printf_P(PSTR("AVRTOS Tickless Example\n"));
 
     for (;;) {

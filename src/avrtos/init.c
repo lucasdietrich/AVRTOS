@@ -6,6 +6,7 @@
 
 #include "init.h"
 
+#include "avrtos/tickless.h"
 #include "canaries.h"
 #include "debug.h"
 #include "kernel.h"
@@ -123,8 +124,13 @@ void z_avrtos_init(void)
     z_init_stacks_sentinel();
 #endif
 
+z_init_sysclock();
+#if CONFIG_KERNEL_TICKLESS
+    z_tickless_init();
+#else
     /* Initialize system clock */
     z_init_sysclock();
+#endif /* CONFIG_KERNEL_TICKLESS */
 
 #if (CONFIG_INTERRUPT_POLICY == 2) && (CONFIG_THREAD_MAIN_COOPERATIVE == 0)
     /* Lock the scheduler if required by configuration */

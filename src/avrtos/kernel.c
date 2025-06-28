@@ -24,6 +24,7 @@
 #include "stack_sentinel.h"
 #include "systime.h"
 #include "timer.h"
+#include "tqueue.h"
 
 #define K_MODULE K_MODULE_KERNEL
 
@@ -353,7 +354,30 @@ void z_sched_enter(void)
     z_ker.kernel_mode = 1u;
 #endif
 
+#if !CONFIG_KERNEL_TICKLESS
+    /* In non-tickless mode, we need to advance the time queue
+     * by the time slice ticks.
+     */
     tqueue_shift(&z_ker.timeouts_queue, Z_KERNEL_TIME_SLICE_TICKS);
+#else
+    /* In tickless mode, we now the current function is called when
+     * the event has occured, so we can advance the time queue
+     * to the first item without actually calculating the time passed.
+     *
+     * TODO: ASSERT to make sure the first item has not already expired 
+     * (i.e. check that timerout != 0 for the first item).
+     */
+     
+    // FIXME we need to discriminate between two cases:
+    // 1. The current scheduling point is still valid, so we can
+    //    advance the time queue to the first item.
+    // 2. The current scheduling point is not valid anymore, because the first item (thread)
+    //    has been canceled, in which case we need to advance the time queue
+    //    only by the given amount.
+    // tqueue_advance_to_first(&z_ker.timeouts_queue);
+
+    tqueue_shift(&z_ker.timeouts_queue, Z_KERNEL_TIME_SLICE_TICKS);
+#endif
 
 #if Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS
     z_ker.sched_ticks_remaining = Z_KERNEL_TIME_SLICE_TICKS;
@@ -507,9 +531,18 @@ static void z_cancel_scheduled_wake_up(struct k_thread *thread)
                  */
                 z_tickless_sched_cancel();
             } else {
+                // TODO ??
+                // DO not relcalculate the next scheduled point,
+                // just add a flag that the next scheduled point
+                // will advance the first item of the timeouts queue
+                // a bit less than expected.
+
+                // TODO do 
                 /* If there are still threads in the timeouts queue,
                  * we need to update the next scheduled point.
                  */
+                // FIXME: shift z_ker.timeouts_queue->timeout with ellapsed time
+                // since last scheduling point.
                 // FIXME: make the timeout value cosistent with the other call to z_tickless_sched_ms()
                 z_tickless_sched_ms(z_ker.timeouts_queue->timeout / K_TICKS_PER_MS);
             }
@@ -589,6 +622,11 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
         z_ker.current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
         z_ker.current->tie.event.timeout = K_TIMEOUT_TICKS(timeout);
         z_ker.current->tie.event.next    = NULL;
+
+        // TODO ??
+        // uint16_t time_to_next_sp = tickless_get_ticks_to_next_scheduling_point();
+        // update first item of the timeouts queue with time_to_next_sp
+
         z_tqueue_schedule(&z_ker.timeouts_queue, &z_ker.current->tie.event);
 
 #if CONFIG_KERNEL_TICKLESS
@@ -602,6 +640,8 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
          * the next scheduled point earlier.
          */
         if (z_ker.timeouts_queue == &z_ker.current->tie.event) {
+                // FIXME: shift z_ker.timeouts_queue->timeout with ellapsed time
+                // since last scheduling point.
             z_tickless_sched_ms(K_TIMEOUT_MS(timeout));
         }
 
