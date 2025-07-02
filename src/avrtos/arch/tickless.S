@@ -9,7 +9,7 @@
 
 #include <avrtos/defines.h>
 
-#if CONFIG_KERNEL_TICKLESS && 0
+#if CONFIG_KERNEL_TICKLESS && 1
 
 #define Z_TICKLESS_ISR TIMER1_COMPA_vect
 
@@ -17,12 +17,8 @@
 .global Z_TICKLESS_ISR
 
 .extern z_ker
-.extern z_sched_enter		; void (void)
+.extern z_sched_point_enter		; void (void)
 
-/*
- * This is our system tick interrupt handler, which is called at
- * the period specified by CONFIG_KERNEL_SYSCLOCK_PERIOD_US
- */
 Z_TICKLESS_ISR:
 	/*
 	 * Save the registers that we are going to use for the increment
@@ -50,7 +46,7 @@ Z_TICKLESS_ISR:
 	 * Call scheduler to evaluate timeouts for threads/timers and events.
 	 * Schedule threads consequently. 
 	 */
-    call z_sched_enter
+    call z_sched_point_enter
 
 #if CONFIG_KERNEL_COOPERATIVE_THREADS
 	/* 

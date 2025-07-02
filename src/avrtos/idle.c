@@ -8,6 +8,7 @@
 
 #include <avr/sleep.h>
 
+#include "avrtos/kernel.h"
 #include "kernel_private.h"
 
 #define K_MODULE K_MODULE_IDLE
@@ -86,7 +87,11 @@ static void z_thread_idle_entry(void *context)
     "CONFIG_THREAD_IDLE_COOPERATIVE is deprecated; prefer using k_yield_from_isr_cond() instead"
         k_yield();
         // z_yield_from_idle_thread();
-#endif /* CONFIG_THREAD_IDLE_COOPERATIVE */
+#elif CONFIG_KERNEL_TICKLESS
+#warning "FIXME make sure that with sysclock when resuming from IRQ while only the IDLE thread is running \
+    "the waked-up thread is scheduled correctly"
+        // k_yield();
+#endif
 
         /* Enter sleep mode if no other threads are ready to run.
          * This is typically used in non-cooperative idle threads.

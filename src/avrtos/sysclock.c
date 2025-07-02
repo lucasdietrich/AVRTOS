@@ -7,6 +7,8 @@
 #include "defines.h"
 #include "drivers/timer.h"
 
+#if !CONFIG_KERNEL_TICKLESS || 1
+
 #if (CONFIG_KERNEL_SYSCLOCK_PERIOD_US < 100)
 #warning SYSCLOCK is probably too fast !
 #endif
@@ -94,6 +96,8 @@
 scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch to qemu"
 #endif
 
+__STATIC_ASSERT_NOMSG(Z_KERNEL_TIME_SLICE_TICKS != 0);
+
 #define COUNTER_VALUE                                                                    \
     TIMER_CALC_COUNTER_VALUE(CONFIG_KERNEL_SYSCLOCK_PERIOD_US, PRESCALER_VALUE)
 
@@ -116,3 +120,5 @@ void z_init_sysclock(void)
 #error "invalid timer type"
 #endif
 }
+
+#endif /* !CONFIG_KERNEL_TICKLESS */

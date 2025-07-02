@@ -721,6 +721,17 @@
 #endif
 
 //
+// Use serial console as trigger signal for the application to start
+// Note: Reserved for debug purpose
+//
+// 0: Serial console is not used as trigger signal
+// 1: Serial console is used as trigger signal
+//
+#ifndef CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL
+#define CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL 0
+#endif
+
+//
 // Force inlining of kernel functions, reserved for debug purpose
 //
 // 0: Kernel function inlining is disabled

@@ -14,7 +14,7 @@
 .global z_yield
 
 .extern z_ker
-.extern z_scheduler			; struct k_thread *(void)
+.extern z_sched_setup_context_switch			; struct k_thread *(void)
 .extern k_abort				; void (struct k_thread *)
 .extern __fault				; void (uint8_t)
 
@@ -22,7 +22,7 @@ z_yield:
 	/*
 	 * call scheduler to determine which thread is next
 	 */
-    call z_scheduler
+    call z_sched_setup_context_switch
 
     movw r26, r24 ; r24 contains previous thread
 	
