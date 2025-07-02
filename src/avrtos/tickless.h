@@ -14,9 +14,6 @@
 #include "kernel.h"
 #include "systime.h"
 
-#define TICKLESS_WRAP_MODE_PERFORMANCE 0
-#define TICKLESS_WRAP_MODE_PRECISION   1
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,14 +25,37 @@ struct z_tickless_timespec {
 
 void z_tickless_init(void);
 
-/**
- * @brief Schedule the next tickless event with a 1 millisecond resolution.
- *
- * @param hundred_us The time in 1 milliseconds to wait until the next tickless event
- */
-void z_tickless_sched_ms(uint32_t ms);
+// /**
+//  * @brief Schedule the next tickless event with a 1 millisecond resolution.
+//  *
+//  * @param hundred_us The time in 1 milliseconds to wait until the next tickless event
+//  */
+// void z_tickless_sched_ms(uint32_t ms);
 
-void z_tickless_continue_ms(uint32_t ms);
+/**
+ * @brief Schedule the next tickless event with a 1 tick resolution.
+ *
+ * @param ticks The time in ticks to wait until the next tickless event
+ */
+void z_tickless_sched_ticks(uint32_t ticks);
+
+uint32_t z_tickless_early_sp(bool advance_sp);
+
+// void z_tickless_continue_ms(uint32_t ms);
+
+/**
+ * @brief Measure the elapsed ticks since the last tickless event.
+ *
+ * This function measures the elapsed ticks since the last tickless event
+ * and updates the ticks counter accordingly.
+ *
+ * FIXME doc and args
+ * @param ticks Pointer to a variable where the elapsed ticks will be stored.
+ * @return The number of elapsed ticks since the last tickless event.
+ */
+uint32_t z_tickless_elapsed_since_last_sp(void);
+
+void z_tickless_continue_ticks(uint32_t ticks);
 
 void z_tickless_sched_cancel(void);
 

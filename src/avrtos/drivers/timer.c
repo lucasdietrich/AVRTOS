@@ -7,6 +7,7 @@
 #include "timer.h"
 
 #include <avrtos/assert.h>
+#include "avrtos/sys.h"
 
 #define DRIVERS_TIMERS_API                                                               \
     ((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) ||                       \
@@ -37,6 +38,9 @@ void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx)
 
     dev->TCCRnA = 0u;
     dev->TCCRnB = 0u;
+    dev->TCNTn = 0u;
+    dev->OCRnA = 0u;
+    dev->OCRnB = 0u;
 }
 
 void ll_timer8_init(TIMER8_Device *dev,
@@ -91,13 +95,18 @@ int8_t timer8_init(TIMER8_Device *dev, const struct timer_config *config)
     return 0;
 }
 
-void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
+__noinline void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
 {
     ARG_UNUSED(tim_idx);
 
     dev->TCCRnA = 0u;
     dev->TCCRnB = 0u;
     dev->TCCRnC = 0u;
+    dev->TCNTn = 0u;
+    dev->OCRnA = 0u;
+    dev->OCRnB = 0u;
+    dev->OCRnC = 0u;
+    dev->IRCN  = 0u;
 }
 
 void ll_timer16_init(TIMER16_Device *dev,
@@ -181,7 +190,7 @@ int8_t timer8_deinit(TIMER8_Device *dev)
     }
 
     ll_timer_clear_enable_int_mask(tim_idx);
-    ll_timer_clear_irq_flags(tim_idx);
+    ll_timer_clear_all_irq_flags(tim_idx);
 
     dev->TCCRnB = 0U;
     dev->TCCRnA = 0U;
@@ -201,7 +210,7 @@ int8_t timer16_deinit(TIMER16_Device *dev)
     }
 
     ll_timer_clear_enable_int_mask(tim_idx);
-    ll_timer_clear_irq_flags(tim_idx);
+    ll_timer_clear_all_irq_flags(tim_idx);
 
     /* disable interrupts first */
     dev->TCCRnA = 0U;

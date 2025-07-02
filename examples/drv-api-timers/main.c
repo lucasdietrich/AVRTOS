@@ -22,7 +22,7 @@ void callback(void *dev, uint8_t tim_idx, void *arg)
          *
          * To avoid this, clear all interrupt flags.
          */
-        ll_timer_clear_irq_flags(tim_idx);
+        ll_timer_clear_all_irq_flags(tim_idx);
     }
 }
 

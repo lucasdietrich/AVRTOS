@@ -10,6 +10,7 @@
 #include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
 
+#include "avrtos/sys.h"
 #include "timer_defs.h"
 
 #if defined(__cplusplus)
@@ -513,7 +514,7 @@ __always_inline void ll_timer16_disable_interrupt(uint8_t tim_idx, timer16_inter
     TIMSKn[tim_idx] &= ~BIT(n);
 }
 
-__always_inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
+__always_inline void ll_timer_clear_all_irq_flags(uint8_t tim_idx)
 {
     /* For example : OCF1A:
      * OCFnA is automatically cleared when the Output Compare Match A

@@ -287,7 +287,7 @@ static __inline__ uint8_t z_sched_lock_ret(void)
  * time.
  *
  * If the timeout is set to `K_FOREVER`, the thread will not be executed again until
- * explicitly resumed with `z_wake_up()` or `z_schedule()`.
+ * explicitly resumed with `z_early_wake_up()` or `z_schedule()`.
  *
  * If the timeout is set to `K_NO_WAIT`, the function has no effect.
  *

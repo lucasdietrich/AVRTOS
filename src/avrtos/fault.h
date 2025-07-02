@@ -35,13 +35,15 @@ extern "C" {
 #endif
 
 // Fault codes
-#define K_FAULT_ASSERT            0 // Assertion failure
-#define K_FAULT_STACK_SENTINEL    1 // Stack sentinel value corrupted
-#define K_FAULT_STACK_OVERFLOW    2 // Stack overflow detected
-#define K_FAULT_MEMORY            3 // Memory-related fault
-#define K_FAULT_THREAD_TERMINATED 4 // Thread terminated unexpectedly
-#define K_FAULT_KERNEL_HALT       5 // Kernel halt due to critical error
-#define K_FAULT_RUST_PANIC        6 // Rust panic
+#define K_FAULT_ASSERT            0    // Assertion failure
+#define K_FAULT_STACK_SENTINEL    1    // Stack sentinel value corrupted
+#define K_FAULT_STACK_OVERFLOW    2    // Stack overflow detected
+#define K_FAULT_MEMORY            3    // Memory-related fault
+#define K_FAULT_THREAD_TERMINATED 4    // Thread terminated unexpectedly
+#define K_FAULT_KERNEL_HALT       5    // Kernel halt due to critical error
+#define K_FAULT_RUST_PANIC        6    // Rust panic
+#define K_FAULT_TIMING            7    // Timing-related fault
+#define K_FAULT_USER              0xFE // User-defined fault
 
 #define K_FAULT_ANY 0xFF
 

@@ -113,7 +113,7 @@ extern void z_thread_switch(struct k_thread *from, struct k_thread *to);
  * with -EAGAIN as the return value.
  *
  * If waitqueue is NULL, the thread is suspended but not added to any wait queue.
- * Consequently, the thread must be woken up manually using `z_wake_up()`.
+ * Consequently, the thread must be woken up manually using `z_early_wake_up()`.
  *
  * Assumptions:
  * - The interrupt flag is cleared when this function is called.
@@ -191,7 +191,7 @@ __kernel uint8_t z_cancel_all_pending(struct dnode *waitqueue);
  *
  * @param thread Pointer to the thread to wake up.
  */
-__kernel void z_wake_up(struct k_thread *thread);
+__kernel void z_early_wake_up(struct k_thread *thread);
 
 /**
  * @brief Check if interrupts are enabled.

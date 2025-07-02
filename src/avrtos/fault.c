@@ -49,6 +49,15 @@ void __fault(uint8_t reason)
     case K_FAULT_KERNEL_HALT:
         serial_print_p(PSTR("Halt"));
         break;
+    case K_FAULT_RUST_PANIC:
+        serial_print_p(PSTR("Rust Panic"));
+        break;
+    case K_FAULT_TIMING:
+        serial_print_p(PSTR("Timing"));
+        break;
+    case K_FAULT_USER:
+        serial_print_p(PSTR("User"));
+        break;
     default:
         serial_print_p(PSTR("Other"));
         break;
