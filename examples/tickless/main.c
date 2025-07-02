@@ -54,7 +54,7 @@ static const struct th_data task_data[] = {
 K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, (void*)&task_data[0], 'a');
 K_THREAD_DEFINE(t2, task, 0x100, K_COOPERATIVE, (void*)&task_data[1], 'b');
 K_THREAD_DEFINE(t3, task, 0x100, K_COOPERATIVE, (void*)&task_data[2], 'c');
-K_THREAD_DEFINE(t4, task, 0x100, K_COOPERATIVE, (void*)&task_data[3], 'c');
+// K_THREAD_DEFINE(t4, task, 0x100, K_COOPERATIVE, (void*)&task_data[3], 'c');
 
 K_SEM_DEFINE(sem, 0, 1);
 
@@ -82,7 +82,7 @@ ISR(TIMER4_COMPA_vect)
     //          ll_timer16_get_tcnt(TIMER1_DEVICE));
 
 
-    gpiol_pin_write_state(GPIOF, 4, 0u);
+    gpiol_pin_write_state(GPIOF, 7u, 0u);
 
     // printf_P(PSTR("irq\n"));
     struct k_thread *thread = k_sem_give(&sem);
@@ -114,7 +114,7 @@ int main(void)
         printf_P(PSTR("=================\nstarting timer\n"));
         k_sem_init(&sem, 0, 1);
         ll_timer16_deinit(TIMER4_DEVICE, TIMER4_INDEX);
-        gpiol_pin_write_state(GPIOF, 4, 1u);
+        gpiol_pin_write_state(GPIOF, 7u, 1u);
         ll_timer16_init(TIMER4_DEVICE, TIMER4_INDEX, &config);
         
         int ret = k_sem_take(&sem, timeout);
