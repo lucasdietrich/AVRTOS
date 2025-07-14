@@ -32,12 +32,18 @@ void z_tickless_init(void);
 //  */
 // void z_tickless_sched_ms(uint32_t ms);
 
+typedef enum {
+    SP_NEW_POINT = 0u,
+    SP_CONTINUE_LAST = 1u,
+    SP_CONTINUE_NEXT = 2u,
+} SP_TYPE;
+
 /**
  * @brief Schedule the next tickless event with a 1 tick resolution.
  *
  * @param ticks The time in ticks to wait until the next tickless event
  */
-void z_tickless_sched_ticks(uint32_t ticks);
+void z_tickless_sched_ticks(uint32_t ticks, SP_TYPE sp_type);
 
 uint32_t z_tickless_early_sp(bool advance_sp);
 
@@ -55,7 +61,7 @@ uint32_t z_tickless_early_sp(bool advance_sp);
  */
 uint32_t z_tickless_elapsed_since_last_sp(void);
 
-void z_tickless_continue_ticks(uint32_t ticks);
+// void z_tickless_continue_ticks(uint32_t ticks, bool continue_last);
 
 void z_tickless_sched_cancel(void);
 

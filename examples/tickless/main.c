@@ -29,32 +29,41 @@
 struct th_data {
     uint8_t led;
     uint16_t ms;
+    uint8_t maxi;
 };
 
 static void task(void *arg)
 {
     struct th_data *data = (struct th_data *)arg;
-    printf_P(PSTR("Task started, blinking LED %u every %u ms\n"), data->led, data->ms);
+    printf("LED: %u ms: %u\n", data->led, data->ms);
     
     k_timeout_t timeout = K_MSEC(data->ms);
 
-    for (;;) {
+    for (uint_fast8_t i = 0;; i++) {
         gpiol_pin_toggle(GPIOF, data->led);
+        serial_transmit(k_thread_get_current()->symbol);
         k_sleep(timeout);
+
+        // Exit
+        if (data->maxi && (i >= data->maxi)) {
+            break;
+        }
     }
+
+    panic();
 }
 
 static const struct th_data task_data[] = {
-    { .led = 4, .ms = 75u },
-    { .led = 5, .ms = 150u },
-    { .led = 6, .ms = 250u },
-    { .led = 7, .ms = 1200u },
+    { .led = 4, .ms = 20u, .maxi = 0 },
+    { .led = 5, .ms = 24u, .maxi = 0 },
+    { .led = 6, .ms = 28u, .maxi = 0 },
+    { .led = 7, .ms = 32u, .maxi = 0 },
 };
 
-K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, (void*)&task_data[0], 'a');
-K_THREAD_DEFINE(t2, task, 0x100, K_COOPERATIVE, (void*)&task_data[1], 'b');
-K_THREAD_DEFINE(t3, task, 0x100, K_COOPERATIVE, (void*)&task_data[2], 'c');
-// K_THREAD_DEFINE(t4, task, 0x100, K_COOPERATIVE, (void*)&task_data[3], 'c');
+// K_THREAD_DEFINE(t4, task, 0x100, K_COOPERATIVE, (void*)&task_data[3], 'W');
+K_THREAD_DEFINE(t2, task, 0x100, K_COOPERATIVE, (void*)&task_data[1], 'Y');
+K_THREAD_DEFINE(t3, task, 0x100, K_COOPERATIVE, (void*)&task_data[2], 'Z');
+K_THREAD_DEFINE(t1, task, 0x100, K_COOPERATIVE, (void*)&task_data[0], 'X');
 
 K_SEM_DEFINE(sem, 0, 1);
 
@@ -92,6 +101,10 @@ ISR(TIMER4_COMPA_vect)
 
 int main(void)
 {
+    gpiol_pin_init(GPIOF, 0u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+    gpiol_pin_init(GPIOF, 1u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+    gpiol_pin_init(GPIOF, 2u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
+    gpiol_pin_init(GPIOF, 3u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
     gpiol_pin_init(GPIOF, 4u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
     gpiol_pin_init(GPIOF, 5u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
     gpiol_pin_init(GPIOF, 6u, GPIO_MODE_OUTPUT, GPIO_OUTPUT_DRIVEN_LOW);
@@ -100,31 +113,29 @@ int main(void)
     const struct timer_config config = {
         .mode = TIMER_MODE_CTC,
         .prescaler = TIMER_PRESCALER_256,
-        .counter = TIMER_CALC_COUNTER_VALUE(50000u, 256u),
+        .counter = TIMER_CALC_COUNTER_VALUE(20000u, 256u),
         .timsk = BIT(OCIEnA)
     };
 
     printf_P(PSTR("AVRTOS Tickless Example\n"));
 
-    k_timeout_t timeout = K_MSEC(100u);
+    k_timeout_t timeout = K_FOREVER;
     serial_u32(timeout.value);
-    printf_P(PSTR(" ticks = 100ms \n"));
     
     for (uint_fast16_t i = 0;;i++) {
-        printf_P(PSTR("=================\nstarting timer\n"));
+        serial_transmit('M');
         k_sem_init(&sem, 0, 1);
         ll_timer16_deinit(TIMER4_DEVICE, TIMER4_INDEX);
         gpiol_pin_write_state(GPIOF, 7u, 1u);
         ll_timer16_init(TIMER4_DEVICE, TIMER4_INDEX, &config);
         
-        int ret = k_sem_take(&sem, timeout);
-        printf_P(PSTR("sem: %d\n"), ret);
+        (void) k_sem_take(&sem, timeout);
 
         // print_time();
-        k_sleep(K_MSEC(1000u));
+        k_sleep(K_MSEC(60u));
 
-        // if (i >= 6) {
-            // __fault(K_FAULT_ANY);
+        // if (i >= 4) {
+        //     __fault(K_FAULT_USER);
         // }
     }
 

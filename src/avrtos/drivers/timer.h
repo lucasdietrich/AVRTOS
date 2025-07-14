@@ -521,7 +521,7 @@ __always_inline void ll_timer_clear_all_irq_flags(uint8_t tim_idx)
      * Interrupt Vector is executed. Alternatively, OCFnA can be cleared by
      * writing a logic one to its bit location.
      */
-    TIFRn[tim_idx] = 0xFFU;
+    TIFRn[tim_idx] = TIFRn[tim_idx];
 }
 
 __always_inline void ll_timer16_clear_irq_flag(uint8_t tim_idx, timer16_interrupt_t n)
@@ -531,7 +531,9 @@ __always_inline void ll_timer16_clear_irq_flag(uint8_t tim_idx, timer16_interrup
      * Interrupt Vector is executed. Alternatively, OCFnA can be cleared by
      * writing a logic one to its bit location.
      */
-    TIFRn[tim_idx] |= BIT(n);
+
+    // FIXME: Setting the flag to unset bits seems to produce unexpected behavior
+    TIFRn[tim_idx] = TIFRn[tim_idx] & BIT(n);
 }
 
 __always_inline uint8_t ll_timer_get_irq_flags(uint8_t tim_idx)
