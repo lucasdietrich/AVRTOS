@@ -142,7 +142,6 @@ void z_avrtos_init(void)
     z_init_stacks_sentinel();
 #endif
 
-// z_init_sysclock();
 #if CONFIG_KERNEL_TICKLESS
     z_tickless_init();
 #else

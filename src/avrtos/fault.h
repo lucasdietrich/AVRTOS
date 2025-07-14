@@ -50,7 +50,7 @@ extern "C" {
 /**
  * @brief fault function alias
  */
-#define panic __fault(K_FAULT_ANY)
+#define panic() __fault(K_FAULT_USER)
 
 #if !defined(__ASSEMBLER__)
 

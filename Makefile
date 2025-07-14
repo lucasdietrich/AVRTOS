@@ -9,7 +9,7 @@ GENERATOR_ARGS?=
 DEVICE?=/dev/ttyACM0
 SAMPLE?=shell
 TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
-BAUDRATE?=115200
+BAUDRATE?=500000
 QEMU?=ON
 
 # if QEMU is enabled, set CMAKE_BUILD_TYPE to Debug by default

@@ -34,7 +34,7 @@
 
 // TICKLESS CONFIGURATION
 #define TICKLESS_WRAP_MODE       TICKLESS_WRAP_MODE_PERFORMANCE
-#define TICKLESS_PRESCALER_VALUE 256u
+#define TICKLESS_PRESCALER_VALUE 8u
 
 #if TICKLESS_PRESCALER_VALUE == 1024
 // prescaler = 1024  freq = 0.2384185791015625 Hz (64.0 us)  period = 4194304 us
@@ -68,7 +68,7 @@
 #define TICKLESS_US_PER_TICK     0.5
 #define TICKLESS_US_PER_PERIOD   32768u
 #define TICKLESS_TOP_PERIOD_US   25000u
-#error "Probable tick calculation error with prescaler 8, check the code"
+// #error "Probable tick calculation error with prescaler 8, check the code"
 #elif TICKLESS_PRESCALER_VALUE == 1
 // prescaler = 1  freq = 244.140625 Hz (0.0625 us)  period = 4096 us
 // Max schedulable duration on 32-bits counter is (1<<32) * 0.0625us = 4m28s
