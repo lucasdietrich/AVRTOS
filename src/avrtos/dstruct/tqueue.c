@@ -76,6 +76,31 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed)
     }
 }
 
+void tqueue_advance_to_first(struct titem **root)
+{
+    struct titem *first_item = *root;
+    if (first_item != NULL) {
+        /* Set the first item delay_shift to 0
+         * if it has not already expired */
+        first_item->timeout = 0;
+    }
+}
+
+void tqueue_advance_to_next(struct titem **root)
+{
+    struct titem *item = *root;
+    while (item != NULL) {
+        /* if item has not expired, mark it as ready then exit */
+        if (item->timeout > 0) {
+            item->timeout = 0;
+            break;
+        }
+
+        /* if item has already expired, we continue to the next item */
+        item = item->next;
+    }
+}
+
 struct titem *tqueue_pop(struct titem **root)
 {
     struct titem *item = NULL;

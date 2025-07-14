@@ -7,6 +7,7 @@
 #include "timer.h"
 
 #include <avrtos/assert.h>
+#include "avrtos/sys.h"
 
 #define DRIVERS_TIMERS_API                                                               \
     ((CONFIG_DRIVERS_TIMER0_API) || (CONFIG_DRIVERS_TIMER1_API) ||                       \
@@ -37,6 +38,9 @@ void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx)
 
     dev->TCCRnA = 0u;
     dev->TCCRnB = 0u;
+    dev->TCNTn = 0u;
+    dev->OCRnA = 0u;
+    dev->OCRnB = 0u;
 }
 
 void ll_timer8_init(TIMER8_Device *dev,
@@ -91,13 +95,18 @@ int8_t timer8_init(TIMER8_Device *dev, const struct timer_config *config)
     return 0;
 }
 
-void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
+__noinline void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
 {
     ARG_UNUSED(tim_idx);
 
     dev->TCCRnA = 0u;
     dev->TCCRnB = 0u;
     dev->TCCRnC = 0u;
+    dev->TCNTn = 0u;
+    dev->OCRnA = 0u;
+    dev->OCRnB = 0u;
+    dev->OCRnC = 0u;
+    dev->IRCN  = 0u;
 }
 
 void ll_timer16_init(TIMER16_Device *dev,
@@ -116,6 +125,10 @@ void ll_timer16_init(TIMER16_Device *dev,
         /* read 16.9.2 Clear Timer on Compare Match (CTC) Mode */
         dev->OCRnA = config->counter;
         break;
+    case TIMER_MODE_CTC_ICRn:
+        /* read 16.9.3 CTC with ICRn as TOP */
+        dev->IRCN = config->counter;
+        break;
     case TIMER_MODE_FAST_PWM_8bit:  /* TOP 0x00FF */
     case TIMER_MODE_FAST_PWM_9bit:  /* TOP 0x01FF */
     case TIMER_MODE_FAST_PWM_10bit: /* TOP 0x03FF */
@@ -132,14 +145,21 @@ void ll_timer16_init(TIMER16_Device *dev,
     dev->TCCRnB |= (config->prescaler << CSn0);
 }
 
+void ll_timer16_channel_set_mode(TIMER16_Device *dev,
+                                 timer_channel_t channel,
+                                 timer_channel_com_t mode)
+{
+    const uint8_t group_shift = (2 * (2 - channel) + 2u);
+    const uint8_t reg_val     = dev->TCCRnA & ~(0x03u << group_shift);
+    dev->TCCRnA               = reg_val | (mode << group_shift);
+}
+
 void ll_timer16_channel_configure(TIMER16_Device *dev,
                                   timer_channel_t channel,
                                   const struct timer_channel_compare_config *config)
 {
-    const uint8_t group_shift = (2 * (2 - channel) + 2u);
-    const uint8_t reg_val     = dev->TCCRnA & ~(0x03u << group_shift);
-    dev->TCCRnA               = reg_val | (config->mode << group_shift);
-    ll_timer16_write_reg16(&dev->OCRnx[channel], config->value);
+    ll_timer16_channel_set_mode(dev, channel, config->mode);
+    ll_timer16_channel_set_compare_register(dev, channel, config->value);
 }
 
 int8_t timer16_init(TIMER16_Device *dev, const struct timer_config *config)
@@ -170,7 +190,7 @@ int8_t timer8_deinit(TIMER8_Device *dev)
     }
 
     ll_timer_clear_enable_int_mask(tim_idx);
-    ll_timer_clear_irq_flags(tim_idx);
+    ll_timer_clear_all_irq_flags(tim_idx);
 
     dev->TCCRnB = 0U;
     dev->TCCRnA = 0U;
@@ -190,7 +210,7 @@ int8_t timer16_deinit(TIMER16_Device *dev)
     }
 
     ll_timer_clear_enable_int_mask(tim_idx);
-    ll_timer_clear_irq_flags(tim_idx);
+    ll_timer_clear_all_irq_flags(tim_idx);
 
     /* disable interrupts first */
     dev->TCCRnA = 0U;

@@ -41,6 +41,21 @@ AVRTOS offers an extensive list of features, including:
 - Macro-based logging subsystem
 - Uptime API
 - Data structures: singly and doubly linked lists, queues, ring buffers, timeout queue
+- Tickless kernel (experimental):
+  - [ ] Measure time spent in the scheduler
+  - [ ] handle 8/16 bits sysclock timer
+  - [ ] handle 16/32bits k_ticks objects
+  - [ ] handle uptime/no uptime
+  - [ ] handle 32/48 bits uptime counter
+  - [ ] optimize the scheduler
+  - [ ] handle preempted threads and voluntary yield
+  - [ ] handle timers/events with tickless (compb, compc)
+  - [ ] clear sysclk timer interrupt before enabling it again ?
+  - [ ] sysclk tcnt swap enough for uptime accuracy ??
+  - [ ] use compa for scheduling points, use ovf for uptime
+- threads 4 levels priority
+  - [ ] cooperative
+  - [ ] preemptive
 
 Additional Features:
 

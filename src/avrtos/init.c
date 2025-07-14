@@ -5,12 +5,15 @@
  */
 
 #include "init.h"
+#include <stdio.h>
 
+#include "avrtos/tickless.h"
 #include "canaries.h"
 #include "debug.h"
 #include "kernel.h"
 #include "kernel_private.h"
 #include "mem_slab.h"
+#include "serial.h"
 #include "stack_sentinel.h"
 #include "stdout.h"
 #include "timer.h"
@@ -45,6 +48,10 @@ z_save_mcusr:
     sts z_mcusr, r2
 
 */
+#endif
+
+#if CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL && !CONFIG_SERIAL_AUTO_INIT
+#error "CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL requires CONFIG_SERIAL_AUTO_INIT to be enabled"
 #endif
 
 void z_avrtos_init(void)
@@ -82,10 +89,22 @@ void z_avrtos_init(void)
 
 #if CONFIG_SERIAL_AUTO_INIT
     serial_init();
+
+#if CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL
+    serial_print_p(PSTR("Press any key to start ...\n"));
+    serial_receive();
+#endif /* CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL */
+
 #if CONFIG_AVRTOS_BANNER_ENABLE
     serial_print_banner();
 #endif /* CONFIG_AVRTOS_BANNER_ENABLE */
 #endif /* CONFIG_SERIAL_AUTO_INIT */
+
+    /* Clear debug GPIO pins to indicate kernel initialization start */
+    __Z_DBG_GPIO_0_CLEAR();
+    __Z_DBG_GPIO_1_CLEAR();
+    __Z_DBG_GPIO_2_CLEAR();
+    __Z_DBG_GPIO_3_CLEAR();
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
     SET_BIT(UCSR0B, BIT(RXCIE0)); // Enable UART receive complete interrupt
@@ -123,8 +142,12 @@ void z_avrtos_init(void)
     z_init_stacks_sentinel();
 #endif
 
+#if CONFIG_KERNEL_TICKLESS
+    z_tickless_init();
+#else
     /* Initialize system clock */
     z_init_sysclock();
+#endif /* CONFIG_KERNEL_TICKLESS */
 
 #if (CONFIG_INTERRUPT_POLICY == 2) && (CONFIG_THREAD_MAIN_COOPERATIVE == 0)
     /* Lock the scheduler if required by configuration */

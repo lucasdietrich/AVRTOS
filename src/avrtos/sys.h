@@ -98,4 +98,6 @@
 #define sys_ptr_dec(ptr)             ((void *)((char *)(ptr)-1))
 #define sys_ptr_shift(ptr_p, offset) (*(ptr_p) = sys_ptr_add(*(ptr_p), offset))
 
+// TODO add ptr coloring on 3 bits
+
 #endif

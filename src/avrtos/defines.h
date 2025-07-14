@@ -10,6 +10,7 @@
 #include "avrtos_conf.h"
 #include "errno.h"
 #include "sys.h"
+#include "tickless_defs.h"
 
 // AVRTOS version 2.0.0
 #define AVRTOS_VERSION_MAJOR    2
@@ -84,6 +85,7 @@
 #error "CONFIG_KERNEL_TIME_API requires CONFIG_KERNEL_UPTIME"
 #endif
 
+#if !CONFIG_KERNEL_TICKLESS || 1
 #if CONFIG_KERNEL_TIME_SLICE_US < CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #error[UNSUPPORTED] CONFIG_KERNEL_TIME_SLICE_US < CONFIG_KERNEL_SYSCLOCK_PERIOD_US
 #elif CONFIG_KERNEL_TIME_SLICE_US > CONFIG_KERNEL_SYSCLOCK_PERIOD_US
@@ -104,14 +106,17 @@
 #define Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS 0
 #define Z_KERNEL_TIME_SLICE_TICKS          1
 #endif /* CONFIG_KERNEL_TIME_SLICE_US != CONFIG_KERNEL_SYSCLOCK_PERIOD_US */
+#endif /* !CONFIG_TICKLESS */
 
-#define KERNEL_TICK_PERIOD_US CONFIG_KERNEL_SYSCLOCK_PERIOD_US
-#define KERNEL_TICK_PERIOD_MS (KERNEL_TICK_PERIOD_US / 1000ULL)
+#if CONFIG_KERNEL_TICKLESS
+#define Z_TICK_US TICKLESS_US_PER_TICK
+#else
+#define Z_TICK_US CONFIG_KERNEL_SYSCLOCK_PERIOD_US
+#endif
 
-#define K_TICKS_US         CONFIG_KERNEL_SYSCLOCK_PERIOD_US
-#define K_TICKS_PER_SECOND (((float)1000000ULL) / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
-#define K_TICKS_PER_MS     (((float)1000ULL) / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
-#define K_TICKS_PER_USEC   (((float)1ULL) / CONFIG_KERNEL_SYSCLOCK_PERIOD_US)
+#define K_TICKS_PER_SECOND (((float)1000000ULL) / Z_TICK_US)
+#define K_TICKS_PER_MS     (((float)1000ULL) / Z_TICK_US)
+#define K_TICKS_PER_USEC   (((float)1ULL) / Z_TICK_US)
 
 // put all c specific definitions  here
 
@@ -369,6 +374,9 @@ typedef struct {
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
     Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 1)
 
+#define K_THREAD_DEFINE_STOPPED(name, entry, stack_size, prio_flag, context_p, symbol) \
+    Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 0)
+
 #if CONFIG_THREAD_MAIN_MONITOR || CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define Z_THREAD_IS_MONITORED(thread) true
 #else
@@ -406,7 +414,7 @@ typedef struct {
 
 /* The thread is pending for an event, it may be in the time queue
  * (events_queue) but it is not in the runqueue. It can be wake up with
- * function z_wake_up()
+ * function z_early_wake_up()
  */
 #define Z_THREAD_STATE_PENDING (2 << Z_THREAD_STATE_POS)
 

@@ -127,7 +127,7 @@ int8_t k_flags_notify(struct k_flags *flags,
 
             /* Unpend thread */
             dlist_remove(thread_handle);
-            z_wake_up(thread);
+            z_early_wake_up(thread);
 
             if (Z_SWAP_DATA_GET_OPTIONS(swap_data) & K_FLAGS_CONSUME) {
                 notify_value &= ~trig;

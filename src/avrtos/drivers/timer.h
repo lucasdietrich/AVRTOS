@@ -10,6 +10,7 @@
 #include <avrtos/drivers.h>
 #include <avrtos/kernel.h>
 
+#include "avrtos/sys.h"
 #include "timer_defs.h"
 
 #if defined(__cplusplus)
@@ -144,23 +145,23 @@ typedef struct {
  */
 #define TIMSKn ((__IO uint8_t *)(AVR_IO_BASE_ADDR + 0x6EU))
 
-#define TIMER_TIMSK_SET_OCIEA(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
-#define TIMER_TIMSK_SET_OCIEB(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
-#define TIMER_TIMSK_SET_OCIEC(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
-#define TIMER_TIMSK_SET_TOIE(tim_idx)  SET_BIT(TIMSKn[tim_idx], BIT(TOIEn))
-#define TIMER_TIMSK_SET_ICIE(tim_idx)  SET_BIT(TIMSKn[tim_idx], BIT(ICIEn))
+#define TIMER_TIMSK_ENABLE_OCIEA(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
+#define TIMER_TIMSK_ENABLE_OCIEB(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
+#define TIMER_TIMSK_ENABLE_OCIEC(tim_idx) SET_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
+#define TIMER_TIMSK_ENABLE_TOIE(tim_idx)  SET_BIT(TIMSKn[tim_idx], BIT(TOIEn))
+#define TIMER_TIMSK_ENABLE_ICIE(tim_idx)  SET_BIT(TIMSKn[tim_idx], BIT(ICIEn))
 
-#define TIMER_TIMSK_CLEAR_OCIEA(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
-#define TIMER_TIMSK_CLEAR_OCIEB(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
-#define TIMER_TIMSK_CLEAR_OCIEC(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
-#define TIMER_TIMSK_CLEAR_TOIE(tim_idx)  CLR_BIT(TIMSKn[tim_idx], BIT(TOIEn))
-#define TIMER_TIMSK_CLEAR_ICIE(tim_idx)  CLR_BIT(TIMSKn[tim_idx], BIT(ICIEn))
+#define TIMER_TIMSK_DISABLE_OCIEA(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
+#define TIMER_TIMSK_DISABLE_OCIEB(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
+#define TIMER_TIMSK_DISABLE_OCIEC(tim_idx) CLR_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
+#define TIMER_TIMSK_DISABLE_TOIE(tim_idx)  CLR_BIT(TIMSKn[tim_idx], BIT(TOIEn))
+#define TIMER_TIMSK_DISABLE_ICIE(tim_idx)  CLR_BIT(TIMSKn[tim_idx], BIT(ICIEn))
 
-#define TIMER_TIMSK_READ_OCIEA(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(OCIEnA))
-#define TIMER_TIMSK_READ_OCIEB(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(OCIEnB))
-#define TIMER_TIMSK_READ_OCIEC(tim_idx) READ_BIT(TIMSKn[tim_idx], BIT(OCIEnC))
-#define TIMER_TIMSK_READ_TOIE(tim_idx)  READ_BIT(TIMSKn[tim_idx], BIT(TOIEn))
-#define TIMER_TIMSK_READ_ICIE(tim_idx)  READ_BIT(TIMSKn[tim_idx], BIT(ICIEn))
+#define TIMER_TIFR_CLEAR_OCIEA(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(OCIEnA))
+#define TIMER_TIFR_CLEAR_OCIEB(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(OCIEnB))
+#define TIMER_TIFR_CLEAR_OCIEC(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(OCIEnC))
+#define TIMER_TIFR_CLEAR_TOIE(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(TOIEn))
+#define TIMER_TIFR_CLEAR_ICIE(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(ICIEn))
 
 #define TIMER_INDEX_EXISTS(tim_idx) ((tim_idx) < TIMERS_COUNT)
 
@@ -240,11 +241,11 @@ typedef enum {
 } timer_prescaler_t;
 
 typedef enum {
-    TIMER16_OVERFLOW_INTERRUPT               = 0u,
-    TIMER16_OUTPUT_COMPARE_MATCH_A_INTERRUPT = 1u,
-    TIMER16_OUTPUT_COMPARE_MATCH_B_INTERRUPT = 2u,
-    TIMER16_OUTPUT_COMPARE_MATCH_C_INTERRUPT = 3u,
-    TIMER16_INPUT_CAPTURE_INTERRUPT          = 5u,
+    TIMER16_OVERFLOW_INTERRUPT               = TOIEn,
+    TIMER16_OUTPUT_COMPARE_MATCH_A_INTERRUPT = OCIEnA,
+    TIMER16_OUTPUT_COMPARE_MATCH_B_INTERRUPT = OCIEnB,
+    TIMER16_OUTPUT_COMPARE_MATCH_C_INTERRUPT = OCIEnC,
+    TIMER16_INPUT_CAPTURE_INTERRUPT          = ICIEn,
 } timer16_interrupt_t;
 
 /* Timer Channel Compare Output Mode */
@@ -396,21 +397,6 @@ __always_inline void ll_timer_set_enable_int_mask(uint8_t tim_idx, uint8_t mask)
     TIMSKn[tim_idx] = mask;
 }
 
-__always_inline void ll_timer_clear_irq_flags(uint8_t tim_idx)
-{
-    /* For example : OCF1A:
-     * OCFnA is automatically cleared when the Output Compare Match A
-     * Interrupt Vector is executed. Alternatively, OCFnA can be cleared by
-     * writing a logic one to its bit location.
-     */
-    TIFRn[tim_idx] = 0xFFU;
-}
-
-__always_inline uint8_t ll_timer_get_irq_flags(uint8_t tim_idx)
-{
-    return TIFRn[tim_idx];
-}
-
 __always_inline void ll_timer8_stop(TIMER8_Device *dev)
 {
     /* timer stops counting at the timer prescaler is set to zero */
@@ -449,13 +435,42 @@ __always_inline void ll_timer16_set_tcnt(TIMER16_Device *dev, uint16_t val)
     dev->TCNTnL = val & 0xffU;
 }
 
+/**
+ * @brief Swap the TCNTn register value with the given value
+ *
+ * This function helps to not miss any timer tick when updating the TCNTn
+ * register. It reads the current value of the TCNTn register, writes the new
+ * value, and returns the old value.
+ *
+ * @param dev
+ * @param val
+ * @return __always_inline
+ */
+__always_inline uint16_t ll_timer16_swap_tcnt(TIMER16_Device *dev, uint16_t val)
+{
+    /**
+     * For a 16-bit read, the low byte must be read before the high byte.
+     */
+    uint8_t ll = dev->TCNTnL;
+    uint8_t lh = dev->TCNTnH;
+
+    /**
+     * To do a 16-bit write, the high byte must be written before the low
+     * byte.
+     */
+    dev->TCNTnH = (uint8_t)(val >> 8);
+    dev->TCNTnL = (uint8_t)val;
+
+    return (lh << 8) | ll;
+}
+
 __always_inline uint16_t ll_timer16_get_tcnt(TIMER16_Device *dev)
 {
     /**
      * For a 16-bit read, the low byte must be read before the high byte.
      */
-    uint32_t ll = dev->TCNTnL;
-    uint32_t lh = dev->TCNTnH;
+    uint8_t ll = dev->TCNTnL;
+    uint8_t lh = dev->TCNTnH;
     return (lh << 8) | ll;
 }
 
@@ -499,6 +514,33 @@ __always_inline void ll_timer16_disable_interrupt(uint8_t tim_idx, timer16_inter
     TIMSKn[tim_idx] &= ~BIT(n);
 }
 
+__always_inline void ll_timer_clear_all_irq_flags(uint8_t tim_idx)
+{
+    /* For example : OCF1A:
+     * OCFnA is automatically cleared when the Output Compare Match A
+     * Interrupt Vector is executed. Alternatively, OCFnA can be cleared by
+     * writing a logic one to its bit location.
+     */
+    TIFRn[tim_idx] = TIFRn[tim_idx];
+}
+
+__always_inline void ll_timer16_clear_irq_flag(uint8_t tim_idx, timer16_interrupt_t n)
+{
+    /* For example : OCF1A:
+     * OCFnA is automatically cleared when the Output Compare Match A
+     * Interrupt Vector is executed. Alternatively, OCFnA can be cleared by
+     * writing a logic one to its bit location.
+     */
+
+    // FIXME: Setting the flag to unset bits seems to produce unexpected behavior
+    TIFRn[tim_idx] = TIFRn[tim_idx] & BIT(n);
+}
+
+__always_inline uint8_t ll_timer_get_irq_flags(uint8_t tim_idx)
+{
+    return TIFRn[tim_idx];
+}
+
 void ll_timer8_init(TIMER8_Device *dev,
                     uint8_t tim_idx,
                     const struct timer_config *config);
@@ -507,9 +549,26 @@ void ll_timer16_init(TIMER16_Device *dev,
                      uint8_t tim_idx,
                      const struct timer_config *config);
 
+void ll_timer16_channel_set_mode(TIMER16_Device *dev,
+                                 timer_channel_t channel,
+                                 timer_channel_com_t mode);
+
 void ll_timer16_channel_configure(TIMER16_Device *dev,
                                   timer_channel_t channel,
                                   const struct timer_channel_compare_config *config);
+
+__always_inline void ll_timer16_channel_set_compare_register(TIMER16_Device *dev,
+                                                    timer_channel_t channel,
+                                                    uint16_t value)
+{
+    ll_timer16_write_reg16(&dev->OCRnx[channel], value);
+}
+
+__always_inline uint16_t ll_timer16_channel_get_compare_register(TIMER16_Device *dev,
+                                                          timer_channel_t channel)
+{
+    return dev->OCRnx[channel];
+}
 
 void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx);
 

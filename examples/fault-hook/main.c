@@ -23,5 +23,5 @@ int main(void)
 
     k_sleep(K_MSEC(1000));
 
-    __fault(K_FAULT_ANY);
+    __fault(K_FAULT_USER);
 }

@@ -296,6 +296,26 @@
 #endif
 
 //
+// Enable tickless mode
+//
+// 0: Tickless mode is disabled
+// 1: Tickless mode is enabled
+//
+#ifndef CONFIG_KERNEL_TICKLESS
+#define CONFIG_KERNEL_TICKLESS 0
+#endif
+
+//
+// Enable tickless mode debug
+//
+// 0: Tickless mode debug is disabled
+// 1: Tickless mode debug is enabled
+//
+#ifndef CONFIG_KERNEL_TICKLESS_DEBUG
+#define CONFIG_KERNEL_TICKLESS_DEBUG 0
+#endif
+
+//
 // Select the hardware timer used for the kernel sysclock.
 //
 // ATmega328P/...
@@ -701,6 +721,17 @@
 #endif
 
 //
+// Use serial console as trigger signal for the application to start
+// Note: Reserved for debug purpose
+//
+// 0: Serial console is not used as trigger signal
+// 1: Serial console is used as trigger signal
+//
+#ifndef CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL
+#define CONFIG_KERNEL_DEBUG_TRIGGER_SERIAL 0
+#endif
+
+//
 // Force inlining of kernel functions, reserved for debug purpose
 //
 // 0: Kernel function inlining is disabled
@@ -906,6 +937,10 @@
 // 6: GPIO port C pins 4 to 7
 // 7: GPIO port D pins 0 to 3
 // 8: GPIO port D pins 4 to 7
+// 9: GPIO port E pins 0 to 3
+// 10: GPIO port E pins 4 to 7
+// 11: GPIO port F pins 0 to 3
+// 12: GPIO port F pins 4 to 7
 //
 #ifndef CONFIG_KERNEL_DEBUG_GPIO
 #define CONFIG_KERNEL_DEBUG_GPIO 0
