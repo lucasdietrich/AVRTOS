@@ -49,6 +49,21 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
     return ret;
 }
 
+int8_t z_sem_poll_take(struct k_sem *sem)
+{
+    Z_ARGS_CHECK(sem && pollfd) return -EINVAL;
+
+    if (sem->count > 0) {
+        /* Semaphore is available, no need to wait */
+        return 0;
+    }
+
+    /* Add the current thread to the semaphore's wait queue */
+    dlist_append(&sem->waitqueue, &z_ker.current->wany);
+
+    return 1; // Indicate that the thread is now waiting
+}
+
 struct k_thread *k_sem_give(struct k_sem *sem)
 {
     Z_ARGS_CHECK(sem) return NULL;
