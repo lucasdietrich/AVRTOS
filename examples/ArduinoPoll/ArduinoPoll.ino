@@ -5,7 +5,7 @@
  */
 
 /**
- * @file main.c
+ * @file Poll.c
  * @brief Polling API demonstration example.
  *
  * This example demonstrates the use of the k_poll() function to wait on multiple
@@ -23,7 +23,7 @@
  * The main thread polls on all these objects and handles events when they occur.
  */
 
-#include <avrtos/avrtos.h>
+#include <avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/logging.h>
@@ -50,86 +50,97 @@ K_SEM_DEFINE(sem_fifo, 0u, 1u);
 K_SEM_DEFINE(sem_msgq_put, 0u, 1u);
 K_SEM_DEFINE(sem_msgq_get, 0u, 1u);
 
-int main(void)
-{
-    int ret;
+/* Threads definitions */
+struct k_thread tmutex, tfifo, tmsgq_put, tmsgq_get;
+char stacks[4u][256u];
+static void thread_mutex(void *p1);
+static void thread_fifo_producer(void *p1);
+static void thread_msgq_putter(void *p1);
+static void thread_msgq_getter(void *p1);
 
-    serial_init();
+struct k_pollfd fds[5u];
+
+void setup(void)
+{
     ll_usart_enable_rx_isr(USART0_DEVICE);
-    k_thread_dump_all();
+
+    printf_P(PSTR("\n\n--- AVRTOS Polling Example ---\n"));
+
+    k_thread_create(&tmutex, thread_mutex, stacks[0u], sizeof(stacks[0u]), K_COOPERATIVE,
+                    NULL, 'm');
+    k_thread_create(&tfifo, thread_fifo_producer, stacks[1u], sizeof(stacks[1u]),
+                    K_COOPERATIVE, NULL, 'f');
+    k_thread_create(&tmsgq_put, thread_msgq_putter, stacks[2u], sizeof(stacks[2u]),
+                    K_COOPERATIVE, NULL, 'p');
+    k_thread_create(&tmsgq_get, thread_msgq_getter, stacks[3u], sizeof(stacks[3u]),
+                    K_COOPERATIVE, NULL, 'g');
+    k_thread_start(&tmutex);
+    k_thread_start(&tfifo);
+    k_thread_start(&tmsgq_put);
+    k_thread_start(&tmsgq_get);
 
     k_msleep(100);
 
     /* Set up poll file descriptors for all objects we want to monitor */
-    struct k_pollfd fds[] = {
-        {
-            .obj.sem = &sem1,
-            .type    = K_POLL_TYPE_SEM,
-        },
-        {
-            .obj.mutex = &mutex1,
-            .type      = K_POLL_TYPE_MUTEX,
-        },
-        {
-            .obj.fifo = &fifo1,
-            .type     = K_POLL_TYPE_FIFO,
-        },
-        {
-            .obj.msgq = &msgq_put1,
-            .type     = K_POLL_TYPE_MSGQ_PUT,
-        },
-        {
-            .obj.msgq = &msgq_get1,
-            .type     = K_POLL_TYPE_MSGQ_GET,
-        },
-    };
+    fds[0].obj.sem   = &sem1;
+    fds[0].type      = K_POLL_TYPE_SEM;
+    fds[1].obj.mutex = &mutex1;
+    fds[1].type      = K_POLL_TYPE_MUTEX;
+    fds[2].obj.fifo  = &fifo1;
+    fds[2].type      = K_POLL_TYPE_FIFO;
+    fds[3].obj.msgq  = &msgq_put1;
+    fds[3].type      = K_POLL_TYPE_MSGQ_PUT;
+    fds[4].obj.msgq  = &msgq_get1;
+    fds[4].type      = K_POLL_TYPE_MSGQ_GET;
+}
 
-    while (1) {
-        k_timeout_t timeout = K_MSEC(1000);
-        ret                 = k_poll(fds, ARRAY_SIZE(fds), timeout);
-        if (ret == 0) {
-            LOG_INF("poll ok: 0");
-            /* Check which objects are ready and handle them */
-            if (fds[0].revents & K_POLL_READY) {
-                LOG_INF("sem1 ready");
-                ret = k_sem_take(&sem1, K_NO_WAIT);
-                k_assert(ret == 0);
-            }
-            if (fds[1].revents & K_POLL_READY) {
-                LOG_INF("mutex1 ready");
-                ret = k_mutex_lock(&mutex1, K_NO_WAIT);
-                LOG_INF("mutex1 locked: %d", ret);
-                k_assert(ret == 0);
-                k_mutex_unlock(&mutex1);
-            }
-            if (fds[2].revents & K_POLL_READY) {
-                LOG_INF("fifo1 ready");
-                struct snode *item = k_fifo_get(&fifo1, K_NO_WAIT);
-                k_assert(item != NULL);
-                LOG_INF("fifo1 item received: %p", item);
-            }
-            if (fds[3].revents & K_POLL_READY) {
-                LOG_INF("msgq_put1 space available for sending");
-                uint8_t msg[SZ] = "MSGQPUT";
-                ret             = k_msgq_put(&msgq_put1, msg, K_NO_WAIT);
-                k_assert(ret == 0);
-                LOG_INF("msgq_put1 message sent");
-            }
-            if (fds[4].revents & K_POLL_READY) {
-                LOG_INF("msgq_get1 message available for receiving");
-                uint8_t msg[SZ];
-                ret = k_msgq_get(&msgq_get1, msg, K_NO_WAIT);
-                k_assert(ret == 0);
-                LOG_INF("msgq_get1 message received: %s", msg);
-            }
-        } else if (ret == -ETIMEDOUT) {
-            LOG_INF("timeout: %d", ret);
-        } else {
-            LOG_INF("error: %d", ret);
+void loop(void)
+{
+    int ret;
+    k_timeout_t timeout = K_MSEC(1000);
+    ret                 = k_poll(fds, ARRAY_SIZE(fds), timeout);
+    if (ret == 0) {
+        LOG_INF("poll ok: 0");
+        /* Check which objects are ready and handle them */
+        if (fds[0].revents & K_POLL_READY) {
+            LOG_INF("sem1 ready");
+            ret = k_sem_take(&sem1, K_NO_WAIT);
+            k_assert(ret == 0);
         }
-
-        k_msleep(50);
+        if (fds[1].revents & K_POLL_READY) {
+            LOG_INF("mutex1 ready");
+            ret = k_mutex_lock(&mutex1, K_NO_WAIT);
+            LOG_INF("mutex1 locked: %d", ret);
+            k_assert(ret == 0);
+            k_mutex_unlock(&mutex1);
+        }
+        if (fds[2].revents & K_POLL_READY) {
+            LOG_INF("fifo1 ready");
+            struct snode *item = k_fifo_get(&fifo1, K_NO_WAIT);
+            k_assert(item != NULL);
+            LOG_INF("fifo1 item received: %p", item);
+        }
+        if (fds[3].revents & K_POLL_READY) {
+            LOG_INF("msgq_put1 space available for sending");
+            uint8_t msg[SZ] = "MSGQPUT";
+            ret             = k_msgq_put(&msgq_put1, msg, K_NO_WAIT);
+            k_assert(ret == 0);
+            LOG_INF("msgq_put1 message sent");
+        }
+        if (fds[4].revents & K_POLL_READY) {
+            LOG_INF("msgq_get1 message available for receiving");
+            uint8_t msg[SZ];
+            ret = k_msgq_get(&msgq_get1, msg, K_NO_WAIT);
+            k_assert(ret == 0);
+            LOG_INF("msgq_get1 message received: %s", msg);
+        }
+    } else if (ret == -ETIMEDOUT) {
+        LOG_INF("timeout: %d", ret);
+    } else {
+        LOG_INF("error: %d", ret);
     }
+
+    k_msleep(50);
 }
 
 /**
@@ -175,9 +186,6 @@ ISR(USART0_RX_vect)
  *
  * This thread acquires the mutex, waits for a signal, then releases it.
  */
-static void thread_mutex(void *p1);
-K_THREAD_DEFINE(tm, thread_mutex, 0x123, K_COOPERATIVE, NULL, 'm');
-
 static void thread_mutex(void *p1)
 {
     (void)p1;
@@ -198,9 +206,6 @@ static void thread_mutex(void *p1)
  *
  * This thread waits for signals and produces items for the FIFO.
  */
-static void thread_fifo_producer(void *p1);
-K_THREAD_DEFINE(tfp, thread_fifo_producer, 0x123, K_COOPERATIVE, NULL, 'f');
-
 static void thread_fifo_producer(void *p1)
 {
     (void)p1;
@@ -222,9 +227,6 @@ static void thread_fifo_producer(void *p1)
  * This thread puts messages into the message queue that can be retrieved
  * via polling.
  */
-static void thread_msgq_putter(void *p1);
-K_THREAD_DEFINE(tmp, thread_msgq_putter, 0x123, K_COOPERATIVE, NULL, 'p');
-
 static void thread_msgq_putter(void *p1)
 {
     (void)p1;
@@ -254,19 +256,14 @@ static void thread_msgq_putter(void *p1)
  *
  * This thread gets messages from the message queue that was filled by polling.
  */
-static void thread_msgq_getter(void *p1);
-K_THREAD_DEFINE(tmg, thread_msgq_getter, 0x123, K_COOPERATIVE, NULL, 'g');
-
 static void thread_msgq_getter(void *p1)
 {
     (void)p1;
-    int ret;
     uint8_t msg[SZ];
 
     while (1) {
         k_sem_take(&sem_msgq_get, K_FOREVER);
-        ret = k_msgq_get(&msgq_put1, msg, K_FOREVER);
-        k_assert(ret == 0);
+        k_msgq_get(&msgq_put1, msg, K_FOREVER);
         LOG_INF("msgq getter received message: %s", msg);
     }
 }

@@ -110,7 +110,7 @@ extern "C" {
  *
  * @param _assertion The boolean expression to assert as true.
  */
-#define k_assert(_assertion)         __ASSERT_APP(_assertion)
+#define k_assert(_assertion) __ASSERT_APP(_assertion)
 
 #define __ASSERT_TRUE(test)  __ASSERT(K_ASSERT_TRUE, (test) != 0)
 #define __ASSERT_FALSE(test) __ASSERT(K_ASSERT_FALSE, (test) == 0)

@@ -183,7 +183,7 @@
  *
  * @param ptr The pointer to decolorize.
  */
-#define sys_ptr_decolorize(ptr)      __sys_ptr_decolorize(ptr, Z_ARCH_PTR_SIZE)
+#define sys_ptr_decolorize(ptr) __sys_ptr_decolorize(ptr, Z_ARCH_PTR_SIZE)
 
 /**
  * @brief Get the color value from a colorized pointer.
@@ -191,7 +191,7 @@
  * @param ptr The colorized pointer.
  * @return The embedded color value.
  */
-#define sys_ptr_color(ptr)     __sys_ptr_color(ptr, Z_ARCH_PTR_SIZE)
+#define sys_ptr_color(ptr) __sys_ptr_color(ptr, Z_ARCH_PTR_SIZE)
 
 /**
  * @brief Get the decolorized version of a pointer.

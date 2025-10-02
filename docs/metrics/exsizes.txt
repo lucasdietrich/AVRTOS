@@ -54,7 +54,7 @@
 [ atmega2560 ]  rt                                      flash 1690 B  (0.7 %)   ram 458 B   (5.6 %)
 [ atmega2560 ]  sched-lock                              flash 3508 B  (1.4 %)   ram 734 B   (9.0 %)
 [ atmega2560 ]  semaphore-multithreading-demo           flash 3348 B  (1.3 %)   ram 682 B   (8.3 %)
-[ atmega2560 ]  shell                                   flash 7928 B  (3.1 %)   ram 808 B   (9.9 %)
+[ atmega2560 ]  shell                                   flash 7930 B  (3.1 %)   ram 808 B   (9.9 %)
 [ atmega2560 ]  signal                                  flash 4740 B  (1.9 %)   ram 516 B   (6.3 %)
 [ atmega2560 ]  stack-sentinel                          flash 5880 B  (2.3 %)   ram 330 B   (4.0 %)
 [ atmega2560 ]  stdio                                   flash 1780 B  (0.7 %)   ram 198 B   (2.4 %)

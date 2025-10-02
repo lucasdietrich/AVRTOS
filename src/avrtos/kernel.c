@@ -16,7 +16,6 @@
 #include "avrtos/sys.h"
 #include "canaries.h"
 #include "debug.h"
-#include "dlist.h"
 #include "event.h"
 #include "fault.h"
 #include "idle.h"

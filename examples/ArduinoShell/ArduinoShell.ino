@@ -5,7 +5,6 @@
  */
 
 #include <avrtos.h>
-#include <avrtos/avrtos.h>
 #include <avrtos/debug.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/logging.h>

@@ -141,4 +141,9 @@
 #define CONFIG_KERNEL_TIME_SLICE_US 1000llu
 #endif
 
+/* Enable polling API */
+#ifndef CONFIG_POLLING
+#define CONFIG_POLLING 1
+#endif
+
 #endif /* _AVRTOS_ARDUINO_IDE_DEFAULT_CONFIG_H */

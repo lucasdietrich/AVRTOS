@@ -62,7 +62,7 @@ int main(void)
     /* Colorize with blue */
     for (uint8_t i = 0; i < ARRAY_SIZE(ptrs); i++) {
         void *decolored = sys_ptr_decolorize(ptrs[i]); /* Ensure decolorized first */
-        ptrs[i] = sys_ptr_colorize(decolored, SYS_PTR_COLOR_BLUE);
+        ptrs[i]         = sys_ptr_colorize(decolored, SYS_PTR_COLOR_BLUE);
     }
     printf_P(PSTR("\nAfter coloring with BLUE:\n"));
     display_ptrs(ptrs, ARRAY_SIZE(ptrs));
@@ -70,7 +70,7 @@ int main(void)
     /* Change to red */
     for (uint8_t i = 0; i < ARRAY_SIZE(ptrs); i++) {
         void *decolored = sys_ptr_decolorize(ptrs[i]);
-        ptrs[i] = sys_ptr_colorize(decolored, SYS_PTR_COLOR_RED);
+        ptrs[i]         = sys_ptr_colorize(decolored, SYS_PTR_COLOR_RED);
     }
     printf_P(PSTR("\nAfter coloring with RED:\n"));
     display_ptrs(ptrs, ARRAY_SIZE(ptrs));
@@ -78,7 +78,7 @@ int main(void)
     /* Change to green */
     for (uint8_t i = 0; i < ARRAY_SIZE(ptrs); i++) {
         void *decolored = sys_ptr_decolorize(ptrs[i]);
-        ptrs[i] = sys_ptr_colorize(decolored, SYS_PTR_COLOR_GREEN);
+        ptrs[i]         = sys_ptr_colorize(decolored, SYS_PTR_COLOR_GREEN);
     }
     printf_P(PSTR("\nAfter coloring with GREEN:\n"));
     display_ptrs(ptrs, ARRAY_SIZE(ptrs));

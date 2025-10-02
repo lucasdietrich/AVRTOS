@@ -24,7 +24,6 @@
 #include "avrtos/fifo.h"
 #include "avrtos/msgq.h"
 #include "avrtos/types.h"
-#include "dlist.h"
 #include "kernel.h"
 
 #ifdef __cplusplus
@@ -43,11 +42,13 @@ extern "C" {
  * the k_poll() function.
  */
 typedef enum {
-    K_POLL_TYPE_SEM      = 0x01, /**< Polling on a semaphore for availability */
-    K_POLL_TYPE_MUTEX    = 0x02, /**< Polling on a mutex for availability */
-    K_POLL_TYPE_MSGQ_PUT = 0x03, /**< Polling on a message queue for free space to put messages */
-    K_POLL_TYPE_MSGQ_GET = 0x04, /**< Polling on a message queue for available messages to get */
-    K_POLL_TYPE_FIFO     = 0x05, /**< Polling on a FIFO for available items */
+    K_POLL_TYPE_SEM   = 0x01, /**< Polling on a semaphore for availability */
+    K_POLL_TYPE_MUTEX = 0x02, /**< Polling on a mutex for availability */
+    K_POLL_TYPE_MSGQ_PUT =
+        0x03, /**< Polling on a message queue for free space to put messages */
+    K_POLL_TYPE_MSGQ_GET =
+        0x04, /**< Polling on a message queue for available messages to get */
+    K_POLL_TYPE_FIFO = 0x05, /**< Polling on a FIFO for available items */
 } k_poll_type_t;
 
 /**
@@ -57,17 +58,17 @@ typedef enum {
  * events have occurred on it.
  */
 struct k_pollfd {
-    z_wqhandle_t _wqhandle;       /**< Internal wait queue handle (private) */
-    struct k_thread *_thread;     /**< Pointer to the thread that is polling (private) */
+    z_wqhandle_t _wqhandle;   /**< Internal wait queue handle (private) */
+    struct k_thread *_thread; /**< Pointer to the thread that is polling (private) */
 
-    k_poll_type_t type;           /**< Type of the object being polled */
+    k_poll_type_t type; /**< Type of the object being polled */
     union {
-        struct k_sem *sem;        /**< Pointer to a semaphore for polling */
-        struct k_mutex *mutex;    /**< Pointer to a mutex for polling */
-        struct k_fifo *fifo;      /**< Pointer to a FIFO for polling */
-        struct k_msgq *msgq;      /**< Pointer to a message queue for polling */
-    } obj;                        /**< Union of pointers to the objects being polled */
-    uint8_t revents;              /**< Events that have occurred (K_POLL_READY) */
+        struct k_sem *sem;     /**< Pointer to a semaphore for polling */
+        struct k_mutex *mutex; /**< Pointer to a mutex for polling */
+        struct k_fifo *fifo;   /**< Pointer to a FIFO for polling */
+        struct k_msgq *msgq;   /**< Pointer to a message queue for polling */
+    } obj;                     /**< Union of pointers to the objects being polled */
+    uint8_t revents;           /**< Events that have occurred (K_POLL_READY) */
 };
 
 /**

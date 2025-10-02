@@ -16,7 +16,7 @@
 /**
  * @brief Flag indicating the thread is waiting for read availability (polling).
  */
-#define Z_WQ_FLAG_POLLIN  0x01
+#define Z_WQ_FLAG_POLLIN 0x01
 
 /**
  * @brief Flag indicating the thread is waiting for write availability (polling).
