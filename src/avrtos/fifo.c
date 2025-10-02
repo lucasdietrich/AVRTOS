@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,6 +9,7 @@
 #include "dstruct/slist.h"
 #include "kernel.h"
 #include "kernel_private.h"
+#include "poll.h"
 
 #define K_MODULE K_MODULE_FIFO
 
@@ -72,6 +73,33 @@ struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 
     return item;
 }
+
+#if CONFIG_POLLING
+/**
+ * @brief Set up polling for FIFO item availability.
+ *
+ * This internal function is called by k_poll() to set up polling on a FIFO.
+ * If the FIFO is not empty (has items available), it returns 0 indicating
+ * the object is ready. Otherwise, it adds the polling descriptor to the
+ * FIFO's wait queue and returns -EAGAIN to indicate the thread should wait.
+ *
+ * @param fifo Pointer to the FIFO to poll
+ * @param pollfd Pointer to the poll file descriptor
+ * @return 0 if FIFO has items available, -EAGAIN if thread should wait
+ */
+int8_t z_fifo_setup_pollin(struct k_fifo *fifo, struct k_pollfd *pollfd)
+{
+    if (slist_peek_head(&fifo->queue) != NULL) {
+        /* FIFO is not empty, no need to wait */
+        return 0;
+    }
+
+    dlist_append(&fifo->waitqueue, &pollfd->_wqhandle.tie);
+    pollfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+
+    return -EAGAIN; // Indicate that the thread is now waiting
+}
+#endif /* CONFIG_POLLING */
 
 int8_t k_fifo_cancel_wait(struct k_fifo *fifo)
 {

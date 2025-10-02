@@ -1,5 +1,5 @@
 From c872c0f164a5ab595cf347d098430301e628b741 Mon Sep 17 00:00:00 2001
-From: Lucas Dietrich <ld.adecy@gmail.com>
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
 Date: Thu, 1 Jun 2023 23:26:33 +0200
 Subject: [PATCH] Fix handling of AVR interrupts above 33 by switching ctz32 to
  ctz64
@@ -12,7 +12,7 @@ target.
 Previously, timers 3, 4, and 5 interrupts were not functioning correctly
 because most of their interrupt vectors are numbered above 33.
 
-Signed-off-by: Lucas Dietrich <ld.adecy@gmail.com>
+Signed-off-by: Lucas Dietrich <lucas.dietrich.git@proton.me>
 ---
  target/avr/helper.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -99,34 +99,33 @@ int8_t k_flags_notify(struct k_flags *flags,
                       k_flags_options_t options)
 {
     int8_t ret = 0;
-    struct dnode *thread_handle;
+    struct dnode *tie;
 
     Z_ARGS_CHECK(flags) return -EINVAL;
     Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u) return -ENOTSUP;
 
     const uint8_t lock = irq_lock();
 
-    thread_handle = flags->waitqueue.head;
-    notify_value  = ~flags->flags & notify_value;
+    tie          = flags->waitqueue.head;
+    notify_value = ~flags->flags & notify_value;
 
     while (notify_value != 0u) {
-        if (!DITEM_VALID(&flags->waitqueue, thread_handle)) {
+        if (!DITEM_VALID(&flags->waitqueue, tie)) {
             /* No more threads waiting; store remaining flags */
             flags->flags |= notify_value;
             break;
         }
 
-        struct k_thread *const thread =
-            CONTAINER_OF(thread_handle, struct k_thread, wflags);
-        const uint16_t swap_data   = (uint16_t)thread->swap_data;
-        const k_flags_value_t mask = Z_SWAP_DATA_GET_PEND_MASK(swap_data);
-        const k_flags_value_t trig = notify_value & mask;
+        struct k_thread *const thread = Z_THREAD_FROM_WQHANDLE_TIE(tie);
+        const uint16_t swap_data      = (uint16_t)thread->swap_data;
+        const k_flags_value_t mask    = Z_SWAP_DATA_GET_PEND_MASK(swap_data);
+        const k_flags_value_t trig    = notify_value & mask;
 
         if (trig != 0u) {
             thread->swap_data = Z_SWAP_DATA_INIT_TRIG_MASK(trig);
 
             /* Unpend thread */
-            dlist_remove(thread_handle);
+            dlist_remove(tie);
             z_wake_up(thread);
 
             if (Z_SWAP_DATA_GET_OPTIONS(swap_data) & K_FLAGS_CONSUME) {
@@ -136,7 +135,7 @@ int8_t k_flags_notify(struct k_flags *flags,
             ret++; /* Increment the number of notified threads */
         }
 
-        thread_handle = thread_handle->next;
+        tie = tie->next;
     }
 
     if ((ret > 0) && (options & K_FLAGS_SCHED)) {

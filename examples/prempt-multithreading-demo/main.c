@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * @file main.cpp
- * @author Dietrich Lucas (ld.adecy@gmail.com)
+ * @author Dietrich Lucas (lucas.dietrich.git@proton.me)
  * @brief Two thread increment two counters. Threads are preempted by the system
  * clock. If configuration option CONFIG_KERNEL_DEBUG_PREEMPT_UART=1 is enabled
  * : send a character over the UART to preempt the thread currently running and
@@ -18,7 +18,7 @@
  * @version 0.1
  * @date 2021-08-21
  *
- * @copyright Copyright (c) 2021
+ * @copyright Copyright (c) 2025
  *
  */
 

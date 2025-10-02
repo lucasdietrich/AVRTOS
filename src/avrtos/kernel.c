@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,6 +11,8 @@
 #include <util/delay.h>
 
 #include "assert.h"
+#include "avrtos/defines.h"
+#include "avrtos/poll.h"
 #include "avrtos/sys.h"
 #include "canaries.h"
 #include "debug.h"
@@ -115,7 +117,7 @@ K_THREAD struct k_thread z_thread_main = {
                     .next = &z_thread_main.tie.runqueue,
                 },
         },
-    .wany      = DITEM_INIT_NULL(), // The thread isn't pending on any events
+    .wqhandle  = WQHANDLE_INIT(), // The thread isn't pending on any events
     .swap_data = NULL,
     .stack =
         {
@@ -358,7 +360,7 @@ void z_sched_enter(void)
 
     struct titem *ready;
     while ((ready = tqueue_pop(&z_ker.timeouts_queue)) != NULL) {
-        struct k_thread *const thread = Z_THREAD_FROM_EVENTQUEUE(ready);
+        struct k_thread *const thread = Z_THREAD_FROM_RUNQUEUE(ready);
 
         __Z_DBG_SCHED_EVENT(thread); // !
 
@@ -377,7 +379,7 @@ void z_sched_enter(void)
          * - The flag should be set when calling z_pend_current_on() and
          *   cleared here. It should not be set when calling z_pend_current().
          */
-        dlist_remove(&thread->wany);
+        dlist_remove(&thread->wqhandle.tie);
 
         z_schedule(thread);
     }
@@ -532,12 +534,6 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
     }
 }
 
-/**
- * @brief Suspend the current thread and wait until the timeout expires or the
- * thread is woken up.
- *
- * @param timeout The timeout value for the sleep.
- */
 __kernel void z_pend_current(k_timeout_t timeout)
 {
     /* Suspend the thread */
@@ -556,7 +552,6 @@ __kernel void z_pend_current(k_timeout_t timeout)
 __kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout)
 {
     __ASSERT_NOINTERRUPT();
-    __ASSERT_NOTNULL(waitqueue);
 
     if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
         return -EAGAIN;
@@ -564,8 +559,10 @@ __kernel int8_t z_pend_current_on(struct dnode *waitqueue, k_timeout_t timeout)
 
     int err;
 
-    /* Queue the thread to the pending queue of the object */
-    dlist_append(waitqueue, &z_ker.current->wany);
+    if (waitqueue) {
+        /* Queue the thread to the pending queue of the object */
+        dlist_append(waitqueue, &z_ker.current->wqhandle.tie);
+    }
 
     /* Make the thread until wake-up */
     z_pend_current(timeout);
@@ -614,21 +611,52 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
     struct dnode *tie               = dlist_get(waitqueue);
 
     if (DITEM_VALID(waitqueue, tie)) {
-        pending_thread = Z_THREAD_FROM_WAITQUEUE(tie);
+        z_wqhandle_t *wqhandle = Z_WQHANDLE_OF_TIE(tie);
 
-        /* Explicity clear the pending_thread->wany pointer
+#if CONFIG_POLLING
+        if (wqhandle->flags) {
+            /* The thread is polling multiple objects, we need to
+             * wake it up only if it is the first object that
+             * becomes ready
+             */
+            struct k_pollfd *pfd = Z_POLLFD_OF_WQHANDLE(wqhandle);
+
+            /* Mark the object as ready */
+            pfd->revents |= K_POLL_READY;
+
+            /* Retrieve the pending thread */
+            pending_thread = pfd->_thread;
+        } else
+#endif /* CONFIG_POLLING */
+        {
+            /* The thread is directly waiting on the object */
+            pending_thread = Z_THREAD_FROM_WQHANDLE(wqhandle);
+        }
+
+        /* Explicity clear the pending_thread->wqhandle pointer
          * to make sure the *waitqueue* is not corrupted
-         * while calling dlist_remove(&thread->wany)
+         * while calling dlist_remove(&thread->wqhandle)
          * when it expires for whatever reason after this call
          */
-        dlist_init(&pending_thread->wany);
+        dlist_init(&pending_thread->wqhandle.tie);
 
         /* Immediate wake-up is no longer required because
          * with the swap model, the object is already reserved for the
          * first pending thread
          */
         z_wake_up(pending_thread);
+
+#if CONFIG_POLLING
+        /* Clear the return value, as thread polling on multiple objects do
+         * not actually get ownership over them. But only get notified
+         * The polling thread still needs to *take* the object.
+         */
+        if (wqhandle->flags) {
+            pending_thread = NULL;
+        }
+#endif
     }
+
     /* If no thread is pending on the object, we simply return */
     return pending_thread;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -100,6 +100,17 @@ extern "C" {
 
 #define K_ASSERT(_acode, _assertion) __ASSERT(_acode, _assertion)
 #define K_ASSERT_APP(_assertion)     __ASSERT_APP(_assertion)
+
+/**
+ * @brief Application-level assertion macro.
+ *
+ * This is a convenience macro for application code to perform runtime assertions.
+ * It uses the application module code and a generic assertion code.
+ * When CONFIG_KERNEL_ASSERT is disabled, this macro expands to nothing.
+ *
+ * @param _assertion The boolean expression to assert as true.
+ */
+#define k_assert(_assertion) __ASSERT_APP(_assertion)
 
 #define __ASSERT_TRUE(test)  __ASSERT(K_ASSERT_TRUE, (test) != 0)
 #define __ASSERT_FALSE(test) __ASSERT(K_ASSERT_FALSE, (test) == 0)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,6 +8,7 @@
 
 #include <util/atomic.h>
 
+#include "avrtos/poll.h"
 #include "debug.h"
 #include "kernel.h"
 #include "kernel_private.h"
@@ -95,6 +96,34 @@ exit:
     irq_unlock(key);
     return thread;
 }
+
+#if CONFIG_POLLING
+/**
+ * @brief Set up polling for mutex availability.
+ *
+ * This internal function is called by k_poll() to set up polling on a mutex.
+ * If the mutex is available (unlocked), it returns 0 indicating the object
+ * is ready. Otherwise, it adds the polling descriptor to the mutex's wait
+ * queue and returns -EAGAIN to indicate the thread should wait.
+ *
+ * @param mutex Pointer to the mutex to poll
+ * @param pollfd Pointer to the poll file descriptor
+ * @return 0 if mutex is available, -EAGAIN if thread should wait
+ */
+int8_t z_mutex_setup_pollin(struct k_mutex *mutex, struct k_pollfd *pollfd)
+{
+    if (mutex->lock == Z_MUTEX_UNLOCKED_VALUE) {
+        /* Mutex is available, no need to wait */
+        return 0;
+    }
+
+    /* Add the current thread to the mutex's wait queue */
+    dlist_append(&mutex->waitqueue, &pollfd->_wqhandle.tie);
+    pollfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+
+    return -EAGAIN; // Indicate that the thread is now waiting
+}
+#endif /* CONFIG_POLLING */
 
 int8_t k_mutex_cancel_wait(struct k_mutex *mutex)
 {

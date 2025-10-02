@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+# Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -42,7 +42,7 @@ set(VERBOSITY "") # --verbose
 set(OBJECT_GEN_FLAGS "${VERBOSITY} -mmcu=${MCU} -Wall -Wextra -fno-fat-lto-objects \
     -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
     -fdata-sections -ffunction-sections -fno-split-wide-types \
-    -fno-tree-scev-cprop -flto" 
+    -fno-tree-scev-cprop -flto -fdiagnostics-color=always"
 )
 # -Wall -Wno-main -Wundef -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fdata-sections -ffunction-sections -fno-split-wide-types -fno-tree-scev-cprop
 

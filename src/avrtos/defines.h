@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,15 +11,15 @@
 #include "errno.h"
 #include "sys.h"
 
-// AVRTOS version 2.0.0
+// AVRTOS version 2.1.0
 #define AVRTOS_VERSION_MAJOR    2
-#define AVRTOS_VERSION_MINOR    0
+#define AVRTOS_VERSION_MINOR    1
 #define AVRTOS_VERSION_REVISION 0
 #define AVRTOS_VERSION                                                                   \
     ((AVRTOS_VERSION_MAJOR << 16) | (AVRTOS_VERSION_MINOR << 8) | AVRTOS_VERSION_REVISION)
-#define AVRTOS_VERSION_STRING "2.0.0"
+#define AVRTOS_VERSION_STRING "2.1.0"
 #define AVRTOS_VERSION_STRING_FULL                                                       \
-    "AVRTOS v" AVRTOS_VERSION_STRING " (c) 2021-2025 Lucas Dietrich"
+    "AVRTOS v" AVRTOS_VERSION_STRING " (c) 2025-2025 Lucas Dietrich"
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN && CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #error                                                                                   \
@@ -282,9 +282,11 @@ typedef struct {
 
 #define K_THREAD Z_LINK_KERNEL_SECTION(.k_threads)
 
-#define Z_THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
-#define Z_THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
-#define Z_THREAD_OF_TITEM(item)        CONTAINER_OF(item, struct k_thread, tie.event)
+#define Z_THREAD_FROM_RUNQUEUE(item)     CONTAINER_OF(item, struct k_thread, tie.runqueue)
+#define Z_THREAD_FROM_WQHANDLE(item)     CONTAINER_OF(item, struct k_thread, wqhandle)
+#define Z_THREAD_FROM_WQHANDLE_TIE(item) CONTAINER_OF(item, struct k_thread, wqhandle.tie)
+#define Z_THREAD_OF_TITEM(item)          CONTAINER_OF(item, struct k_thread, tie.event)
+#define Z_POLLFD_OF_WQHANDLE(handle)     CONTAINER_OF(handle, struct k_pollfd, _wqhandle)
 
 #if Z_ARCH_PC_SIZE == 3
 #define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)                                              \
@@ -335,10 +337,10 @@ typedef struct {
 
 #define Z_THREAD_INITIALIZER(_name, stack_size, _flags, sym)                             \
     struct k_thread _name = {                                                            \
-        .sp    = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),                   \
-        .flags = _flags,                                                                 \
-        .tie   = {.runqueue = DITEM_INIT(NULL)},                                         \
-        {.wany = DITEM_INIT(NULL)},                                                      \
+        .sp        = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),               \
+        .flags     = _flags,                                                             \
+        .tie       = {.runqueue = DITEM_INIT(NULL)},                                     \
+        .wqhandle  = WQHANDLE_INIT(),                                                    \
         .swap_data = NULL,                                                               \
         .stack =                                                                         \
             {                                                                            \

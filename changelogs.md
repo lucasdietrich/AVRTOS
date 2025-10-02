@@ -1,5 +1,21 @@
 # Changelog
 
+## avrtos v2.1.0: Polling API and Pointer Coloring
+
+### Main Features
+
+* **Polling API:**  
+  Introduced polling API allowing threads to wait on multiple kernel objects simultaneously:
+  - New `k_poll()` function to wait for events on semaphores, mutexes, FIFOs, and message queues
+  - `CONFIG_POLLING` configuration option to enable/disable polling support
+  - Add an example (`poll`) demonstrating polling with multiple kernel objects
+
+### Minor Changes
+
+* Added pointer coloring macros for AVR architectures to embed color values in unused pointer bits:
+* Exposed `z_ker` and `z_main_thread` as external symbols for advanced use cases
+* Improved Dining Philosophers example for Arduino framework
+
 ## avrtos v2.0.0: Major Update with Rust Support, Memory Allocators, and More
 
 ### Main Features
