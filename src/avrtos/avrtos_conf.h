@@ -1075,4 +1075,24 @@
 #define CONFIG_DEVICE_MCP2515 0
 #endif
 
+//
+// Enable the polling API (k_poll) allowing to wait on multiple kernel objects
+// simultaneously.
+//
+// The polling API provides a way to wait for events on multiple kernel objects
+// (semaphores, mutexes, FIFOs, message queues) at the same time. This is useful
+// for implementing efficient event-driven programming patterns.
+//
+// When enabled, this adds support for:
+// - k_poll() function to wait on multiple objects
+// - Polling support in semaphore, mutex, FIFO, and message queue APIs
+// - Additional memory overhead for polling structures
+//
+// 0: Polling API is disabled (default)
+// 1: Polling API is enabled
+//
+#ifndef CONFIG_POLLING
+#define CONFIG_POLLING 0
+#endif
+
 #endif

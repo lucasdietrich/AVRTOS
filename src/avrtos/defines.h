@@ -282,9 +282,11 @@ typedef struct {
 
 #define K_THREAD Z_LINK_KERNEL_SECTION(.k_threads)
 
-#define Z_THREAD_FROM_EVENTQUEUE(item) CONTAINER_OF(item, struct k_thread, tie.runqueue)
-#define Z_THREAD_FROM_WAITQUEUE(item)  CONTAINER_OF(item, struct k_thread, wany)
-#define Z_THREAD_OF_TITEM(item)        CONTAINER_OF(item, struct k_thread, tie.event)
+#define Z_THREAD_FROM_RUNQUEUE(item)     CONTAINER_OF(item, struct k_thread, tie.runqueue)
+#define Z_THREAD_FROM_WQHANDLE(item)     CONTAINER_OF(item, struct k_thread, wqhandle)
+#define Z_THREAD_FROM_WQHANDLE_TIE(item) CONTAINER_OF(item, struct k_thread, wqhandle.tie)
+#define Z_THREAD_OF_TITEM(item)          CONTAINER_OF(item, struct k_thread, tie.event)
+#define Z_POLLFD_OF_WQHANDLE(handle)     CONTAINER_OF(handle, struct k_pollfd, _wqhandle)
 
 #if Z_ARCH_PC_SIZE == 3
 #define Z_CORE_CONTEXT_ARCH_PC_INIT(_entry)                                              \
@@ -335,10 +337,10 @@ typedef struct {
 
 #define Z_THREAD_INITIALIZER(_name, stack_size, _flags, sym)                             \
     struct k_thread _name = {                                                            \
-        .sp    = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),                   \
-        .flags = _flags,                                                                 \
-        .tie   = {.runqueue = DITEM_INIT(NULL)},                                         \
-        {.wany = DITEM_INIT(NULL)},                                                      \
+        .sp        = (void *)Z_STACK_INIT_SP_FROM_NAME(_name, stack_size),               \
+        .flags     = _flags,                                                             \
+        .tie       = {.runqueue = DITEM_INIT(NULL)},                                     \
+        .wqhandle  = WQHANDLE_INIT(),                                                    \
         .swap_data = NULL,                                                               \
         .stack =                                                                         \
             {                                                                            \

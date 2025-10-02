@@ -9,6 +9,7 @@
 
 #include "kernel.h"
 #include "kernel_private.h"
+#include "poll.h"
 
 #define K_MODULE K_MODULE_MSGQ
 
@@ -136,6 +137,60 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 
     return ret;
 }
+
+#if CONFIG_POLLING
+/**
+ * @brief Set up polling for message queue write space availability.
+ *
+ * This internal function is called by k_poll() to set up polling for space
+ * to put messages in a message queue. If there is space available (used_msgs < max_msgs),
+ * it returns 0 indicating the object is ready. Otherwise, it adds the polling
+ * descriptor to the message queue's wait queue and returns -EAGAIN.
+ *
+ * @param msgq Pointer to the message queue to poll
+ * @param pollfd Pointer to the poll file descriptor
+ * @return 0 if space is available, -EAGAIN if thread should wait
+ */
+int8_t z_msgq_setup_pollout(struct k_msgq *msgq, struct k_pollfd *pollfd)
+{
+    if (msgq->used_msgs < msgq->max_msgs) {
+        /* There is space available, no need to wait */
+        return 0;
+    }
+
+    /* Add the current thread to the message queue's wait queue */
+    dlist_append(&msgq->waitqueue, &pollfd->_wqhandle.tie);
+    pollfd->_wqhandle.flags = Z_WQ_FLAG_POLLOUT;
+
+    return -EAGAIN; // Indicate that the thread is now waiting
+}
+
+/**
+ * @brief Set up polling for message queue read availability.
+ *
+ * This internal function is called by k_poll() to set up polling for messages
+ * available to get from a message queue. If there are messages available (used_msgs > 0),
+ * it returns 0 indicating the object is ready. Otherwise, it adds the polling
+ * descriptor to the message queue's wait queue and returns -EAGAIN.
+ *
+ * @param msgq Pointer to the message queue to poll
+ * @param pollfd Pointer to the poll file descriptor
+ * @return 0 if messages are available, -EAGAIN if thread should wait
+ */
+int8_t z_msgq_setup_pollin(struct k_msgq *msgq, struct k_pollfd *pollfd)
+{
+    if (msgq->used_msgs > 0) {
+        /* A message is available, no need to wait */
+        return 0;
+    }
+
+    /* Add the current thread to the message queue's wait queue */
+    dlist_append(&msgq->waitqueue, &pollfd->_wqhandle.tie);
+    pollfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+
+    return -EAGAIN; // Indicate that the thread is now waiting
+}
+#endif /* CONFIG_POLLING */
 
 int8_t k_msgq_purge(struct k_msgq *msgq)
 {

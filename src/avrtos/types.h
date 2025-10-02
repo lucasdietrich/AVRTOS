@@ -14,6 +14,58 @@
 #include "dstruct/tqueue.h"
 
 /**
+ * @brief Flag indicating the thread is waiting for read availability (polling).
+ */
+#define Z_WQ_FLAG_POLLIN  0x01
+
+/**
+ * @brief Flag indicating the thread is waiting for write availability (polling).
+ */
+#define Z_WQ_FLAG_POLLOUT 0x02
+
+/**
+ * @brief Wait queue handle structure for kernel objects.
+ *
+ * This structure represents a handle for a thread waiting on a kernel object
+ * such as a semaphore, mutex, FIFO, or message queue. It contains a doubly-linked
+ * list node for queueing and optional flags for polling operations.
+ */
+typedef struct z_wqhandle {
+    struct dnode tie; /**< Doubly-linked list node for wait queue */
+#if CONFIG_POLLING
+    uint8_t flags; /**< Flags indicating the type of wait (POLLIN/POLLOUT) */
+#endif
+} z_wqhandle_t;
+
+/**
+ * @brief Initialize a wait queue handle.
+ *
+ * This macro initializes a z_wqhandle_t structure. When CONFIG_POLLING is enabled,
+ * it initializes both the tie node and flags. Otherwise, only the tie node.
+ */
+#if CONFIG_POLLING
+#define WQHANDLE_INIT()                                                                  \
+    {                                                                                    \
+        .tie = DITEM_INIT(NULL), .flags = 0u                                             \
+    }
+#else
+#define WQHANDLE_INIT()                                                                  \
+    {                                                                                    \
+        .tie = DITEM_INIT(NULL)                                                          \
+    }
+#endif
+
+/**
+ * @brief Get the wait queue handle from a doubly-linked list node.
+ *
+ * This macro retrieves the z_wqhandle_t structure containing the given dnode.
+ *
+ * @param tie Pointer to the dnode within the z_wqhandle_t structure.
+ * @return Pointer to the containing z_wqhandle_t structure.
+ */
+#define Z_WQHANDLE_OF_TIE(tie) CONTAINER_OF(tie, struct z_wqhandle, tie)
+
+/**
  * @brief Thread entry point function type.
  *
  * The `k_thread_entry_t` type is a function pointer type representing a thread
@@ -59,18 +111,10 @@ struct k_thread {
     } tie; ///< Union that holds the queue information, ensuring the thread is in only one
            ///< queue at a time.
 
-    union {
-        struct dnode wany;   ///< Node for waiting on a generic object.
-        struct dnode wmutex; ///< Node for waiting on a mutex.
-        struct dnode wsem;   ///< Node for waiting on a semaphore.
-        struct dnode wsig;   ///< Node for waiting on a signal.
-        struct dnode wfifo;  ///< Node for waiting on a FIFO item.
-        struct dnode wmsgq;  ///< Node for waiting on a message queue item.
-        struct dnode wflags; ///< Node for waiting on flags.
-    }; ///< Union that allows the thread to be pending on different types of kernel
-       ///< objects.
-
-    void *swap_data; ///< Data returned by kernel APIs when the thread is unpended.
+    // TODO might be moved to z_wqhandle_t structure ?
+    z_wqhandle_t wqhandle; ///< Node for waiting on kernel object (mutex, semaphore,
+                           ///< signal, etc...)
+    void *swap_data;       ///< Data returned by kernel APIs when the thread is unpended.
 
     struct {
         void *end;   ///< End of the stack memory.

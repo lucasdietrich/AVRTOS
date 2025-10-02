@@ -1,0 +1,6 @@
+CompileFlags:
+  CompilationDatabase: build
+  Remove: [
+    -fno-split-wide-types, 
+    -fno-tree-scev-cprop
+  ]

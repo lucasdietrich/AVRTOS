@@ -8,6 +8,8 @@
 
 #include <util/atomic.h>
 
+#include "avrtos/poll.h"
+#include "avrtos/sys.h"
 #include "debug.h"
 #include "kernel.h"
 #include "kernel_private.h"
@@ -49,21 +51,6 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
     return ret;
 }
 
-int8_t z_sem_poll_take(struct k_sem *sem)
-{
-    Z_ARGS_CHECK(sem && pollfd) return -EINVAL;
-
-    if (sem->count > 0) {
-        /* Semaphore is available, no need to wait */
-        return 0;
-    }
-
-    /* Add the current thread to the semaphore's wait queue */
-    dlist_append(&sem->waitqueue, &z_ker.current->wany);
-
-    return 1; // Indicate that the thread is now waiting
-}
-
 struct k_thread *k_sem_give(struct k_sem *sem)
 {
     Z_ARGS_CHECK(sem) return NULL;
@@ -87,6 +74,34 @@ struct k_thread *k_sem_give(struct k_sem *sem)
 
     return thread;
 }
+
+#if CONFIG_POLLING
+/**
+ * @brief Set up polling for semaphore availability.
+ *
+ * This internal function is called by k_poll() to set up polling on a semaphore.
+ * If the semaphore is available (count > 0), it returns 0 indicating the object
+ * is ready. Otherwise, it adds the polling descriptor to the semaphore's wait
+ * queue and returns -EAGAIN to indicate the thread should wait.
+ *
+ * @param sem Pointer to the semaphore to poll
+ * @param pollfd Pointer to the poll file descriptor
+ * @return 0 if semaphore is available, -EAGAIN if thread should wait
+ */
+int8_t z_sem_setup_pollin(struct k_sem *sem, struct k_pollfd *pollfd)
+{
+    if (sem->count > 0) {
+        /* Semaphore is available, no need to wait */
+        return 0;
+    }
+
+    /* Add the current thread to the semaphore's wait queue */
+    dlist_append(&sem->waitqueue, &pollfd->_wqhandle.tie);
+    pollfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+
+    return -EAGAIN; // Indicate that the thread is now waiting
+}
+#endif /* CONFIG_POLLING */
 
 __kernel int8_t k_sem_cancel_wait(struct k_sem *sem)
 {
