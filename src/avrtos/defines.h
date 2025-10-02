@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,7 +19,7 @@
     ((AVRTOS_VERSION_MAJOR << 16) | (AVRTOS_VERSION_MINOR << 8) | AVRTOS_VERSION_REVISION)
 #define AVRTOS_VERSION_STRING "2.1.0"
 #define AVRTOS_VERSION_STRING_FULL                                                       \
-    "AVRTOS v" AVRTOS_VERSION_STRING " (c) 2021-2025 Lucas Dietrich"
+    "AVRTOS v" AVRTOS_VERSION_STRING " (c) 2025-2025 Lucas Dietrich"
 
 #if CONFIG_USE_STDLIB_HEAP_MALLOC_MAIN && CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #error                                                                                   \

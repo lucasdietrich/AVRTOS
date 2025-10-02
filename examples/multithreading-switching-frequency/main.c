@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2022 Lucas Dietrich <ld.adecy@gmail.com>
+ * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * @file main.cpp
- * @author Dietrich Lucas (ld.adecy@gmail.com)
+ * @author Dietrich Lucas (lucas.dietrich.git@proton.me)
  * @brief Measurement frequency of the led in order to know at whch frequency
  * does the kernel switch thread
  * @version 0.1
  * @date 2021-07-04
  *
- * @copyright Copyright (c) 2021
+ * @copyright Copyright (c) 2025
  */
 
 // Measurement
