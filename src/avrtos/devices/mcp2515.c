@@ -58,8 +58,8 @@ static void write_registers(struct mcp2515_device *mcp,
 static void
 modify_register(struct mcp2515_device *mcp, uint8_t reg_addr, uint8_t mask, uint8_t data)
 {
-    LOG_DBG("modify_register: reg_addr: 0x%02X, mask: 0x%02X, data: 0x%02X",
-            reg_addr, mask, data);
+    LOG_DBG("modify_register: reg_addr: 0x%02X, mask: 0x%02X, data: 0x%02X", reg_addr,
+            mask, data);
     MCP_SELECT(mcp);
     spi_transceive(MCP_BIT_MODIFY);
     spi_transceive(reg_addr);
@@ -128,7 +128,6 @@ int8_t mcp2515_init(struct mcp2515_device *mcp,
     memcpy(&mcp->slave, spi_slave, sizeof(struct spi_slave));
     k_mutex_init(&mcp->_mutex);
 
-    
     /* For some reason, this spi_slave_ss_init() must be
      * called before spi_regs_restore()
      * otherwise SPI transactions will, sometimes, fail (i.e. timeout)

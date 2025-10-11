@@ -97,6 +97,14 @@ void slab_free(struct slab_allocator *a, void *ptr);
 void slab_reset(struct slab_allocator *a);
 
 /**
+ * @brief Check if a slab is available
+ *
+ * @param a Pointer to slab allocator structure
+ * @return int8_t 0 if a slab is available, -ENOMEM otherwise
+ */
+int8_t slab_available(struct slab_allocator *a);
+
+/**
  * @brief Get slab allocator statistics
  *
  * @param a Pointer to slab allocator structure

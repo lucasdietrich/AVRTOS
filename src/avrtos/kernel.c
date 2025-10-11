@@ -611,9 +611,9 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
     struct dnode *tie               = dlist_get(waitqueue);
 
     if (DITEM_VALID(waitqueue, tie)) {
+#if CONFIG_POLLING
         z_wqhandle_t *wqhandle = Z_WQHANDLE_OF_TIE(tie);
 
-#if CONFIG_POLLING
         if (wqhandle->flags) {
             /* The thread is polling multiple objects, we need to
              * wake it up only if it is the first object that
@@ -626,12 +626,13 @@ __kernel struct k_thread *z_unpend_first_thread(struct dnode *waitqueue)
 
             /* Retrieve the pending thread */
             pending_thread = pfd->_thread;
-        } else
-#endif /* CONFIG_POLLING */
-        {
+        } else {
             /* The thread is directly waiting on the object */
             pending_thread = Z_THREAD_FROM_WQHANDLE(wqhandle);
         }
+#else
+        pending_thread = Z_THREAD_FROM_WQHANDLE_TIE(tie);
+#endif /* CONFIG_POLLING */
 
         /* Explicity clear the pending_thread->wqhandle pointer
          * to make sure the *waitqueue* is not corrupted

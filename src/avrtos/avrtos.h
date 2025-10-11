@@ -26,7 +26,6 @@
 
 #include "atomic.h"
 #include "ring.h"
-#include "flags.h"
 #include "fault.h"
 #include "assert.h"
 #include "kernel.h"
@@ -46,6 +45,8 @@
 #include "fifo.h"
 #include "mem_slab.h"
 #include "msgq.h"
+#include "flags.h"
+#include "poll.h"
 
 #include "rust_helpers.h"
 #include "stdout.h"

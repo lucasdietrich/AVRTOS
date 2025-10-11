@@ -7,10 +7,12 @@
 #include "mem_slab.h"
 
 #include "alloc/slab_private.h"
+#include "avrtos/alloc/slab.h"
 #include "dstruct/dlist.h"
 #include "dstruct/slist.h"
 #include "kernel.h"
 #include "kernel_private.h"
+#include "poll.h"
 
 #define K_MODULE K_MODULE_MEMSLAB
 

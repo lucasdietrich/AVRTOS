@@ -94,6 +94,13 @@ void slab_reset(struct slab_allocator *a)
     z_slab_alloc_finalize_init(a);
 }
 
+int8_t slab_available(struct slab_allocator *a)
+{
+    __ASSERT_NOTNULL(a);
+
+    return (a->free_list != NULL) ? 0 : -ENOMEM;
+}
+
 void slab_stats(struct slab_allocator *a, struct alloc_stats *stats)
 {
     __ASSERT_NOTNULL(a);

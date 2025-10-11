@@ -22,6 +22,7 @@
 
 #include "avrtos/defines.h"
 #include "avrtos/fifo.h"
+#include "avrtos/mem_slab.h"
 #include "avrtos/msgq.h"
 #include "avrtos/types.h"
 #include "kernel.h"
@@ -34,6 +35,11 @@ extern "C" {
  * @brief Event flag indicating that the polled object is ready.
  */
 #define K_POLL_READY 0x01
+
+/**
+ * @brief Event flag indicating that an error occurred while polling the object.
+ */
+#define K_POLL_ERR 0x02
 
 /**
  * @brief Enumeration of pollable object types.
@@ -49,6 +55,8 @@ typedef enum {
     K_POLL_TYPE_MSGQ_GET =
         0x04, /**< Polling on a message queue for available messages to get */
     K_POLL_TYPE_FIFO = 0x05, /**< Polling on a FIFO for available items */
+    K_POLL_TYPE_MEM_SLAB =
+        0x06, /**< Polling on a memory slab for available blocks (not implemented) */
 } k_poll_type_t;
 
 /**
@@ -63,13 +71,27 @@ struct k_pollfd {
 
     k_poll_type_t type; /**< Type of the object being polled */
     union {
-        struct k_sem *sem;     /**< Pointer to a semaphore for polling */
-        struct k_mutex *mutex; /**< Pointer to a mutex for polling */
-        struct k_fifo *fifo;   /**< Pointer to a FIFO for polling */
-        struct k_msgq *msgq;   /**< Pointer to a message queue for polling */
-    } obj;                     /**< Union of pointers to the objects being polled */
+        struct k_sem *sem;           /**< Pointer to a semaphore for polling */
+        struct k_mutex *mutex;       /**< Pointer to a mutex for polling */
+        struct k_fifo *fifo;         /**< Pointer to a FIFO for polling */
+        struct k_msgq *msgq;         /**< Pointer to a message queue for polling */
+        struct k_mem_slab *mem_slab; /**< Pointer to a memory slab for polling */
+    } obj;                           /**< Union of pointers to the objects being polled */
     uint8_t revents;           /**< Events that have occurred (K_POLL_READY) */
 };
+
+#define K_POLLFD_INIT(_type, _obj)                                                        \
+    {                                                                                    \
+        ._wqhandle = WQHANDLE_INIT(), ._thread = NULL, .type = _type, .obj = _obj,      \
+        .revents = 0,                                                                   \
+    }
+
+#define K_POLLFD_SEM(_sem)       K_POLLFD_INIT(K_POLL_TYPE_SEM, {.sem = _sem})
+#define K_POLLFD_MUTEX(_mutex)   K_POLLFD_INIT(K_POLL_TYPE_MUTEX, {.mutex = _mutex})
+#define K_POLLFD_FIFO(_fifo)     K_POLLFD_INIT(K_POLL_TYPE_FIFO, {.fifo = _fifo})
+#define K_POLLFD_MSGQ_PUT(_msgq) K_POLLFD_INIT(K_POLL_TYPE_MSGQ_PUT, {.msgq = _msgq})
+#define K_POLLFD_MSGQ_GET(_msgq) K_POLLFD_INIT(K_POLL_TYPE_MSGQ_GET, {.msgq = _msgq})
+#define K_POLLFD_MEM_SLAB(_slab) K_POLLFD_INIT(K_POLL_TYPE_MEM_SLAB, {.mem_slab = _slab})
 
 /**
  * @brief Poll multiple kernel objects for events.

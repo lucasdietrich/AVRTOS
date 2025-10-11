@@ -36,6 +36,8 @@
 extern "C" {
 #endif
 
+#define Z_MUTEX_UNLOCKED_VALUE 0u
+
 /**
  * @brief Kernel Mutex structure
  */

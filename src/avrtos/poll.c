@@ -17,6 +17,7 @@
 
 #include <avr/pgmspace.h>
 
+#include "avrtos/errno.h"
 #include "avrtos/fifo.h"
 #include "avrtos/kernel.h"
 #include "avrtos/kernel_private.h"
@@ -26,12 +27,6 @@
 #include "avrtos/semaphore.h"
 
 #if CONFIG_POLLING == 1
-
-extern int8_t z_sem_setup_pollin(struct k_sem *sem, struct k_pollfd *pollfd);
-extern int8_t z_mutex_setup_pollin(struct k_mutex *mutex, struct k_pollfd *pollfd);
-extern int8_t z_fifo_setup_pollin(struct k_fifo *fifo, struct k_pollfd *pollfd);
-extern int8_t z_msgq_setup_pollin(struct k_msgq *msgq, struct k_pollfd *pollfd);
-extern int8_t z_msgq_setup_pollout(struct k_msgq *msgq, struct k_pollfd *pollfd);
 
 /**
  * @brief Poll multiple kernel objects for events.
@@ -52,51 +47,76 @@ extern int8_t z_msgq_setup_pollout(struct k_msgq *msgq, struct k_pollfd *pollfd)
  */
 int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
 {
-    int8_t ret        = 0;
-    const uint8_t key = irq_lock();
+    int8_t ret         = 0;
+    const uint8_t key  = irq_lock();
 
     for (uint_fast8_t i = 0; i < nfds; i++) {
         struct k_pollfd *pfd = &pfds[i];
+        struct dnode *waitqueue = NULL;
 
-        pfd->revents = 0;
         switch (pfd->type) {
         case K_POLL_TYPE_SEM:
-            ret = z_sem_setup_pollin(pfd->obj.sem, pfd);
+            if (pfd->obj.sem->count == 0) {
+                waitqueue            = &pfd->obj.sem->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
             break;
         case K_POLL_TYPE_MUTEX:
-            ret = z_mutex_setup_pollin(pfd->obj.mutex, pfd);
+            if (pfd->obj.mutex->lock != Z_MUTEX_UNLOCKED_VALUE) {
+                waitqueue            = &pfd->obj.mutex->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
             break;
         case K_POLL_TYPE_FIFO:
-            ret = z_fifo_setup_pollin(pfd->obj.fifo, pfd);
+            if (slist_peek_head(&pfd->obj.fifo->queue) == NULL) {
+                waitqueue            = &pfd->obj.fifo->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
             break;
         case K_POLL_TYPE_MSGQ_GET:
-            ret = z_msgq_setup_pollin(pfd->obj.msgq, pfd);
+            if (pfd->obj.msgq->used_msgs == 0) {
+                waitqueue            = &pfd->obj.msgq->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
             break;
         case K_POLL_TYPE_MSGQ_PUT:
-            ret = z_msgq_setup_pollout(pfd->obj.msgq, pfd);
+            if (pfd->obj.msgq->used_msgs == pfd->obj.msgq->max_msgs) {
+                waitqueue            = &pfd->obj.msgq->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLOUT;
+            }
+            break;
+        case K_POLL_TYPE_MEM_SLAB:
+            if (slab_available(&pfd->obj.mem_slab->allocator) != 0) {
+                waitqueue            = &pfd->obj.mem_slab->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
             break;
         default:
             ret = -EINVAL;
-            goto exit;
+            pfd->revents |= K_POLL_ERR;
+            continue;
         }
 
-        if (ret == 0) {
+        if (waitqueue != NULL) {
+            pfd->revents = 0;
+            pfd->_thread = k_thread_get_current();
+            dlist_append(waitqueue, &pfd->_wqhandle.tie);
+        } else {
             pfd->revents |= K_POLL_READY;
-            nfds = i; // number of processed fds to cleanup
-            goto ready;
+            ret++;
         }
-
-        pfd->_thread = k_thread_get_current();
     }
 
-    ret = z_pend_current_on(NULL, timeout);
+    if (ret == 0) {
+        ret = z_pend_current_on(NULL, timeout);
+    }
 
-ready:
+    // Cleanup
     for (uint_fast8_t i = 0; i < nfds; i++) {
         struct k_pollfd *pfd = &pfds[i];
 
-        if (pfd->revents & K_POLL_READY) {
-            /* If the object is ready, it has already been removed from the wait object
+        if (pfd->revents) {
+            /* If the object is ready or on error, it has already been removed from the wait object
              * queue */
             continue;
         }
@@ -107,6 +127,7 @@ ready:
         case K_POLL_TYPE_FIFO:
         case K_POLL_TYPE_MSGQ_GET:
         case K_POLL_TYPE_MSGQ_PUT:
+        case K_POLL_TYPE_MEM_SLAB:
             dlist_remove(&pfd->_wqhandle.tie);
             break;
         default:
@@ -114,7 +135,6 @@ ready:
         }
     }
 
-exit:
     irq_unlock(key);
     return ret;
 }

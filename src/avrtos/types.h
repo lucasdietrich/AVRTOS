@@ -111,7 +111,10 @@ struct k_thread {
     } tie; ///< Union that holds the queue information, ensuring the thread is in only one
            ///< queue at a time.
 
-    // TODO might be moved to z_wqhandle_t structure ?
+    /* wqhandle and swap_data cannot be merged into a union because
+     * they are used together in the particular case of threads
+     * waiting on a specific flag mask with the k_flags_poll() API.
+     */
     z_wqhandle_t wqhandle; ///< Node for waiting on kernel object (mutex, semaphore,
                            ///< signal, etc...)
     void *swap_data;       ///< Data returned by kernel APIs when the thread is unpended.
