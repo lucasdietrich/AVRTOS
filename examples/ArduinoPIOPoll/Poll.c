@@ -19,6 +19,7 @@
  * - 'f' or '3': Signal FIFO producer to add item to fifo1
  * - 'p' or '4': Signal message queue putter to add message to msgq_get1
  * - 'g' or '5': Signal message queue getter to get message from msgq_put1
+ * - 'b' or '6': Signal memory slab freer to free memory slab block
  *
  * The main thread polls on all these objects and handles events when they occur.
  */
