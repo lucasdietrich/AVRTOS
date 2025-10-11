@@ -35,10 +35,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-#include "avrtos/canaries.h"
-#include "avrtos/fifo.h"
-#include "avrtos/init.h"
-#include "avrtos/mem_slab.h"
 
 #define LOG_LEVEL LOG_LEVEL_DEBUG
 
@@ -211,7 +207,7 @@ static void thread_unified_producer(void *p1)
 {
     (void)p1;
     int ret;
-    
+
     /* Static variables for state management across different operations */
     static snode_t nodes[4];
     static uint8_t fifo_idx = 0;
@@ -243,18 +239,18 @@ static void thread_unified_producer(void *p1)
     while (1) {
         /* Poll on all interrupt-triggered semaphores */
         ret = k_poll(sem_fds, ARRAY_SIZE(sem_fds), K_FOREVER);
-        
+
         if (ret >= 0) {
             /* Handle mutex semaphore - release mutex for main thread to acquire */
             if (sem_fds[0].revents & K_POLL_READY) {
                 LOG_INF("sem_mutex ready - releasing mutex for main thread");
                 ret = k_sem_take(&sem_mutex, K_NO_WAIT);
                 k_assert(ret == 0);
-                
+
                 LOG_INF("releasing mutex1");
                 k_mutex_unlock(&mutex1);
                 LOG_INF("mutex1 released, main thread can now acquire it via polling");
-                
+
                 /* Let the main thread run a bit to acquire the mutex */
                 k_yield();
                 LOG_INF("re-acquiring mutex1 for next cycle");
@@ -266,7 +262,7 @@ static void thread_unified_producer(void *p1)
                 LOG_INF("sem_fifo_put ready - producing fifo item");
                 ret = k_sem_take(&sem_fifo_put, K_NO_WAIT);
                 k_assert(ret == 0);
-                
+
                 LOG_INF("fifo producer producing item %u", fifo_idx);
                 k_fifo_put(&fifo1, &nodes[fifo_idx]);
                 fifo_idx = (fifo_idx + 1) % ARRAY_SIZE(nodes);
@@ -277,7 +273,7 @@ static void thread_unified_producer(void *p1)
                 LOG_INF("sem_msgq_put ready - producing msgq message");
                 ret = k_sem_take(&sem_msgq_put, K_NO_WAIT);
                 k_assert(ret == 0);
-                
+
                 snprintf_P((char *)msg, SZ, PSTR("MSGQ%u"), msgq_idx);
                 LOG_INF("msgq putter sending message: %s", msg);
                 k_msgq_put(&msgq_get1, msg, K_FOREVER);
@@ -289,7 +285,7 @@ static void thread_unified_producer(void *p1)
                 LOG_INF("sem_msgq_get ready - consuming msgq message");
                 ret = k_sem_take(&sem_msgq_get, K_NO_WAIT);
                 k_assert(ret == 0);
-                
+
                 ret = k_msgq_get(&msgq_put1, msg, K_FOREVER);
                 k_assert(ret == 0);
                 LOG_INF("msgq getter received message: %s", msg);
@@ -300,7 +296,7 @@ static void thread_unified_producer(void *p1)
                 LOG_INF("sem_memslab_free ready - freeing memory slab block");
                 ret = k_sem_take(&sem_memslab_free, K_NO_WAIT);
                 k_assert(ret == 0);
-                
+
                 mem = k_fifo_get(&mem_slab_allocated_fifo, K_FOREVER);
                 if (mem != NULL) {
                     k_mem_slab_free(&mem_slab, mem);
@@ -314,10 +310,3 @@ static void thread_unified_producer(void *p1)
         k_dump_stack_canaries();
     }
 }
-
-
-
-
-
-
-

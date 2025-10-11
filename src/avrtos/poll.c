@@ -13,7 +13,6 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 
 #include <avr/pgmspace.h>
 
@@ -47,11 +46,11 @@
  */
 int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
 {
-    int8_t ret         = 0;
-    const uint8_t key  = irq_lock();
+    int8_t ret        = 0;
+    const uint8_t key = irq_lock();
 
     for (uint_fast8_t i = 0; i < nfds; i++) {
-        struct k_pollfd *pfd = &pfds[i];
+        struct k_pollfd *pfd    = &pfds[i];
         struct dnode *waitqueue = NULL;
 
         switch (pfd->type) {
@@ -116,8 +115,8 @@ int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
         struct k_pollfd *pfd = &pfds[i];
 
         if (pfd->revents) {
-            /* If the object is ready or on error, it has already been removed from the wait object
-             * queue */
+            /* If the object is ready or on error, it has already been removed from the
+             * wait object queue */
             continue;
         }
 

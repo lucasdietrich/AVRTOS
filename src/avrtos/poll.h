@@ -77,13 +77,13 @@ struct k_pollfd {
         struct k_msgq *msgq;         /**< Pointer to a message queue for polling */
         struct k_mem_slab *mem_slab; /**< Pointer to a memory slab for polling */
     } obj;                           /**< Union of pointers to the objects being polled */
-    uint8_t revents;           /**< Events that have occurred (K_POLL_READY) */
+    uint8_t revents;                 /**< Events that have occurred (K_POLL_READY) */
 };
 
-#define K_POLLFD_INIT(_type, _obj)                                                        \
+#define K_POLLFD_INIT(_type, _obj)                                                       \
     {                                                                                    \
-        ._wqhandle = WQHANDLE_INIT(), ._thread = NULL, .type = _type, .obj = _obj,      \
-        .revents = 0,                                                                   \
+        ._wqhandle = WQHANDLE_INIT(), ._thread = NULL, .type = _type, .obj = _obj,       \
+        .revents = 0,                                                                    \
     }
 
 #define K_POLLFD_SEM(_sem)       K_POLLFD_INIT(K_POLL_TYPE_SEM, {.sem = _sem})
