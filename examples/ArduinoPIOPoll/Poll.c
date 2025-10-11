@@ -65,7 +65,8 @@ void setup(void)
     ll_usart_enable_rx_isr(USART0_DEVICE);
 
     printf_P(PSTR("\n\n--- AVRTOS Polling Example ---\n"));
-
+    k_mem_slab_init(&mem_slab, mem_slab.allocator.buffer, mem_slab.allocator.block_size,
+                    mem_slab.allocator.count);
     k_thread_create(&tunified_producer, thread_unified_producer, stack, sizeof(stack),
                     K_COOPERATIVE, NULL, 'm');
     k_thread_start(&tunified_producer);
