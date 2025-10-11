@@ -8,7 +8,6 @@
 
 #include <util/atomic.h>
 
-#include "avrtos/poll.h"
 #include "debug.h"
 #include "kernel.h"
 #include "kernel_private.h"

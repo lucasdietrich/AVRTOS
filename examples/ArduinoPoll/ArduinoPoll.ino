@@ -129,8 +129,8 @@ void loop(void)
         }
         if (fds[5].revents & K_POLL_READY) {
             LOG_INF("mem_slab block available for allocation");
-            void *mem;
-            ret = k_mem_slab_alloc(&mem_slab, &mem, K_NO_WAIT);
+            void *mem = NULL;
+            ret       = k_mem_slab_alloc(&mem_slab, &mem, K_NO_WAIT);
             k_assert(ret == 0);
             LOG_INF("mem_slab block allocated: %p", mem);
 
@@ -204,7 +204,7 @@ static void thread_unified_producer(void *p1)
     static uint8_t fifo_idx = 0;
     static uint8_t msgq_idx = 0;
     uint8_t msg[SZ];
-    void *mem;
+    void *mem = NULL;
 
     /* Initialize msgq_get1 with some initial messages */
     do {
@@ -297,7 +297,5 @@ static void thread_unified_producer(void *p1)
         } else {
             LOG_ERR("k_poll error in unified producer: %d", ret);
         }
-
-        k_dump_stack_canaries();
     }
 }

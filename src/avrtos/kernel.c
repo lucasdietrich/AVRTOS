@@ -12,7 +12,6 @@
 
 #include "assert.h"
 #include "avrtos/defines.h"
-#include "avrtos/poll.h"
 #include "avrtos/sys.h"
 #include "canaries.h"
 #include "debug.h"
@@ -20,6 +19,7 @@
 #include "fault.h"
 #include "idle.h"
 #include "kernel_private.h"
+#include "poll.h"
 #include "stack_sentinel.h"
 #include "systime.h"
 #include "timer.h"
@@ -824,7 +824,7 @@ __kernel int8_t k_thread_abort(struct k_thread *thread)
     return 0;
 }
 
-void k_abort()
+void k_abort(void)
 {
     k_thread_abort(z_ker.current);
 }

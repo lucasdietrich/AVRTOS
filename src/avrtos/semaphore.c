@@ -8,10 +8,8 @@
 
 #include <util/atomic.h>
 
-#include "avrtos/poll.h"
 #include "avrtos/sys.h"
 #include "debug.h"
-#include "dlist.h"
 #include "kernel.h"
 #include "kernel_private.h"
 
