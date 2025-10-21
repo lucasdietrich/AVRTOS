@@ -187,7 +187,7 @@ k_print_stack_canaries	KEYWORD2
 k_print_current_canaries	KEYWORD2
 k_dump_stack_canaries	KEYWORD2
 
-__assert	KEYWORD2
+z_assert	KEYWORD2
 
 serial_init	KEYWORD2
 serial_transmit	KEYWORD2

@@ -348,7 +348,7 @@ void z_sched_enter(void)
     __ASSERT_NOINTERRUPT();
 
 #if CONFIG_KERNEL_ASSERT
-    __ASSERT(!z_ker.kernel_mode, K_ASSERT_USER_MODE);
+    Z_ASSERT(!z_ker.kernel_mode, K_ASSERT_USER_MODE);
     z_ker.kernel_mode = 1u;
 #endif
 

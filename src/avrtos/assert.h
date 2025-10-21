@@ -89,17 +89,14 @@ extern "C" {
 #define K_ASSERT_UNDEFINED_LINE 0u
 
 #if CONFIG_KERNEL_ASSERT
-#define __ASSERT(_acode, _assertion)                                                     \
-    __assert((uint8_t)(_assertion), K_MODULE, _acode, __LINE__)
-#define __ASSERT_APP(_assertion)                                                         \
-    __assert((uint8_t)(_assertion), K_MODULE_APPLICATION, K_ASSERT_ANY, __LINE__)
+#define Z_ASSERT(_acode, _assertion)                                                     \
+    z_assert((uint8_t)(_assertion), K_MODULE, _acode, __LINE__)
+#define Z_ASSERT_APP(_assertion)                                                         \
+    z_assert((uint8_t)(_assertion), K_MODULE_APPLICATION, K_ASSERT_ANY, __LINE__)
 #else
-#define __ASSERT(_acode, _assertion)
-#define __ASSERT_APP(_assertion)
+#define Z_ASSERT(_acode, _assertion)
+#define Z_ASSERT_APP(_assertion)
 #endif
-
-#define K_ASSERT(_acode, _assertion) __ASSERT(_acode, _assertion)
-#define K_ASSERT_APP(_assertion)     __ASSERT_APP(_assertion)
 
 /**
  * @brief Application-level assertion macro.
@@ -110,27 +107,27 @@ extern "C" {
  *
  * @param _assertion The boolean expression to assert as true.
  */
-#define k_assert(_assertion) __ASSERT_APP(_assertion)
+#define k_assert(_assertion) Z_ASSERT_APP(_assertion)
 
-#define __ASSERT_TRUE(test)  __ASSERT(K_ASSERT_TRUE, (test) != 0)
-#define __ASSERT_FALSE(test) __ASSERT(K_ASSERT_FALSE, (test) == 0)
+#define __ASSERT_TRUE(test)  Z_ASSERT(K_ASSERT_TRUE, (test) != 0)
+#define __ASSERT_FALSE(test) Z_ASSERT(K_ASSERT_FALSE, (test) == 0)
 
-#define __ASSERT_INTERRUPT()   __ASSERT(K_ASSERT_INTERRUPT, z_interrupts() != 0)
-#define __ASSERT_NOINTERRUPT() __ASSERT(K_ASSERT_NOINTERRUPT, z_interrupts() == 0)
+#define __ASSERT_INTERRUPT()   Z_ASSERT(K_ASSERT_INTERRUPT, z_interrupts() != 0)
+#define __ASSERT_NOINTERRUPT() Z_ASSERT(K_ASSERT_NOINTERRUPT, z_interrupts() == 0)
 
-#define __ASSERT_NOTNULL(var) __ASSERT(K_ASSERT_NOTNULL, (var) != NULL)
-#define __ASSERT_NULL(var)    __ASSERT(K_ASSERT_NULL, (var) == NULL)
+#define __ASSERT_NOTNULL(var) Z_ASSERT(K_ASSERT_NOTNULL, (var) != NULL)
+#define __ASSERT_NULL(var)    Z_ASSERT(K_ASSERT_NULL, (var) == NULL)
 
 #define __ASSERT_LEASTONE_RUNNING()                                                      \
-    __ASSERT(K_ASSERT_LEASTONE_RUNNING, k_ready_count() != 0u)
+    Z_ASSERT(K_ASSERT_LEASTONE_RUNNING, k_ready_count() != 0u)
 #define __ASSERT_THREAD_STATE(thread, th_state)                                          \
-    __ASSERT(K_ASSERT_THREAD_STATE, (thread->flags & Z_THREAD_STATE_MSK) == th_state)
+    Z_ASSERT(K_ASSERT_THREAD_STATE, (thread->flags & Z_THREAD_STATE_MSK) == th_state)
 #define __ASSERT_THREAD_NOT_STATE(thread, th_state)                                      \
-    __ASSERT(K_ASSERT_THREAD_STATE, (thread->flags & Z_THREAD_STATE_MSK) != th_state)
+    Z_ASSERT(K_ASSERT_THREAD_STATE, (thread->flags & Z_THREAD_STATE_MSK) != th_state)
 
-#define __ASSERT_PREEMPTIVE()   __ASSERT(K_ASSERT_PREEMPTIVE, k_cur_is_preempt())
-#define __ASSERT_COOPERATIVE()  __ASSERT(K_ASSERT_COOPERATIVE, k_cur_is_coop())
-#define __ASSERT_SCHED_LOCKED() __ASSERT(K_ASSERT_SCHED_LOCKED, k_sched_locked())
+#define __ASSERT_PREEMPTIVE()   Z_ASSERT(K_ASSERT_PREEMPTIVE, k_cur_is_preempt())
+#define __ASSERT_COOPERATIVE()  Z_ASSERT(K_ASSERT_COOPERATIVE, k_cur_is_coop())
+#define __ASSERT_SCHED_LOCKED() Z_ASSERT(K_ASSERT_SCHED_LOCKED, k_sched_locked())
 
 #define __ASSERT_ISR_CONTEXT()
 #define __ASSERT_THREAD_CONTEXT()
@@ -149,7 +146,7 @@ extern "C" {
  * @param acode The assertion code (K_ASSERT_*)
  * @param line The line number of the assertion within the source file
  */
-void __assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line);
+void z_assert(uint8_t expression, uint8_t module, uint8_t acode, uint16_t line);
 
 #ifdef __cplusplus
 }

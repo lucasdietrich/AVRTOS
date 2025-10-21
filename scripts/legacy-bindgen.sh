@@ -17,7 +17,7 @@ bindgen src/avrtos_all.h \
     --allowlist-function serial_.* \
     --allowlist-function atomic_.* \
     --allowlist-function __fault \
-    --allowlist-function __assert \
+    --allowlist-function z_assert \
     --allowlist-function print_slist \
     --allowlist-function print_dlist \
     --allowlist-function print_tqueue \

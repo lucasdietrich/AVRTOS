@@ -47,7 +47,7 @@ Additional Features:
 - Thread naming with symbols (e.g., 'M' for the main thread, 'I' for the idle thread)
 - Pseudorandom number generator (LFSR)
 - Debugging and utility functions  (RAM_DUMP, CORE_DUMP, z_read_ra)
-- Kernel assertions (__ASSERT)
+- Kernel assertions (Z_ASSERT)
 - Custom error codes (e.g., EAGAIN, EINVAL, EIO, ENOMEM, ...)
 - Thread safe termination (excluding main thread)
 - `stdout` redirection to USART0

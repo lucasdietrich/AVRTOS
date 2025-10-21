@@ -16,7 +16,7 @@
  * before the debug information is printed.
  *
  * TODOs:
- * - Modify __assert to use __fault.
+ * - Modify z_assert to use __fault.
  *
  * Related configuration options:
  * - CONFIG_KERNEL_FAULT_VERBOSITY: Allows to control the verbosity of the fault
