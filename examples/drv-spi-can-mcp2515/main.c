@@ -35,7 +35,6 @@ static void print_can_frame(struct can_frame *frame)
 int main(void)
 {
     int ret;
-    serial_init_baud(115200u);
 
     const struct spi_config spi_cfg = {
         .role        = SPI_ROLE_MASTER,

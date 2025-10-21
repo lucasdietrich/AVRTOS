@@ -81,12 +81,6 @@ void ll_usart_init(UART_Device *dev, const struct usart_config *config)
     if (config->transmitter) SET_BIT(ucsrnb, BIT(TXENn));
     if (config->receiver) SET_BIT(ucsrnb, BIT(RXENn));
 
-#if DRIVERS_UART_ASYNC
-    /* enable interrupt */
-    SET_BIT(ucsrnb, BIT(RXCIEn));
-    SET_BIT(ucsrnb, BIT(TXCIEn));
-#endif
-
     dev->UCSRnB = ucsrnb;
 
     uint8_t ucsrc = 0u;
@@ -203,7 +197,7 @@ static void rx_interrupt(UART_Device *dev)
 
         ctx->evt = USART_EVENT_RX_COMPLETE;
         ctx->callback(dev, ctx);
-        ctx->rx.cur = 0U;
+        ctx->rx.cur = 0u;
     }
 }
 
@@ -318,7 +312,7 @@ int8_t usart_rx_enable(UART_Device *dev, void *buf, size_t size)
     usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.cur  = 0U;
 
     /* enable receiver */
-    SET_BIT(dev->UCSRnB, BIT(RXENn));
+    SET_BIT(dev->UCSRnB, BIT(RXENn) | BIT(RXCIEn));
 
     return 0;
 }
@@ -344,7 +338,7 @@ int8_t usart_tx(UART_Device *dev, const void *buf, size_t size)
     usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.cur  = 0U;
 
     /* enable transmitter */
-    SET_BIT(dev->UCSRnB, BIT(UDRIEn));
+    SET_BIT(dev->UCSRnB, BIT(TXENn) | BIT(UDRIEn) | BIT(TXCIEn));
 
     return 0;
 }

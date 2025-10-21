@@ -19,7 +19,7 @@ int main(void)
 {
     /* UART initialisation */
     const struct usart_config usart_config = {
-        .baudrate    = USART_BAUD_115200,
+        .baudrate    = USART_BAUD_38400,
         .receiver    = 1u,
         .transmitter = 1u,
         .mode        = USART_MODE_ASYNCHRONOUS,

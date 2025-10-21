@@ -1,4 +1,6 @@
-# Drivers attempt for ATmgea2560
+# Drivers attempt for ATmega2560
+
+Connect ATmega2560 usart1 TX to RX. 
 
 Expected output
 

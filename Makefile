@@ -9,7 +9,7 @@ GENERATOR_ARGS?=
 DEVICE?=/dev/ttyACM0
 SAMPLE?=shell
 TOOLCHAIN_FILE?=cmake/avr6-atmega2560.cmake
-BAUDRATE?=115200
+BAUDRATE?=38400
 QEMU?=ON
 
 # if QEMU is enabled, set CMAKE_BUILD_TYPE to Debug by default
@@ -85,8 +85,16 @@ upload:
 
 flash: upload
 
+fm: flash monitor
+
 monitor:
 	$(GENERATOR_COMMAND) -C build monitor $(GENERATOR_ARGS)
+
+miniterm:
+	$(GENERATOR_COMMAND) -C build miniterm $(GENERATOR_ARGS)
+
+picocom:
+	$(GENERATOR_COMMAND) -C build picocom $(GENERATOR_ARGS)
 
 qemu:
 	$(GENERATOR_COMMAND) -C build qemu $(GENERATOR_ARGS)

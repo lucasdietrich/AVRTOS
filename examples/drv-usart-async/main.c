@@ -37,22 +37,13 @@ void push(struct in **mem)
     *mem = NULL;
 }
 
-int8_t alloc(struct in **mem)
-{
-    return k_mem_slab_alloc(&myslab, (void **)mem, K_NO_WAIT);
-}
-
-void free_mem(struct in *mem)
-{
-    k_mem_slab_free(&myslab, mem);
-}
 
 static struct in *mem = NULL;
 
 void input(const char rx)
 {
     if (mem == NULL) {
-        if (alloc(&mem) != 0) {
+        if (k_mem_slab_alloc(&myslab, (void **)&mem, K_NO_WAIT) != 0) {
             __ASSERT_NULL(mem);
             serial_transmit('!');
             return;
@@ -117,14 +108,16 @@ void consumer(void *arg)
 }
 
 // IPC uart
-const struct usart_config usart_ipc_cfg PROGMEM = {.baudrate    = USART_BAUD_1000000,
-                                                   .receiver    = 1,
-                                                   .transmitter = 1,
-                                                   .mode        = USART_MODE_ASYNCHRONOUS,
-                                                   .parity      = USART_PARITY_NONE,
-                                                   .stopbits    = USART_STOP_BITS_1,
-                                                   .databits    = USART_DATA_BITS_8,
-                                                   .speed_mode = USART_SPEED_MODE_NORMAL};
+const struct usart_config usart_ipc_cfg PROGMEM = {
+    .baudrate    = USART_BAUD_1000000,
+    .receiver    = 1,
+    .transmitter = 1,
+    .mode        = USART_MODE_ASYNCHRONOUS,
+    .parity      = USART_PARITY_NONE,
+    .stopbits    = USART_STOP_BITS_1,
+    .databits    = USART_DATA_BITS_8,
+    .speed_mode  = USART_SPEED_MODE_NORMAL,
+};
 
 #define BUFFER_SIZE 16
 
@@ -157,11 +150,9 @@ void usart_ipc_callback(UART_Device *dev, struct usart_async_context *ctx)
 
 int main(void)
 {
-    irq_enable();
-
     // initialize shell uart
     serial_init();
-    SET_BIT(UCSR0B, 1 << RXCIE0); // enable RX interrupt for shell uart
+    ll_usart_enable_rx_isr(USART0_DEVICE);
 
     // initialize IPC uart
     struct usart_config cfg;

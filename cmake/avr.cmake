@@ -136,10 +136,15 @@ function(target_prepare_env target)
 		USES_TERMINAL
 	)
 
-	# add monitor command
+	# add monitor commands
 	add_custom_target(
-		monitor_${target} 
+		miniterm_${target} 
 		COMMAND echo "Press Ctrl-T + Q to exit" && python3 -m serial.tools.miniterm "${PROG_DEV}" "${BAUDRATE}" --raw --eol LF
+		USES_TERMINAL
+	)
+	add_custom_target(
+		picocom_${target} 
+		COMMAND echo "Press Ctrl-{A + X} to exit" && picocom -b "${BAUDRATE}" "${PROG_DEV}" --imap lfcrlf --omap crlf
 		USES_TERMINAL
 	)
 
@@ -168,7 +173,9 @@ function(target_prepare_env target)
 
 	if (DEFINED ENABLE_SINGLE_SAMPLE)
 		add_custom_target(upload DEPENDS upload_${target})
-		add_custom_target(monitor  DEPENDS monitor_${target})
+		add_custom_target(miniterm  DEPENDS miniterm_${target})
+		add_custom_target(picocom  DEPENDS picocom_${target})
+		add_custom_target(monitor  DEPENDS miniterm_${target})
 
 		if (QEMU)
 			add_custom_target(qemu DEPENDS qemu_${target})

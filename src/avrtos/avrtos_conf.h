@@ -619,7 +619,7 @@
 // USART0 (serial console) default baud rate.
 //
 #ifndef CONFIG_SERIAL_USART_BAUDRATE
-#define CONFIG_SERIAL_USART_BAUDRATE 115200u
+#define CONFIG_SERIAL_USART_BAUDRATE 38400u
 #endif
 
 //

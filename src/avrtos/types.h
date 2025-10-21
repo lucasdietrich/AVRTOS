@@ -101,7 +101,8 @@ typedef void (*k_thread_entry_t)(void *);
 struct k_thread {
     void *sp; ///< Stack pointer, must be the first member of the structure !!
 
-    uint8_t flags; ///< Thread flags indicating the state or attributes of the thread.
+    uint8_t flags; ///< Thread flags indicating the state or attributes of the thread. (see Z_THREAD_*
+                   ///< flags in defines.h)
 
     union {
         struct dnode
