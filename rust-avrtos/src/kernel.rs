@@ -56,5 +56,5 @@ pub fn sleep(duration: Duration) {
 
 #[inline(always)]
 pub fn yeet() {
-    critical_section(|| unsafe { z_yield() });
+    critical_section(|_cs| unsafe { z_yield() });
 }

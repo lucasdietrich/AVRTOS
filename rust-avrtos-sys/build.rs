@@ -233,7 +233,7 @@ fn bindgen() {
         "serial_.*",
         "atomic_.*",
         "__fault",
-        "__assert",
+        "z_assert",
         "print_slist",
         "print_dlist",
         "print_tqueue",

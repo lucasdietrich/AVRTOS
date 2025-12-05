@@ -29,8 +29,8 @@ impl Drop for Cs {
 #[inline(always)]
 pub fn critical_section<F, R>(f: F) -> R
 where
-    F: FnOnce() -> R,
+    F: FnOnce(&Cs) -> R,
 {
-    let _cs = unsafe { Cs::new() };
-    f()
+    let cs = unsafe { Cs::new() };
+    f(&cs)
 }

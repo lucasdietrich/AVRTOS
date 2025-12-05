@@ -17,6 +17,7 @@ pub mod signal;
 pub mod stdio;
 pub mod thread;
 pub mod traits;
+pub mod support;
 
 #[cfg(feature = "alloc")]
 pub mod kalloc;
