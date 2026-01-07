@@ -28,10 +28,6 @@ uint8_t buffer[256];
 
 int main(void)
 {
-    serial_init();
-
-    k_thread_dump_all();
-
     k_prng_get_buffer(&p4, buffer, sizeof(buffer));
     for (uint16_t i = 0; i < sizeof(buffer); i++) {
         serial_hex(buffer[i]);

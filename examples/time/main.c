@@ -23,14 +23,6 @@ K_THREAD_DEFINE(t2, processing, 0x100, K_PREEMPTIVE, NULL, '1');
 
 int main(void)
 {
-    serial_init();
-
-    k_thread_dump_all();
-
-    // _delay_ms(2000);
-
-    irq_enable();
-
     k_show_uptime();
     printf_P(PSTR("Startup\n"));
 

@@ -148,7 +148,6 @@ int main(void)
     uint32_t counter_copy;
     uint8_t key;
 
-    serial_init();
     ll_usart_enable_rx_isr(USART0_DEVICE);
 
     print_help();

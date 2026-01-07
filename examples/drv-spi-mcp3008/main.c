@@ -14,8 +14,6 @@
 
 int main(void)
 {
-    serial_init();
-
     const struct spi_config cfg = {
         .role        = SPI_ROLE_MASTER,
         .polarity    = SPI_CLOCK_POLARITY_RISING,

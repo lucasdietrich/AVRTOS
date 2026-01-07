@@ -87,13 +87,6 @@ void thread_time(void *arg)
 
 int main(void)
 {
-    /* interrupts are disabled in this thread */
-
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
     void *blocks[BLOCKS];
     uint8_t count = 0;
 

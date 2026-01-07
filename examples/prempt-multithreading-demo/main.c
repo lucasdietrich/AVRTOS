@@ -40,11 +40,6 @@ K_THREAD_DEFINE(task2, thread_processing, 0x100, K_COOPERATIVE, NULL, 'B');
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
     serial_printl_p(PSTR(" Send a char over the UART to switch thread !"));
 #endif

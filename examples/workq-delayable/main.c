@@ -50,8 +50,6 @@ K_THREAD_DEFINE(usart, usart_task, 0x200, K_PREEMPTIVE, &my_struct, 'u');
 
 int main(void)
 {
-    serial_init();
-
     k_work_delayable_init(&my_struct.work, work_handler);
     k_sem_init(&my_struct.sem, 0, 1);
 

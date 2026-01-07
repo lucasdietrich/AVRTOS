@@ -15,8 +15,6 @@
 
 int main(void)
 {
-    serial_init();
-
     /* Advised configuration */
     const struct spi_config cfg = {
         .role        = SPI_ROLE_MASTER,
@@ -29,8 +27,6 @@ int main(void)
     gpiol_pin_init(GPIOB, PIN0, GPIO_MODE_OUTPUT, GPIO_HIGH);
 
     spi_init(cfg);
-
-    k_thread_dump_all();
 
     char chr = 0u;
 

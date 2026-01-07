@@ -40,13 +40,6 @@ struct item letters[] = {LETTER('1'), LETTER('2'), LETTER('3'), LETTER('4'), LET
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
-    irq_enable();
-
     uint8_t pos = 0u;
     while (1) {
         serial_transmit(k_thread_get_current()->symbol);

@@ -34,13 +34,6 @@ K_THREAD_DEFINE(waiter5, waiter_entry, 0x50, K_PREEMPTIVE, NULL, 'E');
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
-    sei();
-
     while (1) {
         k_sleep(K_MSEC(PERIOD_SEM_GIVE));
 

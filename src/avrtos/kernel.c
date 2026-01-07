@@ -310,6 +310,10 @@ void z_init_threads(void)
     for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
         struct k_thread *const thread = &(&__k_threads_start)[i];
 
+#if CONFIG_SERIAL_AUTO_INIT && CONFIG_KERNEL_INIT_DEBUG_THREADS
+        k_thread_dump(thread);
+#endif
+
         /* Main thread already in queue */
         if (Z_THREAD_IS_MAIN(thread)) {
             continue;

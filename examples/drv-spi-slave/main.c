@@ -58,8 +58,6 @@ ISR(INT0_vect)
 
 int main(void)
 {
-    serial_init();
-
     /* Advised configuration */
     const struct spi_config cfg = {
         .role        = SPI_ROLE_SLAVE,
@@ -81,8 +79,6 @@ int main(void)
     exti_enable(INT0);
 
 #endif
-
-    k_thread_dump_all();
 
 #if USE_BUTTON
     printf_P(PSTR("SPI Slave ready, use button to enabled/disable SPI\n"));

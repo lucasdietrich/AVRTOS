@@ -15,8 +15,6 @@
 
 int main(void)
 {
-    serial_init();
-
     struct i2c_config config = {
         .prescaler = I2C_PRESCALER_1,
         .twbr      = I2C_CALC_TWBR(I2C_PRESCALER_1, 400000),

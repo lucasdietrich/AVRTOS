@@ -40,8 +40,6 @@ ISR(TIMER1_CAPT_vect)
 
 int main(void)
 {
-    serial_init();
-
     const struct timer_config config = {
         .mode      = TIMER_MODE_FAST_PWM_ICR1,
         .counter   = 0u,

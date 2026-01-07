@@ -13,10 +13,6 @@
 
 int main(void)
 {
-    serial_init();
-
-    k_thread_dump_all();
-
     k_show_uptime();
     printf_P(PSTR("Startup\n"));
 

@@ -37,8 +37,6 @@ static void app_init_timer(uint8_t tim_idx, uint32_t period_us, uint8_t flags)
 
 int main(void)
 {
-    serial_init();
-
     uint32_t period_us = timer_get_max_period_us(5);
     printf_P(PSTR("Timer 5 max period = %lu us\n"), period_us);
     app_init_timer(5, period_us, 0U);

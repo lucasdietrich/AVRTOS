@@ -47,7 +47,6 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'O');
 int main(void)
 {
     led_init();
-    serial_init();
 
     while (1) {
         led_on();

@@ -27,10 +27,6 @@ K_SEM_DEFINE(mysem, 0, 1);
 
 int main(void)
 {
-    serial_init();
-
-    irq_enable();
-
     for (;;) {
         k_sem_take(&mysem, K_FOREVER);
 

@@ -24,14 +24,7 @@ K_MUTEX_DEFINE(mymutex);
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
     k_mutex_lock(&mymutex, K_NO_WAIT);
-
-    irq_enable();
 
     k_sleep(K_SECONDS(1));
 

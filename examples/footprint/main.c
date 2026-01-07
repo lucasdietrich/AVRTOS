@@ -16,8 +16,6 @@
 */
 int main(void)
 {
-    serial_init();
-
     for (;;) {
         serial_print_p(PSTR("Hello\n"));
         k_wait(K_SECONDS(1), K_WAIT_MODE_IDLE);

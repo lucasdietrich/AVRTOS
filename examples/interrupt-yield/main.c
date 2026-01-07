@@ -56,11 +56,6 @@ ISR(USART0_RX_vect)
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
     /* set UART RX interrupt */
     UCSR0B |= 1 << RXCIE0;
 

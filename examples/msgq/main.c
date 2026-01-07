@@ -84,13 +84,6 @@ void reader(struct k_msgq *msgq)
 
 int main(void)
 {
-    /* interrupts are disabled in this thread */
-
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
     for (;;) {
         k_sleep(K_MSEC(PURGE_PERIOD));
 

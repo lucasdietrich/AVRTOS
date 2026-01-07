@@ -13,10 +13,6 @@ K_ATOMIC_DEFINE(a1, 0xFF);
 
 int main(void)
 {
-    serial_init();
-
-    sei();
-
     atomic_val_t val;
 
     val = atomic_get(&a1);

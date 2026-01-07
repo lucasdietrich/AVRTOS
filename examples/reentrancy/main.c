@@ -15,8 +15,6 @@ Z_THREAD_DEFINE(thread1, thread1_entry, 512, K_COOPERATIVE, NULL, '1', 0);
 
 int main(void)
 {
-    serial_init();
-
     k_mutex_lock(&mutex, K_FOREVER);
     k_mutex_lock(&mutex, K_FOREVER);
     k_mutex_lock(&mutex, K_FOREVER);

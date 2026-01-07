@@ -35,7 +35,6 @@ static void print_can_frame(struct can_frame *frame)
 int main(void)
 {
     int ret;
-
     const struct spi_config spi_cfg = {
         .role        = SPI_ROLE_MASTER,
         .polarity    = SPI_CLOCK_POLARITY_RISING,

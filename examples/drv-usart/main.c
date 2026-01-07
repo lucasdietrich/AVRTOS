@@ -30,8 +30,6 @@ int main(void)
     };
     ll_usart_init(USART0_DEVICE, &usart_config);
 
-    k_thread_dump_all();
-
     for (;;) {
         usart_send(USART0_DEVICE, message, strlen(message));
 

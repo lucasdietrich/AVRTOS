@@ -26,13 +26,8 @@ ISR(USART0_RX_vect)
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
     /* enable RX interrupt */
     SET_BIT(UCSR0B, 1 << RXCIE0);
-
-    k_thread_dump_all();
 
     k_sleep(K_FOREVER);
 }

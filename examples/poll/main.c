@@ -60,9 +60,7 @@ int main(void)
 {
     int ret;
 
-    serial_init();
     ll_usart_enable_rx_isr(USART0_DEVICE);
-    k_thread_dump_all();
 
     k_msleep(100);
 

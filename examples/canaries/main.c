@@ -46,9 +46,6 @@ K_THREAD_DEFINE(task2, thread_task2, 0x200, K_PREEMPTIVE, NULL, '2');
 int main(void)
 {
     led_init();
-    serial_init();
-
-    k_thread_dump_all();
 
     k_dump_stack_canaries();
 

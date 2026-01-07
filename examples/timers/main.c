@@ -46,11 +46,6 @@ K_TIMER_DEFINE(mytimer1, mytimer1_handler, K_MSEC(500), 0);
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
     for (uint8_t i = 0; i < ARRAY_SIZE(tasks); i++) {
         k_timer_init(&tasks[i].timer, periodic_task_handler, K_MSEC(100lu * (i + 1)),
                      K_NO_WAIT);

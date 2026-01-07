@@ -24,9 +24,6 @@ K_THREAD_DEFINE(ledon, thread_led, 0x100, K_PRIO_DEFAULT, NULL, 'L');
 int main(void)
 {
     led_init();
-    serial_init();
-
-    k_thread_dump_all();
 
     k_sleep(K_FOREVER);
 }

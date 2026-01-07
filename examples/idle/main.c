@@ -25,11 +25,6 @@
 int main(void)
 {
     static uint32_t counter = 0;
-    serial_init();
-
-    irq_enable();
-
-    k_thread_dump_all();
 
     for (;;) {
         printf_P(PSTR("Hello World, counter = %lx !\n"), counter++);

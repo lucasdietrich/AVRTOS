@@ -54,16 +54,9 @@ struct k_mem_slab myslab;
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
 #if !MEM_SLAB_COMPILATION_TIME
     k_mem_slab_init(&myslab, buffer, BLOCK_SIZE, BLOCK_COUNT);
 #endif
-
-    k_thread_dump_all();
-
-    irq_enable();
 
     uint8_t x = 0;
     while (1) {

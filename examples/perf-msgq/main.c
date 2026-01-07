@@ -47,7 +47,5 @@ void reader(struct k_msgq *msgq)
 
 int main(void)
 {
-    serial_init();
-
     k_abort();
 }

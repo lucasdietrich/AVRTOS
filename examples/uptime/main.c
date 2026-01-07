@@ -24,11 +24,7 @@ K_TIMER_DEFINE(mstimer, timer_handler, K_MSEC(1000), 1000);
 
 int main(void)
 {
-    serial_init();
-
     led_init();
-
-    k_thread_dump_all();
 
     for (;;) {
         led_toggle();

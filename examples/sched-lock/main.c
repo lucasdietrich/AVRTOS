@@ -22,9 +22,6 @@ K_THREAD_DEFINE(coop, thread_coop, 0x100, K_COOPERATIVE, NULL, 'C');
 int main(void)
 {
     led_init();
-    serial_init();
-
-    k_thread_dump_all();
 
     z_print_runqueue();
 

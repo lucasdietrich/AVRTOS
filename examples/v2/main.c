@@ -25,13 +25,6 @@ K_THREAD_DEFINE(t3, canariesthread, 0x80, K_COOPERATIVE, NULL, 'C');
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
-    sei();
-
     while (1) {
         k_show_uptime();
         serial_transmit('\n');
