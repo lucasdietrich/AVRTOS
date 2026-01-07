@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <stdio.h>
+
 #include <avrtos/avrtos.h>
 
 #include <util/delay.h>
@@ -11,7 +13,7 @@
 static void thread1_entry(void *context);
 
 K_MUTEX_DEFINE(mutex);
-Z_THREAD_DEFINE(thread1, thread1_entry, 512, K_COOPERATIVE, NULL, '1', 0);
+K_THREAD_DEFINE_STOPPED(thread1, thread1_entry, 512, K_COOPERATIVE, NULL, '1');
 
 int main(void)
 {
@@ -37,5 +39,5 @@ static void thread1_entry(void *arg)
 
     k_mutex_lock(&mutex, K_FOREVER);
 
-    serial_print("thread1: mutex locked\n");
+    printf_P(PSTR("thread1: mutex locked"));
 }

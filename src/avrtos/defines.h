@@ -372,6 +372,9 @@ typedef struct {
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
     Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 1)
 
+#define K_THREAD_DEFINE_STOPPED(name, entry, stack_size, prio_flag, context_p, symbol)   \
+    Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 0)
+
 #if CONFIG_THREAD_MAIN_MONITOR || CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define Z_THREAD_IS_MONITORED(thread) true
 #else

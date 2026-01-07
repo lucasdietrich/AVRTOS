@@ -4,6 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/* Press any character on USART0 to schedule a work item
+ * that will print "Work done !" after 1 second.
+ * If the character 'c' is pressed, the scheduled work item
+ * is cancelled.
+ */
+
 #include <avrtos/avrtos.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/misc/serial.h>
