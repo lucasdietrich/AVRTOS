@@ -92,7 +92,8 @@ int8_t k_timer_init(struct k_timer *timer,
 {
     Z_ARGS_CHECK(timer && handler) return -EINVAL;
 
-    if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) return -EINVAL;
+    if (K_TIMEOUT_EQ(timeout, K_NO_WAIT))
+        return -EINVAL;
 
     timer->handler = handler;
     timer->timeout = timeout;

@@ -52,7 +52,8 @@ void z_tdqueue_schedule(dlist_t *tqueue, struct tditem *item)
 
 void tdqueue_schedule(dlist_t *tqueue, struct tditem *item, k_delta_t timeout)
 {
-    if (item == NULL) return;
+    if (item == NULL)
+        return;
 
     dlist_init(&item->node);
     item->timeout = timeout;

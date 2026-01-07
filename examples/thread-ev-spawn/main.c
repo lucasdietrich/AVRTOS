@@ -46,7 +46,8 @@ ISR(USART0_RX_vect)
 
     k_ring_push(&rx_bytes, data);
 
-    if (k_sem_give(&sem)) k_yield_from_isr();
+    if (k_sem_give(&sem))
+        k_yield_from_isr();
 }
 
 static void thread_entry(void *arg)

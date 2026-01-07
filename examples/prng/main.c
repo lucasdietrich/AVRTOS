@@ -32,7 +32,8 @@ int main(void)
     for (uint16_t i = 0; i < sizeof(buffer); i++) {
         serial_hex(buffer[i]);
         serial_transmit(' ');
-        if ((i & 0xF) == 0xF) serial_transmit('\n');
+        if ((i & 0xF) == 0xF)
+            serial_transmit('\n');
     }
     serial_transmit('\n');
 

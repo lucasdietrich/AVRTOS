@@ -41,7 +41,8 @@ void reader(struct k_msgq *msgq)
     uint8_t i = 0;
     for (;;) {
         k_msgq_get(msgq, buf, K_FOREVER);
-        if (i++ == 0) serial_transmit('.');
+        if (i++ == 0)
+            serial_transmit('.');
     }
 }
 

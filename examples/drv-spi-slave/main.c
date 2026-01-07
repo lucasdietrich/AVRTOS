@@ -51,7 +51,8 @@ ISR(INT0_vect)
     int ret = k_signal_raise(&sig, 1u);
 
     /* Yield if more than one thread was woken up */
-    if (ret > 0) k_yield_from_isr();
+    if (ret > 0)
+        k_yield_from_isr();
 }
 
 #endif

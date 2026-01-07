@@ -21,7 +21,8 @@ ISR(USART0_RX_vect)
 
     int8_t ret = k_signal_raise(&sig, rx);
 
-    if (ret > 0) k_yield_from_isr();
+    if (ret > 0)
+        k_yield_from_isr();
 }
 
 int main(void)

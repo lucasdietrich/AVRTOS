@@ -115,7 +115,8 @@ static int8_t i2c_get_device_index(const I2C_Device *dev)
 static struct i2c_context *i2c_get_context(const I2C_Device *dev)
 {
     const int8_t index = i2c_get_device_index(dev);
-    if (index < 0) return NULL;
+    if (index < 0)
+        return NULL;
 
     return &i2c_contexts[index];
 }
@@ -344,7 +345,8 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_l
     {
         return -EINVAL;
     }
-    if (x->state != READY) return -EBUSY;
+    if (x->state != READY)
+        return -EBUSY;
 
     x->sla_w = (addr << 1);
     if (w_len == 0) {
@@ -377,10 +379,12 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_l
     default:
         break;
     }
-    if (get_error(x) != I2C_ERROR_NONE) ret = -EIO;
+    if (get_error(x) != I2C_ERROR_NONE)
+        ret = -EIO;
 #elif CONFIG_I2C_BLOCKING
     poll_end(x);
-    if (get_error(x) != I2C_ERROR_NONE) ret = -EIO;
+    if (get_error(x) != I2C_ERROR_NONE)
+        ret = -EIO;
 #endif
 
     return ret;
@@ -406,7 +410,8 @@ int8_t i2c_status(I2C_Device *dev)
 {
     struct i2c_context *const x = i2c_get_context(dev);
     Z_ARGS_CHECK(x) return -EINVAL;
-    if (x->state != READY) return -EBUSY;
+    if (x->state != READY)
+        return -EBUSY;
     return 0;
 }
 

@@ -801,7 +801,8 @@ __kernel int8_t k_thread_abort(struct k_thread *thread)
     __ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
 #endif
 
-    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) return -EINVAL;
+    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED)
+        return -EINVAL;
 
     const uint8_t key = irq_lock();
 
@@ -816,7 +817,8 @@ __kernel int8_t k_thread_abort(struct k_thread *thread)
     }
 #endif
 
-    if (thread == z_ker.current) z_yield();
+    if (thread == z_ker.current)
+        z_yield();
 
     /* Unlock in all cases:
      * - if we stopped ourselves, in which case we need to unlock in any case
@@ -968,7 +970,8 @@ void k_wait(k_timeout_t delay, uint8_t mode)
         now = k_ticks_get_32();
     } while (now - ticks < K_TIMEOUT_TICKS(delay));
 
-    if (unlock_sched) k_sched_unlock();
+    if (unlock_sched)
+        k_sched_unlock();
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 

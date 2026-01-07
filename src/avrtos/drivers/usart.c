@@ -78,8 +78,10 @@ void ll_usart_init(UART_Device *dev, const struct usart_config *config)
 
     /* enable receiver and transmitter */
     uint8_t ucsrnb = 0u;
-    if (config->transmitter) SET_BIT(ucsrnb, BIT(TXENn));
-    if (config->receiver) SET_BIT(ucsrnb, BIT(RXENn));
+    if (config->transmitter)
+        SET_BIT(ucsrnb, BIT(TXENn));
+    if (config->receiver)
+        SET_BIT(ucsrnb, BIT(RXENn));
 
     dev->UCSRnB = ucsrnb;
 
