@@ -9,6 +9,12 @@
 
 #include <avrtos/defines.h>
 
+#if CONFIG_KERNEL_TRACING
+#define trace_call call
+#else
+#define trace_call jmp
+#endif
+
 /*
  * Select the appropriate timer interrupt vector based on the
  * configuration.
@@ -334,7 +340,7 @@ z_thread_entry:
 	 * Exiting the thread will cause a fault
 	 */
     ldi r24, 0x04 ; K_FAULT_THREAD_TERMINATED
-    call __fault
+    jmp __fault
 #else
 	; call thread entry function
     icall
@@ -342,7 +348,7 @@ z_thread_entry:
 	/*
 	 * Graceful/permitted termination of the thread
 	 */
-    call k_abort
+    trace_call k_abort
 #endif
 
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART

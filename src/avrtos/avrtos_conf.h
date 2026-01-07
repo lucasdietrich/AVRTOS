@@ -718,6 +718,16 @@
 #endif
 
 //
+// Improve kernel tracing features
+//
+// 0: Terminal function calls are "jmp"
+// 1: Terminal function calls are "call" allowing to trace back the call stack
+//
+#ifndef CONFIG_KERNEL_TRACING
+#define CONFIG_KERNEL_TRACING 0
+#endif
+
+//
 // Enable Kernel Debug features
 //
 // 0: Kernel Debug is disabled
