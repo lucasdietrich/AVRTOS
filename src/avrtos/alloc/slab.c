@@ -41,7 +41,7 @@ slab_init(struct slab_allocator *a, void *buffer, size_t block_size, uint8_t blo
     /* Validate the arguments: buffer must be non-null, block size must be at least 2
      * bytes (to hold at least one pointer), and there must be at least one block.
      */
-    if (!z_user(buffer && (block_size >= 2) && num_blocks))
+    if (!z_user(buffer && (block_size >= 2) && blocks_count))
         return -EINVAL;
 
     /* Set the slab properties */
