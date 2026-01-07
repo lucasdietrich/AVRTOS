@@ -164,14 +164,11 @@ static void i2c_gpio_setup(uint8_t dev_index, bool enable)
 
 int8_t i2c_init(I2C_Device *dev, struct i2c_config config)
 {
-    int8_t ret;
     int8_t dev_index;
 
     dev_index = i2c_get_device_index(dev);
-    if (dev_index < 0) {
-        ret = -EINVAL;
-        goto exit;
-    }
+    if (dev_index < 0)
+        return -EINVAL;
 
     dev->TWCRn = 0u; // Disable device
 
@@ -188,27 +185,20 @@ int8_t i2c_init(I2C_Device *dev, struct i2c_config config)
 
     dev->TWCRn                    = BIT(TWINT) | BIT(TWEN); // Enable device and interrupt
     i2c_contexts[dev_index].state = READY;
-    ret                           = 0;
 
-exit:
-    return ret;
+    return 0;
 }
 
 int8_t i2c_deinit(I2C_Device *dev)
 {
-    int8_t ret;
     int8_t dev_index;
 
     dev_index = i2c_get_device_index(dev);
-    if (dev_index < 0) {
-        ret = -EINVAL;
-        goto exit;
-    }
+    if (dev_index < 0)
+        return -EINVAL;
 
-    if (i2c_contexts[dev_index].state != READY) {
-        ret = -EBUSY;
-        goto exit;
-    }
+    if (i2c_contexts[dev_index].state != READY)
+        return -EBUSY;
 
     dev->TWCRn  = 0u;
     dev->TWBRn  = 0u;
@@ -221,10 +211,8 @@ int8_t i2c_deinit(I2C_Device *dev)
     i2c_gpio_setup(dev_index, false);
 
     i2c_contexts[dev_index].state = UNINITIALIZED;
-    ret                           = 0;
 
-exit:
-    return ret;
+    return 0;
 }
 
 void transfer_stop(I2C_Device *dev, struct i2c_context *x)
@@ -338,7 +326,6 @@ __always_inline void i2c_state_machine_loop(I2C_Device *dev, struct i2c_context 
 static int8_t
 i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_len)
 {
-    int8_t ret                  = 0;
     struct i2c_context *const x = i2c_get_context(dev);
 
     Z_ARGS_CHECK(x && data && (w_len <= I2C_MAX_BUF_LEN) && (r_len <= I2C_MAX_BUF_LEN))
@@ -380,14 +367,14 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_l
         break;
     }
     if (get_error(x) != I2C_ERROR_NONE)
-        ret = -EIO;
+        return -EIO;
 #elif CONFIG_I2C_BLOCKING
     poll_end(x);
     if (get_error(x) != I2C_ERROR_NONE)
-        ret = -EIO;
+        return -EIO;
 #endif
 
-    return ret;
+    return 0;
 }
 
 int8_t i2c_master_write(I2C_Device *dev, uint8_t addr, const uint8_t *data, uint8_t len)

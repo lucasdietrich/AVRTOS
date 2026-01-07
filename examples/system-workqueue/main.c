@@ -51,5 +51,6 @@ int main(void)
 
     for (;;) {
         /* some processing */
+        k_sleep(K_SECONDS(1));
     }
 }

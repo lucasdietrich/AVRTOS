@@ -780,19 +780,16 @@ int8_t k_thread_create(struct k_thread *thread,
 
 int8_t k_thread_start(struct k_thread *thread)
 {
-    int8_t ret = -EAGAIN;
+    if (z_get_thread_state(thread) != Z_THREAD_STATE_STOPPED)
+        return -EAGAIN;
 
-    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) {
-        const uint8_t key = irq_lock();
+    const uint8_t key = irq_lock();
 
-        z_schedule(thread);
+    z_schedule(thread);
 
-        irq_unlock(key);
+    irq_unlock(key);
 
-        ret = 0;
-    }
-
-    return ret;
+    return 0;
 }
 
 __kernel int8_t k_thread_abort(struct k_thread *thread)
