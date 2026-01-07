@@ -16,7 +16,8 @@
 
 int8_t k_mutex_init(struct k_mutex *mutex)
 {
-    Z_ARGS_CHECK(mutex) return -EINVAL;
+    if (!z_user(mutex))
+        return -EINVAL;
 
     mutex->lock  = Z_MUTEX_UNLOCKED_VALUE;
     mutex->owner = NULL;
@@ -27,7 +28,8 @@ int8_t k_mutex_init(struct k_mutex *mutex)
 
 int8_t k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(mutex) return -EINVAL;
+    if (!z_user(mutex))
+        return -EINVAL;
 
     int8_t ret        = 0;
     const uint8_t key = irq_lock();
@@ -59,7 +61,8 @@ exit:
 
 struct k_thread *k_mutex_unlock(struct k_mutex *mutex)
 {
-    Z_ARGS_CHECK(mutex) return NULL;
+    if (!z_user(mutex))
+        return NULL;
 
     struct k_thread *thread = NULL;
     const uint8_t key       = irq_lock();

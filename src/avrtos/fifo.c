@@ -15,7 +15,8 @@
 
 int8_t k_fifo_init(struct k_fifo *fifo)
 {
-    Z_ARGS_CHECK(fifo) return -EINVAL;
+    if (!z_user(fifo))
+        return -EINVAL;
 
     slist_init(&fifo->queue);
     dlist_init(&fifo->waitqueue);
@@ -45,7 +46,8 @@ struct k_thread *z_fifo_put(struct k_fifo *fifo, struct snode *item)
 
 struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item)
 {
-    Z_ARGS_CHECK(fifo) return NULL;
+    if (!z_user(fifo))
+        return NULL;
 
     const uint8_t key = irq_lock();
 
@@ -58,7 +60,8 @@ struct k_thread *k_fifo_put(struct k_fifo *fifo, struct snode *item)
 
 struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(fifo) return NULL;
+    if (!z_user(fifo))
+        return NULL;
 
     const uint8_t key  = irq_lock();
     struct snode *item = slist_get(&fifo->queue);
@@ -76,7 +79,8 @@ struct snode *k_fifo_get(struct k_fifo *fifo, k_timeout_t timeout)
 
 int8_t k_fifo_cancel_wait(struct k_fifo *fifo)
 {
-    Z_ARGS_CHECK(fifo) return -EINVAL;
+    if (!z_user(fifo))
+        return -EINVAL;
 
     const uint8_t key = irq_lock();
 
@@ -89,14 +93,16 @@ int8_t k_fifo_cancel_wait(struct k_fifo *fifo)
 
 bool k_fifo_is_empty(struct k_fifo *fifo)
 {
-    Z_ARGS_CHECK(fifo) return true;
+    if (!z_user(fifo))
+        return true;
 
     return k_fifo_peek_head(fifo) == NULL;
 }
 
 struct snode *k_fifo_peek_head(struct k_fifo *fifo)
 {
-    Z_ARGS_CHECK(fifo) return NULL;
+    if (!z_user(fifo))
+        return NULL;
 
     const uint8_t key = irq_lock();
 
@@ -109,7 +115,8 @@ struct snode *k_fifo_peek_head(struct k_fifo *fifo)
 
 struct snode *k_fifo_peek_tail(struct k_fifo *fifo)
 {
-    Z_ARGS_CHECK(fifo) return NULL;
+    if (!z_user(fifo))
+        return NULL;
 
     const uint8_t key = irq_lock();
 

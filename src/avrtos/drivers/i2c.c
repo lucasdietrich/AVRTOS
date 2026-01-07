@@ -328,10 +328,8 @@ i2c_run(I2C_Device *dev, uint8_t addr, uint8_t *data, uint8_t w_len, uint8_t r_l
 {
     struct i2c_context *const x = i2c_get_context(dev);
 
-    Z_ARGS_CHECK(x && data && (w_len <= I2C_MAX_BUF_LEN) && (r_len <= I2C_MAX_BUF_LEN))
-    {
+    if (!z_user(x && data && (w_len <= I2C_MAX_BUF_LEN) && (r_len <= I2C_MAX_BUF_LEN)))
         return -EINVAL;
-    }
     if (x->state != READY)
         return -EBUSY;
 
@@ -396,7 +394,8 @@ int8_t i2c_master_write_read(
 int8_t i2c_status(I2C_Device *dev)
 {
     struct i2c_context *const x = i2c_get_context(dev);
-    Z_ARGS_CHECK(x) return -EINVAL;
+    if (!z_user(x))
+        return -EINVAL;
     if (x->state != READY)
         return -EBUSY;
     return 0;
@@ -405,7 +404,8 @@ int8_t i2c_status(I2C_Device *dev)
 i2c_error_t i2c_poll_end(I2C_Device *dev)
 {
     struct i2c_context *const x = i2c_get_context(dev);
-    Z_ARGS_CHECK(x) return I2C_ERROR_ARGS;
+    if (!z_user(x))
+        return I2C_ERROR_ARGS;
 
 #if CONFIG_I2C_INTERRUPT_DRIVEN
     poll_end(x);
@@ -417,7 +417,8 @@ i2c_error_t i2c_poll_end(I2C_Device *dev)
 i2c_error_t i2c_last_error(I2C_Device *dev)
 {
     struct i2c_context *const x = i2c_get_context(dev);
-    Z_ARGS_CHECK(x) return I2C_ERROR_ARGS;
+    if (!z_user(x))
+        return I2C_ERROR_ARGS;
     return get_error(x);
 }
 
@@ -426,7 +427,8 @@ int8_t i2c_calc_config(struct i2c_config *config, uint32_t desired_freq)
     ARG_UNUSED(desired_freq);
     ARG_UNUSED(config);
 
-    Z_ARGS_CHECK(config) return -EINVAL;
+    if (!z_user(config))
+        return -EINVAL;
 
     return -ENOTSUP;
 }

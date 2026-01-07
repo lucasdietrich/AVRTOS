@@ -36,7 +36,8 @@
 
 int8_t k_flags_init(struct k_flags *flags, k_flags_value_t value)
 {
-    Z_ARGS_CHECK(flags) return -EINVAL;
+    if (!z_user(flags))
+        return -EINVAL;
 
     dlist_init(&flags->waitqueue);
     flags->flags       = value;
@@ -52,8 +53,10 @@ int k_flags_poll(struct k_flags *flags,
 {
     int ret = 0;
 
-    Z_ARGS_CHECK(flags && mask) return -EINVAL;
-    Z_ARGS_CHECK((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u) return -ENOTSUP;
+    if (!z_user(flags && mask))
+        return -EINVAL;
+    if (!z_user((options & ~(K_FLAGS_SET_ANY | K_FLAGS_CONSUME)) == 0u))
+        return -ENOTSUP;
 
     k_flags_value_t mask_val = *mask;
     if (mask_val == 0u) {
@@ -101,8 +104,10 @@ int8_t k_flags_notify(struct k_flags *flags,
     int8_t ret = 0;
     struct dnode *tie;
 
-    Z_ARGS_CHECK(flags) return -EINVAL;
-    Z_ARGS_CHECK((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u) return -ENOTSUP;
+    if (!z_user(flags))
+        return -EINVAL;
+    if (!z_user((options & ~(K_FLAGS_SET | K_FLAGS_SCHED)) == 0u))
+        return -ENOTSUP;
 
     const uint8_t lock = irq_lock();
 
@@ -149,7 +154,8 @@ int8_t k_flags_notify(struct k_flags *flags,
 
 int8_t k_flags_reset(struct k_flags *flags)
 {
-    Z_ARGS_CHECK(flags) return -EINVAL;
+    if (!z_user(flags))
+        return -EINVAL;
 
     const uint8_t lock = irq_lock();
 

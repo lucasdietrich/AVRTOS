@@ -744,10 +744,8 @@ int8_t k_thread_create(struct k_thread *thread,
                        void *context_p,
                        char symbol)
 {
-    Z_ARGS_CHECK(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE)
-    {
+    if (!z_user(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE))
         return -EINVAL;
-    }
 
     thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
     thread->stack.size = stack_size;
@@ -837,7 +835,8 @@ int8_t k_thread_join(struct k_thread *thread, k_timeout_t timeout)
 {
     int8_t ret;
 
-    Z_ARGS_CHECK(thread) return -EINVAL;
+    if (!z_user(thread))
+        return -EINVAL;
 
     const uint8_t key = irq_lock();
 

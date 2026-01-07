@@ -131,7 +131,8 @@ int8_t spi_slave_init(struct spi_slave *slave,
                       uint8_t active_state,
                       const struct spi_regs *regs)
 {
-    Z_ARGS_CHECK(slave && regs && cs_port && cs_pin <= PIN7) return -EINVAL;
+    if (!z_user(slave && regs && cs_port && cs_pin <= PIN7))
+        return -EINVAL;
 
     slave->cs_port      = cs_port;
     slave->cs_pin       = cs_pin;
@@ -153,7 +154,8 @@ void spi_slave_unselect(const struct spi_slave *slave)
 
 int8_t spi_slave_ss_init(const struct spi_slave *slave)
 {
-    Z_ARGS_CHECK(slave) return -EINVAL;
+    if (!z_user(slave))
+        return -EINVAL;
 
     gpio_pin_init(slave->cs_port, slave->cs_pin, GPIO_MODE_OUTPUT,
                   (slave->active_state == GPIO_LOW) ? GPIO_OUTPUT_DRIVEN_HIGH
@@ -209,7 +211,8 @@ ISR(SPI_STC_vect)
 
 int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback)
 {
-    Z_ARGS_CHECK(callback) return -EINVAL;
+    if (!z_user(callback))
+        return -EINVAL;
 
     if (spi_async_inprogress())
         return -EBUSY;

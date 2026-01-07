@@ -90,7 +90,8 @@ int8_t k_timer_init(struct k_timer *timer,
                     k_timeout_t timeout,
                     k_timeout_t starting_delay)
 {
-    Z_ARGS_CHECK(timer && handler) return -EINVAL;
+    if (!z_user(timer && handler))
+        return -EINVAL;
 
     if (K_TIMEOUT_EQ(timeout, K_NO_WAIT))
         return -EINVAL;
@@ -109,7 +110,8 @@ int8_t k_timer_init(struct k_timer *timer,
 
 bool k_timer_started(struct k_timer *timer)
 {
-    Z_ARGS_CHECK(timer) return false;
+    if (!z_user(timer))
+        return false;
 
     bool ret;
 
@@ -122,7 +124,8 @@ bool k_timer_started(struct k_timer *timer)
 
 int8_t k_timer_stop(struct k_timer *timer)
 {
-    Z_ARGS_CHECK(timer) return -EINVAL;
+    if (!z_user(timer))
+        return -EINVAL;
 
     if (timer->tie.timeout == K_TIMER_STOPPED) {
         return 0;
@@ -140,7 +143,8 @@ int8_t k_timer_stop(struct k_timer *timer)
 
 int8_t k_timer_start(struct k_timer *timer, k_timeout_t starting_delay)
 {
-    Z_ARGS_CHECK(timer) return -EINVAL;
+    if (!z_user(timer))
+        return -EINVAL;
 
     if (k_timer_started(timer))
         return 0;

@@ -15,7 +15,8 @@
 
 int8_t k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint8_t max_msgs)
 {
-    Z_ARGS_CHECK(msgq && buffer && msg_size && max_msgs) return -EINVAL;
+    if (!z_user(msgq && buffer && msg_size && max_msgs))
+        return -EINVAL;
 
     /* List of pending threads (consumers or producers).
      * Depending on the number of messages used, we can determine if
@@ -38,7 +39,8 @@ int8_t k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size, uint8_t m
 
 int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(msgq && data) return -EINVAL;
+    if (!z_user(msgq && data))
+        return -EINVAL;
 
     int8_t ret;
     const uint8_t key = irq_lock();
@@ -87,7 +89,8 @@ int8_t k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
 
 int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(msgq && data) return -EINVAL;
+    if (!z_user(msgq && data))
+        return -EINVAL;
 
     int8_t ret;
     const uint8_t key = irq_lock();
@@ -140,7 +143,8 @@ int8_t k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 
 int8_t k_msgq_purge(struct k_msgq *msgq)
 {
-    Z_ARGS_CHECK(msgq) return -EINVAL;
+    if (!z_user(msgq))
+        return -EINVAL;
 
     int8_t ret;
 
@@ -161,7 +165,8 @@ int8_t k_msgq_purge(struct k_msgq *msgq)
 
 int8_t k_msgq_peek(struct k_msgq *msgq, void *data)
 {
-    Z_ARGS_CHECK(msgq) return -EINVAL;
+    if (!z_user(msgq))
+        return -EINVAL;
 
     uint8_t ret;
 
@@ -182,7 +187,8 @@ int8_t k_msgq_peek(struct k_msgq *msgq, void *data)
 
 uint8_t k_msgq_num_free_get(struct k_msgq *msgq)
 {
-    Z_ARGS_CHECK(msgq) return -EINVAL;
+    if (!z_user(msgq))
+        return -EINVAL;
 
     uint8_t ret;
 
@@ -197,7 +203,8 @@ uint8_t k_msgq_num_free_get(struct k_msgq *msgq)
 
 uint8_t k_msgq_num_used_get(struct k_msgq *msgq)
 {
-    Z_ARGS_CHECK(msgq) return -EINVAL;
+    if (!z_user(msgq))
+        return -EINVAL;
 
     uint8_t ret;
 

@@ -53,11 +53,12 @@
 #define CONFIG_SYSTEM_WORKQUEUE_PRIORITY K_PREEMPTIVE
 #endif
 
+/* Macro to conditionnaly enable user argument checks */
 #if CONFIG_KERNEL_ARGS_CHECKS
-#define Z_ARGS_CHECK(_cond) if (!(_cond))
+#define z_user(_cond) (!!(_cond))
 #else
 // TODO fallback to ASSERT
-#define Z_ARGS_CHECK(_cond) if (0)
+#define z_user(_cond) (0)
 #endif
 
 #if CONFIG_KERNEL_PRIVATE_MEMBERS

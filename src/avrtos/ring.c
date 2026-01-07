@@ -2,7 +2,8 @@
 
 int8_t k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
 {
-    Z_ARGS_CHECK(ring && buffer && size) return -EINVAL;
+    if (!z_user(ring && buffer && size))
+        return -EINVAL;
 
     ring->buffer = buffer;
     ring->size   = size;
@@ -14,7 +15,8 @@ int8_t k_ring_init(struct k_ring *ring, uint8_t *buffer, uint8_t size)
 
 int8_t k_ring_push(struct k_ring *ring, char data)
 {
-    Z_ARGS_CHECK(ring) return -EINVAL;
+    if (!z_user(ring))
+        return -EINVAL;
 
     const uint8_t r   = ring->r;
     uint8_t w         = ring->w;
@@ -39,7 +41,8 @@ int8_t k_ring_push(struct k_ring *ring, char data)
 
 int8_t k_ring_pop(struct k_ring *ring, char *data)
 {
-    Z_ARGS_CHECK(ring && data) return -EINVAL;
+    if (!z_user(ring && data))
+        return -EINVAL;
 
     const uint8_t w = ring->w;
     uint8_t r       = ring->r;

@@ -168,7 +168,8 @@ int ll_usart_getc(UART_Device *dev)
 
 int8_t usart_send(UART_Device *dev, const char *buf, size_t len)
 {
-    Z_ARGS_CHECK(dev && (buf || !len)) return -EINVAL;
+    if (!z_user(dev && (buf || !len)))
+        return -EINVAL;
 
     for (size_t i = 0; i < len; i++) {
         ll_usart_sync_putc(dev, buf[i]);
@@ -298,7 +299,8 @@ ISR(USART3_UDRE_vect)
 
 int8_t usart_set_callback(UART_Device *dev, usart_async_callback_t cb)
 {
-    Z_ARGS_CHECK(dev) return -EINVAL;
+    if (!z_user(dev))
+        return -EINVAL;
 
     usart_async_contexts[AVR_USARTn_INDEX(dev)].callback = cb;
 
@@ -307,7 +309,8 @@ int8_t usart_set_callback(UART_Device *dev, usart_async_callback_t cb)
 
 int8_t usart_rx_enable(UART_Device *dev, void *buf, size_t size)
 {
-    Z_ARGS_CHECK(dev) return -EINVAL;
+    if (!z_user(dev))
+        return -EINVAL;
 
     usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.buf  = (uint8_t *)buf;
     usart_async_contexts[AVR_USARTn_INDEX(dev)].rx.size = size;
@@ -333,7 +336,8 @@ int8_t usart_rx_disable(UART_Device *dev)
 
 int8_t usart_tx(UART_Device *dev, const void *buf, size_t size)
 {
-    Z_ARGS_CHECK(dev) return -EINVAL;
+    if (!z_user(dev))
+        return -EINVAL;
 
     usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.buf  = (const uint8_t *)buf;
     usart_async_contexts[AVR_USARTn_INDEX(dev)].tx.size = size;
