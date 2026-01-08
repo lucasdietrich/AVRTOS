@@ -58,7 +58,7 @@
 #define z_user(_cond) (!!(_cond))
 #else
 // TODO fallback to ASSERT
-#define z_user(_cond) (0)
+#define z_user(_cond) (1)
 #endif
 
 #if CONFIG_KERNEL_PRIVATE_MEMBERS
