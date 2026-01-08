@@ -21,8 +21,6 @@ ISR(TIMER_vect)
 
 int main(void)
 {
-    serial_init();
-
     const struct timer_config cfg16 = {
         .mode      = TIMER_MODE_CTC,
         .prescaler = TIMER_PRESCALER_1024,

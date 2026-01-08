@@ -56,8 +56,6 @@ ISR(TIMER4_OVF_vect)
 
 int main(void)
 {
-    serial_init();
-
     /* Initialize LED */
     LED_DDR |= BIT(LED_PIN);
     LED_PORT &= ~BIT(LED_PIN);

@@ -29,8 +29,6 @@ void test_tdqueue(void);
 
 int main(void)
 {
-    serial_init();
-
     // #if TESTS & FLAG_SLIST
     //     serial_printl_p(PSTR("queue"));
     //     test_slist();

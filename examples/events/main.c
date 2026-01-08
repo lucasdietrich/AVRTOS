@@ -29,10 +29,6 @@ struct mystruct threads[THREADS_COUNT];
 
 int main(void)
 {
-    serial_init();
-
-    k_thread_dump_all();
-
     struct mystruct *ms;
 
     static uint32_t counter = 0;

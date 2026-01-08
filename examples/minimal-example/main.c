@@ -46,8 +46,6 @@ int main(void)
 
     LOG_INF("Application started");
 
-    k_thread_dump_all();
-
     k_abort();
 }
 

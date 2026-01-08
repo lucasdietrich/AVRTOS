@@ -17,7 +17,8 @@
 
 int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 {
-    Z_ARGS_CHECK(sem && limit) return -EINVAL;
+    if (!z_user(sem && limit))
+        return -EINVAL;
 
     sem->limit = limit;
     sem->count = MIN(limit, initial_count);
@@ -28,7 +29,8 @@ int8_t k_sem_init(struct k_sem *sem, uint8_t initial_count, uint8_t limit)
 
 int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(sem) return -EINVAL;
+    if (!z_user(sem))
+        return -EINVAL;
 
     int8_t ret        = 0;
     const uint8_t key = irq_lock();
@@ -52,7 +54,8 @@ int8_t k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 
 struct k_thread *k_sem_give(struct k_sem *sem)
 {
-    Z_ARGS_CHECK(sem) return NULL;
+    if (!z_user(sem))
+        return NULL;
 
     struct k_thread *thread = NULL;
     const uint8_t key       = irq_lock();

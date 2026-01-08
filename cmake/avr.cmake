@@ -23,7 +23,7 @@ execute_process(
 
 if (AVR_GCC_VERSION VERSION_LESS 14)
 	set(AVR_SIZE_ARGS "-B")
-	message(WARNING "AVR-GCC version ${AVR_GCC_VERSION} is not deprecated, please consider using version 14 or higher.")
+	message(WARNING "AVR-GCC version ${AVR_GCC_VERSION} is deprecated, please consider using version 14 or higher.")
 else()
 	set(AVR_SIZE_ARGS "--mcu=${MCU} -C")
 endif()
@@ -124,7 +124,7 @@ function(target_prepare_env target)
 	add_custom_target(
 		hex_${target} 
 		ALL
-		avr-objcopy -R .eeprom -O ihex ${output_name} ${output_name}.hex 
+		${AVR_OBJCOPY} -R .eeprom -O ihex ${output_name} ${output_name}.hex
 		DEPENDS ${target}
 	)
 		

@@ -119,6 +119,11 @@
 #define CONFIG_SERIAL_AUTO_INIT 1
 #endif
 
+/* Auto init LED */
+#ifndef CONFIG_LED_AUTO_INIT
+#define CONFIG_LED_AUTO_INIT 1
+#endif
+
 /* Default serial baudrate */
 #ifndef CONFIG_SERIAL_USART_BAUDRATE
 #define CONFIG_SERIAL_USART_BAUDRATE 9600lu

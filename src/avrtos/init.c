@@ -87,6 +87,10 @@ void z_avrtos_init(void)
 #endif /* CONFIG_AVRTOS_BANNER_ENABLE */
 #endif /* CONFIG_SERIAL_AUTO_INIT */
 
+#if CONFIG_LED_AUTO_INIT
+    led_init();
+#endif /* CONFIG_LED_AUTO_INIT */
+
 #if CONFIG_KERNEL_DEBUG_PREEMPT_UART
     SET_BIT(UCSR0B, BIT(RXCIE0)); // Enable UART receive complete interrupt
 #endif

@@ -17,7 +17,6 @@ void __fault_hook(void)
 
 int main(void)
 {
-    serial_init();
     led_init();
     led_on();
 

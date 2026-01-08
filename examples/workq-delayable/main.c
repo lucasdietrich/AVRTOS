@@ -4,6 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/* Press any character on USART0 to schedule a work item
+ * that will print "Work done !" after 1 second.
+ * If the character 'c' is pressed, the scheduled work item
+ * is cancelled.
+ */
+
 #include <avrtos/avrtos.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/misc/serial.h>
@@ -50,8 +56,6 @@ K_THREAD_DEFINE(usart, usart_task, 0x200, K_PREEMPTIVE, &my_struct, 'u');
 
 int main(void)
 {
-    serial_init();
-
     k_work_delayable_init(&my_struct.work, work_handler);
     k_sem_init(&my_struct.sem, 0, 1);
 

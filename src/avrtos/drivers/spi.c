@@ -69,10 +69,14 @@ struct spi_regs spi_config_into_regs(struct spi_config config)
     regs.spcr = BIT(SPE) | (config.prescaler & 0x3u) << SPR0;
     regs.spsr = ((config.prescaler >> 2u) & SPI2X_MASK) << SPI2X;
 
-    if (config.role == SPI_ROLE_MASTER) regs.spcr |= BIT(MSTR);
-    if (config.polarity == SPI_CLOCK_POLARITY_FALLING) regs.spcr |= BIT(CPOL);
-    if (config.phase == SPI_CLOCK_PHASE_SETUP) regs.spcr |= BIT(CPHA);
-    if (config.irq_enabled) regs.spcr |= BIT(SPIE);
+    if (config.role == SPI_ROLE_MASTER)
+        regs.spcr |= BIT(MSTR);
+    if (config.polarity == SPI_CLOCK_POLARITY_FALLING)
+        regs.spcr |= BIT(CPOL);
+    if (config.phase == SPI_CLOCK_PHASE_SETUP)
+        regs.spcr |= BIT(CPHA);
+    if (config.irq_enabled)
+        regs.spcr |= BIT(SPIE);
 
     return regs;
 }
@@ -127,7 +131,8 @@ int8_t spi_slave_init(struct spi_slave *slave,
                       uint8_t active_state,
                       const struct spi_regs *regs)
 {
-    Z_ARGS_CHECK(slave && regs && cs_port && cs_pin <= PIN7) return -EINVAL;
+    if (!z_user(slave && regs && cs_port && cs_pin <= PIN7))
+        return -EINVAL;
 
     slave->cs_port      = cs_port;
     slave->cs_pin       = cs_pin;
@@ -149,7 +154,8 @@ void spi_slave_unselect(const struct spi_slave *slave)
 
 int8_t spi_slave_ss_init(const struct spi_slave *slave)
 {
-    Z_ARGS_CHECK(slave) return -EINVAL;
+    if (!z_user(slave))
+        return -EINVAL;
 
     gpio_pin_init(slave->cs_port, slave->cs_pin, GPIO_MODE_OUTPUT,
                   (slave->active_state == GPIO_LOW) ? GPIO_OUTPUT_DRIVEN_HIGH
@@ -205,9 +211,11 @@ ISR(SPI_STC_vect)
 
 int8_t spi_transceive_async_start(char first_tx, spi_callback_t callback)
 {
-    Z_ARGS_CHECK(callback) return -EINVAL;
+    if (!z_user(callback))
+        return -EINVAL;
 
-    if (spi_async_inprogress()) return -EBUSY;
+    if (spi_async_inprogress())
+        return -EBUSY;
 
     spi_callback = callback;
     SPI->SPDRn   = first_tx;

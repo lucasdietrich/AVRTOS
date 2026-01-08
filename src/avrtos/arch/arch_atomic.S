@@ -42,7 +42,7 @@ atomic_clear:
     lds     r18, SREG      ; Store SREG (interrupt flag register) into r18
     cli                    ; Disable interrupts
     ld      r24, X         ; Load the current value of the atomic variable
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     st      X, r1          ; Clear the atomic variable (r1 is 0 __zero_reg__)
     ret                    ; Return the old value in r24
 
@@ -52,7 +52,7 @@ atomic_or:
     cli                    ; Disable interrupts
     ld      r24, X         ; Load the current value of the atomic variable
     or      r22, r24       ; Perform OR operation between r22 and r24
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     st      X, r22         ; Store the result back into the atomic variable
     ret                    ; Return the old value in r24
 
@@ -62,7 +62,7 @@ atomic_xor:
     cli                    ; Disable interrupts
     ld      r24, X         ; Load the current value of the atomic variable
     eor     r22, r24       ; Perform XOR operation between r22 and r24
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     st      X, r22         ; Store the result back into the atomic variable
     ret                    ; Return the old value in r24
 
@@ -72,7 +72,7 @@ atomic_and:
     cli                    ; Disable interrupts
     ld      r24, X         ; Load the current value of the atomic variable
     and     r22, r24       ; Perform AND operation between r22 and r24
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     st      X, r22         ; Store the result back into the atomic variable
     ret                    ; Return the old value in r24
 
@@ -82,7 +82,7 @@ atomic_inc:
     cli                    ; Disable interrupts
     ld      r24, X         ; Load the current value of the atomic variable
     inc     r24            ; Increment the value
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     st      X, r24         ; Store the new value back into the atomic variable
     ret                    ; Return the new value in r24
 
@@ -92,7 +92,7 @@ atomic_dec:
     cli                    ; Disable interrupts
     ld      r24, X         ; Load the current value of the atomic variable
     dec     r24            ; Decrement the value
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     st      X, r24         ; Store the new value back into the atomic variable
     ret                    ; Return the new value in r24
 
@@ -116,7 +116,7 @@ atomic_cas:
     st      X, r20         ; Store the new value (r20) into the atomic variable
 
 __atomic_cas_ret:
-    sts     SREG, r18      ; Restore SREG (re-enable interrupts)
+    sts     SREG, r18      ; Restore SREG (re-enable interrupts, will take effect after the next instruction)
     ret                    ; Return result in r24 (true or false)
 
 #endif /* CONFIG_KERNEL_ATOMIC_API */

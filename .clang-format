@@ -11,9 +11,9 @@ AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
 AlignOperands: Align
-AllowShortLoopsOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
 AlignTrailingComments: true
 BinPackArguments: true
 BinPackParameters: false

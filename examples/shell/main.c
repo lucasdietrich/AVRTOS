@@ -199,10 +199,7 @@ void consumer(void *arg)
 
 int main(void)
 {
-    serial_init();
     led_init();
-
-    k_thread_dump_all();
 
     SET_BIT(UCSR0B, 1 << RXCIE0);
 

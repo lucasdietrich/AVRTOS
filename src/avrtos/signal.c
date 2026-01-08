@@ -15,7 +15,8 @@
 
 int8_t k_signal_init(struct k_signal *sig)
 {
-    Z_ARGS_CHECK(sig) return -EINVAL;
+    if (!z_user(sig))
+        return -EINVAL;
 
     sig->signal = 0u;
     sig->flags  = K_POLL_STATE_NOT_READY;
@@ -26,7 +27,8 @@ int8_t k_signal_init(struct k_signal *sig)
 
 int8_t k_signal_raise(struct k_signal *sig, uint8_t value)
 {
-    Z_ARGS_CHECK(sig) return -EINVAL;
+    if (!z_user(sig))
+        return -EINVAL;
 
     int8_t ret        = 0;
     const uint8_t key = irq_lock();
@@ -46,7 +48,8 @@ int8_t k_signal_raise(struct k_signal *sig, uint8_t value)
 
 int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(sig) return -EINVAL;
+    if (!z_user(sig))
+        return -EINVAL;
 
     int8_t ret;
     const uint8_t key = irq_lock();
@@ -64,7 +67,8 @@ int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout)
 
 int8_t k_poll_cancel_wait(struct k_signal *sig)
 {
-    Z_ARGS_CHECK(sig) return -EINVAL;
+    if (!z_user(sig))
+        return -EINVAL;
 
     int8_t ret;
     const uint8_t key = irq_lock();

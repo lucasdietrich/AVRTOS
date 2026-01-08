@@ -322,9 +322,7 @@ int timer_handler(struct k_timer *timer)
 
 void setup(void)
 {
-    /* LED initialisation */
     led_init();
-    led_off();
 
     /* Serial initialisation */
     Serial.begin(9600u);

@@ -21,18 +21,14 @@ ISR(USART0_RX_vect)
 
     int8_t ret = k_signal_raise(&sig, rx);
 
-    if (ret > 0) k_yield_from_isr();
+    if (ret > 0)
+        k_yield_from_isr();
 }
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
     /* enable RX interrupt */
     SET_BIT(UCSR0B, 1 << RXCIE0);
-
-    k_thread_dump_all();
 
     k_sleep(K_FOREVER);
 }

@@ -310,6 +310,10 @@ void z_init_threads(void)
     for (uint8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
         struct k_thread *const thread = &(&__k_threads_start)[i];
 
+#if CONFIG_SERIAL_AUTO_INIT && CONFIG_KERNEL_INIT_DEBUG_THREADS
+        k_thread_dump(thread);
+#endif
+
         /* Main thread already in queue */
         if (Z_THREAD_IS_MAIN(thread)) {
             continue;
@@ -740,10 +744,8 @@ int8_t k_thread_create(struct k_thread *thread,
                        void *context_p,
                        char symbol)
 {
-    Z_ARGS_CHECK(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE)
-    {
+    if (!z_user(thread && entry && stack && stack_size >= Z_THREAD_STACK_MIN_SIZE))
         return -EINVAL;
-    }
 
     thread->stack.end  = (void *)Z_STACK_END(stack, stack_size);
     thread->stack.size = stack_size;
@@ -776,19 +778,16 @@ int8_t k_thread_create(struct k_thread *thread,
 
 int8_t k_thread_start(struct k_thread *thread)
 {
-    int8_t ret = -EAGAIN;
+    if (z_get_thread_state(thread) != Z_THREAD_STATE_STOPPED)
+        return -EAGAIN;
 
-    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) {
-        const uint8_t key = irq_lock();
+    const uint8_t key = irq_lock();
 
-        z_schedule(thread);
+    z_schedule(thread);
 
-        irq_unlock(key);
+    irq_unlock(key);
 
-        ret = 0;
-    }
-
-    return ret;
+    return 0;
 }
 
 __kernel int8_t k_thread_abort(struct k_thread *thread)
@@ -797,7 +796,8 @@ __kernel int8_t k_thread_abort(struct k_thread *thread)
     __ASSERT_THREAD_NOT_STATE(thread, Z_THREAD_STATE_IDLE);
 #endif
 
-    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED) return -EINVAL;
+    if (z_get_thread_state(thread) == Z_THREAD_STATE_STOPPED)
+        return -EINVAL;
 
     const uint8_t key = irq_lock();
 
@@ -812,7 +812,8 @@ __kernel int8_t k_thread_abort(struct k_thread *thread)
     }
 #endif
 
-    if (thread == z_ker.current) z_yield();
+    if (thread == z_ker.current)
+        z_yield();
 
     /* Unlock in all cases:
      * - if we stopped ourselves, in which case we need to unlock in any case
@@ -834,7 +835,8 @@ int8_t k_thread_join(struct k_thread *thread, k_timeout_t timeout)
 {
     int8_t ret;
 
-    Z_ARGS_CHECK(thread) return -EINVAL;
+    if (!z_user(thread))
+        return -EINVAL;
 
     const uint8_t key = irq_lock();
 
@@ -964,7 +966,8 @@ void k_wait(k_timeout_t delay, uint8_t mode)
         now = k_ticks_get_32();
     } while (now - ticks < K_TIMEOUT_TICKS(delay));
 
-    if (unlock_sched) k_sched_unlock();
+    if (unlock_sched)
+        k_sched_unlock();
 }
 #endif /* CONFIG_KERNEL_UPTIME */
 

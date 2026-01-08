@@ -76,9 +76,6 @@ void func(Task &task)
 
 int main()
 {
-    serial_init();
-    k_thread_dump_all();
-
     Task task1 = Task("task1", func);
     Task task2 = Task("task2", func);
 

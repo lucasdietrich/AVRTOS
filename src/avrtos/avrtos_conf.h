@@ -612,7 +612,14 @@
 // Automatic initialization of the serial console.
 //
 #ifndef CONFIG_SERIAL_AUTO_INIT
-#define CONFIG_SERIAL_AUTO_INIT 0u
+#define CONFIG_SERIAL_AUTO_INIT 1u
+#endif
+
+//
+// Automatic initialization of the LED driver.
+//
+#ifndef CONFIG_LED_AUTO_INIT
+#define CONFIG_LED_AUTO_INIT 0u
 #endif
 
 //
@@ -717,6 +724,16 @@
 //
 #ifndef CONFIG_KERNEL_API_NOINLINE
 #define CONFIG_KERNEL_API_NOINLINE 0
+#endif
+
+//
+// Improve kernel tracing features
+//
+// 0: Terminal function calls are "jmp"
+// 1: Terminal function calls are "call" allowing to trace back the call stack
+//
+#ifndef CONFIG_KERNEL_TRACING
+#define CONFIG_KERNEL_TRACING 0
 #endif
 
 //
@@ -1020,6 +1037,18 @@
 //
 #ifndef CONFIG_AVRTOS_BANNER_ENABLE
 #define CONFIG_AVRTOS_BANNER_ENABLE 0
+#endif
+
+//
+// Enable debug of threads on kernel initialization
+//
+// This option automatically dumps all known threads on kernel initialization
+//
+// 0: Debug of threads on initialization is disabled
+// 1: Debug of threads on initialization is enabled
+//
+#ifndef CONFIG_KERNEL_INIT_DEBUG_THREADS
+#define CONFIG_KERNEL_INIT_DEBUG_THREADS 0
 #endif
 
 //

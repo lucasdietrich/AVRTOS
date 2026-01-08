@@ -89,10 +89,6 @@ static void build_tx_frame(ipc_frame_t *frame)
 
 int main(void)
 {
-    irq_enable();
-
-    serial_init();
-
     usart_init(USART1_DEVICE, &usart_ipc_cfg);
     usart_set_callback(USART1_DEVICE, usart_ipc_callback);
 

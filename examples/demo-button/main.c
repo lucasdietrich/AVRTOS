@@ -25,10 +25,7 @@ ISR(INT0_vect)
 
 int main(void)
 {
-    serial_init();
-
     led_init();
-    led_off();
 
     gpiol_pin_init(GPIOD, PIN0, GPIO_INPUT, PIN_NO_PULLUP);
 
@@ -36,8 +33,6 @@ int main(void)
     exti_configure(INT0, ISC_FALLING);
     exti_clear_flag(INT0);
     exti_enable(INT0);
-
-    k_thread_dump_all();
 
     for (;;) {
         k_sem_take(&button_sem, K_FOREVER);

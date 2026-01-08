@@ -49,8 +49,6 @@ void k_thread_dbg_count(void)
 
 void k_thread_dump_all(void)
 {
-    serial_print_p(PSTR("===== k_thread =====\n"));
-
     for (uint_fast8_t i = 0; i < &__k_threads_end - &__k_threads_start; i++) {
         k_thread_dump(&(&__k_threads_start)[i]);
     }
@@ -70,6 +68,9 @@ void k_thread_dump(struct k_thread *thread)
     serial_hex16((const uint16_t)thread);
 
     serial_transmit(' ');
+    serial_transmit((thread->flags & Z_THREAD_PRIO_COOP_MSK) == Z_THREAD_PRIO_COOP ? 'C'
+                                                                                   : 'P');
+    serial_transmit(' ');
 
     switch (thread->flags & Z_THREAD_STATE_MSK) {
     case Z_THREAD_STATE_READY:
@@ -88,10 +89,6 @@ void k_thread_dump(struct k_thread *thread)
         break;
     }
 
-    serial_transmit(' ');
-
-    serial_transmit((thread->flags & Z_THREAD_PRIO_COOP_MSK) == Z_THREAD_PRIO_COOP ? 'C'
-                                                                                   : 'P');
     serial_transmit(' ');
     serial_transmit(
         (thread->flags & Z_THREAD_PRIO_LEVEL_MSK) == Z_THREAD_PRIO_HIGH ? '0' : '1');

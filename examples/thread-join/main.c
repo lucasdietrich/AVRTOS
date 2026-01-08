@@ -20,8 +20,6 @@ K_THREAD_DEFINE(thread, thread_entry, 0x100, K_PREEMPTIVE, NULL, 'T');
 
 int main(void)
 {
-    serial_init();
-
     for (;;) {
         int8_t ret = k_thread_join(&thread, K_FOREVER);
         printf("Thread joined with return value %d\n", ret);

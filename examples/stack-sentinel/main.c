@@ -27,9 +27,6 @@ void write_stack(uint16_t size, uint8_t pattern)
 
 int main(void)
 {
-    serial_init();
-    k_thread_dump_all();
-
     uint32_t counter = 0u;
 
     for (;;) {

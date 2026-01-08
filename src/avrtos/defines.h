@@ -53,11 +53,12 @@
 #define CONFIG_SYSTEM_WORKQUEUE_PRIORITY K_PREEMPTIVE
 #endif
 
+/* Macro to conditionnaly enable user argument checks */
 #if CONFIG_KERNEL_ARGS_CHECKS
-#define Z_ARGS_CHECK(_cond) if (!(_cond))
+#define z_user(_cond) (!!(_cond))
 #else
 // TODO fallback to ASSERT
-#define Z_ARGS_CHECK(_cond) if (0)
+#define z_user(_cond) (1)
 #endif
 
 #if CONFIG_KERNEL_PRIVATE_MEMBERS
@@ -370,6 +371,9 @@ typedef struct {
 
 #define K_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol)           \
     Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 1)
+
+#define K_THREAD_DEFINE_STOPPED(name, entry, stack_size, prio_flag, context_p, symbol)   \
+    Z_THREAD_DEFINE(name, entry, stack_size, prio_flag, context_p, symbol, 0)
 
 #if CONFIG_THREAD_MAIN_MONITOR || CONFIG_THREAD_EXPLICIT_MAIN_STACK
 #define Z_THREAD_IS_MONITORED(thread) true

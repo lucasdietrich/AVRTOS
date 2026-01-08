@@ -52,7 +52,8 @@ int8_t k_mem_slab_init(struct k_mem_slab *slab,
 
 int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout)
 {
-    Z_ARGS_CHECK(slab && mem) return -EINVAL;
+    if (!z_user(slab && mem))
+        return -EINVAL;
 
     int8_t ret;
 
@@ -82,7 +83,8 @@ int8_t k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout
 
 struct k_thread *k_mem_slab_free(struct k_mem_slab *slab, void *mem)
 {
-    Z_ARGS_CHECK(slab && mem) return NULL;
+    if (!z_user(slab && mem))
+        return NULL;
 
     struct k_thread *thread = NULL;
 

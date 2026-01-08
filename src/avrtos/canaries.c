@@ -54,11 +54,11 @@ void k_print_stack_canaries(struct k_thread *thread)
 
     serial_transmit('[');
     serial_transmit(thread->symbol);
-    serial_print_p(PSTR("] CANARIES until @"));
+    serial_print_p(PSTR("] CANARIES @"));
     serial_hex16((uint16_t)addr);
-    serial_print_p(PSTR(" [found "));
+    serial_print_p(PSTR(" ["));
     serial_u16(canaries_found);
-    serial_print_p(PSTR("], MAX usage = "));
+    serial_print_p(PSTR(" left] MAX: "));
     serial_u16(Z_STACK_SIZE_USABLE(thread->stack.size) - canaries_found);
     serial_print_p(PSTR(" / "));
     serial_u16(Z_STACK_SIZE_USABLE(thread->stack.size));
@@ -66,7 +66,7 @@ void k_print_stack_canaries(struct k_thread *thread)
 #if CONFIG_THREAD_STACK_SENTINEL
     serial_print_p(PSTR(" + "));
     serial_u8(CONFIG_THREAD_STACK_SENTINEL_SIZE);
-    serial_print_p(PSTR(" (sent)"));
+    serial_print_p(PSTR("s"));
 #endif /* CONFIG_THREAD_STACK_SENTINEL */
 
     serial_transmit('\n');

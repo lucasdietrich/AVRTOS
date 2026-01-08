@@ -8,7 +8,8 @@
 
 int8_t exti_configure(uint8_t exti, uint8_t isc)
 {
-    Z_ARGS_CHECK(exti < EXTI_COUNT) return -EINVAL;
+    if (!z_user(exti < EXTI_COUNT))
+        return -EINVAL;
 
 #if CONFIG_KERNEL_ARGS_CHECKS
     isc &= 0x3u;

@@ -60,9 +60,6 @@ struct task_t tasks[TASKS_COUNT];
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
 #if WORKQ_RUNTIME_INIT
     k_workqueue_create(&workqueue, &workqueue_thread, workqueue_stack,
                        sizeof(workqueue_stack), K_PREEMPTIVE, 'W');

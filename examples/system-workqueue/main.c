@@ -38,13 +38,6 @@ K_WORK_DEFINE(work, task_handler);
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
-    k_thread_dump_all();
-
-    irq_enable();
-
     K_SCHED_LOCK_CONTEXT
     {
         /* schedule the work item */
@@ -58,5 +51,6 @@ int main(void)
 
     for (;;) {
         /* some processing */
+        k_sleep(K_SECONDS(1));
     }
 }

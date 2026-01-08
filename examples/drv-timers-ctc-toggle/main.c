@@ -25,8 +25,6 @@
 
 int main(void)
 {
-    serial_init();
-
     const struct timer_config config = {
         .mode      = TIMER_MODE_CTC,
         .counter   = 0u,

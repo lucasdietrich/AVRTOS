@@ -42,9 +42,6 @@ static char stack3[0x100u];
 
 int main(void)
 {
-    led_init();
-    serial_init();
-
 #if !THREAD_PREPROCESSOR
     k_thread_create(&O, thread_led, stack1, sizeof(stack1), K_PRIO_DEFAULT, (void *)&on,
                     'O');

@@ -11,7 +11,8 @@ int8_t tcn75_init_context(struct tcn75_device *tcn75,
                           uint8_t config,
                           I2C_Device *i2c)
 {
-    Z_ARGS_CHECK(tcn75) return -EINVAL;
+    if (!z_user(tcn75))
+        return -EINVAL;
 
     tcn75->addr   = (addr_lsb & 0x07u) | TCN75_ADDR_BASE;
     tcn75->config = config;
@@ -22,7 +23,8 @@ int8_t tcn75_init_context(struct tcn75_device *tcn75,
 
 int8_t tcn75_configure(struct tcn75_device *tcn75)
 {
-    Z_ARGS_CHECK(tcn75) return -EINVAL;
+    if (!z_user(tcn75))
+        return -EINVAL;
 
     const uint8_t buf[2u] = {TCN75_CONFIG_REGISTER, tcn75->config};
 
@@ -31,7 +33,8 @@ int8_t tcn75_configure(struct tcn75_device *tcn75)
 
 int8_t tcn75_select_data_register(struct tcn75_device *tcn75)
 {
-    Z_ARGS_CHECK(tcn75) return -EINVAL;
+    if (!z_user(tcn75))
+        return -EINVAL;
 
     const uint8_t buf[1u] = {TCN75_TEMPERATURE_REGISTER};
 
@@ -64,7 +67,8 @@ static int16_t tcn75_temp2int16(uint8_t msb, uint8_t lsb)
 
 int16_t tcn75_read(struct tcn75_device *tcn75)
 {
-    Z_ARGS_CHECK(tcn75) return INT16_MIN;
+    if (!z_user(tcn75))
+        return INT16_MIN;
 
     int16_t temperature = INT16_MAX;
 
@@ -79,7 +83,8 @@ int16_t tcn75_read(struct tcn75_device *tcn75)
 
 int16_t tcn75_select_read(struct tcn75_device *tcn75)
 {
-    Z_ARGS_CHECK(tcn75) return INT16_MIN;
+    if (!z_user(tcn75))
+        return INT16_MIN;
 
     int16_t temperature = INT16_MAX;
 
