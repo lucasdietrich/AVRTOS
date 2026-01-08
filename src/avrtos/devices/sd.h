@@ -65,8 +65,8 @@ struct sd_card_info {
     struct sd_csd csd;        /* Card Specific Data */
     struct sd_cid cid;        /* Card Identification */
 #if CONFIG_SD_CSD
-    uint8_t csd_valid;        /* CSD data is valid */
-    uint8_t cid_valid;        /* CID data is valid */
+    uint8_t csd_valid; /* CSD data is valid */
+    uint8_t cid_valid; /* CID data is valid */
 #endif
 };
 

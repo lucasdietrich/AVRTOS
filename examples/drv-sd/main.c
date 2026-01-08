@@ -103,7 +103,8 @@ int main(void)
            ((uint32_t)block[2] << 8) | block[3];
 
     /* If seed is all zeros or all ones, use default */
-    if (seed == 0 || seed == 0xFFFFFFFF) seed = K_PRNG_DEFAULT_LFSR32;
+    if (seed == 0 || seed == 0xFFFFFFFF)
+        seed = K_PRNG_DEFAULT_LFSR32;
 
     prng = (struct k_prng)K_PRNG_INITIALIZER(seed, K_PRNG_DEFAULT_LFSR31);
 
@@ -134,8 +135,10 @@ int main(void)
 
     LOG_INF("Demo completed successfully");
 
-    while (1) k_sleep(K_FOREVER);
+    while (1)
+        k_sleep(K_FOREVER);
 
 error:
-    while (1) k_sleep(K_FOREVER);
+    while (1)
+        k_sleep(K_FOREVER);
 }

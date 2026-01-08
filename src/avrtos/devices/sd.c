@@ -66,7 +66,8 @@ static uint8_t sd_read_r1(void)
 
     for (i = 0; i < SD_R1_RESPONSE_RETRIES; i++) {
         res = spi_transceive(0xFF);
-        if (res != 0xFF) break;
+        if (res != 0xFF)
+            break;
     }
 
     LOG_DBG("R1: 0x%02X", res);
@@ -93,7 +94,8 @@ static uint8_t sd_send_cmd_raw(const struct spi_slave *slave, uint8_t index, uin
 
     spi_slave_select(slave);
     spi_transceive(0xFF);
-    for (i = 0; i < sizeof(cmd.buf); i++) spi_transceive(cmd.buf[i]);
+    for (i = 0; i < sizeof(cmd.buf); i++)
+        spi_transceive(cmd.buf[i]);
 
     res = sd_read_r1();
 
@@ -128,7 +130,8 @@ static int sd_wait_ready(void)
     uint16_t timeout = CONFIG_SD_WRITE_TIMEOUT_MS;
 
     while (--timeout) {
-        if (spi_transceive(0xFF) == 0xFF) return 0;
+        if (spi_transceive(0xFF) == 0xFF)
+            return 0;
         k_msleep(1);
     }
 
@@ -155,7 +158,8 @@ static uint8_t sd_send_cmd_r3(const struct spi_slave *slave,
     res = sd_send_cmd_raw(slave, index, arg);
 
     if (res <= 1) {
-        for (i = 0; i < 4; i++) resp[i] = spi_transceive(0xFF);
+        for (i = 0; i < 4; i++)
+            resp[i] = spi_transceive(0xFF);
         LOG_DBG("R3/R7: %02X %02X %02X %02X", resp[0], resp[1], resp[2], resp[3]);
     }
 
@@ -171,7 +175,8 @@ int sd_init(struct sd_device *dev, const struct spi_slave *slave)
     uint8_t resp[4];
     uint16_t timeout;
 
-    if (!dev || !slave) return -EINVAL;
+    if (!dev || !slave)
+        return -EINVAL;
 
     dev->slave                 = slave;
     dev->info.type             = SD_CARD_TYPE_UNKNOWN;
@@ -179,15 +184,16 @@ int sd_init(struct sd_device *dev, const struct spi_slave *slave)
     dev->info.ocr              = 0;
     dev->info.voltage_accepted = 0;
 #if CONFIG_SD_CSD
-    dev->info.csd_valid        = 0;
-    dev->info.cid_valid        = 0;
+    dev->info.csd_valid = 0;
+    dev->info.cid_valid = 0;
 #endif
-    dev->initialized           = 0;
+    dev->initialized = 0;
 
     /* Power up sequence */
     spi_slave_unselect(slave);
     k_msleep(1);
-    for (uint8_t i = 0; i < SD_POWERUP_CLOCKS; i++) spi_transceive(0xFF);
+    for (uint8_t i = 0; i < SD_POWERUP_CLOCKS; i++)
+        spi_transceive(0xFF);
 
     /* CMD0: Reset card */
     res = sd_send_cmd(dev, SD_CMD0, 0);
@@ -238,7 +244,8 @@ int sd_init(struct sd_device *dev, const struct spi_slave *slave)
 
         /* ACMD41: Initialize */
         res = sd_send_cmd(dev, SD_ACMD41, 0);
-        if (res == 0) break;
+        if (res == 0)
+            break;
         if (res > 1) {
             LOG_ERR("ACMD41 failed: 0x%02X", res);
             return -EIO;
@@ -272,14 +279,16 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
     uint16_t i;
     uint8_t crc_hi, crc_lo;
 
-    if (!dev || !dev->initialized || !buf) return -EINVAL;
+    if (!dev || !dev->initialized || !buf)
+        return -EINVAL;
 
     /* CMD17: Read single block */
     sd_cmd_prep(&cmd, SD_CMD17, block_addr * SD_BLOCK_SIZE);
 
     spi_slave_select(dev->slave);
     spi_transceive(0xFF);
-    for (i = 0; i < sizeof(cmd.buf); i++) spi_transceive(cmd.buf[i]);
+    for (i = 0; i < sizeof(cmd.buf); i++)
+        spi_transceive(cmd.buf[i]);
 
     res = sd_read_r1();
     if (res != 0) {
@@ -308,7 +317,8 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
     }
 
     /* Read data block */
-    for (i = 0; i < SD_BLOCK_SIZE; i++) buf[i] = spi_transceive(0xFF);
+    for (i = 0; i < SD_BLOCK_SIZE; i++)
+        buf[i] = spi_transceive(0xFF);
 
     /* Read CRC (not validated) */
     crc_hi = spi_transceive(0xFF);
@@ -329,14 +339,16 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
     uint16_t i;
     int ret;
 
-    if (!dev || !dev->initialized || !buf) return -EINVAL;
+    if (!dev || !dev->initialized || !buf)
+        return -EINVAL;
 
     /* CMD24: Write single block */
     sd_cmd_prep(&cmd, SD_CMD24, block_addr * SD_BLOCK_SIZE);
 
     spi_slave_select(dev->slave);
     spi_transceive(0xFF);
-    for (i = 0; i < sizeof(cmd.buf); i++) spi_transceive(cmd.buf[i]);
+    for (i = 0; i < sizeof(cmd.buf); i++)
+        spi_transceive(cmd.buf[i]);
 
     res = sd_read_r1();
     if (res != 0) {
@@ -349,7 +361,8 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
     spi_transceive(SD_DATA_TOKEN);
 
     /* Write data block */
-    for (i = 0; i < SD_BLOCK_SIZE; i++) spi_transceive(buf[i]);
+    for (i = 0; i < SD_BLOCK_SIZE; i++)
+        spi_transceive(buf[i]);
 
     /* Dummy CRC */
     spi_transceive(0xFF);
@@ -358,7 +371,8 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
     /* Read data response token */
     for (i = 0; i < CONFIG_SD_READ_TIMEOUT; i++) {
         res = spi_transceive(0xFF);
-        if (res != 0xFF) break;
+        if (res != 0xFF)
+            break;
     }
 
     if (i == CONFIG_SD_READ_TIMEOUT) {
@@ -389,9 +403,11 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
 
 int sd_get_info(struct sd_device *dev, struct sd_card_info *info)
 {
-    if (!dev || !info) return -EINVAL;
+    if (!dev || !info)
+        return -EINVAL;
 
-    if (!dev->initialized) return -ENODEV;
+    if (!dev->initialized)
+        return -ENODEV;
 
     *info = dev->info;
     return 0;
@@ -474,14 +490,16 @@ int sd_read_csd(struct sd_device *dev)
     uint16_t i;
     uint8_t crc_hi, crc_lo;
 
-    if (!dev || !dev->initialized) return -EINVAL;
+    if (!dev || !dev->initialized)
+        return -EINVAL;
 
     /* CMD9: Send CSD */
     sd_cmd_prep(&cmd, SD_CMD9, 0);
 
     spi_slave_select(dev->slave);
     spi_transceive(0xFF);
-    for (i = 0; i < sizeof(cmd.buf); i++) spi_transceive(cmd.buf[i]);
+    for (i = 0; i < sizeof(cmd.buf); i++)
+        spi_transceive(cmd.buf[i]);
 
     res = sd_read_r1();
     if (res != 0) {
@@ -510,7 +528,8 @@ int sd_read_csd(struct sd_device *dev)
     }
 
     /* Read CSD data */
-    for (i = 0; i < SD_CSD_SIZE; i++) dev->info.csd.raw[i] = spi_transceive(0xFF);
+    for (i = 0; i < SD_CSD_SIZE; i++)
+        dev->info.csd.raw[i] = spi_transceive(0xFF);
 
     LOG_INF("CSD raw data:");
     LOG_HEXDUMP_INF(dev->info.csd.raw, SD_CSD_SIZE);
@@ -548,14 +567,16 @@ int sd_read_cid(struct sd_device *dev)
     uint16_t i;
     uint8_t crc_hi, crc_lo;
 
-    if (!dev || !dev->initialized) return -EINVAL;
+    if (!dev || !dev->initialized)
+        return -EINVAL;
 
     /* CMD10: Send CID */
     sd_cmd_prep(&cmd, SD_CMD10, 0);
 
     spi_slave_select(dev->slave);
     spi_transceive(0xFF);
-    for (i = 0; i < sizeof(cmd.buf); i++) spi_transceive(cmd.buf[i]);
+    for (i = 0; i < sizeof(cmd.buf); i++)
+        spi_transceive(cmd.buf[i]);
 
     res = sd_read_r1();
     if (res != 0) {
@@ -584,7 +605,8 @@ int sd_read_cid(struct sd_device *dev)
     }
 
     /* Read CID data */
-    for (i = 0; i < SD_CID_SIZE; i++) dev->info.cid.raw[i] = spi_transceive(0xFF);
+    for (i = 0; i < SD_CID_SIZE; i++)
+        dev->info.cid.raw[i] = spi_transceive(0xFF);
 
     LOG_INF("CID raw data:");
     LOG_HEXDUMP_INF(dev->info.cid.raw, SD_CID_SIZE);
@@ -613,14 +635,16 @@ int sd_read_cid(struct sd_device *dev)
 
 uint32_t sd_get_capacity_bytes(struct sd_device *dev)
 {
-    if (!dev || !dev->info.csd_valid) return 0;
+    if (!dev || !dev->info.csd_valid)
+        return 0;
 
     return dev->info.csd.capacity_bytes;
 }
 
 uint32_t sd_get_capacity_blocks(struct sd_device *dev)
 {
-    if (!dev || !dev->info.csd_valid) return 0;
+    if (!dev || !dev->info.csd_valid)
+        return 0;
 
     return dev->info.csd.capacity_blocks;
 }
