@@ -33,7 +33,6 @@ enum sd_card_type {
  * @brief SD card CSD register (Card Specific Data)
  */
 struct sd_csd {
-    uint8_t raw[16];           /* Raw CSD register data */
     uint32_t capacity_bytes;   /* Card capacity in bytes */
     uint32_t capacity_blocks;  /* Card capacity in blocks */
     uint8_t csd_structure;     /* CSD structure version */
@@ -45,13 +44,12 @@ struct sd_csd {
  * @brief SD card CID register (Card Identification)
  */
 struct sd_cid {
-    uint8_t raw[16];           /* Raw CID register data */
-    uint8_t manufacturer_id;   /* Manufacturer ID */
-    char oem_id[3];            /* OEM/Application ID (2 chars + null) */
-    char product_name[6];      /* Product name (5 chars + null) */
-    uint8_t product_revision;  /* Product revision */
-    uint32_t serial_number;    /* Product serial number */
-    uint16_t manufacture_date; /* Manufacturing date (year/month) */
+    uint8_t manufacturer_id;     /* Manufacturer ID */
+    char oem_id[3];              /* OEM/Application ID (2 chars + null) */
+    char product_name[6];        /* Product name (5 chars + null) */
+    uint8_t product_revision;    /* Product revision */
+    uint32_t serial_number;      /* Product serial number */
+    uint16_t manufacturing_date; /* Manufacturing date (year/month) */
 };
 
 /**
@@ -61,12 +59,6 @@ struct sd_card_info {
     enum sd_card_type type;
     uint32_t ocr;             /* Operating Conditions Register */
     uint8_t voltage_accepted; /* Voltage range accepted */
-#if CONFIG_SD_CSD
-    struct sd_csd csd; /* Card Specific Data */
-    struct sd_cid cid; /* Card Identification */
-    uint8_t csd_valid; /* CSD data is valid */
-    uint8_t cid_valid; /* CID data is valid */
-#endif
 };
 
 /**
@@ -110,33 +102,19 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
  * @brief Read CSD register (Card Specific Data)
  *
  * @param dev SD device structure
+ * @param csd Pointer to sd_csd structure to store the CSD data
  * @return 0 on success, negative error code on failure
  */
-int sd_read_csd(struct sd_device *dev);
+int sd_read_csd(struct sd_device *dev, struct sd_csd *csd);
 
 /**
  * @brief Read CID register (Card Identification)
  *
  * @param dev SD device structure
+ * @param cid Pointer to sd_cid structure to store the CID data
  * @return 0 on success, negative error code on failure
  */
-int sd_read_cid(struct sd_device *dev);
-
-/**
- * @brief Get card capacity in bytes
- *
- * @param dev SD device structure
- * @return Capacity in bytes, 0 if CSD not read
- */
-uint32_t sd_get_capacity_bytes(struct sd_device *dev);
-
-/**
- * @brief Get card capacity in blocks
- *
- * @param dev SD device structure
- * @return Capacity in blocks, 0 if CSD not read
- */
-uint32_t sd_get_capacity_blocks(struct sd_device *dev);
+int sd_read_cid(struct sd_device *dev, struct sd_cid *cid);
 
 #ifdef __cplusplus
 }

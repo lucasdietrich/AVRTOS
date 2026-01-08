@@ -13,14 +13,14 @@
 #include <avrtos/logging.h>
 #include <avrtos/prng.h>
 
-#include "usart.h"
-
 #define LOG_LEVEL LOG_LEVEL_INFO
 
 #define BLOCK_OFFSET 0u /* Block number to read/write */
 
 int main(void)
 {
+    struct sd_csd csd;
+    struct sd_cid cid;
     struct sd_device sd;
     uint8_t block[SD_BLOCK_SIZE];
     struct k_prng prng;
@@ -56,33 +56,26 @@ int main(void)
     LOG_INF("Card type: %d OCR: 0x%08lX, voltage: 0x%02X", sd.info.type, sd.info.ocr,
             sd.info.voltage_accepted);
 
-#if CONFIG_SD_CSD
-
     /* Read CSD (Card Specific Data) */
-    ret = sd_read_csd(&sd);
+    ret = sd_read_csd(&sd, &csd);
     if (ret == 0) {
-        LOG_INF("Capacity: %lu blocks (%lu bytes)", sd_get_capacity_blocks(&sd),
-                sd_get_capacity_bytes(&sd));
-        LOG_INF("Capacity: %lu KB / %lu MB", sd_get_capacity_bytes(&sd) / 1024,
-                sd_get_capacity_bytes(&sd) / (1024UL * 1024UL));
+        LOG_INF("CSD v1: max_read_bl_len: %u max_write_bl_len: %u capacity: %lu blocks "
+                "(%lu B)",
+                csd.max_read_bl_len, csd.max_write_bl_len, csd.capacity_blocks,
+                csd.capacity_bytes);
     }
 
     /* Read CID (Card Identification) */
-    ret = sd_read_cid(&sd);
+    ret = sd_read_cid(&sd, &cid);
     if (ret == 0) {
-        if (sd.info.cid_valid) {
-            LOG_INF("Manufacturer: 0x%02X", sd.info.cid.manufacturer_id);
-            LOG_INF("OEM/App ID: %s", sd.info.cid.oem_id);
-            LOG_INF("Product: %s (rev %u.%u)", sd.info.cid.product_name,
-                    sd.info.cid.product_revision >> 4,
-                    sd.info.cid.product_revision & 0x0F);
-            LOG_INF("Serial: 0x%08lX", sd.info.cid.serial_number);
-            LOG_INF("Manufactured: %u/%u", 2000 + (sd.info.cid.manufacture_date >> 4),
-                    sd.info.cid.manufacture_date & 0x0F);
-        }
+        LOG_INF("Manufacturer: 0x%02X", cid.manufacturer_id);
+        LOG_INF("OEM/App ID: %s", cid.oem_id);
+        LOG_INF("Product: %s (rev %u.%u)", cid.product_name, cid.product_revision >> 4,
+                cid.product_revision & 0x0F);
+        LOG_INF("Serial: 0x%08lX", cid.serial_number);
+        LOG_INF("Manufactured: %u/%u", 2000 + (cid.manufacturing_date >> 4),
+                cid.manufacturing_date & 0x0F);
     }
-
-#endif
 
     /* Read block from SD card */
     ret = sd_read_block(&sd, BLOCK_OFFSET, block);

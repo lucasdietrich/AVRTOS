@@ -923,16 +923,6 @@
 #endif
 
 //
-// SD card CSD register support
-//
-// 0: SD card CSD register support is disabled
-// 1: SD card CSD register support is enabled
-//
-#ifndef CONFIG_SD_CSD
-#define CONFIG_SD_CSD 0
-#endif
-
-//
 // SD card driver log level
 //
 // LOG_LEVEL_NONE (0): No logging

@@ -23,6 +23,9 @@
 #define SD_CSD_SIZE 16u
 #define SD_CID_SIZE 16u
 
+#define SD_CSD_VERSION_1 0u
+#define SD_CSD_VERSION_2 1u
+
 #define SD_DATA_TOKEN 0xFEu
 
 /* SD command framing */

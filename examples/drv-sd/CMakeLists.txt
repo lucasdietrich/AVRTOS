@@ -6,8 +6,7 @@ if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	# AVRTOS Configuration
 	target_compile_definitions(${PROJECT_NAME} PUBLIC
 		CONFIG_THREAD_CANARIES=1
-		CONFIG_SD_LOG_LEVEL=4
-		CONFIG_SD_CSD=0
+		CONFIG_SD_LOG_LEVEL=0
 	)
 
 	target_link_avrtos(${PROJECT_NAME})

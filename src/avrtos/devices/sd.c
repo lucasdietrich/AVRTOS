@@ -13,10 +13,10 @@
 #include <avrtos/subsystems/crc.h>
 #include <avrtos/sys.h>
 
+#include "avrtos/defines.h"
 #include "sd_priv.h"
 
 #define LOG_LEVEL CONFIG_SD_LOG_LEVEL
-// #define LOG_LEVEL 0
 
 /* Retries and timing constants */
 #define SD_R1_RESPONSE_RETRIES   8
@@ -25,37 +25,23 @@
 
 #define STUFF_BITS 0x00000000u
 
-#define SD_CMD0_BYTES                                                                    \
-    {                                                                                    \
-        0x40, 0x0, 0x0, 0x0, 0x0, 0x95                                                   \
-    }
-#define SD_CMD58_BYTES                                                                   \
-    {                                                                                    \
-        0x7a, 0x00, 0x00, 0x00, 0x00, 0xfd                                               \
-    }
-#define SD_CMD55_BYTES                                                                   \
-    {                                                                                    \
-        0x77, 0x00, 0x00, 0x00, 0x00, 0x65                                               \
-    }
-#define SD_CMD41_BYTES                                                                   \
-    {                                                                                    \
-        0x69, 0x40, 0x00, 0x00, 0x00, 0xe5                                               \
-    }
+// clang-format off
+#define SD_CMD0_BYTES  {0x40, 0x0, 0x0, 0x0, 0x0, 0x95}
+#define SD_CMD58_BYTES {0x7a, 0x00, 0x00, 0x00, 0x00, 0xfd}
+#define SD_CMD55_BYTES {0x77, 0x00, 0x00, 0x00, 0x00, 0x65}
+#define SD_CMD41_BYTES {0x69, 0x40, 0x00, 0x00, 0x00, 0xe5}
+#define SD_CMD9_BYTES  {0x49, 0x00, 0x00, 0x00, 0x00, 0xaf}
+#define SD_CMD10_BYTES {0x4a, 0x00, 0x00, 0x00, 0x00, 0x1b}
 
-#define SD_CMD_FROM_BYTES(_buf)                                                          \
-    (sd_cmd_t)                                                                           \
-    {                                                                                    \
-        .buf = _buf                                                                      \
-    }
+#define SD_CMD_FROM_BYTES(_buf) (sd_cmd_t) { .buf = _buf }
+// clang-format on
 
 #define SD_GO_IDLE_STATE SD_CMD_FROM_BYTES(SD_CMD0_BYTES)
 #define SD_READ_OCR      SD_CMD_FROM_BYTES(SD_CMD58_BYTES)
 #define SD_APP_CMD       SD_CMD_FROM_BYTES(SD_CMD55_BYTES)
 #define SD_SEND_OP_COND  SD_CMD_FROM_BYTES(SD_CMD41_BYTES)
-
-#if CONFIG_SD_CSD
-#error "CSD/CID parsing not yet implemented"
-#endif
+#define SD_SEND_CSD      SD_CMD_FROM_BYTES(SD_CMD9_BYTES)
+#define SD_SEND_CID      SD_CMD_FROM_BYTES(SD_CMD10_BYTES)
 
 typedef struct sd_cmd {
     uint8_t buf[6u];
@@ -175,10 +161,6 @@ int sd_init(struct sd_device *dev, const struct spi_slave *slave)
     dev->info.type             = SD_CARD_TYPE_UNKNOWN;
     dev->info.ocr              = 0;
     dev->info.voltage_accepted = 0;
-#if CONFIG_SD_CSD
-    dev->info.csd_valid = 0;
-    dev->info.cid_valid = 0;
-#endif
 
     /* Power up sequence
      * Initialization delay is the maximum of:
@@ -374,61 +356,44 @@ exit:
     return ret;
 }
 
-// int sd_get_info(struct sd_device *dev, struct sd_card_info *info)
-// {
-//     if (!z_user(dev && info))
-//         return -EINVAL;
-
-//     if (!z_user(dev->info.type))
-//         return -ENODEV;
-
-//     *info = dev->info;
-//     return 0;
-// }
-
-#if CONFIG_SD_CSD
-
 /**
  * @brief Parse CSD v1.0 register
  */
-static void sd_parse_csd_v1(struct sd_csd *csd)
+static inline void sd_parse_csd_v1(uint8_t *data, struct sd_csd *csd)
 {
-    uint8_t *data = csd->raw;
     uint16_t c_size;
     uint8_t c_size_mult;
-    uint8_t read_bl_len;
+    uint8_t read_bl_len, write_bl_len;
 
-    /* CSD structure version */
-    csd->csd_structure = (data[0] >> 6) & 0x03;
-
-    /* READ_BL_LEN */
+    /* READ_BL_LEN (4 bits [83:80])*/
     read_bl_len          = data[5] & 0x0F;
     csd->max_read_bl_len = 1 << read_bl_len;
 
-    /* C_SIZE (12 bits) */
+    /* WRITE_BL_LEN (4 bits [25:22]) */
+    write_bl_len          = ((data[12] & 0x03) << 2) | ((data[13u] >> 6) & 0x03);
+    csd->max_write_bl_len = 1 << write_bl_len;
+
+    /* C_SIZE (12 bits [73:62]) */
     c_size = ((uint16_t)(data[6] & 0x03) << 10) | ((uint16_t)data[7] << 2) |
              ((data[8] >> 6) & 0x03);
 
-    /* C_SIZE_MULT (3 bits) */
+    /* C_SIZE_MULT (3 bits [49:47]) */
     c_size_mult = ((data[9] & 0x03) << 1) | ((data[10] >> 7) & 0x01);
-    LOG_INF("c_size: %u, c_size_mult: %u, read_bl_len: %u", c_size, c_size_mult,
-            read_bl_len);
 
-    /* WRITE_BL_LEN */
-    csd->max_write_bl_len = 1 << ((data[12] >> 2) & 0x0F);
-
-    /* Calculate capacity: BLOCKNR = (C_SIZE+1) * MULT, MULT = 2^(C_SIZE_MULT+2) */
-    csd->capacity_blocks = (c_size + 1) << (c_size_mult + 2);
-    csd->capacity_bytes  = csd->capacity_blocks * csd->max_read_bl_len;
+    /* Calculate capacity: BLOCKNR * BLOCK_LEN
+     * BLOCK_LEN = 2^READ_BL_LEN
+     * MULT = 2^(C_SIZE_MULT+2)
+     * BLOCKNR = (C_SIZE+1) * MULT
+     */
+    csd->capacity_blocks = ((uint32_t)c_size + 1u) << (c_size_mult + 2);
+    csd->capacity_bytes  = csd->capacity_blocks * (uint32_t)csd->max_read_bl_len;
 }
 
 /**
  * @brief Parse CID register
  */
-static void sd_parse_cid(struct sd_cid *cid)
+static void sd_parse_cid(uint8_t *data, struct sd_cid *cid)
 {
-    uint8_t *data = cid->raw;
-
     /* Manufacturer ID */
     cid->manufacturer_id = data[0];
 
@@ -453,32 +418,32 @@ static void sd_parse_cid(struct sd_cid *cid)
                          ((uint32_t)data[11] << 8) | data[12];
 
     /* Manufacturing date (12 bits: 8-bit year offset from 2000, 4-bit month) */
-    cid->manufacture_date = ((uint16_t)data[13] << 4) | ((data[14] >> 4) & 0x0F);
+    cid->manufacturing_date = ((uint16_t)data[13] << 4) | ((data[14] >> 4) & 0x0F);
 }
 
-int sd_read_csd(struct sd_device *dev)
+int sd_read_csd(struct sd_device *dev, struct sd_csd *csd)
 {
+    int ret;
     sd_cmd_t cmd;
-    uint8_t res;
     uint16_t i;
-    uint8_t crc_hi, crc_lo;
+    uint8_t res, crc_hi, crc_lo;
+    uint8_t buf[SD_CSD_SIZE];
 
-    if (!dev || !dev->initialized)
+    if (!z_user(dev))
         return -EINVAL;
 
-    /* CMD9: Send CSD */
-    sd_cmd_prep(&cmd, SD_CMD9, 0);
+    if (!z_user(dev->info.type))
+        return -ENODEV;
 
+    cmd = SD_SEND_CSD;
     spi_slave_select(dev->slave);
     spi_transceive(0xFF);
     for (i = 0; i < sizeof(cmd.buf); i++)
         spi_transceive(cmd.buf[i]);
-
     res = sd_read_r1();
     if (res != 0) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("CMD9 failed: 0x%02X", res);
-        return -EIO;
+        ret = -EIO;
+        goto exit;
     }
 
     /* Wait for data token */
@@ -486,26 +451,25 @@ int sd_read_csd(struct sd_device *dev)
         res = spi_transceive(0xFF);
         if (res != 0xFF) {
             if (res != SD_DATA_TOKEN) {
-                spi_slave_unselect(dev->slave);
+                ret = -EIO;
                 LOG_ERR("Invalid CSD data token: 0x%02X", res);
-                return -EIO;
+                goto exit;
             }
             break;
         }
     }
 
     if (i == CONFIG_SD_READ_TIMEOUT) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("CSD read timeout");
-        return -ETIMEDOUT;
+        ret = -ETIMEDOUT;
+        goto exit;
     }
 
     /* Read CSD data */
     for (i = 0; i < SD_CSD_SIZE; i++)
-        dev->info.csd.raw[i] = spi_transceive(0xFF);
+        buf[i] = spi_transceive(0xFF);
 
-    LOG_INF("CSD raw data:");
-    LOG_HEXDUMP_INF(dev->info.csd.raw, SD_CSD_SIZE);
+    LOG_DBG("CSD:");
+    LOG_HEXDUMP_DBG(buf, SD_CSD_SIZE);
 
     /* Read CRC (not validated) */
     crc_hi = spi_transceive(0xFF);
@@ -513,39 +477,37 @@ int sd_read_csd(struct sd_device *dev)
     (void)crc_hi;
     (void)crc_lo;
 
+    /* Parse CSD based on structure version */
+    uint8_t csd_structure = (buf[0] >> 6) & 0x03;
+    if (csd_structure != SD_CSD_VERSION_1)
+        return -ENOTSUP;
+    csd->csd_structure = csd_structure;
+
+    sd_parse_csd_v1(buf, csd);
+
+    ret = 0;
+
+exit:
     spi_slave_unselect(dev->slave);
 
-    /* Parse CSD based on structure version */
-    uint8_t csd_structure = (dev->info.csd.raw[0] >> 6) & 0x03;
-    if (csd_structure == 0) {
-        sd_parse_csd_v1(&dev->info.csd);
-    } else if (csd_structure == 1) {
-        return -ENOTSUP;
-    } else {
-        LOG_ERR("Unknown CSD structure: %u", csd_structure);
-        return -ENOTSUP;
-    }
-
-    dev->info.csd_valid = 1;
-    LOG_INF("CSD: capacity=%lu blocks (%lu bytes)", dev->info.csd.capacity_blocks,
-            dev->info.csd.capacity_bytes);
-
-    return 0;
+    return ret;
 }
 
-int sd_read_cid(struct sd_device *dev)
+int sd_read_cid(struct sd_device *dev, struct sd_cid *cid)
 {
+    int ret;
     sd_cmd_t cmd;
-    uint8_t res;
     uint16_t i;
-    uint8_t crc_hi, crc_lo;
+    uint8_t buf[SD_CID_SIZE];
+    uint8_t res, crc_hi, crc_lo;
 
-    if (!dev || !dev->initialized)
+    if (!z_user(dev))
         return -EINVAL;
 
-    /* CMD10: Send CID */
-    sd_cmd_prep(&cmd, SD_CMD10, 0);
+    if (!z_user(dev->info.type))
+        return -ENODEV;
 
+    cmd = SD_SEND_CID;
     spi_slave_select(dev->slave);
     spi_transceive(0xFF);
     for (i = 0; i < sizeof(cmd.buf); i++)
@@ -553,9 +515,8 @@ int sd_read_cid(struct sd_device *dev)
 
     res = sd_read_r1();
     if (res != 0) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("CMD10 failed: 0x%02X", res);
-        return -EIO;
+        ret = -EIO;
+        goto exit;
     }
 
     /* Wait for data token */
@@ -563,26 +524,25 @@ int sd_read_cid(struct sd_device *dev)
         res = spi_transceive(0xFF);
         if (res != 0xFF) {
             if (res != SD_DATA_TOKEN) {
-                spi_slave_unselect(dev->slave);
+                ret = -EIO;
                 LOG_ERR("Invalid CID data token: 0x%02X", res);
-                return -EIO;
+                goto exit;
             }
             break;
         }
     }
 
     if (i == CONFIG_SD_READ_TIMEOUT) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("CID read timeout");
-        return -ETIMEDOUT;
+        ret = -ETIMEDOUT;
+        goto exit;
     }
 
     /* Read CID data */
     for (i = 0; i < SD_CID_SIZE; i++)
-        dev->info.cid.raw[i] = spi_transceive(0xFF);
+        buf[i] = spi_transceive(0xFF);
 
-    LOG_INF("CID raw data:");
-    LOG_HEXDUMP_INF(dev->info.cid.raw, SD_CID_SIZE);
+    LOG_DBG("CID raw data:");
+    LOG_HEXDUMP_DBG(buf, SD_CID_SIZE);
 
     /* Read CRC (not validated) */
     crc_hi = spi_transceive(0xFF);
@@ -590,36 +550,12 @@ int sd_read_cid(struct sd_device *dev)
     (void)crc_hi;
     (void)crc_lo;
 
+    sd_parse_cid(buf, cid);
+
+    ret = 0;
+
+exit:
     spi_slave_unselect(dev->slave);
 
-    /* Parse CID */
-    sd_parse_cid(&dev->info.cid);
-
-    dev->info.cid_valid = 1;
-    LOG_INF("CID: MID=0x%02X OEM=%s Name=%s Rev=%u.%u SN=0x%08lX Date=%u/%u",
-            dev->info.cid.manufacturer_id, dev->info.cid.oem_id,
-            dev->info.cid.product_name, dev->info.cid.product_revision >> 4,
-            dev->info.cid.product_revision & 0x0F, dev->info.cid.serial_number,
-            2000 + (dev->info.cid.manufacture_date >> 4),
-            dev->info.cid.manufacture_date & 0x0F);
-
-    return 0;
+    return ret;
 }
-
-uint32_t sd_get_capacity_bytes(struct sd_device *dev)
-{
-    if (!dev || !dev->info.csd_valid)
-        return 0;
-
-    return dev->info.csd.capacity_bytes;
-}
-
-uint32_t sd_get_capacity_blocks(struct sd_device *dev)
-{
-    if (!dev || !dev->info.csd_valid)
-        return 0;
-
-    return dev->info.csd.capacity_blocks;
-}
-
-#endif
