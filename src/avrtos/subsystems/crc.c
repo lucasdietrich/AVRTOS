@@ -21,3 +21,22 @@ uint8_t crc8(const uint8_t *buf, size_t len)
     }
     return crc;
 }
+
+#define CRC7_POLY 0x89
+
+uint8_t crc7(uint8_t *data, size_t len)
+{
+    uint8_t crc = 0;
+
+    while (len-- > 0) {
+        crc ^= *data++;
+        for (uint8_t i = 0; i < 8; i++) {
+            if (crc & 0x80)
+                crc = (crc << 1) ^ (CRC7_POLY << 1);
+            else
+                crc <<= 1;
+        }
+    }
+
+    return crc >> 1;
+}

@@ -10,42 +10,65 @@
 #include <avrtos/errno.h>
 #include <avrtos/kernel.h>
 #include <avrtos/logging.h>
+#include <avrtos/subsystems/crc.h>
 #include <avrtos/sys.h>
 
 #include "sd_priv.h"
 
 #define LOG_LEVEL CONFIG_SD_LOG_LEVEL
+// #define LOG_LEVEL 0
 
-/* G(x) = x^7 + x^3 + 1 (0b10001001) */
-#define CRC7_POLY 0x89
+/* Retries and timing constants */
+#define SD_R1_RESPONSE_RETRIES   8
+#define SD_POWERUP_CLOCKS        10
+#define SD_ACMD41_RETRY_DELAY_MS 100u /* ACMD41 retry delay in ms */
 
-#define SD_R1_RESPONSE_RETRIES 8
-#define SD_POWERUP_CLOCKS      10
+#define STUFF_BITS 0x00000000u
 
-/**
- * @brief Calculate CRC7 checksum
- */
-uint8_t crc7(uint8_t *data, size_t len)
-{
-    uint8_t crc = 0;
-
-    while (len-- > 0) {
-        crc ^= *data++;
-        for (uint8_t i = 0; i < 8; i++) {
-            if (crc & 0x80)
-                crc = (crc << 1) ^ (CRC7_POLY << 1);
-            else
-                crc <<= 1;
-        }
+#define SD_CMD0_BYTES                                                                    \
+    {                                                                                    \
+        0x40, 0x0, 0x0, 0x0, 0x0, 0x95                                                   \
+    }
+#define SD_CMD58_BYTES                                                                   \
+    {                                                                                    \
+        0x7a, 0x00, 0x00, 0x00, 0x00, 0xfd                                               \
+    }
+#define SD_CMD55_BYTES                                                                   \
+    {                                                                                    \
+        0x77, 0x00, 0x00, 0x00, 0x00, 0x65                                               \
+    }
+#define SD_CMD41_BYTES                                                                   \
+    {                                                                                    \
+        0x69, 0x40, 0x00, 0x00, 0x00, 0xe5                                               \
     }
 
-    return crc >> 1;
-}
+#define SD_CMD_FROM_BYTES(_buf)                                                          \
+    (sd_cmd_t)                                                                           \
+    {                                                                                    \
+        .buf = _buf                                                                      \
+    }
+
+#define SD_GO_IDLE_STATE SD_CMD_FROM_BYTES(SD_CMD0_BYTES)
+#define SD_READ_OCR      SD_CMD_FROM_BYTES(SD_CMD58_BYTES)
+#define SD_APP_CMD       SD_CMD_FROM_BYTES(SD_CMD55_BYTES)
+#define SD_SEND_OP_COND  SD_CMD_FROM_BYTES(SD_CMD41_BYTES)
+
+#if CONFIG_SD_CSD
+#error "CSD/CID parsing not yet implemented"
+#endif
+
+typedef struct sd_cmd {
+    uint8_t buf[6u];
+} sd_cmd_t;
 
 /**
  * @brief Prepare SD command
+ *
+ * @param cmd Command structure to fill
+ * @param index Command index
+ * @param arg Command argument
  */
-void sd_cmd_prep(sd_cmd_t *cmd, uint8_t index, uint32_t arg)
+static void sd_cmd_prep(sd_cmd_t *cmd, uint8_t index, uint32_t arg)
 {
     /* [byte 0]: Start bit (0) + transmission bit (1) + command index (6)
      * [byte 1-4]: Argument (32 bits)
@@ -74,47 +97,16 @@ static uint8_t sd_read_r1(void)
     return res;
 }
 
-/**
- * @brief Send command with inline implementation
- *
- * @param slave SPI slave
- * @param index Command index
- * @param arg Command argument
- * @return R1 response byte
- */
-static uint8_t sd_send_cmd_raw(const struct spi_slave *slave, uint8_t index, uint32_t arg)
+static uint8_t sd_send_cmd_read_r1(struct sd_device *dev, sd_cmd_t *cmd)
 {
-    sd_cmd_t cmd;
-    uint8_t res;
-    uint8_t i;
+    uint8_t res, i;
 
-    sd_cmd_prep(&cmd, index, arg);
-
-    LOG_DBG("CMD%u arg=0x%08lX", index, arg);
-
-    spi_slave_select(slave);
+    spi_slave_select(dev->slave);
     spi_transceive(0xFF);
-    for (i = 0; i < sizeof(cmd.buf); i++)
-        spi_transceive(cmd.buf[i]);
+    for (i = 0; i < sizeof(cmd->buf); i++)
+        spi_transceive(cmd->buf[i]);
 
     res = sd_read_r1();
-
-    return res;
-}
-
-/**
- * @brief Send command to SD card
- *
- * @param dev SD device structure
- * @param index Command index
- * @param arg Command argument
- * @return R1 response byte
- */
-static uint8_t sd_send_cmd(struct sd_device *dev, uint8_t index, uint32_t arg)
-{
-    uint8_t res;
-
-    res = sd_send_cmd_raw(dev->slave, index, arg);
     spi_slave_unselect(dev->slave);
 
     return res;
@@ -142,21 +134,21 @@ static int sd_wait_ready(void)
  * @brief Read R3/R7 response (R1 + 4 bytes)
  *
  * @param slave SPI slave
- * @param index Command index
- * @param arg Command argument
+ * @param cmd Command to send
  * @param resp Buffer for 4-byte response
  * @return R1 response byte
  */
-static uint8_t sd_send_cmd_r3(const struct spi_slave *slave,
-                              uint8_t index,
-                              uint32_t arg,
-                              uint8_t resp[4])
+static uint8_t
+sd_send_cmd_r3(const struct spi_slave *slave, sd_cmd_t *cmd, uint8_t resp[4])
 {
-    uint8_t res;
-    uint8_t i;
+    uint8_t res, i;
 
-    res = sd_send_cmd_raw(slave, index, arg);
+    spi_slave_select(slave);
 
+    spi_transceive(0xFF);
+    for (i = 0; i < sizeof(cmd->buf); i++)
+        spi_transceive(cmd->buf[i]);
+    res = sd_read_r1();
     if (res <= 1) {
         for (i = 0; i < 4; i++)
             resp[i] = spi_transceive(0xFF);
@@ -174,112 +166,96 @@ int sd_init(struct sd_device *dev, const struct spi_slave *slave)
     uint32_t arg;
     uint8_t resp[4];
     uint16_t timeout;
+    sd_cmd_t cmd;
 
-    if (!dev || !slave)
+    if (!z_user(dev && slave))
         return -EINVAL;
 
     dev->slave                 = slave;
     dev->info.type             = SD_CARD_TYPE_UNKNOWN;
-    dev->info.version          = 0;
     dev->info.ocr              = 0;
     dev->info.voltage_accepted = 0;
 #if CONFIG_SD_CSD
     dev->info.csd_valid = 0;
     dev->info.cid_valid = 0;
 #endif
-    dev->initialized = 0;
 
-    /* Power up sequence */
+    /* Power up sequence
+     * Initialization delay is the maximum of:
+     * - 1 msec
+     * - 74 clock cycles
+     * - supply ramp up time
+     */
     spi_slave_unselect(slave);
     k_msleep(1);
     for (uint8_t i = 0; i < SD_POWERUP_CLOCKS; i++)
         spi_transceive(0xFF);
 
     /* CMD0: Reset card */
-    res = sd_send_cmd(dev, SD_CMD0, 0);
-    if (!(res & R1_IDLE_STATE)) {
-        LOG_ERR("CMD0 failed: 0x%02X", res);
+    cmd = SD_GO_IDLE_STATE;
+    res = sd_send_cmd_read_r1(dev, &cmd);
+    if (!(res & R1_IDLE_STATE))
         return -EIO;
-    }
 
     /* CMD8: Check voltage range */
     arg = (SD_CMD8_VHS_27_36V << SD_CMD8_VHS_SHIFT) | SD_CMD8_CHECK_PATTERN;
-    res = sd_send_cmd_r3(slave, SD_CMD8, arg, resp);
-
-    if (res > 1) {
-        if (res & R1_ILLEGAL_COMMAND) {
-            dev->info.version = 1;
-            dev->info.type    = SD_CARD_TYPE_SDSC_V1;
-        } else {
-            LOG_ERR("CMD8 failed: 0x%02X", res);
-            return -EIO;
-        }
-    } else {
-        dev->info.voltage_accepted = resp[2] & SD_CMD8_VOLTAGE_MASK;
-    }
-
-    if (dev->info.version != 1) {
+    sd_cmd_prep(&cmd, SD_CMD8, arg);
+    res = sd_send_cmd_r3(slave, &cmd, resp);
+    if (!(res & R1_IDLE_STATE))
+        return -EIO;
+    if (!(res & R1_ILLEGAL_COMMAND)) {
         LOG_ERR("Ver2.X SD cards not supported");
         return -ENOTSUP;
     }
+    dev->info.type             = SD_CARD_TYPE_SDSC_V1;
+    dev->info.voltage_accepted = resp[2] & SD_CMD8_VOLTAGE_MASK;
 
     /* CMD58: Read OCR */
-    res = sd_send_cmd_r3(slave, SD_CMD58, 0, resp);
-    if (res > 1) {
-        LOG_ERR("CMD58 failed: 0x%02X", res);
+    cmd = SD_READ_OCR;
+    res = sd_send_cmd_r3(slave, &cmd, resp);
+    if (res > 1)
         return -EIO;
-    }
-    dev->info.ocr = ((uint32_t)resp[0] << 24) | ((uint32_t)resp[1] << 16) |
-                    ((uint32_t)resp[2] << 8) | resp[3];
+    dev->info.ocr = sys_read_be32(resp);
 
     /* ACMD41: Initialize card */
-    timeout = CONFIG_SD_INIT_TIMEOUT_MS / SD_ACMD41_RETRY_DELAY;
+    timeout = CONFIG_SD_INIT_TIMEOUT_MS / SD_ACMD41_RETRY_DELAY_MS;
     while (timeout--) {
         /* CMD55: App command follows */
-        res = sd_send_cmd(dev, SD_CMD55, 0);
-        if (res > 1) {
-            LOG_ERR("CMD55 failed: 0x%02X", res);
+        cmd = SD_APP_CMD;
+        res = sd_send_cmd_read_r1(dev, &cmd);
+        if (res > 1)
             return -EIO;
-        }
 
         /* ACMD41: Initialize */
-        res = sd_send_cmd(dev, SD_ACMD41, 0);
+        cmd = SD_SEND_OP_COND;
+        res = sd_send_cmd_read_r1(dev, &cmd);
         if (res == 0)
             break;
-        if (res > 1) {
-            LOG_ERR("ACMD41 failed: 0x%02X", res);
+        if (res > 1)
             return -EIO;
-        }
 
-        k_msleep(SD_ACMD41_RETRY_DELAY);
+        k_msleep(SD_ACMD41_RETRY_DELAY_MS);
     }
-
-    if (timeout == 0) {
-        LOG_ERR("SD card init timeout");
+    if (timeout == 0)
         return -ETIMEDOUT;
-    }
 
     /* CMD16: Set block length */
-    res = sd_send_cmd(dev, SD_CMD16, SD_BLOCK_SIZE);
-    if (res != 0) {
-        LOG_ERR("CMD16 failed: 0x%02X", res);
+    sd_cmd_prep(&cmd, SD_CMD16, SD_BLOCK_SIZE);
+    res = sd_send_cmd_read_r1(dev, &cmd);
+    if (res != 0)
         return -EIO;
-    }
-
-    dev->initialized = 1;
-    LOG_INF("SD card initialized");
 
     return 0;
 }
 
 int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
 {
+    int ret;
     sd_cmd_t cmd;
-    uint8_t res;
     uint16_t i;
-    uint8_t crc_hi, crc_lo;
+    uint8_t res, crc_hi, crc_lo;
 
-    if (!dev || !dev->initialized || !buf)
+    if (!z_user(!dev || !dev->info.type || !buf))
         return -EINVAL;
 
     /* CMD17: Read single block */
@@ -292,9 +268,8 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
 
     res = sd_read_r1();
     if (res != 0) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("CMD17 failed: 0x%02X", res);
-        return -EIO;
+        ret = -EIO;
+        goto exit;
     }
 
     /* Wait for data token */
@@ -302,18 +277,18 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
         res = spi_transceive(0xFF);
         if (res != 0xFF) {
             if (res != SD_DATA_TOKEN) {
-                spi_slave_unselect(dev->slave);
-                LOG_ERR("Invalid data token: 0x%02X", res);
-                return -EIO;
+                ret = -EIO;
+                goto exit;
             }
             break;
         }
     }
 
+    LOG_DBG("Data token received after %u retries", i);
+
     if (i == CONFIG_SD_READ_TIMEOUT) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("Read timeout");
-        return -ETIMEDOUT;
+        ret = -ETIMEDOUT;
+        goto exit;
     }
 
     /* Read data block */
@@ -327,9 +302,11 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
     (void)crc_hi;
     (void)crc_lo;
 
-    spi_slave_unselect(dev->slave);
+    ret = 0;
 
-    return 0;
+exit:
+    spi_slave_unselect(dev->slave);
+    return ret;
 }
 
 int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *buf)
@@ -339,8 +316,11 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
     uint16_t i;
     int ret;
 
-    if (!dev || !dev->initialized || !buf)
+    if (!z_user(dev && buf))
         return -EINVAL;
+
+    if (!z_user(dev->info.type))
+        return -ENODEV;
 
     /* CMD24: Write single block */
     sd_cmd_prep(&cmd, SD_CMD24, block_addr * SD_BLOCK_SIZE);
@@ -349,12 +329,10 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
     spi_transceive(0xFF);
     for (i = 0; i < sizeof(cmd.buf); i++)
         spi_transceive(cmd.buf[i]);
-
     res = sd_read_r1();
     if (res != 0) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("CMD24 failed: 0x%02X", res);
-        return -EIO;
+        ret = -EIO;
+        goto exit;
     }
 
     /* Send data token */
@@ -376,42 +354,37 @@ int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *bu
     }
 
     if (i == CONFIG_SD_READ_TIMEOUT) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("Write data response timeout");
-        return -ETIMEDOUT;
+        ret = -ETIMEDOUT;
+        goto exit;
     }
 
     /* Check data response */
     if ((res & SD_DATA_RESPONSE_MASK) != SD_DATA_ACCEPTED) {
-        spi_slave_unselect(dev->slave);
+        ret = -EIO;
         LOG_ERR("Write rejected: 0x%02X", res);
-        return -EIO;
+        goto exit;
     }
 
     /* Wait for write completion */
     ret = sd_wait_ready();
-    if (ret < 0) {
-        spi_slave_unselect(dev->slave);
-        LOG_ERR("Write completion timeout");
-        return ret;
-    }
 
+exit:
     spi_slave_unselect(dev->slave);
 
-    return 0;
+    return ret;
 }
 
-int sd_get_info(struct sd_device *dev, struct sd_card_info *info)
-{
-    if (!dev || !info)
-        return -EINVAL;
+// int sd_get_info(struct sd_device *dev, struct sd_card_info *info)
+// {
+//     if (!z_user(dev && info))
+//         return -EINVAL;
 
-    if (!dev->initialized)
-        return -ENODEV;
+//     if (!z_user(dev->info.type))
+//         return -ENODEV;
 
-    *info = dev->info;
-    return 0;
-}
+//     *info = dev->info;
+//     return 0;
+// }
 
 #if CONFIG_SD_CSD
 

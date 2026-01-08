@@ -86,8 +86,10 @@
     (*(uint8_t *)(addr)       = (uint8_t)((val) >> 8),                                   \
      *(uint8_t *)((addr) + 1) = (uint8_t)(val))
 #define sys_read_be32(addr)                                                              \
-    ((uint32_t)(*(uint8_t *)(addr) << 24) | (*(uint8_t *)((addr) + 1) << 16) |           \
-     (*(uint8_t *)((addr) + 2) << 8) | *(uint8_t *)((addr) + 3))
+    ((((uint32_t)((const uint8_t *)(addr))[0]) << 24) |                                  \
+     (((uint32_t)((const uint8_t *)(addr))[1]) << 16) |                                  \
+     (((uint32_t)((const uint8_t *)(addr))[2]) << 8) |                                   \
+     (((uint32_t)((const uint8_t *)(addr))[3]) << 0))
 #define sys_write_be32(addr, val)                                                        \
     (*(uint8_t *)(addr)       = (uint8_t)((val) >> 24),                                  \
      *(uint8_t *)((addr) + 1) = (uint8_t)((val) >> 16),                                  \

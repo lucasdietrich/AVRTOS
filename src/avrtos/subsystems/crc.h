@@ -19,4 +19,13 @@
  */
 uint8_t crc8(const uint8_t *buf, size_t len);
 
+/**
+ * @brief Calculate CRC7 checksum using polynomial x^7 + x^3 + 1 (0b10001001)
+ *
+ * @param data Data buffer
+ * @param len Length of data
+ * @return CRC7 checksum
+ */
+uint8_t crc7(uint8_t *data, size_t len);
+
 #endif /* _CRC_H_ */

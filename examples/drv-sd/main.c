@@ -13,6 +13,8 @@
 #include <avrtos/logging.h>
 #include <avrtos/prng.h>
 
+#include "usart.h"
+
 #define LOG_LEVEL LOG_LEVEL_INFO
 
 #define BLOCK_OFFSET 0u /* Block number to read/write */
@@ -20,19 +22,16 @@
 int main(void)
 {
     struct sd_device sd;
-    struct sd_card_info info;
     uint8_t block[SD_BLOCK_SIZE];
     struct k_prng prng;
     uint32_t seed;
     int ret;
 
-    LOG_INF("SD card driver demo");
-
     const struct spi_config spi_cfg = {
         .role        = SPI_ROLE_MASTER,
         .polarity    = SPI_CLOCK_POLARITY_RISING,
         .phase       = SPI_CLOCK_PHASE_SAMPLE,
-        .prescaler   = SPI_PRESCALER_128,
+        .prescaler   = SPI_PRESCALER_16, // SPI_PRESCALER_128
         .irq_enabled = 0,
     };
 
@@ -54,11 +53,8 @@ int main(void)
     }
 
     /* Get and display card information */
-    ret = sd_get_info(&sd, &info);
-    if (ret == 0) {
-        LOG_INF("Card type: %d, version: %d", info.type, info.version);
-        LOG_INF("OCR: 0x%08lX, voltage: 0x%02X", info.ocr, info.voltage_accepted);
-    }
+    LOG_INF("Card type: %d OCR: 0x%08lX, voltage: 0x%02X", sd.info.type, sd.info.ocr,
+            sd.info.voltage_accepted);
 
 #if CONFIG_SD_CSD
 
@@ -74,15 +70,15 @@ int main(void)
     /* Read CID (Card Identification) */
     ret = sd_read_cid(&sd);
     if (ret == 0) {
-        ret = sd_get_info(&sd, &info);
-        if (ret == 0 && info.cid_valid) {
-            LOG_INF("Manufacturer: 0x%02X", info.cid.manufacturer_id);
-            LOG_INF("OEM/App ID: %s", info.cid.oem_id);
-            LOG_INF("Product: %s (rev %u.%u)", info.cid.product_name,
-                    info.cid.product_revision >> 4, info.cid.product_revision & 0x0F);
-            LOG_INF("Serial: 0x%08lX", info.cid.serial_number);
-            LOG_INF("Manufactured: %u/%u", 2000 + (info.cid.manufacture_date >> 4),
-                    info.cid.manufacture_date & 0x0F);
+        if (sd.info.cid_valid) {
+            LOG_INF("Manufacturer: 0x%02X", sd.info.cid.manufacturer_id);
+            LOG_INF("OEM/App ID: %s", sd.info.cid.oem_id);
+            LOG_INF("Product: %s (rev %u.%u)", sd.info.cid.product_name,
+                    sd.info.cid.product_revision >> 4,
+                    sd.info.cid.product_revision & 0x0F);
+            LOG_INF("Serial: 0x%08lX", sd.info.cid.serial_number);
+            LOG_INF("Manufactured: %u/%u", 2000 + (sd.info.cid.manufacture_date >> 4),
+                    sd.info.cid.manufacture_date & 0x0F);
         }
     }
 
@@ -134,9 +130,6 @@ int main(void)
     LOG_HEXDUMP_INF(block, SD_BLOCK_SIZE);
 
     LOG_INF("Demo completed successfully");
-
-    while (1)
-        k_sleep(K_FOREVER);
 
 error:
     while (1)

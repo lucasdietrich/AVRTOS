@@ -43,9 +43,6 @@
 #define SD_DATA_RESPONSE_MASK 0x07u /* Data response mask (bits 0-2) */
 #define SD_DATA_ACCEPTED      0x05u /* Data accepted token */
 
-/* Timing constants */
-#define SD_ACMD41_RETRY_DELAY 100u /* ACMD41 retry delay in ms */
-
 #define R1_IDLE_STATE      0x01
 #define R1_ERASE_ERASE     0x02
 #define R1_ILLEGAL_COMMAND 0x04

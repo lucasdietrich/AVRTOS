@@ -25,8 +25,8 @@ extern "C" {
 enum sd_card_type {
     SD_CARD_TYPE_UNKNOWN = 0,
     SD_CARD_TYPE_SDSC_V1 = 1, /* Standard Capacity v1.x */
-    SD_CARD_TYPE_SDSC_V2 = 2, /* Standard Capacity v2.x */
-    SD_CARD_TYPE_SDHC    = 3, /* High Capacity */
+    // SD_CARD_TYPE_SDSC_V2 = 2, /* Standard Capacity v2.x */
+    // SD_CARD_TYPE_SDHC    = 3, /* High Capacity */
 };
 
 /**
@@ -59,12 +59,11 @@ struct sd_cid {
  */
 struct sd_card_info {
     enum sd_card_type type;
-    uint8_t version;          /* Version (1 or 2) */
     uint32_t ocr;             /* Operating Conditions Register */
     uint8_t voltage_accepted; /* Voltage range accepted */
-    struct sd_csd csd;        /* Card Specific Data */
-    struct sd_cid cid;        /* Card Identification */
 #if CONFIG_SD_CSD
+    struct sd_csd csd; /* Card Specific Data */
+    struct sd_cid cid; /* Card Identification */
     uint8_t csd_valid; /* CSD data is valid */
     uint8_t cid_valid; /* CID data is valid */
 #endif
@@ -76,30 +75,7 @@ struct sd_card_info {
 struct sd_device {
     const struct spi_slave *slave;
     struct sd_card_info info;
-    uint8_t initialized;
 };
-
-typedef struct sd_cmd {
-    uint8_t buf[6];
-} sd_cmd_t;
-
-/**
- * @brief Calculate CRC7 checksum
- *
- * @param data Data buffer
- * @param len Length of data
- * @return CRC7 checksum
- */
-uint8_t crc7(uint8_t *data, size_t len);
-
-/**
- * @brief Prepare SD command
- *
- * @param cmd Command structure to fill
- * @param index Command index
- * @param arg Command argument
- */
-void sd_cmd_prep(sd_cmd_t *cmd, uint8_t index, uint32_t arg);
 
 /**
  * @brief Initialize SD card
@@ -129,15 +105,6 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf);
  * @return 0 on success, negative error code on failure
  */
 int sd_write_block(struct sd_device *dev, uint32_t block_addr, const uint8_t *buf);
-
-/**
- * @brief Get SD card information
- *
- * @param dev SD device structure
- * @param info Pointer to structure to store card information
- * @return 0 on success, negative error code on failure
- */
-int sd_get_info(struct sd_device *dev, struct sd_card_info *info);
 
 /**
  * @brief Read CSD register (Card Specific Data)
