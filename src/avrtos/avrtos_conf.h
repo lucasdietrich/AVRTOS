@@ -650,6 +650,15 @@
 #endif
 
 //
+// Number of bytes to print per line in hexdump output.
+//
+// Default: 16 bytes per line
+//
+#ifndef CONFIG_LOGGING_HEXDUMP_LINE_LENGTH
+#define CONFIG_LOGGING_HEXDUMP_LINE_LENGTH 16
+#endif
+
+//
 // Enable the uptime counter.
 //
 // 0: Uptime counter is disabled.
@@ -858,6 +867,67 @@
 //
 #ifndef CONFIG_DRIVERS_TIMER5_API
 #define CONFIG_DRIVERS_TIMER5_API 0
+#endif
+
+//
+// SD card block size in bytes
+//
+// Default: 512 bytes (standard SD block size)
+//
+#ifndef CONFIG_SD_BLOCK_SIZE
+#define CONFIG_SD_BLOCK_SIZE 512
+#endif
+
+//
+// SD card driver initialization timeout in milliseconds
+//
+// Default: 1000ms (1 second)
+//
+#ifndef CONFIG_SD_INIT_TIMEOUT_MS
+#define CONFIG_SD_INIT_TIMEOUT_MS 1000
+#endif
+
+//
+// SD card driver read timeout in polling iterations
+//
+// Default: 1000 iterations
+//
+#ifndef CONFIG_SD_READ_TIMEOUT
+#define CONFIG_SD_READ_TIMEOUT 1000
+#endif
+
+//
+// SD card driver write timeout in milliseconds
+//
+// Default: 1000ms (1 second)
+//
+#ifndef CONFIG_SD_WRITE_TIMEOUT_MS
+#define CONFIG_SD_WRITE_TIMEOUT_MS 1000
+#endif
+
+//
+// SD card CSD register support
+//
+// 0: SD card CSD register support is disabled
+// 1: SD card CSD register support is enabled
+//
+#ifndef CONFIG_SD_CSD
+#define CONFIG_SD_CSD 0
+#endif
+
+//
+// SD card driver log level
+//
+// LOG_LEVEL_NONE (0): No logging
+// LOG_LEVEL_ERROR (1): Error messages only
+// LOG_LEVEL_WARNING (2): Warnings and errors
+// LOG_LEVEL_INFO (3): Informational messages, warnings, and errors
+// LOG_LEVEL_DEBUG (4): All messages including debug
+//
+// Default: LOG_LEVEL_INFO (3)
+//
+#ifndef CONFIG_SD_LOG_LEVEL
+#define CONFIG_SD_LOG_LEVEL LOG_LEVEL_INFO
 #endif
 
 //

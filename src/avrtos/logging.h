@@ -39,6 +39,10 @@
         if ((level) <= (LOG_LEVEL)) {                                                    \
             for (unsigned int i = 0; i < (len); i++) {                                   \
                 printf_P(PSTR("%02x "), ((uint8_t *)data)[i]);                           \
+                if (((i + 1) % CONFIG_LOGGING_HEXDUMP_LINE_LENGTH) == 0 &&               \
+                    (i + 1) < (len)) {                                                   \
+                    printf_P(PSTR("\n"));                                                \
+                }                                                                        \
             }                                                                            \
             printf_P(PSTR("\n"));                                                        \
         }                                                                                \

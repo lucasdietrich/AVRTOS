@@ -37,7 +37,6 @@ void push(struct in **mem)
     *mem = NULL;
 }
 
-
 static struct in *mem = NULL;
 
 void input(const char rx)
