@@ -116,6 +116,58 @@ static int sd_wait_ready(void)
     return -ETIMEDOUT;
 }
 
+
+/**
+ * @brief Wait for data token from SD card
+ *
+ * @return 0 if valid data token received, -EIO for invalid token, -ETIMEDOUT on timeout
+ */
+static int sd_wait_data_token(void)
+{
+    uint16_t i;
+    uint8_t res;
+
+    for (i = 0; i < CONFIG_SD_READ_TIMEOUT; i++) {
+        res = spi_transceive(0xFF);
+        if (res != 0xFF) {
+            if (res == SD_DATA_TOKEN)
+                return 0;
+            else
+                return -EIO;
+        }
+    }
+    return -ETIMEDOUT;
+}
+
+/**
+ * @brief Read data block with token validation and CRC
+ *
+ * @param buf Buffer to store read data
+ * @param size Size of data to read
+ * @return 0 on success, negative error code on failure
+ */
+static int sd_read_data_block(uint8_t *buf, size_t size)
+{
+    uint16_t i;
+    int ret;
+    uint8_t crc_hi, crc_lo;
+
+    ret = sd_wait_data_token();
+    if (ret != 0)
+        return ret;
+
+    for (i = 0; i < size; i++)
+        buf[i] = spi_transceive(0xFF);
+
+    /* Read CRC (not validated) */
+    crc_hi = spi_transceive(0xFF);
+    crc_lo = spi_transceive(0xFF);
+    (void)crc_hi;
+    (void)crc_lo;
+
+    return 0;
+}
+
 /**
  * @brief Read R3/R7 response (R1 + 4 bytes)
  *
@@ -254,37 +306,9 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
         goto exit;
     }
 
-    /* Wait for data token */
-    for (i = 0; i < CONFIG_SD_READ_TIMEOUT; i++) {
-        res = spi_transceive(0xFF);
-        if (res != 0xFF) {
-            if (res != SD_DATA_TOKEN) {
-                ret = -EIO;
-                goto exit;
-            }
-            break;
-        }
-    }
-
-    LOG_DBG("Data token received after %u retries", i);
-
-    if (i == CONFIG_SD_READ_TIMEOUT) {
-        ret = -ETIMEDOUT;
+    ret = sd_read_data_block(buf, SD_BLOCK_SIZE);
+    if (ret != 0)
         goto exit;
-    }
-
-    /* Read data block */
-    for (i = 0; i < SD_BLOCK_SIZE; i++)
-        buf[i] = spi_transceive(0xFF);
-
-    /* Read CRC (not validated) */
-    crc_hi = spi_transceive(0xFF);
-    crc_lo = spi_transceive(0xFF);
-    LOG_DBG("CRC: 0x%02X%02X", crc_hi, crc_lo);
-    (void)crc_hi;
-    (void)crc_lo;
-
-    ret = 0;
 
 exit:
     spi_slave_unselect(dev->slave);
@@ -446,36 +470,12 @@ int sd_read_csd(struct sd_device *dev, struct sd_csd *csd)
         goto exit;
     }
 
-    /* Wait for data token */
-    for (i = 0; i < CONFIG_SD_READ_TIMEOUT; i++) {
-        res = spi_transceive(0xFF);
-        if (res != 0xFF) {
-            if (res != SD_DATA_TOKEN) {
-                ret = -EIO;
-                LOG_ERR("Invalid CSD data token: 0x%02X", res);
-                goto exit;
-            }
-            break;
-        }
-    }
-
-    if (i == CONFIG_SD_READ_TIMEOUT) {
-        ret = -ETIMEDOUT;
+    ret = sd_read_data_block(buf, SD_CSD_SIZE);
+    if (ret != 0)
         goto exit;
-    }
-
-    /* Read CSD data */
-    for (i = 0; i < SD_CSD_SIZE; i++)
-        buf[i] = spi_transceive(0xFF);
 
     LOG_DBG("CSD:");
     LOG_HEXDUMP_DBG(buf, SD_CSD_SIZE);
-
-    /* Read CRC (not validated) */
-    crc_hi = spi_transceive(0xFF);
-    crc_lo = spi_transceive(0xFF);
-    (void)crc_hi;
-    (void)crc_lo;
 
     /* Parse CSD based on structure version */
     uint8_t csd_structure = (buf[0] >> 6) & 0x03;
@@ -519,36 +519,12 @@ int sd_read_cid(struct sd_device *dev, struct sd_cid *cid)
         goto exit;
     }
 
-    /* Wait for data token */
-    for (i = 0; i < CONFIG_SD_READ_TIMEOUT; i++) {
-        res = spi_transceive(0xFF);
-        if (res != 0xFF) {
-            if (res != SD_DATA_TOKEN) {
-                ret = -EIO;
-                LOG_ERR("Invalid CID data token: 0x%02X", res);
-                goto exit;
-            }
-            break;
-        }
-    }
-
-    if (i == CONFIG_SD_READ_TIMEOUT) {
-        ret = -ETIMEDOUT;
+    ret = sd_read_data_block(buf, SD_CID_SIZE);
+    if (ret != 0)
         goto exit;
-    }
-
-    /* Read CID data */
-    for (i = 0; i < SD_CID_SIZE; i++)
-        buf[i] = spi_transceive(0xFF);
 
     LOG_DBG("CID raw data:");
     LOG_HEXDUMP_DBG(buf, SD_CID_SIZE);
-
-    /* Read CRC (not validated) */
-    crc_hi = spi_transceive(0xFF);
-    crc_lo = spi_transceive(0xFF);
-    (void)crc_hi;
-    (void)crc_lo;
 
     sd_parse_cid(buf, cid);
 
