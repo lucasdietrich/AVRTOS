@@ -287,7 +287,7 @@ int sd_read_block(struct sd_device *dev, uint32_t block_addr, uint8_t *buf)
     int ret;
     sd_cmd_t cmd;
     uint16_t i;
-    uint8_t res, crc_hi, crc_lo;
+    uint8_t res;
 
     if (!z_user(!dev || !dev->info.type || !buf))
         return -EINVAL;
@@ -450,7 +450,7 @@ int sd_read_csd(struct sd_device *dev, struct sd_csd *csd)
     int ret;
     sd_cmd_t cmd;
     uint16_t i;
-    uint8_t res, crc_hi, crc_lo;
+    uint8_t res;
     uint8_t buf[SD_CSD_SIZE];
 
     if (!z_user(dev))
@@ -499,7 +499,7 @@ int sd_read_cid(struct sd_device *dev, struct sd_cid *cid)
     sd_cmd_t cmd;
     uint16_t i;
     uint8_t buf[SD_CID_SIZE];
-    uint8_t res, crc_hi, crc_lo;
+    uint8_t res;
 
     if (!z_user(dev))
         return -EINVAL;

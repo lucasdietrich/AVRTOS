@@ -7,6 +7,7 @@ if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	target_compile_definitions(${PROJECT_NAME} PUBLIC
 		CONFIG_THREAD_CANARIES=1
 		CONFIG_SD_LOG_LEVEL=0
+		CONFIG_KERNEL_UPTIME=1
 	)
 
 	target_link_avrtos(${PROJECT_NAME})
