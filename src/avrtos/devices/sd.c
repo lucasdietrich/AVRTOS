@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Lucas Dietrich <lucas.dietrich.git@proton.me>
+ * Copyright (c) 2026 Lucas Dietrich <lucas.dietrich.git@proton.me>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -115,7 +115,6 @@ static int sd_wait_ready(void)
 
     return -ETIMEDOUT;
 }
-
 
 /**
  * @brief Wait for data token from SD card

@@ -72,7 +72,7 @@ int main(void)
     }
 
     /* Read CID (Card Identification) */
-    ret = sd_read_cid(&sd, &cid); // FIX THE REFACTORING PROBLEMS !!! 
+    ret = sd_read_cid(&sd, &cid); // FIX THE REFACTORING PROBLEMS !!!
     if (ret == 0) {
         LOG_INF("Manufacturer: 0x%02X", cid.manufacturer_id);
         LOG_INF("OEM/App ID: %s", cid.oem_id);
@@ -201,7 +201,7 @@ static int test_update(struct sd_device *sd, uint32_t n, uint8_t pattern)
     for (i = 0; i < SD_BLOCK_SIZE; i++) {
         if (block[i] != pattern) {
             block[i] = pattern;
-            updated = true;
+            updated  = true;
         }
     }
 
@@ -213,8 +213,7 @@ static int test_update(struct sd_device *sd, uint32_t n, uint8_t pattern)
         }
         LOG_INF("Block %u updated with pattern 0x%02x", n, pattern);
     } else {
-        LOG_INF("Block %u already has pattern 0x%02x, no update needed", n,
-                pattern);
+        LOG_INF("Block %u already has pattern 0x%02x, no update needed", n, pattern);
     }
 
     return 0;
@@ -245,8 +244,8 @@ static int test_readall(struct sd_device *sd, uint32_t max)
         read_duration_ms += (t2 - t1);
 
         if ((b + 1) % 128 == 0) {
-            LOG_INF("Read %lu/%lu blocks (%lu MB) in %lums (%lu KB/s)", b + 1,
-                    max, bytes_read / (1024lu * 1024), read_duration_ms,
+            LOG_INF("Read %lu/%lu blocks (%lu MB) in %lums (%lu KB/s)", b + 1, max,
+                    bytes_read / (1024lu * 1024), read_duration_ms,
                     (bytes_read / 1024) * 1000 / read_duration_ms);
         }
 
