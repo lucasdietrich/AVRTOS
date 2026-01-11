@@ -87,7 +87,7 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed);
 /**
  * @brief Advance the time queue to the first item.
  *
- * This function will advance the time queue to the first item, 
+ * This function will advance the time queue to the first item,
  * and mark it as ready to be executed (timeout set to 0).
  * - If the first item has already expired, nothing will happen.
  * - If the first item has not expired, its timeout will be set to 0.

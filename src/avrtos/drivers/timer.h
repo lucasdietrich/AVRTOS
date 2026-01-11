@@ -160,8 +160,8 @@ typedef struct {
 #define TIMER_TIFR_CLEAR_OCIEA(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(OCIEnA))
 #define TIMER_TIFR_CLEAR_OCIEB(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(OCIEnB))
 #define TIMER_TIFR_CLEAR_OCIEC(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(OCIEnC))
-#define TIMER_TIFR_CLEAR_TOIE(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(TOIEn))
-#define TIMER_TIFR_CLEAR_ICIE(tim_idx) CLR_BIT(TIFRn[tim_idx], BIT(ICIEn))
+#define TIMER_TIFR_CLEAR_TOIE(tim_idx)  CLR_BIT(TIFRn[tim_idx], BIT(TOIEn))
+#define TIMER_TIFR_CLEAR_ICIE(tim_idx)  CLR_BIT(TIFRn[tim_idx], BIT(ICIEn))
 
 #define TIMER_INDEX_EXISTS(tim_idx) ((tim_idx) < TIMERS_COUNT)
 
@@ -558,14 +558,14 @@ void ll_timer16_channel_configure(TIMER16_Device *dev,
                                   const struct timer_channel_compare_config *config);
 
 __always_inline void ll_timer16_channel_set_compare_register(TIMER16_Device *dev,
-                                                    timer_channel_t channel,
-                                                    uint16_t value)
+                                                             timer_channel_t channel,
+                                                             uint16_t value)
 {
     ll_timer16_write_reg16(&dev->OCRnx[channel], value);
 }
 
 __always_inline uint16_t ll_timer16_channel_get_compare_register(TIMER16_Device *dev,
-                                                          timer_channel_t channel)
+                                                                 timer_channel_t channel)
 {
     return dev->OCRnx[channel];
 }

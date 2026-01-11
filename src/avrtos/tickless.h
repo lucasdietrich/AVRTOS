@@ -20,7 +20,8 @@ extern "C" {
 
 struct z_tickless_timespec {
     uint32_t global_counter; // Software counter, incremented on each timer overflow
-    uint16_t hardware_counter; // Hardware internal counter, incremented on each timer tick
+    uint16_t
+        hardware_counter; // Hardware internal counter, incremented on each timer tick
 };
 
 void z_tickless_init(void);
@@ -33,7 +34,7 @@ void z_tickless_init(void);
 // void z_tickless_sched_ms(uint32_t ms);
 
 typedef enum {
-    SP_NEW_POINT = 0u,
+    SP_NEW_POINT     = 0u,
     SP_CONTINUE_LAST = 1u,
     SP_CONTINUE_NEXT = 2u,
 } SP_TYPE;

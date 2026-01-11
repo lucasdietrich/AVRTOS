@@ -88,7 +88,8 @@ static void z_thread_idle_entry(void *context)
         k_yield();
         // z_yield_from_idle_thread();
 #elif CONFIG_KERNEL_TICKLESS
-#warning "FIXME make sure that with sysclock when resuming from IRQ while only the IDLE thread is running \
+#warning                                                                                 \
+    "FIXME make sure that with sysclock when resuming from IRQ while only the IDLE thread is running \
     "the waked-up thread is scheduled correctly"
         // k_yield();
 #endif

@@ -7,6 +7,7 @@
 #include "timer.h"
 
 #include <avrtos/assert.h>
+
 #include "avrtos/sys.h"
 
 #define DRIVERS_TIMERS_API                                                               \
@@ -38,9 +39,9 @@ void ll_timer8_deinit(TIMER8_Device *dev, uint8_t tim_idx)
 
     dev->TCCRnA = 0u;
     dev->TCCRnB = 0u;
-    dev->TCNTn = 0u;
-    dev->OCRnA = 0u;
-    dev->OCRnB = 0u;
+    dev->TCNTn  = 0u;
+    dev->OCRnA  = 0u;
+    dev->OCRnB  = 0u;
 }
 
 void ll_timer8_init(TIMER8_Device *dev,
@@ -102,11 +103,11 @@ __noinline void ll_timer16_deinit(TIMER16_Device *dev, uint8_t tim_idx)
     dev->TCCRnA = 0u;
     dev->TCCRnB = 0u;
     dev->TCCRnC = 0u;
-    dev->TCNTn = 0u;
-    dev->OCRnA = 0u;
-    dev->OCRnB = 0u;
-    dev->OCRnC = 0u;
-    dev->IRCN  = 0u;
+    dev->TCNTn  = 0u;
+    dev->OCRnA  = 0u;
+    dev->OCRnB  = 0u;
+    dev->OCRnC  = 0u;
+    dev->IRCN   = 0u;
 }
 
 void ll_timer16_init(TIMER16_Device *dev,

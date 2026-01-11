@@ -33,11 +33,11 @@ extern "C" {
 #include "kernel_private.h"
 
 // modules
-#define K_MODULE_KERNEL   1
-#define K_MODULE_ARCH     2
-#define K_MODULE_SYSCLOCK 3
-#define K_MODULE_THREAD   4
-#define K_MODULE_IDLE     5
+#define K_MODULE_KERNEL         1
+#define K_MODULE_ARCH           2
+#define K_MODULE_SYSCLOCK       3
+#define K_MODULE_THREAD         4
+#define K_MODULE_IDLE           5
 #define K_MODULE_TICKLESS_CLOCK 6
 
 #define K_MODULE_ALLOC     9

@@ -153,7 +153,7 @@ struct z_tickless_rt {
     uint8_t flags;
     // k_ticks_t sp_ticks;      // Duration between the last tickless event and the next
     //                          // tickless event in ticks.
-    
+
     uint16_t last_sp_compa; ///< Last scheduled point compare match register value.
 
     /* Last scheduled point programmed */
@@ -161,10 +161,11 @@ struct z_tickless_rt {
     // uint16_t sp_ticks;
     uint16_t elapsed_loops; // Number of loops elapsed since the last scheduled point.
 
-    // FIXME u16 tells that we can wait for more that 65536 * 250ms (if prescaler is 64 for example)
-    uint16_t unwrap_counter; // Counter used to track the number of timer overflows 
-                              // before the next tickless event can be scheduled
-                              // in the compare match register.
+    // FIXME u16 tells that we can wait for more that 65536 * 250ms (if prescaler is 64
+    // for example)
+    uint16_t unwrap_counter; // Counter used to track the number of timer overflows
+                             // before the next tickless event can be scheduled
+                             // in the compare match register.
 };
 #endif /* CONFIG_KERNEL_TICKLESS */
 

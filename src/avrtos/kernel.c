@@ -19,6 +19,7 @@
 #include "canaries.h"
 #include "debug.h"
 #include "dlist.h"
+#include "drivers/timer.h"
 #include "event.h"
 #include "fault.h"
 #include "idle.h"
@@ -29,12 +30,11 @@
 #include "systime.h"
 #include "timer.h"
 #include "tqueue.h"
-#include "drivers/timer.h"
 
 #define K_MODULE K_MODULE_KERNEL
 
 #define TQ_IS_ITEM_FIRST(tqueue, item) ((tqueue) == (item))
-#define TQ_IS_EMPTY(tqueue) ((tqueue) == NULL)
+#define TQ_IS_EMPTY(tqueue)            ((tqueue) == NULL)
 
 /* Make sure the members are at the expected offsets for k_thread and k_kernel
  * these members are accessed directly in assembly code
@@ -371,9 +371,9 @@ void z_sched_point_enter(void)
     tqueue_shift(&z_ker.timeouts_queue, Z_KERNEL_TIME_SLICE_TICKS);
 #else
 
-    /* We know the current SP is assocaited with the first item in the timeouts 
+    /* We know the current SP is assocaited with the first item in the timeouts
      * queue. We simply advance the queue to the next item
-     */ 
+     */
     tqueue_advance_to_first(&z_ker.timeouts_queue);
 #endif
 
@@ -539,14 +539,15 @@ static void z_cancel_scheduled_wake_up(struct k_thread *thread)
                 // will advance the first item of the timeouts queue
                 // a bit less than expected.
 
-                // TODO do 
+                // TODO do
                 /* If there are still threads in the timeouts queue,
                  * we need to update the next scheduled point.
                  */
                 // FIXME: shift z_ker.timeouts_queue->timeout with ellapsed time
                 // since last scheduling point.
-                // FIXME: make the timeout value cosistent with the other call to z_tickless_sched_ms()
-                // z_tickless_sched_ms(z_ker.timeouts_queue->timeout / K_TICKS_PER_MS);
+                // FIXME: make the timeout value cosistent with the other call to
+                // z_tickless_sched_ms() z_tickless_sched_ms(z_ker.timeouts_queue->timeout
+                // / K_TICKS_PER_MS);
 
                 uint32_t elapsed_ticks = z_tickless_early_sp(true);
                 // serial_u32(elapsed_ticks * Z_TICK_US / 1000u);
@@ -638,7 +639,7 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
             elapsed_ticks = z_tickless_early_sp(false);
         }
 
-        // printf("[%u/%u + %u/%u]\n", (uint16_t)(ticks >> 16), 
+        // printf("[%u/%u + %u/%u]\n", (uint16_t)(ticks >> 16),
         //         (uint16_t)(ticks & 0xFFFFu), (uint16_t)(elapsed_ticks >> 16),
         //         (uint16_t)(elapsed_ticks & 0xFFFFu));
         ticks += elapsed_ticks;
@@ -647,7 +648,7 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
         z_ker.current->flags |= Z_THREAD_WAKEUP_SCHED_MSK;
         z_ker.current->tie.event.timeout = ticks;
         z_ker.current->tie.event.next    = NULL;
-    
+
         // TODO ??
         // uint16_t time_to_next_sp = tickless_get_ticks_to_next_scheduling_point();
         // update first item of the timeouts queue with time_to_next_sp
@@ -666,8 +667,8 @@ static inline void z_schedule_wake_up(k_timeout_t timeout)
          * the next scheduled point earlier.
          */
         if (TQ_IS_ITEM_FIRST(z_ker.timeouts_queue, &z_ker.current->tie.event)) {
-                // FIXME: shift z_ker.timeouts_queue->timeout with ellapsed time
-                // since last scheduling point.
+            // FIXME: shift z_ker.timeouts_queue->timeout with ellapsed time
+            // since last scheduling point.
 
             if (sp_empty) {
                 z_tickless_sched_ticks(z_ker.timeouts_queue->timeout, SP_NEW_POINT);
