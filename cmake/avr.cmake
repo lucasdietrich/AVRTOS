@@ -67,12 +67,6 @@ set(AVRTOS_C_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/event.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/debug.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/idle.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/i2c.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/usart.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/gpio.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/spi.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/timer.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/exti.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/stack_sentinel.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/ring.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/atomic.c
@@ -84,8 +78,6 @@ set(AVRTOS_C_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/canaries.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/init.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/timer.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/mcp2515.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/tcn75.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/signal.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/kernel.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/misc/serial.c
@@ -106,6 +98,16 @@ set(AVRTOS_C_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/tqueue.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/dlist.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/slist.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/i2c.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/usart.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/gpio.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/spi.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/timer.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/exti.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/mcp2515.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/tcn75.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/sd.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/subsystems/crc.c
 )
 
 set(AVRTOS_ASM_SRC
