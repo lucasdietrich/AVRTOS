@@ -12,10 +12,13 @@
  * for events on multiple kernel objects simultaneously.
  */
 
+#if CONFIG_POLLING == 1
+
 #include <stdint.h>
 
 #include <avr/pgmspace.h>
 
+#include "avrtos/defines.h"
 #include "avrtos/errno.h"
 #include "avrtos/fifo.h"
 #include "avrtos/kernel.h"
@@ -24,8 +27,6 @@
 #include "avrtos/mutex.h"
 #include "avrtos/poll.h"
 #include "avrtos/semaphore.h"
-
-#if CONFIG_POLLING == 1
 
 /**
  * @brief Poll multiple kernel objects for events.
@@ -46,6 +47,9 @@
  */
 int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
 {
+    if (!z_user(pfds && nfds > 0))
+        return -EINVAL;
+
     int8_t ret        = 0;
     const uint8_t key = irq_lock();
 

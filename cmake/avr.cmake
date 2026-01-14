@@ -61,8 +61,60 @@ set(CMAKE_C_FLAGS "${OBJECT_GEN_FLAGS} -Wstrict-prototypes -std=gnu11 " CACHE IN
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=gnu++11 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
 
-file(GLOB_RECURSE AVRTOS_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.c**")
-file(GLOB_RECURSE AVRTOS_ASM_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/*.S")
+set(AVRTOS_C_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/mutex.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/assert.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/event.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/debug.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/idle.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/i2c.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/usart.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/gpio.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/spi.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/timer.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/drivers/exti.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/stack_sentinel.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/ring.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/atomic.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/semaphore.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/prng.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/workqueue.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/fault.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/sysclock.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/canaries.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/init.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/timer.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/mcp2515.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/devices/tcn75.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/signal.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/kernel.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/misc/serial.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/misc/led.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/alloc/slab.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/alloc/bump.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/alloc/default.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/msgq.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/flags.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/stdout.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/fifo.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/systime.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/poll.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/mem_slab.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/rust_helpers.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/debug.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/tdqueue.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/tqueue.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/dlist.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/dstruct/slist.c
+)
+
+set(AVRTOS_ASM_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/arch/arch_atomic.S
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/arch/arch_utils.S
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/arch/debug_utils.S
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/arch/init_sections.S
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/arch/thread_switch_preempt.S
+)
 
 if(${FEATURE_TIMER_COUNT} STREQUAL "")
 	set(FEATURE_TIMER_COUNT 0)
