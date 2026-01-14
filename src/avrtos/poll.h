@@ -25,7 +25,6 @@
 #include "avrtos/mem_slab.h"
 #include "avrtos/msgq.h"
 #include "avrtos/types.h"
-#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,9 +65,7 @@ typedef enum {
  * events have occurred on it.
  */
 struct k_pollfd {
-    z_wqhandle_t _wqhandle;   /**< Internal wait queue handle (private) */
-    struct k_thread *_thread; /**< Pointer to the thread that is polling (private) */
-
+    uint8_t revents;    /**< Events that have occurred (K_POLL_READY) */
     k_poll_type_t type; /**< Type of the object being polled */
     union {
         struct k_sem *sem;           /**< Pointer to a semaphore for polling */
@@ -77,7 +74,8 @@ struct k_pollfd {
         struct k_msgq *msgq;         /**< Pointer to a message queue for polling */
         struct k_mem_slab *mem_slab; /**< Pointer to a memory slab for polling */
     } obj;                           /**< Union of pointers to the objects being polled */
-    uint8_t revents;                 /**< Events that have occurred (K_POLL_READY) */
+    z_wqhandle_t _wqhandle;          /**< Internal wait queue handle (private) */
+    struct k_thread *_thread; /**< Pointer to the thread that is polling (private) */
 };
 
 #define K_POLLFD_INIT(_type, _obj)                                                       \
