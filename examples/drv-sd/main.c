@@ -25,8 +25,8 @@ static int test_readall(struct sd_device *sd, uint32_t max);
 
 int main(void)
 {
-    struct sd_csd csd;
-    struct sd_cid cid;
+    struct sd_csd csd = {0};
+    struct sd_cid cid = {0};
     struct sd_device sd;
     int ret;
 
