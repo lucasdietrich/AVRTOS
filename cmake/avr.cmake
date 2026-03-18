@@ -63,6 +63,7 @@ set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL 
 
 set(AVRTOS_C_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/mutex.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/condvar.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/assert.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/event.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/debug.c
