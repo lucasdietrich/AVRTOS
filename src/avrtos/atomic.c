@@ -29,6 +29,11 @@ void atomic_set_bit_to(atomic_t *target, uint8_t bit, bool val)
     }
 }
 
+void atomic_toggle_bit(atomic_t *target, uint8_t bit)
+{
+    atomic_xor(target, BIT(bit));
+}
+
 bool atomic_test_bit(atomic_t *target, uint8_t bit)
 {
     const atomic_val_t mask = BIT(bit);
