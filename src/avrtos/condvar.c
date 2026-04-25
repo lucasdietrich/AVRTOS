@@ -11,7 +11,7 @@
 #include "avrtos/kernel.h"
 #include "avrtos/kernel_private.h"
 #include "avrtos/mutex.h"
-#include "dlist.h"
+#include "avrtos/dstruct/dlist.h"
 
 __kernel int k_condvar_broadcast(struct k_condvar *condvar)
 {
