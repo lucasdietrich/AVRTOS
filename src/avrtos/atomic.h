@@ -149,6 +149,14 @@ __kernel void atomic_set_bit(atomic_t *target, uint8_t bit);
 __kernel void atomic_set_bit_to(atomic_t *target, uint8_t bit, bool val);
 
 /**
+ * @brief Toggle the bit at the specified position in the atomic variable.
+ *
+ * @param target Pointer to the atomic variable.
+ * @param bit The bit position to toggle.
+ */
+__kernel void atomic_toggle_bit(atomic_t *target, uint8_t bit);
+
+/**
  * @brief Test whether the bit at the specified position in the atomic variable is set.
  *
  * @param target Pointer to the atomic variable.
