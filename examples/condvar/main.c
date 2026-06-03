@@ -44,7 +44,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-/* ── Shared state ─────────────────────────────────────────────────────────── */
+/* Shared state  */
 
 static volatile uint8_t data_ready = 0;
 static volatile uint8_t data_value = 0;
@@ -52,7 +52,7 @@ static volatile uint8_t data_value = 0;
 K_MUTEX_DEFINE(data_mutex);
 K_CONDVAR_DEFINE(data_cond);
 
-/* ── Thread declarations ──────────────────────────────────────────────────── */
+/* Thread declarations  */
 
 void producer_thread(void *arg);
 void consumer_thread(void *arg);
@@ -61,14 +61,10 @@ K_THREAD_DEFINE(producer,  producer_thread, 0x110, K_COOPERATIVE, NULL, 'P');
 K_THREAD_DEFINE(consumer1, consumer_thread, 0x110, K_COOPERATIVE, NULL, 'A');
 K_THREAD_DEFINE(consumer2, consumer_thread, 0x110, K_COOPERATIVE, NULL, 'B');
 
-/* ── main ─────────────────────────────────────────────────────────────────── */
-
 int main(void)
 {
     k_sleep(K_FOREVER);
 }
-
-/* ── Producer ─────────────────────────────────────────────────────────────── */
 
 void producer_thread(void *arg)
 {
@@ -93,8 +89,6 @@ void producer_thread(void *arg)
         k_mutex_unlock(&data_mutex);
     }
 }
-
-/* ── Consumer ─────────────────────────────────────────────────────────────── */
 
 void consumer_thread(void *arg)
 {
