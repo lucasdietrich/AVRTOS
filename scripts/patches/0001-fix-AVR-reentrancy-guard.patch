@@ -1,0 +1,39 @@
+From 31dfb3857a0238e77b99d01abac211d5ed34867a Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Sat, 8 Aug 2026 11:33:28 +0200
+Subject: [PATCH] fix: AVR reentrancy guard
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fixes: qemu-system-avr: warning: Blocked re-entrant IO on MemoryRegion:
+avr-cpu-reg2 at addr: 0x5
+
+see: https://www.mail-archive.com/qemu-devel@nongnu.org/msg1143920.html
+
+Reported-By: Philippe Mathieu-Daudé
+---
+ target/avr/cpu.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+index 8579a7283b..975ddb716e 100644
+--- a/target/avr/cpu.c
++++ b/target/avr/cpu.c
+@@ -146,11 +146,13 @@ static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
+      */
+     memory_region_init_io(&cpu->cpu_reg1, OBJECT(cpu), &avr_cpu_reg1, env,
+                           "avr-cpu-reg1", 32);
++    cpu->cpu_reg1.disable_reentrancy_guard = true;
+     memory_region_add_subregion(get_system_memory(),
+                                 OFFSET_DATA, &cpu->cpu_reg1);
+ 
+     memory_region_init_io(&cpu->cpu_reg2, OBJECT(cpu), &avr_cpu_reg2, env,
+                           "avr-cpu-reg2", 8);
++    cpu->cpu_reg2.disable_reentrancy_guard = true;
+     memory_region_add_subregion(get_system_memory(),
+                                 OFFSET_DATA + 0x58, &cpu->cpu_reg2);
+ }
+-- 
+2.55.0
+
