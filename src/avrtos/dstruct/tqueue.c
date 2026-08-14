@@ -97,6 +97,57 @@ struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout)
     return item;
 }
 
+int8_t tqueue_reschedule(struct titem **root, struct titem *item, k_delta_t timeout)
+{
+    if (!item || !root)
+        return -EINVAL;
+
+    struct titem **pp_next;
+    struct titem *p_current;
+
+    struct titem **pp_found  = NULL; // where the item was found
+    struct titem **pp_insert = NULL; // where to insert the item on rescheduling
+
+    for (pp_next = root; (p_current = *pp_next) != NULL; pp_next = &(p_current->next)) {
+        if (p_current == item)
+            pp_found = pp_next;
+
+        // check where to reschedule
+        if (!pp_insert) {
+            if (p_current->delay_shift > timeout) {
+                pp_insert = pp_next;
+            } else {
+                timeout -= p_current->delay_shift;
+            }
+        }
+
+        if (pp_found && pp_insert)
+            break;
+    }
+
+    if (!pp_found)
+        return -ENOENT;
+
+    if (!pp_insert)
+        pp_insert = pp_next;
+
+    if ((*pp_found)->next != NULL) {
+        (*pp_found)->next->delay_shift += item->delay_shift;
+    }
+
+    // remove the item
+    *pp_found = item->next;
+
+    // reschedule de item
+    item->delay_shift = timeout;
+    item->next        = *pp_insert;
+    if (*pp_insert)
+        (*pp_insert)->delay_shift -= timeout;
+    *pp_insert = item;
+
+    return 0;
+}
+
 void tqueue_remove(struct titem **root, struct titem *item)
 {
     struct titem **prev_next_p = root;
