@@ -9,6 +9,7 @@
 #include <util/atomic.h>
 
 #include "assert.h"
+#include "tqueue.h"
 
 #define K_MODULE K_MODULE_EVENT
 
@@ -71,11 +72,30 @@ int8_t k_event_init(struct k_event *event, k_event_handler_t handler)
  */
 void z_event_schedule(struct k_event *event, k_timeout_t timeout)
 {
+    __ASSERT_TRUE(!event->scheduled);
+
     event->scheduled   = 1u;
     event->tie.next    = NULL;
     event->tie.timeout = K_TIMEOUT_TICKS(timeout);
 
     z_tqueue_schedule(&z_event_q.first, &event->tie);
+}
+
+/**
+ * @brief Internal function to reschedule an event.
+ *
+ * This function reschedules an already scheduled event with a new timeout.
+ * It requires interrupts to be disabled.
+ *
+ *
+ * @param event Pointer to the event structure.
+ * @param timeout New timeout in ticks after which the event will be triggered.
+ */
+void z_event_reschedule(struct k_event *event, k_timeout_t timeout)
+{
+    __ASSERT_TRUE(event->scheduled);
+    
+    tqueue_reschedule(&z_event_q.first, &event->tie, K_TIMEOUT_TICKS(timeout));
 }
 
 int8_t k_event_schedule(struct k_event *event, k_timeout_t timeout)

@@ -8,7 +8,9 @@
 
 #include <util/atomic.h>
 
+#include "avrtos/errno.h"
 #include "kernel.h"
+#include "tqueue.h"
 
 #define K_MODULE K_MODULE_WORKQUEUE
 
@@ -177,6 +179,21 @@ void k_work_delayable_init(struct k_work_delayable *dwork, k_work_handler_t hand
 }
 
 extern void z_event_schedule(struct k_event *event, k_timeout_t timeout);
+extern void z_event_reschedule(struct k_event *event, k_timeout_t timeout);
+
+static void z_work_delayable_schedule(struct k_workqueue *workqueue,
+                                        struct k_work_delayable *dwork,
+                                        k_timeout_t timeout)
+{
+    /* Safely assign the workqueue, ensuring it is not modified during submission */
+    dwork->_workqueue = workqueue;
+
+    if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+        z_fifo_put(&workqueue->q, &dwork->work._tie);
+    } else {
+        z_event_schedule(&dwork->_event, timeout);
+    }
+}
 
 int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
                                  struct k_work_delayable *dwork,
@@ -194,13 +211,35 @@ int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
         goto exit;
     }
 
-    /* Safely assign the workqueue, ensuring it is not modified during submission */
-    dwork->_workqueue = workqueue;
+    z_work_delayable_schedule(workqueue, dwork, timeout);
 
-    if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-        z_fifo_put(&workqueue->q, &dwork->work._tie);
+exit:
+    irq_unlock(lock);
+    return ret;
+}
+
+int8_t k_work_delayable_reschedule(struct k_workqueue *workqueue,
+                                 struct k_work_delayable *dwork,
+                                 k_timeout_t timeout)
+{
+    if (!z_user(workqueue && dwork))
+        return -EINVAL;
+
+    int8_t ret;
+    const uint8_t lock = irq_lock();
+
+    /* Ensure the work item is not already submitted to a queue */
+    if (!z_work_submittable(&dwork->work)) {
+        ret = -EBUSY;
+        goto exit;
+    }
+
+    if (dwork->_event.scheduled) {
+        z_event_reschedule(&dwork->_event, timeout);
+        ret = 0; /* Indicate that the work item was already scheduled and has been rescheduled */
     } else {
-        z_event_schedule(&dwork->_event, timeout);
+        z_work_delayable_schedule(workqueue, dwork, timeout);
+        ret = 1; /* Indicate that the work item was newly scheduled */
     }
 
 exit:
@@ -214,16 +253,16 @@ int8_t k_work_delayable_cancel(struct k_work_delayable *dwork)
         return -EINVAL;
 
     int8_t ret = k_event_cancel(&dwork->_event);
-    if (ret == -EAGAIN) {
-        const uint8_t lock = irq_lock();
+    if (ret != -EAGAIN)
+        return ret;
 
-        /* If the work item is not pending, check if it is already in the queue */
-        if (!z_work_submittable(&dwork->work)) {
-            ret = -EBUSY;
-        }
+    const uint8_t lock = irq_lock();
 
-        irq_unlock(lock);
-    }
+    /* If the work item is not pending, check if it is already in the queue */
+    if (!z_work_submittable(&dwork->work))
+        ret = -EBUSY;
+
+    irq_unlock(lock);
 
     return ret;
 }
@@ -233,6 +272,12 @@ int8_t k_system_work_delayable_schedule(struct k_work_delayable *dwork,
                                         k_timeout_t timeout)
 {
     return k_work_delayable_schedule(&z_system_workqueue, dwork, timeout);
+}
+
+int8_t k_system_work_delayable_reschedule(struct k_work_delayable *dwork,
+                                          k_timeout_t timeout)
+{
+    return k_work_delayable_reschedule(&z_system_workqueue, dwork, timeout);
 }
 #endif
 #endif

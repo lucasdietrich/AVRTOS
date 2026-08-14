@@ -326,6 +326,27 @@ __kernel int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
                                           k_timeout_t timeout);
 
 /**
+ * @brief Reschedule a delayable work item with a new timeout.
+ *
+ * This function schedules a delayable work item to be queued after a new timeout.
+ * If the work item is already scheduled or queued, it is rescheduled with the new
+ * timeout. If the work item is not yet scheduled, it is scheduled with the new timeout.
+ *
+ * Safety: This function is safe to call from an ISR context.
+ *
+ * @param workqueue Pointer to the workqueue structure.
+ * @param dwork Pointer to the delayable work item.
+ * @param timeout New timeout before the work item is queued.
+ * @return 1 if the work item was newly scheduled
+ * @return 0 if the work item was already scheduled and has been rescheduled
+ * @return -EBUSY if the work item is already in the queue and cannot be rescheduled
+ * @return -EINVAL if any of the arguments are invalid
+ */
+__kernel int8_t k_work_delayable_reschedule(struct k_workqueue *workqueue,
+                                            struct k_work_delayable *dwork,
+                                            k_timeout_t timeout);
+
+/**
  * @brief Schedule a delayable work item for the system workqueue.
  *
  * This function schedules a delayable work item to be added to the system workqueue
@@ -339,6 +360,26 @@ __kernel int8_t k_work_delayable_schedule(struct k_workqueue *workqueue,
  */
 __kernel int8_t k_system_work_delayable_schedule(struct k_work_delayable *dwork,
                                                  k_timeout_t timeout);
+
+/**
+ * @brief Reschedule a delayable work item for the system workqueue.
+ *
+ * This function schedules a delayable work item to be added to the system workqueue
+ * after a new timeout. If the work item is already scheduled or queued, it is
+ * rescheduled with the new timeout. If the work item is not yet scheduled, it is
+ * scheduled with the new timeout.
+ *
+ * Safety: This function is safe to call from an ISR context.
+ *
+ * @param dwork Pointer to the delayable work item.
+ * @param timeout New timeout before the work item is queued.
+ * @return 0 if the work item was already scheduled and has been rescheduled
+ * @return 1 if the work item was newly scheduled
+ * @return -EBUSY if the work item is already in the queue and cannot be rescheduled
+ * @return -EINVAL if any of the arguments are invalid
+ */
+__kernel int8_t k_system_work_delayable_reschedule(struct k_work_delayable *dwork,
+                                                   k_timeout_t timeout);
 
 /**
  * @brief Cancel a scheduled delayable work item.

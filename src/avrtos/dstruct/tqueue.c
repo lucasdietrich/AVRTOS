@@ -5,6 +5,7 @@
  */
 
 #include "tqueue.h"
+#include "avrtos/defines.h"
 
 // A should be processed in 10 ms
 // B should be processed in 10 + 30 = 40ms
@@ -79,6 +80,9 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed)
 
 struct titem *tqueue_pop(struct titem **root)
 {
+    if (!z_user(root))
+        return NULL;
+
     struct titem *item = NULL;
     /* pop the first item if expired */
     if ((*root != NULL) && ((*root)->delay_shift == 0)) {
@@ -99,62 +103,26 @@ struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout)
 
 int8_t tqueue_reschedule(struct titem **root, struct titem *item, k_delta_t timeout)
 {
-    if (!item || !root)
+    int8_t ret = tqueue_remove(root, item);
+    if (ret != 0)
+        return ret;
+
+    tqueue_schedule(root, item, timeout);
+
+    return 0;
+}
+
+int8_t tqueue_remove(struct titem **root, struct titem *item)
+{
+    if (!z_user(item && root))
         return -EINVAL;
 
     struct titem **pp_next;
     struct titem *p_current;
 
-    struct titem **pp_found  = NULL; // where the item was found
-    struct titem **pp_insert = NULL; // where to insert the item on rescheduling
-
     for (pp_next = root; (p_current = *pp_next) != NULL; pp_next = &(p_current->next)) {
-        if (p_current == item)
-            pp_found = pp_next;
-
-        // check where to reschedule
-        if (!pp_insert) {
-            if (p_current->delay_shift > timeout) {
-                pp_insert = pp_next;
-            } else {
-                timeout -= p_current->delay_shift;
-            }
-        }
-
-        if (pp_found && pp_insert)
-            break;
-    }
-
-    if (!pp_found)
-        return -ENOENT;
-
-    if (!pp_insert)
-        pp_insert = pp_next;
-
-    if ((*pp_found)->next != NULL) {
-        (*pp_found)->next->delay_shift += item->delay_shift;
-    }
-
-    // remove the item
-    *pp_found = item->next;
-
-    // reschedule de item
-    item->delay_shift = timeout;
-    item->next        = *pp_insert;
-    if (*pp_insert)
-        (*pp_insert)->delay_shift -= timeout;
-    *pp_insert = item;
-
-    return 0;
-}
-
-void tqueue_remove(struct titem **root, struct titem *item)
-{
-    struct titem **prev_next_p = root;
-    while (*prev_next_p != NULL) {
-        struct titem *p_current = *prev_next_p;
         if (p_current == item) {
-            *prev_next_p = p_current->next;
+            *pp_next = p_current->next;
 
             /* add removed item remaining time
              * to the next item if exists */
@@ -163,8 +131,9 @@ void tqueue_remove(struct titem **root, struct titem *item)
             }
 
             item->next = NULL;
-            break;
+            return 0;
         }
-        prev_next_p = &(p_current->next);
     }
+
+    return -ENOENT;
 }

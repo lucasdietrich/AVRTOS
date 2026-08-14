@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <stdio.h>
 #include <avrtos/defines.h>
 #include <avrtos/dstruct/debug.h>
 #include <avrtos/dstruct/dlist.h>
@@ -229,6 +230,11 @@ void test_tqueue(void)
     for (uint8_t i = 0; i < ARRAY_SIZE(titems); i++) {
         z_tqueue_schedule(&root, &titems[ARRAY_SIZE(titems) - 1 - i].tie);
     }
+
+    print_tqueue(root);
+
+    int8_t ret = tqueue_reschedule(&root, &titems[3].tie, 150);
+    printf_P(PSTR("reschedule ret: %d\n"), ret);
 
     print_tqueue(root);
 

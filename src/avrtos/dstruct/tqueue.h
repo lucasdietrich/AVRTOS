@@ -131,12 +131,12 @@ int8_t tqueue_reschedule(struct titem **root, struct titem *item, k_delta_t time
  * Assumptions :
  *  - root is not null
  *  - item is not null
- *  - item is in root tqueue
  *
  * @param root
  * @param item Item to remove if exists in the time queue.
+ * @return 0 on success, -ENOENT if the item is not in the time queue.
  */
-void tqueue_remove(struct titem **root, struct titem *item);
+int8_t tqueue_remove(struct titem **root, struct titem *item);
 
 #ifdef __cplusplus
 }
