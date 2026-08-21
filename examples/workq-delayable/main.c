@@ -13,6 +13,8 @@
 #include <avrtos/avrtos.h>
 #include <avrtos/drivers/usart.h>
 #include <avrtos/misc/serial.h>
+#include "avrtos/kernel.h"
+#include "avrtos/ring.h"
 
 #define TIMEOUT_MS 5000
 
@@ -29,14 +31,33 @@ void work_handler(struct k_work *work)
     k_sem_give(&my_struct->sem);
 }
 
+K_RING_DEFINE(ring, 16);
+K_SEM_DEFINE(uart_sem, 0, 1);
+
+ISR(USART0_RX_vect)
+{
+    uint8_t c = USART0_DEVICE->UDRn;
+    k_ring_push(&ring, c);
+    
+    struct k_thread *thread = k_sem_give(&uart_sem);
+    if (thread)
+        k_yield_from_isr();
+}
+
 static void usart_task(void *arg)
 {
     struct MyStruct *ms = (struct MyStruct *)arg;
 
     int8_t ret;
-    uint8_t c;
+    char c;
+
     for (;;) {
-        c = ll_usart_sync_getc(USART0_DEVICE);
+        ret = k_ring_pop(&ring, &c);
+        if (ret) {
+            k_sem_take(&uart_sem, K_FOREVER);
+            continue;
+        }
+
         if (c == 'c' || c == 'C') {
             printf_P(PSTR("Cancelling scheduled work"));
             ret = k_work_delayable_cancel(&ms->work);
@@ -65,6 +86,7 @@ K_THREAD_DEFINE(usart, usart_task, 0x200, K_PREEMPTIVE, &my_struct, 'u');
 
 int main(void)
 {
+    ll_usart_enable_rx_isr(USART0_DEVICE);
     k_work_delayable_init(&my_struct.work, work_handler);
     k_sem_init(&my_struct.sem, 0, 1);
 
