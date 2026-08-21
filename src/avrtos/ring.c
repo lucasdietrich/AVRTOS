@@ -18,9 +18,8 @@ int8_t k_ring_push(struct k_ring *ring, char data)
     if (!z_user(ring))
         return -EINVAL;
 
-    const uint8_t r   = ring->r;
     uint8_t w         = ring->w;
-    const uint8_t rem = ring->size - (w - r) - 1u;
+    const uint8_t rem = ring->size - (w - ring->r) - 1u;
 
     if (!rem) {
         return -ENOMEM;
@@ -28,11 +27,12 @@ int8_t k_ring_push(struct k_ring *ring, char data)
 
     ring->buffer[w] = data;
 
-    w++;
+    /* ensure the data is written before the write cursor is published */
+    memory_barrier();
 
-    if (w == ring->size) {
+    w++;
+    if (w == ring->size)
         w = 0u;
-    }
 
     ring->w = w;
 
@@ -44,20 +44,19 @@ int8_t k_ring_pop(struct k_ring *ring, char *data)
     if (!z_user(ring && data))
         return -EINVAL;
 
-    const uint8_t w = ring->w;
     uint8_t r       = ring->r;
 
-    if (r == w) {
+    if (r == ring->w)
         return -EAGAIN;
-    }
 
     *data = ring->buffer[r];
 
-    r++;
+    /* ensure the data is read before the read cursor (freeing the slot) is published */
+    memory_barrier();
 
-    if (r == ring->size) {
+    r++;
+    if (r == ring->size)
         r = 0u;
-    }
 
     ring->r = r;
 

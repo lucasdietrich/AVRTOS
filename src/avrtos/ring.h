@@ -10,9 +10,11 @@
  * A ring buffer is a fixed-size buffer that wraps around when the end of the buffer is
  * reached.
  *
- * Limitations:
- * - This implementation is currently not thread/interrupt-safe. For concurrent
- * environments, proper synchronization mechanisms must be implemented.
+ * Thread-safety:
+ * - Safe for exactly one producer (k_ring_push) and one consumer (k_ring_pop) running
+ *   concurrently (e.g. one from an ISR, the other from a thread), as long as neither
+ *   side is called concurrently with itself.
+ * - Not safe for multiple concurrent producers or multiple concurrent consumers.
  *
  * TODOs:
  * - Introduce support for concurrent writers and readers:
@@ -33,12 +35,11 @@
  */
 struct k_ring {
     uint8_t *buffer; /**< Pointer to the buffer array used by the ring buffer */
-
-    uint8_t r; /**< Read cursor, indicating the position of the next byte to read */
-
-    uint8_t w; /**< Write cursor, indicating the position of the next byte to write */
-
     uint8_t size; /**< Size of the buffer (total number of elements it can hold) */
+    /* r/w are volatile: each is written by only one side (consumer/producer) but read
+     * by both, so reads must not be cached across a preemption/interrupt point. */
+    volatile uint8_t r; /**< Read cursor, indicating the position of the next byte to read */
+    volatile uint8_t w; /**< Write cursor, indicating the position of the next byte to write */
 };
 
 /**
@@ -51,7 +52,10 @@ struct k_ring {
  */
 #define Z_RING_INIT(_buf, _size)                                                         \
     {                                                                                    \
-        .buffer = _buf, .r = 0u, .w = 0u, .size = _size,                                 \
+        .buffer = _buf,                                                                  \
+        .size   = _size,                                                                 \
+        .r      = 0u,                                                                    \
+        .w      = 0u,                                                                    \
     }
 
 /**
