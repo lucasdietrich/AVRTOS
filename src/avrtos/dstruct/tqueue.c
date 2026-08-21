@@ -5,6 +5,7 @@
  */
 
 #include "tqueue.h"
+#include "avrtos/defines.h"
 
 // A should be processed in 10 ms
 // B should be processed in 10 + 30 = 40ms
@@ -79,6 +80,9 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed)
 
 struct titem *tqueue_pop(struct titem **root)
 {
+    if (!z_user(root))
+        return NULL;
+
     struct titem *item = NULL;
     /* pop the first item if expired */
     if ((*root != NULL) && ((*root)->delay_shift == 0)) {
@@ -97,13 +101,28 @@ struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout)
     return item;
 }
 
-void tqueue_remove(struct titem **root, struct titem *item)
+int8_t tqueue_reschedule(struct titem **root, struct titem *item, k_delta_t timeout)
 {
-    struct titem **prev_next_p = root;
-    while (*prev_next_p != NULL) {
-        struct titem *p_current = *prev_next_p;
+    int8_t ret = tqueue_remove(root, item);
+    if (ret != 0)
+        return ret;
+
+    tqueue_schedule(root, item, timeout);
+
+    return 0;
+}
+
+int8_t tqueue_remove(struct titem **root, struct titem *item)
+{
+    if (!z_user(item && root))
+        return -EINVAL;
+
+    struct titem **pp_next;
+    struct titem *p_current;
+
+    for (pp_next = root; (p_current = *pp_next) != NULL; pp_next = &(p_current->next)) {
         if (p_current == item) {
-            *prev_next_p = p_current->next;
+            *pp_next = p_current->next;
 
             /* add removed item remaining time
              * to the next item if exists */
@@ -112,8 +131,9 @@ void tqueue_remove(struct titem **root, struct titem *item)
             }
 
             item->next = NULL;
-            break;
+            return 0;
         }
-        prev_next_p = &(p_current->next);
     }
+
+    return -ENOENT;
 }

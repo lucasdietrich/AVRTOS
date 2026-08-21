@@ -14,6 +14,8 @@
 #include <avrtos/drivers/usart.h>
 #include <avrtos/misc/serial.h>
 
+#define TIMEOUT_MS 5000
+
 struct MyStruct {
     struct k_work_delayable work;
     struct k_sem sem;
@@ -24,7 +26,6 @@ static struct MyStruct my_struct;
 void work_handler(struct k_work *work)
 {
     struct MyStruct *my_struct = CONTAINER_OF(work, struct MyStruct, work);
-
     k_sem_give(&my_struct->sem);
 }
 
@@ -36,18 +37,26 @@ static void usart_task(void *arg)
     uint8_t c;
     for (;;) {
         c = ll_usart_sync_getc(USART0_DEVICE);
-        if (c == 'c') {
-            printf_P(PSTR("Cancelling scheduled work\n"));
+        if (c == 'c' || c == 'C') {
+            printf_P(PSTR("Cancelling scheduled work"));
             ret = k_work_delayable_cancel(&ms->work);
+        } else if (c == 's' || c == 'S') {
+            printf_P(PSTR("Scheduling work"));
+            ret = k_system_work_delayable_schedule(&ms->work, K_MSEC(TIMEOUT_MS));
+        } else if (c == 'r' || c == 'R') {
+            printf_P(PSTR("Rescheduling work"));
+            ret = k_system_work_delayable_reschedule(&ms->work, K_MSEC(TIMEOUT_MS));
         } else {
-            printf_P(PSTR("Scheduling work\n"));
-            ret = k_system_work_delayable_schedule(&ms->work, K_MSEC(1000));
+            printf_P(PSTR("Unknown command: %c, use 's' to schedule, 'r' to reschedule, "
+                          "'c' to cancel\n"),
+                     c);
+            continue;
         }
 
-        if (ret == 0) {
-            printf_P(PSTR("OK\n"));
+        if (ret >= 0) {
+            printf_P(PSTR(" OK (%d)\n"), ret);
         } else {
-            printf_P(PSTR("Error: %d\n"), ret);
+            printf_P(PSTR(" Error: %d\n"), ret);
         }
     }
 }

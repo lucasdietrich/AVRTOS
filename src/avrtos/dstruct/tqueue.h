@@ -99,12 +99,27 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed);
 struct titem *tqueue_pop(struct titem **root);
 
 /**
- * @brief
+ * @brief Remove the first item from the time queue and reschedule it with a new timeout.
  *
  * @param root
  * @return struct titem*
  */
 struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout);
+
+/**
+ * @brief Reschedule an item in the time queue with a new timeout.
+ *
+ * Assumptions:
+ * - root is not null
+ * - item is not null
+ * - item is in root tqueue
+ *
+ * @param root
+ * @param item Item to reschedule if exists in the time queue.
+ * @param timeout New timeout for the item.
+ * @return struct titem* Pointer to the rescheduled item, or NULL if not found.
+ */
+int8_t tqueue_reschedule(struct titem **root, struct titem *item, k_delta_t timeout);
 
 /**
  * @brief Remove an item from the time queue.
@@ -116,12 +131,12 @@ struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout);
  * Assumptions :
  *  - root is not null
  *  - item is not null
- *  - item is in root tqueue
  *
  * @param root
  * @param item Item to remove if exists in the time queue.
+ * @return 0 on success, -ENOENT if the item is not in the time queue.
  */
-void tqueue_remove(struct titem **root, struct titem *item);
+int8_t tqueue_remove(struct titem **root, struct titem *item);
 
 #ifdef __cplusplus
 }

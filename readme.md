@@ -344,9 +344,13 @@ Note about AVR support in QEMU: https://qemu-project.gitlab.io/qemu/system/targe
 You will have limited support for peripherals: all UART are supported, however 
 only 16-bit timers are supported.
 
-Moreover you'll need to apply the following patch to QEMU (<= 8.0.2): 
-[scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch](./scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch)
+Moreover you'll need to apply the following patches to QEMU:
+
+- For QEMU <= 8.0.2: [scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch](./scripts/patches/0001-Fix-handling-of-AVR-interrupts-above-33-by-switching.patch)
 to have all 16-bit timers working.
+- For QEMU >= 11: [scripts/patches/0001-fix-AVR-reentrancy-guard.patch](./scripts/patches/0001-fix-AVR-reentrancy-guard.patch) to fix `qemu-system-avr: warning: Blocked re-entrant IO on MemoryRegion:
+avr-cpu-reg2 at addr: 0x5`
+
 
 In case you want to emulate you program with QEMU:
 ```bash
