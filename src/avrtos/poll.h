@@ -56,6 +56,7 @@ typedef enum {
     K_POLL_TYPE_FIFO = 0x05, /**< Polling on a FIFO for available items */
     K_POLL_TYPE_MEM_SLAB =
         0x06, /**< Polling on a memory slab for available blocks (not implemented) */
+    K_POLL_TYPE_THREAD_JOIN = 0x07, /**< Polling on a thread for termination (join) */
 } k_poll_type_t;
 
 /**
@@ -73,6 +74,7 @@ struct k_pollfd {
         struct k_fifo *fifo;         /**< Pointer to a FIFO for polling */
         struct k_msgq *msgq;         /**< Pointer to a message queue for polling */
         struct k_mem_slab *mem_slab; /**< Pointer to a memory slab for polling */
+        struct k_thread *thread;     /**< Pointer to a thread for polling */
     } obj;                           /**< Union of pointers to the objects being polled */
     z_wqhandle_t _wqhandle;          /**< Internal wait queue handle (private) */
     struct k_thread *_thread; /**< Pointer to the thread that is polling (private) */
@@ -90,6 +92,7 @@ struct k_pollfd {
 #define K_POLLFD_MSGQ_PUT(_msgq) K_POLLFD_INIT(K_POLL_TYPE_MSGQ_PUT, {.msgq = _msgq})
 #define K_POLLFD_MSGQ_GET(_msgq) K_POLLFD_INIT(K_POLL_TYPE_MSGQ_GET, {.msgq = _msgq})
 #define K_POLLFD_MEM_SLAB(_slab) K_POLLFD_INIT(K_POLL_TYPE_MEM_SLAB, {.mem_slab = _slab})
+#define K_POLLFD_THREAD_JOIN(_thread) K_POLLFD_INIT(K_POLL_TYPE_THREAD_JOIN, {.thread = _thread})
 
 /**
  * @brief Poll multiple kernel objects for events.

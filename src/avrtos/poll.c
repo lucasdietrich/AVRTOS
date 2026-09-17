@@ -94,6 +94,14 @@ int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
                 pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
             }
             break;
+#if CONFIG_THREAD_JOIN
+        case K_POLL_TYPE_THREAD_JOIN:
+            if (z_get_thread_state(pfd->obj.thread) != Z_THREAD_STATE_STOPPED) {
+                waitqueue            = &pfd->obj.thread->join_waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
+            break;
+#endif /* CONFIG_THREAD_JOIN */
         default:
             ret = -EINVAL;
             pfd->revents |= K_POLL_ERR;
@@ -131,6 +139,7 @@ int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
         case K_POLL_TYPE_MSGQ_GET:
         case K_POLL_TYPE_MSGQ_PUT:
         case K_POLL_TYPE_MEM_SLAB:
+        case K_POLL_TYPE_THREAD_JOIN:
             dlist_remove(&pfd->_wqhandle.tie);
             break;
         default:
