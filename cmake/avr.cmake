@@ -66,6 +66,7 @@ set(AVRTOS_C_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/condvar.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/assert.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/event.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/event2.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/debug.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/idle.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/avrtos/stack_sentinel.c

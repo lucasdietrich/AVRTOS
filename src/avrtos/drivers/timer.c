@@ -21,12 +21,12 @@ static int8_t _get_index(void *dev)
     return timer_get_index(dev);
 }
 
-static bool _is_8bits(uint8_t tim_idx)
+static bool z_is_8bits(uint8_t tim_idx)
 {
     return TIMER_INDEX_IS_8BITS(tim_idx);
 }
 
-static bool _is_16bits(uint8_t tim_idx)
+static bool z_is_16bits(uint8_t tim_idx)
 {
     return TIMER_INDEX_IS_16BITS(tim_idx);
 }
@@ -77,11 +77,11 @@ int8_t timer8_init(TIMER8_Device *dev, const struct timer_config *config)
         return tim_idx;
     }
 
-    if (_is_8bits(tim_idx) == false) {
+    if (z_is_8bits(tim_idx) == false) {
         return -EINVAL;
     }
 
-    if ((tim_idx == 2) && (config->prescaler > TIMER_PRESCALER_1024)) {
+    if ((tim_idx != 2) && (config->prescaler > TIMER_PRESCALER_1024)) {
         return -EINVAL;
     }
 
@@ -153,7 +153,7 @@ int8_t timer16_init(TIMER16_Device *dev, const struct timer_config *config)
         return tim_idx;
     }
 
-    if (_is_16bits(tim_idx) == false) {
+    if (z_is_16bits(tim_idx) == false) {
         return -EINVAL;
     }
 
@@ -248,7 +248,7 @@ static int timer2_get_presc_value(timer2_prescaler_t prescaler)
 
 int8_t timer_calc_prescaler(uint8_t timer_index, uint32_t period_us, uint16_t *counter)
 {
-    const bool is_16bit        = _is_16bits(timer_index);
+    const bool is_16bit        = z_is_16bits(timer_index);
     const uint16_t max_counter = is_16bit ? 0xFFFFu : 0xFFu;
     const bool is_timer2       = timer_index == 2; /* timer2 has more prescaler values */
 
@@ -366,7 +366,7 @@ int8_t timer_init(uint8_t tim_idx,
         .counter   = counter,
         .timsk     = BIT(OCIEnA)};
 
-    const bool is_16bit_timer = _is_16bits(tim_idx);
+    const bool is_16bit_timer = z_is_16bits(tim_idx);
     if (is_16bit_timer) {
         ll_timer16_init((TIMER16_Device *)dev, tim_idx, &cfg);
     } else {
@@ -405,9 +405,9 @@ uint8_t timer_get_prescaler(uint8_t tim_idx)
 
 uint32_t timer_get_max_period_us(uint8_t tim_idx)
 {
-    if (_is_16bits(tim_idx)) {
+    if (z_is_16bits(tim_idx)) {
         return (1024LU * 0x10000LU) / (F_CPU / 1000000LU);
-    } else if (_is_8bits(tim_idx)) {
+    } else if (z_is_8bits(tim_idx)) {
         return (1024LU * 0x100LU) / (F_CPU / 1000000LU);
     } else {
         return 0;

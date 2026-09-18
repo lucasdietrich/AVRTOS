@@ -86,7 +86,7 @@ void tqueue_schedule(struct titem **root, struct titem *item, k_delta_t timeout)
 void tqueue_shift(struct titem **root, k_delta_t time_passed);
 
 /**
- * @brief Pop an item from the time queue.
+ * @brief Pop the first item from the time queue if it is ready.
  *
  * Note: this function doesn't alter/reset the item->tie nor the item->next members.
  *
@@ -97,6 +97,21 @@ void tqueue_shift(struct titem **root, k_delta_t time_passed);
  * @return struct titem*
  */
 struct titem *tqueue_pop(struct titem **root);
+
+/**
+ * @brief Pop the first item from the time queue without checking anything
+ *
+ * Note: the user must ensure that the item is actually ready before calling this function.
+ *       e.g. with tqueue_peek_head_if_ready() before calling this function.
+ * Note: this function doesn't alter/reset the item->tie nor the item->next members.
+ *
+ * Assumptions:
+ * - root is not null
+ *
+ * @param root
+ * @return struct titem*
+ */
+struct titem *tqueue_pop_unchecked(struct titem **root);
 
 /**
  * @brief Remove the first item from the time queue and reschedule it with a new timeout.
@@ -137,6 +152,29 @@ int8_t tqueue_reschedule(struct titem **root, struct titem *item, k_delta_t time
  * @return 0 on success, -ENOENT if the item is not in the time queue.
  */
 int8_t tqueue_remove(struct titem **root, struct titem *item);
+
+inline struct titem *tqueue_peek_head(struct titem **root)
+{
+    return *root;
+}
+
+/**
+ * @brief Peek the head if it is ready (timeout == 0).
+ *
+ * Assumptions:
+ * - root is not null
+ *
+ * @param root
+ * @return struct titem* Pointer to the first ready item, or NULL if none are ready.
+ */
+inline struct titem *tqueue_peek_head_if_ready(struct titem **root)
+{
+    struct titem *head = *root;
+    if (head != NULL && head->timeout == 0) {
+        return head;
+    }
+    return NULL;
+}
 
 #ifdef __cplusplus
 }
