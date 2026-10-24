@@ -9,7 +9,7 @@
 #include <util/atomic.h>
 
 #include "assert.h"
-#include "tqueue.h"
+#include "avrtos/dstruct/tqueue.h"
 
 #define K_MODULE K_MODULE_EVENT
 

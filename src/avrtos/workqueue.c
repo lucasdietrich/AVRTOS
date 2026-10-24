@@ -10,7 +10,7 @@
 
 #include "avrtos/errno.h"
 #include "kernel.h"
-#include "tqueue.h"
+#include "avrtos/dstruct/tqueue.h"
 
 #define K_MODULE K_MODULE_WORKQUEUE
 
