@@ -18,32 +18,6 @@
 #define Z_EVENTS_PERIOD_TICKS Z_KERNEL_TIME_SLICE_TICKS
 
 /**
- * @brief Event queue structure.
- *
- * This structure holds the first event in the queue, which is used to manage
- * scheduled events in a time-ordered manner.
- */
-struct k_event_q {
-    struct titem *first; ///< Pointer to the first event in the queue.
-};
-
-/**
- * @brief Macro to initialize the event queue.
- */
-#define Z_EVENT_Q_INIT()                                                                 \
-    {                                                                                    \
-        .first = NULL,                                                                   \
-    }
-
-/**
- * @brief Macro to define and initialize an event queue.
- *
- * This macro defines a global event queue named `name` and initializes it using
- * `Z_EVENT_Q_INIT()`.
- */
-#define K_EVENT_Q_DEFINE(name) struct k_event_q name = Z_EVENT_Q_INIT()
-
-/**
  * @brief Global event queue instance.
  *
  * This is the main event queue used for scheduling and processing events.

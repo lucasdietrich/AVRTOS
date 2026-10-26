@@ -41,6 +41,8 @@
 #include "semaphore.h"
 #include "timer.h"
 #include "event.h"
+#include "event2.h"
+#include "evq.h"
 #include "signal.h"
 #include "fifo.h"
 #include "mem_slab.h"

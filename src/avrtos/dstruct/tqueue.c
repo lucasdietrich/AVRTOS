@@ -92,6 +92,13 @@ struct titem *tqueue_pop(struct titem **root)
     return item;
 }
 
+struct titem *tqueue_pop_unchecked(struct titem **root)
+{
+    struct titem *item = *root;
+    *root = (*root)->next;
+    return item;
+}
+
 struct titem *tqueue_pop_reschedule(struct titem **root, k_delta_t timeout)
 {
     struct titem *item = tqueue_pop(root);

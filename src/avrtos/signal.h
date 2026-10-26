@@ -159,6 +159,8 @@ __kernel int8_t k_signal_raise(struct k_signal *sig, uint8_t value);
  */
 __kernel int8_t k_poll_signal(struct k_signal *sig, k_timeout_t timeout);
 
+#define k_signal_poll(sig, timeout) k_poll_signal(sig, timeout)
+
 /**
  * @brief Cancel the wait for all threads polling on the signal.
  *

@@ -597,6 +597,28 @@
 #define CONFIG_KERNEL_EVENTS 0
 #endif
 
+
+//
+// Enable event2 support.
+// - This feature requires additional stack space for threads.
+//
+// 0: Kernel events (v2) are disabled.
+// 1: Kernel events (v2) are enabled.
+//
+#ifndef CONFIG_KERNEL_EVENTS2
+#define CONFIG_KERNEL_EVENTS2 0
+#endif
+
+//
+// Enable the system event queue for event2.
+//
+// 0: System event queue is disabled.
+// 1: System event queue is enabled.
+//
+#ifndef CONFIG_KERNEL_EVENTS2_SYS_EVQ
+#define CONFIG_KERNEL_EVENTS2_SYS_EVQ CONFIG_KERNEL_EVENTS2
+#endif
+
 //
 // Allow scheduling an event with K_NO_WAIT.
 // This will cause the event callback to be executed immediately.

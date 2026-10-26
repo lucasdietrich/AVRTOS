@@ -25,6 +25,7 @@
 #include "avrtos/mem_slab.h"
 #include "avrtos/msgq.h"
 #include "avrtos/types.h"
+#include "avrtos/evq.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +58,7 @@ typedef enum {
     K_POLL_TYPE_MEM_SLAB =
         0x06, /**< Polling on a memory slab for available blocks (not implemented) */
     K_POLL_TYPE_THREAD_JOIN = 0x07, /**< Polling on a thread for termination (join) */
+    K_POLL_TYPE_EVENT2 = 0x08, /**< Polling on an event for readiness */
 } k_poll_type_t;
 
 /**
@@ -75,6 +77,7 @@ struct k_pollfd {
         struct k_msgq *msgq;         /**< Pointer to a message queue for polling */
         struct k_mem_slab *mem_slab; /**< Pointer to a memory slab for polling */
         struct k_thread *thread;     /**< Pointer to a thread for polling */
+        struct k_event_q *evq;     /**< Pointer to an event queue for polling */
     } obj;                           /**< Union of pointers to the objects being polled */
     z_wqhandle_t _wqhandle;          /**< Internal wait queue handle (private) */
     struct k_thread *_thread; /**< Pointer to the thread that is polling (private) */
@@ -105,8 +108,8 @@ struct k_pollfd {
  * @param nfds Number of file descriptors in the array.
  * @param timeout Maximum time to wait for events. Use K_FOREVER to wait indefinitely,
  *                or K_NO_WAIT to return immediately.
- * @return Number of ready objects on success, -ETIMEDOUT on timeout, or negative
- *         error code on failure.
+ * @return 0 on sucess, -ETIMEDOUT on timeout, -ENOTSUP on unsupported poll type,
+ *         or other negative error code on failure.
  */
 int8_t k_poll(struct k_pollfd *fds, uint8_t nfds, k_timeout_t timeout);
 

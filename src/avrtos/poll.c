@@ -27,6 +27,9 @@
 #include "avrtos/mutex.h"
 #include "avrtos/poll.h"
 #include "avrtos/semaphore.h"
+#include "avrtos/event.h"
+#include "avrtos/event2.h"
+#include "evq.h"
 
 /**
  * @brief Poll multiple kernel objects for events.
@@ -43,17 +46,18 @@
  * @param pfds Array of poll file descriptors
  * @param nfds Number of file descriptors in the array
  * @param timeout Timeout for waiting
- * @return Number of ready objects, or negative error code
+ * @return 0 on success, or negative error code
  */
 int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
 {
     if (!z_user(pfds && nfds > 0))
         return -EINVAL;
 
-    int8_t ret        = 0;
+    int8_t ret = 0;
+    int8_t i;
     const uint8_t key = irq_lock();
 
-    for (uint_fast8_t i = 0; i < nfds; i++) {
+    for (i = 0; i < nfds; i++) {
         struct k_pollfd *pfd    = &pfds[i];
         struct dnode *waitqueue = NULL;
 
@@ -102,10 +106,28 @@ int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
             }
             break;
 #endif /* CONFIG_THREAD_JOIN */
-        default:
-            ret = -EINVAL;
+#if CONFIG_KERNEL_EVENTS2
+        case K_POLL_TYPE_EVENT2: {
+#if CONFIG_KERNEL_EVENTS2_SYS_EVQ
+            if (pfd->obj.evq == K_KERNEL_EVQ)
+                pfd->obj.evq = &z_ker.sys_evq;
+#else
             pfd->revents |= K_POLL_ERR;
-            continue;
+            ret = -EINVAL;
+            goto exit;
+#endif /* CONFIG_KERNEL_EVENTS2_SYS_EVQ */
+
+            struct titem *first = tqueue_peek_head(&pfd->obj.evq->first);
+            if (first == NULL || first->timeout != 0) {
+                waitqueue            = &pfd->obj.evq->waitqueue;
+                pfd->_wqhandle.flags = Z_WQ_FLAG_POLLIN;
+            }
+        } break;
+#endif /* CONFIG_KERNEL_EVENTS2 */
+        default:
+            ret = -ENOTSUP;
+            pfd->revents |= K_POLL_ERR;
+            goto exit;
         }
 
         if (waitqueue != NULL) {
@@ -114,17 +136,20 @@ int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
             dlist_append(waitqueue, &pfd->_wqhandle.tie);
         } else {
             pfd->revents |= K_POLL_READY;
+            /* Increment the count of ready file descriptors */
             ret++;
         }
     }
 
+    /* Do not pend if there are already ready file descriptors or on error */
     if (ret == 0) {
         ret = z_pend_current_on(NULL, timeout);
     }
 
+exit:
     // Cleanup
-    for (uint_fast8_t i = 0; i < nfds; i++) {
-        struct k_pollfd *pfd = &pfds[i];
+    for (uint_fast8_t j = 0; j < i; j++) {
+        struct k_pollfd *pfd = &pfds[j];
 
         if (pfd->revents) {
             /* If the object is ready or on error, it has already been removed from the
@@ -140,6 +165,7 @@ int8_t k_poll(struct k_pollfd *pfds, uint8_t nfds, k_timeout_t timeout)
         case K_POLL_TYPE_MSGQ_PUT:
         case K_POLL_TYPE_MEM_SLAB:
         case K_POLL_TYPE_THREAD_JOIN:
+        case K_POLL_TYPE_EVENT2:
             dlist_remove(&pfd->_wqhandle.tie);
             break;
         default:

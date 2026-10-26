@@ -12,6 +12,7 @@
 #include "defines.h"
 #include "dstruct/dlist.h"
 #include "dstruct/tqueue.h"
+#include "evq.h"
 
 /**
  * @brief Flag indicating the thread is waiting for read availability (polling).
@@ -258,6 +259,14 @@ typedef struct __packed z_kernel {
      * is set to 1.
      */
     uint8_t kernel_mode;
+#endif
+#if CONFIG_KERNEL_EVENTS2_SYS_EVQ
+    /**
+     * @brief System event queue.
+     *
+     * This is the system-wide event queue used for handling kernel events.
+     */
+    struct k_event_q sys_evq;
 #endif
 } z_kernel_t;
 

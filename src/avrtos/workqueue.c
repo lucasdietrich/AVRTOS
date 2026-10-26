@@ -156,7 +156,7 @@ bool k_system_workqueue_submit(struct k_work *work)
 #endif
 
 #if !CONFIG_KERNEL_EVENTS
-#error "CONFIG_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS"
+#error "CONFIG_WORKQUEUE_DELAYABLE requires CONFIG_KERNEL_EVENTS (v1)"
 #endif
 
 void z_delayable_work_trigger(struct k_event *event)

@@ -16,6 +16,7 @@
 #include "canaries.h"
 #include "debug.h"
 #include "event.h"
+#include "event2.h"
 #include "fault.h"
 #include "idle.h"
 #include "kernel_private.h"
@@ -150,6 +151,9 @@ struct z_kernel z_ker = {
 #endif /* Z_KERNEL_TIME_SLICE_MULTIPLE_TICKS */
 #if CONFIG_KERNEL_ASSERT
     .kernel_mode = 0u,
+#endif
+#if CONFIG_KERNEL_EVENTS2_SYS_EVQ
+    .sys_evq   = Z_EVENT_Q_INIT(z_ker.sys_evq),
 #endif
 };
 
@@ -332,6 +336,8 @@ void z_init_threads(void)
 
 __STATIC_ASSERT_NOMSG(Z_KERNEL_TIME_SLICE_TICKS != 0);
 
+extern int8_t z_event2_q_advance(struct k_event_q *evq, k_ticks_t delta);
+
 /*
  * Evaluate timeouts for threads/timers and events.
  * Schedule threads accordingly.
@@ -395,6 +401,9 @@ void z_sched_enter(void)
 #if CONFIG_KERNEL_EVENTS
     z_event_q_process();
 #endif /* CONFIG_KERNEL_EVENTS */
+#if CONFIG_KERNEL_EVENTS2_SYS_EVQ
+    z_event2_q_advance(&z_ker.sys_evq, Z_KERNEL_TIME_SLICE_TICKS);
+#endif /* CONFIG_KERNEL_EVENTS2_SYS_EVQ */
 
 #if CONFIG_KERNEL_ASSERT
     z_ker.kernel_mode = 0u;
